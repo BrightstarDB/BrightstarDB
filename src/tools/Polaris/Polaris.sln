@@ -1,0 +1,82 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0171A079-7C19-4407-80AF-0C7EB3833E23}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		Polaris.vsmdi = Polaris.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Polaris", "BrightstarDB.Polaris\BrightstarDB.Polaris.csproj", "{5413113A-46DE-4D41-BC77-88F731240B16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Polaris.Tests", "BrightstarDB.Polaris.Tests\BrightstarDB.Polaris.Tests.csproj", "{9B38C2EE-B734-49B9-8790-FA06DE824601}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB", "..\..\core\BrightstarDB\BrightstarDB.csproj", "{121A81F3-EB1C-4228-81FB-0D7505A438FB}"
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Polaris.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		CloudDebug|Any CPU = CloudDebug|Any CPU
+		CloudDebug|Mixed Platforms = CloudDebug|Mixed Platforms
+		CloudDebug|x86 = CloudDebug|x86
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5413113A-46DE-4D41-BC77-88F731240B16}.CloudDebug|Any CPU.ActiveCfg = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.CloudDebug|Mixed Platforms.ActiveCfg = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.CloudDebug|Mixed Platforms.Build.0 = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.CloudDebug|x86.ActiveCfg = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.CloudDebug|x86.Build.0 = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Debug|x86.ActiveCfg = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Debug|x86.Build.0 = Debug|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Release|Any CPU.ActiveCfg = Release|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Release|Mixed Platforms.Build.0 = Release|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Release|x86.ActiveCfg = Release|x86
+		{5413113A-46DE-4D41-BC77-88F731240B16}.Release|x86.Build.0 = Release|x86
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.CloudDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.CloudDebug|Any CPU.Build.0 = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.CloudDebug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.CloudDebug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.CloudDebug|x86.ActiveCfg = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9B38C2EE-B734-49B9-8790-FA06DE824601}.Release|x86.ActiveCfg = Release|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.CloudDebug|Any CPU.ActiveCfg = CloudDebug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.CloudDebug|Any CPU.Build.0 = CloudDebug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.CloudDebug|Mixed Platforms.ActiveCfg = CloudDebug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.CloudDebug|Mixed Platforms.Build.0 = CloudDebug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.CloudDebug|x86.ActiveCfg = CloudDebug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

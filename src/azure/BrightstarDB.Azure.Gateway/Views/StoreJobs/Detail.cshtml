@@ -1,0 +1,11 @@
+﻿@model BrightstarDB.Azure.Common.JobInfo
+
+@{
+    ViewBag.Title = "title";
+}
+
+<h2>Job Status</h2>
+<p><strong>@Model.Status.ToString()</strong></p>
+<p><em>@Model.StatusMessage</em></p>
+<br/>
+<p>Refresh this page to update or @Html.ActionLink("return to Store management", "Manage", "Stores", new {id=ViewBag.StoreId}, null).</p>

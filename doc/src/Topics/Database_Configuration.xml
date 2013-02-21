@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="gra" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Exposing ODBC Data Sources</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Exposing ODBC Data Sources</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Before starting ensure that the appropriate ODBC drivers and connections are installed, set up and tested. This can be done via the Windows ODBC Administration console.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The server uses a configuration file to set up and expose different data sources. This file is located in the [INSTALLDIR]\Service folder and is called SdShareConfig.xml. </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The following commented example shows how to expose a relational database as an SdShare Feed.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;SdShareConfiguration&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;LoggingLocation&gt;c:\tmp\sdshare&lt;/LoggingLocation&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;HashValueStorageLocation&gt;c:\tmp\sdshare\storage\hashvalues&lt;/HashValueStorageLocation&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;LastUpdatedStorageLocation&gt;c:\tmp\sdshare\lastupdated&lt;/LastUpdatedStorageLocation&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;CollectionProvider name=&quot;My Data&quot; identifier=&quot;http://psi.example.com/customer/data&quot;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;Assembly=&quot;BrightstarDB.SdShare&quot;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;Type=&quot;BrightstarDB.SdShare.OdbcCollectionProvider&quot;&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- the DSN name of the ODBC connection. If it is an Oracle connection then the UID and PWD are also required --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;DsnConnection&gt;DSN=ORADB;UID=SYSTEM;PWD=ADMIN&lt;/DsnConnection&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- Oracle, MySQL or SqlServer are the allowed DataSource Types for this provider type. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;DataSourceType&gt;Oracle&lt;/DataSourceType&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- This definition uses a changelog in the database to define a fragments feed --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;PublishingDefinitions&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160;&lt;Definition&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;ResourcePrefix&gt;http://psi.example.com/&lt;/ResourcePrefix&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;UriTemplate&gt;/data/address/{id}&lt;/UriTemplate&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true"> &lt;!-- The fragments query must return three columns id, name and updated (the name is informative) --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;FragmentsQuery&gt;select itemid as id, itemid as name, updatetime as updated from ITEMHISTORY where updatetime &gt; [[since]]&lt;/FragmentsQuery&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;FragmentGenerationDefinitions&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160;&lt;!-- Each fragment generation definition contains a fragment query and a snapshot query and is invoked for each item in the fragments feed, </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; or all items in the case of a snapshot. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160;&lt;FragmentGenerationDefinition&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;&lt;SnapshotQuery&gt;select * from VIEW_ADDRESS&lt;/SnapshotQuery&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true"> &#160; &#160; &lt;!-- the fragment query is executed with the id from the fragment. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;&lt;FragmentQuery&gt;select * from VIEW_ADDRESS where id = [[id]] &lt;/FragmentQuery&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true"> &#160; &#160; &lt;!-- The following templates are used to produce NTriples with the rows from FragmentQuery --&gt;</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true"> &#160; &#160; &lt;!-- The names of the columns enlosed by [[ and ]] can be used as place holders for column values e.g. [[name]] --&gt;</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true"> &#160; &#160; &lt;!-- Also the generic pattern [[COLNAME]] [[VALUE]] can be used for all columns unless excluded in the &apos;genericExcludes&apos; parameter --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;&lt;RdfTemplates genericExcludes=&quot;address1&quot;&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160;&lt;li&gt;{{http://psi.example.com/data/address/[[id]]}} {{http://www.w3.org/1999/02/22-rdf-syntax-ns#type}} {{psi.example.com/schema/Address}} .&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160;&lt;li&gt;{{http://psi.example.com/data/address/[[id]]}} {{http://psi.example.com/schema/[[COLNAME]]}} &quot;[[VALUE]]&quot; .&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160;&lt;li&gt;{{http://psi.example.com/data/address/[[id]]}} {{http://psi.example.com/data/schema/country_code}} {{http://psi.example.com/data/ISO-3166-2/country/[[countrycode]]}} .&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160;&lt;li&gt;{{http://psi.example.com/data/address/[[id]]}} {{http://www.w3.org/2000/01/rdf-schema#label}} &quot;[[address1]]&quot; .&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160;&lt;li&gt;{{http://psi.example.com/data/address/[[id]]}} {{http://psi.example.com/schema/ntuser}} {{psi.example.com/data/user/URLENCODE([[ntuser]])}} .&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;&lt;/RdfTemplates&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160;&lt;/FragmentGenerationDefinition&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;/FragmentGenerationDefinitions&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160;&lt;/Definition&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &lt;!-- The next publishing definition makes use of a feature that will create and store a hash value for all rows inditfied by a query. Periodically, the data </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; set will be compared with the local hash values to work out what changes have occurred. This approach should be used when no reliable changelog</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; occurs in the data --&gt; </text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160;&lt;Definition&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;ResourcePrefix&gt;http://psi.example.com/&lt;/ResourcePrefix&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;UriTemplate&gt;/data/people/{id}&lt;/UriTemplate&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true"> &lt;!-- can also be a query --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;HashValueTable&gt;customer&lt;/HashValueTable&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;EntityIdColumn&gt;id&lt;/EntityIdColumn&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;HashValueKeyColumn&gt;id&lt;/HashValueKeyColumn&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;UpdateFrequency&gt;30000&lt;/UpdateFrequency&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;SourceDataInLocalTime&gt;True&lt;/SourceDataInLocalTime&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;FragmentGenerationDefinitions&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160;&lt;FragmentGenerationDefinition&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;&lt;SnapshotQuery&gt;select id, name from customer&lt;/SnapshotQuery&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;&lt;FragmentQuery&gt;select * from customer where id = [[id]]&lt;/FragmentQuery&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;&lt;RdfTemplates genericExcludes=&quot;id,name&quot;&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160;&lt;li&gt;{{http://psi.example.com/data/people/[[id]]}} {{http://psi.example.com/schema/label}} &quot;[[name]]&quot; .&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160;&lt;li&gt;{{http://psi.example.com/data/people/[[id]]}} {{http://www.w3.org/2000/01/rdf-schema#type}} {{http://psi.example.com/schema/person}} .&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160;&lt;li&gt;{{http://psi.example.com/data/people/[[id]]}} {{http://psi.example.com/schema/[[COLNAME]]}} &quot;[[VALUE]]&quot; .&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;&lt;/RdfTemplates&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160;&lt;/FragmentGenerationDefinition&gt; &#160; &#160; &#160; &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;&lt;/FragmentGenerationDefinitions&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160;&lt;/Definition&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;/PublishingDefinitions&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;/CollectionProvider&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;/SdShareConfiguration&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>

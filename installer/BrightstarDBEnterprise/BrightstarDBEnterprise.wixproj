@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.6</ProductVersion>
+    <ProjectGuid>{d7dadf14-e81e-4905-a2b4-e4473130148a}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>BrightstarDBEnterprise</OutputName>
+    <BuildNumber Condition=" '$(BuildNumber)' == '' ">1.0.1</BuildNumber>
+    <OutputType>Package</OutputType>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dSourceFiles.Service=..\InstallerTmp\Service -dSourceFiles.Tools=..\InstallerTmp\Tools -dSourceFiles.Samples=..\InstallerTmp\Samples  -dSourceFiles.SparqlService=..\InstallerTmp\SparqlService  -dSourceFiles.SDShareService=..\InstallerTmp\SDShare\Service -dSourceFiles.SDShareSamples=..\InstallerTmp\SDShare\Samples -dSourceFiles.SDShareDocs=..\InstallerTmp\SDShare\Docs -dSourceFiles.SDShareRoot=..\InstallerTmp\SDShare\Root -dSourceFiles.LicenseManager=..\InstallerTmp\LicenseManager -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
+    <SuppressIces>ICE30</SuppressIces>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dSourceFiles.Service=..\InstallerTmp\Service -dSourceFiles.Tools=..\InstallerTmp\Tools -dSourceFiles.Samples=..\InstallerTmp\Samples  -dSourceFiles.SparqlService=..\InstallerTmp\SparqlService  -dSourceFiles.SDShareService=..\InstallerTmp\SDShare\Service -dSourceFiles.SDShareSamples=..\InstallerTmp\SDShare\Samples -dSourceFiles.SDShareDocs=..\InstallerTmp\SDShare\Docs -dSourceFiles.SDShareRoot=..\InstallerTmp\SDShare\Root -dSourceFiles.LicenseManager=..\InstallerTmp\LicenseManager -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
+    <SuppressIces>ICE30</SuppressIces>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="DocFiles.wxs" />
+    <Compile Include="LicenseManager.wxs" />
+    <Compile Include="Product.wxs" />
+    <Compile Include="Samples.wxs" />
+    <Compile Include="SdkFiles.wxs" />
+    <Compile Include="SdShareDocs.wxs" />
+    <Compile Include="SDShareRoot.wxs" />
+    <Compile Include="SdShareSamples.wxs" />
+    <Compile Include="SdShareService.wxs" />
+    <Compile Include="ServiceFiles.wxs" />
+    <Compile Include="SparqlService.wxs" />
+    <Compile Include="Tools.wxs" />
+    <Compile Include="VisualStudioFiles.wxs" />
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+  <Target Name="BeforeBuild">
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SdkFiles.wxs" Directory="..\InstallerTmp\SDK" ComponentGroupName="sdkFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDKDIR" PreprocessorVariable="var.SourceFiles.Sdk" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="DocFiles.wxs" Directory="..\InstallerTmp\Docs" ComponentGroupName="docFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="DOCSDIR" PreprocessorVariable="var.SourceFiles.Docs" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="VisualStudioFiles.wxs" Directory="..\InstallerTmp\VisualStudio" ComponentGroupName="vsFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="VSDIR" PreprocessorVariable="var.SourceFiles.VisualStudio" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="ServiceFiles.wxs" Directory="..\InstallerTmp\Service" ComponentGroupName="serviceFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SERVICEDIR" PreprocessorVariable="var.SourceFiles.Service" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="Tools.wxs" Directory="..\InstallerTmp\Tools" ComponentGroupName="toolsFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="TOOLSDIR" PreprocessorVariable="var.SourceFiles.Tools" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="Samples.wxs" Directory="..\InstallerTmp\Samples" ComponentGroupName="samplesFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SAMPLESDIR" PreprocessorVariable="var.SourceFiles.Samples" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SparqlService.wxs" Directory="..\InstallerTmp\SparqlService" ComponentGroupName="sparqlServiceFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SPARQLSERVICEDIR" PreprocessorVariable="var.SourceFiles.SparqlService" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="LicenseManager.wxs" Directory="..\InstallerTmp\LicenseManager" ComponentGroupName="licenseManagerFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="LMDIR" PreprocessorVariable="var.SourceFiles.LicenseManager" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SdShareService.wxs" Directory="..\InstallerTmp\SDShare\Service" ComponentGroupName="sdshareServiceFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDSHARESERVICEDIR" PreprocessorVariable="var.SourceFiles.SDShareService" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SdShareSamples.wxs" Directory="..\InstallerTmp\SDShare\Samples" ComponentGroupName="sdshareSamplesFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDSHARESAMPLESDIR" PreprocessorVariable="var.SourceFiles.SDShareSamples" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SdShareDocs.wxs" Directory="..\InstallerTmp\SDShare\Docs" ComponentGroupName="sdshareDocFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDSHAREDOCSDIR" PreprocessorVariable="var.SourceFiles.SDShareDocs" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SDShareRoot.wxs" Directory="..\InstallerTmp\SDShare\Root" ComponentGroupName="sdshareRootFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDSHAREDIR" PreprocessorVariable="var.SourceFiles.SDShareRoot" />
+  </Target>
+  <ItemGroup>
+    <BootstrapperFile Include=".NETFramework,Version=v4.0">
+      <ProductName>.NET Framework 4.0</ProductName>
+    </BootstrapperFile>
+    <BootstrapperFile Include="Microsoft.Windows.Installer.3.1">
+      <ProductName>Windows Installer 3.1</ProductName>
+    </BootstrapperFile>
+    <BootstrapperFile Include="Microsoft.Windows.Installer.4.5">
+      <ProductName>Windows Installer 4.5</ProductName>
+    </BootstrapperFile>
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixVSExtension">
+      <HintPath>$(WixExtDir)\WixVSExtension.dll</HintPath>
+      <Name>WixVSExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <Target Name="AfterBuild">
+    <GenerateBootstrapper ApplicationFile="brightstardbenterprise.msi" ApplicationRequiresElevation="true" ApplicationName="BrightstarDB Enterprise" BootstrapperItems="@(BootstrapperFile)" ComponentsLocation="HomeSite" CopyComponents="true" OutputPath="$(OutputPath)" Path="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bootstrapper\" />
+  </Target>
+</Project>

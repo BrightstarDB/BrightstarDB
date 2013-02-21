@@ -1,0 +1,122 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+	 DefaultTargets="Build">
+  
+  <!--   
+  This build file copies dlls from the main build into local folders and then compiles the sample projects.  
+  The sample src is then extracted into a new folder that can be included in the install package.
+  -->
+
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == ''">Debug</Configuration>
+    <Net40DllFolder>..\installer\InstallerTmp\SDK\NET40\</Net40DllFolder>
+    <MobileDllFolder>..\installer\InstallerTmp\SDK\WP71\</MobileDllFolder>
+  </PropertyGroup>  
+
+  <Target Name="BuildSDK">
+    <MSBuild Projects="..\installer\installers.proj" Targets="BuildSdk" />    
+  </Target>
+
+  <Target Name="SDK" DependsOnTargets="BuildSDK">
+    <MakeDir Directories="SDK;SDK\net40;SDK\WP71"/>
+    
+    <!-- delete dlls -->
+    <ItemGroup>
+      <Net40DllsToDelete Include="SDK\net40\*.dll" />
+      <MobileDllsToDelete Include="SDK\WP71\*.dll"/>
+      <Net40DllsToCopy Include="..\installer\InstallerTmp\SDK\Net40\*.dll"/>
+      <MobileDllsToCopy Include="..\installer\InstallerTmp\SDK\WP71\*.dll"/>
+    </ItemGroup>
+    <Delete Files="@(Net40DllsToDelete)" />
+    <Delete Files="@(MobileDllsToDelete)" />
+    <Copy SourceFiles="@(Net40DllsToCopy)" DestinationFolder="SDK\Net40"/>
+    <Copy SourceFiles="@(MobileDllsToCopy)" DestinationFolder="SDK\WP71"/>
+  </Target>
+  
+  <Target Name="CopySdkFiles">
+    <MakeDir Directories="SDK;SDK\net40;SDK\WP71"/>
+    
+    <!-- delete dlls -->
+    <ItemGroup>
+      <Net40DllsToDelete Include="SDK\net40\*.dll" />
+      <MobileDllsToDelete Include="SDK\WP71\*.dll"/>
+      <TTFile Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt" />
+    </ItemGroup>
+    <Delete Files="@(Net40DllsToDelete)" />
+    <Delete Files="@(MobileDllsToDelete)" />
+
+    <ItemGroup>
+      <Net40Dlls Include="$(Net40DllFolder)*.dll"/>
+      <MobileDlls Include="$(MobileDllFolder)*.dll"/>
+    </ItemGroup>
+
+    <!-- copy dlls -->
+    <Copy SourceFiles="@(Net40Dlls)"  DestinationFolder="SDK\net40"  />
+
+	<Copy SourceFiles="@(MobileDlls)" DestinationFolder="SDK\WP71" />
+  </Target>
+  
+  <Target Name="CopyTTFiles">
+	<!-- copy tt file  -->
+	<Copy 
+		SourceFiles="@(TTFile)" 
+		DestinationFiles="Samples\Embedded\EntityFramework\Foaf\FoafContext.tt"/>
+	<Copy 
+		SourceFiles="@(TTFile)" 
+		DestinationFiles="Samples\Server\NerdDinner\BrightstarDB.Samples.NerdDinner\Models\NerdDinnerContext.tt"/>
+	<Copy 
+		SourceFiles="@(TTFile)" 
+		DestinationFiles="Samples\Embedded\EntityFramework\GettingStarted\MyEntityContext.tt"/>
+	<Copy 
+		SourceFiles="@(TTFile)" 
+		DestinationFiles="Samples\Embedded\EntityFramework\Tweetbox\TweetBoxContext.tt"/>
+    <Copy 
+		SourceFiles="@(TTFile)"
+        DestinationFiles="samples\Embedded\EntityFramework\ChangeTracking\MyEntityContext.tt" />
+    <Copy
+        SourceFiles="@(TTFile)"
+        DestinationFiles="Samples\Mobile\BrightstarNotes\DataModel\NotesContext.tt"/>
+    <Copy
+        SourceFiles="@(TTFile)"
+        DestinationFiles="Samples\Mobile\GettingStarted\DataModel\NotesContext.tt"/>
+    <Copy
+		SourceFiles="@(TTFile)"
+		DestinationFiles="Samples\Mobile\ReferenceDataConsumer\DataModel\DiningGuideContext.tt"/>
+    <Copy
+		SourceFiles="@(TTFile)"
+		DestinationFiles="Samples\Mobile\ReferenceDataGenerator\DataModel\DiningGuideContext.tt"/>
+  </Target>
+  
+  <Target Name="Prepare" DependsOnTargets="CopySdkFiles;CopyTTFiles"/>
+  <Target Name="Build" DependsOnTargets="Prepare">
+	
+
+    <!-- build sample solutions -->
+	<MSBuild Projects="samples\EntityFramework\EntityFrameworkSamples.sln" Properties="Configuration=$(Configuration)"/>  	
+	<MSBuild Projects="samples\DataObjectLayer\DataObjectLayerSamples.sln" Properties="Configuration=$(Configuration)"/>
+	<MSBuild Projects="samples\Mobile\WindowsPhone7Samples.sln" Properties="Configuration=$(Configuration)"/>
+    <MSBuild Projects="samples\RDF\RdfClientSamples.sln" Properties="Configuration=$(Configuration)"/>  
+    <MSBuild Projects="samples\StoreAdmin\StoreAdministrationSamples.sln" Properties="Configuration=$(Configuration)"/>  
+  </Target>
+
+  <Target Name="Package">
+    
+    <!-- delete all sample files -->
+    <ItemGroup>
+      <ExistingSampleFiles Include="PackagedSamples\**\*.*" />
+    </ItemGroup>
+
+    <Delete Files="@(ExistingSampleFiles)" />
+    
+    <!-- copy all the src from the samples folder -->
+    <ItemGroup>
+      <SamplesFiles Include="Samples\**\*.*" Exclude="Samples\**\_resharper*\**;Samples\**\.svn\**;Samples\**\*.suo;Samples\**\*ReSharper*.user;Samples\**\bin\**;Samples\**\obj\**" />
+    </ItemGroup>
+
+    <RemoveDir Directories="PackagedSamples" />
+    
+    <Copy SourceFiles="@(SamplesFiles)"
+          DestinationFiles="@(SamplesFiles -> 'PackagedSamples\%(RecursiveDir)%(Filename)%(Extension)')"
+      />
+
+    </Target>
+</Project>

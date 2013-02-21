@@ -1,0 +1,144 @@
+<SmartAssemblyProject ProjectId="{ed48a69a-28a4-4169-8233-4756e8fd5e7d}" Version="2.0">
+    <MainAssemblyFileName>.\InstallerTmp\Unobfuscated\SDK\WP71\BrightstarDB.Mobile.dll</MainAssemblyFileName>
+    <Configuration Name="Release">
+        <Options>
+            <ExceptionReporting Template="res:{SmartExceptions}.Silverlight.dll" />
+            <FeatureUsageReporting Template="res:SmartUsageWithUIConsentFirstRun1033.dll" />
+            <StringsEncoding Compress="1" Encode="1" />
+            <StrongNameSigning />
+            <OtherOptimizations />
+            <Obfuscation FieldsNameMangling="2" NameMangling="3" />
+            <OtherProtections />
+            <Debugging />
+        </Options>
+        <ApplicationName />
+        <Destination DestinationFileName=".\InstallerTmp\SDK\WP71\BrightstarDB.Mobile.dll" />
+        <Assemblies>
+            <Assembly AssemblyName="BrightstarDB.Mobile, Culture=neutral, PublicKeyToken=null">
+                <Merging>
+                    <ResourcesCompression />
+                    <MemberRefsProxy />
+                    <Pruning />
+                    <Obfuscation Obfuscate="1">
+                        <Exclusion />
+                    </Obfuscation>
+                    <ControlFlow Obfuscate="1" ObfuscationLevel="2" />
+                </Merging>
+                <Embedding />
+            </Assembly>
+            <Assembly AssemblyName="relinq, Culture=neutral, PublicKeyToken=null">
+                <Merging Merge="0">
+                    <Pruning />
+                    <Obfuscation>
+                        <Exclusion />
+                    </Obfuscation>
+                    <ControlFlow />
+                    <MemberRefsProxy />
+                    <ResourcesCompression />
+                </Merging>
+                <Embedding />
+            </Assembly>
+            <Assembly AssemblyName="dotNetRDF, Culture=neutral, PublicKeyToken=null">
+                <Merging Merge="1">
+                    <Pruning />
+                    <Obfuscation>
+                        <Exclusion />
+                    </Obfuscation>
+                    <ControlFlow />
+                    <MemberRefsProxy />
+                    <ResourcesCompression />
+                </Merging>
+                <Embedding />
+            </Assembly>
+            <Assembly AssemblyName="Newtonsoft.Json, Culture=neutral, PublicKeyToken=null">
+                <Merging Merge="0">
+                    <Pruning />
+                    <Obfuscation>
+                        <Exclusion />
+                    </Obfuscation>
+                    <ControlFlow />
+                    <MemberRefsProxy />
+                    <ResourcesCompression />
+                </Merging>
+                <Embedding />
+            </Assembly>
+            <Assembly AssemblyName="HtmlAgilityPack.WindowsPhone, Culture=neutral, PublicKeyToken=null">
+                <Merging Merge="1">
+                    <Pruning />
+                    <Obfuscation>
+                        <Exclusion />
+                    </Obfuscation>
+                    <ControlFlow />
+                    <MemberRefsProxy />
+                    <ResourcesCompression />
+                </Merging>
+                <Embedding />
+            </Assembly>
+            <Assembly AssemblyName="System.Threading.Tasks, Culture=neutral, PublicKeyToken=null">
+                <Merging Merge="0">
+                    <Pruning />
+                    <Obfuscation>
+                        <Exclusion />
+                    </Obfuscation>
+                    <ControlFlow />
+                    <MemberRefsProxy />
+                    <ResourcesCompression />
+                </Merging>
+                <Embedding />
+            </Assembly>
+            <Assembly AssemblyName="Polenter.SharpSerializer.Silverlight, Culture=neutral, PublicKeyToken=8f4f20011571ee5f">
+                <Merging Merge="0">
+                    <Pruning />
+                    <Obfuscation>
+                        <Exclusion />
+                    </Obfuscation>
+                    <ControlFlow />
+                    <MemberRefsProxy />
+                    <ResourcesCompression />
+                </Merging>
+                <Embedding />
+            </Assembly>
+            <Assembly AssemblyName="mscorlib, Culture=neutral, PublicKeyToken=7cec85d7bea7798e" MandatoryPath="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\Profile\WindowsPhone71\mscorlib.dll">
+                <Merging />
+            </Assembly>
+            <Assembly AssemblyName="System.Core, Culture=neutral, PublicKeyToken=7cec85d7bea7798e">
+                <Merging />
+            </Assembly>
+            <Assembly AssemblyName="System, Culture=neutral, PublicKeyToken=7cec85d7bea7798e">
+                <Merging />
+            </Assembly>
+            <Assembly AssemblyName="System.Windows, Culture=neutral, PublicKeyToken=7cec85d7bea7798e">
+                <Merging />
+            </Assembly>
+            <Assembly AssemblyName="System.Xml, Culture=neutral, PublicKeyToken=7cec85d7bea7798e">
+                <Merging />
+            </Assembly>
+            <Assembly AssemblyName="System.Xml.Linq, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+                <Merging />
+            </Assembly>
+            <Assembly AssemblyName="System.Runtime.Serialization, Culture=neutral, PublicKeyToken=7cec85d7bea7798e">
+                <Merging />
+            </Assembly>
+            <Assembly AssemblyName="System.Net, Culture=neutral, PublicKeyToken=7cec85d7bea7798e">
+                <Merging />
+            </Assembly>
+            <Assembly AssemblyName="PoweredBySmartAssembly, Culture=neutral, PublicKeyToken=7f465a1c156d4d57">
+                <Merging />
+            </Assembly>
+            <Assembly AssemblyName="SmartAssembly.StringsEncoding, Culture=neutral, PublicKeyToken=7f465a1c156d4d57">
+                <Merging>
+                    <Obfuscation>
+                        <Exclusion />
+                    </Obfuscation>
+                </Merging>
+            </Assembly>
+            <Assembly AssemblyName="SmartAssembly.Zip, Culture=neutral, PublicKeyToken=7f465a1c156d4d57">
+                <Merging>
+                    <Obfuscation>
+                        <Exclusion />
+                    </Obfuscation>
+                </Merging>
+            </Assembly>
+        </Assemblies>
+    </Configuration>
+</SmartAssemblyProject>

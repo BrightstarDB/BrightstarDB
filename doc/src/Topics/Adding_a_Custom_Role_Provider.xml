@@ -1,0 +1,360 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Adding a Custom Role Provider</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Adding a Custom Role Provider</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">As with Custom Membership Providers, Custom Role Providers allow developers to use role management within application when either the role information is stored in a data source other than that supported by the default providers, or the role information is managed in a schema which differs from that set out in the default providers.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">In this topic we are going to add a Custom Role Provider to the Nerd Dinner sample so that we can restrict certain areas from users who are not members of the appropriate role.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Adding the Custom Role Provider</text></para>
+    <para styleclass="Normal"></para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Add the following line to the INerdDinnerLogin interface&apos;s properties</text><br/><br/><text styleclass="Code Example" translate="true">ICollection&lt;string&gt; Roles { get; set; } </text><br/><br/><text styleclass="Notes" translate="true">To update the context classes, right click on the NerdDinnerContext.tt file and select “Run Custom Tool” from the context menu.</text><br/></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Add a new class to your project and name it BrightstarRoleProvider.cs</text><br/></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Make this new class inherit from the RoleProvider class (System.Web.Security namespace)</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Right click on the RoleProvider class name and choose &quot;Implement abstract class&quot; from the context menu, this automatically creates all the override methods that your custom class can implement.</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Configuring the application to use the Brightstar Membership Provider</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To configure your web application to use the Custom Role Provider, add the following to your Web.config, inside the &lt;system.web&gt; section:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="XML HTML Example"><text styleclass="XML HTML Example" translate="true">&lt;roleManager &#160;enabled=&quot;true&quot; defaultProvider=&quot;BrightstarRoleProvider&quot;&gt;</text></para>
+    <para styleclass="XML HTML Example"><text styleclass="XML HTML Example" translate="true"> &#160;&lt;providers&gt;</text></para>
+    <para styleclass="XML HTML Example"><tab /><text styleclass="XML HTML Example" translate="true">&lt;clear/&gt;</text></para>
+    <para styleclass="XML HTML Example"><tab /><text styleclass="XML HTML Example" translate="true">&lt;add name=&quot;BrightstarRoleProvider&quot; type=&quot;BrightstarDB.Samples.NerdDinner.BrightstarRoleProvider&quot; applicationName=&quot;/&quot; /&gt;</text></para>
+    <para styleclass="XML HTML Example"><text styleclass="XML HTML Example" translate="true"> &#160;&lt;/providers&gt;</text></para>
+    <para styleclass="XML HTML Example"><text styleclass="XML HTML Example" translate="true">&lt;/roleManager&gt;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To set up the default login path for the web application, replace the &lt;authentication&gt; element in the Web.config file with the following:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="XML HTML Example"><text styleclass="XML HTML Example" translate="true">&lt;authentication mode=&quot;Forms&quot;&gt;</text></para>
+    <para styleclass="XML HTML Example"><text styleclass="XML HTML Example" translate="true"> &#160;&lt;forms loginUrl=&quot;/Account/LogOn&quot;/&gt;</text></para>
+    <para styleclass="XML HTML Example"><text styleclass="XML HTML Example" translate="true">&lt;/authentication&gt;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Adding functionality to the Custom Role Provider</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The full code for the BrightstarRoleProvider.cs is given below, but can be broken down as follows:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Initialization</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">We add an Initialize() method along with a GetConfigValue() helper method to handle retrieving the configuration values from Web.config, and setting default values if it is unable to retrieve a value.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">GetRolesForUser()</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">This method returns the contents of the Roles collection that we added to the INerdDinnerLogin entity as a string array.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">AddUsersToRoles()</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">AddUsersToRoles() loops through the usernames and role names supplied, and looks up the logins from the BrightstarDB store. When found, the role names are added to the Roles collection for that login.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">RemoveUsersFromRoles()</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">RemoveUsersFromRoles() loops through the usernames and role names supplied, and looks up the logins from the BrightstarDB store. When found, the role names are removed from the Roles collection for that login.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">IsUserInRole()</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The BrightstarDB store is searched for the login who matches the supplied username, and then a true or false is passed back depending on whether the role name was found in that login&apos;s Role collection. If the login is inactive or locked out for any reason, then a false value is passed back.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">GetUsersInRole()</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB is queried for all logins that contain the supplied role name in their Roles collection.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">using System;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">using System.Collections.Generic;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">using System.Linq;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">using System.Web;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">using System.Web.Security;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">using BrightstarDB.Samples.NerdDinner.Models;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">namespace BrightstarDB.Samples.NerdDinner</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;public class BrightstarRoleProvider : RoleProvider</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;#region Initialization</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;private string _applicationName;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;private static string GetConfigValue(string configValue, string defaultValue)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (string.IsNullOrEmpty(configValue))</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;return defaultValue;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;return configValue;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (config == null) throw new ArgumentNullException(&quot;config&quot;);</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (string.IsNullOrEmpty(name)) name = &quot;NerdDinnerRoleProvider&quot;;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (String.IsNullOrEmpty(config[&quot;description&quot;]))</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;config.Remove(&quot;description&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;config.Add(&quot;description&quot;, &quot;Nerd Dinner Membership Provider&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;base.Initialize(name, config);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;_applicationName = GetConfigValue(config[&quot;applicationName&quot;],</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;#endregion</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Gets a list of the roles that a specified user is in for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// A string array containing the names of all the roles that the specified user is in for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;username&quot;&gt;The user to return a list of roles for.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override string[] GetRolesForUser(string username)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (string.IsNullOrEmpty(username)) throw new ArgumentNullException(&quot;username&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//create a new BrightstarDB context using the values in Web.config</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;var context = new NerdDinnerContext();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//find a match for the username</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;var login = context.NerdDinnerLogins.Where(l =&gt; l.Username.Equals(username)).FirstOrDefault();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (login == null) return null;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//return the Roles collection</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;return login.Roles.ToArray();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Adds the specified user names to the specified roles for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;usernames&quot;&gt;A string array of user names to be added to the specified roles. &lt;/param&gt;&lt;param name=&quot;roleNames&quot;&gt;A string array of the role names to add the specified user names to.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override void AddUsersToRoles(string[] usernames, string[] roleNames)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//create a new BrightstarDB context using the values in Web.config</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;var context = new NerdDinnerContext();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;foreach (var username in usernames)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;//find the match for the username</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;var login = context.NerdDinnerLogins.Where(l =&gt; l.Username.Equals(username)).FirstOrDefault();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;if (login == null) continue;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;foreach (var role in roleNames)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;//if the Roles collection of the login does not already contain the role, then add it</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;if (login.Roles.Contains(role)) continue;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;login.Roles.Add(role);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;context.SaveChanges();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Removes the specified user names from the specified roles for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;usernames&quot;&gt;A string array of user names to be removed from the specified roles. &lt;/param&gt;&lt;param name=&quot;roleNames&quot;&gt;A string array of role names to remove the specified user names from.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override void RemoveUsersFromRoles(string[] usernames, string[] roleNames)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//create a new BrightstarDB context using the values in Web.config</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;var context = new NerdDinnerContext();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;foreach (var username in usernames)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;//find the match for the username</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;var login = context.NerdDinnerLogins.Where(l =&gt; l.Username.Equals(username)).FirstOrDefault();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;if (login == null) continue;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;foreach (var role in roleNames)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;//if the Roles collection of the login contains the role, then remove it</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;if (!login.Roles.Contains(role)) continue;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;login.Roles.Remove(role);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;context.SaveChanges();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Gets a value indicating whether the specified user is in the specified role for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// true if the specified user is in the specified role for the configured applicationName; otherwise, false.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;username&quot;&gt;The username to search for.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;roleName&quot;&gt;The role to search in.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override bool IsUserInRole(string username, string roleName)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;try</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;//create a new BrightstarDB context using the values in Web.config</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;var context = new NerdDinnerContext();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;//find a match for the username</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;var login = context.NerdDinnerLogins.Where(l =&gt; l.Username.Equals(username)).FirstOrDefault();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;if (login == null || login.IsLockedOut || !login.IsActivated)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;// no match or inactive automatically returns false</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;return false;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;//if the Roles collection of the login contains the role we are checking for, return true</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;return login.Roles.Contains(roleName.ToLower());</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;catch (Exception)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;return false;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Gets a list of users in the specified role for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// A string array containing the names of all the users who are members of the specified role for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;roleName&quot;&gt;The name of the role to get the list of users for.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override string[] GetUsersInRole(string roleName)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (string.IsNullOrEmpty(roleName)) throw new ArgumentNullException(&quot;roleName&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//create a new BrightstarDB context using the values in Web.config</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;var context = new NerdDinnerContext();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//search for all logins who have the supplied roleName in their Roles collection</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;var usersInRole = context.NerdDinnerLogins.Where(l =&gt; l.Roles.Contains(roleName.ToLower())).Select(l =&gt; l.Username).ToList();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;return usersInRole.ToArray();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Gets a value indicating whether the specified role name already exists in the role data source for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// true if the role name already exists in the data source for the configured applicationName; otherwise, false.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;roleName&quot;&gt;The name of the role to search for in the data source.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override bool RoleExists(string roleName)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//for the purpose of the sample the roles are hard coded</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;return roleName.Equals(&quot;admin&quot;) || roleName.Equals(&quot;editor&quot;) || roleName.Equals(&quot;standard&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Gets a list of all the roles for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// A string array containing the names of all the roles stored in the data source for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override string[] GetAllRoles()</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//for the purpose of the sample the roles are hard coded</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;return new string[] { &quot;admin&quot;, &quot;editor&quot;, &quot;standard&quot; };</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Gets an array of user names in a role where the user name contains the specified user name to match.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// A string array containing the names of all the users where the user name matches &lt;paramref name=&quot;usernameToMatch&quot;/&gt; and the user is a member of the specified role.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;roleName&quot;&gt;The role to search in.&lt;/param&gt;&lt;param name=&quot;usernameToMatch&quot;&gt;The user name to search for.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override string[] FindUsersInRole(string roleName, string usernameToMatch)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (string.IsNullOrEmpty(roleName)) throw new ArgumentNullException(&quot;roleName&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (string.IsNullOrEmpty(usernameToMatch)) throw new ArgumentNullException(&quot;usernameToMatch&quot;);</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;var allUsersInRole = GetUsersInRole(roleName);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;if (allUsersInRole == null || allUsersInRole.Count() &lt; 1) return new string[] { &quot;&quot; };</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;var match = (from u in allUsersInRole where u.Equals(usernameToMatch) select u);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;return match.ToArray();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;#region Properties</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Gets or sets the name of the application to store and retrieve role information for.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// The name of the application to store and retrieve role information for.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override string ApplicationName</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;get { return _applicationName; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;set { _applicationName = value; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;#endregion</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;#region Not Implemented Methods</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Adds a new role to the data source for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;roleName&quot;&gt;The name of the role to create.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override void CreateRole(string roleName)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//for the purpose of the sample the roles are hard coded</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;throw new NotImplementedException();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// Removes a role from the data source for the configured applicationName.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/summary&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// true if the role was successfully deleted; otherwise, false.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;/returns&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;/// &lt;param name=&quot;roleName&quot;&gt;The name of the role to delete.&lt;/param&gt;&lt;param name=&quot;throwOnPopulatedRole&quot;&gt;If true, throw an exception if &lt;paramref name=&quot;roleName&quot;/&gt; has one or more members and do not delete &lt;paramref name=&quot;roleName&quot;/&gt;.&lt;/param&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;public override bool DeleteRole(string roleName, bool throwOnPopulatedRole)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;//for the purpose of the sample the roles are hard coded</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;throw new NotImplementedException();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;#endregion</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Adding Secure Sections to the Website</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To display the functionality of the new Custom Role Provider, add 2 new ViewResult methods to the Home Controller. Notice that the [Authorize] MVC attribute has been added to each of the methods to restrict access to users in those roles only.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Authorize(Roles = &quot;editor&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public ViewResult SecureEditorSection()</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">return View();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Authorize(Roles = &quot;admin&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public ViewResult SecureAdminSection()</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">return View();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Right click on the View() methods, and select &quot;Add View&quot; for each. This automatically adds the SecureEditorSection.cshtml and SecureAdminSection.cshtml files to the Home view folder.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To be able to navigate to these sections, open the file Views/Shared/_Layout.cshtml and add two new action links to the main navigation menu:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;div id=&quot;menucontainer&quot;&gt;</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">&lt;ul id=&quot;menu&quot;&gt;</text></para>
+    <para styleclass="Code Example"><tab /><tab /><text styleclass="Code Example" translate="true">&lt;li&gt;@Html.ActionLink(&quot;Home&quot;, &quot;Index&quot;, &quot;Home&quot;)&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><tab /><tab /><text styleclass="Code Example" translate="true">&lt;li&gt;@Html.ActionLink(&quot;Query SPARQL&quot;, &quot;Index&quot;, &quot;Sparql&quot;)&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><tab /><tab /><text styleclass="Code Example" style="font-weight:bold;" translate="true">&lt;li&gt;@Html.ActionLink(&quot;Editors Only&quot;, &quot;SecureEditorSection&quot;, &quot;Home&quot;)&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><tab /><tab /><text styleclass="Code Example" style="font-weight:bold;" translate="true">&lt;li&gt;@Html.ActionLink(&quot;Admin Only&quot;, &quot;SecureAdminSection&quot;, &quot;Home&quot;)&lt;/li&gt;</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">&lt;/ul&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;/div&gt;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">In a real world application, you would manage roles within your own administration section, but for the purpose of this sample we are going with an overly simplistic way of adding a user to a role.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Running the Application</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Press F5 to run the application. You will notice a [Log On] link in the top right hand corner of the screen. You can navigate to the registration page via the logon page.</text></para>
+    <para styleclass="Normal"><image src="1_register.png" scale="100.00%" styleclass="Image Caption"></image></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Register</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Choosing a username, email and password will create a login entity for you in the BrightstarDB store, and automatically log you in.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><image src="2_loggedin.png" scale="100.00%" styleclass="Image Caption"></image></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Logged In</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The partial view that contains the login link code recognizes that you are logged in and displays your username and a [Log Off] link. Clicking the links clears the cookies that keep you logged in to the website.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><image src="3_logon.png" scale="100.00%" styleclass="Image Caption"></image></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Log On</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">You can log on again at any time by entering your username and password.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Role Authorization</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Clicking on the navigation links to &quot;Secure Editor Section&quot; will allow access to that view. Whereas the &quot;Secure Admin Section&quot; will not pass authorization - by default MVC redirects the user to the login view.</text></para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>

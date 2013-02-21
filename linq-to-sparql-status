@@ -1,0 +1,33 @@
+Status		Method:				
+DONE		Average				Supported - convert to SPARQL AVERAGE in projection
+DONE		Cast				Supported for casting between entity types only
+DONE		Contains			Supported for literal values only
+DONE		Count				Supported - convert to SPARQL COUNT in projection
+DONE		Count with filter 	Supported - convert to SPARQL COUNT in projection with filter in body
+DONE (No test)	Distinct<TSource>(IQueryable<TSource>)		Supported - convert to SPARQL DISTINCT
+DONE		First<TSource>(IQueryable<TSource>)			Supported - convert to LIMIT 1
+DONE		First<TSource>(IQueryable<TSource>, Expression<Func<TSource, Boolean>>)		Supported - convert to LIMIT 1 with a FILTER
+DONE		GroupBy<TSource, TKey>(IQueryable<TSource>, Expression<Func<TSource, TKey>>)	Supported for grouping by properties.
+DONE		LongCount			Supported - convert to SPARQL COUNT in projection and parse as long
+DONE		LongCount<TSource>(IQueryable<TSource>, Expression<Func<TSource, Boolean>>)	Supported - convert to SPARQL COUNT with FILTER
+DONE		Max<TSource, TResult>(IQueryable<TSource>, Expression<Func<TSource, TResult>>) - convert to SPARQL MAX(*expression*)
+DONE		Min<TSource, TResult>(IQueryable<TSource>, Expression<Func<TSource, TResult>>) - convert to SPARQL MIN(*expression*)
+DONE		OfType<TResult>		Supported if TResult is an entity type
+DONE		OrderBy<TSource, TKey>(IQueryable<TSource>, Expression<Func<TSource, TKey>>)	Supported
+DONE		OrderByDescending<TSource, TKey>(IQueryable<TSource>, Expression<Func<TSource, TKey>>)	Supported
+DONE		Select<TSource, TResult>(IQueryable<TSource>, Expression<Func<TSource, TResult>>)	Supported
+DONE		SelectMany<TSource, TResult>(IQueryable<TSource>, Expression<Func<TSource, TResult>>)	Supported
+DONE		Single<TSource>(IQueryable<TSource>)	Supported
+DONE		Single<TSource>(IQueryable<TSource>, Expression<Func<TSource, Boolean>>)	Supported	
+DONE		SingleOrDefault<TSource>(IQueryable<TSource>)	Supported
+DONE		SingleOrDefault<TSource>(IQueryable<TSource>, Expression<Func<TSource, Boolean>>) Supported
+DONE		Skip<TSource>	Supported
+DONE		Sum				Supported
+DONE		Take			Supported
+DONE		ThenBy<TSource, TKey>(IOrderedQueryable<TSource>, Expression<Func<TSource, TKey>>)	Supported
+DONE		ThenByDescending<TSource, TKey>(IOrderedQueryable<TSource>, Expression<Func<TSource, TKey>>)	Supported
+DONE		Where<TSource>(IQueryable<TSource>, Expression<Func<TSource, Boolean>>) Supported
+
+DONE Anonymous Types
+DONE Select property values
+Better exact match support

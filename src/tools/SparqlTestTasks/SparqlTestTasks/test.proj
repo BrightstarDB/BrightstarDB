@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask AssemblyFile="bin\debug\SparqlTestTasks.dll"
+	     TaskName="SparqlTestTasks.SparqlTestGenerator" />
+
+  <ItemGroup>
+    <SparqlTestManifests Include="../../../../sparql-test-suite/data-r2/manifest-*.ttl"/>
+	<Sparql11TestManifests Include="../../../core/NetworkedPlanet.Brightstar.Tests/Data/sparql11_tests/**/manifest.ttl" />
+  </ItemGroup>
+
+  <Target Name="BuildSparql11Tests">
+	<Message Text="Build it"/>
+	<Message Text="@(Sparql11TestManifests)"/>
+	<SparqlTestGenerator ManifestFiles= "@(Sparql11TestManifests)"
+		OutputDirectory="../Sparql11Tests"
+		RenameTestFiles="True"
+		Namespace="NetworkedPlanet.Brightstar.Tests.Sparql11TestSuite"/>
+  </Target>
+  <Target Name="Build">
+    <SparqlTestGenerator ManifestFiles = "@(SparqlTestManifests)"
+			 OutputDirectory = "../SparqlTests"
+			 Namespace="NetworkedPlanet.BrightStar.Tests.SparqlTestSuite"/>
+  </Target>
+</Project>

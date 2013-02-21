@@ -1,0 +1,12 @@
+﻿<h2>SPARQL</h2>
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+   
+    <p>Enter your SPARQL query in the text box below:</p>
+    @Html.TextArea("query", "SELECT ?d WHERE {?d a <http://brightstardb.com/namespaces/default/Dinner>}", 10, 50, null)
+
+        <p>
+            <input type="submit" value="Query" />
+        </p>
+}

@@ -1,0 +1,86 @@
+﻿<#@ template language="C#" #>
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using BrightstarDB;
+using BrightstarDB.Rdf;
+using VDS.RDF;
+using VDS.RDF.Parsing;
+using VDS.RDF.Query;
+using System.Linq;
+using BrightstarDB.Server;
+
+namespace <#= _testManifest.Namespace #> {
+    [TestClass]
+	public partial class <#= _testManifest.ClassName #> : SparqlTest {
+
+        public <#= _testManifest.ClassName #>() : base()
+        {
+            
+        }
+
+		[TestInitialize]
+		public void SetUp()
+		{
+			CreateStore();
+		    
+		}
+
+        [TestCleanup]
+        public void TearDown()
+        {
+			DeleteStore();
+            
+        }
+
+		#region Test Methods
+
+<# foreach (var t in _testManifest.TestCases ) { 
+	#>
+		[TestMethod]
+		public void <#= t.GetTestMethodName() #>() {
+	<# if (t is QueryEvaluationTestCase) { 
+		var qe = t as QueryEvaluationTestCase; 
+		var resultType = "SparqlResultsFormat.Xml";
+		if (qe.Result.ToString().EndsWith("srj")) resultType="SparqlResultsFormat.Json";
+		if (qe.Result.ToString().EndsWith("tsv")) resultType="SparqlResultsFormat.Tsv";
+		if (qe.Result.ToString().EndsWith("csv")) resultType="SparqlResultsFormat.Csv";
+		#>
+
+		<# if (qe.Data != null) { #>
+			ImportData(@"<#= _testManifest.ManifestDirectory.MakeRelative(qe.Data) #>");
+		<#} #>
+
+		<# foreach(var g in qe.GraphData) { #>
+			ImportGraph("<#= _testManifest.ManifestDirectory.MakeRelative(g) #>", new Uri(@"<#= g #>"));
+		<#} #>
+
+			var result = ExecuteQuery(@"<#= _testManifest.ManifestDirectory.MakeRelative(qe.Query) #>", <#=resultType#>);
+			CheckResult(result, @"<#= _testManifest.ManifestDirectory.MakeRelative(qe.Result) #>", <#= qe.LaxCardinality ? "true" : "false"#>);
+
+	<# }  else if (t is UpdateEvaluationTestCase) { 
+		var uet = t as UpdateEvaluationTestCase;
+		if(uet.PreData != null) { #>
+			ImportData(@"<#=_testManifest.ManifestDirectory.MakeRelative(uet.PreData) #>");
+		<#}
+		foreach (var g in uet.PreGraphData) { #>
+			ImportGraph(@"<#=_testManifest.ManifestDirectory.MakeRelative(g.Data) #>", new Uri(@"<#=g.Uri#>"));
+		<#}#>
+		ExecuteUpdate(@"<#=_testManifest.ManifestDirectory.MakeRelative(uet.Request)#>");
+		<# if (uet.PostData != null) { #>
+			ValidateUnamedGraph(@"<#=_testManifest.ManifestDirectory.MakeRelative(uet.PostData)#>");
+		<#}
+		foreach(var g in uet.PostGraphData) { #>
+			ValidateGraph(@"<#=_testManifest.ManifestDirectory.MakeRelative(g.Data)#>", new Uri(@"<#=g.Uri#>"));
+		<#}#>
+	<# } #>
+
+		}
+
+<# } #>
+		#endregion
+
+		
+	}
+}

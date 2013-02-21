@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.5</ProductVersion>
+    <ProjectGuid>{e85c2dee-58b9-4a67-a3d6-0ec7239523b5}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>BrightstarDBServiceSDK</OutputName>
+    <OutputType>Package</OutputType>
+    <BuildNumber Condition=" '$(BuildNumber)' == '' ">1.0.1</BuildNumber>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\Obfuscated\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\Obfuscated\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
+    <SuppressSpecificWarnings>
+    </SuppressSpecificWarnings>
+    <SuppressIces>ICE30</SuppressIces>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\Obfuscated\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Product.wxs" />
+    <Compile Include="DocFiles.wxs" />
+    <Compile Include="SdkFiles.wxs" />
+    <Compile Include="VisualStudioFiles.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixVSExtension">
+      <HintPath>$(WixExtDir)\WixVSExtension.dll</HintPath>
+      <Name>WixVSExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+  <!--
+	To modify your build process, add your task inside one of the targets below and uncomment it.
+	Other similar extension points exist, see Wix.targets.
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+  <Target Name="BeforeBuild">
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SdkFiles.wxs" Directory="..\InstallerTmp\Obfuscated\SDK" ComponentGroupName="sdkFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDKDIR" PreprocessorVariable="var.SourceFiles.Sdk" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="DocFiles.wxs" Directory="..\InstallerTmp\Docs" ComponentGroupName="docFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="DOCSDIR" PreprocessorVariable="var.SourceFiles.Docs" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="VisualStudioFiles.wxs" Directory="..\InstallerTmp\VisualStudio" ComponentGroupName="vsFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="VSDIR" PreprocessorVariable="var.SourceFiles.VisualStudio" />
+  </Target>
+  <ItemGroup>
+    <BootstrapperFile Include=".NETFramework,Version=v4.0">
+      <ProductName>.NET Framework 4.0</ProductName>
+    </BootstrapperFile>
+    <BootstrapperFile Include="Microsoft.Windows.Installer.3.1">
+      <ProductName>Windows Installer 3.1</ProductName>
+    </BootstrapperFile>
+    <BootstrapperFile Include="Microsoft.Windows.Installer.4.5">
+      <ProductName>Windows Installer 4.5</ProductName>
+    </BootstrapperFile>
+  </ItemGroup>
+  <Target Name="AfterBuild">
+    <GenerateBootstrapper ApplicationFile="BrightstarDBServiceSDK.msi" ApplicationRequiresElevation="true" ApplicationName="BrightstarDB Service SDK" BootstrapperItems="@(BootstrapperFile)" ComponentsLocation="HomeSite" CopyComponents="true" OutputPath="$(OutputPath)" Path="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bootstrapper\" />
+  </Target>
+</Project>

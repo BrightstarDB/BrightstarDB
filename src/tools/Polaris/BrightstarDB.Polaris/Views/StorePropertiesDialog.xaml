@@ -1,0 +1,46 @@
+﻿<Window x:Class="BrightstarDB.Polaris.Views.StorePropertiesDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:BrightstarDB.Polaris.Converters" Title="Store Properties" Width="400" SizeToContent="Height">
+    <Window.Resources>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <converters:VisibilityConverter x:Key="VisibilityConverter"/>
+    </Window.Resources>
+    <Grid Height="Auto" VerticalAlignment="Top">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Store Name"/>
+        <TextBox Name="StoreNameTextBox" Grid.Column="1" Text="{Binding Location, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Margin="1,2,-1,2" />
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" 
+              Visibility="{Binding IsValid, Converter={StaticResource VisibilityConverter}, ConverterParameter=ShowIfFalse}"
+              Background="#45FF0000">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock>Please correct the following issues:</TextBlock>
+            <ListBox Grid.Row="1" ItemsSource="{Binding ValidationMessages}" BorderThickness="0" Margin="5" Background="Transparent"/>
+        </Grid>
+        <Grid Grid.Row="3" Grid.ColumnSpan="2" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="10" Height="30">
+                <Button Name="OKButton" Width="50" IsEnabled="{Binding IsValid}" Content="OK" Click="OnOK"/>
+                <Button Name="CancelButton"  Width="50" Margin="30,0,0,0" Content="Cancel" Click="OnCancel"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

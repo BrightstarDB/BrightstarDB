@@ -1,0 +1,1 @@
+From http://www.damonpayne.com/category/Parallel.aspx. This is a port of the Mono Task Parallel library to silverlight.

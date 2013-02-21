@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ServiceConfiguration serviceName="BrightstarDB.AzureServices" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="2" osVersion="*" schemaVersion="2012-05.1.7">
+  <Role name="BrightstarDB.Azure.StoreWorker">
+    <Instances count="2" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=brightstardbwediag;AccountKey=Hm8RwZpXD3SvwOieP8HPKmt7/shLbrexZEUtNHaBYpjV9ZRrlqXZ8wh5usJMSBMofjsA12jzIosJdDvNggww/g==" />
+      <Setting name="ScheduledTransferPeriod" value="5" />
+      <Setting name="LogLevelFilter" value="Verbose" />
+      <Setting name="ManagementDatabaseConnectionString" value="Data Source=pd3hhe1isp.database.windows.net;Initial Catalog=BrightstarManagement;User Id=bsadmin;Password=T0talTopicmap5;Encrypt=true;Trusted_Connection=false" />
+      <Setting name="BlockStoreConnectionString" value="DefaultEndpointsProtocol=https;AccountName=brightstardbwedata;AccountKey=k3+odL4EED7iI32+5tQZ/1NOKmqz7AraGQ3fso3XyMDLToNaDjsG4wpKjLD5dWd19HFfts+2I9d5b0+1J3bNRg==" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="bsadmin" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEEvsqh6JYMqFThDSGer9s9gwDQYJKoZIhvcNAQEBBQAEggEAROLM2WxuaOpH+X7vZqveyFE4DvIhvZ+l8WVRsNdeuYpavSGVUycjjJJJc5/WhQ/nn7dlzGNYPmGTrUDh1yqhfnTDG/lfAGczssqi8xJH2eA8ns3SkNqjWm1SP0G3XzzY6rmUXgdhAsg/YByOjIi65sLcYKcYgERyJPCKidlMg8PYryrOm/EmuUzJ9iIiJguEKSO34R6vDwBs2Qn9rvSOG6BvFajSxsJKpcMPDrZq7RxKTZOXm9QrnAJg4UG9OERJIh7HblLQSCMRZVNE5MIF0FPt77wlLXItMHvtB1gFwNLd1chBT+moy0hKSINYI44lW7BeBLnUDjvYdJnzDLqR1zAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECLK0ymjE+TyEgBAa1AuzTAX1PyKxzJmPKF0E" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2013-02-13T23:59:59.0000000+00:00" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
+      <Setting name="PerformanceCounters" value="\Process(WaWorkerHost)\% Processor Time;\Process(WaWorkerHost)\Private Bytes;\Process(WaWorkerHost)\Thread Count;\Processor(_Total)\% Processor Time;\Memory\Available Bytes" />
+      <Setting name="PerformanceCounters.SampleRate" value="5" />
+      <Setting name="BlockStoreMemoryCacheMB" value="1024" />
+    </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="79BC30717D08609CE442BA9FB00AE8CB4C03DFC5" thumbprintAlgorithm="sha1" />
+    </Certificates>
+  </Role>
+  <Role name="BrightstarDB.Azure.Gateway">
+    <Instances count="2" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=brightstardbwediag;AccountKey=Hm8RwZpXD3SvwOieP8HPKmt7/shLbrexZEUtNHaBYpjV9ZRrlqXZ8wh5usJMSBMofjsA12jzIosJdDvNggww/g==" />
+      <Setting name="ScheduledTransferPeriod" value="5" />
+      <Setting name="LogLevelFilter" value="Verbose" />
+      <Setting name="ManagementDatabaseConnectionString" value="Data Source=pd3hhe1isp.database.windows.net;Initial Catalog=BrightstarManagement;User Id=bsadmin;Password=T0talTopicmap5;Encrypt=true;Trusted_Connection=false" />
+      <Setting name="BlockStoreConnectionString" value="DefaultEndpointsProtocol=https;AccountName=brightstardbwedata;AccountKey=k3+odL4EED7iI32+5tQZ/1NOKmqz7AraGQ3fso3XyMDLToNaDjsG4wpKjLD5dWd19HFfts+2I9d5b0+1J3bNRg==" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="bsadmin" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEEvsqh6JYMqFThDSGer9s9gwDQYJKoZIhvcNAQEBBQAEggEAROLM2WxuaOpH+X7vZqveyFE4DvIhvZ+l8WVRsNdeuYpavSGVUycjjJJJc5/WhQ/nn7dlzGNYPmGTrUDh1yqhfnTDG/lfAGczssqi8xJH2eA8ns3SkNqjWm1SP0G3XzzY6rmUXgdhAsg/YByOjIi65sLcYKcYgERyJPCKidlMg8PYryrOm/EmuUzJ9iIiJguEKSO34R6vDwBs2Qn9rvSOG6BvFajSxsJKpcMPDrZq7RxKTZOXm9QrnAJg4UG9OERJIh7HblLQSCMRZVNE5MIF0FPt77wlLXItMHvtB1gFwNLd1chBT+moy0hKSINYI44lW7BeBLnUDjvYdJnzDLqR1zAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECLK0ymjE+TyEgBAa1AuzTAX1PyKxzJmPKF0E" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2013-02-13T23:59:59.0000000+00:00" />
+      <Setting name="SuperUserAccount" value="BrightstarDemandAdmin" />
+      <Setting name="SuperUserKey" value="NZZmRtwhXE6uzpz1cEDB0n/Hil48MNVEnvEYIK1JfSg=" />
+      <Setting name="PerformanceCounters" value="\Processor(_Total)\% Processor Time;\Memory\Available Bytes;\.NET CLR LocksAndThreads(_Global_)\Contention Rate / sec;\.NET CLR Memory(_Global_)\# Bytes in all Heaps;\.NET CLR Networking(_Global_)\Connections Established;\ASP.NET Applications(__Total__)\Requests/Sec;\ASP.NET v4.0.30319\Requests Queued;\ASP.NET v4.0.30319\Request Wait Time;\ASP.NET v4.0.30319\Requests Rejected" />
+      <Setting name="PerformanceCounters.SampleRate" value="5" />
+    </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="79BC30717D08609CE442BA9FB00AE8CB4C03DFC5" thumbprintAlgorithm="sha1" />
+      <Certificate name="service.brightstardb.com" thumbprint="D5ABB16CFFBB7E4C9596D0668ABAF7FCAAD03B75" thumbprintAlgorithm="sha1" />
+      <Certificate name="acs.service.brightstardb.com" thumbprint="1BA2545CEAEBCCB355F6C7FAE08857F6D4C2C81E" thumbprintAlgorithm="sha1" />
+    </Certificates>
+  </Role>
+</ServiceConfiguration>

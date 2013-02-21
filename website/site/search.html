@@ -1,0 +1,287 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>BrightstarDB - NoSQL for .NET</title>
+	<link rel="stylesheet" href="css/reset.css" />
+    <link rel="Stylesheet" href="css/main.css" />
+	<link rel="icon" href="images/favicon.ico" />
+    <link rel="alternate" type="application/rss+xml" title="BrightstarDB Blog &raquo; Feed" href="/blog/?feed=rss2" />
+    
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script type="text/javascript" src="js/modernizr-1.7.min.js"></script>
+    <script type="text/javascript">
+            $(document).ready(function(){
+              var q = parseQueryFromUrl();
+              $('#q').val(q);
+            });
+    </script>
+    <style>
+        #teaser 
+        {
+            text-align:center;
+        }
+
+        #teaser 
+        {
+            padding-top : 40px;
+            padding-bottom : 40px;
+        }
+                
+        #teaser h1 
+        {
+            font-size: 46px;
+            margin-bottom: 25px;
+        }
+        #blurb 
+        {
+            text-align : center;
+            max-width: 550px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header id="header">
+        <hgroup>
+            <a href="/" alt="BrightstarDB Home">
+                <img class="logo" src="/images/logo.png" alt="BrightstarDB" />
+            </a>
+            <form method="get" action="/search.html" id="searchForm">
+                <input id="q" type="text" name="q" />
+                <button title="Search" class="button">
+                      <img src="/images/mag.png" alt="Search" class="mag"/>
+                </button>
+            </form>
+        </hgroup>
+
+    </header>
+
+
+    <nav id="sitenav">
+        <a href="/documentation/">Documentation</a>
+		<a href="/download/">Download</a>
+        <a href="/service/">Service</a>
+        <a href="/ecosystem/">Ecosystem</a>
+		<a href="/blog/">Blog</a>
+    </nav>
+
+    <article id="results" class="documentation">
+      <div id="cse" style="width: 100%;">Loading</div>
+<script src="http://www.google.com/jsapi" type="text/javascript"></script>
+<script type="text/javascript"> 
+  function parseQueryFromUrl () {
+    var queryParamName = "q";
+    var search = window.location.search.substr(1);
+    var parts = search.split('&');
+    for (var i = 0; i < parts.length; i++) {
+      var keyvaluepair = parts[i].split('=');
+      if (decodeURIComponent(keyvaluepair[0]) == queryParamName) {
+        return decodeURIComponent(keyvaluepair[1].replace(/\+/g, ' '));
+      }
+    }
+    return '';
+  }
+
+  google.load('search', '1', {language : 'en', style : google.loader.themes.MINIMALIST});
+  google.setOnLoadCallback(function() {
+    var customSearchControl = new google.search.CustomSearchControl(
+      '016357315673277364180:l-uw4vwptly');
+
+    customSearchControl.setResultSetSize(google.search.Search.FILTERED_CSE_RESULTSET);
+    var options = new google.search.DrawOptions();
+    options.enableSearchResultsOnly(); 
+    customSearchControl.draw('cse', options);
+    var queryFromUrl = parseQueryFromUrl();
+    if (queryFromUrl) {
+      customSearchControl.execute(queryFromUrl);
+    }
+  }, true);
+</script>
+
+<style type="text/css">
+  .gsc-control-cse {
+    font-family: Arial, sans-serif;
+    border-color: #FFFFFF;
+    background-color: #FFFFFF;
+  }
+  .gsc-tabHeader.gsc-tabhInactive {
+    background-color: #34872E;
+    border-color: #499343;
+  }
+  .gsc-tabHeader.gsc-tabhActive {
+    background-color: #345F2E;
+    border-color: #333333;
+  }
+  .gsc-tabsArea {
+    border-color: #333333;
+  }
+  .gsc-webResult.gsc-result,
+  .gsc-results .gsc-imageResult {
+    border-color: #FFFFFF;
+    background-color: #FFFFFF;
+  }
+  .gsc-webResult.gsc-result:hover,
+  .gsc-imageResult:hover {
+    border-color: #333333;
+    background-color: #f9f9f9;
+  }
+  .gs-webResult.gs-result a.gs-title:link,
+  .gs-webResult.gs-result a.gs-title:link b,
+  .gs-imageResult a.gs-title:link,
+  .gs-imageResult a.gs-title:link b {
+    color: #0000ff;
+  }
+  .gs-webResult.gs-result a.gs-title:visited,
+  .gs-webResult.gs-result a.gs-title:visited b,
+  .gs-imageResult a.gs-title:visited,
+  .gs-imageResult a.gs-title:visited b {
+    color: #6699FF;
+  }
+  .gs-webResult.gs-result a.gs-title:hover,
+  .gs-webResult.gs-result a.gs-title:hover b,
+  .gs-imageResult a.gs-title:hover,
+  .gs-imageResult a.gs-title:hover b {
+    color: #6699FF;
+  }
+  .gs-webResult.gs-result a.gs-title:active,
+  .gs-webResult.gs-result a.gs-title:active b,
+  .gs-imageResult a.gs-title:active,
+  .gs-imageResult a.gs-title:active b {
+    color: #777777;
+  }
+  .gsc-cursor-page {
+    color: #0000ff;
+  }
+  a.gsc-trailing-more-results:link {
+    color: #0000ff;
+  }
+  .gs-webResult .gs-snippet,
+  .gs-imageResult .gs-snippet,
+  .gs-fileFormatType {
+    color: #333333;
+  }
+  .gs-webResult div.gs-visibleUrl,
+  .gs-imageResult div.gs-visibleUrl {
+    color: #34872E;
+  }
+  .gs-webResult div.gs-visibleUrl-short {
+    color: #34872E;
+  }
+  .gs-webResult div.gs-visibleUrl-short {
+    display: none;
+  }
+  .gs-webResult div.gs-visibleUrl-long {
+    display: block;
+  }
+  .gsc-cursor-box {
+    border-color: #FFFFFF;
+  }
+  .gsc-results .gsc-cursor-box .gsc-cursor-page {
+    border-color: #777777;
+    background-color: #FFFFFF;
+    color: #0000ff;
+  }
+  .gsc-results .gsc-cursor-box .gsc-cursor-current-page {
+    border-color: #333333;
+    background-color: #333333;
+    color: #fff;
+  }
+  .gs-promotion {
+    border-color: #CCCCCC;
+    background-color: #E6E6E6;
+  }
+  .gs-promotion a.gs-title:link,
+  .gs-promotion a.gs-title:link *,
+  .gs-promotion .gs-snippet a:link {
+    color: #0000CC;
+  }
+  .gs-promotion a.gs-title:visited,
+  .gs-promotion a.gs-title:visited *,
+  .gs-promotion .gs-snippet a:visited {
+    color: #0000CC;
+  }
+  .gs-promotion a.gs-title:hover,
+  .gs-promotion a.gs-title:hover *,
+  .gs-promotion .gs-snippet a:hover {
+    color: #444444;
+  }
+  .gs-promotion a.gs-title:active,
+  .gs-promotion a.gs-title:active *,
+  .gs-promotion .gs-snippet a:active {
+    color: #00CC00;
+  }
+  .gs-promotion .gs-snippet,
+  .gs-promotion .gs-title .gs-promotion-title-right,
+  .gs-promotion .gs-title .gs-promotion-title-right *  {
+    color: #333333;
+  }
+  .gs-promotion .gs-visibleUrl,
+  .gs-promotion .gs-visibleUrl-short {
+    color: #00CC00;
+  }
+  .gsc-input input.gsc-input {
+    background: none repeat scroll 0% 0% white !important;
+  }
+</style>
+  </article>
+
+    <footer id="footer">
+        <nav>
+            <h1>
+                Navigation</h1>
+            <ul>
+                <li><a href="/documentation/">Documentation</a></li>
+                <li><a href="/download/">Download</a></li>
+                <li><a href="/service/">Service</a></li>
+                <li><a href="/ecosystem/">Ecosystem</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/community/">Community</a></li>
+                <li><a href="/about/">About / Contact</a></li>
+            </ul>
+        </nav>
+        <nav>
+            <h1>
+                Keep in Touch!</h1>
+            <p>
+                <a href="http://twitter.com/brightstardb" class="twitter-follow-button" data-show-count="false">
+                    Follow @BrightstarDB</a></p>
+            <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+            <div data-href="http://brightstardb.com/" class="g-plusone" data-size="medium">
+            </div>
+            <p>
+                <img src="/images/feed-icon16x16.png" alt="RSS Feed Icon" style="vertical-align: middle" />
+                <a href="/blog/?feed=rss2">Blog RSS Feed</a>
+            </p>
+        </nav>
+        <p>
+            &copy; BrightstarDB Limited 2012</p>
+        <p>
+            Registered in England and Wales no. 7992038. Registered Office: 17 Cosgrove Road,
+            Old Stratford, Milton Keynes, MK19 6AG</p>
+    </footer>
+
+
+  <!-- Place this tag in your head or just before your close body tag -->
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+  {lang: 'en-GB'}
+</script>
+        <!-- google analytics -->
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-25503555-1']);
+            _gaq.push(['_trackPageview']);
+
+            (function () {
+                var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+            })();
+        </script>
+
+
+</body>
+</html>

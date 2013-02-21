@@ -1,0 +1,68 @@
+﻿
+i want a collection that contains entities of two type.
+
+So collection customer db changes.
+
+entities are customer and address.
+
+Customers we know when they change
+Addresses we dont
+
+Addresses are uniquely identified.
+
+select id, lastupdated, name from customer
+select id, lastupdate, 'address' + id from address
+
+fragments feed queries must return id, lastupdate and name.
+
+feed def:
+
+	  ResourceTemplate: http://www.np.com/customer/{id}
+	  fragmentsQuery: select id, lastupdated, name from customer
+	  fragmentsQueryDateConstraints: select id, lastupdated, name from customer where lastupdated > [[since]] && lastupdated < [[before]]
+	  fragmentQueries:
+	   [1] = { query = select * from customer where id = [[id]], rdf = ... }
+	   [2] = { query = select * from address where custref = [[id]], rdf =  }
+
+
+	
+
+
+We can create different streams and do paging based on the datetime being the order.
+
+Todo:
+
+1. snapshot to disk then return via service (done)
+2. configuration reader (done)
+
+3. client service to consume feed into BS
+
+4. odbc connector provider that can track changes using a hashcode
+
+5. management studio for configuration
+
+6. B* db sparql provider
+
+7. logging
+
+8. atom feed paging support
+
+9. ignore db nulls (done)
+
+10. allow user defined transform functions
+
+11. handle data types when serialising.
+
+
+
+
+
+
+
+
+
+
+
+   
+
+

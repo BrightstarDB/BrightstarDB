@@ -1,0 +1,48 @@
+﻿<Window x:Class="BrightstarDB.Polaris.Views.PrefixesDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Validation="clr-namespace:BrightstarDB.Polaris.Validation" Title="Prefixes" Height="300" Width="300">
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
+        <Style x:Key="EditStyle" TargetType="{x:Type TextBox}">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="ToolTip"
+                            Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <DockPanel LastChildFill="True">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+            <Button Click="OkClick" IsDefault="True">OK</Button>
+            <Button Click="CancelClick" IsCancel="True">Cancel</Button>
+        </StackPanel>
+        <DataGrid Name="PrefixesGrid" ItemsSource="{Binding Prefixes}" AutoGenerateColumns="False" CanUserAddRows="True" CanUserDeleteRows="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Prefix" MinWidth="50" EditingElementStyle="{StaticResource ResourceKey=EditStyle}">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Prefix">
+                            <Binding.ValidationRules>
+                                <Validation:RegexValidationRule Expression="([a-zA-Z][a-zA-Z0-9]*)?" Message="Prefix must be a valid XML Name"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+                <DataGridTextColumn Header="Uri" Width="*" EditingElementStyle="{StaticResource ResourceKey=EditStyle}">
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Uri" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <Validation:AbsoluteUriValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

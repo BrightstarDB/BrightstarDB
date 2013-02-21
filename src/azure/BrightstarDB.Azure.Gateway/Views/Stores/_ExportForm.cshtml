@@ -1,0 +1,12 @@
+﻿@model BrightstarDB.Azure.Gateway.Models.ExportSinkModel
+
+@using (Html.BeginForm("Export", "Stores", new {id=ViewBag.StoreId}, FormMethod.Post, new {id="exportForm"} )) {
+@Html.ValidationSummary()
+<div class="editor-label">@Html.LabelFor(Model=>Model.ContainerAddress)</div>
+<div class="editor-field">@Html.EditorFor(Model => Model.ContainerAddress)</div>
+<div class="editor-label">@Html.LabelFor(Model => Model.BlobName)</div>
+<div class="editor-field">@Html.EditorFor(Model => Model.BlobName)</div>
+<div class="editor-label">@Html.LabelFor(Model=>Model.StorageConnectionString)</div>
+<div class="editor-field">@Html.EditorFor(Model => Model.StorageConnectionString)</div>
+<div class="editor-label">Compress Export (using GZip) @Html.EditorFor(Model => Model.UseGZip)</div>
+}

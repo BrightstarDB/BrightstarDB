@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="kal_000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Developing With BrightstarDB</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Developing With BrightstarDB</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">This section takes you through all of the basic principles of working with the BrightstarDB APIs. </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB provides three different levels of API:</text></para>
+    <para styleclass="Normal"></para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">At the highest level the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Entity_Framework" styleclass="Normal" translate="true">Entity Framework</link><text styleclass="Normal" translate="true"> allows you to define your application data model in code. You can then use LINQ to query the data and simple operations on your application data entities to create, update and delete objects.</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">The </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Data_Object_Layer" styleclass="Normal" translate="true">Data Object Layer</link><text styleclass="Normal" translate="true"> provides a simple abstract API for dealing with RDF resources, you can retrieve a resource and all its properties with a single call. This layer provides no direct query functionality, but it can be combined with the SPARQL query functionality provided by the RDF Client API. This layer also has a separate abstraction for use with </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Dynamic_API" styleclass="Normal" translate="true">Dynamic Objects</link><text styleclass="Normal" translate="true">.</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">The </text><link displaytype="text" defaultstyle="true" type="topiclink" href="RDF_Client_API" styleclass="Normal" translate="true">RDF Client API</link><text styleclass="Normal" translate="true"> provides the lowest level interface to BrightstarDB allowing you to add or remove RDF triples and to execute SPARQL queries.</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">If you are new to BrightstarDB and to RDF, we recommend you start with the Entity Framework and take a walk through our </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Developing_with_BrightstarDB" styleclass="Normal" translate="true">Developer Quick Start</link><text styleclass="Normal" translate="true">. If you are already comfortable with RDF and SPARQL you may wish to start with the lower level APIs.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">If you are the kind of person that just likes to dive straight into sample code, please take a moment to read about Running the BrightstarDB Samples first.</text></para>
+  </body>
+</topic>

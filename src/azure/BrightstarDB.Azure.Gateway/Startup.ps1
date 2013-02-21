@@ -1,0 +1,1 @@
+﻿new-eventlog -logname 'Azure Event Logs' -Source 'AzureEventLogs'

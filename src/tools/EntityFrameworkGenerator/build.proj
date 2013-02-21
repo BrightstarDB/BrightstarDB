@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Import Project="$(MSBuildExtensionsPath)/MSBuildCommunityTasks/MSBuild.Community.Tasks.Targets"/>
+
+	<ItemGroup>
+	  <TextTemplates Include="MyEntityContext.tt"/>
+	</ItemGroup>
+
+	<Target Name="CopyTextTemplates">
+	  <Copy SourceFiles="@(TextTemplates)" DestinationFolder="."/>
+	</Target>
+
+  <Target Name="BuildEntityDefTemplate" >
+    <ItemGroup>
+      <DefTemplateContent Include="BrightstarEntityDefinition.vstemplate"/>
+      <DefTemplateContent Include="Icon.ico"/>
+      <DefTemplateContent Include="IMyEntity.cs"/>
+    </ItemGroup>
+    <Zip Files="@(DefTemplateContent)" ZipFileName="BrightstarEntityDefinition.zip"/>
+  </Target>
+  
+	<Target Name="BuildItemTemplate" DependsOnTargets="CopyTextTemplates">
+	  <ItemGroup>
+	    <TemplateContent Include="BrightstarEntityContext.vstemplate"/>
+	    <TemplateContent Include="Icon.ico"/>
+	    <TemplateContent Include="MyEntityContext.tt"/>
+	  </ItemGroup>
+	  <Zip Files="@(TemplateContent)" ZipFileName="BrightstarEntityContext.zip"/>
+	</Target>
+
+	<Target Name="BuildVSI" DependsOnTargets="BuildItemTemplate;BuildEntityDefTemplate">
+	  <ItemGroup>
+	    <VsiContent Include="BrightstarEntityContext.vscontent"/>
+	    <VsiContent Include="BrightstarEntityContext.zip"/>
+      <VsiContent Include="BrightstarEntityDefinition.zip"/>
+	  </ItemGroup>
+	  <Zip Files="@(VsiContent)" ZipFileName="BrightstarEntityContext.vsi"/>
+	</Target>
+
+	<Target Name="Build" DependsOnTargets="BuildVSI">
+	</Target>
+</Project>

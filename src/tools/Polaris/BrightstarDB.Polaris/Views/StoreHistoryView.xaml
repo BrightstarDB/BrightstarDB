@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="BrightstarDB.Polaris.Views.StoreHistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:Dameer="clr-namespace:BrightstarDB.Polaris.Controls"
+             xmlns:Views="clr-namespace:BrightstarDB.Polaris.Views" mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="450">
+    <DockPanel LastChildFill="True">
+        <WrapPanel DockPanel.Dock="Top">
+            <StackPanel Orientation="Horizontal" Margin="0,0,5,0">
+                <TextBlock Margin="3">From:</TextBlock>
+                <Dameer:DateTimePicker Grid.Column="1" ShowCheckBox="True"  Format="Custom" Value="{Binding DateTimeFilterFrom}" Checked="False">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PropertyChanged">
+                            <Command:EventToCommand Command="{Binding RefreshCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Dameer:DateTimePicker>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
+                <TextBlock Grid.Row="1" Margin="3">To:</TextBlock>
+                <Dameer:DateTimePicker Grid.Row="1" Grid.Column="1" ShowCheckBox="True" Checked="False"  Format="Custom" Value="{Binding DateTimeFilterTo}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PropertyChanged">
+                            <Command:EventToCommand Command="{Binding RefreshCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Dameer:DateTimePicker>
+            </StackPanel>
+        </WrapPanel>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <ListView Name="CommitPointList" Grid.Row="0" ItemsSource="{Binding CommitPoints}" SelectedItem="{Binding HistoricalQueryViewModel.TargetCommitPoint}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding CommitTimeString}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Button Grid.Row="1" IsEnabled="{Binding HasMoreCommitPoints}" Content="More...">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding MoreCommitPointsCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+            </Grid>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            <Views:SparqlQueryView Grid.Column="2"  DataContext="{Binding HistoricalQueryViewModel}"/>
+        </Grid>
+    </DockPanel>
+</UserControl>

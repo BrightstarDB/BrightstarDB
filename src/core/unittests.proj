@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<MSTest Condition=" '$(MSTest)' == '' ">C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\MSTest.exe</MSTest>
+	</PropertyGroup>
+	<ItemGroup>
+		<TestResults Include="*.trx" />
+	</ItemGroup>
+	
+	<Target Name="CleanResults">
+		<Delete Files="@(TestResults)" />
+	</Target>
+
+	<Target Name="Frameworks">
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:DataObjectTests /testlist:"EntityFramework Tests" /testlist:Dynamics /testlist:"LinqToSparql Tests" /testsettings:local.testsettings /resultsfile:frameworks.trx' />
+	</Target>
+
+	<Target Name="Client">
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Client Tests" /testsettings:local.testsettings /resultsfile:bplus.trx' />
+	</Target>
+
+	<Target Name="Server">
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Server Tests" /testsettings:local.testsettings /resultsfile:bplus.trx' />
+	</Target>
+	<Target Name="OData">
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"OData Tests" /testsettings:local.testsettings /resultsfile:odata.trx' />
+	</Target>
+
+	<Target Name="SPARQL">
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"SPARQL Dawg Tests" /testsettings:local.testsettings /resultsfile:sparql.trx' />
+	</Target>
+
+	<Target Name="Core">
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:ServerTests /testlist:"BPlusTree and PageStore Tests" /testsettings:local.testsettings /resultsfile:core.trx' />
+	</Target>
+
+	<Target Name="Build" DependsOnTargets="CleanResults;Core;Frameworks;Client;OData;SPARQL">
+	<!--
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:DataObjectTests /testlist:"EntityFramework Tests" /testlist:ServerTests /testlist:"SPARQL Evaluation Tests" /testlist:"SPARQL 11 Tests" /testlist:Dynamics /testlist:"OData Tests" /testsettings:local.testsettings /resultsfile:testresults.trx' />
+	-->
+	</Target>
+	
+	<Target Name="Performance" DependsOnTargets="CleanResults">
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Client Scaling Tests" /testlist:"Scaling Tests" /testsettings:local.testsettings /resultsfile:testresults.trx' />
+	</Target>
+	
+	<UsingTask TaskName="SparqlTestGenerator" AssemblyFile="../tools/SparqlTestTasks/SparqlTestTasks/bin/Debug/SparqlTestTasks.dll" />
+	<Target Name="Generate">
+		<SparqlTestGenerator ManifestFiles="BrightstarDB.Tests\Data\sparql\sparqlDawgTests\manifest-all.ttl"
+			OutputDirectory="BrightstarDB.Tests\SparqlDawgTests"
+			Namespace="BrightstarDB.Tests.SparqlDawgTests" />
+	</Target>
+</Project>

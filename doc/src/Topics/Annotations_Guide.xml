@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Annotations</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Annotations</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The BrightstarDB entity framework relies on a few annotation types in order to accurately express a data model. This section describes the different annotations and how they should be used. The only required attribute annotation is Entity. All other attributes give different levels of control over how the object model is mapped to RDF.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">TypeIdentifierPrefix Attribute</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB makes use of URIs to identify class types and property types. These URI values can be added on each property but to improve clarity and avoid mistakes it is possible to configure a base URI that is then used by all attributes. It is also possible to define models that do not have this attribute set.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The type identifier prefix can be set in the AssemblyInfo.cs file. The example below shows how to set this configuration property.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[assembly: TypeIdentifierPrefix(&quot;http://www.mydomain.com/types/&quot;)]</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Entity Attribute</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The entity attribute is used to indicate that the annotated interface should be included in the generated model. Optionally, a full URI or a URI postfix can be supplied that defines the identity of the class. The following examples show how to use the attribute. The example with just the value &apos;Person&apos; uses a default prefix if one is not specified as described above.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// example 1.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity] </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IPerson { ... }</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// example 2.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;Person&quot;)] </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IPerson { ... }</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// example 3.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;http://xmlns.com/foaf/0.1/Person&quot;)] </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IPerson { ... }</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Example 3. above can be used to map .NET models onto existing RDF vocabularies. This allows the model to create data in a given vocabulary but it also allows models to be mapped onto existing RDF data.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Identity Property</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The Identity property can be used to get and set the underlying identity of an Entity. </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The following example shows how this is defined.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// example 1.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;Person&quot;)] </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IPerson {</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;string Id { get; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">No annotation is required. It is also acceptable for the property to be called ID, [Type]Id or [Type]ID where [Type] is the name of the type, such as PersonId or PersonID.</text></para>
+    <para styleclass="Heading1"></para>
+    <para styleclass="Heading1"><anchor id="idattribute" styleclass="Heading1"></anchor><text styleclass="Heading1" translate="true">Identifier Attribute</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Id property values are URIs, but in some cases it is necessary to work with simpler string values such as GUIDs or numeric values. To do this the Id property can be decorated with the identifier attribute. The identifier attribute requires a string property that is the identifier prefix - this can be specified either as a URI string or as {prefix}:{rest of URI} where {prefix} is a namespace prefix defined by the Namespace Declaration Attribute (see below).</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// example 1.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;Person&quot;)] </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IPerson {</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;[Identifier(&quot;http://www.mydomain.com/people/&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;string Id { get; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// example 2.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface ISkill {</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;[Identifier(&quot;ex:skills#&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;string Id {get;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// NOTE: For the above to work there must be an assembly attribute declared like this:</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[assembly:NamespaceDeclaration(&quot;ex&quot;, &quot;http://example.org/&quot;)]</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Property Inclusion</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Any .NET property with a getter or setter is automatically included in the generated type, no attribute annotation is required for this.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// example 1.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;Person&quot;)] </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IPerson {</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;string Id { get; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;string Name { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Inverse Property Attribute</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">When two types reference each other via different properties that in fact reflect different sides of the same association then it is necessary to declare this explicitly. This can be done with the InverseProperty attribute. This attribute requires the name of the .NET property on the referencing type to be specified.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// example 1.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;Person&quot;)] </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IPerson {</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;string Id { get; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;ICompany Employer { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;Company&quot;)] </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IPerson {</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;string Id { get; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;[InverseProperty(&quot;Employer&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;ICollection&lt;IPerson&gt; Employees { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The above example shows that the inverse of Employees is Employer. This means that if the Employer property on P1 is set to C1 then calling C1.Employees will return P1.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Namespace Declaration Attribute</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">When using URIs in annotations it is cleaner if the complete URI doesn&apos;t need to be entered every time. To support this the NamespaceDeclaration assembly attribute can be used, many times if needed, to define namespace prefix mappings. The mapping takes a short string and the URI prefix to be used.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The attribute can be used to specify the prefixes required (typically assembly attributes are added to the AssemblyInfo.cs code file in the Properties folder of the project).</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[assembly: NamespaceDeclaration(&quot;foaf&quot;, &quot;</text><link displaytype="text" defaultstyle="true" type="weblink" href="&lt;%LINK_CAPTION%&gt;" target="_blank" styleclass="Code Example" translate="true">http://xmlns.com/foaf/0.1/&quot;)</link><text styleclass="Code Example" translate="true">]</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Then these prefixes can be used in property or type annotation using the CURIE syntax of {prefix}:{rest of URI}.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;foaf:Person&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IPerson &#160;{ ...</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Property Type Attribute</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">While no decoration is required to include a property in a generated class, if the property is to be mapped onto an existing RDF vocabulary then the PropertyType attribute can be used to do this. The PropertyType attribute requires a string property that is either an absolute or relative URI. If it is a relative URI then it is appended to the URI defined by the TypeIdentifierPrefix attribute or the default base type URI. Again, prefixes defined by a NamespaceDeclaration attribute can also be used.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// Example 1. Explicit type declaration</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[PropertyType(&quot;http://www.mydomain.com/types/name&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">string Name { get; set; }</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// Example 2. Prefixed type declaration - the prefix must be declared with a NamespaceDeclaration attribute</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[PropertyType(&quot;foaf:name&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">string Name { get; set; }</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// Example 3. Where &quot;name&quot; is appended to the default namespace or the one specified by the TypeIdentifierPrefix in AssemblyInfo.cs.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[PropertyType(&quot;name&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">string Name { get; set; }</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Inverse Property Type Attribute</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Allows inverse properties to be mapped to a given RDF predicate type rather than a .NET property name. This is most useful when mapping existing RDF schemas to support the case where the .NET data-binding only requires the inverse of the RDF property.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// Example 1. The following states that the collection of employees is found by traversing the </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// &quot;</text><link displaytype="text" defaultstyle="true" type="weblink" href="&lt;%LINK_CAPTION%&gt;" target="_blank" styleclass="Code Example" translate="true">http://www.mydomain.com/types/employer</link><text styleclass="Code Example" translate="true">&quot; predicate from instances of Person.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[InversePropertyType(&quot;http://www.mydomain.com/types/employer&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">ICollection&lt;IPerson&gt; Employees { get; set; }</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Additional Custom Attributes</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Any custom attributes added to the entity interface that are not in the BrightstarDB.EntityFramework namespace will be automatically copied through into the generated class. This allows you to easily make use of custom attributes for validation, property annotation and other purposes. </text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">As an example, the following interface code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;http://xmlns.com/foaf/0.1/Person&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IFoafPerson : IFoafAgent</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;[Identifier(&quot;http://www.networkedplanet.com/people/&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Id { get; }</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;[PropertyType(&quot;http://xmlns.com/foaf/0.1/nick&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;[DisplayName(&quot;Also Known As&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Nickname { get; set; }</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;[PropertyType(&quot;http://xmlns.com/foaf/0.1/name&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;[Required]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;[CustomValidation(typeof(MyCustomValidator), &quot;ValidateName&quot;, ErrorMessage=&quot;Custom error message&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Name { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">would result in this generated class code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;public partial class FoafPerson : BrightstarEntityObject, IFoafPerson </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">public FoafPerson(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">public FoafPerson() : base() { }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">#region Implementation of BrightstarDB.Tests.EntityFramework.IFoafPerson</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">[System.ComponentModel.DisplayNameAttribute(&quot;Also Known As&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">public System.String Nickname</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;</text><tab /><tab /><text styleclass="Code Example" translate="true">get { return GetRelatedProperty&lt;System.String&gt;(&quot;Nickname&quot;); }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;</text><tab /><tab /><text styleclass="Code Example" translate="true">set { SetRelatedProperty(&quot;Nickname&quot;, value); }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">[System.ComponentModel.DataAnnotations.RequiredAttribute]</text><tab /></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">[System.ComponentModel.DataAnnotations.CustomValidationAttribute(typeof(MyCustomValidator), &quot;ValidateName&quot;, ErrorMessage=&quot;Custom error message&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">public System.String Name</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;</text><tab /><tab /><text styleclass="Code Example" translate="true">get { return GetRelatedProperty&lt;System.String&gt;(&quot;Name&quot;); }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;</text><tab /><tab /><text styleclass="Code Example" translate="true">set { SetRelatedProperty(&quot;Name&quot;, value); }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text><tab /><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; </text><tab /><text styleclass="Code Example" translate="true">#endregion</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">It is also possible to add custom attributes to the generated entity class itself. Any custom attributes that are allowed on both classes and interfaces can be added to the entity interface and will be automatically copied through to the generated class in the same was as custom attributes on properties. However, if you need to use a custom attribute that is allowed on a class but not on an interface, then you must use the BrightstarDB.EntityFramework.ClassAttribute attribute. This custom attribute can be added to the entity interface and allows you to specify a different custom attribute that should be added to the generated entity class. When using this custom attribute you should ensure that you either import the namespace that contains the other custom attribute or reference the other custom attribute using its fully-qualified type name to ensure that the generated class code compiles successfully.</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">For example, the following interface code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;http://xmlns.com/foaf/0.1/Person&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[ClassAttribute(&quot;[System.ComponentModel.DisplayName(\&quot;Person\&quot;)]&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IFoafPerson : IFoafAgent</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;// ... interface definition here</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">would result in this generated class code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[System.ComponentModel.DisplayName(&quot;Person&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public partial class FoafPerson : BrightstarEntityObject, IFoafPerson </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;// ... generated class code here</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Note that the DisplayName custom attribute is referenced using its fully-qualified type name (System.ComponentModel.DisplayName), as the generated context code will not include a &quot;using System.ComponentModel;&quot; namespace import. Alternatively, this interface code would also generate class code that compiles correctly:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">using System.ComponentModel;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity(&quot;http://xmlns.com/foaf/0.1/Person&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[ClassAttribute(&quot;[DisplayName(\&quot;Person\&quot;)]&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IFoafPerson : IFoafAgent</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;// ... interface definition here</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>

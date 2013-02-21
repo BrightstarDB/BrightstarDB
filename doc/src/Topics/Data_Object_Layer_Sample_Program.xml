@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Sample Program</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Sample Program</text></para>
+    </header>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">The source code for this example can be found in [INSTALLDIR]\Samples\DataObjectLayer\DataObjectLayerSamples.sln</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The sample project is a simple console application that runs through some of the basic usage for BrightstarDB&apos;s Data Object Layer.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Creating the context</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">A context is created using a connection string that specifies usage of the HTTP server</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var context = BrightstarService.GetDataObjectContext(@&quot;Type=http;endpoint=http://localhost:8090/brightstar;&quot;);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Creating the store</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">A store is created with a unique name</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">string storeName = &quot;DataObjectLayerSample_&quot; + Guid.NewGuid();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var store = context.CreateStore(storeName);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Namespace Mappings</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">In order to use simpler identities when we are creating and retrieving data objects, we set up a dictionary of namespace mappings to use when we connect to the store:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">_namespaceMappings = new Dictionary&lt;string, string&gt;()</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{&quot;people&quot;, &quot;http://example.org/people/&quot;},</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{&quot;skills&quot;, &quot;http://example.org/skills/&quot;},</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{&quot;schema&quot;, &quot;http://example.org/schema/&quot;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">};</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">store = context.OpenStore(storeName, _namespaceMappings);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Optimistic Locking</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To enable support for optimistic locking, we must pass a boolean flag to the OpenStore() or CreateStore() method:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">store = context.OpenStore(storeName, _namespaceMappings, true); // Open store with optimistic locking enabled</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Skills</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">We create a data object to use as the type of data object for skills, and then create a number of skill data objects.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var skillType = store.MakeDataObject(&quot;schema:skill&quot;);</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var csharp = store.MakeDataObject(&quot;skills:csharp&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">csharp.SetType(skillType);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var html = store.MakeDataObject(&quot;skills:html&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">html.SetType(skillType);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var css = store.MakeDataObject(&quot;skills:css&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">css.SetType(skillType);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var javascript = store.MakeDataObject(&quot;skills:javascript&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">javascript.SetType(skillType);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">People</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">We follow the same process to create some people data objects.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var personType = store.MakeDataObject(&quot;schema:person&quot;);</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var fred = store.MakeDataObject(&quot;people:fred&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.SetType(personType);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var william = store.MakeDataObject(&quot;people:william&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">william.SetType(personType);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Properties</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">We create 2 data objects to use as the types for some properties that the people data objects will hold.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var fullname = store.MakeDataObject(&quot;schema:person/fullName&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var skill = store.MakeDataObject(&quot;schema:person/skill&quot;);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">We then set the single name property on the people, and add skills</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">For multiple properties we must use the AddProperty() method rather than SetProperty() which would overwrite any previous value</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.SetProperty(fullname, &quot;Fred Evans&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.AddProperty(skill, csharp);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.AddProperty(skill, html);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.AddProperty(skill, css);</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">william.SetProperty(fullname, &quot;William Turner&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">william.AddProperty(skill, html);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">william.AddProperty(skill, css);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">william.AddProperty(skill, javascript);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The data type of literal properties are set automatically when a property value is added or set:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var employeeNumber = store.MakeDataObject(&quot;schema:person/employeeNumber&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var dateOfBirth = store.MakeDataObject(&quot;schema:person/dateOfBirth&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var salary = store.MakeDataObject(&quot;schema:person/salary&quot;);</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred = store.GetDataObject(&quot;people:fred&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.SetProperty(employeeNumber, 123);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.SetProperty(dateOfBirth, DateTime.Now.AddYears(-30));</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.SetProperty(salary, 18000.00);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Save Changes</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Now that we have created the objects we require, we save the changes to the BrightstarDB store.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">store.SaveChanges();</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Querying the data</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">We use SPARQL to query the data in the store. For more information about SPARQL please read the </text><link displaytype="text" defaultstyle="true" type="weblink" href="http://www.w3.org/TR/sparql11-query/" target="_blank" styleclass="Normal" translate="true">SPARQL 1.1</link><text styleclass="Normal" translate="true"> documenation. In the sample, we write a query that returns all of the skills of the data object for &apos;fred&apos;. We can then loop through the ResultDocument of the SparqlResult returned to see the identities of each of those skills.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">const string getPersonSkillsQuery = &quot;SELECT ?skill WHERE { &lt;http://example.org/people/fred&gt; &lt;http://example.org/schemas/person/skill&gt; ?skill }&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var sparqlResult = store.ExecuteSparql(getPersonSkillsQuery);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Binding Data Objects With SPARQL</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The Data Object Store has a very useful method called BindDataObjectsWithSparql(), which takes a SPARQL query that is written to return the URI identities of data object. The method then returns the data objects for each of the URIs contained in the results.</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">In the sample we pass in a query to return URIs of any objects with the skill type.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">const string skillsQuery = &quot;SELECT ?skill WHERE {?skill a &lt;http://example.org/schemas/skill&gt;}&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var allSkills = store.BindDataObjectsWithSparql(skillsQuery).ToList();</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Deleting Objects</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To delete data objects we simply call the Delete() method of that object and save the changes to the store.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">foreach (var s in allSkills)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">s.Delete();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">store.SaveChanges();</text></para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>

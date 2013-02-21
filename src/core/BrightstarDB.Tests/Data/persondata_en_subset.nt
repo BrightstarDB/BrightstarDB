@@ -1,0 +1,95 @@
+<http://dbpedia.org/resource/%60Abdu%27l-Bah%C3%A1> <http://dbpedia.org/ontology/deathDate> "1921-11-28"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/%60Abdu%27l-Bah%C3%A1> <http://dbpedia.org/ontology/birthDate> "1844-05-23"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/%60Abdu%27l-Bah%C3%A1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/%60Abdu%27l-Bah%C3%A1> <http://xmlns.com/foaf/0.1/name> "Abdul-Baha"@en .
+<http://dbpedia.org/resource/Walter_Wright_%28academic%29> <http://dbpedia.org/ontology/deathPlace> <http://dbpedia.org/resource/England> .
+<http://dbpedia.org/resource/Walter_Wright_%28academic%29> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/England> .
+<http://dbpedia.org/resource/Walter_Wright_%28academic%29> <http://purl.org/dc/elements/1.1/description> "Academic administrator"@en .
+<http://dbpedia.org/resource/Walter_Wright_%28academic%29> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Walter_Wright_%28academic%29> <http://xmlns.com/foaf/0.1/givenName> "Walter"@en .
+<http://dbpedia.org/resource/Walter_Wright_%28academic%29> <http://xmlns.com/foaf/0.1/surname> "Wright"@en .
+<http://dbpedia.org/resource/Walter_Wright_%28academic%29> <http://xmlns.com/foaf/0.1/name> "Walter Wright"@en .
+<http://dbpedia.org/resource/Sebastian_Mallaby> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Sebastian_Mallaby> <http://xmlns.com/foaf/0.1/givenName> "Sebastian"@en .
+<http://dbpedia.org/resource/Sebastian_Mallaby> <http://xmlns.com/foaf/0.1/surname> "Mallaby"@en .
+<http://dbpedia.org/resource/Sebastian_Mallaby> <http://xmlns.com/foaf/0.1/name> "Sebastian Mallaby"@en .
+<http://dbpedia.org/resource/Solomon_Kvirkvelia> <http://purl.org/dc/elements/1.1/description> "Footballer"@en .
+<http://dbpedia.org/resource/Solomon_Kvirkvelia> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Solomon_Kvirkvelia> <http://xmlns.com/foaf/0.1/givenName> "Solomon"@en .
+<http://dbpedia.org/resource/Solomon_Kvirkvelia> <http://xmlns.com/foaf/0.1/surname> "Kverkvelia"@en .
+<http://dbpedia.org/resource/Solomon_Kvirkvelia> <http://xmlns.com/foaf/0.1/name> "Solomon Kverkvelia"@en .
+<http://dbpedia.org/resource/Val%C3%A8re_Germain> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/France> .
+<http://dbpedia.org/resource/Val%C3%A8re_Germain> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Marseille> .
+<http://dbpedia.org/resource/Val%C3%A8re_Germain> <http://dbpedia.org/ontology/birthDate> "1990-04-17"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/Val%C3%A8re_Germain> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Val%C3%A8re_Germain> <http://xmlns.com/foaf/0.1/givenName> "Val\u00E8re"@en .
+<http://dbpedia.org/resource/Val%C3%A8re_Germain> <http://xmlns.com/foaf/0.1/surname> "Germain"@en .
+<http://dbpedia.org/resource/Val%C3%A8re_Germain> <http://xmlns.com/foaf/0.1/name> "Val\u00E8re Germain"@en .
+<http://dbpedia.org/resource/Mart%C3%ADn_Zbrun> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Argentina> .
+<http://dbpedia.org/resource/Mart%C3%ADn_Zbrun> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Rafaela> .
+<http://dbpedia.org/resource/Mart%C3%ADn_Zbrun> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Mart%C3%ADn_Zbrun> <http://xmlns.com/foaf/0.1/givenName> "Mart\u00EDn Juan"@en .
+<http://dbpedia.org/resource/Mart%C3%ADn_Zbrun> <http://xmlns.com/foaf/0.1/surname> "Zbrun"@en .
+<http://dbpedia.org/resource/Mart%C3%ADn_Zbrun> <http://xmlns.com/foaf/0.1/name> "Mart\u00EDn Juan Zbrun"@en .
+<http://dbpedia.org/resource/Aleksandar_%C4%90or%C4%91evi%C4%87> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Socialist_Federal_Republic_of_Yugoslavia> .
+<http://dbpedia.org/resource/Aleksandar_%C4%90or%C4%91evi%C4%87> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Socialist_Republic_of_Serbia> .
+<http://dbpedia.org/resource/Aleksandar_%C4%90or%C4%91evi%C4%87> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Belgrade> .
+<http://dbpedia.org/resource/Aleksandar_%C4%90or%C4%91evi%C4%87> <http://dbpedia.org/ontology/birthDate> "1967-08-26"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/Aleksandar_%C4%90or%C4%91evi%C4%87> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Aleksandar_%C4%90or%C4%91evi%C4%87> <http://xmlns.com/foaf/0.1/givenName> "Aleksandar"@en .
+<http://dbpedia.org/resource/Aleksandar_%C4%90or%C4%91evi%C4%87> <http://xmlns.com/foaf/0.1/surname> "Djordjevic"@en .
+<http://dbpedia.org/resource/Aleksandar_%C4%90or%C4%91evi%C4%87> <http://xmlns.com/foaf/0.1/name> "Aleksandar Djordjevic"@en .
+<http://dbpedia.org/resource/Kathleen_Wilhoite> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/United_States> .
+<http://dbpedia.org/resource/Kathleen_Wilhoite> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Santa_Barbara,_California> .
+<http://dbpedia.org/resource/Kathleen_Wilhoite> <http://dbpedia.org/ontology/birthDate> "1964-06-29"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/Kathleen_Wilhoite> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Kathleen_Wilhoite> <http://xmlns.com/foaf/0.1/givenName> "Kathleen"@en .
+<http://dbpedia.org/resource/Kathleen_Wilhoite> <http://xmlns.com/foaf/0.1/surname> "Wilhoite"@en .
+<http://dbpedia.org/resource/Kathleen_Wilhoite> <http://xmlns.com/foaf/0.1/name> "Kathleen Wilhoite"@en .
+<http://dbpedia.org/resource/L%C3%BAcio> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Brazil> .
+<http://dbpedia.org/resource/L%C3%BAcio> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Bras%C3%ADlia> .
+<http://dbpedia.org/resource/L%C3%BAcio> <http://dbpedia.org/ontology/birthDate> "1978-05-08"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/L%C3%BAcio> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/L%C3%BAcio> <http://xmlns.com/foaf/0.1/name> "Lucio"@en .
+<http://dbpedia.org/resource/Svatopluk_%C4%8Cech> <http://dbpedia.org/ontology/deathDate> "1908-02-23"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/Svatopluk_%C4%8Cech> <http://dbpedia.org/ontology/birthDate> "1846-02-21"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/Svatopluk_%C4%8Cech> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Svatopluk_%C4%8Cech> <http://xmlns.com/foaf/0.1/givenName> "Svatopluk"@en .
+<http://dbpedia.org/resource/Svatopluk_%C4%8Cech> <http://xmlns.com/foaf/0.1/surname> "Cech"@en .
+<http://dbpedia.org/resource/Svatopluk_%C4%8Cech> <http://xmlns.com/foaf/0.1/name> "Svatopluk Cech"@en .
+<http://dbpedia.org/resource/Daniel_Mowry,_Jr.> <http://dbpedia.org/ontology/deathDate> "1806-07-06"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/Daniel_Mowry,_Jr.> <http://dbpedia.org/ontology/birthDate> "1729-08-27"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/Daniel_Mowry,_Jr.> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Daniel_Mowry,_Jr.> <http://xmlns.com/foaf/0.1/givenName> "Daniel"@en .
+<http://dbpedia.org/resource/Daniel_Mowry,_Jr.> <http://xmlns.com/foaf/0.1/surname> "Mowry"@en .
+<http://dbpedia.org/resource/Daniel_Mowry,_Jr.> <http://xmlns.com/foaf/0.1/name> "Daniel Mowry"@en .
+<http://dbpedia.org/resource/Kenn_%28Japanese_actor%29> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Kenn_%28Japanese_actor%29> <http://xmlns.com/foaf/0.1/name> "Kenn"@en .
+<http://dbpedia.org/resource/%22Dr._Death%22_Steve_Williams> <http://dbpedia.org/ontology/deathPlace> <http://dbpedia.org/resource/Denver> .
+<http://dbpedia.org/resource/%22Dr._Death%22_Steve_Williams> <http://dbpedia.org/ontology/deathDate> "2009-12-29"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/%22Dr._Death%22_Steve_Williams> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Oklahoma> .
+<http://dbpedia.org/resource/%22Dr._Death%22_Steve_Williams> <http://dbpedia.org/ontology/birthDate> "1960-05-14"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/%22Dr._Death%22_Steve_Williams> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/%22Dr._Death%22_Steve_Williams> <http://xmlns.com/foaf/0.1/givenName> "Steve"@en .
+<http://dbpedia.org/resource/%22Dr._Death%22_Steve_Williams> <http://xmlns.com/foaf/0.1/surname> "Williams"@en .
+<http://dbpedia.org/resource/%22Dr._Death%22_Steve_Williams> <http://xmlns.com/foaf/0.1/name> "Steve Williams"@en .
+<http://dbpedia.org/resource/Judith_Coplon> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Judith_Coplon> <http://xmlns.com/foaf/0.1/givenName> "Judith"@en .
+<http://dbpedia.org/resource/Judith_Coplon> <http://xmlns.com/foaf/0.1/surname> "Coplon"@en .
+<http://dbpedia.org/resource/Judith_Coplon> <http://xmlns.com/foaf/0.1/name> "Judith Coplon"@en .
+<http://dbpedia.org/resource/Mary_Beard_%28classicist%29> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Mary_Beard_%28classicist%29> <http://xmlns.com/foaf/0.1/givenName> "Mary"@en .
+<http://dbpedia.org/resource/Mary_Beard_%28classicist%29> <http://xmlns.com/foaf/0.1/surname> "Beard"@en .
+<http://dbpedia.org/resource/Mary_Beard_%28classicist%29> <http://xmlns.com/foaf/0.1/name> "Mary Beard"@en .
+<http://dbpedia.org/resource/Thomas_Smith_%28engineer%29> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Thomas_Smith_%28engineer%29> <http://xmlns.com/foaf/0.1/givenName> "Thomas"@en .
+<http://dbpedia.org/resource/Thomas_Smith_%28engineer%29> <http://xmlns.com/foaf/0.1/surname> "Smith"@en .
+<http://dbpedia.org/resource/Thomas_Smith_%28engineer%29> <http://xmlns.com/foaf/0.1/name> "Thomas Smith"@en .
+<http://dbpedia.org/resource/Hudson_Maxim> <http://dbpedia.org/ontology/deathPlace> <http://dbpedia.org/resource/Landing,_New_Jersey> .
+<http://dbpedia.org/resource/Hudson_Maxim> <http://dbpedia.org/ontology/deathDate> "1927-05-06"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/Hudson_Maxim> <http://dbpedia.org/ontology/birthPlace> <http://dbpedia.org/resource/Maine> .
+<http://dbpedia.org/resource/Hudson_Maxim> <http://dbpedia.org/ontology/birthDate> "1853-02-03"^^<http://www.w3.org/2001/XMLSchema#date> .
+<http://dbpedia.org/resource/Hudson_Maxim> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+<http://dbpedia.org/resource/Hudson_Maxim> <http://xmlns.com/foaf/0.1/givenName> "Hudson"@en .
+<http://dbpedia.org/resource/Hudson_Maxim> <http://xmlns.com/foaf/0.1/surname> "Maxim"@en .
+<http://dbpedia.org/resource/Hudson_Maxim> <http://xmlns.com/foaf/0.1/name> "Hudson Maxim"@en .

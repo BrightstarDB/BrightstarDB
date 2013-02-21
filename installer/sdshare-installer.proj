@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This project copies all the files that are going to be used in the installer into a temporary directory to
+  make it easier to work with WiX and its tools.
+-->
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <BuildNumberFile Condition=" '$(BuildNumberFile)' == '' ">..\sdsharebuildnumber.txt</BuildNumberFile>
+    <OutputPath>SdShare\bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+
+  <Import Project="..\common.proj"/>
+  <!-- UsingTask TaskName="SmartAssembly.MSBuild.Tasks.Build" AssemblyName="SmartAssembly.MSBuild.Tasks, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7f465a1c156d4d57"/ -->
+
+  <Target Name="Version">
+    <Version FileName="$(BuildNumberFile)" Major="1" Minor="0" Increment="true" Condition=" '$(BuildNumber)' == '' ">
+      <Output PropertyName="BuildNumber" TaskParameter="BuildNumber"/>
+    </Version>
+    <Error Text="The BuildNumber property must be set to a value such as 1.0.234" Condition=" '$(BuildNumber)' == '' "/>
+    <Message Text="Build number set to $(BuildNumber)"/>
+  </Target>
+
+  <Target Name="BuildDocs">
+    <!-- MSBuild Projects="..\src\core\BrightstarDB.sln"
+			 Properties="Configuration=Debug;BuildNumber=$(BuildNumber)"
+			 Targets="Clean;Build"
+			 Condition="'$(Configuration)' != 'Debug'"/>
+    <MSBuild Projects="..\doc\docs.proj"/ -->
+  </Target>
+  
+  <Target Name="BuildCore">
+	  <MSBuild Projects="..\src\sdshare\SdShare.sln"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
+			 Targets="Clean;Build"/>
+  </Target>
+
+  <Target Name="Prepare"
+          DependsOnTargets="Version;BuildCore;BuildDocs">
+    <ItemGroup>
+	    <Service  Include="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.dll"/>
+	    <ServiceExe Include="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.exe"
+			            Exclude="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.vshost.exe"/>
+	    <Service Include="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.config"
+			         Exclude="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.vshost.exe.config"/>
+      <SampleConfig Include="..\samples\Configuration\SdShareConfig.xml"/>
+      <SampleProviderSoln Include="..\src\sdshare\BrightstarDB.SdShare.SampleProvider\*.sln" />
+      <SampleProviderSrc Include="..\src\sdshare\BrightstarDB.SdShare.SampleProvider\BrightstarDB.SdShare.SampleProvider\*.cs" />
+      <SampleProviderProject Include="..\src\sdshare\BrightstarDB.SdShare.SampleProvider\BrightstarDB.SdShare.SampleProvider\*.csproj" />
+      <SampleProviderProperties Include="..\src\sdshare\BrightstarDB.SdShare.SampleProvider\BrightstarDB.SdShare.SampleProvider\Properties\*.*;" />
+      <Root Include="PackageFiles\SdShare\README.txt;PackageFiles\SdShare\EULA.rtf;PackageFiles\SdShare\NOTICE.txt;PackageFiles\SdShare\BrightstarDB SdShare Server.pdf"/>
+    </ItemGroup>
+
+    <RemoveDir Directories="InstallerTmp\SDShare"/>
+    <RemoveDir Directories="$(OutputPath)"/>
+    <MakeDir Directories="InstallerTmp\SDShare"/>
+    <MakeDir Directories="$(OutputPath)"/>
+
+    <Copy SourceFiles="@(Root)" DestinationFolder="InstallerTmp\SDShare"/>
+    <Copy SourceFiles="@(Service)" DestinationFolder="InstallerTmp\SDShare\Service"/>
+    <Copy SourceFiles="@(ServiceExe)" DestinationFolder="InstallerTmp\SDShare\Service"/>
+    <Copy SourceFiles="@(SampleConfig)" DestinationFolder="InstallerTmp\SDShare\Service"/>
+    <Copy SourceFiles="@(SampleProviderSoln)" DestinationFolder="InstallerTmp\SDShare\SampleProvider"/>
+    <Copy SourceFiles="@(SampleProviderSrc)" DestinationFolder="InstallerTmp\SDShare\SampleProvider\BrightstarDB.SdShare.SampleProvider"/>
+    <Copy SourceFiles="@(SampleProviderProject)" DestinationFolder="InstallerTmp\SDShare\SampleProvider\BrightstarDB.SdShare.SampleProvider"/>
+    <Copy SourceFiles="@(SampleProviderProperties)" DestinationFolder="InstallerTmp\SDShare\SampleProvider\BrightstarDB.SdShare.SampleProvider\Properties"/>
+  </Target>
+
+  <!-- Target Name="Obfuscate" DependsOnTargets="Prepare">
+    <SmartAssembly.MSBuild.Tasks.Build ProjectFile="BrightstarDB_Net40.saproj"/>
+    <SmartAssembly.MSBuild.Tasks.Build ProjectFile="BrightstarDB.Mobile.saproj"/>
+    <SmartAssembly.MSBuild.Tasks.Build ProjectFile="BrightstarService.saproj"/>
+    <SmartAssembly.MSBuild.Tasks.Build ProjectFile="Polaris.saproj"/>
+    <Copy SourceFiles="InstallerTmp\Unobfuscated\Tools\Polaris\System.Windows.Interactivity.dll"
+	  DestinationFolder="InstallerTmp\Tools\Polaris"/>
+    <Copy SourceFiles="InstallerTmp\Unobfuscated\Service\BrightstarService.exe.config"
+	  DestinationFolder="InstallerTmp\Service"/>
+  </Target -->
+  
+  <Target Name="Build" DependsOnTargets="Prepare">
+    <ItemGroup>
+      <InstallerFiles Include="InstallerTmp\**\*.*"/>
+    </ItemGroup>
+    <Zip Files="@(InstallerFiles)" ZipFileName="$(OutputPath)\SdShareServer-$(BuildNumber).zip" WorkingDirectory="InstallerTmp"/>
+  </Target>
+  
+</Project>

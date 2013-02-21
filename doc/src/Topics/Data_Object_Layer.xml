@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Data Object Layer</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Data Object Layer</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The Data Object Layer is a simple generic object wrapper for the underlying RDF data in any BrightstarDB store.</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Data Objects are lightweight wrappers around sets of RDF triples in the underlying BrightstarDB store. They allow the developer to interact with the RDF data without requiring all information to be sent in N-Triple format.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">For more information about the RDF layer of BrightstarDB, please read the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="RDF_Client_API" styleclass="Normal" translate="true">RDF Client API</link><text styleclass="Normal" translate="true"> section.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Creating a Data Object Context</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The following example shows how to create a new context using a connection string:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var context = BrightstarService.GetDataObjectContext(&quot;Type=http;endpoint=http://localhost:8090/brightstar;&quot;);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">For more information about connection strings, please read the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Connection_Strings" anchor="connectionstrings" styleclass="Normal" translate="true">&quot;Connection Strings&quot; topic</link></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Creating a Store</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">A new store can be creating using the following code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">string storeName = &quot;Store_&quot; + Guid.NewGuid();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">context.CreateStore(storeName);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Deleting a Store</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Deleting a store is also straight forward:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">context.DeleteStore(storeName);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Creating data objects</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Data Objects can be created using the following code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var fred = store.MakeDataObject(&quot;http://example.org/people/fred&quot;);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The objects can be created by passing in a well formed URI as the identity, if no identity is given then one is automatically generated for it. </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Adding information to data objects</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To add information about this object we can add properties to it:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Setting Single Properties</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To set the value of a single property, use the following code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var fullname = store.MakeDataObject(&quot;http://example.org/schemas/person/fullName&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.SetProperty(fullname, &quot;Fred Evans&quot;);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Using SetProperty() multiple times will overwrite the previous value of the property.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Adding Multiple Properties</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To add multiple properties of the same type use the code below:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var skill = store.MakeDataObject(&quot;http://example.org/schemas/person/skill&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.AddProperty(skill, csharp);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.AddProperty(skill, html);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.AddProperty(skill, css);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Retrieving Data Objects</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">A data object can be retrieved from the store using the following code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var fred = store.GetDataObject(&quot;http://example.org/people/fred&quot;);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">If BrightstarDB does not hold any information about a given URI, then a data object is created for it and passed back. When the developer adds properties to it and saves it, the identity will be automatically added to BrightstarDB.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">GetDataObject() will never return a null object. The data object consists of all the information that is held in BrightstarDB for a particular identity.</text><text styleclass="Normal" translate="true">&#32;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">We can check the RDF data that an object has at any time by using the following code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var triples = ((DataObject)fred).Triples;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Deleting Data Objects</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">A data object can be deleted using the following code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var fred = store.GetDataObject(&quot;http://example.org/people/fred&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">fred.Delete();</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">This removes all triples describing that data object from the store.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Namespace Mappings</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Namespace mappings are sets of simple string prefixes for URIs, enabling the developer to use identities that have been shortened to use the prefixes.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">For example, the mapping:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{&quot;people&quot;, &quot;http://example.org/people/&quot;}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Means that the identity &quot;people:fred&quot; will match the identity &quot;http://example.org/people/fred&quot;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">These mappings are passed through as a dictionary to the OpenStore() method on the context:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">_namespaceMappings = new Dictionary&lt;string, string&gt;()</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; {</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; {&quot;people&quot;, &quot;http://example.org/people/&quot;},</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; {&quot;skills&quot;, &quot;http://example.org/skills/&quot;},</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; {&quot;schema&quot;, &quot;http://example.org/schema/&quot;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; };</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">store = context.OpenStore(storeName, _namespaceMappings);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">It is best practise to set up a static dictionary within your class or configuration</text></para>
+    <para styleclass="Heading1"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Querying data using SPARQL</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB supports </text><link displaytype="text" defaultstyle="true" type="weblink" href="http://www.w3.org/TR/sparql11-query/" target="_blank" styleclass="Normal" translate="true">SPARQL 1.1</link><text styleclass="Normal" translate="true"> for querying the data in the store. These queries can be executed via the Data Object store using the ExecuteSparql() method. </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The SparqlResult returned has the results of the SPARQL query in the ResultDocument property (See </text><link displaytype="text" defaultstyle="true" type="weblink" href="http://www.w3.org/TR/rdf-sparql-XMLres/" target="_blank" styleclass="Normal" translate="true">http://www.w3.org/TR/rdf-sparql-XMLres/</link><text styleclass="Normal" translate="true"> for the XML format returned). </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var query = &quot;SELECT ?skill WHERE { &lt;http://example.org/people/fred&gt; &lt;http://example.org/schemas/person/skill&gt; ?skill }&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var sparqlResult = store.ExecuteSparql(query);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">foreach (var sparqlResultRow in sparqlResult.ResultDocument.SparqlResultRows())</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;var val = sparqlResultRow.GetColumnValue(&quot;skill&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;Console.WriteLine(&quot;Skill is &quot; + val);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Binding SPARQL Results To Data Objects</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">When a SPARQL query has been written to return a variable binding, it can be passed to the BindDataObjectsWithSparql() method. This executes the SPARQL query, and then binds each URI in the results to a data object, and passes back the enumeration of these instances.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var skillsQuery = &quot;SELECT ?skill WHERE {?skill a &lt;http://example.org/schemas/skill&gt;}&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var allSkills = store.BindDataObjectsWithSparql(skillsQuery).ToList();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">foreach (var s in allSkills)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;Console.WriteLine(&quot;Skill is &quot; + s.Identity);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+  </body>
+</topic>

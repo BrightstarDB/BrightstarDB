@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SdShareConfiguration>
+
+  <LoggingLocation>c:\tmp\sdshare</LoggingLocation>
+  <HashValueStorageLocation>c:\tmp\sdshare\storage\hashvalues</HashValueStorageLocation>
+  <LastUpdatedStorageLocation>c:\tmp\sdshare\lastupdated</LastUpdatedStorageLocation>
+
+  <!-- CollectionProvider name="OData"
+                      identifier="http://psi.brightstardb.com/feeds/odatafeed"
+                      Assembly="BrightstarDB.SdShare"
+                      Type="BrightstarDB.SdShare.ODataCollectionProvider">
+  </CollectionProvider -->
+
+  <!-- CollectionProvider name="Sample Business Data" 
+                      identifier="http://psi.brightstardb.com/feeds/samplebusiness"
+                      Assembly="BrightstarDB.SdShare"
+                      Type="BrightstarDB.SdShare.OdbcCollectionProvider">
+    <DsnConnection>DSN=SQLServer</DsnConnection>
+    <DataSourceType>SQLServer</DataSourceType>    
+    <PublishingDefinitions>
+      <Definition>
+        <ResourcePrefix>http://www.brightstardb.com/sample/</ResourcePrefix>
+        <UriTemplate>/people/{id}</UriTemplate>
+        <FragmentsQuery>select customerchangelog.customerid as id, customer.name as name, customerchangelog.updated FROM customerchangelog LEFT OUTER JOIN customer ON customer.id = customerchangelog.customerid where customerchangelog.updated > [[since]]</FragmentsQuery>
+        <SourceDataInLocalTime>True</SourceDataInLocalTime>
+        <FragmentGenerationDefinitions>
+          <FragmentGenerationDefinition>
+            <SnapshotQuery>select id, name from customer</SnapshotQuery>
+            <FragmentQuery>select * from customer where id = [[id]]</FragmentQuery>
+            <RdfTemplates genericExcludes="id,name">
+              <li>{{http://www.brightstardb.com/sample/people/[[id]]}} {{http://www.brightstardb.com/sample/schema/label}} "[[name]]" .</li>
+              <li>{{http://www.brightstardb.com/sample/people/[[id]]}} {{http://www.w3.org/2000/01/rdf-schema#type}} {{http://www.brightstardb.com/sample/person}} .</li>
+              <li>{{http://www.brightstardb.com/sample/people/[[id]]}} {{http://www.brightstardb.com/sample/schema/[[COLNAME]]}}  "[[VALUE]]" .</li>
+            </RdfTemplates>
+          </FragmentGenerationDefinition>          
+        </FragmentGenerationDefinitions>
+      </Definition>
+
+      <Definition>
+        <ResourcePrefix>http://www.brightstardb.com/sample/</ResourcePrefix>
+        <UriTemplate>/error/{id}</UriTemplate>
+        <FragmentsQuery>select id, id as name, CURRENT_TIMESTAMP as updated from CustomerErrorReports</FragmentsQuery>
+        <SourceDataInLocalTime>True</SourceDataInLocalTime>
+        <FragmentGenerationDefinitions>
+          <FragmentGenerationDefinition>
+            <SnapshotQuery>select id, id as name from CustomerErrorReports</SnapshotQuery>
+            <FragmentQuery>select * from CustomerErrorReports where id = '[[id]]'</FragmentQuery>
+            <RdfTemplates>
+              <li>{{http://www.brightstardb.com/sample/error/URLENCODE([[id]])}} {{http://www.w3.org/2000/01/rdf-schema#type}} {{http://www.brightstardb.com/sample/error}} .</li>
+              <li>{{http://www.brightstardb.com/sample/error/URLENCODE([[id]])}} {{http://www.brightstardb.com/sample/schema/[[COLNAME]]}}  "[[VALUE]]" .</li>
+            </RdfTemplates>
+          </FragmentGenerationDefinition>
+        </FragmentGenerationDefinitions>
+      </Definition>
+
+      <Definition>
+        <ResourcePrefix>http://psi.np.com</ResourcePrefix>
+        <UriTemplate>"/sys1/people/{id}"</UriTemplate>
+        <HashValueTable>employee</HashValueTable>
+        <HashValueKeyColumn>id</HashValueKeyColumn>
+        <EntityIdColumn>id</EntityIdColumn>
+        <UpdateFrequency>10000</UpdateFrequency>
+        <FragmentGenerationDefinitions>
+          <FragmentGenerationDefinition>
+            <SnapshotQuery>select id, name from employee</SnapshotQuery>
+            <FragmentQuery>select id, name from employee where id = [[id]]</FragmentQuery>
+            <RdfTemplates>
+              <li>{{http://psi.np.com/sys1/people/[[id]]}} {{http://psi.np.com/schema/label}} "[[name]]" .</li>
+              <li>{{http://psi.np.com/sys1/people/[[id]]}} {{http://psi.np.com/schema/typeof}} {{http://psi.np.com/schema/person}} .</li>
+              <li>{{http://psi.np.com/sys1/people/[[id]]}} {{http://psi.np.com/schema/[[COLNAME]]}}  "[[VALUE]]" .</li>
+            </RdfTemplates>
+          </FragmentGenerationDefinition>
+        </FragmentGenerationDefinitions>
+      </Definition>
+    </PublishingDefinitions>    
+  </CollectionProvider -->
+
+  <CollectionConsumers>
+    <!--FeedSource>
+      <Name>BusinessData</Name>
+      <Url>http://localhost:9090/sdshare/collections/Sparql%20SdShare%20Provider</Url>
+      <CheckPeriod>3000</CheckPeriod>      
+    </FeedSource>
+
+    <ClientAdaptor Assembly="BrightstarDB.SdShare.Client"
+                   Type="BrightstarDB.SdShare.Client.SparqlUpdateAdaptor">
+      <Feed>BusinessData</Feed>
+      <SparqlServiceEndpoint>http://localhost/sparql/slave/update</SparqlServiceEndpoint>
+      <GraphUri>http://www.businessdata.com</GraphUri>
+    </ClientAdaptor -->
+
+
+    <!-- FeedSource>
+      <Name>OData</Name>
+      <Url>http://localhost:9090/sdshare/collections/OData</Url>
+      <CheckPeriod>5000</CheckPeriod>      
+    </FeedSource -->
+
+    <!-- ClientAdaptor Assembly="BrightstarDB.SdShare.Client" Type="BrightstarDB.SdShare.Client.LoggingAdaptor">
+      <Feed>OData</Feed>
+    </ClientAdaptor -->
+
+    <!-- ClientAdaptor Assembly="BrightstarDB.SdShare.Client"
+                   Type="BrightstarDB.SdShare.Client.SparqlUpdateAdaptor">
+      <Feed>OData</Feed>
+      <SparqlServiceEndpoint>http://localhost/sparql/update</SparqlServiceEndpoint>
+      <GraphUri>http://www.example.com/odata</GraphUri>
+    </ClientAdaptor -->
+
+  </CollectionConsumers>
+  
+</SdShareConfiguration>

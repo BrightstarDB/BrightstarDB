@@ -1,0 +1,19 @@
+Index: HashSet.cs
+===================================================================
+--- HashSet.cs	(revision 2029)
++++ HashSet.cs	(working copy)
+@@ -106,12 +106,12 @@
+ 
+         public IEnumerator<T> GetEnumerator()
+         {
+-            throw new NotImplementedException();
++            return MyDict.Keys.GetEnumerator();
+         }
+ 
+         IEnumerator IEnumerable.GetEnumerator()
+         {
+-            throw new NotImplementedException();
++            return GetEnumerator();
+         }
+ 
+         public void UnionWith(IEnumerable<T> other)

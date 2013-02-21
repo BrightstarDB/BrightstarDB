@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutHeading" xml:space="preserve">
+    <value>Polaris Management Tool for BrightstarDB</value>
+  </data>
+  <data name="AboutInfo" xml:space="preserve">
+    <value>Release: {0}, Build: {1}
+Copyright (c) 2012 BrightstarDB Limited. All Rights Reserved.</value>
+  </data>
+  <data name="Acknowledgements" xml:space="preserve">
+    <value>This application makes use of the following open-source components:
+
+dotNetRDF (http://www.dotnetrdf.org/)
+------------------------------------------
+Copyright (c) 2011 Rob Vesse
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+GalaSoft MVVM Light (http://mvvmlight.codeplex.com/)
+------------------------------------------------------------
+Copyright (c) 2009 - 2011 Laurent Bugnion
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</value>
+  </data>
+  <data name="DeleteStoreDialogContent" xml:space="preserve">
+    <value>Are you sure you want to delete the store '{0}' from the server ?
+This operation cannot be undone!</value>
+  </data>
+  <data name="DeleteStoreDialogTitle" xml:space="preserve">
+    <value>Delete Store ?</value>
+  </data>
+  <data name="DirectorySelectorDescription" xml:space="preserve">
+    <value>Select the root folder for the Brightstar service. This folder will contain a subfolder for each store created within the service.</value>
+  </data>
+  <data name="DisconnectServerDialogContent" xml:space="preserve">
+    <value>Are you sure you want to permanently remove the server connection '{0}' from the server list ?</value>
+  </data>
+  <data name="DisconnectServerDialogTitle" xml:space="preserve">
+    <value>Remove Server from Server List ?</value>
+  </data>
+  <data name="ExportCompletedDialogMsg" xml:space="preserve">
+    <value>The export of data from store '{0}' has completed successfully. The data can be found on the BrightstarDB server under the import directory.</value>
+  </data>
+  <data name="ExportCompletedDialogTitle" xml:space="preserve">
+    <value>Export Completed</value>
+  </data>
+  <data name="ExportFailedDialogMsg" xml:space="preserve">
+    <value>The export of data from store '{0}' failed. Check the export tab for details.</value>
+  </data>
+  <data name="ExportFailedDialogTitle" xml:space="preserve">
+    <value>Export Failed</value>
+  </data>
+  <data name="ExportTabDefaultTitle" xml:space="preserve">
+    <value>{0} Export</value>
+  </data>
+  <data name="ExportUnexpectedErrorMsg" xml:space="preserve">
+    <value>An unexpected error prevented the export job from running.</value>
+  </data>
+  <data name="HistoryTabDefaultTitle" xml:space="preserve">
+    <value>{0} History</value>
+  </data>
+  <data name="ImportCompletedDialogMsg" xml:space="preserve">
+    <value>The import of data into store '{0}' has completed successfully.</value>
+  </data>
+  <data name="ImportCompletedDialogTitle" xml:space="preserve">
+    <value>Import Completed</value>
+  </data>
+  <data name="ImportFailedDialogMsg" xml:space="preserve">
+    <value>The import of data into store '{0}' failed. Check the import tab for details.</value>
+  </data>
+  <data name="ImportFailedDialogTitle" xml:space="preserve">
+    <value>Import Failed</value>
+  </data>
+  <data name="ImportFileNotFound" xml:space="preserve">
+    <value>Cannot find import file '{0}'.</value>
+  </data>
+  <data name="ImportFileSizeWarningMsg" xml:space="preserve">
+    <value>The file '{0}' is quite large (over 50MB).
+
+A local import may require a large amount of memory on this machine as well as a fast network connection to the server.
+If possible consider copying the file to the BrightstarDB server's import folder and using a Remote import job instead.
+
+Are you sure you want to attempt to import this file with a Local import job ?</value>
+  </data>
+  <data name="ImportFileSizeWarningTitle" xml:space="preserve">
+    <value>File Size Warning</value>
+  </data>
+  <data name="ImportTabDefaultTitle" xml:space="preserve">
+    <value>{0} Import</value>
+  </data>
+  <data name="ImportUnexpectedErrorMsg" xml:space="preserve">
+    <value>An unexpected error prevented the import job from running.</value>
+  </data>
+  <data name="ParseErrorDescription" xml:space="preserve">
+    <value>An error occurred when parsing the content of the file {0}. Cause: {1}</value>
+  </data>
+  <data name="ParseErrorTitle" xml:space="preserve">
+    <value>Error Parsing RDF File</value>
+  </data>
+  <data name="QueryTabDefaultTitle" xml:space="preserve">
+    <value>New Query</value>
+  </data>
+  <data name="StoreCreateFailed" xml:space="preserve">
+    <value>Failed to create new store. {0}</value>
+  </data>
+  <data name="StoreCreateFailedTitle" xml:space="preserve">
+    <value>Store Creation Failed</value>
+  </data>
+  <data name="TransactionFailed" xml:space="preserve">
+    <value>Transaction failed.</value>
+  </data>
+  <data name="TransactionSuccess" xml:space="preserve">
+    <value>The transaction completed successfully.</value>
+  </data>
+  <data name="TransactionTabDefaultTitle" xml:space="preserve">
+    <value>New Transaction</value>
+  </data>
+  <data name="FileSelectorOptions" xml:space="preserve">
+    <value>NTriples (*.nt)|*.nt;*.nt.gz|NQuads (*.nq)|*.nq;*.nq.gz|RDF/XML (*.rdf)|*.rdf;*.rdf.gz|RDF/JSON (*.rj;*.json)|*.rj;*.json;*.rj.gz;*.json.gz|Notation3 (*.n3)|*.n3;*.n3.gz|Turtle (*.ttl)|*.ttl;*.ttl.gz|All Files(*.*)|*.*</value>
+    <comment>The list of file types displayed in the file selector dialog of the import view.
+		</comment>
+  </data>
+  <data name="ImportFileTooLarge" xml:space="preserve">
+    <value>The import file is too large to be processed in memory on the client. Please copy this file to the server and use a Remote import instead.</value>
+  </data>
+  <data name="ImportLegacyConfigurationMessage" xml:space="preserve">
+    <value>An older Polaris configuration file has been found. Do you want to import this existing configuration ? If you choose No, a new empty configuration will be created for you.</value>
+  </data>
+  <data name="ImportLegacyConfigurationTitle" xml:space="preserve">
+    <value>Import Old Configuration</value>
+  </data>
+  <data name="NoConnectionsMessage" xml:space="preserve">
+    <value>A Connection specifies how Polaris should connect to a BrightstarDB store. This may be either a direct connection to the directory or (recommended) a connection to a BrightstarDB server.
+
+You currently have no connections defined. Would you like to create a new connection now ?</value>
+  </data>
+  <data name="NoConnectionsTitle" xml:space="preserve">
+    <value>No Connections Defined</value>
+  </data>
+</root>

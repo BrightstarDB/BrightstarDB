@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Patterns</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Patterns</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">This section describes how to model common patterns using BrightstarDB Entity Framework. It covers how to define one-to-one, one-to-many, many-to-many and reflexive relationships.</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Examples of these relationship patterns can be found in the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Tweetbox" styleclass="Normal" translate="true">Tweetbox sample</link><text styleclass="Normal" translate="true">.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">One-to-One</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Entities can have one-to-one relationships with other entities. An example of this would be the link between a user and a the authorization to another social networking site. The one-to-one relationship would be described in the interfaces as follows:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IUser {</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">ISocialNetworkAccount SocialNetworkAccount { get; set; }</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface ISocialNetworkAccount {</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">[InverseProperty(&quot;SocialNetworkAccount&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;IUser TwitterAccount { get; set; }</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">One-to-Many</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">A User entity can be modeled to have a one-to-many relationship with a set of Tweet entities, by marking the properties in each interface as follows:</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface ITweet {</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">IUser Author { get; set; }</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IUser {</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">[InverseProperty(&quot;Author&quot;)]</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">ICollection&lt;ITweet&gt; Tweets { get; set; }</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Many-to-Many</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The Tweet entity can be modeled to have a set of zero or more Hash Tags. As any Hash Tag entity could be used in more than one Tweet, this uses a many-to-many relationship pattern </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface ITweet {</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">ICollection&lt;IHashTag&gt; HashTags { get; set; }</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IHashTag {</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">[InverseProperty(&quot;HashTags&quot;)]</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">ICollection&lt;ITweet&gt; Tweets { get; set; }</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Reflexive relationship</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">A reflexive relationship (that refers to itself) can be defined as in the example below</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IUser {</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">ICollection&lt;IUser&gt; Following { get; set; }</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">[InverseProperty(&quot;Following&quot;)]</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">ICollection&lt;IUser&gt; Followers { get; set; }</text></para>
+    <para styleclass="Code Example"><tab /><text styleclass="Code Example" translate="true">...</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+  </body>
+</topic>

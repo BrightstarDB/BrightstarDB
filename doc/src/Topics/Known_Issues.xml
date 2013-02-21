@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="kal_000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Known Issues</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Known Issues</text></para>
+    </header>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">SPARQL Queries</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">When using the less-than (&lt;) symbol in SPARQL queries, it is necessary to put spaces between the symbol and the rest of the query to avoid a parser error. For example the following query will fail with a parser error:</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">SELECT ?p ?s WHERE { ?p a &lt;http://example.org/schema/person&gt; . ?p &lt;http://example.org/schema/salary&gt; ?s . </text><text styleclass="Code Example" style="font-weight:bold;" translate="true">FILTER (?s&lt;50000)</text><text styleclass="Code Example" translate="true"> &#160;} </text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">but the same query written as shown below will be processed correctly.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">SELECT ?p ?s WHERE { ?p a &lt;http://example.org/schema/person&gt; . ?p &lt;http://example.org/schema/salary&gt; ?s . </text><text styleclass="Code Example" style="font-weight:bold;" translate="true">FILTER (?s &lt; 50000)</text><text styleclass="Code Example" translate="true"> &#160;}</text></para>
+    <para styleclass="Heading1"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Entity Framework Tooling</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">&apos;_&apos; underscore characters are not allowed in the names of the namespace(s) containing the interfaces that are to be generated into entity classes.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Currently only the following versions of Visual Studio are provisioned with the Entity Framework item templates through the installer:</text></para>
+    <para styleclass="Normal"></para>
+    <list id="4" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Visual Studio C# Express 2010</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Visual Studio 2010 Professional and above</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Visual Studio 2012 Professional and above</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To create an entity context class in other versions of Visual Studio, we recommend that you copy the .tt file from one of the Entity Framework samples into your own project. You may rename the file if you wish as long as you retain the .tt file extension.</text></para>
+    <para styleclass="Heading1"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">OData Functions</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The filter function &apos;replace&apos; is not supported. </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Avoid HTML Named Entities in String Values</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Using HTML named entities in string values that are not also valid XML named entities will result in errors when parsing the SPARQL results if these string values are included in the results set. Examples of such entities are &amp;pound; for a pound-symbol, &amp;copy; for a copyright symbol etc. It is best to avoid this situation by converting all HTML named entities to their numeric entity form before storing them in BrightstarDB (e.g. &amp;#163; instead of &amp;pound;). A full list of HTML named entities and their numeric equivalents for HTML 4 can be found at </text><link displaytype="text" defaultstyle="true" type="weblink" href="http://www.w3.org/TR/WD-html40-970708/sgml/entities.html" target="_blank" styleclass="Normal" translate="true">http://www.w3.org/TR/WD-html40-970708/sgml/entities.html</link><text styleclass="Normal" translate="true">.</text></para>
+  </body>
+</topic>

@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "BrightstarDB", "BrightstarDb\BrightstarDB.wixproj", "{D940C15A-4965-4E68-9D98-54C00C485B90}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Initialisation", "Initialisation", "{33C11C11-B830-4B0E-B2B9-A3ADDDC5CCD5}"
+	ProjectSection(SolutionItems) = preProject
+		installers.proj = installers.proj
+		sdshare-installer.proj = sdshare-installer.proj
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Transforms", "Transforms", "{5BD7E020-910B-4979-9C4F-28A8A8EC621A}"
+	ProjectSection(SolutionItems) = preProject
+		RemoveDirTransform.xslt = RemoveDirTransform.xslt
+	EndProjectSection
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "BrightstarDBEnterprise", "BrightstarDBEnterprise\BrightstarDBEnterprise.wixproj", "{D7DADF14-E81E-4905-A2B4-E4473130148A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D940C15A-4965-4E68-9D98-54C00C485B90}.Debug|x86.ActiveCfg = Debug|x86
+		{D940C15A-4965-4E68-9D98-54C00C485B90}.Debug|x86.Build.0 = Debug|x86
+		{D940C15A-4965-4E68-9D98-54C00C485B90}.Release|x86.ActiveCfg = Release|x86
+		{D940C15A-4965-4E68-9D98-54C00C485B90}.Release|x86.Build.0 = Release|x86
+		{D7DADF14-E81E-4905-A2B4-E4473130148A}.Debug|x86.ActiveCfg = Debug|x86
+		{D7DADF14-E81E-4905-A2B4-E4473130148A}.Debug|x86.Build.0 = Debug|x86
+		{D7DADF14-E81E-4905-A2B4-E4473130148A}.Release|x86.ActiveCfg = Release|x86
+		{D7DADF14-E81E-4905-A2B4-E4473130148A}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,396 @@
+﻿<Window x:Class="BrightstarDB.Polaris.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+        xmlns:converters="clr-namespace:BrightstarDB.Polaris.Converters"
+        xmlns:Controls="clr-namespace:BrightstarDB.Polaris.Controls" x:Name="Main"
+        Title="Polaris - BrightstarDB Management" 
+        Height="480" Width="640"
+        DataContext="{Binding Main, Source={StaticResource Locator}}" 
+        Loaded="Window_Loaded" Closed="Window_Closed" >
+    <Window.Resources>
+        <converters:TypeMatchConverter x:Key="TypeMatchConverter"/>
+        <converters:VisibilityConverter x:Key="VisibilityConverter"/>
+        <ContextMenu x:Key="ServerContextMenu">
+            <MenuItem Header="New Store..." Click="HandleNewStoreCMClick"/>
+            <MenuItem Header="Refresh" Click="HandleRefreshServerCMClick"/>
+            <MenuItem Header="Edit" Click="HandleEditServerCMClick"/>
+            <MenuItem Header="Remove From Server List" Click="HandleRemoveServerCMClick"/>
+        </ContextMenu>
+        <ContextMenu x:Key="StoreContextMenu">
+            <MenuItem Header="_New">
+                <MenuItem Header="SPARQL _Query" Click="HandleQueryCMClick"/>
+                <MenuItem Header="_Import Job" Click="HandleImportJobCMClick" />
+                <MenuItem Header="_Export Job" Click="HandleExportJobCMClick"/>
+                <MenuItem Header="_Transaction" Click="HandleTransactionCMClick"/>
+                <MenuItem Header="SPARQL _Update" Click="HandleUpdateCMClick"/>
+                <MenuItem Header="_History View" Click="HandleHistoryCMClick"/>
+            </MenuItem>
+            <MenuItem Header="_Delete" Click="HandleStoreDeleteCMClick"/>
+        </ContextMenu>
+        <DataTemplate x:Key="StoreTemplate" >
+            <TextBlock Text="{Binding Location}" ContextMenu="{StaticResource StoreContextMenu}"/>
+        </DataTemplate>
+        <HierarchicalDataTemplate x:Key="StoreSourceTemplate" 
+                                  ItemsSource="{Binding Stores}" 
+                                  ItemTemplate="{StaticResource StoreTemplate}" >
+            <StackPanel Orientation="Horizontal" ContextMenu="{StaticResource ServerContextMenu}">
+                <TextBlock Text="{Binding Name}"/>
+                <TextBlock Text=" - " Visibility="{Binding HasConnectionError, Converter={StaticResource VisibilityConverter}, ConverterParameter=ShowIfTrue}"/>
+                <TextBlock Text="{Binding ConnectionError}" Visibility="{Binding HasConnectionError, Converter={StaticResource VisibilityConverter}, ConverterParameter=ShowIfTrue}"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        
+        <Style TargetType="{x:Type Controls:PolarisTabItem}">
+            <Setter Property="Header" Value="{Binding Path=DataContext.Title,PresentationTraceSources.TraceLevel=High}"/>
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,4,0">
+                            <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="EditableTabHeaderControl" TargetType="{x:Type Controls:EditableTabHeaderControl}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Controls:EditableTabHeaderControl}">
+                        <Grid>
+                            <TextBox x:Name="PART_TabHeader" 
+                                     Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Mode=TwoWay}" 
+                                     Visibility="Collapsed"/>
+                            <TextBlock x:Name="PART_TextBlock" 
+                                       Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Mode=TwoWay}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsInEditMode" Value="True">
+                                <Trigger.Setters>
+                                    <Setter TargetName="PART_TabHeader" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="PART_TextBlock" Property="Visibility" Value="Collapsed"/>
+                                </Trigger.Setters>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TabItemContainerStyle" TargetType="TabItem">
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <Controls:EditableTabHeaderControl Style="{StaticResource EditableTabHeaderControl}">
+                            <Controls:EditableTabHeaderControl.Content>
+                                <Binding Path="Title" Mode="TwoWay"/>
+                            </Controls:EditableTabHeaderControl.Content>
+                        </Controls:EditableTabHeaderControl>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <DockPanel Width="Auto" Height="Auto" LastChildFill="True">
+        <Menu Width="Auto" DockPanel.Dock="Top" Height="20">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New Connection...">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand x:Name="NewConnectionClicked" Command="{Binding NewConnectionCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="_Close All Tabs" Click="HandleCloseAllTabs"/>
+                <Separator/>
+                <MenuItem Header="_Settings">
+                    <MenuItem Header="_Prefixes">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <Command:EventToCommand Command="{Binding PrefixSettingsCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="E_xit">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ExitCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Server" IsEnabled="{Binding ElementName=StoreTreeView, Path=SelectedItem, Converter={StaticResource TypeMatchConverter}, ConverterParameter=BrightstarDB.Polaris.ViewModel.Connection}">
+                <MenuItem Header="_New Store...">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ServerCreateStoreCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="_Refresh">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ServerRefreshCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="_Edit">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ServerEditCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                <MenuItem Header="Remove From Server List" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand x:Name="DisconnectClicked" Command="{Binding ServerDisconnectCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="S_tore" IsEnabled="{Binding ElementName=StoreTreeView, Path=SelectedItem, Converter={StaticResource TypeMatchConverter}, ConverterParameter=BrightstarDB.Polaris.ViewModel.Store}">
+                <MenuItem Header="_New">
+                    <MenuItem Header="SPARQL _Query">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <Command:EventToCommand x:Name="NewSparqlQueryClicked" Command="{Binding NewSparqlQueryCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="_Import Job">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <Command:EventToCommand x:Name="NewImportJobClicked" Command="{Binding NewImportJobCommand,Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="_Export Job">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <Command:EventToCommand x:Name="NewExportJobClicked" Command="{Binding NewExportJobCommand,Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="_Transaction">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <Command:EventToCommand x:Name="NewTransactionClicked" Command="{Binding NewTransactionCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="SPARQL _Update">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <Command:EventToCommand x:Name="NewSparqlUpdateClicked" Command="{Binding NewSparqlUpdateCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/> 
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="_History View">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <Command:EventToCommand Command="{Binding NewHistoryViewCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                </MenuItem>
+                <!--
+                <MenuItem Header="Analyze" IsEnabled="{Binding ElementName=StoreTreeView, Path=SelectedItem, Converter={StaticResource TypeMatchConverter}, ConverterParameter=NetworkedPlanet.Brightstar.Polaris.ViewModel.LocalStore}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand x:Name="StoreAnalyzeClicked" Command="{Binding AnalyzeStoreCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+                -->
+                <MenuItem Header="_Delete">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding StoreDeleteCommand}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Window" ItemsSource="{Binding TabItems}" >
+                <MenuItem.ItemTemplate>
+                    <DataTemplate>
+                        <MenuItem Header="{Binding Title}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <Command:EventToCommand Command="{Binding ActivateCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </MenuItem>
+                    </DataTemplate>
+                </MenuItem.ItemTemplate>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding AboutClickCommand}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <ToolBarTray Name="TabItemToolbarTray" DockPanel.Dock="Top">
+            
+            <ToolBar Band="0" BandIndex="1" x:Name="StoreSelectorToolbar" Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock>Server:</TextBlock>
+                    <ComboBox Name="StoreSelectorServerCombo" 
+                              ItemsSource="{Binding StoreSources}"
+                              SelectedItem="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.Server}"
+                              DisplayMemberPath="Name"
+                              MinWidth="100" Margin="3"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock>Store:</TextBlock>
+                    <ComboBox ItemsSource="{Binding ElementName=StoreSelectorServerCombo, Path=SelectedItem.Stores}"
+                              SelectedItem="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.Store}"
+                              DisplayMemberPath="Location"
+                              MinWidth="100" Margin="3"/>
+                </StackPanel>
+            </ToolBar>
+            
+            <ToolBar Band="0" BandIndex="1" x:Name="SparqlQueryToolbar" Visibility="Collapsed">
+                <Button ToolTip="Load a SPARQL query">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.LoadCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Image Source="/Polaris;component/Resources/folder.png"></Image>
+                </Button>
+                <Button ToolTip="Save the current SPARQL query">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.SaveCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Image Source="/Polaris;component/Resources/disk.png"></Image>
+                </Button>
+                <Separator/>
+                <Button ToolTip="Run the SPARQL query">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand x:Name="SparqlRunClicked" Command="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.ExecuteCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Image Source="/Polaris;component/Resources/control_play_blue.png"></Image>
+                </Button>
+            </ToolBar>
+
+            <ToolBar Band="0" BandIndex="3" x:Name="SparqlUpdateToolbar" Visibility="Collapsed">
+                <Button ToolTip="Run the SPARQL update">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand x:Name="SparqlUpdateRunClicked" Command="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.ExecuteCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Image Source="/Polaris;component/Resources/control_play_blue.png"></Image>
+                </Button>
+            </ToolBar>
+            <ToolBar Band="0" BandIndex="2" x:Name="HistoryToolbar" Visibility="Collapsed">
+                <Button VerticalAlignment="Stretch" Padding="3" ToolTip="Refresh Commit Point List">
+                    <Image Source="/Polaris;component/Resources/arrow_refresh.png"/>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.RefreshCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+                <Button VerticalAlignment="Stretch" Padding="3" ToolTip="Revert to Commit Point">
+                    <Image Source="/Polaris;component/Resources/arrow_undo.png"/>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.RevertCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+            </ToolBar>
+            <ToolBar Band="0" BandIndex="1" x:Name="TransactionToolbar" Visibility="Collapsed" >
+                <Button VerticalAlignment="Stretch" Padding="3" ToolTip="Execute the transaction">
+                    <Button.Content>
+                        <Image Source="/Polaris;component/Resources/lightning.png"></Image>
+                    </Button.Content>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.ExecuteCommand, Mode=OneWay}"
+                                                    PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <StatusBar Width="Auto" Height="31" DockPanel.Dock="Bottom"></StatusBar>
+        <Grid Width="Auto" DockPanel.Dock="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+            <TreeView x:Name="StoreTreeView"
+                Width="Auto" 
+                      HorizontalAlignment="Stretch"
+                      ItemsSource="{Binding StoreSources}"
+                      ItemTemplate="{StaticResource StoreSourceTemplate}"/>
+            <GridSplitter Grid.Column="1" 
+                          Width="5" 
+                          HorizontalAlignment="Center" 
+                          VerticalAlignment="Stretch"
+                          ShowsPreview="True"/>
+            <TabControl ItemsSource="{Binding TabItems}" Grid.Column="2" Background="White" Name="TabControl" 
+                        ItemContainerStyle="{StaticResource TabItemContainerStyle}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <Command:EventToCommand x:Name="TabItemSelectionChanged" Command="{Binding TabItemChangedCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=TabControl, Path=SelectedItem}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <!--
+                            <TextBlock  Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+                            -->
+                            <Controls:EditableTabHeaderControl Content="{Binding Title, Mode=TwoWay}"
+                                                               Style="{StaticResource EditableTabHeaderControl}"/>
+                            <Button Grid.Column="1" Margin="3, 0, 0, 0" BorderThickness="0" Background="Transparent" BorderBrush="Transparent"  >
+                                <Button.Content>
+                                    <Image Source="/Polaris;component/Resources/close_tab.png" Height="12" Width="12" Stretch="UniformToFill" />
+                                </Button.Content>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <Command:EventToCommand Command="{Binding CloseCommand, Mode=OneWay}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate>
+                        <ContentPresenter Content="{Binding Content}"  />
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+            <!--
+            <TabControl x:Name="TabControl" Grid.Column="2" ItemsSource="{Binding TabItems}" >
+              <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <Command:EventToCommand Command="{Binding TabItemChangedCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=TabControl, Path=SelectedItem.DataContext}" />
+                </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TabControl>
+            -->
+        </Grid>
+    </DockPanel>
+</Window>

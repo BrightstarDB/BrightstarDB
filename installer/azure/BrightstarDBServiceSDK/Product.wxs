@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:vs="http://schemas.microsoft.com/wix/VSExtension">
+	<Product Id="*" 
+           Name="BrightstarDB Service SDK $(var.BuildNumber).0" 
+           Language="1033" 
+           Version="$(var.BuildNumber).0" 
+           Manufacturer="BrightstarDB Limited" 
+           UpgradeCode="daf41632-072c-4097-adb2-13b5144dcd71">
+    
+		<Package InstallerVersion="200" Compressed="yes" />
+
+		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+    <Upgrade Id="{BC4C023E-D2D6-4D40-9BBB-95A99FEF000C}">
+      <UpgradeVersion Minimum="1.0.0" IncludeMinimum="yes"
+             Maximum ="$(var.BuildNumber)" IncludeMaximum="no"
+             Property="OLDVERSIONBEINGUPGRADED" />
+    </Upgrade>
+
+    <Upgrade Id="{D75141C8-1D55-4061-B5CC-BD8CBBC42C82}">
+      <UpgradeVersion Minimum="$(var.BuildNumber).0"
+                      OnlyDetect="yes"
+                      Property="NEWERVERSIONDETECTED"/>
+    </Upgrade>
+
+    <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit"/>
+
+    <Icon Id="installer.ico" SourceFile="..\..\images\installer3.ico"/>
+
+    <PropertyRef Id="VCSHARP2010EXPRESS_IDE"/>
+    <PropertyRef Id="VS2010_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED"/>
+    <PropertyRef Id="VS2010_ITEMTEMPLATES_DIR"/>
+    <PropertyRef Id="VS2010_ROOT_FOLDER"/>
+
+    <Property Id="ARPPRODUCTICON" Value="installer.ico"/>
+
+    <CustomAction Id="SetVS2010ItemTemplatesPath" Directory="VS2010ITEMTEMPLATEDIR" Value="[VS2010_ITEMTEMPLATES_DIR]CSharp\Data"/>
+    <CustomAction Id="SetVS2010ExpressItemTemplatesPath" Directory="VS2010ITEMTEMPLATEDIR" Value="[VS2010_ROOT_FOLDER]\Common7\IDE\VCSExpress\ItemTemplates\1033"/>
+    <CustomActionRef Id="VCSHARP2010InstallVSTemplates"/>
+    <CustomActionRef Id="VS2010InstallVSTemplates"/>
+
+    <InstallExecuteSequence>
+      <Custom Action="SetVS2010ItemTemplatesPath" After="CostFinalize"><![CDATA[ &VisualStudioIntegration=3 ]]></Custom>
+      <Custom Action="SetVS2010ExpressItemTemplatesPath" After="CostFinalize"><![CDATA[ &VCSExpressIntegration=3 ]]></Custom>
+      <Custom Action='VCSHARP2010InstallVSTemplates' Before='InstallFinalize'><![CDATA[ &VCSExpressIntegration=3 ]]></Custom>
+      <Custom Action='VS2010InstallVSTemplates' Before='InstallFinalize'><![CDATA[ &VisualStudioIntegration=3 ]]></Custom>
+    </InstallExecuteSequence>
+
+    <WixVariable Id='WixUILicenseRtf' Value='..\InstallerTmp\EULA.rtf'/>
+    <WixVariable Id='WixUIBannerBmp' Value='..\..\images\installtopbanner.bmp'/>
+    <WixVariable Id='WixUIDialogBmp' Value='..\..\images\installerbackground1.bmp'/>
+
+    <UIRef Id='WixUI_FeatureTree'/>
+    <UIRef Id='WixUI_ErrorProgressText'/>
+
+    <UI>
+      <ProgressText Action="VCSHARP2010InstallVSTemplates">Configuring Visual C# 2010 Express Edition... (this may take a few minutes)</ProgressText>
+      <ProgressText Action="VS2010InstallVSTemplates">Configuring Visual Studio 2010... (this may take a few minutes)</ProgressText>
+    </UI>
+
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="VS2010ITEMTEMPLATEDIR"/>
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLLOCATION" Name="BrightstarDB Service SDK">
+          <Directory Id="DOCSDIR" Name="Docs"/>
+          <Directory Id="SDKDIR" Name="SDK"/>
+          <Directory Id="VSDIR" Name="VisualStudio"/>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="BrightstarDBServiceProgramMenuFolder" Name="BrightstarDB Service SDK"/>
+      </Directory>
+		</Directory>
+
+    <DirectoryRef Id="BrightstarDBServiceProgramMenuFolder" >
+      <Component Id="DocsShortcuts" Guid="{79EA8A93-7515-49FB-89D2-E30E3E3DF79E}"  >
+        <Shortcut Id="PdfShortcut"
+                  Name="BrightstarDB Service Documentation (PDF)"
+                  Target="[DOCSDIR]BrightstarDB_ServiceClient.pdf"
+                  WorkingDirectory="DOCSDIR"/>
+        <Shortcut Id="ChmShortcut"
+                  Name="BrightstarDB Service Documentation (CHM)"
+                  Target="[DOCSDIR]BrightstarDB_ServiceClient.chm"
+                  WorkingDirectory="DOCSDIR"/>
+        <util:InternetShortcut Id="OnlineDocsShortcut"
+                               Directory="DOCSDIR"
+                               Target="http://brightstardb.com/service/documentation/"
+                               Name="BrightstarDB Service Online Documentation"/>
+        <util:InternetShortcut Id="OnlineDocsStartMenuShortcut"
+                               Directory="BrightstarDBServiceProgramMenuFolder"
+                               Target="http://brightstardb.com/service/documentation/"
+                               Name="BrightstarDB Service Online Documentation"/>
+        <RemoveFolder Id="BrightstarDBServiceProgramMenuFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\BrightstarDB" Name="ServiceClientInstalled" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="ProductFeature" Title="BrightstarDB Service SDK" Level="1"
+             ConfigurableDirectory="INSTALLLOCATION"
+             Description="Install the BrightstarDB Service SDK"
+             Absent="disallow" Display="expand" AllowAdvertise="no">
+      <!-- Note: The following ComponentGroupRef is required to pull in generated authoring from project references. -->
+      <ComponentGroupRef Id="Product.Generated" />
+      <ComponentGroupRef Id="docFilesComponentGroup"/>
+      <ComponentGroupRef Id="sdkFilesComponentGroup"/>
+      <ComponentRef Id="DocsShortcuts"/>
+      <Component Guid="{E64D4665-B1D0-4270-80C8-3EEA264B9129}" Directory="INSTALLLOCATION">
+        <File Id="README_txt" KeyPath="yes" Source="..\InstallerTmp\README.txt"/>
+        <File Id="LICENSE_txt" KeyPath="no" Source="..\InstallerTmp\EULA.rtf"/>
+        <File Id="NOTICE_txt" KeyPath="no" Source="..\InstallerTmp\NOTICE.txt"/>
+      </Component>
+
+      <Feature Id="VCSExpressIntegration" Title="Visual C# 2010 Express Integration" Level="1"
+         Description="Add item and project templates into the local Visual C# 2010 Express Edition installation."
+         AllowAdvertise="no">
+        <Condition Level="0">
+          <![CDATA[((NOT VCSHARP2010EXPRESS_IDE) or VCSHARP2010EXPRESS_IDE = "")]]>
+        </Condition>
+        <Component Id="vcseItemTemplatesComponent" Guid="{68817118-7608-4430-AA68-1E461081CB8D}" Directory="VS2010ITEMTEMPLATEDIR">
+          <File Id="vcseEntityContextItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityContext.zip"  />
+          <File Id="vcseEntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
+        </Component>
+      </Feature>
+
+      <Feature Id="VisualStudioIntegration" Title="Visual Studio Integration" Level="1"
+               Description="Add item and project templates into the local Visual Studio installation."
+               AllowAdvertise="no">
+        <Condition Level="0">NOT VS2010_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED</Condition>
+        <Component Id="vsItemTemplatesComponent" Guid="{933FFF92-0B3F-4846-AF17-BD9BA9BACCCA}" Directory="VS2010ITEMTEMPLATEDIR">
+          <File Id="vsEntityContextItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityContext.zip"  />
+          <File Id="vsEntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
+        </Component>
+      </Feature>
+      
+    </Feature>
+	</Product>
+</Wix>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSContent xmlns="http://schemas.microsoft.com/developer/vscontent/2005">
+  <Content>
+    <FileName>BrightstarEntityContext.zip</FileName>
+    <DisplayName>Brightstar Entity Context Item Template</DisplayName>
+    <Description>Adds a template for creating a strongly-typed Brightstar Entity Context.</Description>
+    <FileContentType>VSTemplate</FileContentType>
+    <ContentVersion>1.0</ContentVersion>
+    <Attributes>
+      <Attribute name="ProjectType" value="Visual C#"/>
+      <Attribute name="ProjectSubType" value="CSharp"/>
+      <Attribute name="TemplateType" value="Item"/>
+    </Attributes>
+  </Content>
+  <Content>
+    <FileName>BrightstarEntityDefinition.zip</FileName>
+    <DisplayName>Brightstar Entity Definition Item Template</DisplayName>
+    <Description>A template for creating a Brightstar Entity interface.</Description>
+    <FileContentType>VSTemplate</FileContentType>
+    <ContentVersion>1.0</ContentVersion>
+    <Attributes>
+      <Attribute name="ProjectType" value="Visual C#"/>
+      <Attribute name="ProjectSubType" value="CSharp"/>
+      <Attribute name="TemplateType" value="Item"/>
+    </Attributes>
+  </Content>
+</VSContent>

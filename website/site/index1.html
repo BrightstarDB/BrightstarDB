@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>BrightstarDB - NoSQL for .NET</title>
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="Stylesheet" href="css/main.css" />
+    <link rel="icon" href="images/favicon.ico" />
+    <link rel="alternate" type="application/rss+xml" title="BrightstarDB Blog &raquo; Feed"
+        href="/blog/?feed=rss2" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script type="text/javascript" src="js/modernizr-1.7.min.js"></script>
+    <style>
+        #teaser
+        {
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+        
+        #teaser h1
+        {
+            font-size: 46px;
+            margin-bottom: 25px;
+        }
+        #blurb
+        {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <hgroup>
+            <img class="logo" src="/images/logo.png" alt="BrightstarDB" width="366" height="66" />
+            <form method="get" action="/search.html" id="searchForm">
+            <input id="q" type="text" name="q" />
+            <button title="Search" class="button">
+                <img src="/images/mag.png" alt="Search" class="mag" />
+            </button>
+            </form>
+        </hgroup>
+    </header>
+    <nav id="sitenav">
+        <a href="/documentation/">Documentation</a> <a href="/download/">Download</a> <a
+            href="/blog/">Blog</a> <a href="/community/">Community</a>
+    </nav>
+    <article id="teaser" class="smallerteaser">
+        <header>
+            <hgroup>
+                <img src="images/logo-black-notext.png" width="150" height="150" />
+                <h1 title="BrightstarDB">
+                    Brightstar<span class="logotext-highlight">DB</span></h1>
+            </hgroup>
+        </header>
+        <div id="blurb">
+            <p>
+                A <strong>fast</strong> and <strong>scalable NoSQL</strong> database for the <strong>
+                    .NET platform</strong> with code-first data model generation.
+            </p>
+        </div>
+        <section class="columna colaa">
+            <a href="#">
+                <img src="/images/schemaless.png" /></a>
+            <h2>
+                <a href="#">Schema-Free Triple Store</a></h2>
+            <p>
+                BrightstarDB implements the powerfully simple W3C Semantic Web data model, RDF.
+                The RDF data model uses triples to represent data of all shapes. BrightstarDB does
+                not require the definition of fixed schema, allowing great flexibility in what data
+                is stored and how it is connected together. This associative data model is a great
+                fit for many real world applications.</p>
+            <a href="#">
+                <img src="/images/transactional.jpg" /></a>
+            <h2>
+                <a href="#">Transactional</a></h2>
+            <p>
+                BrightstarDB offers a fully ACID transaction model where commits never block reads,
+                reads never block updates and reads never see uncommitted updates.</p>
+            <a href="#">
+                <img src="/images/highperformance.png" /></a>
+            <h2>
+                <a href="#">High Performance</a></h2>
+            <p>
+                Thanks to automatic, dedicated indexes, client and server caching models BrightstarDB
+                is blisteringly fast for updates and reads.</p>
+            <img src="/images/entity.png" />
+            <h2>
+                NoSQL Entity Framework</h2>
+            <p>
+                BrightstarDB is unique in that it offers a full Entity Framework model over the
+                underlying data store. This means developers have the flexibility of a NoSQL store
+                but with the power and familiarity of working with typed objects when building applications.
+            </p>
+        </section>
+        <section class="columna colbb">
+            <a href="#">
+                <img src="/images/odata.png" /></a>
+            <h2>
+                <a href="#">LINQ & OData Support</a></h2>
+            <p>
+                On .NET the language of query is LINQ. BrightstarDB has a custom LINQ implementation
+                that maps LINQ queries into SPARQL to be run natively against the data. Through
+                its Entity Framework any BrightstarDB store can expose an OData endpoint.</p>
+            <a href="#">
+                <img src="/images/historical.png" /></a>
+            <h2>
+                <a href="#">Historical Data Access</a></h2>
+            <p>
+                BrightstarDB never overwrites data, meaning it is possible to access a store at
+                any point in its life time. Query the data as it stood a month ago, or even roll
+                back the store to any previous point. Data stores can periodically be condenses
+                to remove historical data if required.</p>
+            <a href="#">
+                <img src="/images/indexing.jpg" /></a>
+            <h2>
+                <a href="#">Automatic Indexing</a></h2>
+            <p>
+                Many SQL and NoSQL systems require the developer to define all the required indexes
+                for their specific application. BrightstarDB automatically indexes all relationships
+                and property values at insert time.
+            </p>
+        </section>
+    </article>
+    <footer id="footer">
+        <nav>
+            <header>
+                <h1>
+                    Navigation</h1>
+            </header>
+            <ul>
+                <li><a href="/documentation/">Documentation</a></li>
+                <li><a href="/download/">Download</a></li>
+                <li><a href="/blog/" class="current">Blog</a></li>
+                <li><a href="/community/">Community</a></li>
+            </ul>
+        </nav>
+        <nav>
+            <header>
+                <h1>
+                    Keep in Touch!</h1>
+            </header>
+            <p>
+                <a href="http://twitter.com/brightstardb" class="twitter-follow-button" data-show-count="false">
+                    Follow @BrightstarDB</a></p>
+            <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+            <p>
+                <div data-href="http://brightstardb.com/" class="g-plusone" data-size="medium">
+                </div>
+            </p>
+            <p>
+                <img src="/images/feed-icon16x16.png" alt="RSS Feed Icon" style="vertical-align: middle" />
+                <a href="/blog/?feed=rss2">Blog RSS Feed</a>
+            </p>
+        </nav>
+        <p>
+            &copy; <a href="http://www.networkedplanet.com/">Networked Planet Limited</a> 2011</p>
+    </footer>
+    <!-- Place this tag in your head or just before your close body tag -->
+    <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+        { lang: 'en-GB' }
+    </script>
+    <!-- google analytics -->
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-25503555-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+</body>
+</html>

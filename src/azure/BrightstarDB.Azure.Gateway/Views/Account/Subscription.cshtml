@@ -1,0 +1,120 @@
+﻿@model BrightstarDB.Azure.Gateway.Models.AccountAndSubscription
+
+    <nav id="breadcrumb">
+        <ul>
+            <li>@Html.ActionLink("Account", "Index")</li>
+            <li>Subscription Details</li>
+        </ul>
+    </nav>
+<article>
+    <h1>@if(String.IsNullOrEmpty(Model.Subscription.Label)){ @Model.Subscription.Id }else{ @Model.Subscription.Label }</h1>
+
+    <h2>Subscription Details</h2>
+    <table class="summaryTable">
+        <tr>
+            <td>Subscription ID:</td>
+            <td>@Model.Subscription.Id</td>
+        </tr>
+        <tr>
+            <td>Label:</td>
+            <td>@Model.Subscription.Label</td>
+        </tr>
+        <tr>
+            <td>Stores Used / Max</td>
+            <td>@Model.Subscription.CurrentStoreCount / @Model.Subscription.StoreLimit</td>
+        </tr>
+        <tr>
+            <td>Store Size Limit</td>
+            <td>@Model.Subscription.StoreSizeLimit</td>
+        </tr>
+        <tr>
+            <td>Total Size Limit</td>
+            <td>@Model.Subscription.TotalSizeLimit</td>
+        </tr>
+    </table>
+
+    <h2>Stores</h2>
+    <p>This is a list of all stores created under this subscription. Click on a store ID to visit the administration pages for that store.</p>
+    <table class="display">
+        <thead>
+            <tr>
+                <td>Store Label</td>
+                <td>Store ID</td>
+                <td>Size (MB)</td>
+                <td>Limit (MB)</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var store in @Model.Subscription.Stores)
+            {
+                <tr>
+                    <td>@if (!String.IsNullOrEmpty(store.Label)) {
+                            @Html.ActionLink(store.Label, "Manage", "Stores", new {id=store.Id}, null)
+                        }</td>
+                    <td>@Html.ActionLink(store.Id, "Manage", "Stores", new{id=store.Id}, null)</td>
+                    <td>
+                        @if(store.CurrentSize >  store.SizeLimit) {
+                            <span class="attention">@store.CurrentSize</span>
+                        } else {
+                            <span class="ok">@store.CurrentSize</span>
+                        }
+                    </td>
+                    <td>@store.SizeLimit</td>
+                    <td><div class="orange button connectionStringButton" title="Click to view the full connection string for this store" store="@store.Id">Connection String</div></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+   @if (Model.Subscription.CurrentStoreCount < Model.Subscription.StoreLimit)
+    {
+        <div id="newStoreButton" class="orange button">Create Store</div>
+    } else {
+        <p>You have reached or exceeded the allowed number of stores for this subscription. To upgrade your subscription or create a new subscription please visit our <a href="#">billing site</a>.</p>
+    }
+</article>
+<aside>
+    <div id="newStoreDlg">
+        <label for="newStoreLabel">New Store Label (OPTIONAL)</label>&nbsp;<input id="newStoreLabel" type="text"  />
+    </div>
+    <div id="connectionStringDlg">
+        <p>Copy and paste the entire string below into your code to use as a Brightstar client connection string.</p>
+        <textarea id="connectionString" readonly="true" rows=6 style="width:90%" ></textarea>
+    </div>
+</aside>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        $('table.display').dataTable({
+            bJQueryUI: true,
+            sPaginationType: 'full_numbers'
+        });
+        $('#connectionStringDlg').dialog({
+            autoOpen: false,
+            title: "Connection String",
+            width: 500,
+            buttons: {
+                "OK": function () {
+                    $(this).dialog('close');
+                }
+            }
+        });
+        $('#newStoreDlg').dialog({
+            autoOpen: false,
+            title: "Create Store",
+            buttons: {
+                "OK": function () {
+                    label = $('#newStoreLabel').val();
+                    document.location = "/Account/CreateStore?subscriptionId=@Model.Subscription.Id" + "&label=" + escape(label)
+                },
+                "Cancel": function () { $(this).dialog('close'); }
+            }
+        });
+        $('#newStoreButton').click(function () { $('#newStoreDlg').dialog('open'); });
+        $('.connectionStringButton').click(function () {
+            storeId = $(this).attr('store');
+            $('#connectionString').val('type=rest;endpoint=@Model.ApiEndpoint;account=@Model.Account.AccountId;storeName='+storeId+';key=@Model.Account.PrimaryKey');
+            $('#connectionStringDlg').dialog('open');
+
+        });
+    });
+</script>

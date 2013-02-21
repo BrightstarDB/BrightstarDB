@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">BrightstarDB Configuration Options</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">BrightstarDB Configuration Options</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB can be used as an embedded database or accessed as a WCF service. In either case there are certain global configuration options that can be set in the application&apos;s config file.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Configuring an Embedded Database</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">There is no additional configuration required to create and use an embedded database. See the section on Getting Started or the Entity Framework for examples of creating and using an embedded database. However if you wish to override some of the default settings you can do so by adding an &lt;appSettings&gt; section to the applications&apos;s .config file (if one does not already exist) and then adding one or more of the configuration options details below.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Configuring the BrightstarDB Windows Service</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The installer will create a windows service called &quot;BrightstarDB&quot;. This exposes a WCF service endpoint that can be used to access the database. The configuration for this service can be found in BrightstarService.exe.config in the &#160;[INSTALLDIR]\Service folder.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Running the BrightstarDB Service as an Application</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Running the service as an application rather than a Windows service can be done by running the BrightstarService.exe located in the [INSTALLDIR]\Service folder. The configuration from the .config file is used by the service when it starts up. However, some properties can also be overridden using command line parameters passed to the service. Note that either no parameters are passed or all four parameters are required. </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">BrightstarService.exe [&lt;base location&gt; &lt;http port&gt; &lt;tcp port&gt; &lt;pipe name&gt;]</text></para>
+    <para styleclass="Normal"></para>
+    <list id="3" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">&lt;base location&gt; specifies the path to the directory where the BrightstarDB stores are located. This overrides the BrightstarDB.StoreLocation configuration option.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">&lt;http port&gt; specifies the port that the HTTP interface to the BrightstarDB service will use to listen for connections. This overrides the BrightstarDB.HttpPort configuration option.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">&lt;tcp port&gt; specifies the port that the TCP interface to the BrightstarDB service will use to listen for connections. This overrides the BrightstarDB.TcpPort configuration option.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">&lt;pipe name&gt; specifies the name of the named pipe that the named pipe interface to the BrightstarDB service will use to listen for connections. This overrides the BrightstarDB.NetNamedPipeName configuration option.</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">BrightstarDB Configuration Options</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The following list describes all the available configuration options for BrightstarDB.</text></para>
+    <list id="4" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.StoreLocation - specifies the path to the directory where stores are persisted. For Windows Phone 7.1 this path is fixed as the directory &quot;brightstar&quot; in the isolated storage for the application, so this setting has no effect.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.LogLevel - configures the level of detail that is logged by the BrightstarDB application. The valid options are ERROR, INFO, WARN, DEBUG, and ALL. &#160;For more information about logging and configuring where logs are written please refer to the section </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Logging" styleclass="Normal" translate="true">Logging</link><text styleclass="Normal" translate="true">. For Windows Phone 7.1 this setting is fixed as ERROR and cannot be overridden.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.TxnFlushTripleCount - specifies a batch size for importing large sets of triples. At the end of each batch BrightstarDB will perform housekeeping tasks to try to ensure a lower memory footprint. The default value is 10,000 on .NET 4.0. For applications that run on larger, more capable hardware (with available memory of 4GB or more) the value can usually be increased to 50,000 or even 100,000 - but it is worth testing the configured value before committing to it in deployment. For Windows Phone 7.1 this value is fixed as 1,000 and cannot be overridden.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.ConnectionString - specifies the default connection string to use when creating a BrightstarDB client. This setting can be used by applications that want to enable the user to choose the store that they connect to as a runtime configuration option.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.PageCacheSize - specifies the amount of memory in MB to be used by the BrightstarDB store page cache. This setting applies only to applications that open a BrightstarDB store as the cache is used to cache pages of data from the data.bs and resources.bs data files. The default value is 2048 on .NET 4.0 and 4 on Windows Phone 7.1. Note that this memory is not all allocated on startup so actual memory usage by the application may initially be lower than this value.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.EnableQueryCache - specifies whether or not the application should cache the results of SPARQL queries. Allowed values are &quot;true&quot; or &quot;false&quot; and the setting defaults to &quot;true&quot;. Query caching is only available on .NET 4.0 so this setting has no effect on Windows Phone 7.1</text></li>
+    </list>
+    <list id="5" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.QueryCacheDirectory - specifies the folder location where cached results are stored.</text></li>
+    </list>
+    <list id="4" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.QueryCacheMemory - specifies the amount of memory in MB to be used by the SPARQL query cache. The default value is 256.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.QueryCacheDisk - specifies the amount of disk space (in MB) to be used by the SPARQL query cache. The default value is 2048. The disk space used will be in a subdirectory under the location specified by the BrightstarDB.StoreLocation configuration property.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.HttpPort - specifies the port number used by the BrightstarDB WCF service to listen for incoming HTTP requests. The default value is 8090.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.TcpPort - specifies the port number used by the BrightstarDB WCF service to listen for incoming TCP requests. The default value is 8095.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.NetNamedPipeName - specifies the name of the pipe used by the BrighstarDB WCF service to listen for incoming named pipe requests. The default value is &quot;brightstar&quot;.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.PersistenceType - specifies the default type of persistence used for the main BrighstarDB index files. Allowed values are &quot;appendonly&quot; or &quot;rewrite&quot; (values are case-insensitive). For more information about the store persistence types please refer to the section </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Store_Persistence_Types" styleclass="Normal" translate="true">Store Persistence Types</link><text styleclass="Normal" translate="true">.</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Example Configuration</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The sample below shows all the BrightstarDB options with usage comments. </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;?xml version=&quot;1.0&quot;?&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;configuration&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;appSettings&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- The folder where stores are persisted, this is set by the installer but can be changed later. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.StoreLocation&quot; value=&quot;C:\Program Files (x86)\BrightstarDB\Data&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- The logging level for the server. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.LogLevel&quot; value=&quot;ALL&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- Indicates the number of triples in a transaction to process before doing a partial commit. </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; Larger numbers require more machine memory but result in faster transaction processing. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.TxnFlushTripleCount&quot; value=&quot;100000&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- For client applications this property value is used to connect to a store. See the section below for more detail on connection strings --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.ConnectionString&quot; value=&quot;Type=embedded;StoresDirectory=c:\brightstar;StoreName=test&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- Specifies the maximum amount of memory (in MB) to use for page caching. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.PageCacheSize&quot; value=&quot;2048&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- Enable (true) or disable (false) the caching of SPARQL query results --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key-&quot;BrightstarDB.EnableQueryCache&quot; value=&quot;true&quot; /&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- The amount of memory to use for the SPARQL query cache --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.QueryCacheMemory&quot; value=&quot;512&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- The amount of disk space (in MB) to use for the SPARQL query cache. This only applies to server / embedded applications --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.QueryCacheDisk&quot; value=&quot;2048&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- Set the http port that the brightstar service runs on. default value is 8090. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.HttpPort&quot; value=&quot;8090&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- Set the tcp port that the brightstar service runs on. default value is 8095. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.TcpPort&quot; value=&quot;8095&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- Set the tcp port that the brightstar service runs on. default value is brightstar. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.NetNamedPipeName&quot; value=&quot;brightstar&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- The default store index persistence type --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.PersistenceType&quot; value=&quot;AppendOnly&quot; /&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;/appSettings&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;/configuration&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Heading1"></para>
+  </body>
+</topic>

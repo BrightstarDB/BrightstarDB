@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">SdShare Server</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">SdShare Server</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The BrightstarDB SdShare Server is designed to be used to expose RDF data from existing data sources. The data produced can be easily consumed into a BrightstarDB instance or any SPARQL compliant data store. The server has a pluggable architecture to allow any data source to be exposed in accordance with the latest SDShare specification (</text><link displaytype="text" defaultstyle="true" type="weblink" href="http://sdshare.org" target="_blank" styleclass="Normal" translate="true">SDShare)</link><text styleclass="Normal" translate="true">, it comes with configurable components for ODBC enabled databases.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The SdShare Server provides two main features, firstly it exposes existing data sources as feeds of data that comply with the </text><link displaytype="text" defaultstyle="true" type="weblink" href="http://sdshare.org" target="_blank" styleclass="Normal" translate="true">SdShare</link><text styleclass="Normal" translate="true"> specification.Second, it runs a client service that can consume and process valid SdShare feeds. Both the producer and consumer services offer a pluggable framework to support different data sources and data destinations. In addition, a data source adaptor is provided for exposing data via any ODBC compliant database and a client component is also provided that can send updates from an SdShare feed to any SPARQL 1.1 compliant endpoint and BrightstarDB instance.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The following diagram shows the server architecture.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><image src="sdshare server architecture.png" scale="100.00%" styleclass="Image Caption"></image></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">SdShare Server Download</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The SdShare Server is is not part of the core BrightstarDB package and is made available only on request. To get access to the BrightstarDB SdShare Server please email </text><link displaytype="text" defaultstyle="true" type="weblink" href="mailto:contact@brightstardb.com" styleclass="Normal" translate="true">BrightstarDB</link><text styleclass="Normal" translate="true">.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>

@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="gra" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Installation</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Installation &amp; Configuration</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The SdShare Server is provided as .zip file. The following steps should be followed to start the SdShare Server.</text></para>
+    <para styleclass="Normal"></para>
+    <list id="14" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Ensure .NET 4.0 or greater is installed.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Unpack the contents of the .ZIP file into a folder on the machine where it will run. (It is suggested that it be added into the &quot;C:\Program Files (x86)\BrightstarDB&quot; folder). This location will be called the [INSTALLDIR]</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">OPTIONALLY: To aggregate data into BrightstarDB ensure a BrightstarDB database instance is running (see the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Running_BrightstarDB" styleclass="Normal" translate="true">Service Configuration Options</link><text styleclass="Normal" translate="true"> section for running BrightstarDB).</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">OPTIONALLY: To allow updates from exposed data sources to be aggregated into a BrightstarDB instance ensure the SPARQL endpoint is correctly configured (see </text><link displaytype="text" defaultstyle="true" type="topiclink" href="SPARQL_Endpoint" styleclass="Normal" translate="true">SPARQL Endpoint</link><text styleclass="Normal" translate="true">). &#160;</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Installing and Running the SdShare Server as a Windows Service</text></para>
+    <para styleclass="Normal"></para>
+    <list id="15" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;" translate="true">Open a Windows Command Prompt with an account that has Administrator rights and go to the &apos;[INSTALLDIR]\Service&apos; directory.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;" translate="true">Type: &apos;C:\Windows\Microsoft.NET\Framework64\v4.0.30319\installutil -i BrightstarDB.SdShare.Server.exe&apos; followed by pressing &apos;Enter&apos;. Note that the path to the .NET framework may be different.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Start the service from the Control Panel. It appears in the Services list as &apos;SdShare Server&apos;.</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Running the SdShare Server from the Command Line </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The server does not need to be installed as a Windows Service. It can be run from the command line. To run the service from the command line:</text></para>
+    <para styleclass="Normal"></para>
+    <list id="15" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;" translate="true">Open a Windows Command Prompt with an account that has Administrator rights and go to the &apos;[INSTALLDIR]\Service&apos; directory.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Type: &apos;</text><text styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;" translate="true">BrightstarDB.SdShare.Server.exe</text><text styleclass="Normal" translate="true">&apos;.</text></li>
+    </list>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">&#32;</text></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Service Configuration</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The </text><text styleclass="Code Example" translate="true">BrightstarDB.SdShare.Server.exe.config</text><text styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;" translate="true"> file contains the configuration settings for the service. There are just two settings of note:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;appSettings&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- The location of the main sdshare configuration file --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;SdShare.ConfigurationLocation&quot; value=&quot;C:\Program Files (x86)\BrightstarDB\SdShareServer\Service\SdShareConfig.xml&quot;/&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- The port that the service should run on --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;SdShare.ServerPort&quot; value=&quot;9090&quot;/&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;/appSettings&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">If changes are made to this file the service must be restarted for the changes to take effect.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Accessing the Service</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To check that the service is running open a web browser and navigate to the following URL (note that if the port has been changed in the configuration the link will need to be modified to match this value).</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><link displaytype="text" defaultstyle="true" type="weblink" href="&lt;%LINK_CAPTION%&gt;" target="_blank" styleclass="Code Example" translate="true">http://localhost:9090/sdshare/collections</link></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">This should show an empty ATOM feed. To expose data sources follow the instructions in the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Database_Configuration" styleclass="Normal" translate="true">Exposing ODBC Data Sources</link><text styleclass="Normal" translate="true"> section.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>

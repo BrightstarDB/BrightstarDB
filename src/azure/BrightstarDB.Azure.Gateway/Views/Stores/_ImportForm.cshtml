@@ -1,0 +1,10 @@
+﻿@model BrightstarDB.Azure.Gateway.Models.ImportSourceModel
+
+@using (Html.BeginForm("Import", "Stores", new {id=ViewBag.StoreId}, FormMethod.Post, new {id="importForm"} )) {
+@Html.ValidationSummary()
+<div class="editor-label">@Html.LabelFor(Model=>Model.SourceAddress)</div>
+<div class="editor-field">@Html.EditorFor(Model => Model.SourceAddress)</div>
+<div class="editor-label">@Html.LabelFor(Model => Model.StorageConnectionString)</div>
+<div class="editor-field">@Html.EditorFor(Model => Model.StorageConnectionString)</div>
+<div class="editor-label">@Html.LabelFor(Model=>Model.UseGZip) @Html.EditorFor(Model=>Model.UseGZip)</div>
+}

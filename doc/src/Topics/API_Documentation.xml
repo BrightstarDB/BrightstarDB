@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">API Documentation</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">API Documentation</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The full set of classes and methods available can be found in the </text><link displaytype="text" defaultstyle="true" type="weblink" href="http://brightstardb.com/documentation/API/index.html" styleclass="Normal" translate="true">BrightstarDB API Docs</link><text styleclass="Normal" translate="true"> online or in the BrightstarDB_API.chm file that can be found in the Docs directory of your installation.</text></para>
+  </body>
+</topic>

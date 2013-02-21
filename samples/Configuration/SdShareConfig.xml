@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SdShareConfiguration>
+
+  <LoggingLocation>c:\tmp\sdshare</LoggingLocation>
+  <HashValueStorageLocation>c:\tmp\sdshare\storage\hashvalues</HashValueStorageLocation>
+  <LastUpdatedStorageLocation>c:\tmp\sdshare\lastupdated</LastUpdatedStorageLocation>
+
+  <CollectionProvider name="My Data" identifier="http://psi.example.com/customer/data"
+                      Assembly="BrightstarDB.SdShare"
+                      Type="BrightstarDB.SdShare.OdbcCollectionProvider">
+
+    <!-- the DSN name of the ODBC connection. If it is an Oracle connection then the UID and PWD are also required -->
+    <DsnConnection>DSN=ORADB;UID=SYSTEM;PWD=ADMIN</DsnConnection>
+
+    <!-- Oracle, MySQL or SqlServer are the allowed DataSource Types for this provider type. -->
+    <DataSourceType>Oracle</DataSourceType>
+
+    <!-- This definition uses a changelog in the database to define a fragments feed -->
+    <PublishingDefinitions>
+      <Definition>
+        <ResourcePrefix>http://psi.example.com/</ResourcePrefix>
+        <UriTemplate>/data/address/{id}</UriTemplate>
+
+        <!-- The fragments query must return three columns id, name and updated (the name is informative) -->
+        <FragmentsQuery>select itemid as id, itemid as name, updatetime as updated from ITEMHISTORY where updatetime > [[since]]</FragmentsQuery>
+        <FragmentGenerationDefinitions>
+            <!-- Each fragment generation definition contains a fragment query and a snapshot query and is invoked for each item in the fragments feed, 
+                 or all items in the case of a snapshot. -->
+            <FragmentGenerationDefinition>
+              <SnapshotQuery>select * from VIEW_ADDRESS</SnapshotQuery>
+
+              <!-- the fragment query is executed with the id from the fragment. -->
+              <FragmentQuery>select * from VIEW_ADDRESS where id = [[id]] </FragmentQuery>
+
+              <!-- The following templates are used to produce NTriples with the rows from FragmentQuery -->
+              <!-- The names of the columns enlosed by [[ and ]] can be used as place holders for column values e.g. [[name]] -->
+              <!-- Also the generic pattern [[COLNAME]] [[VALUE]] can be used for all columns unless excluded in the 'genericExcludes' parameter -->
+              <RdfTemplates genericExcludes="address1">
+                <li>{{http://psi.example.com/data/address/[[id]]}} {{http://www.w3.org/1999/02/22-rdf-syntax-ns#type}} {{psi.example.com/schema/Address}} .</li>
+                <li>{{http://psi.example.com/data/address/[[id]]}} {{http://psi.example.com/schema/[[COLNAME]]}} "[[VALUE]]" .</li>
+                <li>{{http://psi.example.com/data/address/[[id]]}} {{http://psi.example.com/data/schema/country_code}} {{http://psi.example.com/data/ISO-3166-2/country/[[countrycode]]}} .</li>
+                <li>{{http://psi.example.com/data/address/[[id]]}} {{http://www.w3.org/2000/01/rdf-schema#label}} "[[address1]]" .</li>
+                <li>{{http://psi.example.com/data/address/[[id]]}} {{http://psi.example.com/schema/ntuser}} {{psi.example.com/data/user/URLENCODE([[ntuser]])}} .</li>
+              </RdfTemplates>
+            </FragmentGenerationDefinition>
+          </FragmentGenerationDefinitions>
+      </Definition>
+
+      <!-- The next publishing definition makes use of a feature that will create and store a hash value for all rows inditfied by a query. Periodically, the data 
+         set will be compared with the local hash values to work out what changes have occurred. This approach should be used when no reliable changelog
+         occurs in the data -->
+      <Definition>
+        <ResourcePrefix>http://psi.example.com/</ResourcePrefix>
+        <UriTemplate>/data/people/{id}</UriTemplate>
+
+        <!-- can also be a query -->
+        <HashValueTable>customer</HashValueTable>
+        <EntityIdColumn>id</EntityIdColumn>
+        <HashValueKeyColumn>id</HashValueKeyColumn>
+        <UpdateFrequency>30000</UpdateFrequency>
+        <SourceDataInLocalTime>True</SourceDataInLocalTime>
+        <FragmentGenerationDefinitions>
+          <FragmentGenerationDefinition>
+            <SnapshotQuery>select id, name from customer</SnapshotQuery>
+            <FragmentQuery>select * from customer where id = [[id]]</FragmentQuery>
+            <RdfTemplates genericExcludes="id,name">
+              <li>{{http://psi.example.com/data/people/[[id]]}} {{http://psi.example.com/schema/label}} "[[name]]" .</li>
+              <li>{{http://psi.example.com/data/people/[[id]]}} {{http://www.w3.org/2000/01/rdf-schema#type}} {{http://psi.example.com/schema/person}} .</li>
+              <li>{{http://psi.example.com/data/people/[[id]]}} {{http://psi.example.com/schema/[[COLNAME]]}} "[[VALUE]]" .</li>
+            </RdfTemplates>
+          </FragmentGenerationDefinition>
+        </FragmentGenerationDefinitions>
+      </Definition>
+
+    </PublishingDefinitions>
+
+  </CollectionProvider>
+
+  <!-- This configuration is used to consume SdShare feeds and hand the data over to the configured
+       client adaptors. There are two adaptors provided, a logging adaptor and a SPARQL update adaptor.
+       The SPARQL update adaptor will push data from the feed into the identified graph in the specified
+       endpoint. -->
+  <CollectionConsumers>
+    <!-- This is the sdshare feed. NOTE: this feed might not exist and a correct reference should be used. -->
+    <FeedSource>
+      <Name>BusinessData</Name>
+      <Url>http://localhost:9090/sdshare/collections/Sample%20Business%20Data</Url>
+      <CheckPeriod>30000</CheckPeriod>      
+    </FeedSource>
+
+    <!-- Configure a client adaptor to use a named feed. -->
+    <ClientAdaptor Assembly="BrightstarDB.SdShare.Client"
+                   Type="BrightstarDB.SdShare.Client.SparqlUpdateAdaptor">
+      
+      <!-- This is the name of the feedsource that will push data to this adaptor -->
+      <Feed>BusinessData</Feed>
+      <!-- The following line connects to a B* SPARQL endpoint ensure that a B* store is created 
+           and replace {storename} with the actual value-->
+      <SparqlServiceEndpoint>http://localhost/sparql/{storename}/update</SparqlServiceEndpoint>
+      <GraphUri>http://www.businessdata.com</GraphUri>
+    </ClientAdaptor>
+
+    <ClientAdaptor Assembly="BrightstarDB.SdShare.Client" Type="BrightstarDB.SdShare.Client.LoggingAdaptor">
+      <Feed>BusinessData</Feed>
+    </ClientAdaptor>
+
+  </CollectionConsumers>
+
+</SdShareConfiguration>

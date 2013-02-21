@@ -1,0 +1,24 @@
+Index: Set.cs
+===================================================================
+--- Set.cs	(revision 2156)
++++ Set.cs	(working copy)
+@@ -414,7 +414,18 @@
+                         temp = this._sets[i][variable];
+                         if (temp != null)
+                         {
+-                            this._cache.Add(variable, temp);
++                            INode existing;
++                            if (_cache.TryGetValue(variable, out existing))
++                            {
++                                if (!existing.Equals(temp))
++                                {
++                                    throw new Exception("Inconsistent variable values during join");
++                                }
++                            }
++                            else
++                            {
++                                this._cache.Add(variable, temp);
++                            }
+                             return temp;
+                         }
+                         i++;

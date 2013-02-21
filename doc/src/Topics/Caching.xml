@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="gra" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Caching</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Caching</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB provides facilities for caching the results of SPARQL queries both in memory and to disk. Caching complex SPARQL queries or queries that potentially return large numbers of results can provide a significant performance improvement. Caching is controlled through a combination of settings in the application configuration file (the web.config for web apps, or the .exe.config for other executables).</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="5" colcount="3">
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">AppSetting Key</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Default Value</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Description</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.EnableQueryCache</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">false</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Boolean value (&quot;true&quot; or &quot;false&quot;) that specifies if the system should cache the result of SPARQL queries.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.QueryCacheMemory</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">256</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">The size in MB of the in-memory query cache.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.QueryCacheDirectory</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">&lt;undefined&gt;</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">The path to the directory to be used for the disk cache. If left undefined, then the behaviour depends on whether the BrightstarDB.StoreLocation setting is provided. If it is, then a disk cache will be created in the _bscache subdirectory of the StoreLocation, otherwise disk caching will be disabled.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB.QueryCacheDiskSpace</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">2048</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">The size in MB of the disk cache.</text></para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Example Configurations</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To cache in the _bscache subdirectory of a fixed store location (a good choice for server applications), it is necessary only to enable caching and ensure that the store location is specified in the configuration file:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;configuration&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;appSettings&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.EnableQueryCache&quot; value=&quot;true&quot; /&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- disk cache will be written to the directory d:\brightstar\_bscache --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.StoreLocation&quot; value=&quot;d:\brightstar\&quot; /&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;/appSettings&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;/configuration&gt;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To cache in some other location (e.g. a fast disk dedicated to caching):</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;configuration&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;appSettings&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.EnableQueryCache&quot; value=&quot;true&quot; /&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.StoreLocation&quot; value=&quot;d:\brightstar\&quot; /&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- Cache on a different disk from the B* stores to maximize disk throughput.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; Disk cache will be written to the directory e:\bscache --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.QueryCacheDirectory&quot; value=&quot;e:\bscache\&quot;/&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- Allow disk cache to grow to up to 200GB in size --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.QueryCacheDiskSpace&quot; value=&quot;204800&quot; /&gt; </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;/appSettings&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;/configuration&gt;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">This sample has no disk cache because there is no valid location for the cache to be created:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;configuration&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;appSettings&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.EnableQueryCache&quot; value=&quot;true&quot; /&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- 1GB in-memory cache --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.QueryCacheMemory&quot; value=1024&quot;/&gt;</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;!-- This property is not used because there is no </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160;BrightstarDB.QueryCacheDirectory or</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160;BrightstarDB.StoreLocation setting defined. --&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;&lt;add key=&quot;BrightstarDB.QueryCacheDiskSpace&quot; value=&quot;204800&quot; /&gt; </text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;&lt;/appSettings&gt;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;/configuration&gt;</text></para>
+  </body>
+</topic>

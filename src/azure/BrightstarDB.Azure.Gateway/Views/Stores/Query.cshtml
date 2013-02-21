@@ -1,0 +1,30 @@
+﻿@using System.Web.Mvc.Html
+@model BrightstarDB.Azure.Gateway.Models.QueryModel
+@{
+    ViewBag.Title = "Query";
+}
+<nav id="breadcrumb">
+    <ul>
+    <li>@Html.ActionLink("My Account", "Index", "Account")</li>
+    <li>@Html.ActionLink(Model.StoreId, "Manage", new { id = Model.StoreId })</li>
+    <li>Query</li>
+    </ul>
+</nav>
+<article>
+<h2>Query</h2>
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <legend>SPARQL Query</legend>
+        <textarea rows="5" cols="120" name="query">@Model.Query</textarea>
+        <p><input type="submit" value="Submit Query" class="orange button"/></p>
+    </fieldset>
+}
+<p></p>
+<fieldset>
+    <legend>Results</legend>
+    <pre>
+        @Model.Results
+    </pre>
+</fieldset>
+</article>

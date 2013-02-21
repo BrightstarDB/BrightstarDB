@@ -1,0 +1,7 @@
+To install the BrightstarDB Visual Studio Templates:
+
+1) Close any open instances of Visual Studio.
+
+2) Double click on the BrightstarEntityContext.vsi file that is located in INSTALLFOLDER\VisualStudio. 
+
+3) Follow the instructions in the Visual Studio Content Installer.

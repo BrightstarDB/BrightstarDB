@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Licensing For Embedded Applications</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Licensing For Embedded Applications</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">When using BrightstarDB as an embedded database within your application, it is necessary to provide and validate your license key in your code before you invoke any methods that access an embedded BrightstarDB store. This call can typically be made just once in the startup phase of your application. The license consists of an email address and a license key. A license key is provided to you when you purchase a BrightstarDB license or when you register for a trial license. Note that a full license is required to be able to redistribute applications that use an embedded BrightstarDB database.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">NOTE: No license validation is required to open a client connection to a BrightstarDB service. You do not need to include your BrightstarDB Server or Enterprise license details in a client application that is only using the HTTP, TCP or Named Pipes connections to a server.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To validate the license the line of code required is:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">BrightstarDB.Licensing.License.Validate(&quot;you@yourcompanyname.com&quot;, &quot;XXX-ABCDE-FGHIJ-KLMNO&quot;)</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">There are currently four different levels of BrightstarDB license with different prefixes on the license code:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="5" colcount="3">
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Prefix Code</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">License Type</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Allowed Usage</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">MOB</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Mobile</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Allows you to create / open a BrightstarDB database as an embedded database on a Windows Phone device only. You may redistribute applications that you create using the embedded database.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">EBD</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Embedded</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Allows you to create / open a BrightstarDB database as an embedded database on a workstation / server that runs .NET 4.0 or on a Windows Phone device. You may redistribute applications that you create using the embedded database.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">SRV</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Server</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">As Embedded. Also provides a non-redistributable BrightstarDB server that allows you to run a more traditional client-server architecture where client applications share access to a single server. </text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">ENT</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Enterprise</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">As Server. Also provides tools for enterprise data integration built on the BrightstarDB server.</text></para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">When you embed BrightstarDB inside an application you are responsible for ensuring that the license key you use is not exposed to any third party (including by the use of reflection tools on your application code). The simplest way to do this is to use an obfuscation tool that is capable of robustly encrypting the strings in your code.</text></para>
+  </body>
+</topic>

@@ -1,0 +1,66 @@
+﻿@model BrightstarDB.Samples.NerdDinner.Models.IDinner
+
+<fieldset>
+    <legend>IDinner</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Title)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Title)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Description)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Description)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.EventDate)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.EventDate)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Address)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Address)
+    </div>
+    
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.City)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.City)
+    </div>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.HostedBy)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.HostedBy)
+    </div>
+    
+    <div class="display-label">
+        @Html.DisplayNameFor(model=>model.RSVPs)
+    </div>
+    <div class="display-field">
+        @if (Model.RSVPs != null)
+        {
+            <ul>
+                @foreach (var r in Model.RSVPs)
+                {
+                    <li>@r.AttendeeEmail</li>
+                }
+            </ul>
+        }
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id=Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

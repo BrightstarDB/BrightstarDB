@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <BuildNumberFile Condition=" '$(BuildNumberFile)' == '' ">..\..\buildnumber.txt</BuildNumberFile>
+    <OutputPath>BrightstarDBServiceSDK\bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+
+  <Import Project="..\..\common.proj"/>
+  
+  <UsingTask TaskName="SmartAssembly.MSBuild.Tasks.Build" 
+	     AssemblyName="SmartAssembly.MSBuild.Tasks, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7f465a1c156d4d57"/>
+
+  <Target Name="Version">
+    <Version FileName="$(BuildNumberFile)" Major="1" Minor="0" Increment="true" Condition=" '$(BuildNumber)' == '' ">
+      <Output PropertyName="BuildNumber" TaskParameter="BuildNumber"/>
+    </Version>
+    <Error Text="The BuildNumber property must be set to a value such as 1.0.234" Condition=" '$(BuildNumber)' == '' "/>
+    <Message Text="Build number set to $(BuildNumber)"/>
+  </Target>
+
+  <Target Name="BuildNet40">
+    <!-- Build the .NET 4.0 version of the Service Client SDK -->
+    <MSBuild Projects="..\..\src\azure\BrightstarDB.RestClient\BrightstarDB.RestClient.csproj"
+	     Properties="BuildNumber=$(BuildNumber);Configuration=$(Configuration)"
+	     Targets="Clean;Build"/>
+  </Target>
+
+  <Target Name="BuildVisualStudio">
+    <MSBuild Projects="..\..\src\tools\EntityFrameworkGenerator\build.proj"
+	     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
+	     Targets="Build"/>
+  </Target>
+
+  <Target Name="Docs">
+    <MSBuild Projects="..\..\doc\docs.proj"
+	     Targets="ServiceClientPdfAndChm"/>
+  </Target>
+
+  <Target Name="Prepare" DependsOnTargets="Version;BuildNet40;BuildVisualStudio;Docs">
+    <!-- Copy installer files into temp directory for Wix -->
+    <ItemGroup>
+      <Net40Sdk Include="..\..\src\azure\BrightstarDB.RestClient\bin\$(Configuration)\*.dll"/>
+      <SdkDocs  Include="..\..\doc\build\BrightstarDB_ServiceClient.chm;..\..\doc\build\BrightstarDB_ServiceClient.pdf"/>
+      <VisualStudio Include="..\..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.vsi"/>
+      <ItemTemplates Include="..\..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.zip"/>
+      <ItemTemplates Include="..\..\src\tools\EntityFrameworkGenerator\BrightstarEntityDefinition.zip"/>
+      <Root Include="PackageFiles\README.txt;PackageFiles\EULA.rtf;PackageFiles\NOTICE.txt"/>
+    </ItemGroup>
+    <RemoveDir Directories="InstallerTmp"/>
+    <MakeDir Directories="InstallerTmp"/>
+    <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\Unobfuscated\SDK\NET40"/>
+    <Copy SourceFiles="@(SdkDocs)" DestinationFolder="InstallerTmp\Docs"/>
+    <Copy SourceFiles="@(VisualStudio)" DestinationFolder="InstallerTmp\VisualStudio"/>
+    <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\ItemTemplates"/>
+    <Copy SourceFiles="@(Root)" DestinationFolder="InstallerTmp"/>
+  </Target>
+
+  <Target Name="Obfuscate" DependsOnTargets="Prepare">
+    <!-- Run SmartAssembly to make obfuscated versions of the SDK DLLs -->
+    <SmartAssembly.MSBuild.Tasks.Build ProjectFile="BrightstarDB.RestClient.saproj"/>
+  </Target>
+
+  <Target Name="BuildInstaller" >
+<!-- DependsOnTargets="Prepare;Obfuscate"> -->
+    <!-- Run Wix -->
+    <MSBuild Projects="BrightstarDBServiceSDK\BrightstarDBServiceSDK.wixproj"
+	     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="BuildInstaller">
+    <ItemGroup>
+      <InstallerFiles Include="$(OutputPath)\setup.exe;$(OutputPath)\*.msi"/>
+    </ItemGroup>
+    <Zip Files="@(InstallerFiles)" ZipFileName="$(OutputPath)\BrightstarDB-ServiceClientSDK-$(BuildNumber).zip"
+	 WorkingDirectory="$(OutputPath)"/>
+  </Target>
+</Project>

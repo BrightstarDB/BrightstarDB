@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery-1.4.4.min.js")" type="text/javascript"></script>
+</head>
+<body>
+<div class="page">
+        <div id="header">
+            <div id="title">
+                <h1>BrightstarDB Nerd Dinner</h1>
+            </div>
+            <div id="logindisplay">@Html.Partial("_LogOnPartial")</div>
+                @if (ViewData.ContainsKey("OdataLink"))
+                {
+                    <div class="odatalink">
+                    <a href="@ViewData["OdataLink"]"><img width=16 height=16 src="/content/odata.png" alt="OData for this page" title="OData for this page"/></a>
+                    </div>
+                }
+            <div id="menucontainer">
+                <ul id="menu">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("Query SPARQL", "Index", "Sparql")</li>
+                    <li>@Html.ActionLink("Editors Only", "SecureEditorSection", "Home")</li>
+                    <li>@Html.ActionLink("Admin Only", "SecureAdminSection", "Home")</li>
+                </ul>
+            </div>
+        </div>
+        <div id="main">
+            @RenderBody()
+        </div>
+        <div id="footer">
+        </div>
+    </div></body>
+</html>

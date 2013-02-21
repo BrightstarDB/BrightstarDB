@@ -1,0 +1,9 @@
+﻿<http://example.org/resource7> <http://example.org/property> "simple literal" .
+<http://example.org/resource8> <http://example.org/property> "backslash:\\" .
+<http://example.org/resource9> <http://example.org/property> "dquote:\"" .
+<http://example.org/resource10> <http://example.org/property> "newline:\n" .
+<http://example.org/resource11> <http://example.org/property> "return\r" .
+<http://example.org/resource12> <http://example.org/property> "tab:\t" .
+<http://example.org/resource16> <http://example.org/property> "\u00E9" .
+<http://example.org/resource17> <http://example.org/property> "\u20AC" .
+

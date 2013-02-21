@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1ACF579F-514E-42FF-96FD-7F7DA260B5A9}</ProjectGuid>
+    <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BrightstarDB</RootNamespace>
+    <AssemblyName>BrightstarDB.Mobile</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <TargetFrameworkProfile>WindowsPhone71</TargetFrameworkProfile>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="dotNetRDF">
+      <HintPath>..\lib\dotNetRDF.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Phone" />
+    <Reference Include="Polenter.SharpSerializer.Silverlight">
+      <HintPath>..\lib\Polenter.SharpSerializer.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks">
+      <HintPath>..\lib\System.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Net" />
+    <Reference Include="mscorlib.extensions" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BrightstarDB\Client\CommitPointInfo.cs" />
+    <Compile Include="BrightstarDB\Client\JobInfo.cs" />
+    <Compile Include="BrightstarDB\Client\TransactionInfo.cs" />
+    <Compile Include="BrightstarDB\Client\TransactionStatus.cs" />
+    <Compile Include="BrightstarDB\Client\TransactionType.cs" />
+    <Compile Include="BrightstarDB\ExceptionDetail.cs" />
+    <Compile Include="BrightstarDB\MobileInternals.cs" />
+    <Compile Include="BrightstarDB\SmartAssembly.Attributes.cs" />
+    <Compile Include="MD5.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BrightstarDB\SilverlightCollectionExtensions.cs" />
+    <Compile Include="BrightstarDB\Tuple.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\core\BrightStarDB\**\*.cs" Exclude="..\..\core\BrightStarDB\OData\**\*.cs;..\..\core\BrightstarDB\Test\**\*.cs;..\..\core\BrightstarDB\Server\HttpServer.cs;..\..\core\BrightstarDB\Client\Remote*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\Http*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarServiceClient.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarServiceClientExtensions.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarWcfServiceClient.cs;..\..\core\BrightstarDB\Client\BrightstarWcfClusterClient.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\HttpDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\HttpDataObjectStore.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Storage\FileStoreManager.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Storage\FileBlockProvider.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Properties\**\*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Analysis\**\*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NetTcpDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NetTcpDataObjectStore.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NamedPipeDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NamedPipeDataObjectStore.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\ReplyMessageInspector.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BlobImportSource.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\RestClientHelper.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\RestDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\RestJobInfo.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarRestClient.cs;..\..\core\BrightstarDB\Dynamic\**\*.cs;..\..\core\BrightstarDB\Storage\Persistence\BinaryPageStore.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\SingleVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\TwoVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\ThreeVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\AccumulatorBase.cs;..\..\core\BrightstarDB\Query\Processor\Accumulator.cs;..\..\core\BrightstarDB\Query\Processor\VirtualizingAccumulator.cs">
+      <Link>BrightstarDB\%(recursivedir)\%(filename)</Link>
+    </Compile>
+    <Compile Include="..\relinq\**\*.cs" Exclude="..\relinq\Properties\AssemblyInfo.cs;..\relinq\RelinqCore\Properties\AssemblyInfo.cs">
+      <Link>%(recursivedir)\%(filename)</Link>
+    </Compile>
+    <Compile Include="..\..\..\licensing\BrightstarDB.LicenseValidation\**\*.cs" Exclude="..\..\..\licensing\BrightstarDB.LicenseValidation\Properties\*.cs;..\..\..\licensing\BrightstarDB.LicenseValidation\ActivationClient.cs">
+      <Link>BrightstarDB\Licensing\%(recursivedir)\%(filename)</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <ProjectExtensions />
+  <Import Project="..\..\..\common.proj" />
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
+    <AssemblyTitle>BrightstarDB Mobile Core Assembly</AssemblyTitle>
+  </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <CallTarget Targets="GenerateAssemblyInfo" />
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

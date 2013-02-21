@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:vs="http://schemas.microsoft.com/wix/VSExtension">
+	<Product Id="*" 
+           Name="BrightstarDB $(var.BuildNumber).0" 
+           Language="1033" 
+           Version="$(var.BuildNumber).0" 
+           Manufacturer="BrightstarDB Limited" 
+           UpgradeCode="CF04085A-ACFE-4447-83E1-1A50A4133655">
+    
+		<Package InstallerVersion="200" Compressed="yes"  />
+
+		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+    
+    <Upgrade Id="{EFCDBD43-9743-4B19-AE1F-1F079F93F1E5}">
+      <UpgradeVersion Minimum="1.0.0" IncludeMinimum="yes"
+							Maximum ="$(var.BuildNumber)" IncludeMaximum="no"
+							Property="OLDVERSIONBEINGUPGRADED" />
+    </Upgrade>
+
+    <Upgrade Id="{2F9D2D53-7560-4ABC-9CF0-B123970CED77}">
+      <UpgradeVersion Minimum="$(var.BuildNumber)"
+							OnlyDetect="yes"
+							Property="NEWERVERSIONDETECTED"/>
+    </Upgrade>
+
+    <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit"/>
+    
+    <Icon Id="installer.ico" SourceFile="../images/installer3.ico"/>
+    <Icon Id="polaris.ico" SourceFile="../images/brightstar.ico"/>
+    
+    <PropertyRef Id="VCSHARP2010EXPRESS_IDE"/>
+    <PropertyRef Id="VS2010_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED"/>
+    <PropertyRef Id="VS2012_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED"/>
+    <PropertyRef Id="VS2010_ITEMTEMPLATES_DIR"/>
+    <PropertyRef Id="VS2012_ITEMTEMPLATES_DIR"/>
+    <PropertyRef Id="VS2012WINEXPRESS_IDE"/>
+    <PropertyRef Id="VWD2012EXPRESS_IDE"/>
+    <PropertyRef Id="VS2010_ROOT_FOLDER"/>
+    
+    <Property Id="ARPPRODUCTICON" Value="installer.ico"/>
+
+    <CustomAction Id="SetVS2010ItemTemplatesPath" Directory="VS2010ITEMTEMPLATEDIR" Value="[VS2010_ITEMTEMPLATES_DIR]CSharp\Data"/>
+    <CustomAction Id="SetVS2010ExpressItemTemplatesPath" Directory="VS2010ITEMTEMPLATEDIR" Value="[VS2010_ROOT_FOLDER]\Common7\IDE\VCSExpress\ItemTemplates\1033"/>
+    <CustomAction Id="SetVS2012ItemTemplatesPath" Directory="VS2012ITEMTEMPLATEDIR" Value="[VS2012_ITEMTEMPLATES_DIR]CSharp\Data"/>
+    <CustomAction Id="SetVS2012ExpressItemTemplatesPath" Directory="VS2012ITEMTEMPLATEDIR" Value="[VS2012EXPRESS_ITEMTEMPLATES_DIR]CSharp\Data"/>
+    <CustomActionRef Id="VCSHARP2010InstallVSTemplates"/>
+    <CustomActionRef Id="VS2010InstallVSTemplates"/>
+    <CustomActionRef Id="VS2012InstallVSTemplates"/>
+    <CustomActionRef Id="VWD2012InstallVSTemplates"/>
+    <CustomActionRef Id="VS2012WinExpressInstallVSTemplates"/>
+
+    <InstallExecuteSequence>
+      <Custom Action="SetVS2010ItemTemplatesPath" After="CostFinalize"><![CDATA[ &VisualStudioIntegration=3 ]]></Custom>
+      <Custom Action="SetVS2012ItemTemplatesPath" After="CostFinalize"><![CDATA[ &VisualStudio2012Integration=3 ]]></Custom>
+      <Custom Action="SetVS2010ExpressItemTemplatesPath" After="CostFinalize"><![CDATA[ &VCSExpressIntegration=3 ]]></Custom>
+      <Custom Action='VCSHARP2010InstallVSTemplates' Before='InstallFinalize'><![CDATA[ &VCSExpressIntegration=3 ]]></Custom>
+      <Custom Action='VS2010InstallVSTemplates' Before='InstallFinalize'><![CDATA[ &VisualStudioIntegration=3 ]]></Custom>
+      <Custom Action='VS2012InstallVSTemplates' Before='InstallFinalize'><![CDATA[ &VisualStudio2012Integration=3 ]]></Custom>
+    </InstallExecuteSequence>
+
+    <WixVariable Id='WixUILicenseRtf' Value='..\InstallerTmp\EULA.rtf'/>
+    <WixVariable Id='WixUIBannerBmp' Value='..\images\installtopbanner.bmp'/>
+    <WixVariable Id='WixUIDialogBmp' Value='..\images\installerbackground1.bmp'/>
+    
+    <UIRef Id='WixUI_FeatureTree'/>
+    <UIRef Id='WixUI_ErrorProgressText'/>
+
+    <UI>
+      <ProgressText Action="VCSHARP2010InstallVSTemplates">Configuring Visual C# 2010 Express Edition... (this may take a few minutes)</ProgressText>
+      <ProgressText Action="VS2010InstallVSTemplates">Configuring Visual Studio 2010... (this may take a few minutes)</ProgressText>
+      <ProgressText Action="VS2012InstallVSTemplates">Configuring Visual Studio 2012... (this may take a few minutes)</ProgressText>
+      
+    </UI>
+
+
+    <Property Id="InstallURL"><![CDATA[http://brightstardb.com/installation/]]></Property>
+    <Property Id="InstallEdition">SRV</Property>
+    <CustomAction Id="SetOpenInstallUrl" Property="WixShellExecTarget" Value="[InstallURL]?install=$(var.BuildNumber)&amp;edition=[InstallEdition]"/>
+    <CustomAction Id="SetOpenUninstallUrl" Property="WixShellExecTarget" Value="[InstallURL]?uninstall=$(var.BuildNumber)&amp;edition=[InstallEdition]"/>
+    <CustomAction Id="SetOpenUpgradeUrl" Property="WixShellExecTarget" Value="[InstallURL]?upgrade=$(var.BuildNumber)&amp;edition=[InstallEdition]"/>
+    <CustomAction Id="OpenUninstallUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
+    <CustomAction Id="OpenInstallUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
+    <CustomAction Id="OpenUpgradeUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
+    <CustomAction Id="SetLicenseManagerExe" Property="WixShellExecTarget" Value="[#fil3090A30CEDFA75EDBA8634F6F65FB1BE]"/>
+    <CustomAction Id="RunLicenseManagerExe" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
+    <CustomAction Id="SetLicenseManagerExeUpgrade" Property="WixShellExecTarget" Value="[#fil3090A30CEDFA75EDBA8634F6F65FB1BE]"/>
+    <CustomAction Id="RunLicenseManagerExeUpgrade" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
+
+    <InstallExecuteSequence>
+      <!-- Launch uninstall webpage during full uninstall but not upgrade -->
+      <Custom Action="SetOpenUninstallUrl" After="InstallFinalize"><![CDATA[ REMOVE ~= "ALL" AND NOT (UPGRADINGPRODUCTCODE <> "") ]]></Custom>
+      <Custom Action="OpenUninstallUrl" After="SetOpenUninstallUrl"><![CDATA[ REMOVE ~= "ALL" AND NOT (UPGRADINGPRODUCTCODE <> "") ]]></Custom>
+
+      <!-- Launch install webpage during install but not upgrade -->
+      <Custom Action="SetOpenInstallUrl" After="InstallFinalize"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
+      <Custom Action="OpenInstallUrl" After="SetOpenInstallUrl"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
+      <!-- Launch license manager on install -->
+      <Custom Action="SetLicenseManagerExe" After="OpenInstallUrl"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
+      <Custom Action="RunLicenseManagerExe" After="SetLicenseManagerExe"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
+
+      <Custom Action="SetOpenUpgradeUrl" After="InstallFinalize"><![CDATA[ WIX_UPGRADE_DETECTED <> "" ]]></Custom>
+      <Custom Action="OpenUpgradeUrl" After="SetOpenUpgradeUrl"><![CDATA[ WIX_UPGRADE_DETECTED <> "" ]]></Custom>
+      <!-- Launch license manager on upgrade -->
+      <Custom Action="SetLicenseManagerExeUpgrade" After="OpenUpgradeUrl"><![CDATA[ WIX_UPGRADE_DETECTED <> "" ]]></Custom>
+      <Custom Action="RunLicenseManagerExeUpgrade" After="SetLicenseManagerExeUpgrade"><![CDATA[ WIX_UPGRADE_DETECTED <> "" ]]></Custom>
+      
+    </InstallExecuteSequence>
+
+    <!-- Add and remove HTTP reservation -->
+    <CustomAction Id="ListenerServiceAddReservation"
+                  Directory="INSTALLLOCATION"
+                  ExeCommand="[SystemFolder]netsh.exe http add urlacl url=http://+:8090/brightstar/ sddl=D:(A;;GX;;;WD)"
+                  Return="asyncWait" />
+    <CustomAction Id="ListenerServiceDeleteReservation"
+                      Directory="INSTALLLOCATION"
+                      ExeCommand="[SystemFolder]netsh.exe http delete urlacl url=http://+:8090/brightstar/"
+                      Return="asyncWait" />
+
+    <InstallExecuteSequence>
+      <Custom Action="ListenerServiceDeleteReservation" Before="InstallFinalize">Installed</Custom>
+      <Custom Action="ListenerServiceAddReservation" Before="InstallFinalize">NOT Installed</Custom>
+    </InstallExecuteSequence>
+    
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="VS2010ITEMTEMPLATEDIR"/>
+      <Directory Id="VS2012ITEMTEMPLATEDIR"/>
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLLOCATION" Name="BrightstarDB">
+          <Directory Id="DOCSDIR" Name="Docs"/>
+          <Directory Id="SDKDIR" Name="SDK"/>
+          <Directory Id="SAMPLESDIR" Name="Samples"/>
+          <Directory Id="SERVICEDIR" Name="Service"/>
+          <Directory Id="SERVICEDATADIR" Name="Data"/>
+          <Directory Id="SPARQLSERVICEDIR" Name="SparqlService"/>
+          <Directory Id="VSDIR" Name="VisualStudio"/>
+          <Directory Id="TOOLSDIR" Name="Tools"/>
+          <Directory Id="LMDIR" Name="LicenseManager"/>
+        </Directory>
+      </Directory>
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="BrightstarProgramMenuFolder" Name="BrightstarDB"/>
+      </Directory>
+    </Directory>
+
+    <DirectoryRef Id="BrightstarProgramMenuFolder">
+      <Component Id="ToolsShortcuts" Guid="{72317CF0-9E89-4792-8E92-4A341F497293}">
+        <Shortcut  Id="PolarisStartMenuShortcut"
+                   Name="Polaris"
+                   Description="BrightstarDB management tool"
+                   Target="[TOOLSDIR]Polaris\Polaris.exe" 
+                   Icon="polaris.ico"
+                   WorkingDirectory="TOOLSDIR"/>
+        <RegistryValue Root="HKCU" Key="Software\BrightstarDB" Name="toolsInstalled" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+      <Component Id="LicenseManagerShortcuts" Guid="{EEE3A629-44FD-4635-AD25-B9E46F964BFA}">
+        <Shortcut Id="LMShortcut"
+                  Name="BrightstarDB License Manager"
+                  Target="[LMDIR]LicenseManager.exe"
+                  WorkingDirectory="LMDIR"/>
+        <RegistryValue Root="HKCU" Key="Software\BrightstarDB" Name="lmInstalled" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+      <Component Id="DocsShortcuts" Guid="{5E38F77E-40FE-424F-BF78-28B377487EDE}">
+        <Shortcut Id="PDFShortcut"
+                  Name="BrightstarDB Documentation (PDF)"
+                  Target="[DOCSDIR]BrightstarDB_Documentation.pdf"
+                  WorkingDirectory="DOCSDIR"/>
+        <Shortcut Id="CHMShortcut"
+                  Name="BrightstarDB Documentation (CHM)"
+                  Target="[DOCSDIR]BrightstarDB.chm"
+                  WorkingDirectory="DOCSDIR"/>
+        <Shortcut Id="APICHMShortcut"
+                  Name="BrightstarDB API (CHM)"
+                  Target="[DOCSDIR]BrightstarDB_API.chm"
+                  WorkingDirectory="DOCSDIR"/>
+        <util:InternetShortcut Id="OnlineDocsShortcut"
+                               Directory="DOCSDIR"
+                               Target="http://brightstardb.com/documentation/"
+                               Name="BrightstarDB Online Documentation"/>
+        <util:InternetShortcut Id="OnlineDocsStartMenuShortcut"
+                               Directory="BrightstarProgramMenuFolder"
+                               Target="http://brightstardb.com/documentation/"
+                               Name="BrightstarDB Online Documentation"/>
+        <RemoveFolder Id="BrightstarProgramMenuFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\BrightstarDB" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+    <DirectoryRef Id="SERVICEDIR">
+      <Component Id="serviceEventSourceComponent" Guid="{C878555D-D275-41F4-80BA-4A9508A1CCE6}">
+        <CreateFolder/>
+        <util:EventSource Name="BrightstarDB" Log="Application" EventMessageFile="%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\EventLogMessages.dll" />
+      </Component>
+    </DirectoryRef>
+    
+		<Feature Id="ProductFeature" Title="BrightstarDB" Level="1" 
+             ConfigurableDirectory="INSTALLLOCATION" 
+             Description="Install the BrightstarDB SDK and service files"
+             Absent="disallow" Display="expand" AllowAdvertise="no">
+      
+      <ComponentGroupRef Id="sdkFilesComponentGroup"/>
+			
+      <ComponentGroupRef Id="docFilesComponentGroup" />
+      
+      <ComponentGroupRef Id="vsFilesComponentGroup"/>
+
+      <ComponentGroupRef Id="samplesFilesComponentGroup"/>
+
+      <ComponentGroupRef Id="sparqlServiceFilesComponentGroup"/>
+      
+      <ComponentRef Id="DocsShortcuts"/>
+
+      <ComponentGroupRef Id="licenseManagerFilesComponentGroup"/>
+
+      <ComponentRef Id="LicenseManagerShortcuts"/>
+      
+      <Component Guid="{844DEDDC-DB9E-421E-8D58-D0932399193E}" Directory="INSTALLLOCATION">
+        <File Id="README_txt" KeyPath="yes" Source="..\InstallerTmp\README.txt"/>
+        <File Id="LICENSE_txt" KeyPath="no" Source="..\InstallerTmp\EULA.rtf"/>
+        <File Id="NOTICE_txt" KeyPath="no" Source="..\InstallerTmp\NOTICE.txt"/>
+      </Component>
+      
+      <!--
+      <ComponentGroupRef Id="serviceFilesComponentGroup"/>
+      -->
+      
+      <ComponentRef Id="serviceEventSourceComponent"/>
+
+      <Component Id="serviceExeComponent" Guid="{CE4B042C-3A47-41C1-B154-8B46162DC4CB}" Directory="SERVICEDIR">
+        <File Id="brightstarServiceExe" Source="..\InstallerTmp\Service\BrightstarService.exe" KeyPath="yes" Vital="yes"/>
+        <File Id="brightstarServiceExeConfig" Source="..\InstallerTmp\Service\BrightstarService.exe.config" Vital="yes"/>
+        <util:XmlFile Id="SetDataDirectory"
+                File="[SERVICEDIR]\BrightstarService.exe.config"
+                Action="setValue"
+                ElementPath="/configuration/appSettings/add[\[]@key='BrightstarDB.StoreLocation'[\]]"
+                Name="value"
+                Value="[SERVICEDATADIR]"
+                Permanent="yes"/>
+      </Component>
+
+      
+      <Feature Id="BrightstarServiceDataDirectory" Title="Service Data Directory" Level="1" ConfigurableDirectory="SERVICEDATADIR"
+               Description="Use this feature to specify the location where BrightstarDB data files will be stored."
+                Absent="disallow" Display="expand" AllowAdvertise="no">
+        <Component Id="dataDirectoryComponent" Guid="{20BD7659-4886-451D-87C9-C4D9E055AAEA}" Directory="SERVICEDATADIR">
+          <CreateFolder Directory="SERVICEDATADIR"/>
+        </Component>
+      </Feature>
+      
+      <Feature Id="BrightstarWindowsService" Title="Register BrightstarDB Windows Service" Level="1"
+               Description="Enable this feature to register the BrightstarDB Windows Service."
+               Display="expand" AllowAdvertise="no">
+        <Component Id="serviceInstallComponent" Guid="{973A196D-6414-4036-BE51-BEC684838E7F}" Directory="SERVICEDIR">
+          <File Id="brightstarServiceExe2" Source="..\InstallerTmp\Service\BrightstarService.exe" KeyPath="yes"/>
+          <ServiceInstall Id="BrightstarDB_U" Name="BrightstarDB" DisplayName="BrightstarDB Service" Description="Runs the BrightstarDB WCF service" Type="ownProcess" Start="auto" ErrorControl="normal" Vital="yes"/>
+          <ServiceControl Id="StopBrightstarDB_U" Name="BrightstarDB" Stop="both" Remove="uninstall" Wait="yes" />
+          <ServiceControl Id="StartBrightstarDB_U" Name="BrightstarDB" Start ="install" Wait="no"/>
+        </Component>
+      </Feature>
+      
+      <Feature Id="Tools" Title="BrightstarDB Management Tools" Level="1"
+               Description="Enable this feature to install Polaris, the desktop tool for managing local and remote BrightstarDB instances."
+               Display="expand" AllowAdvertise="no">
+        <Component Id="toolsDirectoryComponent" Guid="{357C6610-1274-44AB-A115-515A7F9522E6}" Directory="TOOLSDIR" KeyPath="yes">
+          <CreateFolder Directory="TOOLSDIR"/>
+        </Component>
+        <ComponentGroupRef Id="toolsFilesComponentGroup"/>
+        <ComponentRef Id="ToolsShortcuts"/>
+      </Feature>
+      
+      <Feature Id="VCSExpressIntegration" Title="Visual C# 2010 Express Integration" Level="1"
+               Description="Add item and project templates into the local Visual C# 2010 Express Edition installation."
+               AllowAdvertise="no">
+        <Condition Level="0">
+          <![CDATA[((NOT VCSHARP2010EXPRESS_IDE) or VCSHARP2010EXPRESS_IDE = "")]]>
+        </Condition>
+        <Component Id="vcseItemTemplatesComponent" Guid="{68817118-7608-4430-AA68-1E461081CB8D}" Directory="VS2010ITEMTEMPLATEDIR">
+          <File Id="vcseEntityContextItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityContext.zip"  />
+          <File Id="vcseEntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
+        </Component>
+      </Feature>
+      
+      <Feature Id="VisualStudioIntegration" Title="Visual Studio 2010 Integration" Level="1"
+               Description="Add item and project templates into the local Visual Studio installation."
+               AllowAdvertise="no">
+        <Condition Level="0">NOT VS2010_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED</Condition>
+        <Component Id="vsItemTemplatesComponent" Guid="{933FFF92-0B3F-4846-AF17-BD9BA9BACCCA}" Directory="VS2010ITEMTEMPLATEDIR">
+          <File Id="vsEntityContextItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityContext.zip"  />
+          <File Id="vsEntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
+        </Component>
+      </Feature>
+
+      <Feature Id="VisualStudio2012Integration" Title="Visual Studio 2012 Integration" Level="1"
+               Description="Add item and project templates in to the local Visual Studio 2012 installation."
+               AllowAdvertise="no">
+        <Condition Level="0">NOT VS2012_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED</Condition>
+        <Component Id="vs1012ItemTemplatesComponent" Guid="{8463A7C4-74B1-49A6-9885-5F2DCE499EE4}" Directory="VS2012ITEMTEMPLATEDIR">
+          <File Id="vs2012EntityContextItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityContext.zip"/>
+          <File Id="vs2012EntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
+        </Component>
+      </Feature>
+    </Feature>
+	</Product>
+  
+</Wix>

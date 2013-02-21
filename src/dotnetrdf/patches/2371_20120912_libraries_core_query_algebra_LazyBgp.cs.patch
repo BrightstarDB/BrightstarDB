@@ -1,0 +1,12 @@
+Index: LazyBgp.cs
+===================================================================
+--- LazyBgp.cs	(revision 2371)
++++ LazyBgp.cs	(working copy)
+@@ -407,6 +407,7 @@
+                         }
+                     }
+                 }
++                context.InputMultiset = results;
+             }
+             else if (temp.PatternType == TriplePatternType.Filter)
+             {

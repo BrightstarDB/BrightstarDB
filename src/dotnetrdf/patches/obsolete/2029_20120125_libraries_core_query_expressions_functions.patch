@@ -1,0 +1,89 @@
+Index: Arq/LocalNameFunction.cs
+===================================================================
+--- Arq/LocalNameFunction.cs	(revision 2029)
++++ Arq/LocalNameFunction.cs	(working copy)
+@@ -40,7 +40,7 @@
+                     else
+                     {
+ #if SILVERLIGHT
+-                        return new LiteralNode(null, u.Uri.Segments().Last());
++                        return new StringNode(null, u.Uri.Segments().Last());
+ #else
+                         return new StringNode(null, u.Uri.Segments.Last());
+ #endif
+Index: Leviathan/Hash/MD5HashFunction.cs
+===================================================================
+--- Leviathan/Hash/MD5HashFunction.cs	(revision 2029)
++++ Leviathan/Hash/MD5HashFunction.cs	(working copy)
+@@ -61,8 +61,8 @@
+         /// Creates a new Leviathan MD5() Function
+         /// </summary>
+         /// <param name="expr">Argument Expression</param>
+-        public LeviathanMD5HashFunction(ISparqlExpression expr)
+-            : base(expr, new MD5()) { }
++        public MD5HashFunction(ISparqlExpression expr)
++            : base(expr, new HashLib.Crypto.MD5()) { }
+ 
+         /// <summary>
+         /// Gets the Functor of the Expression
+@@ -91,7 +91,7 @@
+         /// <returns></returns>
+         public override ISparqlExpression Transform(IExpressionTransformer transformer)
+         {
+-            return new LeviathanMD5HashFunction(transformer.Transform(this._expr));
++            return new MD5HashFunction(transformer.Transform(this._expr));
+         }
+     }
+ #endif
+Index: Sparql/Hash/MD5HashFunction.cs
+===================================================================
+--- Sparql/Hash/MD5HashFunction.cs	(revision 2029)
++++ Sparql/Hash/MD5HashFunction.cs	(working copy)
+@@ -63,7 +63,7 @@
+         /// </summary>
+         /// <param name="expr">Argument Expression</param>
+         public MD5HashFunction(ISparqlExpression expr)
+-            : base(expr, new MD5()) { }
++            : base(expr, new HashLib.Crypto.MD5()) { }
+ 
+         /// <summary>
+         /// Gets the Functor of the Expression
+Index: Sparql/Hash/Sha384HashFunction.cs
+===================================================================
+--- Sparql/Hash/Sha384HashFunction.cs	(revision 2029)
++++ Sparql/Hash/Sha384HashFunction.cs	(working copy)
+@@ -66,7 +66,7 @@
+         /// </summary>
+         /// <param name="expr">Argument Expression</param>
+         public Sha384HashFunction(ISparqlExpression expr)
+-            : base(expr, new SHA384()) { }
++            : base(expr, new HashLib.Crypto.SHA384()) { }
+ 
+         /// <summary>
+         /// Gets the Functor of the Expression
+Index: Sparql/Hash/Sha512HashFunction.cs
+===================================================================
+--- Sparql/Hash/Sha512HashFunction.cs	(revision 2029)
++++ Sparql/Hash/Sha512HashFunction.cs	(working copy)
+@@ -69,7 +69,7 @@
+         /// </summary>
+         /// <param name="expr">Argument Expression</param>
+         public Sha512HashFunction(ISparqlExpression expr)
+-            : base(expr, new SHA512()) { }
++            : base(expr, new HashLib.Crypto.SHA512()) { }
+ 
+         /// <summary>
+         /// Gets the Functor of the Expression
+Index: XPath/Numeric/RoundFunction.cs
+===================================================================
+--- XPath/Numeric/RoundFunction.cs	(revision 2029)
++++ XPath/Numeric/RoundFunction.cs	(working copy)
+@@ -49,7 +49,7 @@
+ #if !SILVERLIGHT
+                         return new FloatNode(null, Convert.ToSingle(Math.Round(a.AsDouble(), MidpointRounding.AwayFromZero)));
+ #else
+-                    return new FloatNode(null, Convert.ToSingle(Math.Round(a.DoubleValue(context, bindingID)));
++                        return new FloatNode(null, Convert.ToSingle(Math.Round(a.AsDouble())));
+ #endif
+                     }
+                     catch (RdfQueryException)

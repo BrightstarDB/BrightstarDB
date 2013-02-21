@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Tweetbox</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Tweetbox</text></para>
+    </header>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">The source code for this example can be found in [INSTALLDIR]\Samples\EntityFramework\EntityFrameworkSamples.sln</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Overview</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The TweetBox sample is a simple console application that shows the speed in which BrightstarDB can load content. The aim is not to create a Twitter style application, but to show how objects with various relationships to one another are loading quickly, in a structure that will be familiar to developers.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The model consists of 3 simple interfaces: IUser, ITweet and IHashTag. The relationships between the interfaces mimic the structure on Twitter, in that Users have a many to many relationship with other Users (or followers), and have a one to many relationship with Tweets. The tweets have a many to many relationship with Hashtags, as a Tweet can have zero or more Hashtags, and a Hashtag may appear in more than one Tweet.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">The Interfaces </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">IUser</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:normal;" translate="true">The IUser interface represents a user on twitter, with simple string properties for the username, bio (profile text) and date of registration. The &apos;Following&apos; property shows the list of users that this user follows, the other end of this relationship is shown in the &apos;Followers&apos; property, this is marked with the &apos;InverseProperty&apos; attribute to tell BrightstarDB that Followers is the other end of the Following relationship. The final property is a list of tweets that the user has authored, this is the other end of the relationship from the ITweet interface (described below)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IUser</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Id { get; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Username { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Bio { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;DateTime DateRegistered { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;ICollection&lt;IUser&gt; Following { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;[InverseProperty(&quot;Following&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;ICollection&lt;IUser&gt; Followers { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;[InverseProperty(&quot;Author&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;ICollection&lt;ITweet&gt; Tweets { get; set; } &#160; &#160; &#160; &#160;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">ITweet</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The ITweet interface represents a tweet on twitter, and has simple properties for the tweet content and the date and time it was published. The Tweet has an IUser property (&apos;Author&apos;) to relate it to the user who wrote it (the other end of this relationship is described above). ITweet also contains a collection of Hashtags that appear in the tweet (described below).</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface ITweet</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Id { get; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Content { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;DateTime DatePublished { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;IUser Author { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;ICollection&lt;IHashTag&gt; HashTags { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">IHashTag</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">A hashtag is a keyword that is contained in a tweet. The same hashtag may appear in more than one tweet, and so the collection of Tweets is marked with the &apos;InverseProperty&apos; attribute to show that it is the other end of the collection of HashTags in the ITweet interface.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">[Entity]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public interface IHashTag</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Id { get; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;string Value { get; set; }</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;[InverseProperty(&quot;HashTags&quot;)]</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;ICollection&lt;ITweet&gt; Tweets { get; set; } </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Initialising the BrightstarDB Context</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The BrightstarDB context can be initialised using a connection string:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var connectionString = &quot;Type=http;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var context = new TweetBoxContext(connectionString);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">If you have added the connection string into the Config file:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="XML HTML Example"><text styleclass="XML HTML Example" translate="true">&lt;add key=&quot;BrightstarDB.ConnectionString&quot; value=&quot;Type=http;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox&quot; /&gt;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">then you can initialise the content with a simple:</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var context = new TweetBoxContext();</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">For more information about connection strings, please read the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Connection_Strings" anchor="connectionstrings" styleclass="Normal" translate="true">&quot;Connection Strings&quot; topic</link></para>
+    <para styleclass="Heading1"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Creating a new User entity</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Method 1:</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var jo = context.Users.Create();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">jo.Username = &quot;JoBloggs79&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">jo.Bio = &quot;A short sentence about this user&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">jo.DateRegistered = DateTime.Now;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">context.SaveChanges();</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Method 2:</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var jo = new User {</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; Username = &quot;JoBloggs79&quot;,</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; Bio = &quot;A short sentence about this user&quot;,</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; DateRegistered = DateTime.Now</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; };</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">context.Users.Add(jo);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">context.SaveChanges();</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Relationships between entities</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The following code snippets show the creation of relationships between entities by simply setting properties.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Users to Users</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var trevor = context.Users.Create();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">trevor.Username = &quot;TrevorSims82&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">trevor.Bio = &quot;A short sentence about this user&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">trevor.DateRegistered = DateTime.Now;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">trevor.Following.Add(jo);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">context.SaveChanges();</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Tweets to Tweeter</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var tweet = context.Tweets.Create();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">tweet.Content = &quot;My first tweet&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">tweet.DatePublished = DateTime.Now;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">tweet.Tweeter = trevor;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">context.SaveChanges();</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Tweets to HashTags:</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var nosql = context.HashTags.Where(ht =&gt; ht.Value.Equals(&quot;nosql&quot;).FirstOrDefault();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">if (nosql == null)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;nosql = context.HashTags.Create();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;nosql.Value = &quot;nosql&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var &#160;brightstardb = context.HashTags.Where(ht =&gt; ht.Value.Equals(&quot;brightstardb&quot;).FirstOrDefault();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">if (brightstardb == null)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;brightstardb = context.HashTags.Create();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;brightstardb.Value = &quot;brightstardb&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var tweet2 = context.Tweets.Create();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">tweet.Content = &quot;New fast, scalable NoSQL database for the .NET platform&quot;;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">tweet.HashTags.Add(nosql);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">tweet.HashTags.Add(brightstar);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">tweet.DatePublished = DateTime.Now;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">tweet.Tweeter = trevor;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">context.SaveChanges();</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Fast creation, persistence and indexing of data</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">In order to show the speed at which objects can be created, persisted and index in BrightstarDB, the console application creates 100 users, each with 500 tweets. Each of those tweets has 2 hashtags (chosen from a set of 10,000 hash tags). </text></para>
+    <para styleclass="Normal"></para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Creates 100 users</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Creates 10,000 hashtags</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Saves the users and hashtags to the database</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Loops through the existing users and adds followers and tweets (each tweet has 2 random hashtags)</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Saves the changes back to the store</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Writes out the time taken to the console</text></li>
+    </list>
+  </body>
+</topic>

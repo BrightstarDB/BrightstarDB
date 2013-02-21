@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="NetworkedPlanet.Brightstar.Azure.Gateway" Label="NetworkedPlanet.Brightstar.Azure.Gateway" Category="Project" />
+    <Node Id="jQuery 1.5.1" Label="jQuery 1.5.1" Category="Package" />
+    <Node Id="jQuery.vsdoc 1.5.1" Label="jQuery.vsdoc 1.5.1" Category="Package" />
+    <Node Id="jQuery.Validation 1.8.0" Label="jQuery.Validation 1.8.0" Category="Package" />
+    <Node Id="jQuery.UI.Combined 1.8.11" Label="jQuery.UI.Combined 1.8.11" Category="Package" />
+    <Node Id="EntityFramework 4.1.10331.0" Label="EntityFramework 4.1.10331.0" Category="Package" />
+    <Node Id="Modernizr 1.7" Label="Modernizr 1.7" Category="Package" />
+    <Node Id="System.Web.Providers 1.0.1" Label="System.Web.Providers 1.0.1" Category="Package" />
+  </Nodes>
+  <Links>
+    <Link Source="jQuery.vsdoc 1.5.1" Target="jQuery 1.5.1" Category="Package Dependency" />
+    <Link Source="jQuery.Validation 1.8.0" Target="jQuery 1.5.1" Category="Package Dependency" />
+    <Link Source="jQuery.UI.Combined 1.8.11" Target="jQuery 1.5.1" Category="Package Dependency" />
+    <Link Source="NetworkedPlanet.Brightstar.Azure.Gateway" Target="jQuery.vsdoc 1.5.1" Category="Installed Package" />
+    <Link Source="NetworkedPlanet.Brightstar.Azure.Gateway" Target="jQuery.Validation 1.8.0" Category="Installed Package" />
+    <Link Source="NetworkedPlanet.Brightstar.Azure.Gateway" Target="jQuery.UI.Combined 1.8.11" Category="Installed Package" />
+    <Link Source="NetworkedPlanet.Brightstar.Azure.Gateway" Target="EntityFramework 4.1.10331.0" Category="Installed Package" />
+    <Link Source="NetworkedPlanet.Brightstar.Azure.Gateway" Target="Modernizr 1.7" Category="Installed Package" />
+    <Link Source="NetworkedPlanet.Brightstar.Azure.Gateway" Target="System.Web.Providers 1.0.1" Category="Installed Package" />
+  </Links>
+  <Categories>
+    <Category Id="Project" />
+    <Category Id="Package" />
+  </Categories>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Project" ValueLabel="True">
+      <Condition Expression="HasCategory('Project')" />
+      <Setter Property="Background" Value="Blue" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Package Dependency" ValueLabel="True">
+      <Condition Expression="HasCategory('Package Dependency')" />
+      <Setter Property="Background" Value="Yellow" />
+    </Style>
+  </Styles>
+</DirectedGraph>

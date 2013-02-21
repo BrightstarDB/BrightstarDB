@@ -1,0 +1,89 @@
+Index: MimeTypeDefinition.cs
+===================================================================
+--- MimeTypeDefinition.cs	(revision 2204)
++++ MimeTypeDefinition.cs	(working copy)
+@@ -40,6 +40,7 @@
+ using System.Text;
+ using System.Text.RegularExpressions;
+ using VDS.RDF.Parsing;
++using VDS.RDF.Parsing.Tokens;
+ using VDS.RDF.Writing;
+ 
+ namespace VDS.RDF
+@@ -592,6 +593,28 @@
+         }
+ 
+         /// <summary>
++        /// Gets an instance of an RDF parser
++        /// </summary>
++        /// <param name="tokenQueueMode">The preferred queue mode for the tokenizer. Only used if the parser supports setting the token queue mode</param>
++        /// <returns></returns>
++        public IRdfReader GetRdfParser(TokenQueueMode tokenQueueMode)
++        {
++            if (_rdfParserType != null)
++            {
++                var queueModeConstructor = _rdfParserType.GetConstructor(new[] {typeof (TokenQueueMode)});
++                if (queueModeConstructor != null)
++                {
++                    return queueModeConstructor.Invoke(new object[] {tokenQueueMode}) as IRdfReader;
++                }
++                return (IRdfReader) Activator.CreateInstance(_rdfParserType);
++            }
++            else
++            {
++                throw new RdfParserSelectionException("There is no RDF Parser available for the Syntax " + this._name);
++            }
++        }
++
++        /// <summary>
+         /// Gets an instance of a RDF parser
+         /// </summary>
+         /// <returns></returns>
+Index: MIMETypesHelper.cs
+===================================================================
+--- MIMETypesHelper.cs	(revision 2204)
++++ MIMETypesHelper.cs	(working copy)
+@@ -39,6 +39,7 @@
+ using System.Linq;
+ using System.Text;
+ using VDS.RDF.Parsing;
++using VDS.RDF.Parsing.Tokens;
+ using VDS.RDF.Query;
+ using VDS.RDF.Update;
+ using VDS.RDF.Writing;
+@@ -1185,7 +1186,7 @@
+         /// </summary>
+         /// <param name="ctypes">MIME TYpes</param>
+         /// <returns></returns>
+-        public static IRdfReader GetParser(IEnumerable<String> ctypes)
++        public static IRdfReader GetParser(IEnumerable<String> ctypes, TokenQueueMode tokenQueueMode = TokenQueueMode.QueueAllBeforeParsing)
+         {
+             if (ctypes != null)
+             {
+@@ -1193,7 +1194,7 @@
+                 {
+                     try
+                     {
+-                        IRdfReader parser = GetParser(ctype);
++                        IRdfReader parser = GetParser(ctype, tokenQueueMode);
+                         return parser;
+                     }
+                     catch (RdfParserSelectionException)
+@@ -1212,7 +1213,7 @@
+         /// </summary>
+         /// <param name="contentType">Value of the HTTP Content-Type Header</param>
+         /// <returns></returns>
+-        public static IRdfReader GetParser(String contentType)
++        public static IRdfReader GetParser(String contentType, TokenQueueMode tokenQueueMode = TokenQueueMode.QueueAllBeforeParsing)
+         {
+             //Strip off Charset specifier of the Content Type if any
+             if (contentType.Contains(";"))
+@@ -1225,7 +1226,7 @@
+             {
+                 if (definition.CanParseRdf)
+                 {
+-                    return definition.GetRdfParser();
++                    return definition.GetRdfParser(tokenQueueMode);
+                 }
+             }
+ 

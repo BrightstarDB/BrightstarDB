@@ -1,0 +1,121 @@
+﻿@model BrightstarDB.Azure.Management.StoreDetail
+@using BrightstarDB.Azure.Gateway.Models
+@using BrightstarDB.Azure.Management
+@{
+    ViewBag.Title = "Manage Store";
+}
+
+<nav id="breadcrumb">
+    <ul>
+        <li>@Html.ActionLink("My Account", "Index", "Account", null,null)</li>
+        <li>Store @ViewBag.StoreId</li>
+    </ul>
+</nav>
+<article>
+<h2>Manage Store</h2>
+
+<p><strong>Store ID:</strong>&nbsp;@ViewBag.StoreId</p>
+<p><strong>Data Usage:</strong>&nbsp;@Model.CurrentSize / @Model.SizeLimit MB</p>
+
+<h3>Operations</h3>
+<p>You can perform certain operations on your data store through the browser.</p>
+@if ((@ViewBag.AccessLevel & StoreAccessLevel.Read) > 0)
+{
+    @Html.ActionLink("SPARQL Query", "Query", new { id = ViewBag.StoreId }, new { @class = "orange button" })
+    @Html.Raw("&nbsp;");
+}
+@if ((@ViewBag.AccessLevel & StoreAccessLevel.Write) > 0)
+{
+    @Html.ActionLink("Update Transaction", "Transaction", new { id = ViewBag.StoreId }, new { @class = "orange button" }); 
+    @Html.Raw("&nbsp;");<a href="#" class="orange button" onclick="showImportDialog()">Import Data</a>
+}
+
+@if ((@ViewBag.AccessLevel & StoreAccessLevel.Admin) > 0)
+{
+    <!-- Extending access to other users is not yet supported
+    <h3>Security</h3>
+    <p>You can assign access privileges on this data store to other user accounts. To do this you must know the other user's account ID.</p>
+    -->
+    <h3>Export Data</h3>
+    <p>You can export all of the data from the store to an Azure Blob storage account that you own.</p>
+    <a href="#" class="orange button" onclick="showExportDialog()">Export Data</a>
+
+    <h3>Store Reset</h3>
+    <p>You can completely reset the content of this store. This option will permanently delete all the content in the store!</p>
+    <a id="reset_button" class="orange button" onclick="showConfirmationDialog()">Reset Content</a>
+
+    <h3>Delete Store</h3>
+    <p>You can permanently delete the store, removing it from the list of stores for your subscription.</p>
+    <a id="delete_button" class="orange button" onclick="showDeleteConfirmationDialog()">Delete Store</a>
+    
+    <h3>Jobs</h3>
+    <p>You can see the queued and running jobs for this store and cancel queued jobs.</p>
+    @Html.ActionLink("Manage Jobs", "Jobs", new { id = ViewBag.StoreId }, new { @class = "orange button" });
+
+<!-- Store cloning is not yet supported                                                                                                           
+    <h3>Copy Store</h3>
+    <p>You can create a complete clone of this store either into this subscription or into any other subscription you own.</p>
+    @Html.ActionLink("Copy Content", "Copy", new { id = ViewBag.StoreId }, new { @class = "orange button" })
+-->
+}
+</article>
+<aside>
+<div id="importDlg">
+    @Html.Partial("_ImportForm", new ImportSourceModel())
+</div>
+<div id="exportDlg">
+    @Html.Partial("_ExportForm", new ExportSinkModel())
+</div>
+<div id="confirmDlg">
+    <p>This operation will permanently discard ALL data in the store.</p>
+    <p>Are you sure you want to do this ?</p>
+</div>
+<div id="deleteConfirmDlg">
+    <p>This operation will permanently discard ALL data in the store.</p>
+    <p>Are you sure you want to do this ?</p>
+</div>
+</aside>
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        $('#importDlg').dialog({ autoOpen: false, title: 'Import Data', dialogClass: 'importDlg',
+            buttons: {
+                "Submit Job": function () { $('#importForm').submit(); },
+                "Cancel": function () { $(this).dialog('close'); }
+            }
+        });
+        $('#exportDlg').dialog({ autoOpen: false, title: 'Export Data', dialogClass: 'importDlg',
+            buttons: {
+                "Submit Job": function () { $('#exportForm').submit(); },
+                "Cancel": function () { $(this).dialog('close'); }
+            }
+        });
+        $('#confirmDlg').dialog({ autoOpen: false, title: 'Confirm Reset',
+            buttons: {
+                "Yes": function () { document.location = document.location + "/Reset"; },
+                "No": function () { $(this).dialog('close'); }
+            }
+        });
+        $('#deleteConfirmDlg').dialog({ autoOpen: false, title: 'Confirm Delete',
+            buttons : {
+                "Yes" : function() {document.location = document.location + "/Delete"; },
+                "No" : function() { $(this).dialog('close'); }
+            }
+        });
+    });
+
+    function showImportDialog(  ) {
+        $('#importDlg').dialog('open');
+    }
+
+    function showExportDialog() {
+        $('#exportDlg').dialog('open');
+    }
+
+    function showConfirmationDialog() {
+        $('#confirmDlg').dialog('open');
+    }
+
+    function showDeleteConfirmationDialog() {
+        $('#deleteConfirmDlg').dialog('open');
+    }
+</script>

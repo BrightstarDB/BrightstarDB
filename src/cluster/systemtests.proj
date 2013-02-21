@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+
+  <PropertyGroup>
+    <ScriptRoot>C:\Work\brightstar\trunk\src\cluster</ScriptRoot>
+		<CN1>BrightstarClusterNodeService1</CN1>
+		<CN2>BrightstarClusterNodeService2</CN2>
+    <CM>BrightstarClusterManagerService</CM>
+		<MSTest Condition=" '$(MSTest)' == '' ">C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\MSTest.exe</MSTest>
+	</PropertyGroup>
+  
+	<ItemGroup>
+		<TestResults Include="*.trx" />
+	</ItemGroup>
+			
+	<Target Name="StopCN1">
+		<ServiceQuery ServiceName="$(CN1)" MachineName="127.0.0.1" >
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+			<Output TaskParameter="Status" PropertyName="ServiceStatus" />
+		</ServiceQuery>
+		
+		<Message Text="$(CN1) Service: Exists: $(Exists) - Status: $(ServiceStatus)"/>
+		<ServiceController Condition=" '$(Exists)'=='True' " MachineName="127.0.0.1" ServiceName="$(CN1)" Action="Stop"/>
+	</Target>
+	
+	<Target Name="StopCN2">
+		<ServiceQuery ServiceName="$(CN2)" MachineName="127.0.0.1" >
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+			<Output TaskParameter="Status" PropertyName="ServiceStatus" />
+		</ServiceQuery>
+
+		<Message Text="$(CN2) Service: Exists: $(Exists) - Status: $(ServiceStatus)"/>
+		<ServiceController Condition=" '$(Exists)'=='True' " MachineName="127.0.0.1" ServiceName="$(CN2)" Action="Stop"/>
+	</Target>
+
+  <Target Name="StopCM">
+    <ServiceQuery ServiceName="$(CM)" MachineName="127.0.0.1" >
+      <Output TaskParameter="Exists" PropertyName="Exists" />
+      <Output TaskParameter="Status" PropertyName="ServiceStatus" />
+    </ServiceQuery>
+
+    <Message Text="$(CM) Service: Exists: $(Exists) - Status: $(ServiceStatus)"/>
+    <ServiceController Condition=" '$(Exists)'=='True' " MachineName="127.0.0.1" ServiceName="$(CM)" Action="Stop"/>
+  </Target>
+	
+	<!-- Installs and starts the service -->
+	<Target Name="StartCN1">
+		<ServiceQuery ServiceName="$(CN1)" MachineName="127.0.0.1" >
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+			<Output TaskParameter="Status" PropertyName="ServiceStatus" />
+		</ServiceQuery>
+				
+		<Exec Condition=" '$(Exists)'=='False' " 
+			  Command="sc create $(CN1) start=auto DisplayName=$(CN1) binPath=$(ScriptRoot)\BrightstarDB.NodeServerRunner\bin\CN1\BrightstarNodeService.exe" />							  
+
+		<ServiceQuery ServiceName="$(CN1)" MachineName="127.0.0.1" >
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+			<Output TaskParameter="Status" PropertyName="ServiceStatus" />
+		</ServiceQuery>	  
+			  
+		<ServiceController Condition=" '$(ServiceStatus)'=='Stopped' " MachineName="127.0.0.1" ServiceName="$(CN1)" Action="Start"/>
+			  
+	</Target>
+	
+	<Target Name="StartCN2">
+		<ServiceQuery ServiceName="$(CN2)" MachineName="127.0.0.1" >
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+			<Output TaskParameter="Status" PropertyName="ServiceStatus" />
+		</ServiceQuery>
+				
+		<Exec Condition=" '$(Exists)'=='False' " 
+			  Command="sc create $(CN2) start=auto DisplayName=$(CN2) binPath=$(ScriptRoot)\BrightstarDB.NodeServerRunner\bin\CN2\BrightstarNodeService.exe" />							  
+
+		<ServiceQuery ServiceName="$(CN2)" MachineName="127.0.0.1" >
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+			<Output TaskParameter="Status" PropertyName="ServiceStatus" />
+		</ServiceQuery>	  
+			  
+		<ServiceController Condition=" '$(ServiceStatus)'=='Stopped' " MachineName="127.0.0.1" ServiceName="$(CN2)" Action="Start"/>			  
+	</Target>
+
+  <Target Name="StartCM">
+    <ServiceQuery ServiceName="$(CM)" MachineName="127.0.0.1" >
+      <Output TaskParameter="Exists" PropertyName="Exists" />
+      <Output TaskParameter="Status" PropertyName="ServiceStatus" />
+    </ServiceQuery>
+
+    <Exec Condition=" '$(Exists)'=='False' "
+			  Command="sc create $(CM) start=auto DisplayName=$(CM) binPath=$(ScriptRoot)\BrightstarDB.ClusterManagerService\bin\Debug\BrightstarClusterManagerService.exe" />
+
+    <ServiceQuery ServiceName="$(CM)" MachineName="127.0.0.1" >
+      <Output TaskParameter="Exists" PropertyName="Exists" />
+      <Output TaskParameter="Status" PropertyName="ServiceStatus" />
+    </ServiceQuery>
+
+    <ServiceController Condition=" '$(ServiceStatus)'=='Stopped' " MachineName="127.0.0.1" ServiceName="$(CM)" Action="Start"/>
+  </Target>
+  
+	
+	<Target Name="UninstallCN1" DependsOnTargets="StopCN1">
+		<ServiceQuery ServiceName="$(CN1)" MachineName="127.0.0.1" >
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+			<Output TaskParameter="Status" PropertyName="ServiceStatus" />
+		</ServiceQuery>
+				
+		<Exec Condition=" '$(ServiceStatus)'=='Stopped' " Command="sc delete $(CN1)" />							  			  
+	</Target>
+	
+	<Target Name="UninstallCN2" DependsOnTargets="StopCN2">
+		<ServiceQuery ServiceName="$(CN2)" MachineName="127.0.0.1" >
+			<Output TaskParameter="Exists" PropertyName="Exists" />
+			<Output TaskParameter="Status" PropertyName="ServiceStatus" />
+		</ServiceQuery>
+				
+		<Exec Condition=" '$(ServiceStatus)'=='Stopped' " Command="sc delete $(CN2)" />							  			  
+	</Target>
+	
+	
+	<Target Name="CopyCN1Files">
+		<ItemGroup>
+			<ServiceBinaries Include=".\BrightstarDB.NodeServerRunner\bin\Debug\*.*" />
+			<ConfigFile Include=".\SystemTestConfig\Node1\*.*" />
+		</ItemGroup>
+
+		<Copy
+            SourceFiles="@(ServiceBinaries)"
+            DestinationFolder=".\BrightstarDB.NodeServerRunner\bin\CN1"
+        />
+		
+		<Copy
+            SourceFiles="@(ConfigFile)"
+            DestinationFolder=".\BrightstarDB.NodeServerRunner\bin\CN1"
+        />			
+	</Target>
+	
+	<Target Name="CopyCN2Files">
+		<ItemGroup>
+			<ServiceBinaries Include=".\BrightstarDB.NodeServerRunner\bin\Debug\*.*" />
+			<ConfigFile Include=".\SystemTestConfig\Node2\*.*" />
+		</ItemGroup>
+
+		<Copy
+            SourceFiles="@(ServiceBinaries)"
+            DestinationFolder=".\BrightstarDB.NodeServerRunner\bin\CN2"
+        />
+		
+		<Copy
+            SourceFiles="@(ConfigFile)"
+            DestinationFolder=".\BrightstarDB.NodeServerRunner\bin\CN2"
+        />
+	</Target>
+		
+	<Target Name="CleanResults">
+		<Delete Files="@(TestResults)" />
+	</Target>
+
+	<Target Name="SystemTests">
+    <Exec Command='"$(MSTest)" /nologo /testmetadata:cluster.vsmdi /testlist:SystemTests /testsettings:local.testsettings /resultsfile:systemtests.trx' />
+	</Target>
+
+	<Target Name="Build" DependsOnTargets="CleanResults;StopCN1;StopCN2;CopyCN1Files;CopyCN2Files;StartCN1;StartCN2;StartCM;SystemTests;StopCN1;StopCN2;StopCM">
+	</Target>
+	
+</Project>

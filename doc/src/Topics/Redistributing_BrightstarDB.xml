@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="kal_000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Redistributing BrightstarDB</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Redistributing BrightstarDB</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">In this case, redistributing BrightstarDB means distributing any application that you develop that makes use of the BrightstarDB libraries. Your BrightstarDB license includes royalty-free redistribution as long as the following rules are followed:</text></para>
+    <para styleclass="Normal"></para>
+    <list id="0" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">You may only redistribute the DLLs that are found in the [INSTALLDIR]\SDK directory. Other binaries and DLLS may not be redistributed. </text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">You may not redistribute BrightstarDB as part of an application that replicates the functionality of any BrightstarDB application (even if that application is not included in the package that you purchased from us).</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">You must take steps to ensure that your licensee ID and license key are protected from exposure through introspection or reverse engineering of your application. This condition can be satisfied by obfuscating your distributed application (or at least that part of the application that contains your licensee ID and license key) in such a way that these strings are robustly encrypted in the final assembly. You should also note that if the application you are distributing uses an HTTP, TCP or Named Pipe connection to a BrightstarDB server, you do not need to include your license information in the assembly at all. </text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">You may not resell BrightstarDB Server or BrightstarDB Enterprise - if you develop an application that connects to a BrightstarDB server, your clients must purchase server licenses directly from BrightstarDB Limited.</text></li>
+    </list>
+  </body>
+</topic>

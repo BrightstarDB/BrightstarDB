@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Jen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Consuming OData in PowerPivot</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Consuming OData in PowerPivot</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The data in BrighstarDB can be consumed by various OData consumers. In this topic we look at consuming the data using PowerPivot (a list of recommended OData consumers can be found </text><link displaytype="text" defaultstyle="true" type="weblink" href="&lt;%LINK_CAPTION%&gt;" target="_blank" styleclass="Normal" translate="true">odata.org/consumers</link><text styleclass="Normal" translate="true">).</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Open Excel, click the PowerPivot tab and open the PowerPivot window</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">If you do not have PowerPivot installed, you can download it from </text><link displaytype="text" defaultstyle="true" type="weblink" href="&lt;%LINK_CAPTION%&gt;" target="_blank" styleclass="Normal" translate="true">powerpivot.com</link></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To consume data from Brightstar, click the &apos;From Data Feeds&apos; button in the &apos;Get External Data&apos; section:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><image src="odataconsumer_1_feedbutton.png" scale="100.00%" styleclass="Image Caption"></image></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Add a name for your feed, and enter the URL of the OData service file for your BrightstarDB application.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><image src="odataconsumer_2b_connect.png" scale="100.00%" styleclass="Image Caption"></image></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Click &quot;Test Connection&quot; to make sure that you can connect to your OData service and then click &quot;Next&quot;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><image src="odataconsumer_3b_selectsets.png" scale="100.00%" styleclass="Image Caption"></image></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Select the sets that you wish to consume and click &quot;Finish&quot;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><image src="odataconsumer_5b_success.png" scale="100.00%" styleclass="Image Caption"></image></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">This then shows all the data that is consumed from the OData service in the PowerPivot window. When any data is added or edited in the BrightstarDB store, the data in the PowerPivot windows can be updated by clicking the &quot;Refresh&quot; button.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><image src="odataconsumer_6_data.png" scale="100.00%" styleclass="Image Caption"></image></para>
+  </body>
+</topic>

@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SparqlTestTasks", "SparqlTestTasks\SparqlTestTasks.csproj", "{19CC99A9-A930-4900-8A42-DF8457BB93CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{49CCBEF9-41E3-4F66-83DC-FC63C7F8113C}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		SparqlTestTasks.vsmdi = SparqlTestTasks.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sparql11Tests", "Sparql11Tests\Sparql11Tests.csproj", "{E5D869A8-F6FA-44D4-8DE0-1A3CE1BC205E}"
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = SparqlTestTasks.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{19CC99A9-A930-4900-8A42-DF8457BB93CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19CC99A9-A930-4900-8A42-DF8457BB93CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19CC99A9-A930-4900-8A42-DF8457BB93CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19CC99A9-A930-4900-8A42-DF8457BB93CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5D869A8-F6FA-44D4-8DE0-1A3CE1BC205E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5D869A8-F6FA-44D4-8DE0-1A3CE1BC205E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5D869A8-F6FA-44D4-8DE0-1A3CE1BC205E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5D869A8-F6FA-44D4-8DE0-1A3CE1BC205E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

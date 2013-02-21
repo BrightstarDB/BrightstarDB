@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestLists xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestList name="SystemTests" id="1d155b04-e84f-418f-a66d-1f82aaf5cbd5" parentListId="8c43106b-9dc1-4907-a29f-aa66a61bf5b6">
+    <Description>These tests are run in the context of the system setup. The systemunittest.proj must be used to run these scripts.</Description>
+    <TestLinks>
+      <TestLink id="07d9c0eb-2062-e444-cad6-02c76fa54c09" name="TestTwoServiceNodes" storage="brightstardb.clustertests\bin\debug\brightstardb.clustertests.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    </TestLinks>
+  </TestList>
+  <TestList name="Lists of Tests" id="8c43106b-9dc1-4907-a29f-aa66a61bf5b6">
+    <RunConfiguration id="15848b72-f4b2-4fdc-be72-5a9bb55dbe8d" name="Local" storage="local.testsettings" type="Microsoft.VisualStudio.TestTools.Common.TestRunConfiguration, Microsoft.VisualStudio.QualityTools.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  </TestList>
+</TestLists>

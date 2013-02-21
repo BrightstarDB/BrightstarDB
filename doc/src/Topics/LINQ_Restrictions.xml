@@ -1,0 +1,446 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">LINQ Restrictions</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">LINQ Restrictions</text></para>
+    </header>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Supported LINQ Operators</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The LINQ query processor in BrightstarDB has some restrictions, but supports the most commonly used core set of LINQ query methods. The following table lists the supported query methods. Unless otherwise noted the indexed variant of LINQ query methods are not supported.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="25" colcount="2">
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Method</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Notes</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Any</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported as first result operator. Not supported as second or subsequent result operator</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">All</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported as first result operator. Not supported as second or subsequent result operator</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Average</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported as first result operator. Not supported as second or subsequent result operator.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Cast</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported for casting between Entity Framework entity types only</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Contains</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported for literal values only</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Count</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported with or without a Boolean filter expression. Supported as first result operator. Not supported as second or subsequent result operator.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Distinct</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported for literal values. For entities &#160;Distinct() is supported but only to eliminate duplicates of the same Id any override of .Equals on the entity class is not used.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">First</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported with or without a Boolean filter expression</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">LongCount</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported with or without a Boolean filter expression. Supported as first result operator. Not supported as second or subsequent result operator.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Max</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported as first result operator. Not supported as second or subsequent result operator.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Min</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported as first result operator. Not supported as second or subsequent result operator.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">OfType&lt;TResult&gt;</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported only if TResult is an Entity Framework entity type</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">OrderBy</text></para>
+        </td>
+        <td style="width:1035px;">
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">OrberByDescending</text></para>
+        </td>
+        <td style="width:1035px;">
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Select</text></para>
+        </td>
+        <td style="width:1035px;">
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">SelectMany</text></para>
+        </td>
+        <td style="width:1035px;">
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Single</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported with or without a Boolean filter expression</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">SingleOrDefault</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported with or without a Boolean filter expression</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Skip</text></para>
+        </td>
+        <td style="width:1035px;">
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Sum</text></para>
+        </td>
+        <td style="width:1035px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Supported as first result operator. Not supported as second or subsequent result operator.</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Take</text></para>
+        </td>
+        <td style="width:1035px;">
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">ThenBy</text></para>
+        </td>
+        <td style="width:1035px;">
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">ThenByDescending</text></para>
+        </td>
+        <td style="width:1035px;">
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td style="width:281px;">
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Where</text></para>
+        </td>
+        <td style="width:1035px;">
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Supported Class Methods and Properties</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">In general, the translation of LINQ to SPARQL cannot translate methods on .NET datatypes into functionally equivalent SPARQL. However we have implemented translation of a few commonly used String, Math and DateTime methods as listed in the following table.</text></para>
+    <para styleclass="Warning"><text styleclass="Warning" translate="true">The return values of these methods and properties can only be used in the filtering of queries and cannot be used to modify the return value. For example you can test that foo.Name.ToLower().Equals(&quot;somestring&quot;), but you cannot return the value foo.Name.ToLower().</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><table styleclass="Default" rowcount="29" colcount="2">
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">.NET function</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">SPARQL Equivalent</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" style="font-style:italic;" translate="true">String Functions</text></para>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.StartsWith(string s)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">STRSTARTS(p0, s)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.StartsWith(string s, bool ignoreCase, CultureInfo culture)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">REGEX(p0, &quot;^&quot; + s, &quot;i&quot;) if ignoreCase is true; STRSTARTS(p0, s) if ignoreCase is false</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.StartsWith(string s, StringComparison comparisonOptions)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">REGEX(p0, &quot;^&quot; + s, &quot;i&quot;) if comparisonOptions is StringComparison.CurrentCultureIgnoreCase, StringComparison.InvariantCultureIgnoreCase or StringComparison.OrdinalIgnoreCase; STRSTARTS(p0, s) otherwise</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.EndsWith(string s)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">STRENDS(p0, s)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.StartsWith(string s, bool ignoreCase, CultureInfo culture)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">REGEX(p0, s + &quot;$&quot;, &quot;i&quot;) if ignoreCase is true; STRENDS(p0, s) if ignoreCase is false</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.StartsWith(string s, StringComparison comparisonOptions)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">REGEX(p0, s + &quot;$&quot;, &quot;i&quot;) if comparisonOptions is StringComparison.CurrentCultureIgnoreCase, StringComparison.InvariantCultureIgnoreCase or StringComparison.OrdinalIgnoreCase; STRENDS(p0, s) otherwise</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.Length</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">STRLEN(p0)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.Substring(int start)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">SUBSTR(p0, start)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.Substring(int start, int len)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">SUBSTR(p0, start, end)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.ToUpper()</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">UCASE(p0)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.ToLower()</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">LCASE(p0)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" style="font-style:italic;" translate="true">Date Functions</text></para>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.Day</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">DAY(p0)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.Hour</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">HOURS(p0)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.Minute</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">MINUTES(p0)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.Month</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">MONTH(p0)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.Second</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">SECONDS(p0)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">p0.Year</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">YEAR(p0)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" style="font-style:italic;" translate="true">Math Functions</text></para>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Math.Round(decimal d)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">ROUND(d)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Math.Round(double d)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">ROUND(d)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Math.Floor(decimal d)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">FLOOR(d)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Math.Floor(double d)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">FLOOR(d)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Math.Ceiling(decimal d)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">CEIL(d)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Math.Ceiling(decimal d)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">CEIL(d)</text></para>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" style="font-style:italic;" translate="true">Regular Expressions</text></para>
+        </td>
+        <td>
+        </td>
+      </tr>
+      <tr style="vertical-align:top">
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">Regex.IsMatch(string p0, string expression, RegexOptions options)</text></para>
+        </td>
+        <td>
+          <para styleclass="Normal"><text styleclass="Normal" translate="true">REGEX(p0, expression, flags) - Note flags are generated from the options parameter. The supported RegexOptions are IgnoreCase, Multiline, Singleline and IgnorePatternWhitespace (or any combination of these).</text></para>
+        </td>
+      </tr>
+    </table></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The static method Regex.IsMatch() is supported when used to filter on a string property in a LINQ query e.g.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">context.Persons.Where(p =&gt; Regex.IsMatch(p.Name, &quot;^a.*e$&quot;, RegexOptions.IgnoreCase));</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">However, please note that the regular expression options that can be used is limited to a combination of IgnoreCase, Multiline, Singleline and IgnorePatternWhitespace.</text></para>
+  </body>
+</topic>

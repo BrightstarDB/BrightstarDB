@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="BrightstarDB.Polaris.Views.TransactionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="2" Header="Triples To Add" Margin="3">
+            <TextBox Text="{Binding AddTriples, UpdateSourceTrigger=PropertyChanged}" Margin="3" AcceptsReturn="True" AcceptsTab="True"></TextBox>
+        </GroupBox>
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="5"/>
+        <GroupBox Grid.Row="0" Header="Triples To Delete" Margin="3">
+            <TextBox Text="{Binding DeletePatterns, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" AcceptsTab="True" />
+        </GroupBox>
+        <GridSplitter Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="5"/>
+        <GroupBox Grid.Row="4" Header="Validation Messages" Margin="3">
+            <ListBox ItemsSource="{Binding ValidationMessages}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+    </Grid>
+</UserControl>

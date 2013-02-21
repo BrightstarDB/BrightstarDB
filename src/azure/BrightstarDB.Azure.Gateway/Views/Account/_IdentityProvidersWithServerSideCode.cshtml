@@ -1,0 +1,49 @@
+﻿@*
+// Copyright 2010 Microsoft Corporation
+// Licensed under the Apache License, Version 2.0 (the "License"); 
+// You may not use this file except in compliance with the License. 
+// You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+
+// THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED, 
+// INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OR 
+// CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE, 
+// MERCHANTABLITY OR NON-INFRINGEMENT. 
+
+// See the Apache 2 License for the specific language governing 
+// permissions and limitations under the License.
+*@
+@using BrightstarDB.Azure.Gateway.Models
+@model IEnumerable<BrightstarDB.Azure.Gateway.Models.HrdIdentityProvider>
+
+
+@*Needed for Visual Studio Intellisense*@
+@if (false)
+{
+    <script src="/Scripts/jquery-1.5.1-vsdoc.js" type="text/javascript"></script>
+}
+
+<script type="text/javascript">
+    $(function () {
+        // make buttons jqueryui buttons
+        $("button").button();
+
+        // add click behaviour
+        $("button").click(function () {
+            window.location = $(this).attr("id");
+        });
+    });
+</script>
+
+<div id="identity-provider-content">
+    <h2>
+        Sign in using one of the following Identity Providers
+    </h2>
+    <div id="identity-providers">
+        @foreach (HrdIdentityProvider identityProvider in Model)
+        {
+            <div class="identity-provider"><button id="@Html.Raw(identityProvider.LoginUrl)">@identityProvider.Name</button></div>
+        }
+    </div>
+</div>
+

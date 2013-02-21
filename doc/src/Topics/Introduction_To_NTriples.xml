@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="gra" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Introduction To N-Triples</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Introduction To N-Triples</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">N-Triples is a consistent and simple way to encode RDF triples. N-Triples is a line based format. Each N-Triples line encodes one RDF triple. Each line consists of the subject (a URI), followed &#160;by whitespace, the predicate (a URI), more whitespace, and then the object (a URI or literal) followed by a dot and a new line. The encoding of the literal may include a datatype or language code as well as the value. URIs are enclosed in &apos;&lt;&apos; &apos;&gt;&apos; brackets. The formal definition of the N-Triples format can be found </text><link displaytype="text" defaultstyle="true" type="weblink" href="http://www.w3.org/TR/rdf-testcases/#ntriples" target="_blank" styleclass="Normal" translate="true">here</link><text styleclass="Normal" translate="true">.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The following are examples of N-Triples data.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"># simple literal property</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;http://www.brightstardb.com/products/brightstar&gt; &lt;http://www.brightstardb.com/schemas/product/name&gt; &quot;Brightstar DB&quot; .</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"># relationship between two resources</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;http://www.brightstardb.com/products/brightstar&gt; &lt;http://www.brightstardb.com/schemas/product/category&gt; &lt;http://www.brightstardb.com/categories/nosql&gt; .</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"># data type example for integer value</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;http://www.brightstardb.com/products/brightstar&gt; &lt;http://www.brightstardb.com/schemas/product/productCode&gt; &quot;640&quot;^^&lt;http://www.w3.org/2001/XMLSchema#integer&gt; .</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;http://www.brightstardb.com/products/brightstar&gt; &lt;http://www.brightstardb.com/schemas/product/releaseDate&gt; &quot;2011-11-11 12:00&quot;^^&lt;http://www.w3.org/2001/XMLSchema#dateTime&gt; .</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">&lt;http://www.brightstardb.com/products/brightstar&gt; &lt;http://www.brightstardb.com/schemas/product/cost&gt; &quot;0.00&quot;^^&lt;http://www.w3.org/2001/XMLSchema#decimal&gt; .</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold;" translate="true">Allowed Data Types</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:normal;" translate="true">Data types are defined in terms of an identifier. Common data types use the XML Schema identifiers. The prefix of these is:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">http://www.w3.org/2001/XMLSchema#</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">And the common primitive datatypes are defined in </text><link displaytype="text" defaultstyle="true" type="weblink" href="http://www.w3.org/TR/xmlschema-2/#built-in-primitive-datatypes" target="_blank" styleclass="Normal" translate="true">XML Schema Part 2: Datatypes Second Edition</link><text styleclass="Normal" translate="true">.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>

@@ -1,0 +1,77 @@
+Index: Storage/IGenericIOManager.cs
+===================================================================
+--- Storage/IGenericIOManager.cs	(revision 2156)
++++ Storage/IGenericIOManager.cs	(working copy)
+@@ -33,7 +33,6 @@
+ 
+ */
+ 
+-#if !NO_STORAGE
+ 
+ using System;
+ using System.Collections.Generic;
+@@ -315,5 +314,3 @@
+ #endif
+     }
+ }
+-
+-#endif
+\ No newline at end of file
+Index: Update/GenericUpdateProcessor.cs
+===================================================================
+--- Update/GenericUpdateProcessor.cs	(revision 2156)
++++ Update/GenericUpdateProcessor.cs	(working copy)
+@@ -33,11 +33,12 @@
+ 
+ */
+ 
+-#if !NO_STORAGE
+ 
++
+ using System;
+ using System.Collections.Generic;
+ using System.Linq;
++using System.Threading;
+ using VDS.RDF.Parsing;
+ using VDS.RDF.Parsing.Tokens;
+ using VDS.RDF.Query;
+@@ -1131,6 +1132,7 @@
+ 
+                     Graph g = new Graph();
+                     if (!this._manager.UpdateSupported) this._manager.LoadGraph(g, cmd.TargetUri);
++#if !SILVERLIGHT
+                     UriLoader.Load(g, cmd.SourceUri);
+                     g.BaseUri = cmd.TargetUri;
+                     if (this._manager.UpdateSupported)
+@@ -1141,6 +1143,25 @@
+                     {
+                         this._manager.SaveGraph(g);
+                     }
++#else
++                    var importCompleted = new ManualResetEvent(false);
++                    UriLoader.Load(g, cmd.SourceUri,
++                                   (newGraph, flag) =>
++                                       {
++                                           newGraph.BaseUri = cmd.TargetUri;
++                                           if (this._manager.UpdateSupported)
++                                           {
++                                               this._manager.UpdateGraph(cmd.TargetUri, newGraph.Triples,
++                                                                         Enumerable.Empty<Triple>());
++                                           }
++                                           else
++                                           {
++                                               this._manager.SaveGraph(newGraph);
++                                           }
++                                           ((ManualResetEvent) flag).Set();
++                                       }, importCompleted);
++                    importCompleted.WaitOne();
++#endif
+                 }
+                 catch
+                 {
+@@ -1559,4 +1580,3 @@
+     }
+ }
+ 
+-#endif
+\ No newline at end of file

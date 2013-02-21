@@ -1,0 +1,65 @@
+﻿@model BrightstarDB.Azure.Management.AccountDetails
+
+@{
+    ViewBag.Title = "Index";
+}
+
+@Html.Partial("_AdminMenuPartial")
+<h2>Account Details</h2>
+
+<p>Account ID: @Model.AccountId</p>
+<p>Contact Email: @Model.EmailAddress</p>
+
+<h3>Subscriptions</h3>
+<table class="display">
+    <thead>
+        <tr>
+            <td>Subscription ID</td>
+            <td>Name</td>
+            <td>Stores (Used / Max)</td>
+            <td>Store Size Limit</td>
+            <td>Total Size Limit</td>
+            <td>Status</td>
+            <td>Action</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var subscription in Model.Subscriptions) 
+        {
+            <tr>
+                <td>@Html.ActionLink(subscription.Id, "Subscription", new {subscriptionId=subscription.Id})</td>
+                <td>@subscription.Label</td>
+                <td>@subscription.CurrentStoreCount / @subscription.StoreLimit</td>
+                <td>@subscription.StoreSizeLimit</td>
+                <td>@subscription.TotalSizeLimit</td>
+                <td>
+                    @if (subscription.IsActive){
+                        <span class="ok">Active</span>
+                    } else {
+                        <span class="attention">Inactive</span>
+                    }
+                </td>
+                <td>
+                    @if (subscription.IsActive)
+                    {
+                        @Html.ActionLink("Deactivate", "Deactivate", new { subscriptionId = subscription.Id }, new { @class="orange button"});
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Activate", "Activate", new { subscriptionId = subscription.Id }, new { @class = "orange button" });
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
+@Html.ActionLink("Add Subscription", "AddSubscription", null, new {@class="button orange"})
+<script>
+    jQuery(document).ready(function () {
+        $('table.display').dataTable({
+            bJQueryUI: true,
+            sPaginationType: 'full_numbers'
+        });
+    });
+</script>

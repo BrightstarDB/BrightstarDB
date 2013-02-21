@@ -1,2 +1,4 @@
-BrightstarDB
+brightstardb
 ============
+
+BrightstarDB Development Repo

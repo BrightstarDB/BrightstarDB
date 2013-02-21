@@ -1,0 +1,12 @@
+﻿<local:MainViewModel xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:local="clr-namespace:BrightstarNotes.DataModel" xmlns:DataModel="clr-namespace:BrightstarNotes.DataModel">
+
+    <local:MainViewModel.AllNotes>
+        <DataModel:Note Title="Note one"
+                             Modified="11/11/2011"/>
+        <DataModel:Note Title="Note two"
+                             Modified="2011-11-18" />
+    </local:MainViewModel.AllNotes>
+
+</local:MainViewModel>

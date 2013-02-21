@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Deploying a Reference Store</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Deploying a Reference Store</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">As well as using BrightstarDB to store user-modifiable data, you can also ship reference data with your application. A BrightstarDB reference store can be embedded as part of your application content and deployed to the Isolated Storage on the mobile device. Once deployed, the store can be queried and/or updated through your code as normal. The basic steps to deploying a store in a mobile application are as follows:</text></para>
+    <para styleclass="Normal"></para>
+    <list id="3" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Create the reference store</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Add the reference store files to your application and compile it</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Deploy the application to the device</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">At runtime, copy the reference store files from the application directory to Isolated Storage</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Access the copied store from your code</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Create The Reference Store</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB stores are fully portable between the desktop and a mobile device through simple file copy. You can create and update a BrightstarDB database using a .NET application on a desktop workstation or a server and use the database files on a mobile device without the need for any conversion.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">If the database you are deploying has been through a number of update transactions you may want to consider creating a coalesced copy of the database for deployment purposes. Coalescing the database will reduce the database size by copying only the current state of the database and removing all the historical states of the data.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Add Database File To Your Application</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Every BrightstarDB store exists in its own folder and contains at least the following files:</text></para>
+    <list id="4" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">master.bs</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">data.bs</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">resources.bs</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">transactionheaders.bs</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">transactions.bs</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">For normal operation you only need to add the master.bs, resources.bs and data.bs files to your solution. The transactionheaders.bs and transactions.bs files are required only if your application will need to replay the transactions that built the database.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To add the reference database to your application</text></para>
+    <para styleclass="Normal"></para>
+    <list id="5" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">With Visual Studio, create a project for the Windows Phone application that consumes the reference store.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">From the Project menu of the application, select Add Existing Item.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">From the Add Existing Item menu, select the master.bs file for the BrightstarDB store that you want to add, then click Add. This will add the local file to the project.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">In Solution Explorer, right-click the local file and set the file properties so that the file is built as Content and always copied to the output directory (Copy always).</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Repeat steps 3 and 4 for the data.bs file and resources.bs file</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Optionally repeat steps 3 and 4 for transactionheaders.bs and transactions.bs</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">It is good practice to put the BrightstarDB data files you are copying into a folder under your project. If you want to deploy multiple reference databases, you will have to put the files for each store in a separate folder to avoid name clashes. The folders you define in your project will be mirrored in the installation directory when the application is deployed.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Deploy Application</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Compile and deploy your application as normal. The store files you have copied will be available in the installation directory of the application (under the folders that you created in the project if applicable).</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Copy Database Files To Isolated Storage</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">BrightstarDB on a mobile device will only access stores from a named directory in the application&apos;s Isolated Storage. It is therefore necessary when your application starts up to ensure that the data is copied or moved to Isolated Storage. Each BrightstarDB store you deploy must be in its own named directory, and those directories must in turn be in a named directory under the Isolated Storage root folder. These directory names are important as they form the values in the connection string you provide to BrightstarDB. The directory structure used by the sample application is shown below:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">IsolatedStorageFile Root</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">|</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">+-brightstar &#160; &#160;&lt;-- the storesDirectory value in the connection string, create a sub</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;| &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; create one sub-directory for each store you want to access</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;|</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;+-dining &#160; &#160; &#160;&lt;-- the storeName value in the connection string, </text><br/><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;only the files for a single store should go in here</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The precise way you choose to deploy or update the BrightstarDB store files is up to you, but the simplest method (as shown in the sample code) is to check for the presence of the store and if it is not there, copy the files from the application installation directory to Isolated Storage. The code to do this in the sample can be found in the App() constructor in the App.xaml.cs file:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">if (!BrightstarDbDeploymentHelper.StoreExists(&quot;brightstar&quot;, &quot;dining&quot;))</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;BrightstarDbDeploymentHelper.CopyStore(&quot;data&quot;, &quot;brightstar&quot;, &quot;dining&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The helper class can also be found in the sample project and has the following methods:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">public static class BrightstarDbDeploymentHelper</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;public static bool StoreExists(string storeDirectoryName, string storeName)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;IsolatedStorageFile iso = IsolatedStorageFile.GetUserStoreForApplication();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;return iso.DirectoryExists(storeDirectoryName + &quot;\\&quot; + storeName) &amp;&amp;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; iso.FileExists(storeDirectoryName + &quot;\\&quot; + storeName + &quot;\\master.bs&quot;) &amp;&amp;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; iso.FileExists(storeDirectoryName + &quot;\\&quot; + storeName + &quot;\\resources.bs&quot;) &amp;&amp;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; iso.FileExists(storeDirectoryName + &quot;\\&quot; + storeName + &quot;\\data.bs&quot;);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;public static void CopyStore(string resourceFolderPath, string storeDirectoryName, string storeName)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;IsolatedStorageFile iso = IsolatedStorageFile.GetUserStoreForApplication();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;CopyStoreFile(iso, &quot;data.bs&quot;, resourceFolderPath, storeDirectoryName, storeName);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;CopyStoreFile(iso, &quot;master.bs&quot;, resourceFolderPath, storeDirectoryName, storeName);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;CopyStoreFile(iso, &quot;resources.bs&quot;, resourceFolderPath, storeDirectoryName, storeName);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;private static void CopyStoreFile(IsolatedStorageFile iso, string fileName, string resourceFolderPath,</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;string storeDirectoryName, string storeName)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;if (!iso.DirectoryExists(storeDirectoryName))</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;iso.CreateDirectory(storeDirectoryName);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;if (!iso.DirectoryExists(storeDirectoryName + &quot;\\&quot; + storeName))</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;iso.CreateDirectory(storeDirectoryName + &quot;\\&quot; + storeName);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;// Create a stream for the file in the installation folder.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;var appResource =</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;Application.GetResourceStream(</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160;new Uri(resourceFolderPath + &quot;\\&quot; + fileName, UriKind.Relative));</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;if (appResource != null)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;using (Stream input = appResource.Stream)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;// Create a stream for the new file in isolated storage.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;using (</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;IsolatedStorageFileStream output =</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;iso.CreateFile(storeDirectoryName + &quot;\\&quot; + storeName + &quot;\\&quot; + fileName))</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;// Initialize the buffer.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;var readBuffer = new byte[4096];</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;int bytesRead = -1;</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;// Copy the file from the installation folder to isolated storage. </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;while ((bytesRead = input.Read(readBuffer, 0, readBuffer.Length)) &gt; 0)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;output.Write(readBuffer, 0, bytesRead);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;} </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;else</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;// There is no application resource for this file, so create it as an empty file &#160; </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160; &#160; &#160;iso.CreateFile(storeDirectoryName + &quot;\\&quot; + storeName + &quot;\\&quot; + fileName).Close();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160; &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Access Reference Database Files</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Once deployed to Isolated Storage, the BrightstarDB store can be accessed as normal. You can use the RDF API, DataObjects API or EntityFramework to access the data depending on your application requirements. The connection string used to access the store is as follows:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">type=embedded;storesDirectory={path to directory containing store directories};storeName={name of store directory}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">With our sample application, the store is contained in a directory named &quot;dining&quot;, which is itself contained in a directory named &quot;brightstar&quot;, so the full connection string is</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">type=embedded;storesDirectory=brightstar;storeName=dining</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">When the sample application runs, you should see a listing of top restaurants generated from a LINQ query against the EntityFramework.</text></para>
+  </body>
+</topic>

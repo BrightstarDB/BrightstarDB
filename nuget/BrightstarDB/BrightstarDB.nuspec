@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>BrightstarDB</id>
+    <version>1.1.30928</version>
+	<title>BrightstarDB</title>
+    <authors>kal_ahmed</authors>
+    <owners>kal_ahmed</owners>
+    <licenseUrl>http://brightstardb.com/download/license_agreement.html</licenseUrl>
+    <projectUrl>http://brightstardb.com/</projectUrl>
+    <iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>BrightstarDB is a fast and scalable NoSQL database for .NET with code-first data model generation. This package installs the BrightstarDB libraries and the text template for generating a BrightstarDB Entity Framework context class.</description>
+	<releaseNotes>This update brings the NuGet package inline with the latest release from BrightstarDB. For full release notes please see http://brightstardb.com/documentation/Whats_New.html</releaseNotes>
+    <copyright>Copyright 2012 BrightstarDB Limited</copyright>
+    <tags>brightstardb rdf nosql database sparql entityframework</tags>
+  </metadata>
+</package>

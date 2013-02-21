@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="Kal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">MVC Nerd Dinner</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">MVC Development with BrightstarDB</text></para>
+    </header>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">The source code for this example can be found in the solution [INSTALLDIR]\Samples\NerdDinner\BrightstarDB.Samples.NerdDinner.sln</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To demonstrate the ease of using BrightstarDB with ASP.NET MVC, we will use the well-known “Nerd Dinner” tutorial used by .NET Developers when they first learn MVC. We won’t recreate the full Nerd Dinner application, but just a portion of it, to show how to use BrightstarDB for code-first data persistence, and show how it not only matches the ease of creating applications from scratch, but surpasses Entity Framework by introducing pain free model changes (more on that later). The Brightstar.NerdDinner sample application shows a simple model layer, using ASP.NET MVC4 for the CRUD application and BrightstarDB for data storage. In later sections we will extend this basic functionality with support for linked data in the form of both OData and SPARQL query support and we will show how to use BrightstarDB as the basis for a .NET custom membership and role provider.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">This tutorial is quite long, but is broken up into a number of separate sections each of which you can follow along with in code, or you can refer to the complete sample application which can be found in [INSTALLDIR]\Samples\NerdDinner.</text></para>
+    <list id="1" type="ul" listtype="bullet" formatstring="&#183;" format-charset="SYMBOL_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Symbol; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><link displaytype="text" defaultstyle="true" type="topiclink" href="Creating_The_Basic_Data_Model" styleclass="Normal" translate="true">Creating The Basic Data Model</link><text styleclass="Normal" translate="true"> - creates the initial application and code-first data model</text></li>
+      <li styleclass="Normal"><link displaytype="text" defaultstyle="true" type="topiclink" href="Creating_MVC_Controllers_And_V" styleclass="Normal" translate="true">Creating MVC Controllers and Views</link><text styleclass="Normal" translate="true"> - shows how easy it is to use this model with ASP.NET MVC4 to create web interfaces for create, update and delete (CRUD) operations.</text></li>
+      <li styleclass="Normal"><link displaytype="text" defaultstyle="true" type="topiclink" href="Applying_Model_Changes" styleclass="Normal" translate="true">Applying Model Changes</link><text styleclass="Normal" translate="true"> - shows how BrightstarDB handles changes to the code-first data model without data loss.</text></li>
+      <li styleclass="Normal"><link displaytype="text" defaultstyle="true" type="topiclink" href="Adding_a_Custom_Membership_Pro" styleclass="Notes" translate="true">Adding A Custom Membership Provider</link><text styleclass="Notes" translate="true"> - describes how to build a ASP.NET custom membership provider that uses BrightstarDB to manage user account information.</text></li>
+      <li styleclass="Normal"><link displaytype="text" defaultstyle="true" type="topiclink" href="Adding_a_Custom_Role_Provider" styleclass="Notes" translate="true">Adding A Custom Role Provider</link><text styleclass="Notes" translate="true"> - builds on the custom membership provider to enable users to be assigned different roles and levels of access</text></li>
+      <li styleclass="Normal"><link displaytype="text" defaultstyle="true" type="topiclink" href="Adding_Linked_Data_Support" styleclass="Normal" translate="true">Adding Linked Data Support</link><text styleclass="Normal" translate="true"> - extends the web application to provide a SPARQL and an ODATA query endpoint</text></li>
+      <li styleclass="Normal"><link displaytype="text" defaultstyle="true" type="topiclink" href="Consuming_OData_in_PowerPivot" styleclass="Normal" translate="true">Consuming OData In PowerPivot</link><text styleclass="Normal" translate="true"> - shows one way in which the OData endpoint can be used - enabling data to be retrieved into Excel.</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"></para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>

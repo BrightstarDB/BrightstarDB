@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestSettings name="Local" id="ebcd40db-4fd1-4af1-89fd-09f09950d54e" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Description>These are default test settings for a local test run.</Description>
+  <Deployment>
+    <DeploymentItem filename="BrightstarDB.Tests\Data\graph_triples.nt" />
+    <DeploymentItem filename="BrightstarDB.Tests\Data\bsbm_370k.nt" />
+    <DeploymentItem filename="BrightstarDB.Tests\Data\escaping.nt" />
+    <DeploymentItem filename="BrightstarDB.Tests\Data\simple.txt" />
+    <DeploymentItem filename="BrightstarDB.Tests\Data\sparql\" />
+    <DeploymentItem filename="BrightstarDB.Tests\Data\sparql-test-suite\" />
+    <DeploymentItem filename="BrightstarDB.Tests\Data\ntriples.txt" />
+    <DeploymentItem filename="BrightstarDB.Tests\Data\bsbm_1M.nt" />
+    <DeploymentItem filename="BrightstarDB.Tests\Data\persondata_en_subset.nt" />
+    <DeploymentItem filename="BrightstarDB.Tests\Data\nquads.txt" />
+  </Deployment>
+  <Execution hostProcessPlatform="MSIL">
+    <TestTypeSpecific>
+      <UnitTestRunConfig testTypeId="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b">
+        <AssemblyResolution>
+          <TestDirectory useLoadContext="true" />
+        </AssemblyResolution>
+      </UnitTestRunConfig>
+    </TestTypeSpecific>
+    <AgentRule name="LocalMachineDefaultRole">
+    </AgentRule>
+  </Execution>
+</TestSettings>

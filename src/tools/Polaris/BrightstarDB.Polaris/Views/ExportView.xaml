@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="BrightstarDB.Polaris.Views.ExportView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:c="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4" mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,5,0"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock VerticalAlignment="Center" >Export File Name</TextBlock>
+        <TextBox Grid.Column="1" VerticalAlignment="Center" Text="{Binding ExportFileName, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <Button Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Width="100" Height="30" IsEnabled="{Binding IsValid}" Content="Start">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                    <c:EventToCommand Command="{Binding StartClickCommand}" PassEventArgsToCommand="True"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Button>
+        <TextBlock Grid.Row="2" VerticalAlignment="Top">Progress</TextBlock>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ProgressText}" TextWrapping="Wrap"/>
+    </Grid>
+</UserControl>

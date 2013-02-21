@@ -1,0 +1,893 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XInclude" xmlns:xml="http://www.w3.org/XML/1998/namespace" elementFormDefault="unqualified" attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/XML/1998/namespace"/>
+	<xs:element name="helpproject">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="config" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence minOccurs="0" maxOccurs="unbounded">
+							<xs:element name="config-group" type="config-group.class" minOccurs="0" maxOccurs="unbounded"/>
+							<xs:element name="namespaces" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence minOccurs="0" maxOccurs="unbounded">
+										<xs:element name="namespace" minOccurs="0">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="name" type="xs:string" use="required"/>
+														<xs:attribute name="href" type="xs:string" use="required"/>
+														<xs:attribute name="build" type="xs:string" default="ALL"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="variables" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence minOccurs="0" maxOccurs="unbounded">
+										<xs:element name="variable" minOccurs="0">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="id" type="xs:string" use="required"/>
+														<xs:attribute name="type">
+															<xs:simpleType>
+																<xs:restriction base="xs:string">
+																	<xs:enumeration value="text"/>
+																	<xs:enumeration value="html"/>
+																</xs:restriction>
+															</xs:simpleType>
+														</xs:attribute>
+														<xs:attribute name="translate" type="xs:boolean"/>
+														<xs:attribute name="lang" type="xs:language"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="helpwindows" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence maxOccurs="unbounded">
+										<xs:element name="helpwindow" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:choice minOccurs="0" maxOccurs="unbounded">
+													<xs:element name="caption" type="caption.class"/>
+													<xs:element name="window-options-chm">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="user-button" type="user-button.class" minOccurs="0" maxOccurs="3"/>
+															</xs:sequence>
+															<xs:attribute name="navigation" type="xs:boolean" default="true"/>
+															<xs:attribute name="search" type="xs:boolean" default="true"/>
+															<xs:attribute name="favorite" type="xs:boolean" default="true"/>
+															<xs:attribute name="saveregistry" type="xs:boolean" default="true"/>
+															<xs:attribute name="buttons" type="xs:integer"/>
+															<xs:attribute name="navigationwidth" type="xs:integer" default="200"/>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="window-options-hlp">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="user-button" type="user-button.class" minOccurs="0" maxOccurs="unbounded"/>
+															</xs:sequence>
+															<xs:attribute name="headercolor" type="color.type"/>
+															<xs:attribute name="textcolor" type="color.type"/>
+															<xs:attribute name="autosize" type="xs:boolean" default="false"/>
+															<xs:attribute name="maximize" type="xs:boolean" default="false"/>
+															<xs:attribute name="keepontop" type="xs:boolean" default="false"/>
+															<xs:attribute name="posabsolute" type="xs:boolean" default="false"/>
+															<xs:attribute name="buttons" type="xs:integer"/>
+														</xs:complexType>
+													</xs:element>
+												</xs:choice>
+												<xs:attribute name="name" type="xs:string" use="required"/>
+												<xs:attribute name="left" type="xs:integer"/>
+												<xs:attribute name="top" type="xs:integer"/>
+												<xs:attribute name="width" type="xs:integer"/>
+												<xs:attribute name="height" type="xs:integer"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="styleclasses" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence minOccurs="0" maxOccurs="unbounded">
+										<xs:element name="styleclass" minOccurs="0" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="style-set" minOccurs="0" maxOccurs="unbounded">
+														<xs:complexType mixed="false">
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="media">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:string">
+																				<xs:enumeration value="screen"/>
+																				<xs:enumeration value="print"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																	<xs:attribute name="type">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:string">
+																				<xs:enumeration value="text"/>
+																				<xs:enumeration value="para"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute name="name" type="xs:string" use="required"/>
+												<xs:attribute name="parentclass" type="xs:string"/>
+												<xs:attribute name="shortcut" type="xs:integer"/>
+												<xs:attribute name="mode" type="xs:integer"/>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="tablestyleclass" minOccurs="0" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="style-set" maxOccurs="unbounded">
+														<xs:complexType mixed="false">
+															<xs:simpleContent>
+																<xs:extension base="xs:string">
+																	<xs:attribute name="media" use="optional">
+																		<xs:simpleType>
+																			<xs:restriction base="xs:string">
+																				<xs:enumeration value="all"/>
+																				<xs:enumeration value="screen"/>
+																				<xs:enumeration value="print"/>
+																			</xs:restriction>
+																		</xs:simpleType>
+																	</xs:attribute>
+																</xs:extension>
+															</xs:simpleContent>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+												<xs:attribute name="name" type="xs:string" use="required"/>
+												<xs:attribute name="parentclass" type="xs:string"/>
+												<xs:attribute name="mode" type="xs:integer"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="helpcontext-numbers" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence minOccurs="0" maxOccurs="unbounded">
+										<xs:element name="helpcontext-number" minOccurs="0">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="value" type="xs:unsignedInt" use="required"/>
+														<xs:attribute name="href" type="xs:string" use="required"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="repository" type="repository.class" minOccurs="0"/>
+						</xs:sequence>
+						<xs:attribute ref="xml:base"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="map" type="map.class" minOccurs="0"/>
+				<xs:element name="project-files" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence minOccurs="0">
+							<xs:element name="file" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="file.class">
+											<xs:attribute ref="xml:base"/>
+										</xs:extension>
+									</xs:complexContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute ref="xml:base"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="isskin" type="xs:boolean"/>
+			<xs:attribute name="isrepository" type="xs:boolean"/>
+			<xs:attribute name="version" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="topic" type="topic.class"/>
+	<xs:element name="map" type="map.class"/>
+	<xs:simpleType name="color.type">
+		<xs:annotation>
+			<xs:documentation>HTML color value #RRGGBB</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:whiteSpace value="collapse"/>
+			<xs:pattern value="#([a-fA-F0-9])+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="charset.type">
+		<xs:annotation>
+			<xs:documentation>ANSI_CHARSET, DEFAULT_CHARSET, SYMBOL_CHARSET, MAC_CHARSET, SHIFTJIS_CHARSET, HANGEUL_CHARSET, JOHAB_CHARSET, GB2312_CHARSET, CHINESEBIG5_CHARSET, GREEK_CHARSET, TURKISH_CHARSET, HEBREW_CHARSET, ARABIC_CHARSET, BALTIC_CHARSET, RUSSIAN_CHARSET, THAI_CHARSET, EASTEUROPE_CHARSET, OEM_CHARSET</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="xs:string xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="coords.type">
+		<xs:annotation>
+			<xs:documentation>Describes the bounding rectangle for a hotspot (left,top,width,height)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([0-9])+,([0-9])+,([0-9])+,([0-9])+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="pixel.type">
+		<xs:annotation>
+			<xs:documentation>Pixel value (integer with optional "px" suffix)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([0-9.])+[px]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="percent.type">
+		<xs:annotation>
+			<xs:documentation>Percent value (integer with optional "%" suffix)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([0-9.])+[%]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="anchor.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Describes an anchor inside a topic that can be addressed by a link</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:element name="keywords" type="keywords.class" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required"/>
+		<xs:attribute name="styleclass" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="area.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Image hotspot area</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="link.base.class">
+				<xs:attribute name="shape" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="rect"/>
+							<xs:enumeration value="elipse"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="coords" type="coords.type" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="body.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Topic body</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="header" type="cell.class" minOccurs="0"/>
+			<xs:element name="para" type="para.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="list" type="list.class" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:choice>
+		<xs:attribute name="lang" type="xs:language"/>
+	</xs:complexType>
+	<xs:complexType name="br.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Simple line break</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:anySimpleType"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="caption.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Caption for images, buttons, etc. Contains the translatable part of a structure</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="translate" type="xs:boolean"/>
+				<xs:attribute name="lang" type="xs:language"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="cell.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Table cell, base class for the header and td elements</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="para" type="para.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="list" type="list.class" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:complexType name="conditional-text.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Beginning or end of conditional text in a topic</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="IF"/>
+					<xs:enumeration value="IFNOT"/>
+					<xs:enumeration value="ELSE"/>
+					<xs:enumeration value="END"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="value" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="config-group.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Configuration group in the config element</xs:documentation>
+		</xs:annotation>
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="config-group" type="config-group.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="config-value" type="config-value.class" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute ref="xml:base"/>
+	</xs:complexType>
+	<xs:complexType name="config-value.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Single configuration value</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="name" type="xs:string" use="required"/>
+				<xs:attribute name="translate" type="xs:boolean"/>
+				<xs:attribute name="lang" type="xs:language"/>
+				<xs:attribute ref="xml:base"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="draft-comment.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Design time comment</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="width" type="pixel.type"/>
+		<xs:attribute name="height" type="pixel.type"/>
+		<xs:attribute name="modified" type="xs:date"/>
+		<xs:attribute name="modifiedby" type="xs:string"/>
+		<xs:attribute name="styleclass" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="embedded-image.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Embedded image in topic</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:base64Binary">
+				<xs:attribute name="width" type="pixel.type"/>
+				<xs:attribute name="height" type="pixel.type"/>
+				<xs:attribute name="spacing" type="pixel.type"/>
+				<xs:attribute name="type" type="xs:string" use="required" fixed="xsd:base64Binary"/>
+				<xs:attribute name="objectclass" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="embedded-olecontrol.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Embedded OLE control in topic</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="embedded-image.class"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="file.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Topic and baggage file reference (can include wildcards)</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="file-mod.class">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="file-mod" type="file-mod.class" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:choice>
+				<xs:attribute name="filetype" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="topic"/>
+							<xs:enumeration value="baggage"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="file-mod.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Topic and baggage files include modification</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="href" type="xs:string" use="required"/>
+		<xs:attribute name="build" type="xs:string" default="ALL"/>
+	</xs:complexType>
+	<xs:complexType name="html-code.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>HTML code object in topic</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="width" type="pixel.type"/>
+				<xs:attribute name="height" type="pixel.type"/>
+				<xs:attribute name="translate" type="xs:boolean"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="image.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Image, optionally with image map</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0" maxOccurs="2">
+			<xs:element name="caption" type="caption.class" minOccurs="0"/>
+			<xs:element name="imagemap" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence maxOccurs="unbounded">
+						<xs:element name="area" type="area.class" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="title" type="caption.class" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="src" type="xs:string" use="required"/>
+		<xs:attribute name="scale" type="percent.type"/>
+		<xs:attribute name="align">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="left"/>
+					<xs:enumeration value="right"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="width" type="xs:integer"/>
+		<xs:attribute name="height" type="xs:integer"/>
+		<xs:attribute name="padding" type="xs:integer"/>
+		<xs:attribute name="styleclass" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="snippet.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Topic inclusion reference, "embedded topic"</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="src" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="keyword.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Single keyword (translatable)</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="keyword" type="keyword.class" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:choice>
+		<xs:attribute name="translate" type="xs:boolean"/>
+	</xs:complexType>
+	<xs:complexType name="keywords.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>List of keywords, used in topic and anchor element</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="keyword" type="keyword.class" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="lang" type="xs:language"/>
+	</xs:complexType>
+	<xs:complexType name="link.base.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Base class for link and area element</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:element name="title" type="caption.class" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="topiclink"/>
+					<xs:enumeration value="weblink"/>
+					<xs:enumeration value="filelink"/>
+					<xs:enumeration value="javascript"/>
+					<xs:enumeration value="macro"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="href" type="xs:string" use="required"/>
+		<xs:attribute name="anchor" type="xs:string"/>
+		<xs:attribute name="target" type="xs:string"/>
+		<xs:attribute name="domain" type="xs:string"/>
+		<xs:attribute name="params" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="link.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Text, image or button link</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="link.base.class">
+				<xs:attribute name="displaytype" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="text"/>
+							<xs:enumeration value="image"/>
+							<xs:enumeration value="button"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="defaultstyle" type="xs:boolean"/>
+				<xs:attribute name="src" type="xs:string"/>
+				<xs:attribute name="styleclass" type="xs:string"/>
+				<xs:attribute name="style" type="xs:string"/>
+				<xs:attribute name="translate" type="xs:boolean"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="line.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Horizontal line</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:anySimpleType">
+				<xs:attribute name="style" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="list.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Ordered or unordered list</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="li" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="para.class"/>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ol" type="list.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="ul" type="list.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="list" type="list.class" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:choice>
+		<xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="level" type="xs:integer"/>
+		<xs:attribute name="listtype" type="xs:string"/>
+		<xs:attribute name="formatstring" type="xs:string"/>
+		<xs:attribute name="format-font" type="xs:string"/>
+		<xs:attribute name="format-charset" type="charset.type"/>
+		<xs:attribute name="levelreset" type="xs:boolean"/>
+		<xs:attribute name="legalstyle" type="xs:boolean"/>
+		<xs:attribute name="startfrom" type="xs:integer"/>
+		<xs:attribute name="styleclass" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="map.class">
+		<xs:annotation>
+			<xs:documentation>Table of contents</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0">
+			<xs:element name="navref" type="navref.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="topicref" type="topicref.class" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:choice>
+		<xs:attribute ref="xml:base"/>
+	</xs:complexType>
+	<xs:complexType name="navref.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Reference to a child project in the TOC map</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:element name="caption" type="caption.class"/>
+		</xs:sequence>
+		<xs:attribute name="href" type="xs:string" use="required"/>
+		<xs:attribute name="id" type="xs:integer"/>
+		<xs:attribute name="build" type="xs:string" default="ALL"/>
+		<xs:attribute name="modified" type="xs:dateTime"/>
+		<xs:attribute name="merge" default="compile">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="compile"/>
+					<xs:enumeration value="runtime"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute ref="xml:base"/>
+	</xs:complexType>
+	<xs:complexType name="para.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Paragraph</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="text" type="text.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="table" type="table.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="link" type="link.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="anchor" type="anchor.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="br" type="br.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="line" type="line.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="tab" type="tab.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="var" type="var.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="conditional-text" type="conditional-text.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="draft-comment" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType mixed="true">
+					<xs:complexContent mixed="true">
+						<xs:extension base="draft-comment.class"/>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="embedded-image" type="embedded-image.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="image" type="image.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="html-code" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType mixed="true">
+					<xs:simpleContent>
+						<xs:extension base="html-code.class"/>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="embedded-olecontrol" type="embedded-olecontrol.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="video" type="video.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="snippet" type="snippet.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="toggle" type="toggle.class" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:choice>
+		<xs:attribute name="styleclass" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="simpletext.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>HTML code object in topic</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="styleclass" type="xs:string"/>
+				<xs:attribute name="translate" type="xs:boolean"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="tab.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Tabstop in text</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:anySimpleType"/>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="table.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Table</xs:documentation>
+		</xs:annotation>
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="thead" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="td" type="td.class" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="style" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="tr" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="td" type="td.class" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="style" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+		<xs:attribute name="colcount" type="xs:integer"/>
+		<xs:attribute name="rowcount" type="xs:integer"/>
+		<xs:attribute name="style" type="xs:string"/>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="styleclass" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="td.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Table cell</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="cell.class">
+				<xs:attribute name="colspan" type="xs:integer" default="1"/>
+				<xs:attribute name="rowspan" default="1">
+					<xs:simpleType>
+						<xs:restriction base="xs:integer">
+							<xs:minInclusive value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="style" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="text.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Simple text</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent mixed="true">
+			<xs:extension base="para.class">
+				<xs:attribute name="translate" type="xs:boolean"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="toggle.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Expanding object, screenshot or text toggle</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0" maxOccurs="2">
+			<xs:element name="caption" minOccurs="0" maxOccurs="2">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="caption.class">
+							<xs:attribute name="state" type="xs:string"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="title" minOccurs="0" maxOccurs="2">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="caption.class">
+							<xs:attribute name="state" type="xs:string"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="hidden-text" type="simpletext.class" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="picture"/>
+					<xs:enumeration value="dropdown"/>
+					<xs:enumeration value="inline"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="id" type="xs:string"/>
+		<xs:attribute name="defaultstyle" type="xs:boolean"/>
+		<xs:attribute name="help-expanded" type="xs:boolean"/>
+		<xs:attribute name="print-expanded" type="xs:boolean"/>
+		<xs:attribute name="src-collapsed" type="xs:string"/>
+		<xs:attribute name="src-expanded" type="xs:string"/>
+		<xs:attribute name="scale" type="percent.type"/>
+		<xs:attribute name="align">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="left"/>
+					<xs:enumeration value="right"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="width" type="xs:integer"/>
+		<xs:attribute name="height" type="xs:integer"/>
+		<xs:attribute name="padding" type="xs:integer"/>
+		<xs:attribute name="styleclass" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="topicref.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Topic or chapter heading in the TOC map</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="topicref" type="topicref.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="navref" type="navref.class" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="caption" type="caption.class"/>
+		</xs:choice>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="topic"/>
+					<xs:enumeration value="script"/>
+					<xs:enumeration value="weblink"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="id" type="xs:integer"/>
+		<xs:attribute name="build" type="xs:string" default="ALL"/>
+		<xs:attribute name="modified" type="xs:dateTime"/>
+		<xs:attribute name="icon" default="0">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer"/>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="href" type="xs:string"/>
+		<xs:attribute name="anchor" type="xs:string"/>
+		<xs:attribute name="target" type="xs:string"/>
+		<xs:attribute name="domain" type="xs:string"/>
+		<xs:attribute ref="xml:base"/>
+	</xs:complexType>
+	<xs:complexType name="topic.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Help topic</xs:documentation>
+		</xs:annotation>
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="meta" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="value" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="title" type="caption.class" minOccurs="0"/>
+			<xs:element name="keywords" type="keywords.class" minOccurs="0"/>
+			<xs:element name="a-keywords" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence maxOccurs="unbounded">
+						<xs:element name="a-keyword" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="topic-variables" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence maxOccurs="unbounded">
+						<xs:element name="topic-variable">
+							<xs:complexType>
+								<xs:simpleContent>
+									<xs:extension base="xs:string">
+										<xs:attribute name="id" type="xs:string" use="required"/>
+										<xs:attribute name="type" type="xs:string"/>
+									</xs:extension>
+								</xs:simpleContent>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="body" type="body.class"/>
+		</xs:choice>
+		<xs:attribute name="template" type="xs:string" use="required"/>
+		<xs:attribute name="status" type="xs:string" use="optional"/>
+		<xs:attribute name="class" type="xs:string" use="optional"/>
+		<xs:attribute name="lasteditedby" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="user-button.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>User defined buttons in helpwindow class</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="caption" type="caption.class" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="href" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="var.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Variable in topic</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="styleclass" type="xs:string"/>
+				<xs:attribute name="style" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="repository.class" mixed="false">
+		<xs:annotation>
+			<xs:documentation>Repository binding in project</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="name" type="xs:string"/>
+				<xs:attribute name="href" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="video.class" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Video in topic</xs:documentation>
+		</xs:annotation>
+		<xs:choice minOccurs="0" maxOccurs="2">
+			<xs:element name="html-code" type="html-code.class" minOccurs="0"/>
+		</xs:choice>
+		<xs:attribute name="src" type="xs:string" use="required"/>
+		<xs:attribute name="width" type="pixel.type" use="required"/>
+		<xs:attribute name="height" type="pixel.type" use="required"/>
+		<xs:attribute name="previewimage" type="xs:string"/>
+		<xs:attribute name="autostart" type="xs:boolean"/>
+		<xs:attribute name="loop" type="xs:boolean"/>
+		<xs:attribute name="showcontrols" type="xs:boolean"/>
+		<xs:attribute name="flashversion" type="xs:integer"/>
+	</xs:complexType>
+</xs:schema>

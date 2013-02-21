@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="kal_000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Optimistic Locking</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Optimistic Locking</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The Entity Framework provides the option to enable optimistic locking when working with the store. Optimistic locking uses a well-known version number property (the property predicate URI is http://www.brightstardb.com/.well-known/model/version) to track the version number of an entity, when making an update to an entity the version number is used to determine if another client has concurrently updated the entity. If this is detected, it results in an exception of the type BrightstarDB.Client.TransactionPreconditionsFailedException being raised.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Enabling Optimistic Locking</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Optimistic locking can be enabled either through the connection string (giving the user control over whether or not optimistic locking is enabled) or through code (giving the control to the programmer). </text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To enable optimistic locking in a connection string, simply add &quot;optimisticLocking=true&quot; to the connection string. e.g. </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">type=http;endpoint=http://localhost:8090/brightstar;storeName=myStore;optimisticLocking=true</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To enable optimistic locking from code, use the optional optimisticLocking parameter on the constructor of the context class e.g.</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var myContext = new MyEntityContext(connectionString, true);</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">The programmatic setting always overrides the setting in the connection string - this gives the programmer final control over whether optimistic locking is used. The programmer can also prevent optimistic locking from being used by passing false as the value of the optimisticLocking parameter of the constructor of the context class.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Handling Optimistic Locking Errors</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Optimistic locking errors only occur when the SaveChanges() method is called on the context class. The error is notified by raising an exception of the type BrightstarDB.Client.TransactionPreconditionsFailedException. When this exception is caught by your code, you have two basic options to choose from. You can apply each of these options separately to each object modified by your update.</text></para>
+    <para styleclass="Normal"></para>
+    <list id="1" type="ol" listtype="decimal" formatstring="&#37;&#48;&#58;&#115;&#46;" format-charset="DEFAULT_CHARSET" levelreset="true" legalstyle="false" startfrom="1" styleclass="Normal" style="font-family:Arial; font-size:10pt; color:#000000;">
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Attempt the save again but first update the local context object with data from the server. This will save all the changes you have made EXCEPT for those that were detected on the server. This is the &quot;store wins&quot; scenario.</text></li>
+      <li styleclass="Normal"><text styleclass="Normal" translate="true">Attempt the save again, but first update only the version numbers of the local context object with data from the server. This will keep all the changes you have made, overwriting any concurrent changes that happened on the server. This is the &quot;client wins&quot; scenario.</text></li>
+    </list>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">To attempt the save again, you must first call the Refresh() method on the context object. This method takes two paramters - the first parameter specifies the mode for the refresh, this can either be RefreshMode.ClientWins or RefreshMode.StoreWins depending on the scenario to be applied. The second parameter is the entity or collection of entities to which the refresh is to be applied. You apply different refresh strategies to different entities within the same update if you wish. Once the conflicted entities are refreshed, you can then make a call to the SaveChanges() method of the context once more. The code sample below shows this in outline:</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">try </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;myContext.SaveChanges();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">catch(TransactionPreconditionsFailedException) </text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;// Refresh the conflicted object(s) - in this case with the StoreWins mode</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;myContext.Refresh(RefreshMode.StoreWins, conflictedEntity);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;// Attempt the save again</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160;myContext.SaveChanges();</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Notes"><text styleclass="Notes" translate="true">On stores with a high degree of concurrent updates it is possible that the second call to SaveChanges() could also result in an optimistic locking error because objects have been further modified since the initial optimistic locking failure was reported. Production code for highly concurrent environments should be written to handle this possibility.</text></para>
+    <para styleclass="Normal"></para>
+  </body>
+</topic>

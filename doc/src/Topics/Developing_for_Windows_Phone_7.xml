@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
+<topic template="Default" lasteditedby="kal_000" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
+  <title translate="true">Developing for Windows Phone</title>
+  <body>
+    <header>
+      <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Developing for Windows Phone</text></para>
+    </header>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">For Windows Phone 7 and Windows Phone 8 (WP) developers, BrightstarDB provides a fast, schema-less persistent data store, that is easily managed as part of the isolated storage for an app. When running on a phone, all the key features of BrighstarDB are available, including the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Data_Object_Layer" styleclass="Normal" translate="true">Data Object Layer</link><text styleclass="Normal" translate="true"> and the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="Entity_Framework" styleclass="Normal" translate="true">Entity Framework</link><text styleclass="Normal" translate="true"> as well as the </text><link displaytype="text" defaultstyle="true" type="topiclink" href="RDF_Client_API" styleclass="Normal" translate="true">RDF Client API</link><text styleclass="Normal" translate="true">. This section covers the main differences with the .NET 4.0 version of BrightstarDB and some important considerations when writing your WP7 app to use BrightstarDB. The SDK provides libraries that are compatible with Windows Phone 7.1 and Windows Phone 8, so all apps you develop with BrightstarDB will need to target that version of the Windows Phone OS.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Data Storage And Connection Strings</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">When running on WP, BrightstarDB writes its data using the IsolatedStorage APIs. This means that a BrightstarDB store opened within an application will be written into the IsolatedStorage for that application. This keeps the stores used by different applications separate from each other. An application can also use multiple stores, as long as each store has a unique store name. As the BrightstarDB server is not running on the phone, the only access to the store is by using the embedded connection type. A typical connection string used in a WP application is shown in the code snippet below:</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">var connectionString = &quot;type=embedded;storesdirectory=brightstar;storename=MyAppStore&quot;;</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">SDK Libraries</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">The BrightstarDB libraries for WP are all contained in [INSTALLDIR]\SDK\WP71. You need to add references to these libraries to your WP application project.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Heading1"><text styleclass="Heading1" translate="true">Development Considerations</text></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">For the most part, working with BrightstarDB on Windows Phone is the same as working with it on the full .NET Framework. However due to the platform and some .NET restrictions there are a few things that you need to keep in mind when building your application.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold; text-decoration:underline;" translate="true">Store Shutdown</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="background-color:transparent;" translate="true">Because BrightstarDB uses separate threads to process updates to its stores, it is necessary for any WP app that uses BrightstarDB to cleanly shutdown the database when the application is not in use. The easiest way to achieve this is to add code to the Application_Deactivated and Application_Closing methods in the main application class as shown below. There is no corresponding global startup required as BrightstarDB will automatically start the required threads the first time you access a store.</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// Code to execute when the application is deactivated (sent to background)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// This code will not execute when the application is closing</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">private void Application_Deactivated(object sender, DeactivatedEventArgs e)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;BrightstarService.Shutdown(true);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Code Example"></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// Code to execute when the application is closing (eg, user hit Back)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">// This code will not execute when the application is deactivated</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">private void Application_Closing(object sender, ClosingEventArgs e)</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">{</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true"> &#160; &#160;BrightstarService.Shutdown(true);</text></para>
+    <para styleclass="Code Example"><text styleclass="Code Example" translate="true">}</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" style="font-weight:bold; text-decoration:underline;" translate="true">EntityFramework Interfaces Must Be Public</text></para>
+    <para styleclass="Normal"></para>
+    <para styleclass="Normal"><text styleclass="Normal" translate="true">Due to differences between the .NET Framework and Silverlight, there are is one known limitation on the Entity Framework. All interfaces that are marked with the [Entity] attribute must be public interfaces when building a Windows Phone application. This is because Silverlight prevents reflection on internal classes / interfaces for reasons of code security.</text></para>
+  </body>
+</topic>

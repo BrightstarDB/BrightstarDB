@@ -1,0 +1,2 @@
+svcutil /t:code /directory:..\core\BrightstarDB\Client /out:BrightstarWcfClusterClient.cs /namespace:*,BrightstarDB.Client http://localhost:9090/brightstarcluster /i /r:..\core\BrightstarDB\bin\Debug\BrightstarDB.dll
+svcutil /t:code /directory:BrightstarDB.ClusterTests /out:BrightstarWcfClusterClient.cs /namespace:*,BrightstarDB.ClusterTests http://localhost:9090/brightstarcluster /i /r:..\core\BrightstarDB\bin\Debug\BrightstarDB.dll

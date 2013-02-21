@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpproject xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="helpproject.xsd" version="1.5" isskin="false" isrepository="false">
+  <config>
+    <namespaces/>
+    <helpwindows>
+      <helpwindow name="Main" left="-1" top="-1" width="-1" height="-1">
+        <caption translate="true">&lt;%TITLE%&gt;</caption>
+        <window-options-hlp autosize="true" maximize="false" posabsolute="false" keepontop="false" buttons="0" headercolor="#F0F0F0" textcolor="#FFFFFF"/>
+        <window-options-chm navigation="true" navigationwidth="200" search="true" favorite="true" saveregistry="true" buttons="12366">
+          <user-button name="jump1">
+            <caption translate="true">jump1</caption>
+          </user-button>
+          <user-button name="jump2">
+            <caption translate="true">jump2</caption>
+          </user-button>
+        </window-options-chm>
+      </helpwindow>
+    </helpwindows>
+    <styleclasses>
+      <styleclass name="Code Example" shortcut="0">
+        <style-set media="screen" type="para">background-color:#dbdbdb; white-space:nowrap; page-break-inside:avoid; border:none;</style-set>
+        <style-set media="screen" type="text">font-family:'Courier New'; font-size:8pt;</style-set>
+        <style-set media="print" type="para">text-indent:48px; margin-left:0px; background-color:#dbdbdb; white-space:normal; page-break-inside:avoid; border:none;</style-set>
+        <style-set media="print" type="text">font-family:'Courier New'; font-size:8pt;</style-set>
+      </styleclass>
+      <styleclass name="XML HTML Example" parentclass="Code Example" shortcut="0">
+        <style-set media="screen" type="para">background-color:#cce3de;</style-set>
+      </styleclass>
+      <styleclass name="Normal" shortcut="0">
+        <style-set media="screen" type="text">font-family:Arial; font-size:10pt;</style-set>
+      </styleclass>
+      <styleclass name="Comment" parentclass="Normal" shortcut="0"/>
+      <styleclass name="Heading1" parentclass="Normal" shortcut="0">
+        <style-set media="screen" type="text">font-size:16pt; font-weight:bold;</style-set>
+      </styleclass>
+      <styleclass name="Image Caption" parentclass="Normal" shortcut="0">
+        <style-set media="screen" type="text">font-size:8pt; font-weight:bold;</style-set>
+      </styleclass>
+      <styleclass name="Notes" parentclass="Normal" shortcut="0">
+        <style-set media="screen" type="para">margin-right:94px; margin-left:94px; background-color:#99ccff; border-style:single; border-width:1px; border-top:none; border-right:none; border-bottom:none; border-left:none;</style-set>
+      </styleclass>
+      <styleclass name="Warning" parentclass="Notes" shortcut="0">
+        <style-set media="screen" type="para">background-color:#ebbebe;</style-set>
+      </styleclass>
+      <tablestyleclass name="Default">
+        <style-set media="screen">width:auto; cell-padding:0px; cell-spacing:0px; page-break-inside:auto; border-width:0px; border-spacing:0px; cell-border-width:0px; border-style:none; background-color:none; head-row-background-color:none; alt-row-background-color:none;</style-set>
+      </tablestyleclass>
+    </styleclasses>
+    <config-group name="project">
+      <config-value name="title" translate="true">BrightstarDB</config-value>
+      <config-value name="author" translate="true">BrightstarDB Limited</config-value>
+      <config-value name="copyright" translate="true">© &lt;%YEAR%&gt; &lt;%AUTHOR%&gt;</config-value>
+      <config-value name="versionmajor">1</config-value>
+      <config-value name="versionminor">0</config-value>
+      <config-value name="versionbuild">0</config-value>
+      <config-value name="lcid">en-uk</config-value>
+      <config-value name="charset">ANSI_CHARSET</config-value>
+      <config-value name="deffont">font-family:'MS Sans Serif'; font-size:8pt; color:#000000;</config-value>
+      <config-value name="autohelpstart">0</config-value>
+      <config-value name="autohelpincrement">1</config-value>
+      <config-value name="autohelpanchor">0</config-value>
+      <config-value name="searchpath">.\;.\Images\</config-value>
+      <config-group name="custombuilds">
+        <config-value name="DEMO">Demo Build</config-value>
+        <config-value name="INDEX">BS Doc Index</config-value>
+        <config-value name="MOBILE">Documentation for the Mobile Build</config-value>
+        <config-value name="ENTERPRISE">ENTERPRISE</config-value>
+        <config-value name="SERVER">SERVER</config-value>
+        <config-value name="EMBEDDED">EMBEDDED</config-value>
+      </config-group>
+      <config-value name="imageshortcuts_includebaggage">1</config-value>
+      <config-value name="make0include">CHM,PDF</config-value>
+      <config-value name="make0status">*</config-value>
+      <config-group name="spellcheck">
+        <config-value name="project">0</config-value>
+      </config-group>
+      <config-value name="make4include">PDF</config-value>
+      <config-value name="make4status">*</config-value>
+    </config-group>
+    <config-group name="user">
+      <config-group name="gra">
+        <config-group name="project">
+          <config-value name="lastexport">0</config-value>
+        </config-group>
+      </config-group>
+      <config-group name="kal">
+        <config-group name="project">
+          <config-value name="lastexport">0</config-value>
+        </config-group>
+        <config-group name="report">
+          <config-value name="type">0</config-value>
+          <config-value name="sort">0</config-value>
+          <config-value name="include">ALL</config-value>
+        </config-group>
+      </config-group>
+    </config-group>
+    <config-group name="chm">
+      <config-value name="outputfile">BrightstarDB.chm</config-value>
+      <config-value name="deletetemp">1</config-value>
+    </config-group>
+    <config-group name="pdf">
+      <config-value name="outputfile">BrightstarDB.pdf</config-value>
+      <config-value name="template">..\DocumentationPdf.mnl</config-value>
+    </config-group>
+    <variables/>
+    <helpcontext-numbers/>
+  </config>
+  <xi:include parse="xml" href="Maps/table_of_contents.xml"/>
+  <project-files>
+    <file href="Topics/*.xml" build="ALL" filetype="topic">
+      <file-mod href="SPARQL_Endpoint.xml" build="ENTERPRISE,SERVER"/>
+      <file-mod href="Using_Polaris.xml" build="ENTERPRISE,SERVER"/>
+      <file-mod href="SdShare_Server.xml" build="ENTERPRISE"/>
+      <file-mod href="Developing_with_BrightstarDB.xml" build="EMBEDDED,ENTERPRISE,SERVER"/>
+    </file>
+    <file href="Baggage/*.*" build="ALL" filetype="baggage"/>
+  </project-files>
+</helpproject>
