@@ -27,7 +27,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DocFiles.wxs" />
-    <Compile Include="LicenseManager.wxs" />
     <Compile Include="Product.wxs" />
     <Compile Include="Samples.wxs" />
     <Compile Include="SdkFiles.wxs" />
@@ -59,7 +58,6 @@
     <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="Tools.wxs" Directory="..\InstallerTmp\Tools" ComponentGroupName="toolsFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="TOOLSDIR" PreprocessorVariable="var.SourceFiles.Tools" />
     <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="Samples.wxs" Directory="..\InstallerTmp\Samples" ComponentGroupName="samplesFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SAMPLESDIR" PreprocessorVariable="var.SourceFiles.Samples" />
     <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SparqlService.wxs" Directory="..\InstallerTmp\SparqlService" ComponentGroupName="sparqlServiceFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SPARQLSERVICEDIR" PreprocessorVariable="var.SourceFiles.SparqlService" />
-    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="LicenseManager.wxs" Directory="..\InstallerTmp\LicenseManager" ComponentGroupName="licenseManagerFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="LMDIR" PreprocessorVariable="var.SourceFiles.LicenseManager" />
   </Target>
   <ItemGroup>
     <BootstrapperFile Include=".NETFramework,Version=v4.0">
@@ -87,6 +85,17 @@
     </WixExtension>
   </ItemGroup>
   <Target Name="AfterBuild">
-    <GenerateBootstrapper ApplicationFile="brightstardb.msi" ApplicationRequiresElevation="true" ApplicationName="BrightstarDB" BootstrapperItems="@(BootstrapperFile)" ComponentsLocation="HomeSite" CopyComponents="true" OutputPath="$(OutputPath)" Path="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bootstrapper\" />
+    <GetFrameworkSdkPath>
+      <Output TaskParameter="Path" PropertyName="WindowsSdkPath"/>
+    </GetFrameworkSdkPath>
+    <GenerateBootstrapper 
+      ApplicationFile="brightstardb.msi" 
+      ApplicationRequiresElevation="true" 
+      ApplicationName="BrightstarDB" 
+      BootstrapperItems="@(BootstrapperFile)" 
+      ComponentsLocation="HomeSite" 
+      CopyComponents="true" 
+      OutputPath="$(OutputPath)" 
+      Path="$(WindowsSdkPath)\Bootstrapper" />
   </Target>
 </Project>

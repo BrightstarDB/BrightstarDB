@@ -1,6 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{56BB8FB9-712A-41FA-B2D5-8DF157AE7F66}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		sdshare.vsmdi = sdshare.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.SdShare", "BrightstarDB.SdShare\BrightstarDB.SdShare.csproj", "{91690AB5-7B9D-48D3-988C-ACBCEDE30051}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.SdShare.Server", "BrightstarDB.SdShare.Server\BrightstarDB.SdShare.Server.csproj", "{14AFBA8C-BDE7-4B79-8A72-CB577C92C0D1}"
@@ -8,13 +15,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.SdShare.Service", "BrightstarDB.SdShare.Service\BrightstarDB.SdShare.Service.csproj", "{2E5435A9-79CC-4A82-B74F-EC89AF8AAEF8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.SdShare.Test", "BrightstarDB.SdShare.Test\BrightstarDB.SdShare.Test.csproj", "{8935A6CC-D4B5-4B8F-BC7D-500F52E576EA}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{56BB8FB9-712A-41FA-B2D5-8DF157AE7F66}"
-	ProjectSection(SolutionItems) = preProject
-		Local.testsettings = Local.testsettings
-		sdshare.vsmdi = sdshare.vsmdi
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution

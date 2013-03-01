@@ -84,10 +84,6 @@
     <CustomAction Id="OpenUninstallUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
     <CustomAction Id="OpenInstallUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
     <CustomAction Id="OpenUpgradeUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
-    <CustomAction Id="SetLicenseManagerExe" Property="WixShellExecTarget" Value="[#fil3090A30CEDFA75EDBA8634F6F65FB1BE]"/>
-    <CustomAction Id="RunLicenseManagerExe" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
-    <CustomAction Id="SetLicenseManagerExeUpgrade" Property="WixShellExecTarget" Value="[#fil3090A30CEDFA75EDBA8634F6F65FB1BE]"/>
-    <CustomAction Id="RunLicenseManagerExeUpgrade" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
 
     <InstallExecuteSequence>
       <!-- Launch uninstall webpage during full uninstall but not upgrade -->
@@ -97,15 +93,9 @@
       <!-- Launch install webpage during install but not upgrade -->
       <Custom Action="SetOpenInstallUrl" After="InstallFinalize"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
       <Custom Action="OpenInstallUrl" After="SetOpenInstallUrl"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
-      <!-- Launch license manager on install -->
-      <Custom Action="SetLicenseManagerExe" After="OpenInstallUrl"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
-      <Custom Action="RunLicenseManagerExe" After="SetLicenseManagerExe"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
 
       <Custom Action="SetOpenUpgradeUrl" After="InstallFinalize"><![CDATA[ WIX_UPGRADE_DETECTED <> "" ]]></Custom>
       <Custom Action="OpenUpgradeUrl" After="SetOpenUpgradeUrl"><![CDATA[ WIX_UPGRADE_DETECTED <> "" ]]></Custom>
-      <!-- Launch license manager on upgrade -->
-      <Custom Action="SetLicenseManagerExeUpgrade" After="OpenUpgradeUrl"><![CDATA[ WIX_UPGRADE_DETECTED <> "" ]]></Custom>
-      <Custom Action="RunLicenseManagerExeUpgrade" After="SetLicenseManagerExeUpgrade"><![CDATA[ WIX_UPGRADE_DETECTED <> "" ]]></Custom>
 
     </InstallExecuteSequence>
 
@@ -160,13 +150,6 @@
                    WorkingDirectory="TOOLSDIR"/>
         <RegistryValue Root="HKCU" Key="Software\BrightstarDB" Name="toolsInstalled" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
-      <Component Id="LicenseManagerShortcuts" Guid="{EEE3A629-44FD-4635-AD25-B9E46F964BFA}">
-        <Shortcut Id="LMShortcut"
-                  Name="BrightstarDB License Manager"
-                  Target="[LMDIR]LicenseManager.exe"
-                  WorkingDirectory="LMDIR"/>
-        <RegistryValue Root="HKCU" Key="Software\BrightstarDB" Name="lmInstalled" Type="integer" Value="1" KeyPath="yes"/>
-      </Component>
       <Component Id="DocsShortcuts" Guid="{5E38F77E-40FE-424F-BF78-28B377487EDE}">
         <Shortcut Id="PDFShortcut"
                   Name="BrightstarDB Documentation (PDF)"
@@ -219,10 +202,6 @@
       <ComponentGroupRef Id="sdshareDocFilesComponentGroup"/>
       
       <ComponentRef Id="DocsShortcuts"/>
-
-      <ComponentGroupRef Id="licenseManagerFilesComponentGroup"/>
-
-      <ComponentRef Id="LicenseManagerShortcuts"/>
 
       <Component Guid="{844DEDDC-DB9E-421E-8D58-D0932399193E}" Directory="INSTALLLOCATION">
         <File Id="README_txt" KeyPath="yes" Source="..\InstallerTmp\README.txt"/>
