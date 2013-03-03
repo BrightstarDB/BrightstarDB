@@ -104,7 +104,7 @@
 	  <Service Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.dll"/>
 	  <ServiceExe Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.exe"
 			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe"/>
-	  <Service Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.config"
+	  <ServiceExe Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.config"
 			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe.config"/>
       <Docs Include="..\doc\build\Server\BrightstarDB_Documentation.pdf;..\doc\build\Server\BrightstarDB.chm;..\doc\build\BrightstarDB_API.chm"/>
       <VisualStudio Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.vsi"/>
@@ -146,7 +146,7 @@
     <Copy SourceFiles="@(VisualStudio)" DestinationFolder="InstallerTmp\VisualStudio"/>
     <Copy SourceFiles="@(Root)" DestinationFolder="InstallerTmp"/>
     <Copy SourceFiles="@(Service)" DestinationFolder="InstallerTmp\Service"/>
-    <Copy SourceFiles="@(ServiceExe)" DestinationFolder="InstallerTmp\Service"/>
+    <Copy SourceFiles="@(ServiceExe)" DestinationFolder="InstallerTmp\ServiceExe"/>
     <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\ItemTemplates"/>
     <Copy SourceFiles="@(Polaris)" DestinationFolder="InstallerTmp\Tools\Polaris"/>
     <Copy SourceFiles="@(Samples)" DestinationFiles="@(Samples->'InstallerTmp\Samples\%(recursivedir)%(filename)%(extension)')"/>

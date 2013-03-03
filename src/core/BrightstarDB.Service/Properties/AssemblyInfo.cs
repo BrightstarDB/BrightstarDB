@@ -15,7 +15,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("1.2.0.0")]
-[assembly: AssemblyFileVersion("1.2.40301")]
+[assembly: AssemblyFileVersion("1.2.40303")]
 [assembly: AssemblyProduct("BrightstarDB")]
 [assembly: AssemblyCompany("BrightstarDB Limited")]
 [assembly: AssemblyCopyright("Copyright (c) BrightstarDB Limited 2012")]

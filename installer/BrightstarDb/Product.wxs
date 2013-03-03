@@ -199,15 +199,13 @@
         <File Id="NOTICE_txt" KeyPath="no" Source="..\InstallerTmp\NOTICE.txt"/>
       </Component>
       
-      <!--
       <ComponentGroupRef Id="serviceFilesComponentGroup"/>
-      -->
       
       <ComponentRef Id="serviceEventSourceComponent"/>
 
       <Component Id="serviceExeComponent" Guid="{CE4B042C-3A47-41C1-B154-8B46162DC4CB}" Directory="SERVICEDIR">
-        <File Id="brightstarServiceExe" Source="..\InstallerTmp\Service\BrightstarService.exe" KeyPath="yes" Vital="yes"/>
-        <File Id="brightstarServiceExeConfig" Source="..\InstallerTmp\Service\BrightstarService.exe.config" Vital="yes"/>
+        <File Id="brightstarServiceExe" Source="..\InstallerTmp\ServiceExe\BrightstarService.exe" KeyPath="yes" Vital="yes"/>
+        <File Id="brightstarServiceExeConfig" Source="..\InstallerTmp\ServiceExe\BrightstarService.exe.config" Vital="yes"/>
         <util:XmlFile Id="SetDataDirectory"
                 File="[SERVICEDIR]\BrightstarService.exe.config"
                 Action="setValue"
@@ -230,7 +228,7 @@
                Description="Enable this feature to register the BrightstarDB Windows Service."
                Display="expand" AllowAdvertise="no">
         <Component Id="serviceInstallComponent" Guid="{973A196D-6414-4036-BE51-BEC684838E7F}" Directory="SERVICEDIR">
-          <File Id="brightstarServiceExe2" Source="..\InstallerTmp\Service\BrightstarService.exe" KeyPath="yes"/>
+          <File Id="brightstarServiceExe2" Source="..\InstallerTmp\ServiceExe\BrightstarService.exe" KeyPath="yes"/>
           <ServiceInstall Id="BrightstarDB_U" Name="BrightstarDB" DisplayName="BrightstarDB Service" Description="Runs the BrightstarDB WCF service" Type="ownProcess" Start="auto" ErrorControl="normal" Vital="yes"/>
           <ServiceControl Id="StopBrightstarDB_U" Name="BrightstarDB" Stop="both" Remove="uninstall" Wait="yes" />
           <ServiceControl Id="StartBrightstarDB_U" Name="BrightstarDB" Start ="install" Wait="no"/>
