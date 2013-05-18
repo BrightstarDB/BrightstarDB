@@ -1,5 +1,4 @@
 using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -9,7 +8,6 @@ namespace BrightstarDB.EntityFramework
     /// a relative or an absolute URI. Relative URIs are resolved relative to 
     /// the base URI specified by the <see cref="TypeIdentifierPrefixAttribute"/> on the assembly.
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     [AttributeUsage(AttributeTargets.Interface|AttributeTargets.Class, AllowMultiple=false)]
     public sealed class EntityAttribute : RelativeOrAbsoluteIdentifierAttribute
     {

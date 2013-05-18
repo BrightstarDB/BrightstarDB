@@ -1,12 +1,10 @@
 ﻿using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.Server
 {
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    [DoNotObfuscate]
     internal class PreconditionFailedException : BrightstarInternalException
     {
         public int FailureCount { get; private set; }

@@ -1,12 +1,10 @@
 ﻿using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// Exception raised when an entity for a specific .NET type cannot be found
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     public class MappingNotFoundException : EntityFrameworkException
     {
         /// <summary>

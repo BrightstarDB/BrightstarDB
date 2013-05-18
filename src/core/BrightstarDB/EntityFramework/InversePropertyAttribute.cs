@@ -1,5 +1,4 @@
 using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -8,7 +7,6 @@ namespace BrightstarDB.EntityFramework
     /// inverse property. The inverse property will be located by examining the
     /// property return type of the decorated property.
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public sealed class InversePropertyAttribute : Attribute
     {

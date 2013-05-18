@@ -1,5 +1,4 @@
 using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -7,7 +6,6 @@ namespace BrightstarDB.EntityFramework
     /// Assembly attribute that specifies a prefix mapping for a namespace
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    [DoNotObfuscateType, DoNotPruneType]
     public class NamespaceDeclarationAttribute : Attribute
     {
         /// <summary>

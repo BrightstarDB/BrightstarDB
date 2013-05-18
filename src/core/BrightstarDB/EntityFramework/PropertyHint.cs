@@ -1,11 +1,8 @@
-﻿using SmartAssembly.Attributes;
-
-namespace BrightstarDB.EntityFramework
+﻿namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// Provides a mapping hint for a .NET property
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     public class PropertyHint
     {
         /// <summary>

@@ -1,12 +1,10 @@
 ﻿using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// The base class for BrightstarDB Entity Framework exceptions
     /// </summary>
-    [DoNotObfuscate, DoNotPrune]
     public class EntityFrameworkException : Exception
     {
         /// <summary>

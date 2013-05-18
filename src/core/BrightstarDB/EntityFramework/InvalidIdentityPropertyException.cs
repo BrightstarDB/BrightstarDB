@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -36,7 +35,6 @@ namespace BrightstarDB.EntityFramework
     /// }
     /// </example>
     /// </remarks>
-    [DoNotObfuscateType, DoNotPruneType]
     public sealed class InvalidIdentityPropertyException : EntityFrameworkException
     {
         internal InvalidIdentityPropertyException(PropertyInfo invalidProperty) : base(

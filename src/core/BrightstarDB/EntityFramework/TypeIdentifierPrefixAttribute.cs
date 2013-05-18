@@ -1,5 +1,4 @@
 ﻿using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -7,7 +6,6 @@ namespace BrightstarDB.EntityFramework
     /// Assembly attribute that specifies the default base URI for all PropertyType and Entity attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple=false)]
-    [DoNotObfuscateType, DoNotPruneType]
     public class TypeIdentifierPrefixAttribute : Attribute
     {
         /// <summary>

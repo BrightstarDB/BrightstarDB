@@ -1,6 +1,5 @@
 using System;
 using BrightstarDB.Storage.Persistence;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.Storage
 {
@@ -8,7 +7,6 @@ namespace BrightstarDB.Storage
     /// Exception raised when an attempt is made to write to a block other than the active block
     /// of an <see cref="IBlockProvider"/>
     /// </summary>
-    [DoNotObfuscate]
     public class InvalidWriteOffsetException : BrightstarException
     {
         /// <summary>

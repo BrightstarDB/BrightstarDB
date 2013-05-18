@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using BrightstarDB.Rdf;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.Client
 {
@@ -9,7 +8,6 @@ namespace BrightstarDB.Client
     /// Exception raised when a transaction does not complete due to one or more precondition
     /// triples not matching.
     /// </summary>
-    [DoNotObfuscate]
     public class TransactionPreconditionsFailedException : BrightstarException, ITripleSink
     {
         private readonly List<string> _invalidSubjects;

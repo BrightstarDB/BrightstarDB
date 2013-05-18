@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// The base interface implemented by entity framework implementation classes
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     public interface IEntityObject
     {
         /// <summary>

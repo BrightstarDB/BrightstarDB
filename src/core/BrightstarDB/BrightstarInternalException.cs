@@ -1,5 +1,4 @@
 ﻿using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB
 {
@@ -10,7 +9,6 @@ namespace BrightstarDB
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    [DoNotObfuscate]
     public class BrightstarInternalException : BrightstarException
     {
         ///<summary>

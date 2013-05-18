@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
-using SmartAssembly.Attributes;
 
 #if !SILVERLIGHT
 
@@ -12,7 +11,6 @@ namespace BrightstarDB.Storage
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    [DoNotObfuscate]
     internal abstract class StoreException : BrightstarException
     {
         protected StoreException(string message) : base(message){}
@@ -24,7 +22,6 @@ namespace BrightstarDB.Storage
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    [DoNotObfuscate]
     internal sealed class StoreManagerException : StoreException
     {
         /// <summary>
@@ -51,7 +48,6 @@ namespace BrightstarDB.Storage
 #if !SILVERLIGHT
     [Serializable]
 #endif
-    [DoNotObfuscate]
     internal sealed class StoreReadException : StoreException
     {
         public StoreReadException(string message, Exception innerException) : base(message, innerException){}

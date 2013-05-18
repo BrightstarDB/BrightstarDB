@@ -1,5 +1,4 @@
 ﻿using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB
 {
@@ -13,7 +12,6 @@ namespace BrightstarDB
     /// The base class for all custom exception types raised by Brightstar
     /// </summary>
 #endif
-    [DoNotObfuscate]
     public abstract class BrightstarException : Exception
     {
         internal BrightstarException(string msg) :base(msg){}

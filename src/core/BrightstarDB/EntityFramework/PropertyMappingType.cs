@@ -1,11 +1,8 @@
-﻿using SmartAssembly.Attributes;
-
-namespace BrightstarDB.EntityFramework
+﻿namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// Enumeration that specifies how a .NET property is mapped to the underlying RDF data model
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     public enum PropertyMappingType
     {
         /// <summary>

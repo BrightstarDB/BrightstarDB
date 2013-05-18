@@ -5,14 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using BrightstarDB.EntityFramework.Query;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// The base class for an EntityFramework context
     /// </summary>
-    [DoNotObfuscate, DoNotPrune]
     public abstract class EntityContext
     {
         /// <summary>

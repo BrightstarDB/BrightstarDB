@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -10,7 +9,6 @@ namespace BrightstarDB.EntityFramework
     /// Class for processing one or more assemblies to populate an <see cref="EntityMappingStore"/> based on the 
     /// interfaces and attributes found via reflection
     /// </summary>
-    [DoNotObfuscate, DoNotPruneType]
     public class ReflectionMappingProvider
     {
         private readonly Dictionary<string, AssemblyMappingInfo> _assemblyMappings;
@@ -30,7 +28,6 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="mappingStore">The <see cref="EntityMappingStore"/> to be populated</param>
         /// <param name="context">The <see cref="EntityContext"/> to be processed</param>
-        [DoNotPrune, DoNotObfuscate]
         public void AddMappingsForContext(EntityMappingStore mappingStore, EntityContext context)
         {
             var contextType = context.GetType();
@@ -59,7 +56,6 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="mappingStore">The <see cref="EntityMappingStore"/> to be updated</param>
         /// <param name="mappedType">The entity implementation type to be processed</param>
-        [DoNotPrune, DoNotObfuscate]
         public void AddMappingsForType(EntityMappingStore mappingStore, Type mappedType)
         {
             var mappedTypeAssembly = mappedType.Assembly;
@@ -78,7 +74,6 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="mappingStore">The <see cref="EntityMappingStore"/> to be updated</param>
         /// <param name="assembly">The assembly to be processed</param>
-        [DoNotPrune, DoNotObfuscate]
         public void AddMappingsForAssembly(EntityMappingStore mappingStore, Assembly assembly)
         {
             AssemblyMappingInfo assemblyMappings;

@@ -1,12 +1,10 @@
 using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// Attribute used to decorate entity interface properties whose value is an arc of a particular property type
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public sealed class PropertyTypeAttribute : RelativeOrAbsoluteIdentifierAttribute
     {

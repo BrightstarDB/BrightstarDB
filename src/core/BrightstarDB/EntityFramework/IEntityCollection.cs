@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -7,7 +6,6 @@ namespace BrightstarDB.EntityFramework
     /// The interface for a collection of entities that appear as the value of a property on an entity instance
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    [DoNotObfuscateType, DoNotPruneType]
     public interface IEntityCollection<T> : ICollection<T>, IEntityCollection
     {
         /// <summary>
@@ -20,7 +18,6 @@ namespace BrightstarDB.EntityFramework
     /// <summary>
     /// The non-generic base for the <see cref="IEntityCollection{T}"/> interface
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     public interface IEntityCollection 
     {
         /// <summary>

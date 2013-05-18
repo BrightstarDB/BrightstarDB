@@ -1,12 +1,10 @@
 using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// Property attribute which flags the property that is bound to the resource address
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     [AttributeUsage(AttributeTargets.Property, AllowMultiple=false)]
     public sealed class IdentifierAttribute : Attribute
     {

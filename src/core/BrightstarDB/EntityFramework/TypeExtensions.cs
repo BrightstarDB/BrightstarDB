@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// Extension class for the <see cref="System.Type"/> class
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     public static class TypeExtensions
     {
         /// <summary>
@@ -17,13 +15,6 @@ namespace BrightstarDB.EntityFramework
         /// <returns>True if the type is a generic collection, false otherwise</returns>
         public static bool IsGenericCollection(this Type t)
         {
-#if DEBUG
-            bool isGeneric = t.IsGenericType;
-            if (isGeneric)
-            {
-                bool isEnumerableGeneric = typeof (IEnumerable<>).IsAssignableFrom(t.GetGenericTypeDefinition());
-            }
-#endif
             return (t.IsGenericType && typeof (IEnumerable<>).IsAssignableFrom(t.GetGenericTypeDefinition()));
         }
 

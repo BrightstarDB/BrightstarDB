@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -33,7 +29,6 @@ namespace BrightstarDB.EntityFramework
     /// }
     /// </code>
     /// </example>
-    [DoNotObfuscateType, DoNotPruneType]
     [AttributeUsage(AttributeTargets.Interface, AllowMultiple = false)]
     public class ClassAttributeAttribute : Attribute
     {

@@ -1,11 +1,8 @@
-﻿using SmartAssembly.Attributes;
-
-namespace BrightstarDB.EntityFramework
+﻿namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// Class of exception raised when the <see cref="ReflectionMappingProvider"/> cannot process an entity interface or implementation class.
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     public class ReflectionMappingException : EntityFrameworkException
     {
         /// <summary>

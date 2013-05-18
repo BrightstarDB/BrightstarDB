@@ -1,13 +1,10 @@
-﻿using SmartAssembly.Attributes;
-
-namespace BrightstarDB.EntityFramework
+﻿namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// An enumeration of values that specify whether property changes
     /// made to a collection of persistable objects are kept or replaced
     /// with property values from the data source
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     public enum RefreshMode
     {
         /// <summary>

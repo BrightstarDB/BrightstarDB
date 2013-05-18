@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -10,7 +9,6 @@ namespace BrightstarDB.EntityFramework
     /// Manages the interface to implementation class mappings, interface to resource type mappings
     /// and property to RDF property type mappings required by a <see cref="EntityContext"/>.
     /// </summary>
-    [DoNotPruneType, DoNotObfuscateType]
     public class EntityMappingStore
     {
         private readonly Dictionary<Type, string> _typeMappings;

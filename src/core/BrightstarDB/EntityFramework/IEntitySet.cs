@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -7,7 +6,6 @@ namespace BrightstarDB.EntityFramework
     /// The base interface for the collections of entities provided by a <see cref="EntityContext"/>
     /// </summary>
     /// <typeparam name="T">The type of entity in the collection</typeparam>
-    [DoNotObfuscateType, DoNotPruneType]
     public interface IEntitySet<T> : IQueryable<T>, IEntitySet
     {
         /// <summary>

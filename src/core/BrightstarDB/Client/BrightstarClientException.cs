@@ -1,6 +1,5 @@
 ﻿using System;
 using BrightstarDB.Rdf;
-using SmartAssembly.Attributes;
 #if !SILVERLIGHT
 using System.ServiceModel;
 
@@ -14,7 +13,6 @@ namespace BrightstarDB.Client
     /// </summary>
     [Serializable]
 #endif
-    [DoNotObfuscate]
     public sealed class BrightstarClientException : BrightstarException
     {
         private const string DefaultServiceErrorMessage = "Error executing client call.";

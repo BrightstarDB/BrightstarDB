@@ -1,12 +1,10 @@
 using System;
-using SmartAssembly.Attributes;
 
 namespace BrightstarDB.EntityFramework
 {
     /// <summary>
     /// The base class for attributes whose value is a relative or absolute URI identifier
     /// </summary>
-    [DoNotObfuscateType, DoNotPruneType]
     public class RelativeOrAbsoluteIdentifierAttribute : Attribute
     {
         /// <summary>
