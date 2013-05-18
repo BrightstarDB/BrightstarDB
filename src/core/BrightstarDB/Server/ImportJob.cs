@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using BrightstarDB.Profiling;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
@@ -145,17 +146,23 @@ namespace BrightstarDB.Server
 
         private static IRdfParser GetParser(string fileName)
         {
-            bool isGZiped = MimeTypesHelper.GetTrueFileExtension(fileName).EndsWith(MimeTypesHelper.DefaultGZipExtension);
-            var rdfReader =
-                MimeTypesHelper.GetParser(MimeTypesHelper.GetMimeTypes(MimeTypesHelper.GetTrueFileExtension(fileName)), TokenQueueMode.SynchronousBufferDuringParsing);
-            if (rdfReader != null)
+            Options.DefaultTokenQueueMode = TokenQueueMode.SynchronousBufferDuringParsing;
+            var fileExtension = MimeTypesHelper.GetTrueFileExtension(fileName);
+            bool isGZiped = fileExtension.EndsWith(MimeTypesHelper.DefaultGZipExtension, StringComparison.InvariantCultureIgnoreCase);
+            var parserDefinition = MimeTypesHelper.GetDefinitionsByFileExtension(fileExtension).FirstOrDefault(
+                def => def.CanParseRdf);
+            if (parserDefinition != null)
             {
-                if (rdfReader is VDS.RDF.Parsing.NTriplesParser && !isGZiped)
+                var rdfReader = parserDefinition.GetRdfParser();
+                if (rdfReader != null)
                 {
-                    // Use the Brighstar NTriples Parser
-                    return new NTriplesParser();
+                    if (rdfReader is VDS.RDF.Parsing.NTriplesParser && !isGZiped)
+                    {
+                        // Use the Brighstar NTriples Parser
+                        return new NTriplesParser();
+                    }
+                    return new BrightstarRdfParserAdapter(rdfReader, isGZiped);
                 }
-                return new BrightstarRdfParserAdapter(rdfReader, isGZiped);
             }
             Logging.LogWarning(BrightstarEventId.ParserWarning,
                                "Unable to select a parser by determining MIME type from file extension. Will default to NTriples parser.");
