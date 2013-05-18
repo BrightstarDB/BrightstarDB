@@ -58,7 +58,12 @@ namespace BrightstarDB.Tests
             var client = BrightstarService.GetClient("type=embedded;storesdirectory=C:\\brightstar");
             client.CreateStore(storeName);
 
-            FileInfo importFile = new FileInfo("graph_triples.nt");
+            var importFile = new FileInfo("graph_triples.nt");
+            var targetDir = new DirectoryInfo("c:\\brightstar\\import");
+            if (!targetDir.Exists)
+            {
+                targetDir.Create();
+            }
             importFile.CopyTo("C:\\brightstar\\import\\graph_triples.nt", true);
 
             var job = client.StartImport(storeName, "graph_triples.nt", "http://np.com/g2");
@@ -97,6 +102,11 @@ namespace BrightstarDB.Tests
             client.CreateStore(storeName);
 
             FileInfo importFile = new FileInfo("graph_triples.nt");
+            var targetDir = new DirectoryInfo("c:\\brightstar\\import");
+            if (!targetDir.Exists)
+            {
+                targetDir.Create();
+            }
             importFile.CopyTo("C:\\brightstar\\import\\graph_triples.nt", true);
 
             var job = client.StartImport(storeName, "graph_triples.nt", "http://np.com/g2");
