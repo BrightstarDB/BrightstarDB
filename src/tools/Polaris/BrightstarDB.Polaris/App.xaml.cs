@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
+using VDS.RDF.Parsing.Tokens;
 
 namespace BrightstarDB.Polaris
 {
@@ -30,6 +31,7 @@ namespace BrightstarDB.Polaris
                     PolarisTraceSource.Switch.Level = SourceLevels.Verbose;
                 }
             }
+            VDS.RDF.Options.DefaultTokenQueueMode = TokenQueueMode.AsynchronousBufferDuringParsing;
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
         }

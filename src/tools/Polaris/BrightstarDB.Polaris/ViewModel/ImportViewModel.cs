@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -128,10 +129,9 @@ namespace BrightstarDB.Polaris.ViewModel
                     var ext = MimeTypesHelper.GetTrueFileExtension(_importFileName);
                     bool isGZipped = ext.EndsWith(MimeTypesHelper.DefaultGZipExtension);
                     string lines;
-                    var rdfReader =
-                        MimeTypesHelper.GetParser(
-                            MimeTypesHelper.GetMimeTypes(MimeTypesHelper.GetTrueFileExtension(_importFileName)),
-                            TokenQueueMode.AsynchronousBufferDuringParsing);
+                    var fileTypeDefinition =
+                        MimeTypesHelper.GetDefinitionsByFileExtension(ext).FirstOrDefault(d => d.CanParseRdf);
+                    var rdfReader = fileTypeDefinition == null ? null : fileTypeDefinition.GetRdfParser();
                     if (rdfReader == null || rdfReader is NTriplesParser || rdfReader is NQuadsParser)
                     {
                         // We can't determine the file type, or it is NQuads or NTriples
