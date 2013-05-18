@@ -71,7 +71,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="EntityFrameworkTests.cs" />
     <Compile Include="EntityFramework\INote.cs" />
     <Compile Include="EntityFramework\MyEntityContext.cs">

@@ -17,7 +17,6 @@ namespace BrightstarDB.Tests
         public SparqlUpdateTests()
         {
 #if WINDOWS_PHONE
-            Licensing.License.Validate("support@brightstardb.com", "MOB-PW08C-ZBX4Y-00200-0000G");
             _client = BrightstarService.GetEmbeddedClient("brightstar");
 #else
             _client = BrightstarService.GetClient("type=embedded;storesDirectory=c:\\brightstar");

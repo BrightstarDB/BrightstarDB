@@ -16,8 +16,6 @@ namespace BrightstarDB.Mobile.Tests
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            // Register BS license key
-            Licensing.License.Validate("support@brightstardb.com", "MOB-PW08C-ZBX4Y-00200-0000G");
             SystemTray.IsVisible = false;
             var unitTestSettings = UnitTestSystem.CreateDefaultSettings();
             unitTestSettings.TestHarness.TestHarnessCompleted += HandleTestCompleted;
