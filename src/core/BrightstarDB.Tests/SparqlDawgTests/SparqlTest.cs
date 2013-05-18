@@ -130,32 +130,42 @@ namespace BrightstarDB.Tests.SparqlDawgTests
 
         protected void CheckResult(string results, string expectedResultPath, bool laxCardinality)
         {
-            Assert.IsNotNull(results);
-            var resultExtension = Path.GetExtension(expectedResultPath).ToLower();
-            if (resultExtension.Equals(".srx"))
+            try
             {
-                CompareSparqlResults(results, expectedResultPath, laxCardinality);
+                Assert.IsNotNull(results);
+                var resultExtension = Path.GetExtension(expectedResultPath).ToLower();
+                if (resultExtension.Equals(".srx"))
+                {
+                    CompareSparqlResults(results, expectedResultPath, laxCardinality);
+                }
+                else if (resultExtension.Equals(".srj"))
+                {
+                    CompareSparqlResults(results, expectedResultPath, laxCardinality, new SparqlJsonParser());
+                }
+                else if (resultExtension.Equals(".tsv"))
+                {
+                    CompareSparqlResults(results, expectedResultPath, laxCardinality, new SparqlTsvParser());
+                }
+                else if (resultExtension.Equals(".csv"))
+                {
+                    CompareSparqlResults(results, expectedResultPath, laxCardinality, new SparqlCsvParser());
+                }
+                else if (resultExtension.Equals(".ttl") || resultExtension.Equals(".rdf"))
+                {
+                    CompareResultGraphs(results, expectedResultPath, laxCardinality);
+                }
+
+                else
+                {
+                    Assert.Fail("Don't know how to compare results to results file {0}", expectedResultPath);
+                }
             }
-            else if (resultExtension.Equals(".srj"))
+            catch (AssertFailedException)
             {
-                CompareSparqlResults(results, expectedResultPath, laxCardinality, new SparqlJsonParser());
-            }
-            else if (resultExtension.Equals(".tsv"))
-            {
-                CompareSparqlResults(results, expectedResultPath, laxCardinality, new SparqlTsvParser());
-            }
-            else if (resultExtension.Equals(".csv"))
-            {
-                CompareSparqlResults(results, expectedResultPath, laxCardinality, new SparqlCsvParser());
-            }
-            else if (resultExtension.Equals(".ttl") || resultExtension.Equals(".rdf"))
-            {
-                CompareResultGraphs(results, expectedResultPath, laxCardinality);
-            }
-            
-            else
-            {
-                Assert.Fail("Don't know how to compare results to results file {0}", expectedResultPath);
+                Console.WriteLine("Expected Results Path: {0}", expectedResultPath);
+                Console.WriteLine("Actual Results:");
+                Console.WriteLine(results);
+                throw;
             }
         }
 
