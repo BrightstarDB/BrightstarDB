@@ -34,8 +34,8 @@
 			..\samples\Samples\**\Debug*.*;
       ..\samples\Samples\Embedded\SamplesConfiguration.template.cs"/>
   </ItemGroup>
+  
   <Import Project="..\common.proj"/>
-  <UsingTask TaskName="SmartAssembly.MSBuild.Tasks.Build" AssemblyName="SmartAssembly.MSBuild.Tasks, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7f465a1c156d4d57"/>
 
   <Target Name="Version">
     <Version FileName="$(BuildNumberFile)" Major="1" Minor="0" Increment="true" Condition=" '$(BuildNumber)' == '' ">
