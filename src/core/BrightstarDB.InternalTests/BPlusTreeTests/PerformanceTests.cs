@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace BrightstarDB.Tests.BPlusTreeTests
 {
     [TestClass]
+    [Ignore]
     public class PerformanceTests
     {
         [TestMethod]

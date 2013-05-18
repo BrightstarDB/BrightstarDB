@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace BrightstarDB.Tests
 {
     [TestClass]
+    [Ignore]
     public class BrightstarQueryProcessorTests
     {
         private readonly IStoreManager _storeManager;

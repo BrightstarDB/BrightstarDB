@@ -17,6 +17,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace BrightstarDB.Tests
 {
     [TestClass]
+    [Ignore]
     public class ScalingTests
     {
         private IStoreManager _storeManager;

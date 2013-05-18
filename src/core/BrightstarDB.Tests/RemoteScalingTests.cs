@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace BrightstarDB.Tests
 {
     [TestClass]
+    [Ignore]
     public class RemoteScalingTests : ClientTestBase
     {
         private static string _importDirPath;
@@ -34,6 +35,7 @@ namespace BrightstarDB.Tests
         }
 
         [TestMethod]
+        [TestCategory("ScalingTests")]
         public void TestRepeatedSmallUnitsOfWork()
         {
             // ServicePointManager.DefaultConnectionLimit = 1000;
@@ -63,6 +65,7 @@ namespace BrightstarDB.Tests
         }
 
         [TestMethod]
+        [TestCategory("ScalingTests")]
         public void TestBulkLoad24M()
         {
             var testTarget = new FileInfo(_importDirPath + Path.DirectorySeparatorChar + "BSBM_24M.nt");
@@ -94,6 +97,7 @@ namespace BrightstarDB.Tests
         }
 
         [TestMethod]
+        [TestCategory("ScalingTests")]
         public void TestBulkLoad370K()
         {
             var testTarget = new FileInfo(_importDirPath + Path.DirectorySeparatorChar + "BSBM_370k.nt");

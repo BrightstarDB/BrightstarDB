@@ -11,7 +11,9 @@ using System.Linq;
 using BrightstarDB.Server;
 
 namespace BrightstarDB.Tests.SparqlDawgTests {
+    
     [TestClass]
+    [Ignore] // For now just run the SPARQL 1.1 tests that are in InternalTests
 	public partial class ManifestAll : SparqlTest {
 
         public ManifestAll() : base()
