@@ -3085,6 +3085,11 @@ namespace BrightstarDB.Tests.SparqlTestSuite {
             return true;
         }
 
+        // TODO: This method doesn't handle triple collections with multiple bNodes correctly
+        // For example the DawgConstructIdentity test results in two foaf:Person resources with
+        // blank node identifiers. This code blindly matches the first blank node with the first
+        // B* generated ID in the results set, which can end up being for the wrong resource
+        // Need to find a way of deferring the match of triples that have multiple potential matches.
         private static void CompareTripleCollections(BaseTripleCollection actualTriples, BaseTripleCollection expectedTriples, bool reduced) 
 		{
             var actualTripleList = new List<Triple>(actualTriples);
