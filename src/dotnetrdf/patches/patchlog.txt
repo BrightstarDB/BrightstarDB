@@ -5,29 +5,6 @@ Put as much detail as you can in the Reason and Work Done fields to make it easi
 when we update dotNetRdf. There should be enough information to make it possible to easily manually re-apply changes
 (this may be necessary if the source changes so much that an automated patch is not possible).
 
-Patch: 2029_20120125_libraries_core_query_SPARQLExpressionParser.cs.patch
-Patched by: Kal
-Reason: Fix for BUGZID 5123 - TestLinqContainsLong(). The XML Schema long datatype was not being recognized as a valid integer value.
-Work done: Changed test for integer value to check for XmlSpecsHelper.XmlSchemaDataTypeInteger OR XmlSpecsHelper.XmlSchemaDataTypeLong, rather than just XmlSpecsHelper.XmlSchemaDataTypeInteger
-
-Patch: 2156_20120320_libraries_core_query_algebra_Set.cs.patch
-Patched by: Kal with input from Gra
-Status: NEEDS REVIEW (Rob has moved JoinedSet into the EXPERIMENTAL build, so its not any longer an issue unless it gets resurrected)
-Reason: Rob's caching code for the JoinedSet implementation could not handle a second insert of the same key/value pair. The patch checks inserts and will only throw an error if an attempt is made to overwrite an exising cached value with a different value.
-Work done: Added a _cache.TryGetValue() before doing _cache.Add()
-
-Patch: 2181_20120516_libraries_core_core.patch
-Patched by: Kal
-Reason: Modifies the MimeTypesHelper.GetRdfParser() methods to take a TokenQueueMode parameter that allows the default queuing mode of the returned parser to be set.
-Work done: Added GetRdfParser(TokenQueueMode) to MimeTypeDefinition.cs, added a tokenQueueMode parameter to GetParser(IEnumerable<string>) and GetParser(string) in MIMETypesHelper.
-
-2369_20120813_libraries_core.silverlight_compatibility_SilverlightCompatability.cs.patch
-Patched by: Kal
-Reason: Adds FindIndex<T>(Predicate<T>) method to the List<T> class as an extension method (this method is present in .NET 4.0 but not in the Silverlight libraries)
-
-2371_20120912_libraries_core_query_algebra_LazyBgp.cs.patch
-Patched by: Gra
-Reason: Fixes processing of queries with a LIMIT that is greater than the total number of rows in the results set.
 
 Obsolete Patches
 ----------------
@@ -61,3 +38,30 @@ Status: OBSOLETE (made obsolete by changes to dotNetRDF core APIs)
 Reason: Adds the GenericUpdateProcessor and IGenericIOManager classes into the windows phone build of dotNetRdf.
 Work done: Removed the #if !NO_STORE conditional compilation, and added a conditionally compiled section to ProcessLoadCommand to load the graph (as the mobile build does not support synchronous graph import)
 
+Patch: 2029_20120125_libraries_core_query_SPARQLExpressionParser.cs.patch
+Patched by: Kal
+Status: OBSOLETE (made obsolete by changes to dotNetRDF internals)
+Reason: Fix for BUGZID 5123 - TestLinqContainsLong(). The XML Schema long datatype was not being recognized as a valid integer value.
+Work done: Changed test for integer value to check for XmlSpecsHelper.XmlSchemaDataTypeInteger OR XmlSpecsHelper.XmlSchemaDataTypeLong, rather than just XmlSpecsHelper.XmlSchemaDataTypeInteger
+
+Patch: 2156_20120320_libraries_core_query_algebra_Set.cs.patch
+Patched by: Kal with input from Gra
+Status: OBSOLETE (Rob has moved JoinedSet into the EXPERIMENTAL build, so its not any longer an issue unless it gets resurrected)
+Reason: Rob's caching code for the JoinedSet implementation could not handle a second insert of the same key/value pair. The patch checks inserts and will only throw an error if an attempt is made to overwrite an exising cached value with a different value.
+Work done: Added a _cache.TryGetValue() before doing _cache.Add()
+
+Patch: 2181_20120516_libraries_core_core.patch
+Patched by: Kal
+Status: OBSOLETE (made obsolete by changes to dotNetRDF core APIs)
+Reason: Modifies the MimeTypesHelper.GetRdfParser() methods to take a TokenQueueMode parameter that allows the default queuing mode of the returned parser to be set.
+Work done: Added GetRdfParser(TokenQueueMode) to MimeTypeDefinition.cs, added a tokenQueueMode parameter to GetParser(IEnumerable<string>) and GetParser(string) in MIMETypesHelper.
+
+2369_20120813_libraries_core.silverlight_compatibility_SilverlightCompatability.cs.patch
+Patched by: Kal
+Status: OBSOLETE (now merged into dotNetRDF)
+Reason: Adds FindIndex<T>(Predicate<T>) method to the List<T> class as an extension method (this method is present in .NET 4.0 but not in the Silverlight libraries)
+
+2371_20120912_libraries_core_query_algebra_LazyBgp.cs.patch
+Patched by: Gra
+Status: OBSOLETE (now merged into dotNetRDF)
+Reason: Fixes processing of queries with a LIMIT that is greater than the total number of rows in the results set.
