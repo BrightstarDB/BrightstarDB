@@ -13,6 +13,24 @@
 	<RemoveDir Directories="$(AzureDocumentationDir)"/>
   </Target>
 
+  <Target Name="Sphinx">
+    <XslTransformation
+      XmlInputPaths="src\Maps\table_of_contents.xml"
+      OutputPaths="sphinx\index.rst"
+      XslInputPath="sphinx_index.xslt"/>
+
+    <XmlPeek XmlInputPath="src\Maps\table_of_contents.xml"
+             Query="map/topicref/@href">
+      <Output TaskParameter="Result" ItemName="Source"/>
+    </XmlPeek>
+
+    <XslTransformation
+      XmlInputPaths="@(Source->'src\Maps\table_of_contents.xml')"
+      OutputPaths="@(Source->'sphinx\%(Identity).rst')"
+      XslInputPath="sphinx_docs.xslt"
+      Parameters="&lt;Parameter Name='docname' Value='%(Identity)'/&gt;"/>
+  </Target>
+  
   <Target Name="Website">
 
     <Message Text="Building to $(WebsiteDocumentationDir)"/>
