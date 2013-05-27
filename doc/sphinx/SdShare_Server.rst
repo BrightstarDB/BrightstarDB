@@ -21,7 +21,7 @@ The following diagram shows the server architecture.
 
 
 
-.. image:: ../src/images/sdshare server architecture.png
+.. image:: ../src/images/sdshare_server_architecture.png
 
 
 
