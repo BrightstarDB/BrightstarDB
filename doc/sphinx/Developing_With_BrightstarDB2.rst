@@ -2401,19 +2401,18 @@ change the configuration values in the Web.config file in the root directory of 
 application. Change the membership node contained within the <system.web> to the 
 snippet below::
 
-  <membership defaultProvider="BrightstarMembershipProvider">
-      <providers>
-        <clear/>
-        <add name="BrightstarMembershipProvider" 
-             type="BrightstarDB.Samples.NerdDinner.BrightstarMembershipProvider, 
-                   BrightStarDB.Samples.NerdDinner" 
-		     enablePasswordReset="true" 
-             maxInvalidPasswordAttempts="5" 
-			 minRequiredPasswordLength="6" 
-             minRequiredNonalphanumericCharacters="0" 
-			 passwordAttemptWindow="10" 
-			 applicationName="/" />
-      </providers>
+  <membership defaultProvider="BrightstarMembershipProvider">
+    <providers>
+      <clear/>
+      <add name="BrightstarMembershipProvider" 
+           type="BrightstarDB.Samples.NerdDinner.BrightstarMembershipProvider, BrightStarDB.Samples.NerdDinner" 
+           enablePasswordReset="true" 
+           maxInvalidPasswordAttempts="5" 
+           minRequiredPasswordLength="6" 
+           minRequiredNonalphanumericCharacters="0" 
+           passwordAttemptWindow="10" 
+           applicationName="/" />
+    </providers>
   </membership> 
 
 Note that if the name of your project is not BrightstarDB.Samples.NerdDinner, you will have to 
@@ -2441,66 +2440,49 @@ in the Web.config file located in the project's root directory.
 Adding functionality to the Custom Membership Provider
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-
-
 .. note::
 
   For the purpose of keeping this example simple, we will leave some of these methods to throw 
-NotImplementedException, but you can add in whatever logic suits your business requirements 
-once you have the basic functionality up and running.
+  ``System.NotImplementedException``, but you can add in whatever logic suits your business requirements 
+  once you have the basic functionality up and running.
 
-
-
-The full code for the BrightstarMembershipProvider.cs is given below, but can be broken down 
+The full code for the ``BrightstarMembershipProvider.cs`` is given below, but can be broken down 
 as follows:
-
-
 
 **Initialization**
 
-We add an Initialize() method along with a GetConfigValue() helper method to handle retrieving 
-the configuration values from Web.config, and setting default values if it is unable to 
+We add an ``Initialize()`` method along with a ``GetConfigValue()`` helper method to handle retrieving 
+the configuration values from `Web.config`, and setting default values if it is unable to 
 retrieve a value.
-
-
 
 **Private helper methods**
 
-We add three more helper methods: CreateSalt() and CreatePasswordHash() to help us with user 
-passwords, and ConvertLoginToMembershipUser() to return a built in .NET MembershipUser object 
-when given the BrightstarDB INerdDinnerLogin entity.
-
-
+We add three more helper methods: ``CreateSalt()`` and ``CreatePasswordHash()`` to help us with user 
+passwords, and ``ConvertLoginToMembershipUser()`` to return a built in .NET MembershipUser object 
+when given the BrightstarDB ``INerdDinnerLogin`` entity.
 
 **CreateUser()**
 
-The CreateUser() method is used when a user registers on our site, the first part of this code 
+The ``CreateUser()`` method is used when a user registers on our site, the first part of this code 
 validates based on the configuration settings (such as whether an email must be unique) and 
 then creates a NerdDinnerLogin entity, adds it to the NerdDinnerContext and saves the changes 
 to the BrightstarDB store.
 
-
-
 **GetUser()**
 
-The GetUser() method simply looks up a login in the BrightstarDB store, and returns a .NET 
-MembershipUser object with the help of the ConvertLoginToMembershipUser() method mentioned 
+The ``GetUser()`` method simply looks up a login in the BrightstarDB store, and returns a .NET 
+MembershipUser object with the help of the ``ConvertLoginToMembershipUser()`` method mentioned 
 above.
-
-
 
 **GetUserNameByEmail()**
 
-The GetUserNameByEmail() method is similar to the GetUser() method but looks up by email 
-rather than username. It’s used by the CreateUser() method if the configuration settings 
+The ``GetUserNameByEmail()`` method is similar to the ``GetUser()`` method but looks up by email 
+rather than username. It’s used by the ``CreateUser()`` method if the configuration settings 
 specify that new users must have unique emails.
-
-
 
 **ValidateUser()**
 
-The ValidateUser() method is used when a user logs in to our web application. The login is 
+The ``ValidateUser()`` method is used when a user logs in to our web application. The login is 
 looked up in the BrightstarDB store by username, and then the password is checked. If the 
 checks pass successfully then it returns a true value which enables the user to successfully 
 login.
@@ -2571,7 +2553,7 @@ login.
                             GetConfigValue(config["passwordAttemptWindow"], "10"));
               _minRequiredNonalphanumericCharacters = Convert.ToInt32(
                             GetConfigValue(config["minRequiredNonalphanumericCharacters"], 
-"1"));
+                                           "1"));
               _minRequiredPasswordLength = Convert.ToInt32(
                             GetConfigValue(config["minRequiredPasswordLength"], "6"));
               _enablePasswordReset = Convert.ToBoolean(
@@ -2661,7 +2643,7 @@ login.
          
           /// <summary>
           /// This helper method returns a .NET MembershipUser object generated from the 
-supplied BrightstarDB entity
+          /// supplied BrightstarDB entity
           /// </summary>
           private static MembershipUser ConvertLoginToMembershipUser(INerdDinnerLogin login)
           {
@@ -2678,15 +2660,19 @@ supplied BrightstarDB entity
           #endregion
 
 
-          public override MembershipUser CreateUser(string username, string password, string 
-email, string passwordQuestion, string passwordAnswer, bool isApproved, object 
-providerUserKey, out MembershipCreateStatus status)
+          public override MembershipUser CreateUser(
+                                            string username, 
+											string password, 
+											string email, 
+											string passwordQuestion, 
+											string passwordAnswer, 
+											bool isApproved, 
+											object providerUserKey, 
+											out MembershipCreateStatus status)
           {
               var args = new ValidatePasswordEventArgs(email, password, true);
 
-
               OnValidatingPassword(args);
-
 
               if (args.Cancel)
               {
@@ -2694,13 +2680,11 @@ providerUserKey, out MembershipCreateStatus status)
                   return null;
               }
 
-
               if (string.IsNullOrEmpty(email))
               {
                   status = MembershipCreateStatus.InvalidEmail;
                   return null;
               }
-
 
               if (string.IsNullOrEmpty(password))
               {
@@ -2708,16 +2692,13 @@ providerUserKey, out MembershipCreateStatus status)
                   return null;
               }
 
-
               if (RequiresUniqueEmail && GetUserNameByEmail(email) != "")
               {
                   status = MembershipCreateStatus.DuplicateEmail;
                   return null;
               }
 
-
               var u = GetUser(username, false);
-
 
               try
               {
@@ -2739,13 +2720,15 @@ providerUserKey, out MembershipCreateStatus status)
                           LastLoginDate = DateTime.UtcNow,
                           LastActive = DateTime.UtcNow
                       };
+   
                       //Create a context using the connection string in the Web.Config
                       var context = new NerdDinnerContext();
+   
                       //Add the entity to the context
                       context.NerdDinnerLogins.Add(login);
+   
                       //Save the changes to the BrightstarDB store
                       context.SaveChanges();
-
 
                       status = MembershipCreateStatus.Success;
                       return GetUser(username, true /*online*/);
@@ -2770,12 +2753,12 @@ providerUserKey, out MembershipCreateStatus status)
               var context = new NerdDinnerContext();
               //Query the store for a NerdDinnerLogin that matches the supplied username
               var login = context.NerdDinnerLogins.Where(l => 
-l.Username.Equals(username)).FirstOrDefault();
+                                    l.Username.Equals(username)).FirstOrDefault();
               if (login == null) return null;
               if(userIsOnline)
               {
-                  //if the call states that the user is online, update the LastActive property 
-of the NerdDinnerLogin
+                  // if the call states that the user is online, update the LastActive property 
+                  // of the NerdDinnerLogin
                   login.LastActive = DateTime.UtcNow;
                   context.SaveChanges();
               }
@@ -2790,7 +2773,7 @@ of the NerdDinnerLogin
               var context = new NerdDinnerContext();
               //Query the store for a NerdDinnerLogin that matches the supplied username
               var login = context.NerdDinnerLogins.Where(l => 
-l.Email.Equals(email)).FirstOrDefault();
+                                    l.Email.Equals(email)).FirstOrDefault();
               if (login == null) return string.Empty;
               return login.Username;
           }
@@ -2805,12 +2788,11 @@ l.Email.Equals(email)).FirstOrDefault();
               {
                   //Ensure that only a single login matches the supplied username
                   var login = logins.First();
-                  //Check the properties on the NerdDinnerLogin to ensure the user account is 
-activate and not locked out
+                  // Check the properties on the NerdDinnerLogin to ensure the user account is 
+                  // activated and not locked out
                   if (login.IsLockedOut || !login.IsActivated) return false;
-                  //Validate the password of the NerdDinnerLogin against the supplied password
-                  var validatePassword = login.Password == CreatePasswordHash(password, 
-login.PasswordSalt);
+                  // Validate the password of the NerdDinnerLogin against the supplied password
+                  var validatePassword = login.Password == CreatePasswordHash(password, login.PasswordSalt);
                   if (!validatePassword)
                   {
                       //return validation failure
@@ -2826,8 +2808,6 @@ login.PasswordSalt);
           #region MembershipProvider properties and methods not implemented for this tutorial
   ...
           #endregion
-
-
           
       }
   }
@@ -2848,42 +2828,28 @@ beginning you will need to add this infrastructure by hand. The infrastructure i
 
 
   - An AccountController class with ActionResult methods for logging in, logging out and 
-registering (in AccountController.cs in the Controllers folder).
+    registering (in ``AccountController.cs`` in the Controllers folder).
 
-  - AccountModels.cs which contains classes for LogonModel and RegisterModel (in the Models 
-folder).
+  - ``AccountModels.cs`` which contains classes for LogonModel and RegisterModel (in the Models 
+    folder).
 
   - LogOn, Register, ChangePassword and ChangePasswordSuccess views that use the models to 
-display form fields and validate input from the user (in the Views/Account folder).
+    display form fields and validate input from the user (in the Views/Account folder).
 
   - A _LogOnPartial view that is used in the main _Layout view to display a login link, or the 
-username if the user is logged in (in the Views/Shared folder).
-
-
+    username if the user is logged in (in the Views/Shared folder).
 
 .. note::
 
   These files can be found in [INSTALLDIR]\\Samples\\NerdDinner\\BrightstarDB.Samples.NerdDinner
 
-
-
 The details of the contents of these files is beyond the scope of this tutorial, however the 
 infrastructure is all designed to work with the configured Membership Provider for the web 
-application - in our case the BrightstarMembershipProvider class we have just created.
-
-
+application - in our case the ``BrightstarMembershipProvider`` class we have just created.
 
 The AccountController created here has some dependencies on the Custom Role Provider discussed 
 in the next section. You will need to complete the steps in the next section before you will 
 be able to successfully register a user in the web application.
-
-
-
-
-
-
-
-
 
 **Summary**
 
@@ -2894,134 +2860,85 @@ For simplicity, we have kept the same structure of membership information as we 
 a default provider, but you can expand on this sample to include extra membership information 
 by simply adding more properties to the BrightstarDB entity.
 
-
 .. _Adding_a_Custom_Role_Provider:
-
 
 Adding a Custom Role Provider
 -----------------------------
-
 
 As with Custom Membership Providers, Custom Role Providers allow developers to use role 
 management within application when either the role information is stored in a data source 
 other than that supported by the default providers, or the role information is managed in a 
 schema which differs from that set out in the default providers.
 
-
-
 In this topic we are going to add a Custom Role Provider to the Nerd Dinner sample so that we 
 can restrict certain areas from users who are not members of the appropriate role.
-
-
-
-
 
 Adding the Custom Role Provider
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+  1. Add the following line to the INerdDinnerLogin interface's properties::
 
+      ICollection<string> Roles { get; set; }
 
-
-  1. Add the following line to the INerdDinnerLogin interface's 
-properties``ICollection<string> Roles { get; set; } ``To update the context classes, right 
-click on the NerdDinnerContext.tt file and select “Run Custom Tool” from the context menu.
+  2. To update the context classes, right click on the NerdDinnerContext.tt file and select “Run Custom Tool” from the context menu.
 
   #. Add a new class to your project and name it BrightstarRoleProvider.cs
 
   #. Make this new class inherit from the RoleProvider class (System.Web.Security namespace)
 
-
-
-  1. Right click on the RoleProvider class name and choose "Implement abstract class" from the 
-context menu, this automatically creates all the override methods that your custom class can 
-implement.
-
-
-
-
+  #. Right click on the RoleProvider class name and choose "Implement abstract class" from the 
+     context menu, this automatically creates all the override methods that your custom class can 
+     implement.
 
 Configuring the application to use the Brightstar Membership Provider
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-
-
 To configure your web application to use the Custom Role Provider, add the following to your 
-Web.config, inside the <system.web> section:
+Web.config, inside the <system.web> section::
 
-
-
-<roleManager  enabled="true" defaultProvider="BrightstarRoleProvider">
-
-  <providers>
-
-<clear/>
-
-<add name="BrightstarRoleProvider" 
-type="BrightstarDB.Samples.NerdDinner.BrightstarRoleProvider" applicationName="/" />
-
-  </providers>
-
-</roleManager>
-
-
+  <roleManager  enabled="true" defaultProvider="BrightstarRoleProvider">
+    <providers>
+      <clear/>
+      <add name="BrightstarRoleProvider" 
+           type="BrightstarDB.Samples.NerdDinner.BrightstarRoleProvider" applicationName="/" />
+    </providers>
+  </roleManager>
 
 To set up the default login path for the web application, replace the <authentication> element 
-in the Web.config file with the following:
+in the Web.config file with the following::
 
-
-
-<authentication mode="Forms">
-
-  <forms loginUrl="/Account/LogOn"/>
-
-</authentication>
-
-
-
-
+  <authentication mode="Forms">
+    <forms loginUrl="/Account/LogOn"/>
+  </authentication>
 
 Adding functionality to the Custom Role Provider
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-
-
-
-The full code for the BrightstarRoleProvider.cs is given below, but can be broken down as 
+The full code for the ``BrightstarRoleProvider.cs`` is given below, but can be broken down as 
 follows:
-
-
 
 **Initialization**
 
-We add an Initialize() method along with a GetConfigValue() helper method to handle retrieving 
+We add an ``Initialize()`` method along with a ``GetConfigValue()`` helper method to handle retrieving 
 the configuration values from Web.config, and setting default values if it is unable to 
 retrieve a value.
-
-
 
 **GetRolesForUser()**
 
 This method returns the contents of the Roles collection that we added to the INerdDinnerLogin 
 entity as a string array.
 
-
-
 **AddUsersToRoles()**
 
-AddUsersToRoles() loops through the usernames and role names supplied, and looks up the logins 
+This method loops through the usernames and role names supplied, and looks up the logins 
 from the BrightstarDB store. When found, the role names are added to the Roles collection for 
 that login.
 
-
-
 **RemoveUsersFromRoles()**
 
-RemoveUsersFromRoles() loops through the usernames and role names supplied, and looks up the 
+This method loops through the usernames and role names supplied, and looks up the 
 logins from the BrightstarDB store. When found, the role names are removed from the Roles 
 collection for that login.
-
-
 
 **IsUserInRole()**
 
@@ -3029,8 +2946,6 @@ The BrightstarDB store is searched for the login who matches the supplied userna
 true or false is passed back depending on whether the role name was found in that login's Role 
 collection. If the login is inactive or locked out for any reason, then a false value is 
 passed back.
-
-
 
 **GetUsersInRole()**
 
@@ -3067,7 +2982,7 @@ collection.
 
 
           public override void Initialize(string name, 
-System.Collections.Specialized.NameValueCollection config)
+                             System.Collections.Specialized.NameValueCollection config)
           {
               if (config == null) throw new ArgumentNullException("config");
 
@@ -3090,11 +3005,11 @@ System.Collections.Specialized.NameValueCollection config)
 
           /// <summary>
           /// Gets a list of the roles that a specified user is in for the configured 
-applicationName.
+          /// applicationName.
           /// </summary>
           /// <returns>
           /// A string array containing the names of all the roles that the specified user is 
-in for the configured applicationName.
+          /// in for the configured applicationName.
           /// </returns>
           /// <param name="username">The user to return a list of roles for.</param>
           public override string[] GetRolesForUser(string username)
@@ -3104,7 +3019,7 @@ in for the configured applicationName.
               var context = new NerdDinnerContext();
               //find a match for the username
               var login = context.NerdDinnerLogins.Where(l => 
-l.Username.Equals(username)).FirstOrDefault();
+                                               l.Username.Equals(username)).FirstOrDefault();
               if (login == null) return null;
               //return the Roles collection
               return login.Roles.ToArray();
@@ -3113,11 +3028,14 @@ l.Username.Equals(username)).FirstOrDefault();
 
           /// <summary>
           /// Adds the specified user names to the specified roles for the configured 
-applicationName.
+          /// applicationName.
           /// </summary>
-          /// <param name="usernames">A string array of user names to be added to the 
-specified roles. </param><param name="roleNames">A string array of the role names to add 
-the specified user names to.</param>
+          /// <param name="usernames">
+          ///   A string array of user names to be added to the specified roles. 
+          /// </param>
+          /// <param name="roleNames">
+          ///  A string array of the role names to add the specified user names to.
+          /// </param>
           public override void AddUsersToRoles(string[] usernames, string[] roleNames)
           {
               //create a new BrightstarDB context using the values in Web.config
@@ -3126,12 +3044,12 @@ the specified user names to.</param>
               {
                   //find the match for the username
                   var login = context.NerdDinnerLogins.Where(l => 
-l.Username.Equals(username)).FirstOrDefault();
+                                       l.Username.Equals(username)).FirstOrDefault();
                   if (login == null) continue;
                   foreach (var role in roleNames)
                   {
-                      //if the Roles collection of the login does not already contain the 
-role, then add it
+                      // if the Roles collection of the login does not already contain the 
+                      // role, then add it
                       if (login.Roles.Contains(role)) continue;
                       login.Roles.Add(role);
                   }
@@ -3142,11 +3060,14 @@ role, then add it
 
           /// <summary>
           /// Removes the specified user names from the specified roles for the configured 
-applicationName.
+          /// applicationName.
           /// </summary>
-          /// <param name="usernames">A string array of user names to be removed from the 
-specified roles. </param><param name="roleNames">A string array of role names to remove the 
-specified user names from.</param>
+          /// <param name="usernames">
+          ///  A string array of user names to be removed from the specified roles. 
+          /// </param>
+          /// <param name="roleNames">
+          ///  A string array of role names to remove the specified user names from.
+          /// </param>
           public override void RemoveUsersFromRoles(string[] usernames, string[] roleNames)
           {
               //create a new BrightstarDB context using the values in Web.config
@@ -3155,7 +3076,7 @@ specified user names from.</param>
               {
                   //find the match for the username
                   var login = context.NerdDinnerLogins.Where(l => 
-l.Username.Equals(username)).FirstOrDefault();
+                                             l.Username.Equals(username)).FirstOrDefault();
                   if (login == null) continue;
                   foreach (var role in roleNames)
                   {
@@ -3170,11 +3091,11 @@ l.Username.Equals(username)).FirstOrDefault();
 
           /// <summary>
           /// Gets a value indicating whether the specified user is in the specified role for 
-the configured applicationName.
+          /// the configured applicationName.
           /// </summary>
           /// <returns>
           /// true if the specified user is in the specified role for the configured 
-applicationName; otherwise, false.
+          /// applicationName; otherwise, false.
           /// </returns>
           /// <param name="username">The username to search for.</param>
           /// <param name="roleName">The role to search in.</param>
@@ -3186,14 +3107,14 @@ applicationName; otherwise, false.
                   var context = new NerdDinnerContext();
                   //find a match for the username
                   var login = context.NerdDinnerLogins.Where(l => 
-l.Username.Equals(username)).FirstOrDefault();
+                                             l.Username.Equals(username)).FirstOrDefault();
                   if (login == null || login.IsLockedOut || !login.IsActivated)
                   {
                       // no match or inactive automatically returns false
                       return false;
                   }
-                  //if the Roles collection of the login contains the role we are checking 
-for, return true
+                  // if the Roles collection of the login contains the role we are checking 
+                  // for, return true
                   return login.Roles.Contains(roleName.ToLower());
               }
               catch (Exception)
@@ -3208,7 +3129,7 @@ for, return true
           /// </summary>
           /// <returns>
           /// A string array containing the names of all the users who are members of the 
-specified role for the configured applicationName.
+          /// specified role for the configured applicationName.
           /// </returns>
           /// <param name="roleName">The name of the role to get the list of users for.</param>
           public override string[] GetUsersInRole(string roleName)
@@ -3218,25 +3139,25 @@ specified role for the configured applicationName.
               var context = new NerdDinnerContext();
               //search for all logins who have the supplied roleName in their Roles collection
               var usersInRole = context.NerdDinnerLogins.Where(l => 
-l.Roles.Contains(roleName.ToLower())).Select(l => l.Username).ToList();
+                         l.Roles.Contains(roleName.ToLower())).Select(l => l.Username).ToList();
               return usersInRole.ToArray();
           }
           
           /// <summary>
           /// Gets a value indicating whether the specified role name already exists in the 
-role data source for the configured applicationName.
+          /// role data source for the configured applicationName.
           /// </summary>
           /// <returns>
           /// true if the role name already exists in the data source for the configured 
-applicationName; otherwise, false.
+          /// applicationName; otherwise, false.
           /// </returns>
-          /// <param name="roleName">The name of the role to search for in the data 
-source.</param>
+          /// <param name="roleName">The name of the role to search for in the data source.</param>
           public override bool RoleExists(string roleName)
           {
               //for the purpose of the sample the roles are hard coded
-              return roleName.Equals("admin") || roleName.Equals("editor") || 
-roleName.Equals("standard");
+              return roleName.Equals("admin") || 
+                     roleName.Equals("editor") || 
+                     roleName.Equals("standard");
           }
           
           /// <summary>
@@ -3244,7 +3165,7 @@ roleName.Equals("standard");
           /// </summary>
           /// <returns>
           /// A string array containing the names of all the roles stored in the data source 
-for the configured applicationName.
+          /// for the configured applicationName.
           /// </returns>
           public override string[] GetAllRoles()
           {
@@ -3255,24 +3176,27 @@ for the configured applicationName.
 
           /// <summary>
           /// Gets an array of user names in a role where the user name contains the specified 
-user name to match.
+          /// user name to match.
           /// </summary>
           /// <returns>
           /// A string array containing the names of all the users where the user name matches 
-<paramref name="usernameToMatch"/> and the user is a member of the specified role.
+          /// <paramref name="usernameToMatch"/> and the user is a member of the specified role.
           /// </returns>
-          /// <param name="roleName">The role to search in.</param><param 
-name="usernameToMatch">The user name to search for.</param>
+          /// <param name="roleName">The role to search in.</param>
+          /// <param name="usernameToMatch">The user name to search for.</param>
           public override string[] FindUsersInRole(string roleName, string usernameToMatch)
           {
-              if (string.IsNullOrEmpty(roleName)) throw new ArgumentNullException("roleName");
-              if (string.IsNullOrEmpty(usernameToMatch)) throw new 
-ArgumentNullException("usernameToMatch");
-
+              if (string.IsNullOrEmpty(roleName)) {
+                  throw new ArgumentNullException("roleName");
+              }
+              if (string.IsNullOrEmpty(usernameToMatch)) {
+                  throw new ArgumentNullException("usernameToMatch");
+              }
 
               var allUsersInRole = GetUsersInRole(roleName);
-              if (allUsersInRole == null || allUsersInRole.Count() < 1) return new string[] { 
-"" };
+              if (allUsersInRole == null || allUsersInRole.Count() < 1) {
+                  return new string[] { "" };
+              }
               var match = (from u in allUsersInRole where u.Equals(usernameToMatch) select u);
               return match.ToArray();
           }
@@ -3282,8 +3206,7 @@ ArgumentNullException("usernameToMatch");
 
 
           /// <summary>
-          /// Gets or sets the name of the application to store and retrieve role information 
-for.
+          /// Gets or sets the name of the application to store and retrieve role information for.
           /// </summary>
           /// <returns>
           /// The name of the application to store and retrieve role information for.
@@ -3317,29 +3240,21 @@ for.
           /// <returns>
           /// true if the role was successfully deleted; otherwise, false.
           /// </returns>
-          /// <param name="roleName">The name of the role to delete.</param><param 
-name="throwOnPopulatedRole">If true, throw an exception if <paramref name="roleName"/> has 
-one or more members and do not delete <paramref name="roleName"/>.</param>
+          /// <param name="roleName">The name of the role to delete.</param>
+          /// <param name="throwOnPopulatedRole">If true, throw an exception if <paramref name="roleName"/> has 
+          /// one or more members and do not delete <paramref name="roleName"/>.</param>
           public override bool DeleteRole(string roleName, bool throwOnPopulatedRole)
           {
               //for the purpose of the sample the roles are hard coded
               throw new NotImplementedException();
           }
 
-
           #endregion
       }
   }
 
-
-
-
-
 Adding Secure Sections to the Website
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
 
 To display the functionality of the new Custom Role Provider, add 2 new ViewResult methods to 
 the Home Controller. Notice that the [Authorize] MVC attribute has been added to each of the 
@@ -3350,92 +3265,63 @@ methods to restrict access to users in those roles only.
   [Authorize(Roles = "editor")]
   public ViewResult SecureEditorSection()
   {
-  return View();
+      return View();
   }
 
 
   [Authorize(Roles = "admin")]
   public ViewResult SecureAdminSection()
   {
-  return View();
+      return View();
   }
-
 
 
 Right click on the View() methods, and select "Add View" for each. This automatically adds the 
 SecureEditorSection.cshtml and SecureAdminSection.cshtml files to the Home view folder.
 
-
-
 To be able to navigate to these sections, open the file Views/Shared/_Layout.cshtml and add 
-two new action links to the main navigation menu:
-
-::
+two new action links to the main navigation menu::
 
   <div id="menucontainer">
-  <ul id="menu">
-  <li>@Html.ActionLink("Home", "Index", "Home")</li>
-  <li>@Html.ActionLink("Query SPARQL", "Index", "Sparql")</li>
-  **<li>@Html.ActionLink("Editors Only", "SecureEditorSection", "Home")</li>**
-  **<li>@Html.ActionLink("Admin Only", "SecureAdminSection", "Home")</li>**
-  </ul>
+    <ul id="menu">
+      <li>@Html.ActionLink("Home", "Index", "Home")</li>
+      <li>@Html.ActionLink("Query SPARQL", "Index", "Sparql")</li>
+      <li>@Html.ActionLink("Editors Only", "SecureEditorSection", "Home")</li>
+      <li>@Html.ActionLink("Admin Only", "SecureAdminSection", "Home")</li>
+    </ul>
   </div>
-
-
 
 In a real world application, you would manage roles within your own administration section, 
 but for the purpose of this sample we are going with an overly simplistic way of adding a user 
 to a role.
 
 
-
-
-
 Running the Application
 ^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
 
 Press F5 to run the application. You will notice a [Log On] link in the top right hand corner 
 of the screen. You can navigate to the registration page via the logon page.
 
 .. image:: ../src/images/1_register.png
 
-
-
 **Register**
-
-
 
 Choosing a username, email and password will create a login entity for you in the BrightstarDB 
 store, and automatically log you in.
 
-
-
 .. image:: ../src/images/2_loggedin.png
 
-
-
 **Logged In**
-
-
 
 The partial view that contains the login link code recognizes that you are logged in and 
 displays your username and a [Log Off] link. Clicking the links clears the cookies that keep 
 you logged in to the website.
 
-
-
 .. image:: ../src/images/3_logon.png
-
-
 
 **Log On**
 
 You can log on again at any time by entering your username and password.
-
-
 
 **Role Authorization**
 
@@ -3443,15 +3329,10 @@ Clicking on the navigation links to "Secure Editor Section" will allow access to
 Whereas the "Secure Admin Section" will not pass authorization - by default MVC redirects the 
 user to the login view.
 
-
-
-
 .. _Adding_Linked_Data_Support:
-
 
 Adding Linked Data Support
 --------------------------
-
 
 As data on the web becomes more predominant, it is becoming increasingly important to be able 
 to expose the underlying data of a web application in some way that is easy for external 
@@ -3460,8 +3341,6 @@ difficult for developers to use because each API has its own data structures and
 access data. However there are two well supported standards for publishing data on the web - 
 OData and SPARQL.
 
-
-
 OData is an open standard, originally created by Microsoft, that provides a framework for 
 exposing a collection of entities as data accessible by URIs and represented in ATOM feeds. 
 SPARQL is a standard from the W3C for querying an RDF data store. Because BrightstarDB is, 
@@ -3469,20 +3348,11 @@ under the hood, an RDF data store adding SPARQL support is pretty straightforwar
 the BrightstarDB Entity Framework provides a set of entity classes, it is also very easy to 
 create an OData endpoint.
 
-
-
 In this section we will show how to add these different forms of Linked Data to your web 
 application.
 
-
-
-
-
 Create a SPARQL Action
 ^^^^^^^^^^^^^^^^^^^^^^
-
-
-
 
 The standard way of interfacing to a SPARQL endpoint is to either use an HTTP GET with a 
 ?query= parameter that carries the SPARQL query as a string; or to use an HTTP POST which has 
@@ -3491,23 +3361,16 @@ latter as it is easiest to show and test with a browser-based API. We will creat
 action at /sparql, and include a form that allows a SPARQL query to be submitted through the 
 browser. To do this we need to create a new Controller to handle the /sparql URL.
 
-
-
 Right-click on the Controllers folder and choose Add > Controller. In the dialog that is 
-displayed, change the controller name to SparqlController, and choose the Empty MVC Controller 
+displayed, change the controller name to ``SparqlController``, and choose the **Empty MVC Controller** 
 template option from the drop-down list.
 
-
-
-Edit the SparqlController.cs file to add the following two methods to the class:
-
-::
+Edit the ``SparqlController.cs`` file to add the following two methods to the class::
 
   public ViewResult Index()
   {
       return View();
   }
-
 
   [HttpPost]
   [ValidateInput(false)]
@@ -3522,19 +3385,13 @@ Edit the SparqlController.cs file to add the following two methods to the class:
       return new FileStreamResult(results, "application/xml; charset=utf-16");
   }
 
-
-
 The first method just displays a form that will allow a user to enter a SPARQL query. The 
 second method handles a POST operation and extracts the SPARQL query and executes it, 
 returning the results to the browser directly as an XML data stream.
 
-
-
 Create a new folder under Views called "Sparql" and add a new View to the Views\\Sparql with 
 the name Index.cshtml. This view simply displays a form with a large enough text box to allow 
-a query to be entered.
-
-::
+a query to be entered::
 
   <h2>SPARQL</h2>
 
@@ -3545,15 +3402,13 @@ a query to be entered.
       <p>Enter your SPARQL query in the text box below:</p>
 
 
-      @Html.TextArea("query", "SELECT ?d WHERE {?d a <
-http://brightstardb.com/namespaces/default/Dinner>}", 10, 50, null)
-
-
+      @Html.TextArea("query", 
+                     "SELECT ?d WHERE {?d a <http://brightstardb.com/namespaces/default/Dinner>}", 
+                     10, 50, null)
       <p>
           <input type="submit" value="Query" />
       </p>
   }
-
 
 
 Now you can compile and run the web application again and click on the Query SPARQL link at 
@@ -3563,95 +3418,62 @@ action methods. By default this contains a SPARQL query that should work nicely 
 NerdDinner entity model, returning the URI identifiers of all Dinner entities in the 
 BrightstarDB data store.
 
-
-
 .. image:: ../src/images/mvc15.png
-
-
 
 Clicking on the Query button submits the form, simulating an HTTP POST from an external 
 application. The results are returned as raw XML, which will be formatted and displayed 
 depending on which browser you use and your browser settings (the screenshot below is from a 
 Firefox browser window).
 
-
-
 .. image:: ../src/images/mvc16.png
-
-
 
 Creating an OData Provider
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
 
 The Open Data Protocol (OData) is an open web protocol for querying and updating data. An 
 OData provider can be added to BrightstarDB Entity Framework projects to allow OData consumers 
 to query the underlying data.
 
-
-
 The following steps describe how to create an OData provider to an existing project (in this 
 example we add to the NerdDinner MVC Web Application project).
 
+  1. Right-click on the project in the Solution Explorer and select **Add New Item**. In the dialog 
+     that is displayed click on Web, and select WCF Data Service. Rename this to ``OData.svc`` and 
+     click **Add**.
 
+    .. image:: ../src/images/odata_1_additem.png
 
-1. Right-click on the project in the Solution Explorer and select Add New Item. In the dialog 
-that is displayed click on Web, and select WCF Data Service. Rename this to OData.svc and 
-click 'add'.
+  2. Change the class inheritance from DataService to ``EntityDataService``, and add the name of the 
+     BrightstarEntityContext to the type argument.
 
+  3. Edit the body of the method with the following configuration settings::
 
+       public class OData : EntityDataService<NerdDinnerContext>
+       {
+         // This method is called only once to initialize service-wide policies.
+         public static void InitializeService(DataServiceConfiguration config)
+         {
+           config.SetEntitySetAccessRule("*", EntitySetRights.AllRead);
+           config.SetEntitySetAccessRule("NerdDinnerLogin", EntitySetRights.None); 
+           config.SetServiceOperationAccessRule("*", ServiceOperationRights.All);
+           config.DataServiceBehavior.MaxProtocolVersion = DataServiceProtocolVersion.V2;
+         }
+       }
 
-.. image:: ../src/images/odata_1_additem.png
+     .. note::
+     
+       The NerdDinnerLogin set has been given EntitySetRights of None. This hides the set (which 
+       contains sensitive login information) from the OData service
 
+  4. Rebuild and run the project. Browse to /OData.svc and you will see the standard OData 
+     metadata page displaying the entity sets from BrightstarDB
 
+     .. image:: ../src/images/odata_2_metadata.png
 
-2. Change the class inheritance from DataService to EntityDataService, and add the name of the 
-BrightstarEntityContext to the type argument.
+  5. The OData service can now be queried using the standard OData conventions. There are a 
+     :ref:`few restrictions <OData>` when using OData services with BrighstarDB.
 
-
-
-3. Edit the body of the method with the following configuration settings:
-
-::
-
-  public class OData : EntityDataService<NerdDinnerContext>
-  {
-  // This method is called only once to initialize service-wide policies.
-  public static void InitializeService(DataServiceConfiguration config)
-  {
-  config.SetEntitySetAccessRule("*", EntitySetRights.AllRead);
-  config.SetEntitySetAccessRule("NerdDinnerLogin", EntitySetRights.None); 
-  config.SetServiceOperationAccessRule("*", ServiceOperationRights.All);
-  config.DataServiceBehavior.MaxProtocolVersion = DataServiceProtocolVersion.V2;
-  }
-  }
-
-
-
-.. note::
-
-  The NerdDinnerLogin set has been given EntitySetRights of None. This hides the set (which 
-contains sensitive login information) from the OData service
-
-
-
-4. Rebuild and run the project. Navigation to /OData.svc and you will see the standard OData 
-metadata page displaying the entity sets from BrightstarDB
-
-
-
-.. image:: ../src/images/odata_2_metadata.png
-
-
-
-5. The OData service can now be queried using the standard OData conventions. There are a 
-:ref:`few restrictions <OData>` when using OData services with BrighstarDB.
-
-
-
-.. image:: ../src/images/odata_3_querying.png
+    .. image:: ../src/images/odata_3_querying.png
 
 
 .. _Consuming_OData_in_PowerPivot:
@@ -3660,161 +3482,102 @@ metadata page displaying the entity sets from BrightstarDB
 Consuming OData in PowerPivot
 -----------------------------
 
-
-.. _odata.org/consumers: <%LINK_CAPTION%>
-.. _powerpivot.com: <%LINK_CAPTION%>
-
+.. _odata.org/consumers: http://odata.org/consumers
+.. _powerpivot.com: http://powerpivot.com
 
 The data in BrighstarDB can be consumed by various OData consumers. In this topic we look at 
 consuming the data using PowerPivot (a list of recommended OData consumers can be found 
 `odata.org/consumers`_).
 
+To consume OData from BrightstarDB in PowerPivot:
 
+  1. Open Excel, click the PowerPivot tab and open the PowerPivot window. 
+     If you do not have PowerPivot installed, you can download it from `powerpivot.com`_
 
-Open Excel, click the PowerPivot tab and open the PowerPivot window
+  #. To consume data from BrightstarDB, click the **From Data Feeds** button in the **Get External Data** section:
+     
+     .. image:: ../src/images/odataconsumer_1_feedbutton.png
 
-If you do not have PowerPivot installed, you can download it from `powerpivot.com`_
+  #. Add a name for your feed, and enter the URL of the OData service file for your BrightstarDB application.
 
+     .. image:: ../src/images/odataconsumer_2b_connect.png
 
+  #. Click **Test Connection** to make sure that you can connect to your OData service and then click **Next**
 
-To consume data from Brightstar, click the 'From Data Feeds' button in the 'Get External Data' 
-section:
+    .. image:: ../src/images/odataconsumer_3b_selectsets.png
 
+  #. Select the sets that you wish to consume and click **Finish**
 
+    .. image:: ../src/images/odataconsumer_5b_success.png
 
-.. image:: ../src/images/odataconsumer_1_feedbutton.png
+  #. This then shows all the data that is consumed from the OData service in the PowerPivot window. 
+     When any data is added or edited in the BrightstarDB store, the data in the PowerPivot windows 
+     can be updated by clicking the **Refresh** button.
+     
+     .. image:: ../src/images/odataconsumer_6_data.png
 
-
-
-Add a name for your feed, and enter the URL of the OData service file for your BrightstarDB 
-application.
-
-
-
-.. image:: ../src/images/odataconsumer_2b_connect.png
-
-
-
-Click "Test Connection" to make sure that you can connect to your OData service and then click 
-"Next"
-
-
-
-.. image:: ../src/images/odataconsumer_3b_selectsets.png
-
-
-
-Select the sets that you wish to consume and click "Finish"
-
-
-
-.. image:: ../src/images/odataconsumer_5b_success.png
-
-
-
-This then shows all the data that is consumed from the OData service in the PowerPivot window. 
-When any data is added or edited in the BrightstarDB store, the data in the PowerPivot windows 
-can be updated by clicking the "Refresh" button.
-
-
-
-.. image:: ../src/images/odataconsumer_6_data.png
-
-
+     
 .. _Mapping_to_Existing_RDF_Schema:
 
 
 Mapping to Existing RDF Data
 ============================
 
-
-.. _http://xmlns.com/foaf/0.1/name": <%LINK_CAPTION%>
-.. _http://xmlns.com/foaf/0.1/name: <%LINK_CAPTION%>
-.. _http://xmlns.com/foaf/0.1/"): <%LINK_CAPTION%>
-
-
 .. note::
 
   The source code for this example can be found in 
-[INSTALLDIR]\\Samples\\EntityFramework\\EntityFrameworkSamples.sln
-
+  [INSTALLDIR]\\Samples\\EntityFramework\\EntityFrameworkSamples.sln
 
 
 One of the things that makes BrightstarDB unique is the ability to map multiple object models 
 onto the same data and to map an object model onto existing RDF data. An example of this could 
-be when some contact data in RDF foaf form is imported into BrightstarDB and an application 
+be when some contact data in the RDF FOAF vocabulary is imported into BrightstarDB and an application 
 wants to make use of that data. Using the BrightstarDB annotations it is possible to map 
 object classes and properties to existing types and property types.
-
-
-
 
 
 The following FOAF RDF triples are added to the data store. 
 ------------------------------------------------------------
 ::
 
-  <http://www.brightstardb.com/people/david> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> 
-<http://xmlns.com/foaf/0.1/Person> .
-  <http://www.brightstardb.com/people/david> <http://xmlns.com/foaf/0.1/nick> ""David"" .
-  <http://www.brightstardb.com/people/david> <http://xmlns.com/foaf/0.1/name> ""David 
-Summers"" .
-  <http://www.brightstardb.com/people/david> <http://xmlns.com/foaf/0.1/Organization> 
-""Microsoft"" .
-  <http://www.brightstardb.com/people/simon> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> 
-<http://xmlns.com/foaf/0.1/Person> .
-  <http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/nick> ""Simon"" .
-  <http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/name> ""Simon 
-Williamson"" .
-  <http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/Organization> 
-""Microsoft"" .
-  <http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/knows> <
-http://www.brightstardb.com/people/david> .
+  <http://www.brightstardb.com/people/david> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+  <http://www.brightstardb.com/people/david> <http://xmlns.com/foaf/0.1/nick> "David" .
+  <http://www.brightstardb.com/people/david> <http://xmlns.com/foaf/0.1/name> "David Summers" .
+  <http://www.brightstardb.com/people/david> <http://xmlns.com/foaf/0.1/Organization> "Microsoft" .
+  <http://www.brightstardb.com/people/simon> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .
+  <http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/nick> "Simon" .
+  <http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/name> "Simon Williamson" .
+  <http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/Organization> "Microsoft" .
+  <http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/knows> <http://www.brightstardb.com/people/david> .
 
 Triples can be loaded into the BrightStarDB using the following code:::
 
   var triples = new StringBuilder();
-  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <
-http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .");
-  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <
-http://xmlns.com/foaf/0.1/nick> ""Simon"" .");
-  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <
-http://xmlns.com/foaf/0.1/name> ""Simon Williamson"" .");
-  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <
-http://xmlns.com/foaf/0.1/Organization> ""Microsoft"" .");
-  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <
-http://xmlns.com/foaf/0.1/knows> <http://www.brightstardb.com/people/david> .");
+  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://xmlns.com/foaf/0.1/Person> .");
+  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/nick> ""Simon"" .");
+  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/name> ""Simon Williamson"" .");
+  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/Organization> ""Microsoft"" .");
+  triples.AppendLine(@"<http://www.brightstardb.com/people/simon> <http://xmlns.com/foaf/0.1/knows> <http://www.brightstardb.com/people/david> .");
   client.ExecuteTransaction(storeName, null, triples.ToString());
-
-
 
 Defining Mappings
 -----------------
 
-
-
-
 To access this data from the Entity Framework, we need to define the mappings between the RDF 
 predictates and the properties on an object that represents an entity in the store.
 
-
-
 The properties are marked up with the PropertyType attribute of the RDF predicate. If the 
-property "Name" should match the predicate "`http://xmlns.com/foaf/0.1/name"`_, we add the 
-attribute ``[PropertyType("```http://xmlns.com/foaf/0.1/name`_``")].``
+property "Name" should match the predicate ``http://xmlns.com/foaf/0.1/name``, we add the 
+attribute ``[PropertyType("http://xmlns.com/foaf/0.1/name")].``
 
+We can add a ``NamespaceDeclaration`` assembly attribute to the project's AssemblyInfo.cs file 
+to shorten the URIs used in the attributes. The NamespaceDeclaration attribute allows us to define
+a short code for a URI prefix. For example::
 
+  [assembly: NamespaceDeclaration("foaf", "http://xmlns.com/foaf/0.1/")]
 
-We can add a Namespace Declaration to the project's AssemblyInfo.cs file to shorted the URIs 
-used in the attributes, in the format:::
-
-  [assembly: NamespaceDeclaration("foaf", "`http://xmlns.com/foaf/0.1/")`_]
-
-
-
-This means the PropertyType attributes can be shortened to ``[PropertyType("foaf:name")]``
-
-
+With this ``NamespaceDeclaration`` attribute in the project, the ``PropertyType`` attribute can 
+be shortened to ``[PropertyType("foaf:name")]``
 
 The RDF example given above would be mapped to an entity as given below:::
 
@@ -3824,37 +3587,27 @@ The RDF example given above would be mapped to an entity as given below:::
       [Identifier("http://www.brightstardb.com/people/")]
       string Id { get; }
 
-
       [PropertyType("foaf:nick")]
       string Nickname { get; set; }
-
 
       [PropertyType("foaf:name")]
       string Name { get; set; }
 
-
       [PropertyType("foaf:Organization")]
       string Organisation { get; set; }
 
-
       [PropertyType("foaf:knows")]
       ICollection<IPerson> Knows { get; set; }
-
 
       [InversePropertyType("foaf:knows")]
       ICollection<IPerson> KnownBy { get; set; }
   }
 
-Adding the [Identifier("http://www.``brightstardb``.com/people/")] to the ID of the interface, 
+Adding the ``[Identifier("http://www.brightstardb.com/people/")]`` to the ID of the interface, 
 means that when we can query and retrieve the Id without the entire prefix
-
-
-
-
 
 Example
 -------
-
 
 Once there is RDF data in the store, and an interface that maps an entity to the RDF data, the 
 data can then be accessed easy using the Entity Framework by using the correct connection 
@@ -3866,26 +3619,18 @@ string to directly access the store.
   var context = new FoafContext(connectionString);
 
 
+If you have added the connection string into the Config file::
 
-If you have added the connection string into the Config file:
+  <add key="BrightstarDB.ConnectionString" 
+       value="Type=http;endpoint=http://localhost:8090/brightstar;StoreName=Foaf" />
 
-
-
-<add key="BrightstarDB.ConnectionString" value="Type=http;endpoint=
-http://localhost:8090/brightstar;StoreName=Foaf" />
-
-
-
-then you can initialise the content with a simple:::
+Then you can initialise the content with a simple::
 
   var context = new FoafContext();
 
 
-
 For more information about connection strings, please read the :ref:`"Connection Strings" 
 topic <Connection_Strings>`
-
-
 
 The code below connects to the store to access all the people in the RDF data, it then writes 
 their name and place of employment, along with all the people they know or are known by.
@@ -3904,19 +3649,15 @@ their name and place of employment, along with all the people they know or are k
       knows.AddRange(person.KnownBy);
 
 
-      Console.WriteLine(@"{0} ({1}), works at {2}", person.Name, person.Nickname, 
-person.Organisation);
-      Console.WriteLine(knows.Count == 1 ? string.Format(@"{0} knows 1 other person", 
-person.Nickname)
-                         : string.Format(@"{0} knows {1} other people", person.Nickname, 
-knows.Count));
+      Console.WriteLine(@"{0} ({1}), works at {2}", person.Name, person.Nickname, person.Organisation);
+      Console.WriteLine(knows.Count == 1 ? string.Format(@"{0} knows 1 other person", person.Nickname)
+                         : string.Format(@"{0} knows {1} other people", person.Nickname, knows.Count));
       foreach(var other in knows)
       {
           Console.WriteLine(@"    {0} at {1}", other.Name, other.Organisation);
       }
       Console.WriteLine();
   }
-
 
 
 
@@ -3928,7 +3669,7 @@ knows.Count));
 
 
 .. _SPARQL 1.1: http://www.w3.org/TR/sparql11-query/
-.. _http://www.w3.org/TR/rdf-sparql-XMLres/: http://www.w3.org/TR/rdf-sparql-XMLres/
+.. _SPARQL XML Query Results Format: http://www.w3.org/TR/rdf-sparql-XMLres/
 
 
 The Data Object Layer is a simple generic object wrapper for the underlying RDF data in any 
@@ -3938,219 +3679,115 @@ Data Objects are lightweight wrappers around sets of RDF triples in the underlyi
 BrightstarDB store. They allow the developer to interact with the RDF data without requiring 
 all information to be sent in N-Triple format.
 
-
-
 For more information about the RDF layer of BrightstarDB, please read the :ref:`RDF Client API 
 <RDF_Client_API>` section.
-
-
-
 
 
 Creating a Data Object Context
 ==============================
 
 
+The following example shows how to create a new context using a connection string::
 
-
-The following example shows how to create a new context using a connection string:
-
-::
-
-  var context = BrightstarService.GetDataObjectContext("Type=http;endpoint=
-http://localhost:8090/brightstar;");
-
-
+  var context = BrightstarService.GetDataObjectContext("Type=http;endpoint=http://localhost:8090/brightstar;");
 
 For more information about connection strings, please read the :ref:`"Connection Strings" 
 topic <Connection_Strings>`
 
 
-
-
-
 Creating a Store
 ================
 
-
-
-
-A new store can be creating using the following code:
-
-::
+A new store can be creating using the following code::
 
   string storeName = "Store_" + Guid.NewGuid();
   context.CreateStore(storeName);
 
 
-
-
-
 Deleting a Store
 ================
 
-
-
-
-Deleting a store is also straight forward:
-
-::
+Deleting a store is also straight forward::
 
   context.DeleteStore(storeName);
-
-
-
 
 
 Creating data objects
 =====================
 
 
-
-
-Data Objects can be created using the following code:
-
-::
+Data Objects can be created using the following code::
 
   var fred = store.MakeDataObject("http://example.org/people/fred");
-
-
 
 The objects can be created by passing in a well formed URI as the identity, if no identity is 
 given then one is automatically generated for it. 
 
 
-
-
-
 Adding information to data objects
 ==================================
 
+To add information about this object we can add properties to it.
 
-
-
-To add information about this object we can add properties to it:
-
-
-
-**Setting Single Properties**
-
-
-
-To set the value of a single property, use the following code:
-
-::
+To set the value of a single property, use the following code::
 
   var fullname = store.MakeDataObject("http://example.org/schemas/person/fullName");
   fred.SetProperty(fullname, "Fred Evans");
 
+Calling ``SetProperty()`` a second time will overwrite the previous value of the property.
 
-
-Using SetProperty() multiple times will overwrite the previous value of the property.
-
-
-
-**Adding Multiple Properties**
-
-
-
-To add multiple properties of the same type use the code below:
-
-::
+To add multiple properties of the same type use the code below::
 
   var skill = store.MakeDataObject("http://example.org/schemas/person/skill");
   fred.AddProperty(skill, csharp);
   fred.AddProperty(skill, html);
   fred.AddProperty(skill, css);
 
-
-
-
-
 Retrieving Data Objects
 =======================
 
-
-
-
-A data object can be retrieved from the store using the following code:
-
-::
+A data object can be retrieved from the store using the following code::
 
   var fred = store.GetDataObject("http://example.org/people/fred");
-
-
 
 If BrightstarDB does not hold any information about a given URI, then a data object is created 
 for it and passed back. When the developer adds properties to it and saves it, the identity 
 will be automatically added to BrightstarDB.
 
-
-
 .. note::
 
-  GetDataObject() will never return a null object. The data object consists of all the 
-information that is held in BrightstarDB for a particular identity.
+  ``GetDataObject()`` will never return a null object. The data object consists of all the 
+  information that is held in BrightstarDB for a particular identity.
 
-
-
-We can check the RDF data that an object has at any time by using the following code:
-
-::
+We can check the RDF data that an object has at any time by using the following code:::
 
   var triples = ((DataObject)fred).Triples;
-
-
-
 
 
 Deleting Data Objects
 =====================
 
-
-
-
-A data object can be deleted using the following code:
-
-::
+A data object can be deleted using the following code::
 
   var fred = store.GetDataObject("http://example.org/people/fred");
   fred.Delete();
 
-
-
 This removes all triples describing that data object from the store.
-
-
-
 
 
 Namespace Mappings
 ==================
 
-
-
-
 Namespace mappings are sets of simple string prefixes for URIs, enabling the developer to use 
 identities that have been shortened to use the prefixes.
 
-
-
-For example, the mapping:
-
-::
+For example, the mapping::
 
   {"people", "http://example.org/people/"}
 
+Means that the short string "people:fred" will be expanded to the full identity string "http://example.org/people/fred"
 
-
-Means that the identity "people:fred" will match the identity "http://example.org/people/fred"
-
-
-
-These mappings are passed through as a dictionary to the OpenStore() method on the context:
-
-::
+These mappings are passed through as a dictionary to the OpenStore() method on the context::
 
   _namespaceMappings = new Dictionary<string, string>()
                            {
@@ -4158,38 +3795,31 @@ These mappings are passed through as a dictionary to the OpenStore() method on t
                                {"skills", "http://example.org/skills/"},
                                {"schema", "http://example.org/schema/"}
                            };
-
-
   store = context.OpenStore(storeName, _namespaceMappings);
-
-
 
 .. note::
 
   It is best practise to set up a static dictionary within your class or configuration
 
 
-
-
-
 Querying data using SPARQL
 ==========================
 
-
-
-
 BrightstarDB supports `SPARQL 1.1`_ for querying the data in the store. These queries can be 
-executed via the Data Object store using the ExecuteSparql() method. 
+executed via the Data Object store using the ``ExecuteSparql()`` method. 
 
 
 
 The SparqlResult returned has the results of the SPARQL query in the ResultDocument property 
-(See `http://www.w3.org/TR/rdf-sparql-XMLres/`_ for the XML format returned). 
+which is an XML document formatted according to the `SPARQL XML Query Results Format`_. The
+BrightstarDB libraries provide some helpful extension methods for accessing the contents of
+a SPARQL XML results document
 
 ::
 
-  var query = "SELECT ?skill WHERE { <http://example.org/people/fred> <
-http://example.org/schemas/person/skill> ?skill }";
+  var query = "SELECT ?skill WHERE { " +
+              "<http://example.org/people/fred> <http://example.org/schemas/person/skill> ?skill " +
+              "}";
   var sparqlResult = store.ExecuteSparql(query);
   foreach (var sparqlResultRow in sparqlResult.ResultDocument.SparqlResultRows())
   {
@@ -4199,19 +3829,12 @@ http://example.org/schemas/person/skill> ?skill }";
 
 
 
-
-
 Binding SPARQL Results To Data Objects
 ======================================
 
-
-
-
-When a SPARQL query has been written to return a variable binding, it can be passed to the 
-BindDataObjectsWithSparql() method. This executes the SPARQL query, and then binds each URI in 
-the results to a data object, and passes back the enumeration of these instances.
-
-::
+When a SPARQL query has been written to return a single variable binding, it can be passed to the 
+``BindDataObjectsWithSparql()`` method. This executes the SPARQL query, and then binds each URI in 
+the results to a data object, and passes back the enumeration of these instances::
 
   var skillsQuery = "SELECT ?skill WHERE {?skill a <http://example.org/schemas/skill>}";
   var allSkills = store.BindDataObjectsWithSparql(skillsQuery).ToList();
@@ -4227,68 +3850,39 @@ the results to a data object, and passes back the enumeration of these instances
 Sample Program
 ==============
 
-
 .. _SPARQL 1.1: http://www.w3.org/TR/sparql11-query/
-
 
 .. note::
 
   The source code for this example can be found in 
-[INSTALLDIR]\\Samples\\DataObjectLayer\\DataObjectLayerSamples.sln
-
-
+  [INSTALLDIR]\\Samples\\DataObjectLayer\\DataObjectLayerSamples.sln
 
 The sample project is a simple console application that runs through some of the basic usage 
 for BrightstarDB's Data Object Layer.
 
 
-
-
-
 Creating the context
 --------------------
 
+A context is created using a connection string that specifies usage of the HTTP server::
 
+  var context = BrightstarService.GetDataObjectContext(
+                       @"Type=http;endpoint=http://localhost:8090/brightstar;");
 
-
-A context is created using a connection string that specifies usage of the HTTP server
-
-::
-
-  var context = BrightstarService.GetDataObjectContext(@"Type=http;endpoint=
-http://localhost:8090/brightstar;");
-
-
-
-
-
+                       
 Creating the store
 ------------------
 
-
-
-
-A store is created with a unique name
-
-::
+A store is created with a unique name::
 
   string storeName = "DataObjectLayerSample_" + Guid.NewGuid();
   var store = context.CreateStore(storeName);
 
-
-
-
-
 Namespace Mappings
 ------------------
 
-
-
-
 In order to use simpler identities when we are creating and retrieving data objects, we set up 
-a dictionary of namespace mappings to use when we connect to the store:
-
-::
+a dictionary of namespace mappings to use when we connect to the store::
 
   _namespaceMappings = new Dictionary<string, string>()
       {
@@ -4297,44 +3891,25 @@ a dictionary of namespace mappings to use when we connect to the store:
           {"schema", "http://example.org/schema/"}
   };
 
-
   store = context.OpenStore(storeName, _namespaceMappings);
-
-
-
 
 
 Optimistic Locking
 ------------------
 
+To enable support for optimistic locking, we must pass a boolean flag to the ``OpenStore()`` or 
+``CreateStore()`` method::
 
-
-
-To enable support for optimistic locking, we must pass a boolean flag to the OpenStore() or 
-CreateStore() method:
-
-::
-
-  store = context.OpenStore(storeName, _namespaceMappings, true); // Open store with 
-optimistic locking enabled
-
-
-
+  store = context.OpenStore(storeName, _namespaceMappings, true); // Open store with optimistic locking enabled
 
 
 Skills
 ------
 
-
-
-
 We create a data object to use as the type of data object for skills, and then create a number 
-of skill data objects.
-
-::
+of skill data objects::
 
   var skillType = store.MakeDataObject("schema:skill");
-
 
   var csharp = store.MakeDataObject("skills:csharp");
   csharp.SetType(skillType);
@@ -4346,23 +3921,12 @@ of skill data objects.
   javascript.SetType(skillType);
 
 
-
-
-
-
-
 People
 ------
 
-
-
-
-We follow the same process to create some people data objects.
-
-::
+We follow the same process to create some people data objects::
 
   var personType = store.MakeDataObject("schema:person");
-
 
   var fred = store.MakeDataObject("people:fred");
   fred.SetType(personType);
@@ -4370,33 +3934,21 @@ We follow the same process to create some people data objects.
   william.SetType(personType);
 
 
-
-
-
 Properties
 ----------
 
-
-
-
 We create 2 data objects to use as the types for some properties that the people data objects 
-will hold.
-
-::
+will hold::
 
   var fullname = store.MakeDataObject("schema:person/fullName");
   var skill = store.MakeDataObject("schema:person/skill");
 
-
-
 We then set the single name property on the people, and add skills
-
-
 
 .. note::
 
-  For multiple properties we must use the AddProperty() method rather than SetProperty() which 
-would overwrite any previous value
+  For multiple properties we must use the ``AddProperty()`` method rather than ``SetProperty()`` which 
+  would overwrite any previous value
 
 ::
 
@@ -4405,22 +3957,16 @@ would overwrite any previous value
   fred.AddProperty(skill, html);
   fred.AddProperty(skill, css);
 
-
   william.SetProperty(fullname, "William Turner");
   william.AddProperty(skill, html);
   william.AddProperty(skill, css);
   william.AddProperty(skill, javascript);
 
-
-
-The data type of literal properties are set automatically when a property value is added or set:
-
-::
+The data type of literal properties are set automatically when a property value is added or set::
 
   var employeeNumber = store.MakeDataObject("schema:person/employeeNumber");
   var dateOfBirth = store.MakeDataObject("schema:person/dateOfBirth");
   var salary = store.MakeDataObject("schema:person/salary");
-
 
   fred = store.GetDataObject("people:fred");
   fred.SetProperty(employeeNumber, 123);
@@ -4428,86 +3974,54 @@ The data type of literal properties are set automatically when a property value 
   fred.SetProperty(salary, 18000.00);
 
 
-
-
-
 Save Changes
 ------------
 
-
-
-
-Now that we have created the objects we require, we save the changes to the BrightstarDB store.
-
-::
+Now that we have created the objects we require, we save the changes to the BrightstarDB store::
 
   store.SaveChanges();
 
-
-
-
-
+  
 Querying the data
 -----------------
 
-
-
-
-We use SPARQL to query the data in the store. For more information about SPARQL please read 
-the `SPARQL 1.1`_ documenation. In the sample, we write a query that returns all of the skills 
-of the data object for 'fred'. We can then loop through the ResultDocument of the SparqlResult 
-returned to see the identities of each of those skills.
+In this sample, we use a SPARQL query to return all of the skills of the data object for 'fred'. 
+We can then loop through the ResultDocument of the SparqlResult returned to see the identities 
+of each of those skills.
 
 ::
 
-  const string getPersonSkillsQuery = "SELECT ?skill WHERE { <http://example.org/people/fred> 
-<http://example.org/schemas/person/skill> ?skill }";
+  const string getPersonSkillsQuery = 
+        "SELECT ?skill WHERE { " +
+        "  <http://example.org/people/fred> <http://example.org/schemas/person/skill> ?skill " +
+        "}";
   var sparqlResult = store.ExecuteSparql(getPersonSkillsQuery);
-
-
-
 
 
 Binding Data Objects With SPARQL
 --------------------------------
 
-
-
-
-The Data Object Store has a very useful method called BindDataObjectsWithSparql(), which takes 
+The Data Object Store has a very useful method called ``BindDataObjectsWithSparql()``, which takes 
 a SPARQL query that is written to return the URI identities of data object. The method then 
 returns the data objects for each of the URIs contained in the results.
 
-In the sample we pass in a query to return URIs of any objects with the skill type.
+In the sample we pass in a query to return URIs of any objects with the skill type::
 
-::
-
-  const string skillsQuery = "SELECT ?skill WHERE {?skill a <http://example.org/schemas/skill
->}";
+  const string skillsQuery = "SELECT ?skill WHERE {?skill a <http://example.org/schemas/skill>}";
   var allSkills = store.BindDataObjectsWithSparql(skillsQuery).ToList();
-
-
-
 
 
 Deleting Objects
 ----------------
 
-
-
-
 To delete data objects we simply call the Delete() method of that object and save the changes 
-to the store.
-
-::
+to the store::
 
   foreach (var s in allSkills)
   {
-  s.Delete();
+      s.Delete();
   }
   store.SaveChanges();
-
-
 
 
 .. _Optimistic_Locking_in_DOL:
@@ -4520,15 +4034,13 @@ Optimistic Locking in the Data Object Layer
 The Data Object Layer provides a basic level of optimistic locking support using the 
 conditional update support provided by the RDF Client API and a special version property that 
 gets assigned to data objects. To enable optimistic locking support it is necessary to enable 
-locking when the IDataObjectStore instance is retrieved from the context by either the 
-OpenStore or CreateStore method (see :ref:`Sample Program <Data_Object_Layer_Sample_Program>` 
+locking when the ``IDataObjectStore`` instance is retrieved from the context by either the 
+``OpenStore()`` or ``CreateStore()`` method (see :ref:`Sample Program <Data_Object_Layer_Sample_Program>` 
 for an example).
-
-
 
 With optimistic locking enabled, the Data Object Layer checks for the presence of a special 
 version property on every object it retrieves (the property predicate URI is 
-http://www.brightstardb.com/.well-known/model/version). If this property is present, its value 
+``http://www.brightstardb.com/.well-known/model/version``). If this property is present, its value 
 defines the current version number of the property. If the property is not present, the object 
 is recorded as being currently unversioned. On save, the DataObjectLayer uses the current 
 version number of all versioned data objects as the set of preconditions for the update, if 
@@ -4537,14 +4049,10 @@ precondition will fail and the update will not be applied. Also as part of the s
 DataObjectLayer updates the version number of all versioned data objects and creates a new 
 version number for all unversioned data objects.
 
-
-
 When an concurrent modification is detected, this is notified to your code by a 
-BrightstarClientException being raised. In your code you should catch this exception and 
+``BrightstarClientException`` being raised. In your code you should catch this exception and 
 handle the error, typically either by abandoning updates (and notifying the user) or 
 re-retrieving the modified objects and attempting the update again.
-
-
 
 
 .. _Dynamic_API:
@@ -4553,13 +4061,10 @@ re-retrieving the modified objects and attempting the update again.
  Dynamic API
 ************
 
-
 The Dynamic API is a thin layer on top of the data object layer. It is designed to further 
 ease the use of .NET with RDF data and to provide a model for persisting data in systems that 
 make use of the .NET dynamic keyword. The .NET dynamic keyword and dynamic runtime allow 
 properties of objects to be set at runtime without any prior class definition.
-
-
 
 The following example shows how dynamics work in general. Both 'Name' and 'Type' are resolved 
 at runtime. In this case they are simply stored as properties in the ExpandoObject. 
@@ -4570,13 +4075,8 @@ at runtime. In this case they are simply stored as properties in the ExpandoObje
   d.Name = "Brightstar";
   d.Type = "Product";
 
-
-
-
-
 Dynamic Context
 ===============
-
 
 A dynamic context can be used to create dynamic objects whose state is persisted as RDF in 
 BrightstarDB. To use the dynamic context a normal DataObjectContext must be created first. 
@@ -4592,96 +4092,60 @@ fetch dynamic objects.
   var storeId = "DynamicSample" + Guid.NewGuid().ToString();
   var dynaStore = dynaContext.CreateStore(storeId);
 
-
-
-
-
 Dynamic Object
 ==============
 
-
-The dynamic object is a wrapper around the IDataObject. When a dynamic property is set this is 
-translated into an update to the IDataObject and in turn into RDF. By default the name of the 
+The dynamic object is a wrapper around the ``IDataObject``. When a dynamic property is set this is 
+translated into an update to the ``IDataObject`` and in turn into RDF. By default the name of the 
 property is appended to  the default namespace. By using namespace mappings any RDF vocabulary 
-can be mapped. If the value of the property is set to be a list of values then multiple 
-triples are created, one for each value.
+can be mapped. To use a namespace mapping, you must access / update a property whose name is
+the namespace prefix followed by ``__`` (two underscore characters) followed by the suffix part
+of the URI. For example ``object.foaf__name``. 
+
+If the value of the property is set to be a list of values then multiple triples are created, one for each value.
 
 ::
 
   dynamic brightstar = dynaStore.MakeNewObject();
   brightstar.name = "BrightstarDB";
 
-::
-
-  // namespaces are used by having the prefix comes before '__'
   // setting a list of values creates multiple properties on the object.
   brightstar.rdfs__label = new[] { "BrightstarDB", "NoSQL Database" };
-
-
-
-::
 
   dynamic product = dynaStore.MakeNewObject();
   // objects are connected together in the same way
   brightstar.rdfs__type = product;
 
 
-
-
-
-
-
 Saving Changes
 ==============
 
-
-The data updated in a context is persisted when SaveChanges is called on the store object.
-
-::
+The data updated in a context is persisted when ``SaveChanges()`` is called on the store object.::
 
   dynaStore.SaveChanges();
-
-
-
-
-
 
 
 Loading Data
 ============
 
-
-After opening a store dynamic objects can be loaded via the GetDataObject method or the 
-BindObjectsWithSparql method.
+After opening a store dynamic objects can be loaded via the ``GetDataObject()`` method or the 
+``BindObjectsWithSparql()`` method.
 
 ::
 
   dynaStore = dynaContext.OpenStore(storeId);
+
+  // Retrieve a single object by its identifier
   var object = dynaStore.GetDataObject(aUri);
 
-
-  // any sparql that returns a single variable can be bound as dynamic objects
+  // Use a SPARQL query that returns a single variable to return a collection of dynamic objects
   var objects = dynaStore.BindObjectsWithSparql("select distinct ?dy where { ?dy ?p ?o }");
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 .. _Sample_Program:
 
-
 Sample Program
 ==============
-
 
 .. note::
 
@@ -4702,8 +4166,8 @@ Sample Program
       public class Program
       {
           /// <summary>
-          /// Assumes BrightstarDB is running as a service and exposing the default endpoint 
-at http://localhost:8090/brightstar 
+          /// Assumes BrightstarDB is running as a service and exposing the 
+          /// default endpoint at http://localhost:8090/brightstar 
           /// </summary>
           /// <param name="args"></param>
           static void Main(string[] args)
@@ -4773,8 +4237,8 @@ at http://localhost:8090/brightstar
 
               // dynamic objects can also be loaded via sparql
               dynaStore = dynaContext.OpenStore(storeId);
-              var objects = dynaStore.BindObjectsWithSparql("select distinct ?dy where { ?dy 
-?p ?o }");
+              var objects = dynaStore.BindObjectsWithSparql(
+                                  "select distinct ?dy where { ?dy ?p ?o }");
               foreach (var obj in objects)
               {
                   Console.WriteLine(obj.rdfs__label[0]);
@@ -4786,10 +4250,6 @@ at http://localhost:8090/brightstar
   }
 
 
-
-
-
-
 .. _RDF_Client_API:
 
 ***************
@@ -4798,208 +4258,131 @@ at http://localhost:8090/brightstar
 
 
 .. _SPARQL 1.1: http://www.w3.org/TR/sparql11-query/
-.. _http://www.w3.org/TR/rdf-sparql-XMLres/: http://www.w3.org/TR/rdf-sparql-XMLres/
 .. _SPARQL 1.1 Update: http://www.w3.org/TR/sparql11-update/
-
+.. _SPARQL XML Query Results Format: http://www.w3.org/TR/rdf-sparql-XMLres/
 
 The RDF Client API provides a simple set of methods for creating and deleting stores, 
 executing transactions and running queries. It should be used when the application needs to 
-deal directly  with RDF data.  A RDF Client can connect to an embedded store or remotely to a 
+deal directly with RDF data. An RDF Client can connect to an embedded store or remotely to a 
 running BrightstarDB instance.
-
-
-
 
 
 Creating a client
 =================
 
-
-
-
 The BrightstarService class provides a number of static methods that can be used to create a 
 new client. The most general one takes a connection string as a parameter and returns a client 
-object. The client implements BrightstarDB.IBrightstarService. 
+object. The client implements the ``BrightstarDB.IBrightstarService`` interface. 
 
+The following example shows how to create a new service client using a connection string::
 
-
-The following example shows how to create a new service client using a connection string:
-
-::
-
-  var client = BrightstarService.GetClient("Type=http;endpoint=
-http://localhost:8090/brightstar;");
-
-
+  var client = BrightstarService.GetClient(
+                    "Type=http;endpoint=http://localhost:8090/brightstar;");
 
 For more information about connection strings, please read the :ref:`"Connection Strings" 
 topic <Connection_Strings>`
 
 
-
-
-
 Creating a Store
 ================
 
-
-
-
-A new store can be creating using the following code:
-
-::
+A new store can be creating using the following code::
 
   string storeName = "Store_" + Guid.NewGuid();
   client.CreateStore(storeName);
 
 
-
-
-
 Deleting a Store
 ================
 
-
-Deleting a store is also straight forward:
-
-::
+Deleting a store is also straight forward::
 
   client.DeleteStore(storeName);
-
-
-
-
-
 
 
 Adding data
 ===========
 
 
-
-
 Data is added to the store by sending the data to add in N-Triples format. Each triple must be 
-on a single line with no line breaks, a good way to do this is to use a StringBuilder and then 
-using AppendLine for each triple:
-
-::
+on a single line with no line breaks, a good way to do this is to use a ``StringBuilder`` and then 
+using ``AppendLine()`` for each triple::
 
   var data = new StringBuilder();
-  data.AppendLine("<http://www.brightstardb.com/products/brightstar> 
-<http://www.brightstardb.com/schemas/product/name> \\"BrightstarDB\\" .");
-  data.AppendLine("<http://www.brightstardb.com/products/brightstar> 
-<http://www.brightstardb.com/schemas/product/category> 
-<http://www.brightstardb.com/categories/nosql> .");
-  data.AppendLine("<http://www.brightstardb.com/products/brightstar> 
-<http://www.brightstardb.com/schemas/product/category> 
-<http://www.brightstardb.com/categories/.net> .");
-  data.AppendLine("<http://www.brightstardb.com/products/brightstar> 
-<http://www.brightstardb.com/schemas/product/category> 
-<http://www.brightstardb.com/categories/rdf> .");
+  data.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/name> \\"BrightstarDB\\" .");
+  data.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/nosql> .");
+  data.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/.net> .");
+  data.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/rdf> .");
 
 
-
-The ExecuteTransaction() method is used to insert the N-Triples data into the store:
-
-::
+The ``ExecuteTransaction()`` method is used to insert the N-Triples data into the store::
 
   client.ExecuteTransaction(storeName,null, null, data.ToString());
-
-
-
 
 
 Querying data using SPARQL
 ==========================
 
-
-
-
 BrightstarDB supports `SPARQL 1.1`_ for querying the data in the store. A simple query on the 
 N-Triples above that returns all categories that the subject called "Brightstar DB" is 
-connected to would look like this:
+connected to would look like this::
 
-::
+  var query = "SELECT ?category WHERE { " +
+          "<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> ?category " +
+          "}";
 
-  var query = "SELECT ?category WHERE { <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/category> ?category }";
-
-
-
-This string query can then be used by the ExecuteQuery() method to create an XDocument from 
-the SPARQL results (See `http://www.w3.org/TR/rdf-sparql-XMLres/`_ for the XML format 
-returned). 
+This string query can then be used by the ``ExecuteQuery()`` method to create an XDocument from 
+the SPARQL results (See `SPARQL XML Query Results Format`_ for format of the XML document returned). 
 
 ::
 
   var result = XDocument.Load(client.ExecuteQuery(storeName, query));
 
-
-
-BrightstarDB supports several different formats for SPARQL results. The default format is XML, 
+BrightstarDB also supports several different formats for SPARQL results. The default format is XML, 
 but you can also add a BrightstarDB.SparqlResultsFormat parameter to the ExecuteQuery method 
-to control the format and encoding of the results set. For example:
-
-::
+to control the format and encoding of the results set. For example::
 
   var jsonResult = client.ExecuteQuery(storeName, query, SparqlResultsFormat.Json);
 
-
-
 By default results are returned using UTF-8 encoding; however you can override this default 
-behaviour by using the WithEncoding() method on the SparqlResultsFormat class. The 
-WithEncoding() method takes a System.Text.Encoding instance and returns a SparqlResultsFormat 
-instance that will ask for that specific encoding.
+behaviour by using the ``WithEncoding()`` method on the ``SparqlResultsFormat`` class. The 
+``WithEncoding()`` method takes a ``System.Text.Encoding`` instance and returns a ``SparqlResultsFormat``
+instance that will ask for that specific encoding::
 
-::
-
-  var unicodeXmlResult = client.ExecuteQuery(storeName, query, 
-SparqlResultsFormat.Xml.WithEncoding(Encoding.Unicode));
-
-
-
+  var unicodeXmlResult = client.ExecuteQuery(
+                           storeName, query, 
+                           SparqlResultsFormat.Xml.WithEncoding(Encoding.Unicode));
 
 
 Update data using SPARQL
 ========================
 
-
-
-
 BrightstarDB supports `SPARQL 1.1 Update`_ for updating data in the store. An update operation 
-is submitted to BrightstarDB as a job. By default the call to ExecuteUpdate will block until 
-the update job completes:
-
-::
+is submitted to BrightstarDB as a job. By default the call to ``ExecuteUpdate()`` will block until 
+the update job completes::
 
   IJobInfo jobInfo = _client.ExecuteUpdate(storeName, updateExpression);
 
-
-
-In this case, the resulting IJobInfo object will describe the final state of the update job. 
+In this case, the resulting ``IJobInfo`` object will describe the final state of the update job. 
 However, you can also run the job asynchronously by passing false for the optional 
-waitForCompletion parameter:
-
-::
+``waitForCompletion`` parameter::
 
   IJobInfo jobInfo = _client.ExecuteUpdate(storeName, updateExpression, false);
 
-
-
-In this case the resulting IJobInfo object will describe the current state of the update job 
-and you can use calls to GetJobInfo to poll the job for its current status.
-
-
-
+In this case the resulting ``IJobInfo`` object will describe the current state of the update job 
+and you can use calls to ``GetJobInfo()`` to poll the job for its current status.
 
 
 Using extension methods
 =======================
 
-
 To make working with the resulting XDocument easier there exist a number of extensions 
-methods. The first method is called XDocument.SparqlResultRows() and returns XElements where 
-each XElement represents a single result row.
+methods. The method ``SparqlResultRows()`` returns an enumeration of ``XElement`` instances 
+where each ``XElement`` represents a single result row in the SPARQL results.
+
+The ``GetColumnValue()`` method takes the name of the SPARQL result column and returns the value as 
+a string. There are also methods to test if the object is a literal, and to retrieve the data type 
+and language code.
 
 ::
 
@@ -5010,129 +4393,68 @@ each XElement represents a single result row.
   }
 
 
-
-GetColumnValue takes the name of the SPARQL result column and returns the string value. There 
-are also methods to test if the object is a literal, IsLiteral(string column), and retrieve 
-the data type and language code.
-
-
-
-
-
 Deleting data
 =============
 
-
-
-
 Deletion is done by defining a pattern that should matching the triples to be deleted. The 
 following example deletes all the category data about BrightstarDB, again we use the 
-StringBuilder to create the delete pattern.
+``StringBuilder`` to create the delete pattern.
 
 ::
 
   var deletePatternsData = new StringBuilder();
-  deletePatternsData.AppendLine("<http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/category> <
-http://www.brightstardb.com/.well-known/model/wildcard> .");
+  deletePatternsData.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/.well-known/model/wildcard> .");
 
 
+The identifier ``http://www.brightstardb.com/.well-known/model/wildcard`` is a wildcard 
+match for any value, so the above example deletes all triples that have a subject of
+``http://www.brightstardb.com/products/brightstar`` and a predicate of
+``http://www.brightstardb.com/schemas/product/category``.
 
-The delete pattern uses a special Resource identifier that can be used as a wildcard: ``
-http://www.brightstardb.com/.well-known/model/wildcard``
-
-
-
-The ExecuteTransaction() method is used to delete the data from the store
-
-::
+The ``ExecuteTransaction()`` method is used to delete the data from the store::
 
   client.ExecuteTransaction(storeName, null, deletePatternsData.ToString(), null);
-
-
-
-.. note::
-
-  ExecuteTransaction is blocking by default. To run asynchronously an additional parameter can 
-be passed in.
-
-
-
 
 
 Data Types
 ==========
 
+In the code above we used simple triples to add a string literal object to a subject, such as::
 
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/name> "BrightstarDB"
 
+Other data types can be used by using the ^^ syntax::
 
-In the code above we used simple triples to add a literal object to a subject, such as:
-
-::
-
-  <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/name> "BrightstarDB"
-
-
-
-Other data types can be used by using the ^^ syntax:
-
-::
-
-  <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/productCode> "640"^^<
-http://www.w3.org/2001/XMLSchema#integer> .
-  <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/releaseDate> "2011-11-11 12:00"^^<
-http://www.w3.org/2001/XMLSchema#dateTime> .
-  <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/cost> "0.00"^^<
-http://www.w3.org/2001/XMLSchema#decimal> .
-
-
-
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/releaseDate> "2011-11-11 12:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/cost> "0.00"^^<http://www.w3.org/2001/XMLSchema#decimal> .
 
 
 Conditional Updates
 ===================
 
-
-
-
 The execution of a transaction can be made conditional on certain triples existing in the 
-store. The following example updates the productCode property of a resource only if its 
-current value is 640.
+store. The following example updates the ``productCode`` property of a resource only if its 
+current value is ``640``.
 
 ::
 
   var preconditions = new StringBuilder();
-  preconditions.AppendLine("<http://www.brightstardb.com/products/brightstar> 
-<http://www.brightstardb.com/schemas/product/productCode> 
-"640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
+  preconditions.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
   var deletes = new StringBuilder();
-  preconditions.AppendLine("<http://www.brightstardb.com/products/brightstar> 
-<http://www.brightstardb.com/schemas/product/productCode> 
-"640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
+  deletes.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
   var inserts = new StringBuilder();
-  preconditions.AppendLine("<http://www.brightstardb.com/products/brightstar> 
-<http://www.brightstardb.com/schemas/product/productCode> 
-"973"^^<http://www.w3.org/2001/XMLSchema#integer> .");
-  client.ExecuteTransaction(storeName, preconditions.ToString(), deletes.ToString(), 
-inserts.ToString());
-
+  inserts.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "973"^^<http://www.w3.org/2001/XMLSchema#integer> .");
+  client.ExecuteTransaction(storeName, preconditions.ToString(), deletes.ToString(), inserts.ToString());
 
 
 When a transaction contains condition triples, every triple specified in the preconditions 
 must exist in the store before the transaction is applied. If one or more triples specified in 
-the preconditions are not found, a BrightstarClientException will be raised.
-
-
-
+the preconditions are not matched, a ``BrightstarClientException`` will be raised.
 
 
 Data Imports
 ============
-
 
 To support the loading of large data sets BrightstarDB provides an import function. Before 
 invoking the import function via the client API the data to be imported should be copied into 
@@ -5143,11 +4465,8 @@ about the RDF syntaxes that BrightstarDB supports for import, please refer to :r
 RDF Syntaxes <Supported_RDF_Syntaxes>`.
 
 
-
 With the data copied into the folder the following client method can be called. The parameter 
-is the name of the file that was copied into the import folder.
-
-::
+is the name of the file that was copied into the import folder::
 
   client.StartImport("data.nt");
 
@@ -5159,9 +4478,8 @@ Introduction To N-Triples
 =========================
 
 
-.. _here: http://www.w3.org/TR/rdf-testcases/#ntriples
-.. _XML Schema Part 2: Datatypes Second Edition: 
-http://www.w3.org/TR/xmlschema-2/#built-in-primitive-datatypes
+.. _here: http://www.w3.org/TR/2013/NOTE-n-triples-20130409/
+.. _the XML Schema specification: http://www.w3.org/TR/xmlschema-2/#built-in-primitive-datatypes
 
 
 N-Triples is a consistent and simple way to encode RDF triples. N-Triples is a line based 
@@ -5171,56 +4489,32 @@ literal) followed by a dot and a new line. The encoding of the literal may inclu
 or language code as well as the value. URIs are enclosed in '<' '>' brackets. The formal 
 definition of the N-Triples format can be found `here`_.
 
-
-
-The following are examples of N-Triples data.
-
-::
+The following are examples of N-Triples data::
 
   # simple literal property
-  <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/name> "Brightstar DB" .
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/name> "Brightstar DB" .
 
 
   # relationship between two resources
-  <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/category> <
-http://www.brightstardb.com/categories/nosql> .
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/nosql> .
 
 
-  # data type example for integer value
-  <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/productCode> "640"^^<
-http://www.w3.org/2001/XMLSchema#integer> .
+  # A property with an integer value
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .
 
-
-  <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/releaseDate> "2011-11-11 12:00"^^<
-http://www.w3.org/2001/XMLSchema#dateTime> .
-  <http://www.brightstardb.com/products/brightstar> <
-http://www.brightstardb.com/schemas/product/cost> "0.00"^^<
-http://www.w3.org/2001/XMLSchema#decimal> .
-
+  # A property with a date/time value
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/releaseDate> "2011-11-11 12:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+  
+  # A property with a decimal value
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/cost> "0.00"^^<http://www.w3.org/2001/XMLSchema#decimal> .
 
 
 **Allowed Data Types**
 
 
-
 Data types are defined in terms of an identifier. Common data types use the XML Schema 
-identifiers. The prefix of these is:
-
-::
-
-  http://www.w3.org/2001/XMLSchema#
-
-
-
-And the common primitive datatypes are defined in `XML Schema Part 2: Datatypes Second 
-Edition`_.
-
-
-
+identifiers. The prefix of these is ``http://www.w3.org/2001/XMLSchema#``. The common primitive 
+datatypes are defined in `the XML Schema specification`_.
 
 
 
@@ -5231,19 +4525,15 @@ Introduction To SPARQL
 ======================
 
 
-.. _http://www.brightstardb.com/schemas/: <%LINK_CAPTION%>
-.. _http://www.brightstardb.com/schemas/: <%LINK_CAPTION%>
 .. _SPARQL 1.1 Query Language: http://www.w3.org/TR/sparql11-query/
 .. _Introduction to RDF Query with SPARQL Tutorial: http://www.w3.org/2004/Talks/17Dec-sparql/
 
 
 BrightstarDB is a triple store that implements the RDF and SPARQL standards. SPARQL, 
 pronounced "sparkle", is the query language developer by the W3C for querying RDF data. SPARQL 
-primarily uses pattern matching as a query mechanism. A short example follows:
+primarily uses pattern matching as a query mechanism. A short example follows::
 
-::
-
-  PREFIX ont: <`http://www.brightstardb.com/schemas/`_>
+  PREFIX ont: <http://www.brightstardb.com/schemas/>
   SELECT ?name ?description WHERE {
     ?product a ont:Product .
     ?product ont:name ?name .
@@ -5251,26 +4541,15 @@ primarily uses pattern matching as a query mechanism. A short example follows:
   }
 
 
-
-
-
 This query is asking for all the names and descriptions of all products in the store. 
-
-
 
 SELECT is used to specify which bound variables should appear in the result set. The result of 
 this query is a table with two columns, one called "name" and the other "description". 
 
-
-
 The PREFIX notation is used so that the query itself is more readable. Full URIs can be used 
 in the query. When included in the query directly URIs are enclosed by '<' and '>'.  
 
-
-
 Variables are specified with the '?' character in front of the variable name. 
-
-
 
 In the above example if a product did not have a description then it would not appear in the 
 results even if it had a name. If the intended result was to retrieve all products with their 
@@ -5278,7 +4557,7 @@ name and the description if it existed then the OPTIONAL keyword can be used.
 
 ::
 
-  PREFIX ont: <`http://www.brightstardb.com/schemas/`_>
+  PREFIX ont: <http://www.brightstardb.com/schemas/>
   SELECT ?name ?description WHERE {
     ?product a ont:Product .
     ?product ont:name ?name .
@@ -5289,10 +4568,7 @@ name and the description if it existed then the OPTIONAL keyword can be used.
   }
 
 
-
-For more information on SPARQL 1.1 (BrightstarDB supports many 1.1 features) and more 
-tutorials the following resources are worth reading.
-
+For more information on SPARQL 1.1 and more tutorials the following resources are worth reading.
 
 
   1. `SPARQL 1.1 Query Language`_
@@ -5318,13 +4594,8 @@ are compatible with Windows Phone 7.1 and Windows Phone 8, so all apps you devel
 BrightstarDB will need to target that version of the Windows Phone OS.
 
 
-
-
-
 Data Storage And Connection Strings
 ===================================
-
-
 
 
 When running on WP, BrightstarDB writes its data using the IsolatedStorage APIs. This means 
@@ -5338,35 +4609,22 @@ in a WP application is shown in the code snippet below:::
   var connectionString = "type=embedded;storesdirectory=brightstar;storename=MyAppStore";
 
 
-
-
-
 SDK Libraries
 =============
-
-
-
 
 The BrightstarDB libraries for WP are all contained in [INSTALLDIR]\\SDK\\WP71. You need to add 
 references to these libraries to your WP application project.
 
 
-
-
-
 Development Considerations
 ==========================
-
 
 For the most part, working with BrightstarDB on Windows Phone is the same as working with it 
 on the full .NET Framework. However due to the platform and some .NET restrictions there are a 
 few things that you need to keep in mind when building your application.
 
-
-
 Store Shutdown
-
-
+--------------
 
 Because BrightstarDB uses separate threads to process updates to its stores, it is necessary 
 for any WP app that uses BrightstarDB to cleanly shutdown the database when the application is 
@@ -5395,8 +4653,7 @@ threads the first time you access a store.
 
 
 EntityFramework Interfaces Must Be Public
-
-
+-----------------------------------------
 
 Due to differences between the .NET Framework and Silverlight, there are is one known 
 limitation on the Entity Framework. All interfaces that are marked with the [Entity] attribute 
@@ -5410,14 +4667,11 @@ Silverlight prevents reflection on internal classes / interfaces for reasons of 
 Deploying a Reference Store
 ===========================
 
-
 As well as using BrightstarDB to store user-modifiable data, you can also ship reference data 
 with your application. A BrightstarDB reference store can be embedded as part of your 
 application content and deployed to the Isolated Storage on the mobile device. Once deployed, 
 the store can be queried and/or updated through your code as normal. The basic steps to 
 deploying a store in a mobile application are as follows:
-
-
 
   1. Create the reference store
 
@@ -5425,44 +4679,29 @@ deploying a store in a mobile application are as follows:
 
   #. Deploy the application to the device
 
-  #. At runtime, copy the reference store files from the application directory to Isolated 
-Storage
+  #. At runtime, copy the reference store files from the application directory to Isolated Storage
 
   #. Access the copied store from your code
 
 
-
-
-
 Create The Reference Store
 --------------------------
-
-
-
 
 BrightstarDB stores are fully portable between the desktop and a mobile device through simple 
 file copy. You can create and update a BrightstarDB database using a .NET application on a 
 desktop workstation or a server and use the database files on a mobile device without the need 
 for any conversion.
 
-
-
 .. note::
 
   If the database you are deploying has been through a number of update transactions you may 
-want to consider creating a coalesced copy of the database for deployment purposes. 
-Coalescing the database will reduce the database size by copying only the current state of 
-the database and removing all the historical states of the data.
-
-
-
+  want to consider creating a coalesced copy of the database for deployment purposes. 
+  Coalescing the database will reduce the database size by copying only the current state of 
+  the database and removing all the historical states of the data.
 
 
 Add Database File To Your Application
 -------------------------------------
-
-
-
 
 Every BrightstarDB store exists in its own folder and contains at least the following files:
 
@@ -5477,64 +4716,45 @@ Every BrightstarDB store exists in its own folder and contains at least the foll
   - transactions.bs
 
 
-
 For normal operation you only need to add the master.bs, resources.bs and data.bs files to 
 your solution. The transactionheaders.bs and transactions.bs files are required only if your 
 application will need to replay the transactions that built the database.
 
-
-
 To add the reference database to your application
 
-
-
   1. With Visual Studio, create a project for the Windows Phone application that consumes the 
-reference store.
+     reference store.
 
-  #. From the Project menu of the application, select Add Existing Item.
+  #. From the Project menu of the application, select **Add Existing Item**.
 
-  #. From the Add Existing Item menu, select the master.bs file for the BrightstarDB store 
-that you want to add, then click Add. This will add the local file to the project.
+  #. From the **Add Existing Item** menu, select the ``master.bs`` file for the BrightstarDB store 
+     that you want to add, then click **Add**. This will add the local file to the project.
 
   #. In Solution Explorer, right-click the local file and set the file properties so that the 
-file is built as Content and always copied to the output directory (Copy always).
+     file is built as Content and always copied to the output directory (Copy always).
 
-  #. Repeat steps 3 and 4 for the data.bs file and resources.bs file
+  #. Repeat steps 3 and 4 for the data.bs file and ``resources.bs`` file
 
-  #. Optionally repeat steps 3 and 4 for transactionheaders.bs and transactions.bs
-
-
+  #. Optionally repeat steps 3 and 4 for ``transactionheaders.bs`` and ``transactions.bs``
 
 .. note::
 
   It is good practice to put the BrightstarDB data files you are copying into a folder under 
-your project. If you want to deploy multiple reference databases, you will have to put the 
-files for each store in a separate folder to avoid name clashes. The folders you define in 
-your project will be mirrored in the installation directory when the application is deployed.
-
-
-
+  your project. If you want to deploy multiple reference databases, you will have to put the 
+  files for each store in a separate folder to avoid name clashes. The folders you define in 
+  your project will be mirrored in the installation directory when the application is deployed.
 
 
 Deploy Application
 ------------------
-
-
-
 
 Compile and deploy your application as normal. The store files you have copied will be 
 available in the installation directory of the application (under the folders that you created 
 in the project if applicable).
 
 
-
-
-
 Copy Database Files To Isolated Storage
 ---------------------------------------
-
-
-
 
 BrightstarDB on a mobile device will only access stores from a named directory in the 
 application's Isolated Storage. It is therefore necessary when your application starts up to 
@@ -5551,18 +4771,14 @@ used by the sample application is shown below:
   +-brightstar    <-- the storesDirectory value in the connection string, create a sub
     |                 create one sub-directory for each store you want to access
     |
-    +-dining      <-- the storeName value in the connection string,                     only 
-the files for a single store should go in here
-
-
+    +-dining      <-- the storeName value in the connection string,
+                      only the files for a single store should go in here
 
 The precise way you choose to deploy or update the BrightstarDB store files is up to you, but 
 the simplest method (as shown in the sample code) is to check for the presence of the store 
 and if it is not there, copy the files from the application installation directory to Isolated 
-Storage. The code to do this in the sample can be found in the App() constructor in the 
-App.xaml.cs file:
-
-::
+Storage. The code to do this in the sample can be found in the ``App()`` constructor in the 
+``App.xaml.cs`` file::
 
   if (!BrightstarDbDeploymentHelper.StoreExists("brightstar", "dining"))
   {
@@ -5570,10 +4786,7 @@ App.xaml.cs file:
   }
 
 
-
-The helper class can also be found in the sample project and has the following methods:
-
-::
+The helper class can also be found in the sample project and has the following methods::
 
   public static class BrightstarDbDeploymentHelper
   {
@@ -5587,8 +4800,9 @@ The helper class can also be found in the sample project and has the following m
       }
 
 
-      public static void CopyStore(string resourceFolderPath, string storeDirectoryName, 
-string storeName)
+      public static void CopyStore(string resourceFolderPath, 
+                                   string storeDirectoryName, 
+                                   string storeName)
       {
           IsolatedStorageFile iso = IsolatedStorageFile.GetUserStoreForApplication();
           CopyStoreFile(iso, "data.bs", resourceFolderPath, storeDirectoryName, storeName);
@@ -5597,8 +4811,8 @@ string storeName)
       }
 
 
-      private static void CopyStoreFile(IsolatedStorageFile iso, string fileName, string 
-resourceFolderPath,
+      private static void CopyStoreFile(IsolatedStorageFile iso, string fileName, 
+                                        string resourceFolderPath,
                                         string storeDirectoryName, string storeName)
       {
           if (!iso.DirectoryExists(storeDirectoryName))
@@ -5622,8 +4836,7 @@ resourceFolderPath,
                   // Create a stream for the new file in isolated storage.
                   using (
                       IsolatedStorageFileStream output =
-                          iso.CreateFile(storeDirectoryName + "\\\\" + storeName + "\\\\" + 
-fileName))
+                          iso.CreateFile(storeDirectoryName + "\\\\" + storeName + "\\\\" + fileName))
                   {
                       // Initialize the buffer.
                       var readBuffer = new byte[4096];
@@ -5646,34 +4859,19 @@ fileName))
   }
 
 
-
-
-
 Access Reference Database Files
 -------------------------------
 
-
-
-
 Once deployed to Isolated Storage, the BrightstarDB store can be accessed as normal. You can 
 use the RDF API, DataObjects API or EntityFramework to access the data depending on your 
-application requirements. The connection string used to access the store is as follows:
+application requirements. The connection string used to access the store is as follows::
 
-::
-
-  type=embedded;storesDirectory={path to directory containing store 
-directories};storeName={name of store directory}
-
-
+  type=embedded;storesDirectory={path to directory containing store directories};storeName={name of store directory}
 
 With our sample application, the store is contained in a directory named "dining", which is 
-itself contained in a directory named "brightstar", so the full connection string is
-
-::
+itself contained in a directory named "brightstar", so the full connection string is::
 
   type=embedded;storesDirectory=brightstar;storeName=dining
-
-
 
 When the sample application runs, you should see a listing of top restaurants generated from a 
 LINQ query against the EntityFramework.
@@ -5692,9 +4890,6 @@ containing some sample applications that use these APIs can be found in
 [INSTALLDIR]/Samples/StoreAdmin.
 
 
-
-
-
 Managing Commit Points
 ======================
 
@@ -5702,10 +4897,9 @@ Managing Commit Points
 .. note::
 
   Commit Points are a feature that is only available with the Append-Only store persistence 
-type. If you are accessing a store that uses the Rewrite persistence type, operations on a 
-Commit Points are not supported and will raise a BrightstarClientException if an attempt is 
-made to query against or revert to a previous Commit Point.
-
+  type. If you are accessing a store that uses the Rewrite persistence type, operations on a 
+  Commit Points are not supported and will raise a BrightstarClientException if an attempt is 
+  made to query against or revert to a previous Commit Point.
 
 
 Each time a transaction is committed to a BrightstarDB store, a new commit point is written. 
@@ -5718,17 +4912,14 @@ followed, but instead makes a new commit point which duplicates the commit point
 the revert.
 
 
-
 **To Retrieve a List of Commit Points**
 
-The method to retrieve a list of commit points from a store is GetCommitPoints() on the 
-IBrightstarService interface. There are two versions of this method. The first takes a store 
+The method to retrieve a list of commit points from a store is ``GetCommitPoints()`` on the 
+``IBrightstarService`` interface. There are two versions of this method. The first takes a store 
 name and skip and take parameters to define a subrange of commit points to retrieve, the 
 second adds a date/time range in the form of two date time parameters to allow more specific 
 selection of a particular commit point range. The code below shows an example of using the 
-first of these methods:
-
-::
+first of these methods::
 
   // Create a client - the connection string used is configured in the App.config file.
   var client = BrightstarService.GetClient();
@@ -5738,59 +4929,43 @@ first of these methods:
   }
 
 
-
 To avoid operations that return potentially very large results sets, the server will not 
 return more than 100 commit points at a time, attempting to set the take parameter higher than 
-100 will result in an ArgumentException being raised.
+100 will result in an ``ArgumentException`` being raised.
 
-
-
-The structures returned by the GetCommitPoints() method implement the ICommitPointInfo 
+The structures returned by the ``GetCommitPoints()`` method implement the ``ICommitPointInfo`` 
 interface, this interface provides access to the following properties:
 
+  ``StoreName``
+    the name of the store that the commit point is associated with.
+    
+  ``Id``
+    the commit point identifier. This identifier is unique amongst all commit points in the same store.
 
+  ``CommitTime``
+    the UTC date/time when the commit was made.
 
-  - StoreName - the name of the store that the commit point is associated with
-
-  - Id - the commit point identifier. This identifier is unique amongst all commit points in 
-the same store.
-
-  - CommitTime - the UTC date/time when the commit was made
-
-  - JobId - the GUID identifier of the transaction job that resulted in the commit. The value 
-of this property may be Guid.Empty for operations that were not associated with a 
-transaction job (e.g initial store creation).
-
-
-
-
+  ``JobId``
+    the GUID identifier of the transaction job that resulted in the commit. The value 
+    of this property may be Guid.Empty for operations that were not associated with a 
+    transaction job (e.g initial store creation).
 
 Querying A Commit Point
 =======================
 
-
 To execute a SPARQL query against a particular commit point of a store, use the overload of 
-the ExecuteQuery method that takes an ICommitPointInfo parameter rather than a store name 
-string parameter:
-
-::
+the ``ExecuteQuery()`` method that takes an ``ICommitPointInfo`` parameter rather than a store name 
+string parameter::
 
   var resultsStream = client.ExecuteQuery(commitPointInfo, sparqlQuery);
-
 
 
 The resulting stream can be processed in exactly the same way as if you had queried the 
 current state of the store.
 
 
-
-
-
 Reverting The Store
 ===================
-
-
-
 
 Reverting the store takes a copy of an old commit point and pushes it to the top of the commit 
 point list for the store. Queries and updates are then applied to the store as normal, and the 
@@ -5799,46 +4974,32 @@ data modified by commit points since the reverted one is effectively hidden.
 This operation does not delete the commit points added since the reverted one, those commit 
 points are still there as long as a Coalesce operation is not performed, meaning that it is 
 possible to "re-revert" the store to its state before the revert was applied. The method to 
-revert a store is also on the IBrightstarService interface and is shown below;
-
-::
+revert a store is also on the ``IBrightstarService`` interface and is shown below::
 
   var client = BrightstarService.GetClient();
   ICommitPointInfo commitPointInfo = ... ; // Code to get the commit point we want to revert to
   client.RevertToCommitPoint(storeName, commitPointInfo); // Reverts the store
 
 
-
-
-
 Consolidate The Store
 =====================
 
-
-
-
 Over time the size of the BrightstarDB store will grow. Each separate commit adds new data to 
 the store, even if the commit deletes triples from the store the commit itself will extend the 
-store file. The ConsolidateStore operation enables the BrightstarDB store to be compressed, 
+store file. The ``ConsolidateStore()`` operation enables the BrightstarDB store to be compressed, 
 removing all commit point history. The operation rewrites the store data file to a shadow file 
 and then replaces the existing data file with the new compressed data file and updates the 
 master file. The consolidate operation blocks new writers, but allows readers to continue 
 accessing the data file up until the shadow file is prepared. The code required to start a 
-consolidate operation is shown below:
-
-::
+consolidate operation is shown below::
 
   var client = BrightstarService.GetClient();
   var consolidateJob = client.ConsolidateStore(storeName);
 
-
-
 This method submits the consolidate operation to the store as a long-running job. Because this 
 operation may take some time to complete the call does not block, but instead returns an 
-IJobInfo structure which can be used to monitor the job. The code below shows a typical loop 
-for monitoring the consolidate job:
-
-::
+``IJobInfo`` structure which can be used to monitor the job. The code below shows a typical loop 
+for monitoring the consolidate job::
 
   while (!(consolidateJob.JobCompletedOk || consolidateJob.JobCompletedWithErrors))
   {
@@ -5847,51 +5008,14 @@ for monitoring the consolidate job:
   }
 
 
-
-
 .. _API_Documentation:
 
 ******************
  API Documentation
 ******************
 
-
 .. _BrightstarDB API Docs: http://brightstardb.com/documentation/API/index.html
-
 
 The full set of classes and methods available can be found in the `BrightstarDB API Docs`_ 
 online or in the BrightstarDB_API.chm file that can be found in the Docs directory of your 
 installation.
-
-
-.. _Redistributing_BrightstarDB:
-
-****************************
- Redistributing BrightstarDB
-****************************
-
-
-In this case, redistributing BrightstarDB means distributing any application that you develop 
-that makes use of the BrightstarDB libraries. Your BrightstarDB license includes royalty-free 
-redistribution as long as the following rules are followed:
-
-
-
-  1. You may only redistribute the DLLs that are found in the [INSTALLDIR]\\SDK directory. 
-Other binaries and DLLS may not be redistributed. 
-
-  #. You may not redistribute BrightstarDB as part of an application that replicates the 
-functionality of any BrightstarDB application (even if that application is not included in 
-the package that you purchased from us).
-
-  #. You must take steps to ensure that your licensee ID and license key are protected from 
-exposure through introspection or reverse engineering of your application. This condition 
-can be satisfied by obfuscating your distributed application (or at least that part of the 
-application that contains your licensee ID and license key) in such a way that these strings 
-are robustly encrypted in the final assembly. You should also note that if the application 
-you are distributing uses an HTTP, TCP or Named Pipe connection to a BrightstarDB server, 
-you do not need to include your license information in the assembly at all. 
-
-  #. You may not resell BrightstarDB Server or BrightstarDB Enterprise - if you develop an 
-application that connects to a BrightstarDB server, your clients must purchase server 
-licenses directly from BrightstarDB Limited.
