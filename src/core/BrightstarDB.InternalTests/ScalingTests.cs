@@ -10,8 +10,6 @@ using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Server;
 using BrightstarDB.Storage;
-using BrightstarDB.Storage.BTreeStore;
-using BrightstarDB.Tests.BPlusTreeTests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BrightstarDB.Tests
@@ -34,17 +32,18 @@ namespace BrightstarDB.Tests
         [TestMethod]
         public void TestImportAndValidateSingleFile()
         {
-            //var fileName = "bsbm_370k.nt";
             const string fileName = "bsbm_1M.nt";
-            if (_storeManager.DoesStoreExist("bsbm_370k"))
+            const string storeName = "ImportAndValidate";
+
+            if (_storeManager.DoesStoreExist(storeName))
             {
-                _storeManager.DeleteStore("bsbm_370k");
-                while(_storeManager.DoesStoreExist("bsbm_370k"))
+                _storeManager.DeleteStore(storeName);
+                while (_storeManager.DoesStoreExist(storeName))
                 {
                     Thread.Sleep(10);
                 }
             }
-            using(var store = _storeManager.CreateStore("bsbm_370k"))
+            using (var store = _storeManager.CreateStore(storeName))
             {
                 var jobId = Guid.NewGuid();
                 using (var triplesStream = File.OpenRead(fileName))
@@ -56,7 +55,7 @@ namespace BrightstarDB.Tests
 
             using(var triplesStream = File.OpenRead(fileName))
             {
-                using (var store = _storeManager.OpenStore("bsbm_370k"))
+                using (var store = _storeManager.OpenStore(storeName))
                 {
                     var validatorSink = new ValidatorSink(store);
                     var parser = new NTriplesParser();
