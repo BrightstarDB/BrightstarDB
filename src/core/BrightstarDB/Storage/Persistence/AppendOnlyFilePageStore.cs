@@ -111,6 +111,7 @@ namespace BrightstarDB.Storage.Persistence
                         _backgroundPageWriter.QueueWrite(p, commitId);
                     }
                     _backgroundPageWriter.Flush();
+                    RestartBackgroundWriter();
                     foreach (var p in _newPages)
                     {
                         PageCache.Instance.InsertOrUpdate(_path, p);
@@ -255,6 +256,17 @@ namespace BrightstarDB.Storage.Persistence
         ~AppendOnlyFilePageStore()
         {
             Dispose(false);
+        }
+
+        private void RestartBackgroundWriter()
+        {
+            lock (this)
+            {
+                _backgroundPageWriter.Shutdown();
+                _backgroundPageWriter.Dispose();
+                _backgroundPageWriter =
+                    new BackgroundPageWriter(_peristenceManager.GetOutputStream(_path, FileMode.Open));
+            }
         }
     }
 }
