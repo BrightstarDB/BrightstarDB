@@ -698,21 +698,22 @@ namespace BrightstarDB.Tests
             var storeName = "QuadsTransaction3_" + DateTime.Now.Ticks;
             client.CreateStore(storeName);
 
-            const string txn1Adds =
-                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .
-<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .";
-            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds);
+            var txn1Adds = new StringBuilder();
+            txn1Adds.AppendLine(
+                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .");
+            txn1Adds.AppendLine(@"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
+            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
             Assert.IsTrue(result.JobCompletedOk);
 
             AssertTriplePatternInDefaultGraph(client, storeName, @"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob""");
             AssertTriplePatternInGraph(client, storeName, @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice""",
                 "http://example.org/graphs/alice");
 
-            const string txn2Adds =
-    @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice Arnold"" <http://example.org/graphs/alice> .
-<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins"" .";
+            var txn2Adds = new StringBuilder();
+            txn2Adds.AppendLine(@"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice Arnold"" <http://example.org/graphs/alice> .");
+            txn2Adds.AppendLine(@"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins"" .");
 
-            result = client.ExecuteTransaction(storeName, txn1Adds, txn1Adds, txn2Adds);
+            result = client.ExecuteTransaction(storeName, txn1Adds.ToString(), txn1Adds.ToString(), txn2Adds.ToString());
             Assert.IsTrue(result.JobCompletedOk);
 
             AssertTriplePatternInGraph(client, storeName,
@@ -758,6 +759,42 @@ namespace BrightstarDB.Tests
 
         }
 
+
+        [TestMethod]
+        public void TestTransactionWithWildcardGraph()
+        {
+            var client = GetClient();
+            var storeName = "QuadsTransaction5_" + DateTime.Now.Ticks;
+            client.CreateStore(storeName);
+
+            var txn1Adds = new StringBuilder();
+            txn1Adds.AppendLine(@"<http://example.org/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .");
+            txn1Adds.AppendLine(
+                @"<http://example.org/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"" <http://example.org/graphs/alice> .");
+            txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
+            txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/mbox> ""bob@example.org"" .");
+
+            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
+            Assert.IsTrue(result.JobCompletedOk);
+
+            AssertTriplePatternInGraph(client, storeName,
+                                       @"<http://example.org/alice> <http://xmlns.com/foaf/0.1/name> ""Alice""",
+                                       "http://example.org/graphs/alice");
+            AssertTriplePatternInDefaultGraph(client, storeName,
+                                       @"<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> ""Bob""");
+
+            var txn2Deletes = new StringBuilder();
+            txn2Deletes.AppendFormat(@"<{0}> <http://xmlns.com/foaf/0.1/name> <{0}> <{0}> .", Constants.WildcardUri);
+            client.ExecuteTransaction(storeName, null, txn2Deletes.ToString(), null);
+
+            AssertTriplePatternNotInGraph(client, storeName,
+                                       @"<http://example.org/alice> <http://xmlns.com/foaf/0.1/name> ""Alice""",
+                                       "http://example.org/graphs/alice");
+            AssertTriplePatternNotInDefaultGraph(client, storeName,
+                                       @"<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> ""Bob""");
+            
+        }
+
         private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
                                               string graphUri)
         {
@@ -773,5 +810,22 @@ namespace BrightstarDB.Tests
             var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
             Assert.IsTrue(resultsDoc.SparqlBooleanResult());
         }
+
+        private static void AssertTriplePatternNotInGraph(IBrightstarService client, string storeName, string triplePattern,
+                                      string graphUri)
+        {
+            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
+        }
+
+        private static void AssertTriplePatternNotInDefaultGraph(IBrightstarService client, string storeName,
+                                                              string triplePattern)
+        {
+            var sparql = "ASK {{" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
+        }
+
     }
 }
