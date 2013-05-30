@@ -27,7 +27,7 @@
 	</Target>
 
 	<Target Name="SPARQL">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"SPARQL Dawg Tests" /testsettings:local.testsettings /resultsfile:sparql.trx' />
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"SPARQL Dawg Tests" /testlist:"SPARQL Evaluation Tests" /testsettings:local.testsettings /resultsfile:sparql.trx' />
 	</Target>
 
 	<Target Name="Core">
