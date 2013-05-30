@@ -331,31 +331,32 @@ namespace BrightstarDB.Server
         /// <param name="preconditions">The triples that must be present for txn to succeed</param>
         /// <param name="deletePatterns"></param>
         /// <param name="insertData"></param>
+        /// <param name="defaultGraphUri"></param>
         /// <param name="format"></param>
         /// <returns></returns>
-        public Guid ProcessTransaction(string preconditions, string deletePatterns, string insertData, string format)
+        public Guid ProcessTransaction(string preconditions, string deletePatterns, string insertData, string defaultGraphUri, string format)
         {
             Logging.LogInfo("ProcessTransaction");           
             var jobId = Guid.NewGuid();
-            var job = new UpdateTransaction(jobId, this, preconditions, deletePatterns, insertData);
+            var job = new UpdateTransaction(jobId, this, preconditions, deletePatterns, insertData, defaultGraphUri);
             Logging.LogDebug("Queueing Job Id {0}", jobId);
             _jobs.Enqueue(job);
             _jobExecutionStatus.TryAdd(jobId.ToString(), new JobExecutionStatus { JobId = jobId, JobStatus = JobStatus.Pending });
             return jobId;
         }
 
-        public Guid Insert(String data, string format)
-        {
-            var jobId = Guid.NewGuid();
-            _jobs.Enqueue(new UpdateTransaction(jobId, this,"", "", data));
-            _jobExecutionStatus.TryAdd(jobId.ToString(), new JobExecutionStatus { JobId = jobId, JobStatus = JobStatus.Pending });
-            return jobId;
-        }
+        //public Guid Insert(String data, string format)
+        //{
+        //    var jobId = Guid.NewGuid();
+        //    _jobs.Enqueue(new UpdateTransaction(jobId, this,"", "", data));
+        //    _jobExecutionStatus.TryAdd(jobId.ToString(), new JobExecutionStatus { JobId = jobId, JobStatus = JobStatus.Pending });
+        //    return jobId;
+        //}
 
-        public void ExportData(Stream stream)
-        {
-            ExportData(stream, Constants.DefaultGraphUri.ToString());
-        }
+        //public void ExportData(Stream stream)
+        //{
+        //    ExportData(stream, Constants.DefaultGraphUri.ToString());
+        //}
 
         public void ExportData(Stream stream, string graphUri)
         {

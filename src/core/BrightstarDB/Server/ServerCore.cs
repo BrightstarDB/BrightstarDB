@@ -271,23 +271,23 @@ namespace BrightstarDB.Server
         #endregion
 
 
-        public Guid ProcessTransaction(string storeName, string preconditions, string deletePatterns, string insertData)
+        public Guid ProcessTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri)
         {
             var storeWorker = GetStoreWorker(storeName);
-            return storeWorker.ProcessTransaction(preconditions, deletePatterns, insertData, "nt");
+            return storeWorker.ProcessTransaction(preconditions, deletePatterns, insertData, defaultGraphUri, "nt");
         }
 
-        public void QueueTransaction(Guid jobId, string storeId, string preconditions, string deletes, string inserts)
-        {
-            var storeWorker = GetStoreWorker(storeId);
-            storeWorker.QueueJob(new UpdateTransaction(jobId, storeWorker, preconditions, deletes, inserts));
-        }
+        //public void QueueTransaction(Guid jobId, string storeId, string preconditions, string deletes, string inserts)
+        //{
+        //    var storeWorker = GetStoreWorker(storeId);
+        //    storeWorker.QueueJob(new UpdateTransaction(jobId, storeWorker, preconditions, deletes, inserts));
+        //}
 
-        public void Insert(string storeName, string data, string format)
-        {
-            var storeWorker = GetStoreWorker(storeName);
-            storeWorker.Insert(data, format);
-        }
+        //public void Insert(string storeName, string data, string format)
+        //{
+        //    var storeWorker = GetStoreWorker(storeName);
+        //    storeWorker.Insert(data, format);
+        //}
 
         public Guid Import(string storeName, string contentFileName, string graphUri/* = Constants.DefaultGraphUri*/)
         {

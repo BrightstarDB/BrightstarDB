@@ -7,15 +7,29 @@ namespace BrightstarDB.Server
 {
     internal class UpdateTransaction : UpdateJob
     {
-        // these triples must exist in order for the rest of the operation to continue
+        /// <summary>
+        /// The default graph to apply the transaction to
+        /// </summary>
+        private string _defaultGraphUri;
+
+        /// <summary>
+        ///  The triples that must exist in order for the rest of the operation to continue
+        /// </summary>
         private string _preconditions;
-        // triples patterns that match triples to be deleted
+
+        /// <summary>
+        /// triples patterns that match triples to be deleted 
+        /// </summary>
         private string _deletePatterns;
-        // triples to add
+
+        /// <summary>
+        /// Triples to be added
+        /// </summary>
         private string _insertData;
 
-        public UpdateTransaction(Guid jobId, StoreWorker storeWorker, string preconditionData, string deletePatterns, string insertData) : base(jobId, storeWorker)
+        public UpdateTransaction(Guid jobId, StoreWorker storeWorker, string preconditionData, string deletePatterns, string insertData, string defaultGraphUri) : base(jobId, storeWorker)
         {
+            _defaultGraphUri = defaultGraphUri ?? Constants.DefaultGraphUri;
             _deletePatterns = deletePatterns ?? "";
             _insertData = insertData ?? "";
             _preconditions = preconditionData ?? "";
@@ -52,7 +66,7 @@ namespace BrightstarDB.Server
                 {
                     var preconditionSink = new PreconditionSink(writeStore);
                     var parser = new NTriplesParser();
-                    parser.Parse(new StringReader(_preconditions), preconditionSink, Constants.DefaultGraphUri);
+                    parser.Parse(new StringReader(_preconditions), preconditionSink, _defaultGraphUri);
                     if (preconditionSink.FailedPreconditionCount > 0)
                     {
                         throw new PreconditionFailedException(preconditionSink.FailedPreconditionCount, preconditionSink.GetFailedPreconditions());
@@ -69,7 +83,7 @@ namespace BrightstarDB.Server
                 {
                     var delSink = new DeletePatternSink(writeStore);
                     var parser = new NTriplesParser();
-                    parser.Parse(new StringReader(_deletePatterns), delSink, Constants.DefaultGraphUri);
+                    parser.Parse(new StringReader(_deletePatterns), delSink, _defaultGraphUri);
                 }
                 catch (RdfParserException parserException)
                 {
@@ -83,7 +97,7 @@ namespace BrightstarDB.Server
                     var parser = new NTriplesParser();
                     parser.Parse(new StringReader(_insertData),
                                  new StoreTripleSink(writeStore, JobId, Configuration.TransactionFlushTripleCount),
-                                 Constants.DefaultGraphUri);
+                                 _defaultGraphUri);
                 }
                 catch (RdfParserException parserException)
                 {

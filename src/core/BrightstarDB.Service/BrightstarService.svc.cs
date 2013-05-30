@@ -206,11 +206,11 @@ namespace BrightstarDB.Service
 
         }
 
-        public JobInfo ExecuteTransaction(string storeName,string preconditions, string deletePatterns, string insertData)
+        public JobInfo ExecuteTransaction(string storeName,string preconditions, string deletePatterns, string insertData, string graphUri)
         {
             try
             {
-                var jobId = ServerCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData);
+                var jobId = ServerCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData, graphUri);
                 return new JobInfo { JobId = jobId.ToString(), JobPending = true };
             }
             catch (Exception ex)

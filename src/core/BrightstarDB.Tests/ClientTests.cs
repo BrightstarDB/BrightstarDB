@@ -653,5 +653,125 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(job.JobCompletedOk, "Job did not complete successfully: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
 
         }
+
+        [TestMethod]
+        public void TestInsertQuadsIntoDefaultGraph()
+        {
+            var client = GetClient();
+            var storeName = "QuadsTransaction1_" + DateTime.Now.Ticks;
+            client.CreateStore(storeName);
+
+            const string txn1Adds =
+                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .
+<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .";
+            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds);
+            Assert.IsTrue(result.JobCompletedOk);
+
+            AssertTriplePatternInDefaultGraph(client, storeName, @"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob""");
+            AssertTriplePatternInGraph(client, storeName, @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice""",
+                "http://example.org/graphs/alice");
+        }
+
+        [TestMethod]
+        public void TestInsertQuadsIntoNonDefaultGraph()
+        {
+            var client = GetClient();
+            var storeName = "QuadsTransaction2_" + DateTime.Now.Ticks;
+            client.CreateStore(storeName);
+
+            const string txn1Adds =
+    @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .
+<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .";
+            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds, "http://example.org/graphs/bob");
+            Assert.IsTrue(result.JobCompletedOk);
+
+            AssertTriplePatternInGraph(client, storeName, @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice""",
+                "http://example.org/graphs/alice");
+            AssertTriplePatternInGraph(client, storeName, @"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob""",
+                "http://example.org/graphs/bob");
+        }
+
+        [TestMethod]
+        public void TestUpdateQuadsUsingDefaultGraph()
+        {
+            var client = GetClient();
+            var storeName = "QuadsTransaction3_" + DateTime.Now.Ticks;
+            client.CreateStore(storeName);
+
+            const string txn1Adds =
+                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .
+<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .";
+            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds);
+            Assert.IsTrue(result.JobCompletedOk);
+
+            AssertTriplePatternInDefaultGraph(client, storeName, @"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob""");
+            AssertTriplePatternInGraph(client, storeName, @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice""",
+                "http://example.org/graphs/alice");
+
+            const string txn2Adds =
+    @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice Arnold"" <http://example.org/graphs/alice> .
+<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins"" .";
+
+            result = client.ExecuteTransaction(storeName, txn1Adds, txn1Adds, txn2Adds);
+            Assert.IsTrue(result.JobCompletedOk);
+
+            AssertTriplePatternInGraph(client, storeName,
+                                       @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice Arnold""",
+                                       "http://example.org/graphs/alice");
+            AssertTriplePatternInDefaultGraph(client, storeName,
+                                       @"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins""");
+        }
+
+        [TestMethod]
+        public void TestUpdateQuadsUsingNonDefaultGraph()
+        {
+            var client = GetClient();
+            var storeName = "QuadsTransaction4_" + DateTime.Now.Ticks;
+            client.CreateStore(storeName);
+
+            const string txn1Adds =
+                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .
+<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .";
+            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds, "http://example.org/graphs/bob");
+            Assert.IsTrue(result.JobCompletedOk);
+
+            AssertTriplePatternInGraph(client, storeName,
+                                       @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice""",
+                                       "http://example.org/graphs/alice");
+            AssertTriplePatternInGraph(client, storeName,
+                                       @"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob""",
+                                       "http://example.org/graphs/bob");
+
+            const string txn2Adds =
+                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice Arnold"" <http://example.org/graphs/alice> .
+<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins"" .";
+            
+            result = client.ExecuteTransaction(storeName, txn1Adds, txn1Adds, txn2Adds, "http://example.org/graphs/bob");
+            Assert.IsTrue(result.JobCompletedOk);
+
+            AssertTriplePatternInGraph(client, storeName,
+                                       @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice Arnold""",
+                                       "http://example.org/graphs/alice");
+            AssertTriplePatternInGraph(client, storeName,
+                                       @"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins""",
+                                       "http://example.org/graphs/bob");
+
+        }
+
+        private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
+                                              string graphUri)
+        {
+            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
+        }
+
+        private static void AssertTriplePatternInDefaultGraph(IBrightstarService client, string storeName,
+                                                              string triplePattern)
+        {
+            var sparql = "ASK {{" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
+        }
     }
 }

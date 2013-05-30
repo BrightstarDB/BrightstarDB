@@ -236,20 +236,22 @@ namespace BrightstarDB.Client
         /// <param name="preconditions">NTriples that must be in the store in order for the transaction to execute</param>
         /// <param name="deletePatterns">The delete patterns that will be removed from the store</param>
         /// <param name="insertData">The NTriples data that will be inserted into the store.</param>
+        /// <param name="defaultGraphUri">The URI of the default graph that the transaction will be applied to.</param>
         /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
         /// <returns>A JobInfo instance</returns>
-        public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, bool waitForCompletion = true)
+        public IJobInfo ExecuteTransaction(string storeName, string preconditions, 
+            string deletePatterns, string insertData, string defaultGraphUri, bool waitForCompletion = true)
         {
             ValidateStoreName(storeName);
             try
             {
                 if (!waitForCompletion)
                 {
-                    return new JobInfoWrapper(_service.ExecuteTransaction(storeName, preconditions, deletePatterns, insertData));
+                    return new JobInfoWrapper(_service.ExecuteTransaction(storeName, preconditions, deletePatterns, insertData, defaultGraphUri));
                 }
                 else
                 {
-                    var jobInfo = _service.ExecuteTransaction(storeName, preconditions, deletePatterns, insertData);
+                    var jobInfo = _service.ExecuteTransaction(storeName, preconditions, deletePatterns, insertData, defaultGraphUri);
                     while (!jobInfo.JobCompletedOk && !jobInfo.JobCompletedWithErrors)
                     {
                         Thread.Sleep(50);

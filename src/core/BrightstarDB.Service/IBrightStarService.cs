@@ -75,9 +75,10 @@ namespace BrightstarDB.Service
         /// <param name="preconditions"></param>
         /// <param name="deletePatterns"></param>
         /// <param name="insertData"></param>
+        /// <param name="defaultGraphUri"></param>
         /// <returns>Job id</returns>
         [OperationContract]
-        JobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData);
+        JobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri);
 
         /// <summary>
         /// Returns all the triples in the named store

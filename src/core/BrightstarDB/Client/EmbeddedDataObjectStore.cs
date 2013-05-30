@@ -126,7 +126,7 @@ namespace BrightstarDB.Client
             }
             preconditionsData.Close();
 
-            var jobId = _serverCore.ProcessTransaction(_storeName, preconditionsData.ToString(), deleteData.ToString(), addData.ToString());
+            var jobId = _serverCore.ProcessTransaction(_storeName, preconditionsData.ToString(), deleteData.ToString(), addData.ToString(), Constants.DefaultGraphUri);
             var status = _serverCore.GetJobStatus(_storeName, jobId.ToString());
             while (!(status.JobStatus == JobStatus.CompletedOk || status.JobStatus == JobStatus.TransactionError))
             {
