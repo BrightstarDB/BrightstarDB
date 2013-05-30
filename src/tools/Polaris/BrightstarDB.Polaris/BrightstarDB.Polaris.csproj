@@ -39,6 +39,14 @@
   <PropertyGroup>
     <ApplicationIcon>brightstar.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="dotNetRDF, Version=0.5.1.22605, Culture=neutral, PublicKeyToken=da294bc4e1ae447d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
