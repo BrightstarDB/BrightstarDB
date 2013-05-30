@@ -4303,7 +4303,6 @@ Deleting a store is also straight forward::
 Adding data
 ===========
 
-
 Data is added to the store by sending the data to add in N-Triples format. Each triple must be 
 on a single line with no line breaks, a good way to do this is to use a ``StringBuilder`` and then 
 using ``AppendLine()`` for each triple::
@@ -4320,6 +4319,99 @@ The ``ExecuteTransaction()`` method is used to insert the N-Triples data into th
   client.ExecuteTransaction(storeName,null, null, data.ToString());
 
 
+Deleting data
+=============
+
+Deletion is done by defining a pattern that should matching the triples to be deleted. The 
+following example deletes all the category data about BrightstarDB, again we use the 
+``StringBuilder`` to create the delete pattern.
+
+::
+
+  var deletePatternsData = new StringBuilder();
+  deletePatternsData.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/.well-known/model/wildcard> .");
+
+
+The identifier ``http://www.brightstardb.com/.well-known/model/wildcard`` is a wildcard 
+match for any value, so the above example deletes all triples that have a subject of
+``http://www.brightstardb.com/products/brightstar`` and a predicate of
+``http://www.brightstardb.com/schemas/product/category``.
+
+The ``ExecuteTransaction()`` method is used to delete the data from the store::
+
+  client.ExecuteTransaction(storeName, null, deletePatternsData.ToString(), null);
+
+.. note::
+  The string ``http://www.brightstardb.com/.well-known/model/wildcard`` is also defined
+  as the constant string ``BrightstarDB.Constants.WildcardUri``.
+  
+Conditional Updates
+===================
+
+The execution of a transaction can be made conditional on certain triples existing in the 
+store. The following example updates the ``productCode`` property of a resource only if its 
+current value is ``640``.
+
+::
+
+  var preconditions = new StringBuilder();
+  preconditions.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
+  var deletes = new StringBuilder();
+  deletes.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
+  var inserts = new StringBuilder();
+  inserts.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "973"^^<http://www.w3.org/2001/XMLSchema#integer> .");
+  client.ExecuteTransaction(storeName, preconditions.ToString(), deletes.ToString(), inserts.ToString());
+
+
+When a transaction contains condition triples, every triple specified in the preconditions 
+must exist in the store before the transaction is applied. If one or more triples specified in 
+the preconditions are not matched, a ``BrightstarClientException`` will be raised.
+
+
+Data Types
+==========
+
+In the code above we used simple triples to add a string literal object to a subject, such as::
+
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/name> "BrightstarDB"
+
+Other data types can be specified for the object of a triple by using the ^^ syntax::
+
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/releaseDate> "2011-11-11 12:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/cost> "0.00"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+
+
+Updating Graphs
+===============
+
+The ``ExecuteTransaction()`` method on the ``IBrightstarService`` interface 
+accepts a parameter that defines the default graph URI. When this parameters is 
+specified, all precondition triples are tested against that graph; all delete 
+triple patterns are applied to that graph; and all addition triples are added
+to that graph::
+
+  // This code update the graph http://example.org/graph1
+  client.ExecuteTransaction(storeName, preconditions, deletePatterns, additions, "http://example.org/graph1");
+
+In addition, the format that is parsed for preconditions, delete patterns and additions
+allows you to mix N-Triples and N-Quads formats together. N-Quads are simply N-Triples
+with a fourth URI identifier on the end that specifies the graph to be updated. When
+an N-Quad is encountered, its graph URI overrides that passed into the ``ExecuteTransaction()``
+method. For example, in the following code, one triple is added to the graph "http://example.org/graphs/alice"
+and the other is added to the default graph (because no value is specified in the call 
+to ``ExecuteTransaction()``::
+
+    var txn1Adds = new StringBuilder();
+    txn1Adds.AppendLine(
+        @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .");
+    txn1Adds.AppendLine(@"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
+    var result = client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
+
+.. note::
+  The wildcard URI is also supported for the graph URI in delete patterns, allowing you
+  to delete matching patterns from all graphs in the BrightstarDB store.
+  
 Querying data using SPARQL
 ==========================
 
@@ -4354,25 +4446,6 @@ instance that will ask for that specific encoding::
                            SparqlResultsFormat.Xml.WithEncoding(Encoding.Unicode));
 
 
-Update data using SPARQL
-========================
-
-BrightstarDB supports `SPARQL 1.1 Update`_ for updating data in the store. An update operation 
-is submitted to BrightstarDB as a job. By default the call to ``ExecuteUpdate()`` will block until 
-the update job completes::
-
-  IJobInfo jobInfo = _client.ExecuteUpdate(storeName, updateExpression);
-
-In this case, the resulting ``IJobInfo`` object will describe the final state of the update job. 
-However, you can also run the job asynchronously by passing false for the optional 
-``waitForCompletion`` parameter::
-
-  IJobInfo jobInfo = _client.ExecuteUpdate(storeName, updateExpression, false);
-
-In this case the resulting ``IJobInfo`` object will describe the current state of the update job 
-and you can use calls to ``GetJobInfo()`` to poll the job for its current status.
-
-
 Using extension methods
 =======================
 
@@ -4393,64 +4466,23 @@ and language code.
   }
 
 
-Deleting data
-=============
+Update data using SPARQL
+========================
 
-Deletion is done by defining a pattern that should matching the triples to be deleted. The 
-following example deletes all the category data about BrightstarDB, again we use the 
-``StringBuilder`` to create the delete pattern.
+BrightstarDB supports `SPARQL 1.1 Update`_ for updating data in the store. An update operation 
+is submitted to BrightstarDB as a job. By default the call to ``ExecuteUpdate()`` will block until 
+the update job completes::
 
-::
+  IJobInfo jobInfo = _client.ExecuteUpdate(storeName, updateExpression);
 
-  var deletePatternsData = new StringBuilder();
-  deletePatternsData.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/.well-known/model/wildcard> .");
+In this case, the resulting ``IJobInfo`` object will describe the final state of the update job. 
+However, you can also run the job asynchronously by passing false for the optional 
+``waitForCompletion`` parameter::
 
+  IJobInfo jobInfo = _client.ExecuteUpdate(storeName, updateExpression, false);
 
-The identifier ``http://www.brightstardb.com/.well-known/model/wildcard`` is a wildcard 
-match for any value, so the above example deletes all triples that have a subject of
-``http://www.brightstardb.com/products/brightstar`` and a predicate of
-``http://www.brightstardb.com/schemas/product/category``.
-
-The ``ExecuteTransaction()`` method is used to delete the data from the store::
-
-  client.ExecuteTransaction(storeName, null, deletePatternsData.ToString(), null);
-
-
-Data Types
-==========
-
-In the code above we used simple triples to add a string literal object to a subject, such as::
-
-  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/name> "BrightstarDB"
-
-Other data types can be used by using the ^^ syntax::
-
-  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .
-  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/releaseDate> "2011-11-11 12:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
-  <http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/cost> "0.00"^^<http://www.w3.org/2001/XMLSchema#decimal> .
-
-
-Conditional Updates
-===================
-
-The execution of a transaction can be made conditional on certain triples existing in the 
-store. The following example updates the ``productCode`` property of a resource only if its 
-current value is ``640``.
-
-::
-
-  var preconditions = new StringBuilder();
-  preconditions.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
-  var deletes = new StringBuilder();
-  deletes.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
-  var inserts = new StringBuilder();
-  inserts.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "973"^^<http://www.w3.org/2001/XMLSchema#integer> .");
-  client.ExecuteTransaction(storeName, preconditions.ToString(), deletes.ToString(), inserts.ToString());
-
-
-When a transaction contains condition triples, every triple specified in the preconditions 
-must exist in the store before the transaction is applied. If one or more triples specified in 
-the preconditions are not matched, a ``BrightstarClientException`` will be raised.
+In this case the resulting ``IJobInfo`` object will describe the current state of the update job 
+and you can use calls to ``GetJobInfo()`` to poll the job for its current status.
 
 
 Data Imports
