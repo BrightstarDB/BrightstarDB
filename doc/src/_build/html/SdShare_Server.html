@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SdShare Server &mdash; BrightstarDB 1.3pre1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3pre1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="BrightstarDB 1.3pre1 documentation" href="index.html" />
+    <link rel="next" title="Whats New" href="Whats_New.html" />
+    <link rel="prev" title="Polaris Management Tool" href="Using_Polaris.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Whats_New.html" title="Whats New"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Using_Polaris.html" title="Polaris Management Tool"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">BrightstarDB 1.3pre1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="sdshare-server">
+<span id="id1"></span><h1>SdShare Server<a class="headerlink" href="#sdshare-server" title="Permalink to this headline">¶</a></h1>
+<p>The BrightstarDB SdShare Server is designed to be used to expose RDF data from existing data sources. The data produced can be easily consumed into a BrightstarDB instance or any SPARQL compliant data store. The server has a pluggable architecture to allow any data source to be exposed in accordance with the latest SDShare specification (<a class="reference external" href="http://sdshare.org">SDShare)</a>, it comes with configurable components for ODBC enabled databases.</p>
+<p>The SdShare Server provides two main features, firstly it exposes existing data sources as feeds of data that comply with the <a class="reference external" href="http://sdshare.org">SdShare</a> specification.Second, it runs a client service that can consume and process valid SdShare feeds. Both the producer and consumer services offer a pluggable framework to support different data sources and data destinations. In addition, a data source adaptor is provided for exposing data via any ODBC compliant database and a client component is also provided that can send updates from an SdShare feed to any SPARQL 1.1 compliant endpoint and BrightstarDB instance.</p>
+<p>The following diagram shows the server architecture.</p>
+<img alt="_images/sdshare_server_architecture.png" src="_images/sdshare_server_architecture.png" />
+<div class="section" id="sdshare-server-download">
+<h2>SdShare Server Download<a class="headerlink" href="#sdshare-server-download" title="Permalink to this headline">¶</a></h2>
+<p>The SdShare Server is is not part of the core BrightstarDB package and is made available only on request. To get access to the BrightstarDB SdShare Server please email <a class="reference external" href="mailto:contact&#37;&#52;&#48;brightstardb&#46;com">BrightstarDB</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">SdShare Server</a><ul>
+<li><a class="reference internal" href="#sdshare-server-download">SdShare Server Download</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Using_Polaris.html"
+                        title="previous chapter">Polaris Management Tool</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Whats_New.html"
+                        title="next chapter">Whats New</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/SdShare_Server.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Whats_New.html" title="Whats New"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Using_Polaris.html" title="Polaris Management Tool"
+             >previous</a> |</li>
+        <li><a href="index.html">BrightstarDB 1.3pre1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Kal Ahmed, Graham Moore.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

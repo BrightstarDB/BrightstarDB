@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Supported RDF Syntaxes &mdash; BrightstarDB 1.3pre1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3pre1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="BrightstarDB 1.3pre1 documentation" href="index.html" />
+    <link rel="next" title="Developing With BrightstarDB" href="Developing_With_BrightstarDB2.html" />
+    <link rel="prev" title="Why BrightstarDB?" href="Why_BrightstarDB_.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Developing_With_BrightstarDB2.html" title="Developing With BrightstarDB"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Why_BrightstarDB_.html" title="Why BrightstarDB?"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">BrightstarDB 1.3pre1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="supported-rdf-syntaxes">
+<span id="id1"></span><h1>Supported RDF Syntaxes<a class="headerlink" href="#supported-rdf-syntaxes" title="Permalink to this headline">¶</a></h1>
+<p>As BrightstarDB is built on the W3C RDF data model, we also provide the ability
+to import and export your data as RDF.</p>
+<p>BrightstarDB supports a number of different RDF syntaxes for file-based import.
+This list of supported file formats applies both to import jobs created using
+the BrightstarDB API (see <a class="reference internal" href="Developing_With_BrightstarDB2.html#rdf-client-api"><em>RDF Client API</em></a> for details),
+and to file import using Polaris (see <a class="reference internal" href="Using_Polaris.html#using-polaris"><em>Polaris Management Tool</em></a> for details). To determine the parser to be used, BrightstarDB
+checks the file extension, so it is important to use the correct file extension
+for the syntax you are importing. The supported syntaxes and their file
+extensions are listed in the table below as shown, BrightstarDB also supports
+reading from files that are compressed with the GZip compression method.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="41%" />
+<col width="45%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">RDF Syntax</th>
+<th class="head">File Extension (uncompressed)</th>
+<th class="head">File Extension (GZip compressed)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>NTriples</td>
+<td>.nt</td>
+<td>.nt.gz</td>
+</tr>
+<tr class="row-odd"><td>NQuads</td>
+<td>.nq</td>
+<td>.nq.gz</td>
+</tr>
+<tr class="row-even"><td>RDF/XML</td>
+<td>.rdf</td>
+<td>.rdf.gz</td>
+</tr>
+<tr class="row-odd"><td>Turtle</td>
+<td>.ttl</td>
+<td>.ttl.gz</td>
+</tr>
+<tr class="row-even"><td>RDF/JSON</td>
+<td>.rj or .json</td>
+<td>.rj.gz or .json.gz</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Why_BrightstarDB_.html"
+                        title="previous chapter">Why BrightstarDB?</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Developing_With_BrightstarDB2.html"
+                        title="next chapter">Developing With BrightstarDB</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Supported_RDF_Syntaxes.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Developing_With_BrightstarDB2.html" title="Developing With BrightstarDB"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Why_BrightstarDB_.html" title="Why BrightstarDB?"
+             >previous</a> |</li>
+        <li><a href="index.html">BrightstarDB 1.3pre1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Kal Ahmed, Graham Moore.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

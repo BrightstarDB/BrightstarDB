@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Concepts &mdash; BrightstarDB 1.3pre1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.3pre1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="BrightstarDB 1.3pre1 documentation" href="index.html" />
+    <link rel="next" title="Why BrightstarDB?" href="Why_BrightstarDB_.html" />
+    <link rel="prev" title="Getting Started" href="Getting_Started.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Why_BrightstarDB_.html" title="Why BrightstarDB?"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Getting_Started.html" title="Getting Started"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">BrightstarDB 1.3pre1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="concepts">
+<span id="id1"></span><h1>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h2>
+<p>BrightstarDB is a native .NET NoSQL semantic web database. It can be used as
+an embedded database or run as a service. When run as a service clients can
+connect using HTTP, TCP/IP or Named Pipes. While the core data model is RDF
+triples and the query language SPARQL BrightstarDB provides a code-first
+Entity Framework. The Entity Framework tools take .NET interfaces and
+generate concrete classes that persist their data in BrightstarDB. As well as
+the Entity Framework there is a low level <a class="reference internal" href="Developing_With_BrightstarDB2.html#rdf-client-api"><em>RDF API</em></a> for
+working with the underlying data. BrightstarDB (in the Enterprise and Server
+versions) also provides a management studio called <a class="reference internal" href="Using_Polaris.html#using-polaris"><em>Polaris</em></a> for running queries and transactions against a BrightstarDB
+service.</p>
+<p>The following diagram provides an overview of the BrightstarDB architecture.</p>
+<img alt="_images/Architecture.png" src="_images/Architecture.png" />
+</div>
+<div class="section" id="data-model">
+<h2>Data Model<a class="headerlink" href="#data-model" title="Permalink to this headline">¶</a></h2>
+<p>BrightstarDB supports the <a class="reference external" href="http://www.w3.org/TR/2004/REC-rdf-primer-20040210/">W3C RDF</a> and SPARQL 1.1 <a class="reference external" href="http://www.w3.org/TR/sparql11-query/">Query</a> and <a class="reference external" href="http://www.w3.org/TR/sparql11-update/">Update</a>.
+standards, the data model stored is triples with a graph context (often this
+is called a quad store). The triple data structure is very powerful,
+especially for creating associative data models, merging data from many
+sources, and for giving unique persistent and global identity to &#8216;things&#8217;.</p>
+<p>A <strong>triple</strong> is defined as having three parts: A subject URI, a predicate
+URI, and an object value. The subject URI is the identifier for some thing. A
+person, company, product etc. The predicate is an identifier for a property
+type and the object can either be the identifier for another thing, or a
+literal value. Literal values can also have data types.</p>
+<p>An example of a literal property assigned to some thing is:</p>
+<div class="highlight-python"><pre>&lt;http://www.brightstardb.com/companies/brightstardb&gt; &lt;http://www.w3.org/2000/01/rdf-schema#label&gt; "BrightstarDB" .</pre>
+</div>
+<p>and a connection between two entities is described:</p>
+<div class="highlight-python"><pre>&lt;http://www.brightstardb.com/companies/brightstardb&gt; &lt;http://www.brightstardb.com/types/hasproduct&gt; &lt;http://www.brightstardb.com/products/brightstardb&gt; .</pre>
+</div>
+</div>
+<div class="section" id="storage-features">
+<h2>Storage Features<a class="headerlink" href="#storage-features" title="Permalink to this headline">¶</a></h2>
+<p>BrightstarDB is a write once, read many store (WORM). Modifications to data
+are appended to the end of the storage file, no data is ever overwritten. It
+employs a single writer, concurrent reader model. This supports concurrent
+read with no possibility of reading dirty data. Reads are not blocked while
+writes occur. The WORM store approach supports rollback or querying of the
+complete database at any transaction point. The store can be periodically
+coalesced to manage file size growth at the expense of removing previous
+transaction points.</p>
+</div>
+<div class="section" id="client-apis">
+<h2>Client APIs<a class="headerlink" href="#client-apis" title="Permalink to this headline">¶</a></h2>
+<p>There are three different code layers with which to access BrightstarDB. The
+first of these is the <a class="reference internal" href="Developing_With_BrightstarDB2.html#rdf-client-api"><em>RDF Client API</em></a>. This is a low
+level API that allows developers to insert and delete triples, and run SPARQL
+queries. The second API layer is the <a class="reference internal" href="Developing_With_BrightstarDB2.html#data-object-layer"><em>Data Object Layer</em></a>. This provides the ability to &nbsp;treat a collection of
+triples with the same subject as a single unit and also provides support for
+RDF list structures and optimistic locking. The highest API layer is the
+<a class="reference internal" href="Developing_With_BrightstarDB2.html#entity-framework"><em>BrightstarDB Entity Framework</em></a>. BrightstarDB enables
+data-binding from items at the Data Object Layer to full .NET objects
+described by a programmer-defined interface. As well as storing object state
+BrightstarDB also allows developers to use LINQ expressions to query the data
+they have created.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Concepts</a><ul>
+<li><a class="reference internal" href="#architecture">Architecture</a></li>
+<li><a class="reference internal" href="#data-model">Data Model</a></li>
+<li><a class="reference internal" href="#storage-features">Storage Features</a></li>
+<li><a class="reference internal" href="#client-apis">Client APIs</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Getting_Started.html"
+                        title="previous chapter">Getting Started</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Why_BrightstarDB_.html"
+                        title="next chapter">Why BrightstarDB?</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Concepts.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Why_BrightstarDB_.html" title="Why BrightstarDB?"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Getting_Started.html" title="Getting Started"
+             >previous</a> |</li>
+        <li><a href="index.html">BrightstarDB 1.3pre1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Kal Ahmed, Graham Moore.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
