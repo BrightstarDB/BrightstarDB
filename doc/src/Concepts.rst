@@ -29,7 +29,7 @@ service.
 
 The following diagram provides an overview of the BrightstarDB architecture.
 
-.. image:: ../src/images/Architecture.png
+.. image:: Images/Architecture.png
 
 
 
