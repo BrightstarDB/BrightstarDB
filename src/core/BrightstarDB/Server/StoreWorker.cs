@@ -3,15 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using BrightstarDB.Client;
 using BrightstarDB.Model;
-using BrightstarDB.Query;
-using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
 #if !SILVERLIGHT
 using System.ServiceModel;
-using BrightstarDB.Storage.BTreeStore;
 #endif
 
 namespace BrightstarDB.Server
@@ -84,35 +80,12 @@ namespace BrightstarDB.Server
         }
 
         /// <summary>
-        /// Creates a new server core that uses a specific IStoreManager implementation
-        /// rather than getting one from the StoreManagerFactory
-        /// </summary>
-        /// <param name="baseLocation"></param>
-        /// <param name="storeName"></param>
-        /// <param name="storeManager"></param>
-        public StoreWorker(string baseLocation, string storeName, IStoreManager storeManager)
-        {
-            _storeName = storeName;
-            _storeLocation = Path.Combine(baseLocation, storeName);
-            Logging.LogInfo("StoreWorker created with location {0}", _storeLocation);
-            _jobs = new ConcurrentQueue<Job>();
-            _jobExecutionStatus = new ConcurrentDictionary<string, JobExecutionStatus>();
-            _storeManager = storeManager;
-            _transactionLog = _storeManager.GetTransactionLog(_storeLocation);
-        }
-
-        /// <summary>
         /// Starts the thread that processes the jobs queue.
         /// </summary>
         public void Start()
         {
             _jobProcessingThread = new Thread(ProcessJobs);
             _jobProcessingThread.Start();
-        }
-
-        public string StoreLocation
-        {
-            get { return _storeLocation; }
         }
 
         public ITransactionLog TransactionLog
@@ -129,7 +102,7 @@ namespace BrightstarDB.Server
                 try
                 {
                     if (_shutdownRequested && !_completeRemainingJobs) break;
-                    Job job = null;
+                    Job job;
                     _jobs.TryDequeue(out job);
                     if (job != null)
                     {
@@ -201,14 +174,6 @@ namespace BrightstarDB.Server
             }
         }
 
-        private void RaiseTransactionCommitting(Job job)
-        {
-            if (JobCompleted != null)
-            {
-                JobCompleted(this, new JobCompletedEventArgs(_storeName, job));
-            }
-        }
-
         public JobExecutionStatus GetJobStatus(string jobId)
         {
             JobExecutionStatus status;
@@ -246,75 +211,38 @@ namespace BrightstarDB.Server
             {
                 lock (_readStoreLock)
                 {
-                    if (_readStore == null)
-                    {
-                        _readStore = _storeManager.OpenStore(_storeLocation, true);
-                    }
-                    return _readStore;
+                    return _readStore ?? (_readStore = _storeManager.OpenStore(_storeLocation, true));
                 }
             }
         }
 
         internal IStore WriteStore
         {
-            get
-            {
-                if (_writeStore == null)
-                {
-                    _writeStore = _storeManager.OpenStore(_storeLocation, false);
-                }
-                return _writeStore;
-            }            
+            get { return _writeStore ?? (_writeStore = _storeManager.OpenStore(_storeLocation)); }
         }
 
-        public void Query(ulong commitPointId, string queryExpression, SparqlResultsFormat resultsFormat, Stream resultsStream)
-        {
-            // Not supported by read/write store so no handling for ReadWriteStoreModifiedException required
-            using (var readStore = _storeManager.OpenStore(_storeLocation, commitPointId))
-            {
-                BrightstarSparqlResultsType resultsType;
-                readStore.ExecuteSparqlQuery(queryExpression, resultsFormat, resultsStream, out resultsType);
-            }
-        }
-
-        public void Query(string queryExpression, SparqlResultsFormat resultsFormat, Stream resultsStream)
-        {
-            Logging.LogDebug("Query {0}", queryExpression);
-            try
-            {
-                BrightstarSparqlResultsType resultsType;
-                ReadStore.ExecuteSparqlQuery(queryExpression, resultsFormat, resultsStream, out resultsType);
-            }
-            catch (ReadWriteStoreModifiedException)
-            {
-                Logging.LogDebug("Read/Write store was concurrently modified. Attempting a retry");
-                InvalidateReadStore();
-                Query(queryExpression, resultsFormat, resultsStream);
-            }
-        }
-
-        public string Query(ulong commitPointId, string queryExpression, SparqlResultsFormat resultsFormat)
+        public string Query(ulong commitPointId, string queryExpression, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris )
         {
             // Not supported by read/write store so no handling for ReadWriteStoreModifiedException required
             Logging.LogDebug("CommitPointId={0}, Query={1}", commitPointId, queryExpression);
             using (var readStore = _storeManager.OpenStore(_storeLocation, commitPointId))
             {
-                return readStore.ExecuteSparqlQuery(queryExpression, resultsFormat);
+                return readStore.ExecuteSparqlQuery(queryExpression, resultsFormat, defaultGraphUris);
             }
         }
 
-        public string Query(string queryExpression, SparqlResultsFormat resultsFormat)
+        public string Query(string queryExpression, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris )
         {
             Logging.LogDebug("Query {0}", queryExpression);
             try
             {
-                return ReadStore.ExecuteSparqlQuery(queryExpression, resultsFormat);
+                return ReadStore.ExecuteSparqlQuery(queryExpression, resultsFormat, defaultGraphUris);
             }
             catch (ReadWriteStoreModifiedException)
             {
                 Logging.LogDebug("Read/Write store was concurrently modified. Attempting a retry");
                 InvalidateReadStore();
-                return Query(queryExpression, resultsFormat);
+                return Query(queryExpression, resultsFormat, defaultGraphUris);
             }
         }
 
@@ -345,45 +273,6 @@ namespace BrightstarDB.Server
             return jobId;
         }
 
-        //public Guid Insert(String data, string format)
-        //{
-        //    var jobId = Guid.NewGuid();
-        //    _jobs.Enqueue(new UpdateTransaction(jobId, this,"", "", data));
-        //    _jobExecutionStatus.TryAdd(jobId.ToString(), new JobExecutionStatus { JobId = jobId, JobStatus = JobStatus.Pending });
-        //    return jobId;
-        //}
-
-        //public void ExportData(Stream stream)
-        //{
-        //    ExportData(stream, Constants.DefaultGraphUri.ToString());
-        //}
-
-        public void ExportData(Stream stream, string graphUri)
-        {
-            try
-            {
-                var triples = ReadStore.Match(null, null, null, graph: graphUri);
-                using (var sw = new StreamWriter(stream))
-                {
-                    var nw = new BrightstarTripleSinkAdapter(new NTriplesWriter(sw));
-                    foreach (var triple in triples)
-                    {
-                        nw.Triple(triple);
-                    }
-                    sw.Flush();
-                }
-            }
-            catch (ReadWriteStoreModifiedException)
-            {
-                Logging.LogError(BrightstarEventId.ExportDataError, "Store was modified while export was running.");
-            }
-            catch (Exception ex)
-            {
-                Logging.LogError(BrightstarEventId.ExportDataError, "Error Exporting Data {0} {1}", ex.Message,
-                                 ex.StackTrace);
-            }
-        }
-
         public Guid Import(string contentFileName, string graphUri)
         {
             var jobId = Guid.NewGuid();
@@ -410,19 +299,23 @@ namespace BrightstarDB.Server
             exportJob.Run((id, ex) =>
                               {
                                   JobExecutionStatus jobExecutionStatus;
-                                  _jobExecutionStatus.TryGetValue(id.ToString(), out jobExecutionStatus);
-                                  jobExecutionStatus.Information = "Export failed";
-                                  jobExecutionStatus.ExceptionDetail = new ExceptionDetail(ex);
-                                  jobExecutionStatus.JobStatus = JobStatus.TransactionError;
-                                  jobExecutionStatus.Ended = DateTime.UtcNow;
+                                  if (_jobExecutionStatus.TryGetValue(id.ToString(), out jobExecutionStatus))
+                                  {
+                                      jobExecutionStatus.Information = "Export failed";
+                                      jobExecutionStatus.ExceptionDetail = new ExceptionDetail(ex);
+                                      jobExecutionStatus.JobStatus = JobStatus.TransactionError;
+                                      jobExecutionStatus.Ended = DateTime.UtcNow;
+                                  }
                               },
                           id =>
                               {
                                   JobExecutionStatus jobExecutionStatus;
-                                  _jobExecutionStatus.TryGetValue(id.ToString(), out jobExecutionStatus);
-                                  jobExecutionStatus.Information = "Export completed";
-                                  jobExecutionStatus.JobStatus = JobStatus.CompletedOk;
-                                  jobExecutionStatus.Ended = DateTime.UtcNow;
+                                  if (_jobExecutionStatus.TryGetValue(id.ToString(), out jobExecutionStatus))
+                                  {
+                                      jobExecutionStatus.Information = "Export completed";
+                                      jobExecutionStatus.JobStatus = JobStatus.CompletedOk;
+                                      jobExecutionStatus.Ended = DateTime.UtcNow;
+                                  }
                               });
             return jobId;
         }

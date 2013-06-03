@@ -355,7 +355,7 @@ namespace BrightstarDB.Tests
                 jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             }
 
-            storeWorker.Query("select * where { ?s ?p ?o }", SparqlResultsFormat.Xml);
+            storeWorker.Query("select * where { ?s ?p ?o }", SparqlResultsFormat.Xml, new string[]{Constants.DefaultGraphUri});
             storeWorker.Shutdown(true, () => _storeManager.DeleteStore(Configuration.StoreLocation + "\\"+ sid));            
         }
 
@@ -420,7 +420,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(JobStatus.CompletedOk, jobStatus.JobStatus);
 
             // open store and find all triples
-            var results = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            var results = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             var doc = XDocument.Parse(results);
             XNamespace sparqlNs = "http://www.w3.org/2005/sparql-results#";
             Assert.AreEqual(1, doc.Descendants(sparqlNs + "result").Count());
@@ -450,7 +450,7 @@ namespace BrightstarDB.Tests
 
             Assert.AreEqual(JobStatus.CompletedOk, jobStatus.JobStatus);
 
-            results = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            results = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             doc = XDocument.Parse(results);
             Assert.AreEqual(0, doc.Descendants(sparqlNs + "result").Count());
         }
@@ -481,14 +481,14 @@ namespace BrightstarDB.Tests
 
             var sw = new Stopwatch();
             sw.Start();
-            var queryResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            var queryResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             sw.Stop();
             Console.WriteLine("initial query took : " + sw.ElapsedMilliseconds);
             var initTime = sw.ElapsedMilliseconds;
 
             sw = new Stopwatch();
             sw.Start();
-            var cachedResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            var cachedResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             sw.Stop();
             Console.WriteLine("warm query took : " + sw.ElapsedMilliseconds);
 
@@ -496,7 +496,7 @@ namespace BrightstarDB.Tests
 
             sw = new Stopwatch();
             sw.Start();
-            cachedResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            cachedResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             sw.Stop();
             Console.WriteLine("cached query took : " + sw.ElapsedMilliseconds);
             var cachedTime = sw.ElapsedMilliseconds;

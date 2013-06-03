@@ -403,20 +403,20 @@ namespace BrightstarDB.Client
         System.Threading.Tasks.Task<bool> DoesStoreExistAsync(string storeName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQuery", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryResponse")]
-        System.IO.Stream ExecuteQuery(string storeName, string queryExpression, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType);
+        System.IO.Stream ExecuteQuery(string storeName, string queryExpression, string[] defaultGraphUris, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQuery", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryResponse")]
-        System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryAsync(string storeName, string queryExpression, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType);
+        System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryAsync(string storeName, string queryExpression, string[] defaultGraphUris, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryOnCommitP" +
             "oint", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryOnCommitP" +
             "ointResponse")]
-        System.IO.Stream ExecuteQueryOnCommitPoint(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string resultsMediaType);
+        System.IO.Stream ExecuteQueryOnCommitPoint(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string[] defaultGraphUris, string resultsMediaType);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryOnCommitP" +
             "oint", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryOnCommitP" +
             "ointResponse")]
-        System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryOnCommitPointAsync(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string resultsMediaType);
+        System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryOnCommitPointAsync(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string[] defaultGraphUris, string resultsMediaType);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteTransaction", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteTransactionRes" +
             "ponse")]
@@ -595,24 +595,24 @@ namespace BrightstarDB.Client
             return base.Channel.DoesStoreExistAsync(storeName);
         }
         
-        public System.IO.Stream ExecuteQuery(string storeName, string queryExpression, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType)
+        public System.IO.Stream ExecuteQuery(string storeName, string queryExpression, string[] defaultGraphUris, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType)
         {
-            return base.Channel.ExecuteQuery(storeName, queryExpression, ifNotModifiedSince, resultsMediaType);
+            return base.Channel.ExecuteQuery(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince, resultsMediaType);
         }
         
-        public System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryAsync(string storeName, string queryExpression, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType)
+        public System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryAsync(string storeName, string queryExpression, string[] defaultGraphUris, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType)
         {
-            return base.Channel.ExecuteQueryAsync(storeName, queryExpression, ifNotModifiedSince, resultsMediaType);
+            return base.Channel.ExecuteQueryAsync(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince, resultsMediaType);
         }
         
-        public System.IO.Stream ExecuteQueryOnCommitPoint(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string resultsMediaType)
+        public System.IO.Stream ExecuteQueryOnCommitPoint(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string[] defaultGraphUris, string resultsMediaType)
         {
-            return base.Channel.ExecuteQueryOnCommitPoint(commitPoint, queryExpression, resultsMediaType);
+            return base.Channel.ExecuteQueryOnCommitPoint(commitPoint, queryExpression, defaultGraphUris, resultsMediaType);
         }
         
-        public System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryOnCommitPointAsync(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string resultsMediaType)
+        public System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryOnCommitPointAsync(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string[] defaultGraphUris, string resultsMediaType)
         {
-            return base.Channel.ExecuteQueryOnCommitPointAsync(commitPoint, queryExpression, resultsMediaType);
+            return base.Channel.ExecuteQueryOnCommitPointAsync(commitPoint, queryExpression, defaultGraphUris, resultsMediaType);
         }
         
         public BrightstarDB.Client.JobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri)

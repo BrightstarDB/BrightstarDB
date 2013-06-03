@@ -135,24 +135,24 @@ namespace BrightstarDB.Service
             }
         }
 
-        public Stream ExecuteQuery(string storeName, string queryExpression, DateTime? ifNotModifiedSince, string resultsMediaType = null)
+        /// <summary>
+        /// Query the store using a SPARQL query
+        /// </summary>
+        /// <param name="storeName">Store to query</param>
+        /// <param name="queryExpression">SPARQL query string</param>
+        /// <param name="defaultGraphUris">The URIs of the graphs to be treated as the default graph for this query. If NULL the built-in default graph will be used.</param>
+        /// <param name="ifNotModifiedSince">If the store has not been modified since the date/time specified by this parameter, 
+        /// a StoreNotModified exception will be raised.</param>
+        /// <param name="resultsMediaType">OPTIONAL: The media type to use for serializing the results</param>
+        /// <returns>A stream containing the serialized query results</returns>
+        public Stream ExecuteQuery(string storeName, string queryExpression, string[] defaultGraphUris, DateTime? ifNotModifiedSince, string resultsMediaType = null)
         {
             try
             {
                 var resultsFormat = resultsMediaType == null ? SparqlResultsFormat.Xml : SparqlResultsFormat.GetResultsFormat(resultsMediaType);
-                /*
-                var connStream = new ConnectionStream();
-                var cStream = new ConsumerStream(connStream);
-                var pStream = new ProducerStream(connStream);
-                */
                 var pStream = new MemoryStream();
-                ServerCore.Query(storeName, queryExpression, ifNotModifiedSince, resultsFormat, pStream);
-                //var t = new Task(() => ServerCore.Query(storeName, queryExpression, ifNotModifiedSince, pStream));
-                //t.Start();
-                //t.Wait();
-                //if (t.IsFaulted && t.Exception != null) throw t.Exception;
+                ServerCore.Query(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince, resultsFormat, pStream);
                 var cStream = new MemoryStream(pStream.GetBuffer(), 0, (int)pStream.Length);
-
                 return cStream;
             }
             catch (AggregateException aggregateException)
@@ -176,20 +176,22 @@ namespace BrightstarDB.Service
             }
         }
 
+
         /// <summary>
         /// Queries a given commit point of a store using a SPARQL query
         /// </summary>
         /// <param name="commitPoint">The store commit point to be queried</param>
         /// <param name="queryExpression">The SPARQL query string</param>
-        /// <param name="resultsMediaType">The media type for the serialization of the SPARQL results</param>
+        /// <param name="defaultGraphUris">The URIs of the graphs to be treated as the default graph for this query. If NULL the built-in default graph will be used.</param>
+        /// <param name="resultsMediaType">OPTIONAL: The media type to use for serializing the results</param>
         /// <returns>A stream containing the serialized query results</returns>
-        public Stream ExecuteQueryOnCommitPoint(CommitPointInfo commitPoint, string queryExpression, string resultsMediaType = null)
+        public Stream ExecuteQueryOnCommitPoint(CommitPointInfo commitPoint, string queryExpression, string[] defaultGraphUris, string resultsMediaType = null)
         {
             try
             {
                 var resultsFormat = resultsMediaType == null ? SparqlResultsFormat.Xml : SparqlResultsFormat.GetResultsFormat(resultsMediaType);
                 var pstream = new MemoryStream();
-                var t = new Task(() => ServerCore.Query(commitPoint.StoreName, commitPoint.Id, queryExpression, resultsFormat, pstream));
+                var t = new Task(() => ServerCore.Query(commitPoint.StoreName, commitPoint.Id, queryExpression, defaultGraphUris, resultsFormat, pstream));
                 t.Start();
                 t.Wait();
                 if (t.IsFaulted && t.Exception != null) throw t.Exception;

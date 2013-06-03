@@ -28,8 +28,14 @@ namespace BrightstarDB.Storage
         // query
         void ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, Stream resultStream, out BrightstarSparqlResultsType resultsType);
 
-        //
-        string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat);
+        /// <summary>
+        /// Execute a SPARQL query against this store
+        /// </summary>
+        /// <param name="exp">The SPARQL query expression</param>
+        /// <param name="resultsFormat">The requested SPARQL results format</param>
+        /// <param name="defaultGraphUris">OPTIONAL: An enumeration of the URIs of the graphs to be treated as the default graph in the SPARQL dataset</param>
+        /// <returns>The SPARQL query results in the requested format</returns>
+        string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris = null);
 
         /// <summary>
         /// Overload of ExecuteSparqlQuery that returns a count of the number of rows returned by the query

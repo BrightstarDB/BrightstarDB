@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Storage;
 using VDS.RDF;
@@ -9,13 +10,32 @@ namespace BrightstarDB.Query
 {
     internal class SparqlQueryHandler
     {
+        private readonly List<Uri> _defaultGraphUris;
+
+        public SparqlQueryHandler()
+        {
+            _defaultGraphUris = null;
+        }
+
+        public SparqlQueryHandler(IEnumerable<string> defaultGraphUris = null)
+        {
+            if (defaultGraphUris != null)
+            {
+                _defaultGraphUris = defaultGraphUris.Select(g => new Uri(g)).ToList();
+            }
+        }
 
         public void ExecuteSparql(IRdfHandler rdfHandler, ISparqlResultsHandler resultsHandler, string sparqlQuery, IStore store)
         {
             try
             {
                 var query = ParseSparql(sparqlQuery);
-                var queryProcessor = new BrightstarQueryProcessor(store, new StoreSparqlDataset(store));
+                var dataset = new StoreSparqlDataset(store);
+                if (_defaultGraphUris != null)
+                {
+                    dataset.SetDefaultGraph(_defaultGraphUris);
+                }
+                var queryProcessor = new BrightstarQueryProcessor(store, dataset);
                 queryProcessor.ProcessQuery(rdfHandler, resultsHandler, query);
             }
             catch (Exception ex)
@@ -34,7 +54,12 @@ namespace BrightstarDB.Query
             {
                 Logging.LogDebug("ExecuteSparql {0}", expression);
                 var query = ParseSparql(expression);
-                var queryProcessor = new BrightstarQueryProcessor(store, new StoreSparqlDataset(store));
+                var dataset = new StoreSparqlDataset(store);
+                if (_defaultGraphUris != null)
+                {
+                    dataset.SetDefaultGraph(_defaultGraphUris);
+                }
+                var queryProcessor = new BrightstarQueryProcessor(store, dataset);
                 return new BrightstarSparqlResultSet(queryProcessor.ProcessQuery(query));
             }
             catch (Exception ex)

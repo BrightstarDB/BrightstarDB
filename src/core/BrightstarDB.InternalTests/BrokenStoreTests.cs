@@ -80,7 +80,7 @@ namespace BrightstarDB.Tests
                 Assert.IsNotNull(resource);
                 try
                 {
-                    var results = storeWorker.Query(TestQuery, SparqlResultsFormat.Xml);
+                    var results = storeWorker.Query(TestQuery, SparqlResultsFormat.Xml, new[] { Constants.DefaultGraphUri });
                     Console.WriteLine("Query succeeded");
                 }
                 catch(Exception ex)

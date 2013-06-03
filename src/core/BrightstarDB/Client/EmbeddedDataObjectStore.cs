@@ -15,12 +15,14 @@ namespace BrightstarDB.Client
         private readonly ServerCore _serverCore;
         private readonly string _storeName;
         private readonly bool _optimisticLockingEnabled;
+        private readonly string _defaultGraphUri;
 
         internal EmbeddedDataObjectStore(ServerCore serverCore, string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled)
             : base(namespaceMappings)
         {
             _serverCore = serverCore;
             _storeName = storeName;
+            _defaultGraphUri = Constants.DefaultGraphUri;
             _optimisticLockingEnabled = optimisticLockingEnabled;
             ResetTransactionData();
         }
@@ -52,7 +54,7 @@ namespace BrightstarDB.Client
 
         public override SparqlResult ExecuteSparql(string sparqlExpression)
         {
-            var xml = _serverCore.Query(_storeName, sparqlExpression, SparqlResultsFormat.Xml);
+            var xml = _serverCore.Query(_storeName, sparqlExpression, new string[]{_defaultGraphUri},  SparqlResultsFormat.Xml);
             return new SparqlResult(xml);
         }
 

@@ -4445,6 +4445,35 @@ instance that will ask for that specific encoding::
                            storeName, query, 
                            SparqlResultsFormat.Xml.WithEncoding(Encoding.Unicode));
 
+Querying Graphs
+===============
+
+By default a SPARQL query will be executed against the default graph in the BrightstarDB store (that is,
+the graph in the store whose identifier is ``http://www.brightstardb.com/.well-known/model/defaultgraph``). In 
+SPARQL terms, this means that the default graph of the dataset consists of just the default graph in the store.
+You can override this default behaviour by passing the identifier of one or more graphs to the 
+``ExecuteQuery()`` method. There are two overrides of ``ExecuteQuery()`` that allow this. One accepts a single
+graph identifier as a ``string`` parameter, the other accepts multiple graph identifiers as an 
+``IEnumerable<string>`` parameter. The three different approaches are shown below::
+
+  // Execute query using the store's default graph as the default graph
+  var result = client.ExecuteQuery(storeName, query);
+  
+  // Execute query using the graph http://example.org/graphs/1 as 
+  // the default graph
+  var result = client.ExecuteQuery(storeName, query, 
+                                   "http://example.org/graphs/1");
+  
+  // Execute query using the graphs http://example.org/graphs/1 and 
+  // http://example.org/graphs/2 as the default graph
+  var result = client.ExecuteQuery(storeName, query, 
+                                   new string[] {
+								     "http://example.org/graphs/1", 
+									 "http://example.org/graphs/2"});
+
+.. note::
+  It is also possible to use the ``FROM`` and ``FROM NAMED`` keywords in the SPARQL query to define
+  both the default graph and the named graphs used in your query.
 
 Using extension methods
 =======================

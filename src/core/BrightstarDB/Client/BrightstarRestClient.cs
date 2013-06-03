@@ -55,7 +55,11 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store to be created</param>
         public void CreateStore(string storeName)
         {
-            var response = AuthenticatedPost("", new Dictionary<string, string> {{"storeName", storeName}});
+            var response = AuthenticatedPost("",
+                                             new List<Tuple<string, string>>
+                                                 {
+                                                     new Tuple<string, string>("storeName", storeName)
+                                                 });
             if (response.StatusCode != HttpStatusCode.Created)
             {
                 throw new BrightstarClientException(
@@ -119,10 +123,47 @@ namespace BrightstarDB.Client
         /// <param name="queryExpression">SPARQL query string</param>
         /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
         /// a BrightstarClientException will be raised with the message "Store not modified".</param>
-        /// <param name="resultsFormat">OPTIONAL: The serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
         /// <returns>A stream containing XML SPARQL result XML</returns>
         public Stream ExecuteQuery(string storeName, string queryExpression,
                                    DateTime? ifNotModifiedSince = new DateTime?(),
+                                   SparqlResultsFormat resultsFormat = null)
+        {
+            return ExecuteQuery(storeName, queryExpression, (string[]) null, ifNotModifiedSince, resultsFormat);
+        }
+
+        /// <summary>
+        /// Query the store using a SPARQL query
+        /// </summary>
+        /// <param name="storeName">The name of the store to query</param>
+        /// <param name="queryExpression">SPARQL query string</param>
+        /// <param name="defaultGraphUri">The URI of the graph that will be the default graph for the query</param>
+        /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
+        /// a BrightstarClientException will be raised with the message "Store not modified".</param>
+        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <returns>A stream containing XML SPARQL result XML</returns>
+        public Stream ExecuteQuery(string storeName, string queryExpression,
+                                   string defaultGraphUri,
+                                   DateTime? ifNotModifiedSince = new DateTime?(),
+                                   SparqlResultsFormat resultsFormat = null)
+        {
+            return ExecuteQuery(storeName, queryExpression, new string[] {defaultGraphUri}, ifNotModifiedSince,
+                                resultsFormat);
+        }
+
+        /// <summary>
+        /// Query the store using a SPARQL query
+        /// </summary>
+        /// <param name="storeName">The name of the store to query</param>
+        /// <param name="queryExpression">SPARQL query string</param>
+        /// <param name="defaultGraphUris">An enumeration over the URIs of the graphs that will be taken together as the default graph for the query</param>
+        /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
+        /// a BrightstarClientException will be raised with the message "Store not modified".</param>
+        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <returns>A stream containing XML SPARQL result XML</returns>
+        public Stream ExecuteQuery(string storeName, string queryExpression,
+            IEnumerable<string> defaultGraphUris,
+            DateTime? ifNotModifiedSince = new DateTime?(),
             SparqlResultsFormat resultsFormat = null)
         {
             if (resultsFormat == null) resultsFormat = SparqlResultsFormat.Xml;
@@ -135,7 +176,13 @@ namespace BrightstarDB.Client
                     throw new BrightstarClientException("Store not modified");
                 }
             }
-            var queryResponse = AuthenticatedPost(storeName, new Dictionary<string, string> {{"query", queryExpression}});
+            var parameters = new List<Tuple<string, string>> {new Tuple<string, string>("query", queryExpression)};
+            if (defaultGraphUris != null)
+            {
+                parameters.AddRange(defaultGraphUris.Select(g => new Tuple<string, string>("default-graph-uri", g)));
+            }
+            
+            var queryResponse = AuthenticatedPost(storeName, parameters);
             return queryResponse.GetResponseStream();
         }
 
@@ -144,9 +191,37 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="commitPoint">The commit point be queried</param>
         /// <param name="queryExpression">The SPARQL query string</param>
+        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <returns>A stream containing XML SPARQL results</returns>
+        public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression,
+                                   SparqlResultsFormat resultsFormat)
+        {
+            return ExecuteQuery(commitPoint, queryExpression, (IEnumerable<string>) null, resultsFormat);
+        }
+
+        /// <summary>
+        /// Query a specific commit point of a store
+        /// </summary>
+        /// <param name="commitPoint">The commit point be queried</param>
+        /// <param name="queryExpression">The SPARQL query string</param>
+        /// <param name="defaultGraphUri">The URI of the default graph for the query</param>
+        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <returns>A stream containing XML SPARQL results</returns>
+        public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression, string defaultGraphUri,
+                                   SparqlResultsFormat resultsFormat)
+        {
+            return ExecuteQuery(commitPoint, queryExpression, new string[] {defaultGraphUri}, resultsFormat);
+        }
+
+        /// <summary>
+        /// Query a specific commit point of a store
+        /// </summary>
+        /// <param name="commitPoint">The commit point be queried</param>
+        /// <param name="queryExpression">The SPARQL query string</param>
+        /// <param name="defaultGraphUris"></param>
         /// <param name="resultsFormat"> </param>
         /// <returns>A stream containing XML SPARQL results</returns>
-        public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression, SparqlResultsFormat resultsFormat)
+        public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression, IEnumerable<string> defaultGraphUris, SparqlResultsFormat resultsFormat)
         {
             throw new NotImplementedException();
         }
@@ -424,7 +499,7 @@ namespace BrightstarDB.Client
             return headRequest.GetResponse() as HttpWebResponse;
         }
 
-        private HttpWebResponse AuthenticatedPost(string relativePath, Dictionary<string, string> postBodyParameters)
+        private HttpWebResponse AuthenticatedPost(string relativePath, IEnumerable<Tuple<string, string>> postBodyParameters)
         {
             var uri = new Uri(_serviceEndpoint, relativePath);
             var postRequest = WebRequest.Create(uri) as HttpWebRequest;
@@ -434,8 +509,8 @@ namespace BrightstarDB.Client
             var contentBuilder = new StringBuilder();
             foreach (var bodyParam in postBodyParameters)
             {
-                contentBuilder.AppendFormat("{0}={1}", EscapeDataString(bodyParam.Key),
-                                            EscapeDataString(bodyParam.Value));
+                contentBuilder.AppendFormat("{0}={1}", EscapeDataString(bodyParam.Item1),
+                                            EscapeDataString(bodyParam.Item2));
                 contentBuilder.Append("&");
             }
             var content = contentBuilder.ToString().TrimEnd('&');
@@ -502,10 +577,10 @@ namespace BrightstarDB.Client
 
         private string CreateJob(string storeName, string jobType, string jobData)
         {
-            var postBodyParameters = new Dictionary<string, string>
+            var postBodyParameters = new List<Tuple<string, string>>
                                          {
-                                             {"jobType", jobType},
-                                             {"jobData", jobData}
+                                             new Tuple<string, string>("jobType", jobType),
+                                             new Tuple<string, string>("jobData", jobData)
                                          };
             var response = AuthenticatedPost(storeName + "/jobs", postBodyParameters);
             if (response.StatusCode == HttpStatusCode.Created)

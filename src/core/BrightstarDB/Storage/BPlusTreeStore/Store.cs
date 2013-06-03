@@ -108,9 +108,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             streamWriter.Flush();
         }
 
-        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat)
+        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris = null)
         {
-            var queryHandler = new SparqlQueryHandler();
+            var queryHandler = new SparqlQueryHandler(defaultGraphUris);
             BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
             return result.GetString(resultsFormat);
         }

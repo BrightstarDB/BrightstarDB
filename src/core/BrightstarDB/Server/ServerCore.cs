@@ -144,7 +144,7 @@ namespace BrightstarDB.Server
         }
 
         // operations
-        public void Query(string storeName, string queryExpression, DateTime? ifNotModifiedSince, SparqlResultsFormat resultsFormat, Stream responseStream)
+        public void Query(string storeName, string queryExpression, IEnumerable<string> defaultGraphUris, DateTime? ifNotModifiedSince, SparqlResultsFormat resultsFormat, Stream responseStream)
         {
             try
             {
@@ -154,7 +154,9 @@ namespace BrightstarDB.Server
                 {
                     throw new BrightstarStoreNotModifiedException();
                 }
-                var cachedResult = GetCachedResult(storeName, commitPoint.CommitTime.Ticks, queryExpression, resultsFormat);
+                var g = defaultGraphUris == null ? null : defaultGraphUris.ToArray();
+                var cacheKey = MakeQueryCacheKey(storeName, commitPoint.CommitTime.Ticks, queryExpression, g, resultsFormat);
+                var cachedResult = GetCachedResult(cacheKey);
                 if (cachedResult != null)
                 {
                     WriteResults(resultsFormat, responseStream, cachedResult);
@@ -162,8 +164,8 @@ namespace BrightstarDB.Server
                 }
 
                 var storeWorker = GetStoreWorker(storeName);
-                var results = storeWorker.Query(queryExpression, resultsFormat);
-                CacheResult(storeName, commitPoint.CommitTime.Ticks, queryExpression, resultsFormat, results);
+                var results = storeWorker.Query(queryExpression, resultsFormat, g);
+                CacheResult(cacheKey, results);
                 WriteResults(resultsFormat, responseStream, results);
             }
             catch (Exception)
@@ -193,11 +195,12 @@ namespace BrightstarDB.Server
             }
         }
 
-        public void Query(string storeName, ulong commitPointId, string queryExpression, SparqlResultsFormat resultsFormat, Stream responseStream)
+        public void Query(string storeName, ulong commitPointId, string queryExpression,IEnumerable<string> defaultGraphUris, SparqlResultsFormat resultsFormat, Stream responseStream)
         {
             try
             {
                 Logging.LogDebug("Query {0}@{1} {2}", storeName, commitPointId, queryExpression);
+                var g = defaultGraphUris == null ? null : defaultGraphUris.ToArray();
                 var storeLocation = Path.Combine(_baseLocation, storeName);
                 var masterFile = _storeManager.GetMasterFile(storeLocation);
                 if (masterFile.PersistenceType == PersistenceType.Rewrite)
@@ -211,7 +214,8 @@ namespace BrightstarDB.Server
                     throw new InvalidCommitPointException(String.Format("Could not find commit point {0} for store {1}.", commitPointId, storeName));
                 }
 
-                var cachedResult = GetCachedResult(storeName, commitPoint.CommitTime.Ticks, queryExpression, resultsFormat);
+                var cacheKey = MakeQueryCacheKey(storeName, commitPoint.CommitTime.Ticks, queryExpression, g, resultsFormat);
+                var cachedResult = GetCachedResult(cacheKey);
                 if (cachedResult != null)
                 {
                     Logging.LogDebug("Returning cached result for query. Store={0}@{1}, queryExpression={2}", storeName, commitPointId, queryExpression);
@@ -220,8 +224,8 @@ namespace BrightstarDB.Server
                 }
 
                 var storeWorker = GetStoreWorker(storeName);
-                var results = storeWorker.Query(commitPointId, queryExpression, resultsFormat);
-                CacheResult(storeName, commitPoint.CommitTime.Ticks, queryExpression, resultsFormat, results);
+                var results = storeWorker.Query(commitPointId, queryExpression, resultsFormat, g);
+                CacheResult(cacheKey, results);
                 WriteResults(resultsFormat, responseStream, results);
             }
             catch(Exception)
@@ -231,40 +235,43 @@ namespace BrightstarDB.Server
             }
         }
 
-        public string Query(string storeName, string queryExpression, SparqlResultsFormat resultsFormat)
+        public string Query(string storeName, string queryExpression, IEnumerable<string> defaultGraphUris, SparqlResultsFormat resultsFormat)
         {
+            var g = defaultGraphUris == null ? null : defaultGraphUris.ToArray();
             Logging.LogDebug("Query {0} {1}", storeName, queryExpression);
             var currentCommitPoint = _storeManager.GetMasterFile(Path.Combine(_baseLocation, storeName)).GetLatestCommitPoint();
-            var cachedResult = GetCachedResult(storeName, currentCommitPoint.CommitTime.Ticks, queryExpression, resultsFormat);
+            var cacheKey = MakeQueryCacheKey(storeName, currentCommitPoint.CommitTime.Ticks,
+                                             queryExpression, g, resultsFormat);
+            var cachedResult = GetCachedResult(cacheKey);
             if (cachedResult != null)
             {
                 Logging.LogDebug("Returning cached result for query Query {0} {1}", storeName, queryExpression);
                 return cachedResult;
             }
             var storeWorker = GetStoreWorker(storeName);
-            var result =  storeWorker.Query(queryExpression, resultsFormat);
+            var result =  storeWorker.Query(queryExpression, resultsFormat, g);
             //add to cache
-            CacheResult(storeName, currentCommitPoint.CommitTime.Ticks, queryExpression, resultsFormat, result);
+            CacheResult(cacheKey, result);
             return result;
         }
 
 
         #region Query Caching
 
-        private static string MakeQueryCacheKey(string storeName, long commitTime, int queryHashcode, SparqlResultsFormat format)
+        private static string MakeQueryCacheKey(string storeName, long commitTime, string query, IEnumerable<string> defaultGraphUris, SparqlResultsFormat format)
         {
-            return storeName + "_" + commitTime + "_" + queryHashcode + "." + format.DefaultExtension;
+            var graphHashCode = defaultGraphUris == null ? 0 : String.Join(",", defaultGraphUris).GetHashCode();
+            return storeName + "_" + commitTime + "_" + query.GetHashCode() + "_" + graphHashCode + "." +
+                   format.DefaultExtension;
         }
 
-        private string GetCachedResult(string storeName, long commitTime, string queryString, SparqlResultsFormat format)
+        private string GetCachedResult(string key)
         {
-            var key = MakeQueryCacheKey(storeName, commitTime, queryString.GetHashCode(), format);
             return _queryCache.Lookup<String>(key);
         }
 
-        private void CacheResult(string storeName, long commitTime, string queryString, SparqlResultsFormat format, string results)
+        private void CacheResult(string key, string results)
         {
-            var key = MakeQueryCacheKey(storeName, commitTime, queryString.GetHashCode(), format);
             _queryCache.Insert(key, results, CachePriority.Normal);
         }
 
