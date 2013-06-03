@@ -6,12 +6,9 @@
 
 .. _System.ComponentModel.INotifyPropertyChanged: http://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged%28v=vs.100%29.aspx
 .. _System.Collections.Specialized.INotifyCollectionChanged: http://msdn.microsoft.com/en-us/library/system.collections.specialized.inotifycollectionchanged%28v=vs.100%29.aspx
-.. _http://www.w3.org/2001/XMLSchema#date: <%LINK_CAPTION%>
 
 
 This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are marked with FIX
-
-
 
 
 *************************
@@ -103,7 +100,7 @@ This release introduces some BREAKING API changes (but data store format is unaf
 
   - NEW: EntityFramework now surfaces an event that is invoked immediately before changes are saved to the store. For more information please see the section :ref:`SavingChanges Event <SavingChanges_Event>`.
 
-  - FIX: The XML Schema "date" datatype (`http://www.w3.org/2001/XMLSchema#date`_) is now recognized and mapped to a System.DateTime value by EntityFramework.
+  - FIX: The XML Schema "date" datatype (``http://www.w3.org/2001/XMLSchema#date``) is now recognized and mapped to a System.DateTime value by EntityFramework.
 
   - NEW: Added support for the LINQ .All() filter operator.
 

@@ -1,68 +1,10 @@
 <Project ToolsVersion="4.0" 
 	 xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
 	 DefaultTargets="Build">
-
-  <PropertyGroup>
-	  <HMPath Condition=" '$(HMPath)' == '' ">C:\Program Files (x86)\EC Software\HelpAndManual5</HMPath>
-    <WebsiteDocumentationDir>..\website\site\documentation</WebsiteDocumentationDir>
-	<AzureDocumentationDir>..\website\site\service\documentation</AzureDocumentationDir>
-  </PropertyGroup>
-
-  <Target Name="WebsiteClean">
-    <RemoveDir Directories="$(WebsiteDocumentationDir)"/>
-	<RemoveDir Directories="$(AzureDocumentationDir)"/>
+ 
+  <Target Name="Html">
+    <Exec Command="make.bat html" WorkingDirectory="src" />
   </Target>
-
-  <Target Name="Sphinx">
-    <XslTransformation
-      XmlInputPaths="src\Maps\table_of_contents.xml"
-      OutputPaths="sphinx\index.rst"
-      XslInputPath="sphinx_index.xslt"/>
-
-    <XmlPeek XmlInputPath="src\Maps\table_of_contents.xml"
-             Query="map/topicref/@href">
-      <Output TaskParameter="Result" ItemName="Source"/>
-    </XmlPeek>
-
-    <XslTransformation
-      XmlInputPaths="@(Source->'src\Maps\table_of_contents.xml')"
-      OutputPaths="@(Source->'sphinx\%(Identity).rst')"
-      XslInputPath="sphinx_docs.xslt"
-      Parameters="&lt;Parameter Name='docname' Value='%(Identity)'/&gt;"/>
-  </Target>
-  
-  <Target Name="Website">
-
-    <Message Text="Building to $(WebsiteDocumentationDir)"/>
-    <MakeDir Directories="$(WebsiteDocumentationDir)"/>
-
-    <ItemGroup>
-      <Images Include="src\Images\*.png"/>
-    </ItemGroup>
-    
-    <Copy SourceFiles="@(Images)"
-          DestinationFolder="$(WebsiteDocumentationDir)\images"/>
-
-    <XslTransformation
-      XmlInputPaths="src\Maps\table_of_contents.xml"
-      OutputPaths="$(WebsiteDocumentationDir)\index.html"
-      XslInputPath="website_docs_index.xslt"/>
-
-    <XmlPeek XmlInputPath="src\Maps\table_of_contents.xml"
-             Query="map/topicref/@href">
-      <Output TaskParameter="Result" ItemName="Source"/>
-    </XmlPeek>
-
-    <XslTransformation
-      XmlInputPaths="@(Source->'src\Maps\table_of_contents.xml')"
-      OutputPaths="@(Source->'$(WebsiteDocumentationDir)\%(Identity).html')"
-      XslInputPath="website_docs.xslt"
-      Parameters="&lt;Parameter Name='docname' Value='%(Identity)'/&gt;"/>
-
-  </Target>
-
-  <Target Name="WebsiteRebuild"
-	  DependsOnTargets="WebsiteClean;Website;APIDocs"/>
 
   <Target Name="APIDocs">
     <MSBuild Projects="api\BrightstarDB.shfbproj" />
@@ -72,29 +14,6 @@
 	<Move SourceFiles="@(CHMFile)" DestinationFolder="build"/>
   </Target>
 
-  <Target Name="CorePdfAndChmServer">
-    <Exec Command='"$(HMPath)\helpman" src\BrightstarDB.hmxp /PDF=../build/Server/BrightstarDB_Documentation.pdf /Template=..\DocumentationPdf.mnl /CHM=../build/Server/BrightstarDB.chm /I=CHM,PDF,SERVER'
-	  IgnoreExitCode="True"/>
-  </Target>
-
-  <Target Name="CorePdfAndChmEnterprise">
-    <Exec Command='"$(HMPath)\helpman" src\BrightstarDB.hmxp /PDF=../build/Enterprise/BrightstarDB_Documentation.pdf /Template=..\DocumentationPdf.mnl /CHM=../build/Enterprise/BrightstarDB.chm /I=CHM,PDF,ENTERPRISE'
-	  IgnoreExitCode="True"/>
-  </Target>
-
-  <Target Name="CorePdfAndChmMobile">
-    <Exec Command='"$(HMPath)\helpman" src\BrightstarDB.hmxp /PDF=../build/Mobile/BrightstarDB_Documentation.pdf /Template=..\DocumentationPdf.mnl /CHM=../build/Mobile/BrightstarDB.chm /I=CHM,PDF,MOBILE'
-	  IgnoreExitCode="True"/>
-  </Target>
-
-  <Target Name="CorePdfAndChmEmbedded">
-    <Exec Command='"$(HMPath)\helpman" src\BrightstarDB.hmxp /PDF=../build/Embedded/BrightstarDB_Documentation.pdf /Template=..\DocumentationPdf.mnl /CHM=../build/Embedded/BrightstarDB.chm /I=CHM,PDF,EMBEDDED'
-	  IgnoreExitCode="True"/>
-  </Target>
-
-  <Target Name="PackagedFiles" DependsOnTargets="CorePdfAndChmEnterprise;CorePdfAndChmServer;CorePdfAndChmMobile;CorePdfAndChmEmbedded">
-  </Target>
-  
-  <Target Name="Build" DependsOnTargets="WebsiteRebuild;PackagedFiles"/>
+  <Target Name="Build" DependsOnTargets="APIDocs;Html"/>
   
 </Project>
