@@ -2,10 +2,6 @@
 [Bb]in/
 [Oo]bj/
 
-# Generated HTML docs
-documentation/
-
-
 # mstest test results
 TestResults
 
