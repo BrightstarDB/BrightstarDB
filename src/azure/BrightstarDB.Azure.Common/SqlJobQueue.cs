@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -34,7 +34,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "QueueJob";
+                        cmd.CommandText = "Brightstar_QueueJob";
                         cmd.Parameters.AddWithValue("id", jobId);
                         cmd.Parameters.AddWithValue("storeId", storeId);
                         cmd.Parameters.AddWithValue("jobType", (short) jobType);
@@ -66,7 +66,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "NextJob";
+                        cmd.CommandText = "Brightstar_NextJob";
                         cmd.Parameters.AddWithValue("storeId",
                                                     String.IsNullOrEmpty(preferredStoreId)
                                                         ? (object) DBNull.Value
@@ -107,7 +107,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "UpdateStatus";
+                        cmd.CommandText = "Brightstar_UpdateStatus";
                         cmd.Parameters.AddWithValue("jobId", jobId);
                         cmd.Parameters.AddWithValue("statusMessage", StatusMessageValue(statusMessage));
                         cmd.ExecuteNonQuery();
@@ -130,7 +130,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "StartCommit";
+                        cmd.CommandText = "Brightstar_StartCommit";
                         cmd.Parameters.AddWithValue("jobId", jobId);
                         cmd.Parameters.AddWithValue("statusMessage", StatusMessageValue(statusMessage));
                         cmd.ExecuteNonQuery();
@@ -152,7 +152,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "CompleteJob";
+                        cmd.CommandText = "Brightstar_CompleteJob";
                         cmd.Parameters.AddWithValue("jobId", jobId);
                         cmd.Parameters.AddWithValue("finalStatus", (int) finalStatus);
                         cmd.Parameters.AddWithValue("finalStatusMessage", StatusMessageValue(finalStatusMessage));
@@ -177,7 +177,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "JobException";
+                        cmd.CommandText = "Brightstar_JobException";
                         cmd.Parameters.AddWithValue("jobId", jobId);
                         cmd.Parameters.AddWithValue("statusMessage", StatusMessageValue(failureMessage));
                         cmd.Parameters.AddWithValue("processingException", ex.ToString());
@@ -203,7 +203,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "ReleaseJob";
+                        cmd.CommandText = "Brightstar_ReleaseJob";
                         cmd.Parameters.AddWithValue("jobId", jobId);
                         cmd.ExecuteNonQuery();
                     }
@@ -261,8 +261,8 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        
-                        cmd.CommandText = "GetJob";
+
+                        cmd.CommandText = "Brightstar_GetJob";
                         cmd.Parameters.AddWithValue("jobId", jobId);
                         cmd.Parameters.AddWithValue("storeId", storeId);
                         using (var reader = cmd.ExecuteReader())
@@ -302,7 +302,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "Cleanup";
+                        cmd.CommandText = "Brightstar_Cleanup";
                         cmd.Parameters.AddWithValue("maxJobAge", (int) maxJobAge.TotalSeconds);
                         cmd.ExecuteNonQuery();
                     }
@@ -327,7 +327,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "ClearAllJobs";
+                        cmd.CommandText = "Brightstar_ClearAllJobs";
                         cmd.ExecuteNonQuery();
                     }
                 } finally
@@ -352,7 +352,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "GetLastCommit";
+                        cmd.CommandText = "Brightstar_GetLastCommit";
                         cmd.Parameters.AddWithValue("storeId", storeId);
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -394,7 +394,7 @@ namespace BrightstarDB.Azure.Common
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandText = "GetStoreJobs";
+                        cmd.CommandText = "Brightstar_GetStoreJobs";
                         cmd.Parameters.AddWithValue("storeId", storeId);
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -429,7 +429,7 @@ namespace BrightstarDB.Azure.Common
                         using (var cmd = conn.CreateCommand())
                         {
                             cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.CommandText = "GetJobDetail";
+                            cmd.CommandText = "Brightstar_GetJobDetail";
                             cmd.Parameters.AddWithValue("jobId", jobId);
                             using (var reader = cmd.ExecuteReader())
                             {
