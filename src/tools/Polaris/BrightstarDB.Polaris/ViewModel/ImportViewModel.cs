@@ -186,7 +186,7 @@ namespace BrightstarDB.Polaris.ViewModel
                         }
                     }
                     var client = BrightstarService.GetClient(Store.Source.ConnectionString);
-                    _transactionJob = client.ExecuteTransaction(Store.Location, String.Empty, String.Empty, lines, false);
+                    _transactionJob = client.ExecuteTransaction(Store.Location, String.Empty, String.Empty, lines, waitForCompletion:false);
                     _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle,
                                             new TransactionViewModel.JobMonitorDelegate(CheckJobStatus));
                 }
