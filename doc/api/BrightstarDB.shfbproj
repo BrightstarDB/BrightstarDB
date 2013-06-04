@@ -15,7 +15,7 @@
     <RootNamespace>Documentation</RootNamespace>
     <Name>Documentation</Name>
     <!-- SHFB properties -->
-    <OutputPath>..\..\website\documentation\API\</OutputPath>
+    <OutputPath>..\build\api\</OutputPath>
     <HtmlHelpName>BrightstarDB_API</HtmlHelpName>
     <Language>en-US</Language>
     <DocumentationSources>
