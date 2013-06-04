@@ -7,15 +7,22 @@ into the main documentation.
 
 Version
 -------
-1.1
+1.3
 
-We welcome feedback, comments, feature requests and bug reports sent to 
-support@brightstardb.com.
+We welcome feedback, comments, feature requests and bug reports. Please use
+our issue tracker at https://github.com/BrightstarDB/BrightstarDB/issues 
+or join us on our Google Group at 
+https://groups.google.com/forum/?fromgroups#!forum/brightstardb-users
+
+Documentation
+-------------
+Our developer and user guide is available at http://brightstardb.readthedocs.org/
+The API documentation for this release is available at http://brightstardb.com/api/1.3/
 
 Change Log
 ----------
 For full list of changes and bug fixes, please refer to 
-http://brightstarDB.com/documentation/Whats_New.html
+http://brightstardb.readthedocs.org/en/latest/Whats_New/
 
 Please be aware that this release will break existing BrightstarDB databases. 
 If you have stores created with a previous version of BrightstarDB that you
@@ -25,20 +32,11 @@ wish to continue using, please read the information at the above URL
 
 Known Issues
 ------------
-None at this time.
+Please see the list at http://brightstardb.readthedocs.org/en/latest/Known_Issues/
 
 Licensing
 ---------
-BrightstarDB is free for all non-commercial and development purposes. If you 
-run an instance as part of internal production system, as part of a service 
-offering, or as a component in a desktop, server or phone application you 
-require a license. 
-
-Please see the website for more license information. 
-
-It is your responsibility to check with BrightstarDB Limited if you are unsure
-if you need to purchase a license. 
-
+BrightstarDB is licensed under the MIT license: http://www.opensource.org/licenses/MIT
 
 More Information
 ----------------
@@ -50,6 +48,3 @@ Third-party libraries
 This software makes use of a number of 3rd party libraries. Please refer to the
 NOTICE.txt file for details of those libraries and their licensing terms and
 conditions.
- 
---
-Copyright (c) 2012 BrightstarDB Ltd

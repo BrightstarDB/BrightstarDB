@@ -2,17 +2,17 @@
 <package >
   <metadata>
     <id>BrightstarDBLibs</id>
-    <version>1.1.30928</version>
+    <version>$version$</version>
 	<title>BrightstarDB (Libraries Only)</title>
     <authors>kal_ahmed</authors>
     <owners>kal_ahmed</owners>
-    <licenseUrl>http://brightstardb.com/download/license_agreement.html</licenseUrl>
+    <licenseUrl>http://www.opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>http://brightstardb.com/</projectUrl>
     <iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>BrightstarDB is a fast and scalable NoSQL database for .NET with code-first data model generation. This package only installs the BrightstarDB libraries - for entity framework support please install the BrightstarDB package</description>
-	<releaseNotes>This update brings the NuGet package inline with the latest release from BrightstarDB. For full release notes please see http://brightstardb.com/documentation/Whats_New.html</releaseNotes>
-    <copyright>Copyright 2012 BrightstarDB Limited</copyright>
+	<releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>Copyright 2013 BrightstarDB Limited</copyright>
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
   </metadata>
 </package>

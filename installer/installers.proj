@@ -181,7 +181,7 @@
   </Target>
 
 
-  <Target Name="PrepareSdk" DependsOnTargets="BuildNet40;BuildWP71">
+  <Target Name="PrepareSdk" DependsOnTargets="Version;BuildNet40;BuildWP71">
     <ItemGroup>
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <WP71Sdk Include="..\src\mobile\BrightstarDB.Mobile\bin\$(Configuration)\*.dll"/>
@@ -233,12 +233,6 @@
     <Copy SourceFiles="@(SDShareSampleProviderProperties)" DestinationFolder="InstallerTmp\SDShare\Samples\SampleProvider\BrightstarDB.SdShare.SampleProvider\Properties"/>
   </Target>
 
-  
-  <Target Name="BuildSdk" DependsOnTargets="PrepareSdk">
-    <SmartAssembly.MSBuild.Tasks.Build ProjectFile="BrightstarDB_Net40.saproj"/>
-    <SmartAssembly.MSBuild.Tasks.Build ProjectFile="BrightstarDB.Mobile.saproj"/>
-  </Target>
-
   <Target Name="BuildInstaller" DependsOnTargets="Prepare;PrepareSparqlEndpoint">
     <!-- Invoke the WIX project to build the installer -->
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
@@ -271,7 +265,7 @@
     <CallTarget Targets="Build"/>
   </Target>
 
-  <Target Name="Build" DependsOnTargets="CleanOutput;BuildEnterpriseInstaller">
+  <Target Name="Build" DependsOnTargets="CleanOutput;BuildEnterpriseInstaller;NuGet">
     <ItemGroup>
       <InstallerPackages Include="$(OutputPath)\*.zip"/>
     </ItemGroup>
@@ -297,5 +291,50 @@
              Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
   </Target>
 
+  <Target Name="NuGet" DependsOnTargets="Version">
+    <RemoveDir Directories="$(OutputPath)\nuget" />
+    <MakeDir Directories="$(OutputPath)\nuget\BrightstarDBLibs" />
+    <MakeDir Directories="$(OutputPath)\nuget\BrightstarDB" />
+    <ItemGroup>
+        <Readme Include="nuget\README.txt" />
+        <ReleaseNotes Include="nuget\ReleaseNotes.txt"/>
+        <NuspecTemplate Include="nuget\BrightstarDB.nuspec.template"/>
+        <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
+        <Net40Libs Include="InstallerTmp\SDK\Net40\*.dll" />
+        <WP71Libs Include="InstallerTmp\SDK\WP71\*.dll" />
+        <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
+    </ItemGroup>
+    
+    <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
+    <Copy SourceFiles="@(LibsNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec')" />
 
+    <ReadLinesFromFile File="@(ReleaseNotes)">
+      <Output TaskParameter="Lines" PropertyName="ReleaseNotesText" />
+    </ReadLinesFromFile>
+    <Message Text="Release Notes: $(ReleaseNotesText)"/>
+    <FileUpdate Files="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec;$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec"
+   Regex="\$releaseNotes\$"
+   ReplacementText="$([System.IO.File]::ReadAllText('nuget\ReleaseNotes.txt'))" />
+        
+    
+    <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec"
+             Query="package/metadata/version"
+             Value="$(BuildNumber)" />
+    <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec"
+             Query="package/metadata/version"
+             Value="$(BuildNumber)" />
+
+    <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
+    <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\wp71"/>
+    <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs" />
+    
+    <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\net40"/>
+    <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\wp71"/>
+    <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB" />
+    <Copy SourceFiles="@(TextTemplates)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\content" />
+    
+    <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" />
+    <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec" />
+  </Target>
+  
 </Project>
