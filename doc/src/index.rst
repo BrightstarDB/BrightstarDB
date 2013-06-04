@@ -9,7 +9,7 @@ BrightstarDB Documentation
     Concepts <Concepts>
     Why BrightstarDB? <Why_BrightstarDB_>
     Supported RDF Syntaxes <Supported_RDF_Syntaxes>
-    Developing With BrightstarDB <Developing_With_BrightstarDB2>
+    Developing With BrightstarDB <Developing_With_BrightstarDB>
     BrightstarDB Configuration Options <Running_BrightstarDB>
     SPARQL Endpoint <SPARQL_Endpoint>
     Polaris Management Tool <Using_Polaris>
