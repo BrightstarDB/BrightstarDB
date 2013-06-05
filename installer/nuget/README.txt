@@ -24,12 +24,6 @@ Change Log
 For full list of changes and bug fixes, please refer to 
 http://brightstardb.readthedocs.org/en/latest/Whats_New/
 
-Please be aware that this release will break existing BrightstarDB databases. 
-If you have stores created with a previous version of BrightstarDB that you
-wish to continue using, please read the information at the above URL
-*before* installing this upgrade.
-
-
 Known Issues
 ------------
 Please see the list at http://brightstardb.readthedocs.org/en/latest/Known_Issues/

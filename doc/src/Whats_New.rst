@@ -10,11 +10,20 @@
 
 This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are marked with FIX
 
+*************************
+ BrightstarDB 1.3 Release
+*************************
 
+  - NEW: The ExecuteTransaction method now supports specifying a target graph.
+  
+  - NEW: The ExecuteQuery Method now supports specifying the default graph of the SPARQL dataset.
+  
+  - FIX: NuGet packages are now updated import their dependencies on installation.
+  
+  
 *************************
  BrightstarDB 1.2 Release
 *************************
-
 
   - NEW: Collection properties on entities now support compiling LINQ queries to SPARQL. This can be achieved by using the AsQueryable() method on the collection. e.g. myEntity.RelatedItems.AsQueryable()....// LINQ query follows
 
@@ -24,13 +33,10 @@ This section gives a brief outline of what is new / changed in each official rel
 
   - NEW: BrightstarDB generated entity classes now implement the `System.ComponentModel.INotifyPropertyChanged`_ interface and fire a notification event any time a property with a single value is modified. All collections exposed by the generated classes now implement the `System.Collections.Specialized.INotifyCollectionChanged`_ interface and fire a notification when an item is added to or removed from the collection or when the collection is reset. For more information please refer to the section :ref:`INotifyPropertyChanged and INotifyCollectionChanged Support <Local_Change_Tracking>`.
 
-
-
-
+  
 *************************
  BrightstarDB 1.1 Release
 *************************
-
 
   - FIX: Entity Framework code generation now supports multiple levels of inheritance on interfaces.
 
@@ -38,25 +44,19 @@ This section gives a brief outline of what is new / changed in each official rel
 
   - NEW: Installer now adds the BrightstarDB item templates for EntityContext and Entity to VS2012 Professional and above. VS2010 and VS2010 Express are also still supported. Please note that VS2012 Express editions are not supported at this time.
 
-
-
-
+  
 *************************
  BrightstarDB 1.0 Release
 *************************
-
 
   - NEW: Added support for executing SPARQL Update commands to :ref:`Polaris <Using_Polaris>`
 
   - FIX: A few minor bug fixes
 
-
-
-
+  
 ***********************************
  BrightstarDB 1.0 Release Candidate
 ***********************************
-
 
 This release introduces a BREAKING file format change. If you are upgrading from a previous version of BrightstarDB and you wish to retain the data in a store, you should export all data from that store before performing the upgrade and then after the upgrade delete and recreate the store and import the exported data.
 
@@ -65,12 +65,9 @@ This release introduces a BREAKING file format change. If you are upgrading from
   - NEW: Store now supports a file format that reduces index file growth rate
 
 
-
-
 *************************************
  BrightstarDB 1.0 Public Beta Refresh
 *************************************
-
 
 This release introduces some BREAKING API changes (but data store format is unaffected, so only your code needs to be modified). If you are upgrading from a previous release, please read the following carefully - in particular note the BREAKING changes that are introduced in this release.
 
