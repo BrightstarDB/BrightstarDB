@@ -14,5 +14,8 @@
 	<releaseNotes>$releaseNotes$</releaseNotes>
     <copyright>Copyright 2013 BrightstarDB Limited</copyright>
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
+    <dependencies>
+      <dependency id="dotNetRDF" version="1.0.0.2533" />
+    </dependencies>
   </metadata>
 </package>
