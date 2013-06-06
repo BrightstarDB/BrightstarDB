@@ -44,7 +44,7 @@ namespace BrightstarDB.Server
                 var filePath = Path.Combine(storeDirectory,
                                             ".." + Path.DirectorySeparatorChar + "import" + Path.DirectorySeparatorChar +
                                             _contentFileName);
-                var profiler = new BrightstarProfiler("Import " + _contentFileName); // TODO : Conditionally create this if profiling is enabled
+                var profiler = Logging.IsProfilingEnabled ? new BrightstarProfiler("Import " + _contentFileName) : null;
                 Logging.LogDebug("Import file path calculated as '{0}'", filePath);
                 if (!File.Exists(filePath))
                 {
