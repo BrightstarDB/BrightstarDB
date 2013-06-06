@@ -20,6 +20,10 @@ namespace BulkImport
         [Argument(ArgumentType.AtMostOnce, ShortName = "p", HelpText = "The pattern to use to match the names of the files to be imported")]
         public string FilePattern = "*.*";
 
+        [Argument(ArgumentType.AtMostOnce, ShortName = "m",
+            HelpText = "Specify the directory to which imported file should be moved after successful import")] 
+        public string MoveTo;
+
         [Argument(ArgumentType.AtMostOnce, ShortName = "l", HelpText = "The path to the file to write logging information to.")]
         public string LogFile = "import.log";
     }
