@@ -20,6 +20,7 @@ This section gives a brief outline of what is new / changed in each official rel
   
   - FIX: NuGet packages are now updated import their dependencies on installation.
   
+  - FIX: Disabled profiling code that was eating up significant amounts of memory during long running imports. Profiling can now be enabled globally by calling Logging.EnableProfiling(true);
   
 *************************
  BrightstarDB 1.2 Release
