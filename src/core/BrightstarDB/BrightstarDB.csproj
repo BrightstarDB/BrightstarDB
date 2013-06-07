@@ -298,10 +298,13 @@
     <Compile Include="Storage\BPlusTreeStore\BPlusTreeBuilder.cs" />
     <Compile Include="Storage\BPlusTreeStore\BPlusTreeConfiguration.cs" />
     <Compile Include="Storage\BPlusTreeStore\BPlusTreeStoreManager.cs" />
+    <Compile Include="Storage\BPlusTreeStore\DirectNodeFactory.cs" />
     <Compile Include="Storage\BPlusTreeStore\DuplicateKeyException.cs" />
     <Compile Include="Storage\BPlusTreeStore\GraphIndex\IPageStoreGraphIndex.cs" />
+    <Compile Include="Storage\BPlusTreeStore\ILeafNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\INode.cs" />
     <Compile Include="Storage\BPlusTreeStore\INodeCache.cs" />
+    <Compile Include="Storage\BPlusTreeStore\INodeFactory.cs" />
     <Compile Include="Storage\BPlusTreeStore\InternalNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\IPageStoreObject.cs" />
     <Compile Include="Storage\BPlusTreeStore\IPageStorePrefixManager.cs" />
@@ -317,6 +320,7 @@
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LongLiteralResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LongUriResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceTable.cs" />
+    <Compile Include="Storage\DirectLeafNode.cs" />
     <Compile Include="Storage\IPrefixManager.cs" />
     <Compile Include="Storage\BPlusTreeStore\Store.cs" />
     <Compile Include="Storage\BTreeStore\AbstractStoreManager.cs" />

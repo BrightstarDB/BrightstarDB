@@ -17,7 +17,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public void Add(INode node)
         {
-            if (node is LeafNode)
+            if (node is ILeafNode)
             {
                 _leafNodeCache.Insert(node.PageId, new WeakReference(node));
             }

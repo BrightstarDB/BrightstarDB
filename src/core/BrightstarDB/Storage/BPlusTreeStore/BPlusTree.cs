@@ -14,6 +14,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         private readonly IPageStore _pageStore;
         private readonly Dictionary<ulong, INode> _modifiedNodes;
         private readonly INodeCache _nodeCache;
+        private INodeFactory _nodeFactory;
 
         public BPlusTreeConfiguration Configuration { get { return _config; } }
 
@@ -23,12 +24,14 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="pageStore"></param>
         /// <param name="keySize">The size of the B+ tree's key (in bytes)</param>
         /// <param name="dataSize">The size of the values stored in leaf nodes (in bytes)</param>
-        public BPlusTree(IPageStore pageStore, int keySize = 8, int dataSize = 64) 
+        /// <param name="nodeFactoryType">The type of node factory to use to create nodes in this tree</param>
+        public BPlusTree(IPageStore pageStore, int keySize = 8, int dataSize = 64, Type nodeFactoryType = null) 
         {
             _config = new BPlusTreeConfiguration(keySize, dataSize, pageStore.PageSize);
             _pageStore = pageStore;
+            CreateNodeFactory(nodeFactoryType);
             _modifiedNodes = new Dictionary<ulong, INode>();
-            _root = new LeafNode(pageStore.Create(), 0, 0, _config);
+            _root = _nodeFactory.MakeLeafNode();
             _nodeCache = new WeakReferenceNodeCache();
             _modifiedNodes[_root.PageId] = _root;
             _nodeCache.Add(_root);
@@ -42,10 +45,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="keySize"></param>
         /// <param name="dataSize"></param>
         /// <param name="profiler"></param>
-        public BPlusTree(IPageStore pageStore, ulong rootPageId, int keySize = 8, int dataSize = 64, BrightstarProfiler profiler = null)
+        /// <param name="nodeFactoryType"></param>
+        public BPlusTree(IPageStore pageStore, ulong rootPageId, int keySize = 8, int dataSize = 64, BrightstarProfiler profiler = null,
+            Type nodeFactoryType = null)
         {
             _config = new BPlusTreeConfiguration(keySize, dataSize, pageStore.PageSize);
             _pageStore = pageStore;
+            CreateNodeFactory(nodeFactoryType);
             _modifiedNodes = new Dictionary<ulong, INode>();
             _nodeCache = new WeakReferenceNodeCache();
             _root = GetNode(rootPageId, profiler);
@@ -96,7 +102,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     }
                     else
                     {
-                        ret = new LeafNode(nodeId, nodePage, header, _config);
+                        ret = _nodeFactory.MakeLeafNode(nodeId, nodePage, header);
                     }
                     _nodeCache.Add(ret);
                     return ret;
@@ -114,7 +120,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     var internalNode = u as InternalNode;
                     u = GetNode(internalNode.GetChildNodeId(key), profiler);
                 }
-                var l = u as LeafNode;
+                var l = u as ILeafNode;
                 return l.GetValue(key, valueBuff);
             }
         }
@@ -142,9 +148,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             using (profiler.Step("BPlusTree.Delete"))
             {
-                if (_root is LeafNode)
+                if (_root is ILeafNode)
                 {
-                    (_root as LeafNode).Delete(key);
+                    (_root as ILeafNode).Delete(key);
                     MarkDirty(txnId, _root, profiler);
                 }
                 else
@@ -201,9 +207,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     }
                 }
             }
-            if (node is LeafNode)
+            if (node is ILeafNode)
             {
-                var leaf = node as LeafNode;
+                var leaf = node as ILeafNode;
                 foreach(var entry in leaf.Scan())
                 {
                     yield return entry;
@@ -224,9 +230,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     }
                 }
             }
-            else if (node is LeafNode)
+            else if (node is ILeafNode)
             {
-                var leaf = node as LeafNode;
+                var leaf = node as ILeafNode;
                 foreach(var entry in leaf.Scan(fromKey, toKey))
                 {
                     yield return entry;
@@ -256,9 +262,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
             var childNodeId = parentInternalNode.GetChildNodeId(key);
             var childNode = GetNode(childNodeId, profiler);
-            if (childNode is LeafNode)
+            if (childNode is ILeafNode)
             {
-                var childLeafNode = childNode as LeafNode;
+                var childLeafNode = childNode as ILeafNode;
                 // Delete the key and mark the node as updated. This may update the child node id
                 childLeafNode.Delete(key);
                 MarkDirty(txnId, childLeafNode, profiler);
@@ -271,11 +277,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 if (childLeafNode.NeedsJoin)
                 {
                     ulong leftSiblingId, rightSiblingId;
-                    LeafNode leftSibling = null, rightSibling = null;
+                    ILeafNode leftSibling = null, rightSibling = null;
                     bool hasLeftSibling = parentInternalNode.GetLeftSibling(childNodeId, out leftSiblingId);
                     if (hasLeftSibling)
                     {
-                        leftSibling = GetNode(leftSiblingId, profiler) as LeafNode;
+                        leftSibling = GetNode(leftSiblingId, profiler) as ILeafNode;
                         if (childLeafNode.RedistributeFromLeft(leftSibling))
                         {
                             parentInternalNode.SetLeftKey(childLeafNode.PageId, childLeafNode.LeftmostKey);
@@ -291,7 +297,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                         
                     if (hasRightSibling)
                     {
-                        rightSibling = GetNode(rightSiblingId, profiler) as LeafNode;
+                        rightSibling = GetNode(rightSiblingId, profiler) as ILeafNode;
 #if DEBUG
                         if (rightSibling.LeftmostKey.Compare(childLeafNode.RightmostKey) <= 0)
                         {
@@ -463,9 +469,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private ulong Insert(ulong txnId, INode node, byte[] key, byte[] value, out bool split, out INode rightNode, out byte[] splitKey, bool overwrite, BrightstarProfiler profiler)
         {
-            if (node is LeafNode)
+            if (node is ILeafNode)
             {
-                var leaf = node as LeafNode;
+                var leaf = node as ILeafNode;
                 if (leaf.IsFull)
                 {
                     var newNode = leaf.Split(_pageStore.Create(), out splitKey);
@@ -579,6 +585,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     }
                     node.IsDirty = true;
                     _modifiedNodes[node.PageId] = node;
+                } 
+                // KA: Added this logic as a temporary workaround for DirectLeafNode TODO: This has to move into the node code itself
+                else if (!_pageStore.IsWriteable(node.PageId))
+                {
+                    node.PageId = _pageStore.Create();
+                    _modifiedNodes[node.PageId] = node;
                 }
                 _pageStore.Write(txnId, node.PageId, node.GetData(), profiler: profiler);
                 //Task.Factory.StartNew(() => _pageStore.Write(txnId, node.PageId, node.GetData(), profiler:null)); // Not passing through the profiler because it is not thread-safe
@@ -621,6 +633,19 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             Delete(txnId, BitConverter.GetBytes(key), profiler);
         }
 
-        
+        private void CreateNodeFactory(Type nodeFactoryType)
+        {
+            if (nodeFactoryType == null)
+            {
+                //_nodeFactory = new DefaultNodeFactory(_pageStore, _config);
+                _nodeFactory = new DirectNodeFactory(_pageStore, _config);
+            }
+            else
+            {
+                _nodeFactory = Activator.CreateInstance(nodeFactoryType, _pageStore, _config) as INodeFactory;
+            }
+        }
+
+
     }
 }

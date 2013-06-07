@@ -7,7 +7,7 @@ using BrightstarDB.Utils;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
-    internal class LeafNode : INode
+    internal class LeafNode : ILeafNode
     {
         private readonly BPlusTreeConfiguration _config;
         private readonly byte[][] _dataSegments;
@@ -318,7 +318,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="splitKey">Receives the key that was used for the split</param>
         /// <returns>The new node created by the split</returns>
         /// <remarks>The split operation always creates a new node for the upper (right-hand) half of the keys and keeps the lower (left-hand) half in this leaf node.</remarks>
-        public LeafNode Split(ulong newNodeId, out byte[] splitKey)
+        public ILeafNode Split(ulong newNodeId, out byte[] splitKey)
         {
             var rightNode = new LeafNode(newNodeId, PageId, _nextPointer, _config);
             _nextPointer = newNodeId;
@@ -373,10 +373,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <summary>
         /// Attempts to ensure that the minimum size for this node is achieved by transferring entries from the left-hand sibling
         /// </summary>
-        /// <param name="leftNode">The left-hand sibling that will provide entries</param>
+        /// <param name="left">The left-hand sibling that will provide entries</param>
         /// <returns>True if the node achieves its minimum size by the redistribution process, false otherwise</returns>
-        public bool RedistributeFromLeft(LeafNode leftNode)
+        public bool RedistributeFromLeft(ILeafNode left)
         {
+            var leftNode = left as LeafNode;
+            if (leftNode == null) throw new ArgumentException("Expected a LeafNode instance", "left");
+
             int copyCount = (_keyCount + leftNode.KeyCount)/2 - _keyCount;
             if (copyCount > 0)
             {
@@ -399,10 +402,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <summary>
         /// Attempts to ensure that the minimum size for this node is achieved by transferring entries from the right-hand sibling
         /// </summary>
-        /// <param name="rightNode">The right-hand sibling that will provide entries</param>
+        /// <param name="right">The right-hand sibling that will provide entries</param>
         /// <returns>True if the node achieves its minimum size by the redistribution process, false otherwise</returns>
-        public bool RedistributeFromRight(LeafNode rightNode)
+        public bool RedistributeFromRight(ILeafNode right)
         {
+            var rightNode = right as LeafNode;
+            if (rightNode == null) throw new ArgumentException("Expected a LeafNode instance", "right");
+
             int copyCount = (_keyCount + rightNode._keyCount)/2 - _keyCount;
             if (copyCount > 0)
             {

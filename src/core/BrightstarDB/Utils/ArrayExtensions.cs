@@ -25,5 +25,15 @@
             }
             return ret;
         }
+
+        public static int Compare(this byte[] arry, int offset, byte[] other, int otherOffset, int len)
+        {
+            int ret = 0;
+            for (int i = len - 1; i >= 0 && ret == 0; i--)
+            {
+                ret = arry[i + offset] - other[i + otherOffset];
+            }
+            return ret;
+        }
     }
 }

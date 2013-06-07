@@ -15,11 +15,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         private readonly BPlusTreeConfiguration _config;
         private readonly int _leafLoadFactor;
         private readonly int _internalBranchFactor;
+        private INodeFactory _nodeFactory;
 
-        public BPlusTreeBuilder(IPageStore targetPageStore, BPlusTreeConfiguration targetTreeConfiguration)
+        public BPlusTreeBuilder(IPageStore targetPageStore, BPlusTreeConfiguration targetTreeConfiguration, Type nodeFactoryType = null)
         {
             _pageStore = targetPageStore;
             _config = targetTreeConfiguration;
+            CreateNodeFactory(nodeFactoryType);
             // These values are copied locally to allow us to later change the default loading from 100% to something lower if we want
             _leafLoadFactor = _config.LeafLoadFactor;
             _internalBranchFactor = _config.InternalBranchFactor;
@@ -34,6 +36,21 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
             return nodeList[0].Value;
         }
+
+        private void CreateNodeFactory(Type nodeFactoryType)
+        {
+            if (nodeFactoryType == null)
+            {
+                //_nodeFactory = new DefaultNodeFactory(_pageStore, _config);
+                _nodeFactory = new DirectNodeFactory(_pageStore, _config);
+            }
+            else
+            {
+                _nodeFactory = Activator.CreateInstance(nodeFactoryType, _pageStore, _config) as INodeFactory;
+            }
+        }
+
+
 
         private IEnumerable<KeyValuePair<byte[], ulong>>MakeInternalNodes(ulong txnId, IEnumerable<KeyValuePair<byte[], ulong >> children, BrightstarProfiler profiler)
         {
@@ -138,14 +155,14 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private IEnumerable<KeyValuePair<byte[], ulong >> MakeLeafNodes(ulong txnId, IEnumerator<KeyValuePair<byte[], byte[]>> orderedValues, BrightstarProfiler profiler = null)
         {
-            LeafNode prevNode = MakeLeafNode(orderedValues.Next(_leafLoadFactor));
+            ILeafNode prevNode = MakeLeafNode(orderedValues.Next(_leafLoadFactor));
             if (prevNode.KeyCount < _leafLoadFactor)
             {
                 // There were only enough values to fill a single leaf node
                 yield return WriteNode(txnId, prevNode, profiler);
                 yield break;
             }
-            LeafNode nextNode = MakeLeafNode(orderedValues.Next(_leafLoadFactor));
+            ILeafNode nextNode = MakeLeafNode(orderedValues.Next(_leafLoadFactor));
             do
             {
                 if (nextNode.KeyCount >= _config.LeafSplitIndex)
@@ -166,7 +183,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             yield return WriteNode(txnId, prevNode, profiler);
         }
 
-        private KeyValuePair<byte[], ulong> WriteNode(ulong txnId, LeafNode node, BrightstarProfiler profiler = null)
+        private KeyValuePair<byte[], ulong> WriteNode(ulong txnId, ILeafNode node, BrightstarProfiler profiler = null)
         {
             _pageStore.Write(txnId, node.PageId, node.GetData(), profiler: profiler);
             return new KeyValuePair<byte[], ulong>(node.LeftmostKey, node.PageId);
@@ -178,10 +195,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return new KeyValuePair<byte[], ulong>(lowestLeafKey, node.PageId);
         }
 
-        private LeafNode MakeLeafNode(IEnumerable<KeyValuePair<byte [], byte []>> orderedValues)
+        private ILeafNode MakeLeafNode(IEnumerable<KeyValuePair<byte [], byte []>> orderedValues)
         {
             var leafPage = _pageStore.Create();
-            return new LeafNode(leafPage, 0, 0, _config, orderedValues, _leafLoadFactor);
+            return _nodeFactory.MakeLeafNode(leafPage, _pageStore.Retrieve(leafPage, null), orderedValues,
+                                             _leafLoadFactor);
+            //return new LeafNode(leafPage, 0, 0, _config, orderedValues, _leafLoadFactor);
         }
     }
 }

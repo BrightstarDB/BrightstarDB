@@ -137,8 +137,8 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                 var root = targetTree.GetNode(targetTree.RootId, null) as InternalNode;
                 Assert.IsNotNull(root);
                 Assert.AreEqual(1, root.KeyCount);
-                var leftChild = targetTree.GetNode(root.ChildPointers[0], null) as LeafNode;
-                var rightChild = targetTree.GetNode(root.ChildPointers[1], null) as LeafNode;
+                var leftChild = targetTree.GetNode(root.ChildPointers[0], null) as ILeafNode;
+                var rightChild = targetTree.GetNode(root.ChildPointers[1], null) as ILeafNode;
                 Assert.IsNotNull(leftChild);
                 Assert.IsNotNull(rightChild);
 

@@ -73,6 +73,7 @@
     <Compile Include="BPlusTreeTests\BasicTreeTests.cs" />
     <Compile Include="BPlusTreeTests\BPlusTreeBuilderTests.cs" />
     <Compile Include="BPlusTreeTests\CoalesceTests.cs" />
+    <Compile Include="BPlusTreeTests\DirectLeafNodeTests.cs" />
     <Compile Include="BPlusTreeTests\GraphIndexTests.cs" />
     <Compile Include="BPlusTreeTests\LeafNodeTests.cs" />
     <Compile Include="BPlusTreeTests\PageFileTests.cs" />

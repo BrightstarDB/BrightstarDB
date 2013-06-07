@@ -297,7 +297,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                 var child = tree.GetNode(childId, null) as InternalNode;
                 var childLeftmostKey = BitConverter.ToUInt64(child.LeftmostKey, 0);
                 var grandchild =
-                    tree.GetNode(child.GetChildNodeId(BitConverter.GetBytes(childLeftmostKey - 1)), null) as LeafNode;
+                    tree.GetNode(child.GetChildNodeId(BitConverter.GetBytes(childLeftmostKey - 1)), null) as ILeafNode;
                 var deleteFrom = BitConverter.ToUInt64(grandchild.LeftmostKey, 0);
 
                 var findChildId = (rootNode as InternalNode).GetChildNodeId(BitConverter.GetBytes(deleteFrom));
