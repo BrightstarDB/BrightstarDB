@@ -233,11 +233,16 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                 {
                     tree.Insert(txnId, (ulong) i, BitConverter.GetBytes((ulong) i));
                 }
+                Console.WriteLine("Before deletes:");
+                tree.DumpStructure();
                 tree.Delete(txnId, 13ul, null);
                 tree.Delete(txnId, 12ul, null); // Should force a borrow frrom the right node
+                Console.WriteLine("After Deletes");
+                tree.DumpStructure();
                 for (int i = 0; i <= _config.LeafLoadFactor; i++)
                 {
-                    Assert.IsTrue(i == 12 ^ i == 13 ^ tree.Search((ulong) i, buff, null));
+                    Assert.IsTrue(i == 12 ^ i == 13 ^ tree.Search((ulong) i, buff, null),
+                        "Could not find entry for key {0}", i);
                 }
             }
         }
@@ -290,29 +295,45 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                     {
                         Assert.Fail("Insert failed for key {0} with exception {1}", i, ex);
                     }
+
+                    
                 }
 
                 var rootNode = tree.GetNode(tree.RootId, null);
-                var childId = (rootNode as InternalNode).GetChildNodeId(rootNode.RightmostKey);
-                var child = tree.GetNode(childId, null) as InternalNode;
+                var childId = (rootNode as IInternalNode).GetChildNodeId(rootNode.RightmostKey);
+                var child = tree.GetNode(childId, null) as IInternalNode;
                 var childLeftmostKey = BitConverter.ToUInt64(child.LeftmostKey, 0);
                 var grandchild =
                     tree.GetNode(child.GetChildNodeId(BitConverter.GetBytes(childLeftmostKey - 1)), null) as ILeafNode;
                 var deleteFrom = BitConverter.ToUInt64(grandchild.LeftmostKey, 0);
 
-                var findChildId = (rootNode as InternalNode).GetChildNodeId(BitConverter.GetBytes(deleteFrom));
+                var findChildId = (rootNode as IInternalNode).GetChildNodeId(BitConverter.GetBytes(deleteFrom));
                 Assert.AreEqual(child.PageId, findChildId, "Incorrect node id returned for key {0}", deleteFrom);
+
+                tree.DumpStructure();
 
                 for (ulong i = 0; i < 4; i++)
                 {
                     var deleteKey = deleteFrom + i;
                     tree.Delete(txnId, deleteKey, null); // Should be enough to force a right merge
+                    Console.WriteLine("\n\nDeleted {0}\n", deleteKey);
+                    tree.DumpStructure();
+                    Assert.IsTrue(tree.Search(10395ul, buff, null));
                 }
 
                 for (ulong i = 0; i < (ulong) (_config.LeafLoadFactor*_config.InternalBranchFactor); i++)
                 {
-                    Assert.IsTrue(tree.Search(i, buff, null) ^ (i - deleteFrom >= 0 && i - deleteFrom < 4),
-                                  "Could not find key {0}. deleteFrom={1}", i, deleteFrom);
+                    try
+                    {
+                        Assert.IsTrue(tree.Search(i, buff, null) ^ (i - deleteFrom >= 0 && i - deleteFrom < 4),
+                                      "Could not find key {0}. deleteFrom={1}", i, deleteFrom);
+                    }
+                    catch (AssertFailedException)
+                    {
+                        Console.WriteLine("\nFailed tree structure:\n");
+                        tree.DumpStructure();
+                        throw;
+                    }
                 }
 
                 deleteFrom = (ulong) (_config.LeafLoadFactor*_config.InternalBranchFactor) - 5;
@@ -343,11 +364,13 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                 tree.Save(0, null);
                 treeRoot = tree.RootId;
                 pageStore.Commit(0ul, null);
+                tree.DumpStructure();
             }
 
             using (var pageStore = TestUtils.OpenPageStore("TestValuelessBTree.data", false))
             {
                 var tree = new BPlusTree(pageStore, treeRoot, 16, 0);
+                tree.DumpStructure();
                 var buff = new byte[0];
                 foreach(var g in insertedValues)
                 {
@@ -419,10 +442,12 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             using (var pageStore = TestUtils.OpenPageStore("TestInsertAndDeleteAllEntries.data", false))
             {
                 var tree = new BPlusTree(pageStore, rootPageId);
+                Assert.IsTrue(tree.Search(3457ul, value, null), "Could not find entry 3457 before deletes");
                 for (int i = 0; i < keyCount; i += 2)
                 {
                     tree.Delete(1ul, (ulong)i, null);
                     Assert.IsFalse(tree.Search((ulong)i, value, null), "Still found entry for key {0} after delete", i);
+                    Assert.IsTrue(tree.Search(3457ul, value, null), "Could not find entry 3457 after delete of {0}",i);
                 }
                 rootPageId = tree.Save(1, null);
                 pageStore.Commit(1, null);
@@ -482,7 +507,15 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                 var tree = new BPlusTree(pageStore, rootPageId);
                 for (int i = keyCount - 1; i >= 0; i--)
                 {
-                    tree.Delete(1, (ulong) i, null);
+                    try
+                    {
+                        tree.Delete(1, (ulong) i, null);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Delete threw exception on key {0}", i);
+                        throw;
+                    }
                 }
                 rootPageId = tree.Save(1, null);
                 pageStore.Commit(0, null);

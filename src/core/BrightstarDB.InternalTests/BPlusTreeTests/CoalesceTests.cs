@@ -134,11 +134,11 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                     Assert.AreEqual((ulong)i, BitConverter.ToUInt64(valueBuff, 0));
                 }
 
-                var root = targetTree.GetNode(targetTree.RootId, null) as InternalNode;
+                var root = targetTree.GetNode(targetTree.RootId, null) as IInternalNode;
                 Assert.IsNotNull(root);
                 Assert.AreEqual(1, root.KeyCount);
-                var leftChild = targetTree.GetNode(root.ChildPointers[0], null) as ILeafNode;
-                var rightChild = targetTree.GetNode(root.ChildPointers[1], null) as ILeafNode;
+                var leftChild = targetTree.GetNode(root.GetChildPointer(0), null) as ILeafNode;
+                var rightChild = targetTree.GetNode(root.GetChildPointer(1), null) as ILeafNode;
                 Assert.IsNotNull(leftChild);
                 Assert.IsNotNull(rightChild);
 

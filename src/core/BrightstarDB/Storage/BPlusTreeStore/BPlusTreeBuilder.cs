@@ -63,11 +63,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
 
             byte[] prevNodeKey = childList[0].Key;
-            InternalNode prevNode = MakeInternalNode(childList);
+            IInternalNode prevNode = MakeInternalNode(childList);
             childList = enumerator.Next(_internalBranchFactor).ToList();
             while(childList.Count > 0)
             {
-                InternalNode nextNode = MakeInternalNode(childList);
+                IInternalNode nextNode = MakeInternalNode(childList);
                 var nextNodeKey = childList[0].Key;
                 if (nextNode.NeedJoin)
                 {
@@ -106,13 +106,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             yield return WriteNode(txnId, prevNode, prevNodeKey, profiler);
         }
 
-        private InternalNode MakeInternalNode(KeyValuePair<byte[], ulong > onlyChild)
+        private IInternalNode MakeInternalNode(KeyValuePair<byte[], ulong > onlyChild)
         {
             var nodePage = _pageStore.Create();
-            return new InternalNode(nodePage, onlyChild.Value, _config);
+            return _nodeFactory.MakeInternalNode(nodePage, onlyChild.Value);
         }
 
-        private InternalNode MakeInternalNode(List<KeyValuePair<byte[], ulong >> keyValuePairs)
+        private IInternalNode MakeInternalNode(List<KeyValuePair<byte[], ulong >> keyValuePairs)
         {
             if (keyValuePairs.Count == 1)
             {
@@ -126,10 +126,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                                                     Array.Copy(kvp.Key, key, _config.KeySize);
                                                     return key;
                                                 }).ToList();
-            return new InternalNode(nodePage, keys, childPointers, _config);
+            return _nodeFactory.MakeInternalNode(nodePage, keys, childPointers);
         }
 
-        private InternalNode MakeInternalNode(KeyValuePair<byte[], ulong> firstChild, IEnumerator<KeyValuePair<byte[], ulong>> enumerator, int internalBranchFactor)
+        private IInternalNode MakeInternalNode(KeyValuePair<byte[], ulong> firstChild, IEnumerator<KeyValuePair<byte[], ulong>> enumerator, int internalBranchFactor)
         {
             var nodePage = _pageStore.Create();
             var childPointers = new List<ulong>(internalBranchFactor + 1) {firstChild.Value};
@@ -150,7 +150,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 Array.Copy(enumerator.Current.Key, keys[i], _config.KeySize);
             }
              */
-            return new InternalNode(nodePage, keys, childPointers, _config);
+            return _nodeFactory.MakeInternalNode(nodePage, keys, childPointers);
         }
 
         private IEnumerable<KeyValuePair<byte[], ulong >> MakeLeafNodes(ulong txnId, IEnumerator<KeyValuePair<byte[], byte[]>> orderedValues, BrightstarProfiler profiler = null)
@@ -189,7 +189,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return new KeyValuePair<byte[], ulong>(node.LeftmostKey, node.PageId);
         }
 
-        private KeyValuePair<byte[], ulong > WriteNode(ulong  txnId, InternalNode node, byte[] lowestLeafKey, BrightstarProfiler profiler)
+        private KeyValuePair<byte[], ulong > WriteNode(ulong  txnId, IInternalNode node, byte[] lowestLeafKey, BrightstarProfiler profiler)
         {
             _pageStore.Write(txnId, node.PageId, node.GetData(), profiler:profiler);
             return new KeyValuePair<byte[], ulong>(lowestLeafKey, node.PageId);

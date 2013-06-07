@@ -70,11 +70,6 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// </summary>
         public ulong RootId { get { return _root.PageId; } }
 
-        public IEnumerable<InternalNode> ModifiedInternalNodes
-        {
-            get { return _modifiedNodes.Values.OfType<InternalNode>(); }
-        }
-
         public INode GetNode(ulong nodeId, BrightstarProfiler profiler)
         {
             using (profiler.Step("BPlusTree.GetNode"))
@@ -98,7 +93,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     var header = BitConverter.ToInt32(nodePage, 0);
                     if (header < 0)
                     {
-                        ret = new InternalNode(nodeId, nodePage, ~header, _config);
+                        ret = _nodeFactory.MakeInternalNode(nodeId, nodePage, ~header);
                     }
                     else
                     {
@@ -115,9 +110,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             using (profiler.Step("BPlusTree.Search"))
             {
                 INode u = _root;
-                while (u is InternalNode)
+                while (u is IInternalNode)
                 {
-                    var internalNode = u as InternalNode;
+                    var internalNode = u as IInternalNode;
                     u = GetNode(internalNode.GetChildNodeId(key), profiler);
                 }
                 var l = u as ILeafNode;
@@ -135,8 +130,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 Insert(txnId, _root, key, value, out splitRoot, out rightNode, out rootSplitKey, overwrite, profiler);
                 if (splitRoot)
                 {
-                    var newRoot = new InternalNode(_pageStore.Create(), rootSplitKey, _root.PageId, rightNode.PageId,
-                                                   _config);
+                    var newRoot = _nodeFactory.MakeInternalNode(_pageStore.Create(), rootSplitKey, _root.PageId,
+                                                                rightNode.PageId);
+                    //var newRoot = new InternalNode(_pageStore.Create(), rootSplitKey, _root.PageId, rightNode.PageId,
+                    //                               _config);
                     MarkDirty(txnId, _root, profiler);
                     _modifiedNodes[newRoot.PageId] = newRoot;
                     _root = newRoot;
@@ -156,11 +153,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 else
                 {
                     bool underAllocation;
-                    Delete(txnId, _root as InternalNode, key, out underAllocation, profiler);
+                    Delete(txnId, _root as IInternalNode, key, out underAllocation, profiler);
                     if (_root.KeyCount ==0)
                     {
                         // Now has only a single child leaf node, which should become the new tree root
-                        _root = GetNode((_root as InternalNode).ChildPointers[0], profiler);
+                        _root = GetNode((_root as IInternalNode).GetChildPointer(0), profiler);
                     }
                 }
             }
@@ -196,9 +193,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private IEnumerable<KeyValuePair<byte[], byte[]>> Scan(INode node, BrightstarProfiler profiler)
         {
-            if (node is InternalNode)
+            if (node is IInternalNode)
             {
-                var internalNode = node as InternalNode;
+                var internalNode = node as IInternalNode;
                 foreach(var childNodeId in internalNode.Scan())
                 {
                     foreach(var entry in Scan(GetNode(childNodeId, profiler), profiler))
@@ -219,9 +216,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private IEnumerable<KeyValuePair<byte[], byte[]>> Scan(INode node, byte[] fromKey, byte[] toKey, BrightstarProfiler profiler)
         {
-            if (node is InternalNode)
+            if (node is IInternalNode)
             {
-                var internalNode = node as InternalNode;
+                var internalNode = node as IInternalNode;
                 foreach(var childNodeId in internalNode.Scan(fromKey, toKey))
                 {
                     foreach(var entry in Scan(GetNode(childNodeId, profiler), fromKey, toKey, profiler))
@@ -254,7 +251,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     v => new KeyValuePair<ulong, byte[]>(BitConverter.ToUInt64(v.Key, 0), v.Value));
         }
 
-        private void Delete(ulong txnId, InternalNode parentInternalNode, byte[] key, out bool underAllocation, BrightstarProfiler profiler)
+        private void Delete(ulong txnId, IInternalNode parentInternalNode, byte[] key, out bool underAllocation, BrightstarProfiler profiler)
         {
             if (parentInternalNode.RightmostKey == null)
             {
@@ -343,10 +340,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
 
 
-            if (childNode is InternalNode)
+            if (childNode is IInternalNode)
             {
                 bool childUnderAllocated;
-                var childInternalNode = childNode as InternalNode;
+                var childInternalNode = childNode as IInternalNode;
                 Delete(txnId, childInternalNode, key, out childUnderAllocated, profiler);
                 if (childInternalNode.PageId != childNodeId)
                 {
@@ -358,14 +355,14 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
                 if (childUnderAllocated)
                 {
-                    InternalNode leftSibling = null, rightSibling = null;
+                    IInternalNode leftSibling = null, rightSibling = null;
                     ulong leftSiblingId, rightSiblingId;
 
                     // Redistribute values from left-hand sibling
                     bool hasLeftSibling = parentInternalNode.GetLeftSibling(childNodeId, out leftSiblingId);
                     if (hasLeftSibling)
                     {
-                        leftSibling = GetNode(leftSiblingId, profiler) as InternalNode;
+                        leftSibling = GetNode(leftSiblingId, profiler) as IInternalNode;
                         byte[] joinKey = parentInternalNode.GetKey(leftSiblingId);
                         var newJoinKey = new byte[_config.KeySize];
                         if (childInternalNode.RedistributeFromLeft(leftSibling, joinKey, newJoinKey))
@@ -383,7 +380,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     bool hasRightSibling = parentInternalNode.GetRightSiblingId(childNodeId, out rightSiblingId);
                     if (hasRightSibling)
                     {
-                        rightSibling = GetNode(rightSiblingId, profiler) as InternalNode;
+                        rightSibling = GetNode(rightSiblingId, profiler) as IInternalNode;
                         byte[] joinKey = parentInternalNode.GetKey(childInternalNode.PageId);
                         byte[] newJoinKey = new byte[_config.KeySize];
                         if (childInternalNode.RedistributeFromRight(rightSibling, joinKey, newJoinKey))
@@ -500,7 +497,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
             else
             {
-                var internalNode = node as InternalNode;
+                var internalNode = node as IInternalNode;
                 var childNodeId = internalNode.GetChildNodeId(key);
                 var childNode = GetNode(childNodeId, profiler);
                 bool childSplit;
@@ -523,13 +520,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                             }
                             else
                             {
-                                (rightNode as InternalNode).Insert(childSplitKey, rightChild.PageId);
+                                (rightNode as IInternalNode).Insert(childSplitKey, rightChild.PageId);
                             }
                             // update child pointers if required (need to check both internalNode and rightNode as we don't know which side the modified child node ended up on)
                             if (newChildNodeId != childNodeId)
                             {
                                 internalNode.UpdateChildPointer(childNodeId, newChildNodeId);
-                                (rightNode as InternalNode).UpdateChildPointer(childNodeId, newChildNodeId);
+                                (rightNode as IInternalNode).UpdateChildPointer(childNodeId, newChildNodeId);
                             }
                         }
                     }

@@ -7,7 +7,7 @@ using Remotion.Linq.Utilities;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
-    internal class InternalNode : INode
+    internal class InternalNode : IInternalNode
     {
         private readonly BPlusTreeConfiguration _config;
         private int _keyCount;
@@ -220,7 +220,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="rightNodeId">The ID of the page reserved to receive the newly created internal node</param>
         /// <param name="splitKey">Receives the value of the key used for the split</param>
         /// <returns>The new right-hand node</returns>
-        public InternalNode Split(ulong rightNodeId, out byte[] splitKey)
+        public IInternalNode Split(ulong rightNodeId, out byte[] splitKey)
         {
             var rightNode = new InternalNode(rightNodeId, _config);
             var splitIndex = _config.InternalSplitIndex;
@@ -347,8 +347,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="joinKey">The value of the key that is present in the parent node between the pointer to this node and its left sibling</param>
         /// <param name="newJoinKey">The replacement value for the join key in the parent node</param>
         /// <returns>True if the node achieves its minimum size by the redistribution process, false otherwise</returns>
-        public bool RedistributeFromLeft(InternalNode leftSibling, byte[] joinKey, byte[] newJoinKey)
+        public bool RedistributeFromLeft(IInternalNode leftSibling, byte[] joinKey, byte[] newJoinKey)
         {
+            InternalNode left = leftSibling as InternalNode;
+            if (left == null) throw new ArgumentException("Expected an InternalNode as left sibling", "leftSibling");
+
             int required = _config.InternalSplitIndex - _keyCount;
             if (leftSibling.KeyCount - required < _config.InternalSplitIndex)
             {
@@ -356,7 +359,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 return false;
             }
 
-            int evenOut = (_keyCount + leftSibling._keyCount) / 2 - _keyCount;
+            int evenOut = (_keyCount + left._keyCount) / 2 - _keyCount;
             if (leftSibling.KeyCount  - evenOut > _config.InternalSplitIndex)
             {
                 required = evenOut;
@@ -370,12 +373,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 _childPointers[i + required] = _childPointers[i];
             }
             SetKey(required-1, joinKey);
-            CopyKeys(leftSibling._keys, (leftSibling._keyCount - required) + 1, 0, required - 1);
+            CopyKeys(left._keys, (left._keyCount - required) + 1, 0, required - 1);
             //Array.Copy(leftSibling._keys, (leftSibling._keyCount - required) + 1, _keys, 0, required-1);
-            Array.Copy(leftSibling._childPointers, (leftSibling._keyCount-required) + 1, _childPointers, 0, required);
-            Array.Copy(leftSibling._keys[leftSibling.KeyCount-required], newJoinKey, _config.KeySize);
+            Array.Copy(left._childPointers, (left._keyCount-required) + 1, _childPointers, 0, required);
+            Array.Copy(left._keys[left.KeyCount-required], newJoinKey, _config.KeySize);
             _keyCount += required;
-            leftSibling._keyCount -= required;
+            left._keyCount -= required;
             return true;
         }
 
@@ -393,8 +396,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
         }
 
-        public bool RedistributeFromRight(InternalNode rightSibling, byte[] joinKey, byte [] newJoinKey)
+        public bool RedistributeFromRight(IInternalNode rightSibling, byte[] joinKey, byte [] newJoinKey)
         {
+            var right = rightSibling as InternalNode;
+            if (right == null) throw new ArgumentException("Expected an InternalNode as right sibling", "rightSibling");
+
             int required = _config.InternalSplitIndex - _keyCount;
             if (rightSibling.KeyCount - required < _config.InternalSplitIndex)
             {
@@ -403,19 +409,19 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
             // Copy keys and child pointers
             SetKey(_keyCount, joinKey);
-            CopyKeys(rightSibling._keys, 0, _keyCount + 1, required - 1);
+            CopyKeys(right._keys, 0, _keyCount + 1, required - 1);
             //Array.Copy(rightSibling._keys, 0, _keys, _keyCount + 1, required - 1);
-            Array.Copy(rightSibling._childPointers, 0, _childPointers, _keyCount + 1, required);
-            Array.Copy(rightSibling._keys[required - 1], newJoinKey, _config.KeySize);
+            Array.Copy(right._childPointers, 0, _childPointers, _keyCount + 1, required);
+            Array.Copy(right._keys[required - 1], newJoinKey, _config.KeySize);
 
             // Shift up remaining keys and child pointers in the right node
-            for(int i  = 0; i < rightSibling._keyCount - required; i++)
+            for(int i  = 0; i < right._keyCount - required; i++)
             {
-                rightSibling._keys[i] = rightSibling._keys[i + required];
-                rightSibling._childPointers[i] = rightSibling.ChildPointers[i + required];
+                right._keys[i] = right._keys[i + required];
+                right._childPointers[i] = rightSibling.GetChildPointer(i + required);
             }
-            rightSibling._childPointers[rightSibling._keyCount - required] = rightSibling._childPointers[rightSibling.KeyCount];
-            rightSibling._keyCount -= required;
+            right._childPointers[right._keyCount - required] = right._childPointers[right.KeyCount];
+            right._keyCount -= required;
             _keyCount += required;
             return true;
         }
@@ -548,6 +554,15 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         public IEnumerable<ulong> Scan()
         {
             return _childPointers.Take(_keyCount + 1);
+        }
+
+        public ulong GetChildPointer(int ix)
+        {
+            if (ix > KeyCount)
+            {
+                throw new ArgumentOutOfRangeException("ix");
+            }
+            return _childPointers[ix];
         }
     }
 }

@@ -7,12 +7,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
     internal class NodeCache : INodeCache
     {
         private readonly IndexedCircularBuffer<ulong, WeakReference> _leafNodeCache;
-        private readonly IndexedCircularBuffer<ulong, InternalNode> _internalNodeCache;
+        private readonly IndexedCircularBuffer<ulong, IInternalNode> _internalNodeCache;
 
         public NodeCache(int internalNodeCapacity, int leafNodeCapacity)
         {
             _leafNodeCache = new IndexedCircularBuffer<ulong, WeakReference>(leafNodeCapacity);
-            _internalNodeCache = new IndexedCircularBuffer<ulong, InternalNode>(internalNodeCapacity);
+            _internalNodeCache = new IndexedCircularBuffer<ulong, IInternalNode>(internalNodeCapacity);
         }
 
         public void Add(INode node)
@@ -21,9 +21,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             {
                 _leafNodeCache.Insert(node.PageId, new WeakReference(node));
             }
-            else if (node is InternalNode)
+            else if (node is IInternalNode)
             {
-                _internalNodeCache.Insert(node.PageId, node as InternalNode);
+                _internalNodeCache.Insert(node.PageId, node as IInternalNode);
             }
         }
 
@@ -57,7 +57,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
             else
             {
-                InternalNode internalNode;
+                IInternalNode internalNode;
                 if (_internalNodeCache.TryGetValue(nodeId, out internalNode))
                 {
                     node = internalNode;

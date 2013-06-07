@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using BrightstarDB.Profiling;
-using BrightstarDB.Storage.BPlusTreeStore;
-using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
-namespace BrightstarDB.Storage
+
+namespace BrightstarDB.Storage.BPlusTreeStore
 {
     internal class DirectLeafNode : ILeafNode
     {
