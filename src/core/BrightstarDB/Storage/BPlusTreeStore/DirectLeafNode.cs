@@ -178,6 +178,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                         Array.Copy(value, 0, 
                             _nodeData, ValueOffset(insertIndex),
                             Math.Min(value.Length, _config.ValueSize));
+                        return;
                     }
                     throw new DuplicateKeyException();
                 }
