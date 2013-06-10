@@ -395,12 +395,8 @@ section.meta {
 article.post {
     padding-top: 35px;
     padding-bottom: 35px;
-    padding-right: 260px;
-    min-width: 500px;
     font-family: Georgia, serif;
     font-size: 12pt;
-    width: 650px;
-    margin: 0 auto;
 }
 
 article.post h1 {
@@ -469,21 +465,33 @@ article.post > div.entry-content > pre {
 }
 
 section.previous-posts {
-    margin: 0 auto;
-    width: 860px;
     background: white;
-    padding-left: 50px;
-    padding-right: 50px;
     font-family: Georgia, serif;
 }
 
-section.previous-posts > header {
-    padding-top: 30px;
-    padding-bottom: 30px;
+section.previous-posts > article {
+	padding-bottom: 0px;
+	padding-top: 15px;
 }
 
+section.previous-posts > header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+section.previous-posts > article > header > h1 {
+	margin-bottom: 15px;
+}
+
+section.previous-posts .updated {
+	margin:0;
+}
 section.previous-posts h1 {
     font-size: 24px;
+}
+
+section.previous-posts > article > section > p:first-child{
+	margin-top: 15px;
 }
 
 nav.prev-next-posts {
@@ -537,25 +545,32 @@ article h2 + ul.archive {
 }
 
 /* Styles for blog chrome */
-
 #sidebar {
-    padding: 15px;
-    margin: 0 auto;
-    width: 930px;
-    text-align: center;
-    font-size: 24px;
-    font-family: Georgia, serif;
-    background: white;
+	font-family: Georgia, serif;
+	font-size: small;
+	padding-top: 35px;
 }
 
-#sidebar > div {
-    padding-bottom: 35px;
+#sidebar h2 {
+	color: #AAAAAA;
+	display: block;
+	margin-bottom: 20px;
 }
 
-#sidebar li {
-    padding-bottom: 0.5em;
+.widget {
+	margin-bottom: 35px;
 }
 
+.widget li {
+	line-height: 1.6;
+	margin-left: 2em;
+	text-indent: -1em;
+}
+
+#posts .postmetadata {
+	display: none;
+}
+	
 #respond {
     min-width: 500px;
     padding-left: 50px;
