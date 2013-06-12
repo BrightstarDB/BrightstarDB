@@ -300,8 +300,8 @@
         <ReleaseNotes Include="nuget\ReleaseNotes.txt"/>
         <NuspecTemplate Include="nuget\BrightstarDB.nuspec.template"/>
         <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
-        <Net40Libs Include="InstallerTmp\SDK\Net40\*.dll" Exclude="**\dotNetRDF.dll;**\HtmlAgilityPack.dll;**\Newtonsoft.Json.dll;**\VDS.Common.dll" />
-        <WP71Libs Include="InstallerTmp\SDK\WP71\*.dll" Exclude="**\dotNetRDF.dll;**\HtmlAgilityPack.dll;**\Newtonsoft.Json.dll;**\VDS.Common.dll" />
+        <Net40Libs Include="InstallerTmp\SDK\Net40\*.dll" />
+        <WP71Libs Include="InstallerTmp\SDK\WP71\*.dll" />
         <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
     </ItemGroup>
     
