@@ -12,14 +12,14 @@
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <Name>BrightstarDB</Name>
-    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dSourceFiles.Service=..\InstallerTmp\Service -dSourceFiles.Tools=..\InstallerTmp\Tools -dSourceFiles.Samples=..\InstallerTmp\Samples -dSourceFiles.SparqlService=..\InstallerTmp\SparqlService -dSourceFiles.LicenseManager=..\InstallerTmp\LicenseManager -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
+    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dSourceFiles.Service=..\InstallerTmp\Service -dSourceFiles.Tools=..\InstallerTmp\Tools -dSourceFiles.Samples=..\InstallerTmp\Samples -dSourceFiles.SparqlService=..\InstallerTmp\SparqlService  -dSourceFiles.SDShareService=..\InstallerTmp\SDShare\Service -dSourceFiles.SDShareSamples=..\InstallerTmp\SDShare\Samples -dSourceFiles.SDShareDocs=..\InstallerTmp\SDShare\Docs -dSourceFiles.SDShareRoot=..\InstallerTmp\SDShare\Root -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
     <SuppressIces>ICE30</SuppressIces>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
-    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dSourceFiles.Service=..\InstallerTmp\Service -dSourceFiles.Tools=..\InstallerTmp\Tools -dSourceFiles.Samples=..\InstallerTmp\Samples  -dSourceFiles.SparqlService=..\InstallerTmp\SparqlService -dSourceFiles.LicenseManager=..\InstallerTmp\LicenseManager -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
+    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dSourceFiles.Service=..\InstallerTmp\Service -dSourceFiles.Tools=..\InstallerTmp\Tools -dSourceFiles.Samples=..\InstallerTmp\Samples  -dSourceFiles.SparqlService=..\InstallerTmp\SparqlService -dSourceFiles.SDShareService=..\InstallerTmp\SDShare\Service -dSourceFiles.SDShareSamples=..\InstallerTmp\SDShare\Samples -dSourceFiles.SDShareDocs=..\InstallerTmp\SDShare\Docs -dSourceFiles.SDShareRoot=..\InstallerTmp\SDShare\Root -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -30,6 +30,10 @@
     <Compile Include="Product.wxs" />
     <Compile Include="Samples.wxs" />
     <Compile Include="SdkFiles.wxs" />
+    <Compile Include="SdShareDocs.wxs" />
+    <Compile Include="SDShareRoot.wxs" />
+    <Compile Include="SdShareSamples.wxs" />
+    <Compile Include="SdShareService.wxs" />
     <Compile Include="ServiceFiles.wxs" />
     <Compile Include="SparqlService.wxs" />
     <Compile Include="Tools.wxs" />
@@ -58,6 +62,10 @@
     <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="Tools.wxs" Directory="..\InstallerTmp\Tools" ComponentGroupName="toolsFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="TOOLSDIR" PreprocessorVariable="var.SourceFiles.Tools" />
     <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="Samples.wxs" Directory="..\InstallerTmp\Samples" ComponentGroupName="samplesFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SAMPLESDIR" PreprocessorVariable="var.SourceFiles.Samples" />
     <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SparqlService.wxs" Directory="..\InstallerTmp\SparqlService" ComponentGroupName="sparqlServiceFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SPARQLSERVICEDIR" PreprocessorVariable="var.SourceFiles.SparqlService" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SdShareService.wxs" Directory="..\InstallerTmp\SDShare\Service" ComponentGroupName="sdshareServiceFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDSHARESERVICEDIR" PreprocessorVariable="var.SourceFiles.SDShareService" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SdShareSamples.wxs" Directory="..\InstallerTmp\SDShare\Samples" ComponentGroupName="sdshareSamplesFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDSHARESAMPLESDIR" PreprocessorVariable="var.SourceFiles.SDShareSamples" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SdShareDocs.wxs" Directory="..\InstallerTmp\SDShare\Docs" ComponentGroupName="sdshareDocFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDSHAREDOCSDIR" PreprocessorVariable="var.SourceFiles.SDShareDocs" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="SDShareRoot.wxs" Directory="..\InstallerTmp\SDShare\Root" ComponentGroupName="sdshareRootFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SDSHAREDIR" PreprocessorVariable="var.SourceFiles.SDShareRoot" />
   </Target>
   <ItemGroup>
     <BootstrapperFile Include=".NETFramework,Version=v4.0">
@@ -86,16 +94,8 @@
   </ItemGroup>
   <Target Name="AfterBuild">
     <GetFrameworkSdkPath>
-      <Output TaskParameter="Path" PropertyName="WindowsSdkPath"/>
+      <Output TaskParameter="Path" PropertyName="WindowsSdkPath" />
     </GetFrameworkSdkPath>
-    <GenerateBootstrapper 
-      ApplicationFile="brightstardb.msi" 
-      ApplicationRequiresElevation="true" 
-      ApplicationName="BrightstarDB" 
-      BootstrapperItems="@(BootstrapperFile)" 
-      ComponentsLocation="HomeSite" 
-      CopyComponents="true" 
-      OutputPath="$(OutputPath)" 
-      Path="$(WindowsSdkPath)\Bootstrapper" />
+    <GenerateBootstrapper ApplicationFile="brightstardb.msi" ApplicationRequiresElevation="true" ApplicationName="BrightstarDB" BootstrapperItems="@(BootstrapperFile)" ComponentsLocation="HomeSite" CopyComponents="true" OutputPath="$(OutputPath)" Path="$(WindowsSdkPath)\Bootstrapper" />
   </Target>
 </Project>

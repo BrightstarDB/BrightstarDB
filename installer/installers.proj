@@ -32,7 +32,7 @@
 			..\samples\**\*.user;
 			..\samples\**\OData\**\*.*;
 			..\samples\Samples\**\Debug*.*;
-      ..\samples\Samples\Embedded\SamplesConfiguration.template.cs"/>
+      ..\samples\Samples\Embedded\SamplesConfiguration.cs"/>
   </ItemGroup>
   
   <Import Project="..\common.proj"/>
@@ -131,8 +131,7 @@
                               ..\samples\Samples\SparqlService\**\Web.Debug.config;
                               ..\samples\Samples\SparqlService\**\Web.Release.config;
                               ..\samples\Samples\SparqlService\**\Packages.config;
-                              ..\samples\Samples\SamplesConfiguration.cs;
-                              ..\samples\Samples\SamplesConfiguration.template.cs" />
+                              ..\samples\Samples\SamplesConfiguration.cs" />
     </ItemGroup>
     <RemoveDir Directories="InstallerTmp\SDK"/>
     <RemoveDir Directories="InstallerTmp"/>
@@ -150,7 +149,6 @@
     <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\ItemTemplates"/>
     <Copy SourceFiles="@(Polaris)" DestinationFolder="InstallerTmp\Tools\Polaris"/>
     <Copy SourceFiles="@(Samples)" DestinationFiles="@(Samples->'InstallerTmp\Samples\%(recursivedir)%(filename)%(extension)')"/>
-    <Copy SourceFiles="..\samples\Samples\Embedded\SamplesConfiguration.template.cs" DestinationFiles="InstallerTmp\Samples\Embedded\SamplesConfiguration.cs"/>
     <Copy SourceFiles="@(SparqlService)" DestinationFiles="@(SparqlService->'InstallerTmp\SparqlService\%(recursivedir)%(filename)%(extension)')"/>
   </Target>
 
@@ -233,7 +231,7 @@
     <Copy SourceFiles="@(SDShareSampleProviderProperties)" DestinationFolder="InstallerTmp\SDShare\Samples\SampleProvider\BrightstarDB.SdShare.SampleProvider\Properties"/>
   </Target>
 
-  <Target Name="BuildInstaller" DependsOnTargets="Prepare;PrepareSparqlEndpoint">
+  <Target Name="BuildInstaller" DependsOnTargets="Prepare;PrepareSparqlEndpoint;PrepareSDShare">
     <!-- Invoke the WIX project to build the installer -->
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
              Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
@@ -243,33 +241,12 @@
     <Zip Files="@(InstallerFiles)" ZipFileName="$(OutputPath)\BrightstarDB-$(BuildNumber).zip" WorkingDirectory="BrightstarDB\bin\$(Configuration)"/>
   </Target>
 
-  <Target Name="BuildEnterpriseInstaller" DependsOnTargets="BuildInstaller;PrepareSDShare">
-  
-	<!-- Copy over the enterprise version of the docs into the docs directory -->
-	<ItemGroup>
-		<EnterpriseDocs Include="..\doc\build\BrightstarDB_API.chm"/>
-	</ItemGroup>
-	<Copy SourceFiles="@(EnterpriseDocs)" DestinationFolder="InstallerTmp\Docs"/>
-	
-    <!--Invoke the WIX project to build the enterprise installer-->
-    <MSBuild Projects="BrightstarDBEnterprise\BrightstarDBEnterprise.wixproj"
-             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
-    <ItemGroup>
-      <EnterpriseInstallerFiles Include="BrightstarDBEnterprise\bin\$(Configuration)\setup.exe;BrightstarDBEnterprise\bin\$(Configuration)\*.msi"/>
-    </ItemGroup>
-    <Zip Files="@(EnterpriseInstallerFiles)" ZipFileName="$(OutputPath)\BrightstarDB-Enterprise-$(BuildNumber).zip" WorkingDirectory="BrightstarDBEnterprise\bin\$(Configuration)"/>
-  </Target>
-  
   <Target Name="Rebuild">
     <CallTarget Targets="Clean"/>
     <CallTarget Targets="Build"/>
   </Target>
 
-  <Target Name="Build" DependsOnTargets="CleanOutput;BuildEnterpriseInstaller;NuGet">
-    <ItemGroup>
-      <InstallerPackages Include="$(OutputPath)\*.zip"/>
-    </ItemGroup>
-    <Zip Files="@(InstallerPackages)" ZipFileName="$(OutputPath)\$(BuildNumber).zip" WorkingDirectory="$(OutputPath)"/>
+  <Target Name="Build" DependsOnTargets="CleanOutput;BuildInstaller;NuGet">
   </Target>
 
   <Target Name="CleanOutput">
@@ -286,9 +263,6 @@
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
 	     Targets="Clean"
 	     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
-    <MSBuild Projects="BrightstarDBEnterprise\BrightstarDBEnterprise.wixproj"
-             Targets="Clean"
-             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
   </Target>
 
   <Target Name="NuGet" DependsOnTargets="Version">

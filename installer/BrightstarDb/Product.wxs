@@ -128,6 +128,11 @@
           <Directory Id="SERVICEDIR" Name="Service"/>
           <Directory Id="SERVICEDATADIR" Name="Data"/>
           <Directory Id="SPARQLSERVICEDIR" Name="SparqlService"/>
+          <Directory Id="SDSHAREDIR" Name="SDShare">
+            <Directory Id="SDSHAREDOCSDIR" Name="Docs"/>
+            <Directory Id="SDSHARESERVICEDIR" Name="Service"/>
+            <Directory Id="SDSHARESAMPLESDIR" Name="Samples"/>
+          </Directory>
           <Directory Id="VSDIR" Name="VisualStudio"/>
           <Directory Id="TOOLSDIR" Name="Tools"/>
           <Directory Id="LMDIR" Name="LicenseManager"/>
@@ -195,7 +200,13 @@
       <ComponentGroupRef Id="samplesFilesComponentGroup"/>
 
       <ComponentGroupRef Id="sparqlServiceFilesComponentGroup"/>
+
+      <ComponentGroupRef Id="sdshareServiceFilesComponentGroup"/>
+
+      <ComponentGroupRef Id="sdshareSamplesFilesComponentGroup"/>
       
+      <ComponentGroupRef Id="sdshareDocFilesComponentGroup"/>
+
       <ComponentRef Id="DocsShortcuts"/>
 
       <Component Guid="{844DEDDC-DB9E-421E-8D58-D0932399193E}" Directory="INSTALLLOCATION">
