@@ -18,8 +18,6 @@
     <SilverlightApplication>false</SilverlightApplication>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,15 +42,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="dotNetRDF">
-      <HintPath>..\packages\dotNetRDF.1.0.0.2533\lib\sl4-wp\dotNetRDF.dll</HintPath>
-    </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\sl4-windowsphone71\HtmlAgilityPack.dll</HintPath>
+      <HintPath>..\lib\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Phone" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.5\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="Polenter.SharpSerializer.Silverlight">
       <HintPath>..\lib\Polenter.SharpSerializer.Silverlight.dll</HintPath>
     </Reference>
@@ -66,9 +58,6 @@
     <Reference Include="System.Net" />
     <Reference Include="mscorlib.extensions" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="VDS.Common">
-      <HintPath>..\packages\VDS.Common.1.2.0\lib\sl4-wp\VDS.Common.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrightstarDB\Client\CommitPointInfo.cs" />
@@ -95,9 +84,6 @@
       <Link>BrightstarDB\Licensing\%(recursivedir)\%(filename)</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions />
@@ -112,5 +98,4 @@
   </Target>
   <Target Name="AfterBuild">
   </Target>
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
 </Project>
