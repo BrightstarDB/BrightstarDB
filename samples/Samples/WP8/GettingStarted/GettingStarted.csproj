@@ -102,6 +102,21 @@
     <Reference Include="BrightstarDB.Mobile">
       <HintPath>..\..\..\SDK\WP71\BrightstarDB.Mobile.dll</HintPath>
     </Reference>
+    <Reference Include="dotNetRDF">
+      <HintPath>..\..\..\SDK\WP71\dotNetRDF.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\..\..\SDK\WP71\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\SDK\WP71\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Polenter.SharpSerializer.Silverlight">
+      <HintPath>..\..\..\SDK\WP71\Polenter.SharpSerializer.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="VDS.Common">
+      <HintPath>..\..\..\SDK\WP71\VDS.Common.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
