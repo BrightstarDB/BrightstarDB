@@ -276,6 +276,7 @@
         <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
         <Net40Libs Include="InstallerTmp\SDK\Net40\*.dll" />
         <WP71Libs Include="InstallerTmp\SDK\WP71\*.dll" />
+		<WP8Libs Include="InstallerTmp\SDK\WP71\*.dll" Exclude="InstallerTmp\SDK\WP71\System.Threading.Tasks.dll" />
         <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
     </ItemGroup>
     
@@ -300,10 +301,12 @@
 
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
     <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\wp71"/>
+	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\windowsphone8" />
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs" />
     
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\net40"/>
     <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\wp71"/>
+	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\windowsphone8" />
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB" />
     <Copy SourceFiles="@(TextTemplates)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\content" />
     
