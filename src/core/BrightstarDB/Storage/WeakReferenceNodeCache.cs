@@ -6,6 +6,7 @@ namespace BrightstarDB.Storage
 {
     internal class WeakReferenceNodeCache : INodeCache
     {
+        private object _dictLock = new object();
         private readonly Dictionary<ulong, WeakReference> _cache;
 
         public WeakReferenceNodeCache()
@@ -17,23 +18,37 @@ namespace BrightstarDB.Storage
 
         public void Add(INode node)
         {
-            _cache[node.PageId] = new WeakReference(node);
+            lock (_dictLock)
+            {
+                _cache[node.PageId] = new WeakReference(node);
+            }
         }
 
         public void Remove(INode node)
         {
-            _cache.Remove(node.PageId);
+            lock (_dictLock)
+            {
+                _cache.Remove(node.PageId);
+            }
         }
 
         public void Clear()
         {
-            _cache.Clear();
+            lock (_dictLock)
+            {
+                _cache.Clear();
+            }
         }
 
         public bool TryGetValue(ulong nodeId, out INode node)
         {
             WeakReference wr;
-            if (_cache.TryGetValue(nodeId, out wr) && wr.IsAlive)
+            bool haveNode;
+            lock (_dictLock)
+            {
+                haveNode = _cache.TryGetValue(nodeId, out wr);
+            }
+            if (haveNode && wr.IsAlive)
             {
                 node = wr.Target as INode;
                 return (node != null);

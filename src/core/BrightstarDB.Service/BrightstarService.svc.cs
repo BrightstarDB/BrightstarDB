@@ -165,7 +165,8 @@ namespace BrightstarDB.Service
             }
             catch (BrightstarStoreNotModifiedException ex)
             {
-                throw new BrightstarClientException("Store not modified", new ExceptionDetail(ex));
+                throw new BrightstarClientException("Store not modified", ex);
+                //throw new BrightstarClientException("Store not modified", new ExceptionDetail(ex));
             }
             catch (Exception ex)
             {

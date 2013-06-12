@@ -22,7 +22,11 @@ namespace BrightstarDB
         {
             get { return false; }
         }
-        internal static bool IsProfilingEnabled { return false; }
+
+        internal static bool IsProfilingEnabled
+        {
+            get { return false; }
+        }
 #else
         /// <summary>
         /// Gets the <see cref="TraceSource"/> that BrightstarDB writes all logging to

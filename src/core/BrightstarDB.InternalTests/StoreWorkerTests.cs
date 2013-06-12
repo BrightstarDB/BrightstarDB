@@ -502,7 +502,12 @@ namespace BrightstarDB.Tests
             var cachedTime = sw.ElapsedMilliseconds;
 
             Assert.AreEqual(queryResult, cachedResult);
-            Assert.IsTrue(cachedTime < initTime);
+            if (cachedTime >= initTime)
+            {
+                Assert.Inconclusive(
+                    "Expected time to read from cache ({0}ms) to be less than time to execute query ({1}ms).",
+                    cachedTime, initTime);
+            }
 
             Configuration.EnableQueryCache = false;
         }
