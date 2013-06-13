@@ -14,11 +14,13 @@ This section gives a brief outline of what is new / changed in each official rel
  BrightstarDB 1.3 Release
 *************************
 
+  - NEW: First official open source release. 
+         All documentation and examples updated to remove references to commercial licensing and license protection code.
+		 Build updated to remove dependencies on third-party commercial tools
+
   - NEW: The ExecuteTransaction method now supports specifying a target graph.
   
   - NEW: The ExecuteQuery Method now supports specifying the default graph of the SPARQL dataset.
-  
-  - FIX: NuGet packages are now updated import their dependencies on installation.
   
   - FIX: Disabled profiling code that was eating up significant amounts of memory during long running imports. Profiling can now be enabled globally by calling Logging.EnableProfiling(true);
   
