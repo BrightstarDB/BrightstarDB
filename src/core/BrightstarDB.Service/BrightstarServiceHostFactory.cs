@@ -34,9 +34,10 @@ namespace BrightstarDB.Service
             var netTcpContextBinding = new NetTcpContextBinding { TransferMode = TransferMode.StreamedResponse, MaxReceivedMessageSize = int.MaxValue, SendTimeout = TimeSpan.FromMinutes(30), ReaderQuotas = XmlDictionaryReaderQuotas.Max, Namespace = "http://www.networkedplanet.com/schemas/brightstar" };
             var netNamedPipeBinding = new NetNamedPipeBinding { TransferMode = TransferMode.StreamedResponse, MaxReceivedMessageSize = int.MaxValue, SendTimeout = TimeSpan.FromMinutes(30), ReaderQuotas = XmlDictionaryReaderQuotas.Max, Namespace = "http://www.networkedplanet.com/schemas/brightstar" };
 
-            serviceHost.AddServiceEndpoint(typeof(IBrightstarService), basicHttpBinding, "");
-            serviceHost.AddServiceEndpoint(typeof(IBrightstarService), netTcpContextBinding, "");
-            serviceHost.AddServiceEndpoint(typeof(IBrightstarService), netNamedPipeBinding, "");
+            var headersBehaviour = new BrightstarServiceHeadersBehaviour();
+            serviceHost.AddServiceEndpoint(typeof(IBrightstarService), basicHttpBinding, "").Behaviors.Add(headersBehaviour);
+            serviceHost.AddServiceEndpoint(typeof(IBrightstarService), netTcpContextBinding, "").Behaviors.Add(headersBehaviour);
+            serviceHost.AddServiceEndpoint(typeof(IBrightstarService), netNamedPipeBinding, "").Behaviors.Add(headersBehaviour);
 
             var throttlingBehavior = new ServiceThrottlingBehavior { MaxConcurrentCalls = int.MaxValue };
 

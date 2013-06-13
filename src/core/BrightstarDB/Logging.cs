@@ -23,6 +23,10 @@ namespace BrightstarDB
             get { return false; }
         }
 
+        internal static bool IsProfilingEnabled
+        {
+            get { return false; }
+        }
 #else
         /// <summary>
         /// Gets the <see cref="TraceSource"/> that BrightstarDB writes all logging to
@@ -84,10 +88,23 @@ namespace BrightstarDB
             BrightstarTraceSource.Listeners.Add(consoleListener);
         }
 
+        /// <summary>
+        /// Enable or disable profiling.
+        /// </summary>
+        /// <param name="profilingOn">True to turn on profiling, false otherwise</param>
+        /// <remarks>By default profiling is disabled. If profiling is enabled several key components of the code will generate and emit profiling information. 
+        /// Collecting this information is a small CPU overhead but can be a substantial memory overhead for large operations.
+        /// It is recommended only to enable profiling if you are absolutely sure you need the information it produces.</remarks>
+        public static void EnableProfiling(bool profilingOn)
+        {
+            IsProfilingEnabled = profilingOn;
+        }
+
         internal static bool IsDebugEnabled { get { return BrightstarTraceSource.Switch.Level >= SourceLevels.Verbose; } }
         internal static bool IsInfoEnabled { get { return BrightstarTraceSource.Switch.Level >= SourceLevels.Information; } }
         internal static bool IsWarnEnabled { get { return BrightstarTraceSource.Switch.Level >= SourceLevels.Warning; } }
         internal static bool IsErrorEnabled { get { return BrightstarTraceSource.Switch.Level >= SourceLevels.Error; } }
+        internal static bool IsProfilingEnabled { get; private set; }
 #endif
 
     }

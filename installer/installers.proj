@@ -32,7 +32,7 @@
 			..\samples\**\*.user;
 			..\samples\**\OData\**\*.*;
 			..\samples\Samples\**\Debug*.*;
-      ..\samples\Samples\Embedded\SamplesConfiguration.template.cs"/>
+      ..\samples\Samples\Embedded\SamplesConfiguration.cs"/>
   </ItemGroup>
   
   <Import Project="..\common.proj"/>
@@ -106,7 +106,7 @@
 			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe"/>
 	  <ServiceExe Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.config"
 			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe.config"/>
-      <Docs Include="..\doc\build\Server\BrightstarDB_Documentation.pdf;..\doc\build\Server\BrightstarDB.chm;..\doc\build\BrightstarDB_API.chm"/>
+      <Docs Include="..\doc\build\BrightstarDB_API.chm"/>
       <VisualStudio Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.vsi"/>
       <Root Include="PackageFiles\README.txt;PackageFiles\EULA.rtf;PackageFiles\NOTICE.txt"/>
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.zip"/>
@@ -131,8 +131,7 @@
                               ..\samples\Samples\SparqlService\**\Web.Debug.config;
                               ..\samples\Samples\SparqlService\**\Web.Release.config;
                               ..\samples\Samples\SparqlService\**\Packages.config;
-                              ..\samples\Samples\SamplesConfiguration.cs;
-                              ..\samples\Samples\SamplesConfiguration.template.cs" />
+                              ..\samples\Samples\SamplesConfiguration.cs" />
     </ItemGroup>
     <RemoveDir Directories="InstallerTmp\SDK"/>
     <RemoveDir Directories="InstallerTmp"/>
@@ -150,7 +149,6 @@
     <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\ItemTemplates"/>
     <Copy SourceFiles="@(Polaris)" DestinationFolder="InstallerTmp\Tools\Polaris"/>
     <Copy SourceFiles="@(Samples)" DestinationFiles="@(Samples->'InstallerTmp\Samples\%(recursivedir)%(filename)%(extension)')"/>
-    <Copy SourceFiles="..\samples\Samples\Embedded\SamplesConfiguration.template.cs" DestinationFiles="InstallerTmp\Samples\Embedded\SamplesConfiguration.cs"/>
     <Copy SourceFiles="@(SparqlService)" DestinationFiles="@(SparqlService->'InstallerTmp\SparqlService\%(recursivedir)%(filename)%(extension)')"/>
   </Target>
 
@@ -181,7 +179,7 @@
   </Target>
 
 
-  <Target Name="PrepareSdk" DependsOnTargets="BuildNet40;BuildWP71">
+  <Target Name="PrepareSdk" DependsOnTargets="Version;BuildNet40;BuildWP71">
     <ItemGroup>
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <WP71Sdk Include="..\src\mobile\BrightstarDB.Mobile\bin\$(Configuration)\*.dll"/>
@@ -233,49 +231,22 @@
     <Copy SourceFiles="@(SDShareSampleProviderProperties)" DestinationFolder="InstallerTmp\SDShare\Samples\SampleProvider\BrightstarDB.SdShare.SampleProvider\Properties"/>
   </Target>
 
-  
-  <Target Name="BuildSdk" DependsOnTargets="PrepareSdk">
-    <SmartAssembly.MSBuild.Tasks.Build ProjectFile="BrightstarDB_Net40.saproj"/>
-    <SmartAssembly.MSBuild.Tasks.Build ProjectFile="BrightstarDB.Mobile.saproj"/>
-  </Target>
-
-  <Target Name="BuildInstaller" DependsOnTargets="Prepare;PrepareSparqlEndpoint">
+  <Target Name="BuildInstaller" DependsOnTargets="Prepare;PrepareSparqlEndpoint;PrepareSDShare">
     <!-- Invoke the WIX project to build the installer -->
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
              Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
     <ItemGroup>
       <InstallerFiles Include="BrightstarDB\bin\$(Configuration)\setup.exe;BrightstarDB\bin\$(Configuration)\*.msi"/>
     </ItemGroup>
-    <Zip Files="@(InstallerFiles)" ZipFileName="$(OutputPath)\BrightstarDB-Server-$(BuildNumber).zip" WorkingDirectory="BrightstarDB\bin\$(Configuration)"/>
+    <Zip Files="@(InstallerFiles)" ZipFileName="$(OutputPath)\BrightstarDB-$(BuildNumber).zip" WorkingDirectory="BrightstarDB\bin\$(Configuration)"/>
   </Target>
 
-  <Target Name="BuildEnterpriseInstaller" DependsOnTargets="BuildInstaller;PrepareSDShare">
-  
-	<!-- Copy over the enterprise version of the docs into the docs directory -->
-	<ItemGroup>
-		<EnterpriseDocs Include="..\doc\build\Enterprise\BrightstarDB_Documentation.pdf;..\doc\build\Enterprise\BrightstarDB.chm;..\doc\build\BrightstarDB_API.chm"/>
-	</ItemGroup>
-	<Copy SourceFiles="@(EnterpriseDocs)" DestinationFolder="InstallerTmp\Docs"/>
-	
-    <!--Invoke the WIX project to build the enterprise installer-->
-    <MSBuild Projects="BrightstarDBEnterprise\BrightstarDBEnterprise.wixproj"
-             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
-    <ItemGroup>
-      <EnterpriseInstallerFiles Include="BrightstarDBEnterprise\bin\$(Configuration)\setup.exe;BrightstarDBEnterprise\bin\$(Configuration)\*.msi"/>
-    </ItemGroup>
-    <Zip Files="@(EnterpriseInstallerFiles)" ZipFileName="$(OutputPath)\BrightstarDB-Enterprise-$(BuildNumber).zip" WorkingDirectory="BrightstarDBEnterprise\bin\$(Configuration)"/>
-  </Target>
-  
   <Target Name="Rebuild">
     <CallTarget Targets="Clean"/>
     <CallTarget Targets="Build"/>
   </Target>
 
-  <Target Name="Build" DependsOnTargets="CleanOutput;BuildEnterpriseInstaller;BuildMobilePackage;BuildEmbeddedPackage">
-    <ItemGroup>
-      <InstallerPackages Include="$(OutputPath)\*.zip"/>
-    </ItemGroup>
-    <Zip Files="@(InstallerPackages)" ZipFileName="$(OutputPath)\$(BuildNumber).zip" WorkingDirectory="$(OutputPath)"/>
+  <Target Name="Build" DependsOnTargets="CleanOutput;BuildInstaller;NuGet">
   </Target>
 
   <Target Name="CleanOutput">
@@ -292,122 +263,55 @@
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
 	     Targets="Clean"
 	     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
-    <MSBuild Projects="BrightstarDBEnterprise\BrightstarDBEnterprise.wixproj"
-             Targets="Clean"
-             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
   </Target>
 
+  <Target Name="NuGet" DependsOnTargets="Version">
+    <RemoveDir Directories="$(OutputPath)\nuget" />
+    <MakeDir Directories="$(OutputPath)\nuget\BrightstarDBLibs" />
+    <MakeDir Directories="$(OutputPath)\nuget\BrightstarDB" />
+    <ItemGroup>
+        <Readme Include="nuget\README.txt" />
+        <ReleaseNotes Include="nuget\ReleaseNotes.txt"/>
+        <NuspecTemplate Include="nuget\BrightstarDB.nuspec.template"/>
+        <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
+        <Net40Libs Include="InstallerTmp\SDK\Net40\*.dll" />
+        <WP71Libs Include="InstallerTmp\SDK\WP71\*.dll" />
+		<WP8Libs Include="InstallerTmp\SDK\WP71\*.dll" Exclude="InstallerTmp\SDK\WP71\System.Threading.Tasks.dll" />
+        <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
+    </ItemGroup>
+    
+    <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
+    <Copy SourceFiles="@(LibsNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec')" />
+
+    <ReadLinesFromFile File="@(ReleaseNotes)">
+      <Output TaskParameter="Lines" PropertyName="ReleaseNotesText" />
+    </ReadLinesFromFile>
+    <Message Text="Release Notes: $(ReleaseNotesText)"/>
+    <FileUpdate Files="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec;$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec"
+   Regex="\$releaseNotes\$"
+   ReplacementText="$([System.IO.File]::ReadAllText('nuget\ReleaseNotes.txt'))" />
+        
+    
+    <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec"
+             Query="package/metadata/version"
+             Value="$(BuildNumber)" />
+    <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec"
+             Query="package/metadata/version"
+             Value="$(BuildNumber)" />
+
+    <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
+    <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\wp71"/>
+	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\windowsphone8" />
+    <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs" />
+    
+    <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\net40"/>
+    <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\wp71"/>
+	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\windowsphone8" />
+    <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB" />
+    <Copy SourceFiles="@(TextTemplates)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\content" />
+    
+    <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" />
+    <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec" />
+  </Target>
   
-  <!-- This target builds a mobile package -->
-  <Target Name="BuildMobilePackage" DependsOnTargets="Prepare">
-
-	  <!-- clear packages dir -->
-    <RemoveDir Directories="InstallerTmp\Mobile\BrightstarDB"/>
-  
-	  <!-- create folder for package contents -->
-	  <MakeDir Directories="InstallerTmp\Mobile\BrightstarDB"/>
-	
-	  <!-- create SDK folder -->
-	  <MakeDir Directories="InstallerTmp\Mobile\BrightstarDB\SDK\WP71" />
-	
-	  <!-- copy DLLS -->
-	  <ItemGroup>
-		  <PhoneDlls Include="InstallerTmp\SDK\WP71\*.*" />
-	  </ItemGroup>		
-	  <Copy SourceFiles="@(PhoneDlls)" DestinationFolder="InstallerTmp\Mobile\BrightstarDB\SDK\WP71"/>
-
-	  <!-- VS files -->
-	  <ItemGroup>
-		  <VsFiles Include="InstallerTmp\VisualStudio\*.*" />
-	  </ItemGroup>		
-	  <Copy SourceFiles="@(VsFiles)" DestinationFolder="InstallerTmp\Mobile\BrightstarDB\VisualStudio"/>
-	
-	  <!-- VS files -->
-	  <ItemGroup>
-		  <ItemTemplates Include="InstallerTmp\ItemTemplates\*.*" />
-	  </ItemGroup>		
-	  <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\Mobile\BrightstarDB\ItemTemplates"/>
-
-	  <!-- Docs -->
-    <ItemGroup>
-      <DocFiles Include="..\doc\build\Mobile\BrightstarDB_Documentation.pdf;..\doc\build\Mobile\BrightstarDB.chm;..\doc\build\BrightstarDB_API.chm"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(DocFiles)" DestinationFolder="InstallerTmp\Mobile\BrightstarDB\Docs"/>
-
-    <!--Samples -->
-    <Copy SourceFiles="@(MobileSamples)" DestinationFiles="InstallerTmp\Mobile\BrightstarDB\Samples\%(RecursiveDir)%(Filename)%(Extension)"/>
-
-    <!-- READMEs & EULA -->
-    <ItemGroup>
-      <RootFiles Include="PackageFiles\README.txt;PackageFiles\NOTICE.txt"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(RootFiles)" DestinationFolder="InstallerTmp\Mobile\BrightstarDB"/>
-    <Copy SourceFiles="PackageFiles\EULAEmbedded.rtf" DestinationFiles="InstallerTmp\Mobile\BrightstarDB\EULA.rtf" />
-    <Copy SourceFiles="PackageFiles\VisualStudioIntegration-Install.txt" DestinationFiles="InstallerTmp\Mobile\BrightstarDB\VisualStudioIntegration-Install.txt" />
-    
-    <ItemGroup>
-      <PackageFiles Include="InstallerTmp\Mobile\BrightstarDB/**/*.*" />
-    </ItemGroup>
-    <Zip Files="@(PackageFiles)" ZipFileName="$(OutputPath)\BrightstarDB-Mobile-$(BuildNumber).zip" WorkingDirectory="InstallerTmp\Mobile"/>
-
-  </Target>
-
-
-  <!-- This target builds an embedded package -->
-  <Target Name="BuildEmbeddedPackage" DependsOnTargets="Prepare">
-    <!-- clear packages dir -->
-    <RemoveDir Directories="InstallerTmp\Embedded\BrightstarDB"/>
-
-    <!-- create folder for package contents -->
-    <MakeDir Directories="InstallerTmp\Embedded\BrightstarDB"/>
-
-    <!-- create SDK folder -->
-    <MakeDir Directories="InstallerTmp\Embedded\BrightstarDB\SDK\NET40" />
-
-    <!-- copy DLLS -->
-    <ItemGroup>
-      <EmbeddedDlls Include="InstallerTmp\SDK\NET40\*.*" />
-      <MobileDlls Include="InstallerTmp\SDK\WP71\*.*"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(EmbeddedDlls)" DestinationFolder="InstallerTmp\Embedded\BrightstarDB\SDK\NET40"/>
-    <Copy SourceFiles="@(MobileDlls)" DestinationFolder="InstallerTmp\Embedded\BrightstarDB\SDK\WP71"/>
-    
-    <!-- VS files -->
-    <ItemGroup>
-      <VsFiles Include="InstallerTmp\VisualStudio\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(VsFiles)" DestinationFolder="InstallerTmp\Embedded\BrightstarDB\VisualStudio"/>
-
-    <!-- VS files -->
-    <ItemGroup>
-      <ItemTemplates Include="InstallerTmp\ItemTemplates\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\Embedded\BrightstarDB\ItemTemplates"/>
-
-    <!-- Docs -->
-    <ItemGroup>
-      <DocFiles Include="..\doc\build\Embedded\BrightstarDB_Documentation.pdf;..\doc\build\Embedded\BrightstarDB.chm;..\doc\build\BrightstarDB_API.chm"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(DocFiles)" DestinationFolder="InstallerTmp\Embedded\BrightstarDB\Docs"/>
-
-    <!-- Samples -->
-    <Copy SourceFiles="@(MobileSamples)" DestinationFiles="InstallerTmp\Embedded\BrightstarDB\Samples\%(RecursiveDir)%(Filename)%(Extension)"/>
-    <Copy SourceFiles="@(EmbeddedSamples)" DestinationFiles="InstallerTmp\Embedded\BrightstarDB\Samples\Embedded\%(RecursiveDir)%(Filename)%(Extension)"/>
-    <Copy SourceFiles="..\samples\Samples\Embedded\SamplesConfiguration.template.cs" DestinationFiles="InstallerTmp\Embedded\BrightstarDB\Samples\Embedded\SamplesConfiguration.cs"/>
-
-    <!-- READMEs and EULA -->
-    <ItemGroup>
-      <RootFiles Include="PackageFiles\README.txt;PackageFiles\NOTICE.txt"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(RootFiles)" DestinationFolder="InstallerTmp\Embedded\BrightstarDB"/>
-    <Copy SourceFiles="PackageFiles\EULAEmbedded.rtf" DestinationFiles="InstallerTmp\Embedded\BrightstarDB\EULA.rtf" />
-    <Copy SourceFiles="PackageFiles\VisualStudioIntegration-Install.txt" DestinationFiles="InstallerTmp\Embedded\BrightstarDB\VisualStudioIntegration-Install.txt" />
-
-    <ItemGroup>
-      <EmbeddedPackageFiles Include="InstallerTmp\Embedded\BrightstarDB\**\*.*" />      
-    </ItemGroup>
-    <Zip Files="@(EmbeddedPackageFiles)" ZipFileName="$(OutputPath)\BrightstarDB-Embedded-$(BuildNumber).zip" WorkingDirectory="InstallerTmp\Embedded"/>
-    
-  </Target>
-
 </Project>

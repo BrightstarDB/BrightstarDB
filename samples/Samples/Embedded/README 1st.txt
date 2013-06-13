@@ -3,14 +3,5 @@ BrightstarDB Embedded Samples
 
 IMPORTANT INFORMATION!
 
-The samples provided here all require a valid license key to run correctly.
-To get your license key please visit http://brightstardb.com/customers.
-
-If you have not purchased a license, you can still get a trial license by
-registering on the customer site and then claiming your free trial license.
-
-Once you have your license key you must edit the SamplesConfiguration.cs
-file in this directory with the licensee ID (this is the email address
-you register on the customer site) and the license key string.
-
-You can then compile and run the samples.
+By default the samples are set up to write to a folder named "BrightstarSamplesData" under your "My Documents" directory.
+You can change this default by editing the file SamplesConfiguration.cs (found in the same directory as this README file).

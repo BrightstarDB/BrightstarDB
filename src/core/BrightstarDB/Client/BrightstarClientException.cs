@@ -22,6 +22,11 @@ namespace BrightstarDB.Client
         /// </summary>
         public new ExceptionDetail InnerException { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string InnerExceptionType { get; private set; }
+
 #if !SILVERLIGHT
         internal BrightstarClientException(FaultException<ExceptionDetail> fault) 
             : base(fault.Detail!=null && fault.Detail.Message != null ? fault.Detail.Message : DefaultServiceErrorMessage)
@@ -35,6 +40,7 @@ namespace BrightstarDB.Client
         internal BrightstarClientException(string message, ExceptionDetail detail) : base(message)
         {
             InnerException = detail;
+            InnerExceptionType = detail.Type;
         }
 
         internal BrightstarClientException(string message, RdfParserException parserException) : base(

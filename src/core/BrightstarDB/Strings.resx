@@ -176,4 +176,7 @@
   <data name="BrightstarServiceClient_NoConnectionStringConfiguration" xml:space="preserve">
     <value>Could not find the connection string configuration information. Please check that the application configuration file contains the required appSettings elements.</value>
   </data>
+  <data name="BrightstarServiceClient_QueryDefaultGraphUriMustNotBeNull" xml:space="preserve">
+    <value>Default graph URI must not be NULL.</value>
+  </data>
 </root>

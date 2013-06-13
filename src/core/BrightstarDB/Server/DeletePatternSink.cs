@@ -42,9 +42,20 @@ namespace BrightstarDB.Server
                 wildCards = true;
             }
 
+            var g = graphUri;
+            if (graphUri.Equals(Constants.WildcardUri))
+            {
+                g = null;
+                wildCards = true;
+            }
+            else if (g == null)
+            {
+                g = Constants.DefaultGraphUri;
+            }
+
             if (wildCards)
             {
-                var triples = _store.Match(s, p, o, graph: Constants.DefaultGraphUri).ToList();
+                var triples = _store.Match(s, p, o, graph: g).ToList();
                 foreach (var t in triples)
                 {
                     _store.DeleteTriple(t);

@@ -1,41 +1,39 @@
-
 /**
  * Creates the job queue table and stored procedures in the database
  */
 
-
-DROP ROLE gateway
+DROP ROLE brightstar_role_gateway
 GO
 
-DROP PROCEDURE [dbo].[CompleteJob]
+DROP PROCEDURE [dbo].[Brightstar_CompleteJob]
 GO
-DROP PROCEDURE [dbo].[GetJob]
+DROP PROCEDURE [dbo].[Brightstar_GetJob]
 GO
-DROP PROCEDURE [dbo].[GetJobDetail]
+DROP PROCEDURE [dbo].[Brightstar_GetJobDetail]
 GO
-DROP PROCEDURE [dbo].[GetStoreJobs]
+DROP PROCEDURE [dbo].[Brightstar_GetStoreJobs]
 GO
-DROP PROCEDURE [dbo].[JobException]
+DROP PROCEDURE [dbo].[Brightstar_JobException]
 GO
-DROP PROCEDURE [dbo].[NextJob]
+DROP PROCEDURE [dbo].[Brightstar_NextJob]
 GO
-DROP PROCEDURE [dbo].[QueueJob]
+DROP PROCEDURE [dbo].[Brightstar_QueueJob]
 GO
-DROP PROCEDURE [dbo].[StartCommit]
+DROP PROCEDURE [dbo].[Brightstar_StartCommit]
 GO
-DROP PROCEDURE [dbo].[UpdateStatus]
+DROP PROCEDURE [dbo].[Brightstar_UpdateStatus]
 GO
-DROP PROCEDURE [dbo].[ClearAllJobs]
+DROP PROCEDURE [dbo].[Brightstar_ClearAllJobs]
 GO
-DROP PROCEDURE [dbo].[Cleanup]
+DROP PROCEDURE [dbo].[Brightstar_Cleanup]
 GO
-DROP PROCEDURE [dbo].[GetActiveJobs]
+DROP PROCEDURE [dbo].[Brightstar_GetActiveJobs]
 GO
-DROP PROCEDURE [dbo].[ReleaseJob]
+DROP PROCEDURE [dbo].[Brightstar_ReleaseJob]
 GO
-DROP PROCEDURE [dbo].[GetLastCommit]
+DROP PROCEDURE [dbo].[Brightstar_GetLastCommit]
 GO
-DROP TABLE [dbo].[Jobs]
+DROP TABLE [dbo].[Brightstar_Jobs]
 GO
 
 SET ANSI_NULLS ON
@@ -45,10 +43,10 @@ GO
 SET ANSI_PADDING ON
 GO
 
-CREATE ROLE gateway
+CREATE ROLE brightstar_role_gateway
 GO
 
-CREATE TABLE [dbo].[Jobs](
+CREATE TABLE [dbo].[Brightstar_Jobs](
  [Id] [varchar](255) NOT NULL,
  [StoreId] [nvarchar](255) NOT NULL,
  [JobType] [int] NOT NULL,
@@ -62,21 +60,21 @@ CREATE TABLE [dbo].[Jobs](
  [ProcessingCompleted] [datetime] NULL,
  [ProcessingException] [nvarchar](max) NULL,
  [RetryCount] [int] NOT NULL DEFAULT 0
- CONSTRAINT [PK_Jobs] PRIMARY KEY NONCLUSTERED ([Id] ASC))
+ CONSTRAINT [PK_Brightstar_Jobs] PRIMARY KEY NONCLUSTERED ([Id] ASC))
 GO
 SET ANSI_PADDING OFF
 GO
-GRANT INSERT, DELETE, SELECT, UPDATE ON [dbo].[Jobs] TO gateway
+GRANT INSERT, DELETE, SELECT, UPDATE ON [dbo].[Brightstar_Jobs] TO brightstar_role_gateway
 GO
 
-CREATE UNIQUE CLUSTERED INDEX [IX_Jobs_QueuedTime] ON [dbo].[Jobs] 
+CREATE UNIQUE CLUSTERED INDEX [IX_Brightstar_Jobs_QueuedTime] ON [dbo].[Brightstar_Jobs] 
 (
  [QueuedTime] ASC,
  [Id] ASC
 )
 GO
 
-CREATE NONCLUSTERED INDEX [IX_Jobs_StoreId] ON [dbo].[Jobs] 
+CREATE NONCLUSTERED INDEX [IX_Brightstar_Jobs_StoreId] ON [dbo].[Brightstar_Jobs] 
 (
  [StoreId] ASC
 )
@@ -95,7 +93,7 @@ GO
 --   @jobData - input data for the job
 --   @scheduledStartTime - the earliest start time for the job.
 -- =============================================
-CREATE PROCEDURE [dbo].[QueueJob]
+CREATE PROCEDURE [dbo].[Brightstar_QueueJob]
  @id varchar(255),
  @storeId nvarchar(255),
  @jobType int,
@@ -105,11 +103,11 @@ AS
 BEGIN
  SET NOCOUNT OFF;
  SET @scheduledRunTime = COALESCE(@scheduledRunTime, CURRENT_TIMESTAMP)
- INSERT INTO Jobs(Id, StoreId, JobType, JobStatus, JobData, QueuedTime, ScheduledRunTime) 
+ INSERT INTO Brightstar_Jobs(Id, StoreId, JobType, JobStatus, JobData, QueuedTime, ScheduledRunTime) 
  VALUES (@id, @storeId, @jobType, 0, @jobData, CURRENT_TIMESTAMP, @scheduledRunTime)
 END
 GO
-GRANT EXECUTE ON [dbo].[QueueJob] TO gateway
+GRANT EXECUTE ON [dbo].[Brightstar_QueueJob] TO brightstar_role_gateway
 GO
 
 -- ======================================
@@ -118,16 +116,16 @@ GO
 -- Selects all jobs from the job table where the Processor is @workerId
 -- and the ProcessingCompleted timestamp is not set
 -- ======================================
-CREATE PROCEDURE [dbo].[GetActiveJobs]
+CREATE PROCEDURE [dbo].[Brightstar_GetActiveJobs]
  @workerId varchar(255)
 AS
 BEGIN
  SELECT Id, StoreId, JobType, JobStatus, JobData, StatusMessage, RetryCount 
- FROM Jobs
+ FROM Brightstar_Jobs
  WHERE Processor = @workerId AND ProcessingCompleted IS NULL
 END
 GO
-GRANT EXECUTE ON [dbo].[GetActiveJobs] TO gateway
+GRANT EXECUTE ON [dbo].[Brightstar_GetActiveJobs] TO brightstar_role_gateway
 GO
 
 -- =============================================
@@ -136,16 +134,16 @@ GO
 --  @statusMessage - the new status message for the job
 -- Updates the user-friendly status message on the job
 -- =============================================
-CREATE PROCEDURE [dbo].[UpdateStatus]
+CREATE PROCEDURE [dbo].[Brightstar_UpdateStatus]
  @jobId varchar(255),
  @statusMessage nvarchar(2000)
 AS
 BEGIN
  SET NOCOUNT ON;
- UPDATE Jobs SET StatusMessage=@statusMessage WHERE Id=@jobId
+ UPDATE Brightstar_Jobs SET StatusMessage=@statusMessage WHERE Id=@jobId
 END
 GO
-GRANT EXECUTE ON [dbo].[UpdateStatus] TO gateway
+GRANT EXECUTE ON [dbo].[Brightstar_UpdateStatus] TO brightstar_role_gateway
 GO
 
 -- =============================================
@@ -153,23 +151,23 @@ GO
 --  @jobId - the ID of the job to update
 --  @statusMessage - the user-friendly status message for the job
 -- =============================================
-CREATE PROCEDURE [dbo].[StartCommit]
+CREATE PROCEDURE [dbo].[Brightstar_StartCommit]
  @jobId varchar(255),
  @statusMessage nvarchar(2000)
 AS
 BEGIN
  SET NOCOUNT ON;
- UPDATE Jobs SET JobStatus=2, StatusMessage=@statusMessage WHERE Id=@jobId
+ UPDATE Brightstar_Jobs SET JobStatus=2, StatusMessage=@statusMessage WHERE Id=@jobId
 END
 GO
-GRANT EXECUTE ON [dbo].[StartCommit] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_StartCommit] to brightstar_role_gateway
 GO
 
 -- =============================================
 -- NextJob
 -- Acquires a job for processing by a specific worker
 -- =============================================
-CREATE PROCEDURE [dbo].[NextJob] 
+CREATE PROCEDURE [dbo].[Brightstar_NextJob] 
  @workerId varchar(255),
  @storeId nvarchar(255)
 AS
@@ -182,7 +180,7 @@ BEGIN
  -- First check to see if there is a Job already running for the worker
  -- If so, this job needs to be re-run
  SET @jobId = (
-	SELECT TOP 1 Id FROM Jobs j WHERE
+  SELECT TOP 1 Id FROM Brightstar_Jobs j WHERE
 	j.Processor=@workerId AND
 	(j.JobStatus = 1 OR j.JobStatus = 2)
  )
@@ -194,11 +192,11 @@ BEGIN
 	 BEGIN
 	  SET @jobId = (
 	   SELECT TOP 1 Id FROM
-	   Jobs j WHERE 
+	   Brightstar_Jobs j WHERE 
 		(j.ScheduledRunTime IS NULL OR j.ScheduledRunTime <= @now) AND 
 		j.JobStatus=0 
 		AND NOT EXISTS(
-		 SELECT Id FROM Jobs w 
+		 SELECT Id FROM Brightstar_Jobs w 
 		 WHERE 
 		  w.StoreId=j.StoreId 
 		  AND w.JobStatus > 0
@@ -210,14 +208,14 @@ BEGIN
 	 BEGIN
 	  SET @jobId = (
 	   SELECT TOP 1 Id
-	   FROM Jobs
+	   FROM Brightstar_Jobs
 	   WHERE StoreId=@storeId AND Processor=@workerId AND ProcessingCompleted IS NULL
 	   ORDER BY QueuedTime ASC
 	  )
-	  IF @jobId IS NULL AND NOT EXISTS (SELECT Id FROM Jobs WHERE Processor IS NOT NULL AND ProcessingCompleted IS NULL AND StoreId=@storeId)
+	  IF @jobId IS NULL AND NOT EXISTS (SELECT Id FROM Brightstar_Jobs WHERE Processor IS NOT NULL AND ProcessingCompleted IS NULL AND StoreId=@storeId)
 	   SET @jobId = (
 		SELECT TOP 1 Id 
-		FROM Jobs 
+		FROM Brightstar_Jobs 
 		WHERE JobStatus = 0 AND StoreId=@storeId 
 		ORDER BY QueuedTime ASC
 	   )
@@ -226,12 +224,12 @@ BEGIN
  
  IF (@jobId IS NOT NULL)
  BEGIN
-  UPDATE Jobs SET JobStatus = 1, ProcessingStarted=CURRENT_TIMESTAMP, Processor=@workerId WHERE Id=@jobId
-  SELECT Id, StoreId, JobType, JobStatus, JobData, RetryCount FROM Jobs WHERE Id=@jobId
+  UPDATE Brightstar_Jobs SET JobStatus = 1, ProcessingStarted=CURRENT_TIMESTAMP, Processor=@workerId WHERE Id=@jobId
+  SELECT Id, StoreId, JobType, JobStatus, JobData, RetryCount FROM Brightstar_Jobs WHERE Id=@jobId
  END
 END
 
-GRANT EXECUTE ON [dbo].[NextJob] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_NextJob] to brightstar_role_gateway
 GO
 
 -- =============================================
@@ -248,7 +246,7 @@ GO
 --    Append @processingException to ProcessingException
 --    Increment RetryCount
 -- =============================================
-CREATE PROCEDURE [dbo].[JobException]
+CREATE PROCEDURE [dbo].[Brightstar_JobException]
  @jobId varchar(255),
  @statusMessage nvarchar(2000),
  @processingException nvarchar(max)
@@ -259,7 +257,7 @@ BEGIN
  DECLARE @linebreak as varchar(2)
  SET @linebreak = CHAR(13) + CHAR(10)
  
- UPDATE Jobs 
+ UPDATE Brightstar_Jobs 
  SET JobStatus=0, 
   StatusMessage=@statusMessage, 
   ProcessingException=COALESCE(ProcessingException, '') +  '-----' + @linebreak + COALESCE(@processingException, '') + @linebreak,
@@ -267,7 +265,7 @@ BEGIN
  WHERE
   Id=@jobId and RetryCount <= 3
 
- UPDATE Jobs 
+ UPDATE Brightstar_Jobs 
  SET JobStatus=99,
 	ProcessingCompleted=CURRENT_TIMESTAMP
  WHERE
@@ -275,7 +273,7 @@ BEGIN
 
 END
 GO
-GRANT EXECUTE ON [dbo].[JobException] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_JobException] to brightstar_role_gateway
 GO
 
 -- =============================================
@@ -283,7 +281,7 @@ GO
 -- Create date: <Create Date,,>
 -- Description: <Description,,>
 -- =============================================
-CREATE PROCEDURE [dbo].[GetJob]
+CREATE PROCEDURE [dbo].[Brightstar_GetJob]
  @jobId varchar(255),
  @storeId nvarchar(255)
 AS
@@ -292,26 +290,26 @@ BEGIN
  -- interfering with SELECT statements.
  SET NOCOUNT ON;
 
- SELECT TOP 1 Id, StoreId, JobType, JobStatus, StatusMessage, ScheduledRunTime, ProcessingStarted, ProcessingCompleted FROM Jobs WHERE Id=@jobId AND StoreId=@storeId
+ SELECT TOP 1 Id, StoreId, JobType, JobStatus, StatusMessage, ScheduledRunTime, ProcessingStarted, ProcessingCompleted FROM Brightstar_Jobs WHERE Id=@jobId AND StoreId=@storeId
 END
 GO
 
-GRANT EXECUTE ON [dbo].[GetJob] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_GetJob] to brightstar_role_gateway
 GO
 
-CREATE PROCEDURE [dbo].[GetJobDetail]
+CREATE PROCEDURE [dbo].[Brightstar_GetJobDetail]
   @jobId varchar(255)
 AS
 BEGIN
 	SET NOCOUNT ON;
 
 	SELECT TOP 1 Id, StoreId, JobType, JobStatus, StatusMessage, ScheduledRunTime, ProcessingStarted, Processor, ProcessingCompleted, ProcessingException, RetryCount
-	FROM [Jobs]
+	FROM [Brightstar_Jobs]
 	WHERE Id = @jobId
 END
 GO
 
-GRANT EXECUTE ON [dbo].[GetJob] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_GetJob] to brightstar_role_gateway
 GO
 
 -- =======================================
@@ -319,15 +317,15 @@ GO
 -- Returns the details for all jobs targetting the specified store
 -- @storeId - The ID of the target store
 -- ========================================
-CREATE PROCEDURE [dbo].[GetStoreJobs]
+CREATE PROCEDURE [dbo].[Brightstar_GetStoreJobs]
 	@storeId nvarchar(255)
 AS
 BEGIN
-SELECT Id, StoreId, JobType, JobStatus, StatusMessage, ScheduledRunTime, ProcessingStarted, ProcessingCompleted FROM Jobs WHERE StoreId=@storeId ORDER BY ScheduledRunTime
+SELECT Id, StoreId, JobType, JobStatus, StatusMessage, ScheduledRunTime, ProcessingStarted, ProcessingCompleted FROM Brightstar_Jobs WHERE StoreId=@storeId ORDER BY ScheduledRunTime
 END
 GO
 
-GRANT EXECUTE ON [dbo].[GetStoreJobs] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_GetStoreJobs] to brightstar_role_gateway
 GO
 
 -- ==================================
@@ -337,18 +335,18 @@ GO
 -- 
 -- @storeId - the id of the store
 -- ===================================
-CREATE PROCEDURE [dbo].[GetLastCommit]
+CREATE PROCEDURE [dbo].[Brightstar_GetLastCommit]
 	@storeId nvarchar(255)
 AS
 BEGIN
 	SELECT TOP 1 Id, StoreId, JobType, JobStatus, StatusMessage, ProcessingCompleted 
-	FROM Jobs
+	FROM Brightstar_Jobs
 	WHERE ProcessingCompleted IS NOT NULL
 	ORDER BY ProcessingCompleted DESC
 END
 GO
 
-GRANT EXECUTE ON [dbo].[GetLastCommit] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_GetLastCommit] to brightstar_role_gateway
 GO
 
 -- =============================================
@@ -356,18 +354,18 @@ GO
 --  @jobId - the ID of the job to be released
 -- Returns the specified job to the queue
 -- =============================================
-CREATE PROCEDURE [dbo].[ReleaseJob]
+CREATE PROCEDURE [dbo].[Brightstar_ReleaseJob]
   @jobId varchar(255)
 AS
 BEGIN
  SET NOCOUNT ON
- UPDATE Jobs 
+ UPDATE Brightstar_Jobs 
  SET Processor=NULL, JobStatus=0 
  WHERE Id=@jobId
 END
 GO
 
-GRANT EXECUTE ON [dbo].[ReleaseJob] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_ReleaseJob] to brightstar_role_gateway
 GO
 
 -- =============================================
@@ -376,50 +374,50 @@ GO
 -- @finalStatus - the status code to record for the completed job
 -- @finalStatusMessage - the user friendly message to record for the completed job
 -- =============================================
-CREATE PROCEDURE [dbo].[CompleteJob]
+CREATE PROCEDURE [dbo].[Brightstar_CompleteJob]
  @jobId varchar(255),
  @finalStatus int,
  @finalStatusMessage nvarchar(2000)
 AS
 BEGIN
  SET NOCOUNT ON;
- UPDATE Jobs 
+ UPDATE Brightstar_Jobs 
  SET JobStatus=@finalStatus, StatusMessage=@finalStatusMessage, ProcessingCompleted=CURRENT_TIMESTAMP
  WHERE Id=@jobId
 END
 GO
 
-GRANT EXECUTE ON [dbo].[CompleteJob] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_CompleteJob] to brightstar_role_gateway
 GO
 
 /**
  * Deletes all jobs (regardless of their status) from the queue.
  * This is intended only for testing purposes.
  */
-CREATE PROCEDURE [dbo].[ClearAllJobs]
+CREATE PROCEDURE [dbo].[Brightstar_ClearAllJobs]
 AS
 BEGIN
- DELETE FROM Jobs
+ DELETE FROM Brightstar_Jobs
 END
 GO
 
-GRANT EXECUTE ON [dbo].[ClearAllJobs] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_ClearAllJobs] to brightstar_role_gateway
 GO
 
 /**
  * Deletes all jobs that have a ProcessingCompleted timestamp
  * that is earlier than the current date/time less @maxJobAge (in seconds)
  */
-CREATE PROCEDURE [dbo].[Cleanup]
+CREATE PROCEDURE [dbo].[Brightstar_Cleanup]
  @maxJobAge int
 AS
 BEGIN
  DECLARE @cutOffDate datetime
  SET @cutOffDate = DATEADD(second, 0 - @maxJobAge, CURRENT_TIMESTAMP)
- DELETE FROM Jobs WHERE 
+ DELETE FROM Brightstar_Jobs WHERE 
   ProcessingCompleted IS NOT NULL AND
   ProcessingCompleted < @cutOffDate
 END
 
-GRANT EXECUTE ON [dbo].[Cleanup] to gateway
+GRANT EXECUTE ON [dbo].[Brightstar_Cleanup] to brightstar_role_gateway
 GO

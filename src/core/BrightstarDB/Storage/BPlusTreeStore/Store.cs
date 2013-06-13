@@ -61,7 +61,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public IEnumerable<Triple> Match(string subject, string predicate, string obj, bool isLiteral, string dataType, string langCode, string graph)
         {
-            return Match(subject, predicate, obj, isLiteral, dataType, langCode, new[] {graph});
+            return Match(subject, predicate, obj, isLiteral, dataType, langCode, graph == null ? null : new[] {graph});
         }
 
         public IEnumerable<Triple> Match(string subject, string predicate, string obj, bool isLiteral, string dataType, string langCode, IEnumerable<string> graphs)
@@ -108,9 +108,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             streamWriter.Flush();
         }
 
-        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat)
+        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris = null)
         {
-            var queryHandler = new SparqlQueryHandler();
+            var queryHandler = new SparqlQueryHandler(defaultGraphUris);
             BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
             return result.GetString(resultsFormat);
         }

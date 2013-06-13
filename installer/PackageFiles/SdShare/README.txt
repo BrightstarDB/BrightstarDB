@@ -5,7 +5,7 @@ Welcome to the Brightstar SdShare Server. This document contains any late breaki
 
 Version
 -------
-1.0 Beta
+1.3
 
 We welcome feedback, comments, feature requests and bug reports sent to contact@brightstardb.com.
 
@@ -16,15 +16,27 @@ None at this time.
 
 Licensing
 ---------
-Brightstar SdShare Server is free for all non-commercial and development purposes. 
+The MIT License (MIT)
 
-If you run an instance as part of internal production system, 
-as part of a service offering, or as a component in a desktop, server or phone application you require a license. 
+Copyright (c) 2013 Khalil Ahmed, Graham Moore
 
-Please see the website for more license information. 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-It is your responsibility to check with BrightstarDB Ltd if you are unsure if you need to purchase a license. 
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 More Information
 ----------------

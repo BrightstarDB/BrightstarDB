@@ -2987,6 +2987,14 @@ namespace BrightstarDB.Tests.SparqlTestSuite {
                 // This is a constructed graph
                 var actualGraph = new Graph();
                 actualGraph.LoadFromString(results);
+                var toReplace = actualGraph.Triples.Where(
+                    t => IsGenid(t.Subject) || IsGenid(t.Predicate) || IsGenid(t.Object)).ToList();
+                foreach (var t in toReplace)
+                {
+                    var mapped = MapGenidToBlank(t);
+                    actualGraph.Retract(t);
+                    actualGraph.Assert(mapped);
+                }
                 CompareTripleCollections(actualGraph.Triples, expectedResultGraph.Triples, reduced);
             }
         }
@@ -3085,15 +3093,42 @@ namespace BrightstarDB.Tests.SparqlTestSuite {
             return true;
         }
 
-        private static void CompareTripleCollections(BaseTripleCollection actualTriples, BaseTripleCollection expectedTriples, bool reduced) 
-		{
+        private static void CompareTripleCollections(BaseTripleCollection actualTriples, BaseTripleCollection expectedTriples, bool reduced)
+        {
             var actualGraph = new Graph(actualTriples);
             var expectedGraph = new Graph(expectedTriples);
             Assert.IsTrue(expectedGraph.Equals(actualGraph), "Result graphs do not match.r\nExpected:\r\n{0}\r\nActual:\r\n{1}",
-                String.Join(",", expectedTriples.Select(t=>t.ToString())),
-                String.Join(",", actualTriples.Select(t=>t.ToString())));
+                String.Join(" .\n", expectedTriples.Select(t=>t.ToString())),
+                String.Join(" .\n", actualTriples.Select(t=>t.ToString())));
 		}
 
-		#endregion
+        private static bool IsGenid(INode n)
+        {
+            return n is UriNode && (n as UriNode).Uri.ToString().StartsWith(Constants.GeneratedUriPrefix);
+        }
+
+        private static Triple MapGenidToBlank(Triple triple)
+        {
+            return new Triple(MapGenidToBlank(triple.Subject, triple.Graph),
+                              MapGenidToBlank(triple.Predicate, triple.Graph),
+                              MapGenidToBlank(triple.Object, triple.Graph),
+                              triple.Graph);
+        }
+
+        
+        private static INode MapGenidToBlank(INode node, IGraph g)
+        {
+            if (node is UriNode)
+            {
+                var u = node as UriNode;
+                if (u.Uri.ToString().StartsWith(Constants.GeneratedUriPrefix))
+                {
+                    return g.CreateBlankNode(u.Uri.ToString().Substring(Constants.GeneratedUriPrefix.Length));
+                }
+            }
+            return node;
+        }
+
+        #endregion
 	}
 }

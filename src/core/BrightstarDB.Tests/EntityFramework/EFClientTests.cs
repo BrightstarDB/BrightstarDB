@@ -30,7 +30,7 @@ namespace BrightstarDB.Tests.EntityFramework
             triples.AppendLine(@"<http://www.networkedplanet.com/people/j.williams> <http://xmlns.com/foaf/0.1/name> ""Jen Williams"" .");
             triples.AppendLine(@"<http://www.networkedplanet.com/people/j.williams> <http://xmlns.com/foaf/0.1/Organization> ""Networked Planet"" .");
 
-            embeddedClient.ExecuteTransaction(storeName,null, null, triples.ToString(), true);
+            embeddedClient.ExecuteTransaction(storeName,null, null, triples.ToString());
 
             //check EF can access all properties
             var context = new MyEntityContext(string.Format(@"type=embedded;storesDirectory=c:\\brightstar;storeName={0}", storeName));
@@ -65,7 +65,7 @@ namespace BrightstarDB.Tests.EntityFramework
             triples.AppendLine(@"<http://www.networkedplanet.com/people/j.williams> <http://dbpedia.org/ontology/birthDate> ""1921-11-28""^^<http://www.w3.org/2001/XMLSchema#date> .");
             
 
-            embeddedClient.ExecuteTransaction(storeName, null, null, triples.ToString(), true);
+            embeddedClient.ExecuteTransaction(storeName, null, null, triples.ToString());
 
             //check EF can access all properties
             var context = new MyEntityContext(string.Format(@"type=embedded;storesDirectory=c:\\brightstar;storeName={0}", storeName));
@@ -128,7 +128,7 @@ namespace BrightstarDB.Tests.EntityFramework
             triples.AppendLine(@"<http://www.networkedplanet.com/people/j.williams> <http://xmlns.com/foaf/0.1/name> ""Jen Williams"" .");
             triples.AppendLine(@"<http://www.networkedplanet.com/people/j.williams> <http://xmlns.com/foaf/0.1/Organization> ""Networked Planet"" .");
 
-            httpClient.ExecuteTransaction(storeName,null, null, triples.ToString(), true);
+            httpClient.ExecuteTransaction(storeName,null, null, triples.ToString());
 
             //check EF can access all properties
             var context = new MyEntityContext(string.Format(@"type=http;endpoint=http://localhost:8090/brightstar;storeName={0}", storeName));

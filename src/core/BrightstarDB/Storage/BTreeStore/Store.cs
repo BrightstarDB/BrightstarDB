@@ -572,10 +572,11 @@ namespace BrightstarDB.Storage.BTreeStore
         /// </summary>
         /// <param name="exp"></param>
         /// <param name="resultsFormat"></param>
+        /// <param name="defaultGraphUris"></param>
         /// <returns></returns>
-        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat)
+        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris )
         {
-            var queryHandler = new SparqlQueryHandler();
+            var queryHandler = new SparqlQueryHandler(defaultGraphUris);
             BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
             return result.GetString(resultsFormat);
         }

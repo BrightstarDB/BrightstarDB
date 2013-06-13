@@ -114,16 +114,16 @@ namespace BrightstarDB.Client
             }
             preconditionsData.Close();
 
-            PostTransaction(preconditionsData.ToString(), deleteData.ToString(), addData.ToString());
+            PostTransaction(preconditionsData.ToString(), deleteData.ToString(), addData.ToString(), Constants.DefaultGraphUri);
 
             // reset changes
             ResetTransactionData();
         }
 
 
-        private void PostTransaction(string preconditions, string patternsToDelete, string triplesToAdd)
+        private void PostTransaction(string preconditions, string patternsToDelete, string triplesToAdd, string defaultGraphUri)
         {
-            var jobInfo = Client.ExecuteTransaction(_storeName, preconditions, patternsToDelete, triplesToAdd);
+            var jobInfo = Client.ExecuteTransaction(_storeName, preconditions, patternsToDelete, triplesToAdd, defaultGraphUri);
             while (!(jobInfo.JobCompletedOk || jobInfo.JobCompletedWithErrors))
             {
                 Thread.Sleep(20);

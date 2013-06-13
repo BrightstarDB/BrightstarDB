@@ -47,8 +47,15 @@ namespace BulkImport
             {
                 throw new ApplicationException(String.Format("Cannot find import directory '{0}'", importDirectory.FullName));
             }
-            var importedDirectory = new DirectoryInfo(Path.Combine(importDirectory.FullName, "imported"));
-            if (!importedDirectory.Exists){importedDirectory.Create();}
+            DirectoryInfo importedDirectory = null;
+            if (!String.IsNullOrEmpty(parsedArgs.MoveTo))
+            {
+                importedDirectory = new DirectoryInfo(Path.Combine(importDirectory.FullName, parsedArgs.MoveTo));
+                if (!importedDirectory.Exists)
+                {
+                    importedDirectory.Create();
+                }
+            }
 
             using (var logWriter = new StreamWriter(logFile))
             {
@@ -68,7 +75,10 @@ namespace BulkImport
                     if (importSuccessful)
                     {
                         logWriter.WriteLine("Imported file '{0}' in {1} seconds", file.Name, timer.Elapsed.TotalSeconds);
-                        file.MoveTo(Path.Combine(importedDirectory.FullName, file.Name));
+                        if (importedDirectory != null)
+                        {
+                            file.MoveTo(Path.Combine(importedDirectory.FullName, file.Name));
+                        }
                     }
                     else
                     {
@@ -76,6 +86,8 @@ namespace BulkImport
                     }
                 }
             }
+
+            BrightstarService.Shutdown();
 
         }
 

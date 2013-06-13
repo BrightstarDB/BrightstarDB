@@ -49,7 +49,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("This is a test", result);
 
             client.ExecuteTransaction(storeName, null, null,
-                                      "<http://example.org/s> <http://example.org/p> <http://example.org/o> .", true);
+                                      "<http://example.org/s> <http://example.org/p> <http://example.org/o> .",
+                                      Constants.DefaultGraphUri, true);
             resultStream = client.ExecuteQuery(storeName, query);
             using (var resultReader = new StreamReader(resultStream))
             {

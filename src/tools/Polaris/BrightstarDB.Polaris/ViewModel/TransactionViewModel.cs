@@ -79,10 +79,10 @@ namespace BrightstarDB.Polaris.ViewModel
             {
                 _dispatcher = executeButton.Dispatcher;
                 var client = BrightstarService.GetClient(Store.Source.ConnectionString);
-                // TODO: Instead of blocking, start the job and a background thread to monitor it
+                // Instead of blocking, start the job and a background thread to monitor it
                 var expandedAddTriples = GetExpandedTriples(AddTriples);
                 var expandedDeleteTriples = GetExpandedDeletePatterns();
-                _transactionJob = client.ExecuteTransaction(Store.Location, null, expandedDeleteTriples, expandedAddTriples, false);
+                _transactionJob = client.ExecuteTransaction(Store.Location, null, expandedDeleteTriples, expandedAddTriples, waitForCompletion:false);
                 ValidationMessages.Add("Executing transaction. Please wait...");
                 _dispatcher.BeginInvoke(DispatcherPriority.Normal,
                                         new JobMonitorDelegate(this.CheckJobStatus));

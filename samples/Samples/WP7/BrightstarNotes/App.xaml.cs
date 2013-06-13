@@ -66,9 +66,6 @@ namespace BrightstarNotes
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
 
-            // Initialize BrightstarDB License
-            BrightstarDB.Licensing.License.Validate(LicenseeId, LicenseKey);
-
         }
 
         // Code to execute when the application is launching (eg, from Start)

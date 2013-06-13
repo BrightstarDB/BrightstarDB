@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="../helpproject.xsl" ?>
-<topic template="Default" status="" lasteditedby="gra" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../helpproject.xsd">
-  <title>Developer Guide</title>
-  <body>
-    <header><para styleclass="Heading1">Developer Guide</para></header>
-    <para styleclass="Normal">Enter topic text here.</para>
-  </body>
-</topic>

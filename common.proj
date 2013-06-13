@@ -96,8 +96,8 @@
   <!-- Common targets for Brightstar projects -->
   <PropertyGroup>
     <AssemblyProduct>BrightstarDB</AssemblyProduct>
-    <AssemblyCompany>BrightstarDB Limited</AssemblyCompany>
-    <AssemblyCopyright>Copyright (c) BrightstarDB Limited 2012</AssemblyCopyright>
+    <AssemblyCompany></AssemblyCompany>
+    <AssemblyCopyright>Copyright (c) 2013 Khalil Ahmed, Graham Moore</AssemblyCopyright>
     <AssemblyTrademark>All rights reserved</AssemblyTrademark>
     <AssemblyTitle></AssemblyTitle>
   </PropertyGroup>

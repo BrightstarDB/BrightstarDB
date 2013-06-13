@@ -4,7 +4,7 @@
            Name="BrightstarDB $(var.BuildNumber).0" 
            Language="1033" 
            Version="$(var.BuildNumber).0" 
-           Manufacturer="BrightstarDB Limited" 
+           Manufacturer="BrightstarDB Project" 
            UpgradeCode="CF04085A-ACFE-4447-83E1-1A50A4133655">
     
 		<Package InstallerVersion="200" Compressed="yes"  />
@@ -74,6 +74,9 @@
     </UI>
 
 
+    <!-- The following custom actions ping a URL on the brightstardb.com server on install / uninstall. Disabled for now,
+         we should decide if the project would like to track install/uninstall actions or not
+         
     <Property Id="InstallURL"><![CDATA[http://brightstardb.com/installation/]]></Property>
     <Property Id="InstallEdition">SRV</Property>
     <CustomAction Id="SetOpenInstallUrl" Property="WixShellExecTarget" Value="[InstallURL]?install=$(var.BuildNumber)&amp;edition=[InstallEdition]"/>
@@ -82,13 +85,14 @@
     <CustomAction Id="OpenUninstallUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
     <CustomAction Id="OpenInstallUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
     <CustomAction Id="OpenUpgradeUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" Return="ignore"/>
+    
 
     <InstallExecuteSequence>
-      <!-- Launch uninstall webpage during full uninstall but not upgrade -->
+      <!- Launch uninstall webpage during full uninstall but not upgrade ->
       <Custom Action="SetOpenUninstallUrl" After="InstallFinalize"><![CDATA[ REMOVE ~= "ALL" AND NOT (UPGRADINGPRODUCTCODE <> "") ]]></Custom>
       <Custom Action="OpenUninstallUrl" After="SetOpenUninstallUrl"><![CDATA[ REMOVE ~= "ALL" AND NOT (UPGRADINGPRODUCTCODE <> "") ]]></Custom>
 
-      <!-- Launch install webpage during install but not upgrade -->
+      <!- Launch install webpage during install but not upgrade ->
       <Custom Action="SetOpenInstallUrl" After="InstallFinalize"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
       <Custom Action="OpenInstallUrl" After="SetOpenInstallUrl"><![CDATA[ ProductState < 5 AND NOT (WIX_UPGRADE_DETECTED <> "") ]]></Custom>
 
@@ -96,6 +100,7 @@
       <Custom Action="OpenUpgradeUrl" After="SetOpenUpgradeUrl"><![CDATA[ WIX_UPGRADE_DETECTED <> "" ]]></Custom>
       
     </InstallExecuteSequence>
+    -->
 
     <!-- Add and remove HTTP reservation -->
     <CustomAction Id="ListenerServiceAddReservation"
@@ -123,6 +128,11 @@
           <Directory Id="SERVICEDIR" Name="Service"/>
           <Directory Id="SERVICEDATADIR" Name="Data"/>
           <Directory Id="SPARQLSERVICEDIR" Name="SparqlService"/>
+          <Directory Id="SDSHAREDIR" Name="SDShare">
+            <Directory Id="SDSHAREDOCSDIR" Name="Docs"/>
+            <Directory Id="SDSHARESERVICEDIR" Name="Service"/>
+            <Directory Id="SDSHARESAMPLESDIR" Name="Samples"/>
+          </Directory>
           <Directory Id="VSDIR" Name="VisualStudio"/>
           <Directory Id="TOOLSDIR" Name="Tools"/>
           <Directory Id="LMDIR" Name="LicenseManager"/>
@@ -145,25 +155,25 @@
       </Component>
 
       <Component Id="DocsShortcuts" Guid="{5E38F77E-40FE-424F-BF78-28B377487EDE}">
-        <Shortcut Id="PDFShortcut"
+        <!--<Shortcut Id="PDFShortcut"
                   Name="BrightstarDB Documentation (PDF)"
                   Target="[DOCSDIR]BrightstarDB_Documentation.pdf"
-                  WorkingDirectory="DOCSDIR"/>
-        <Shortcut Id="CHMShortcut"
+                  WorkingDirectory="DOCSDIR"/>-->
+        <!--<Shortcut Id="CHMShortcut"
                   Name="BrightstarDB Documentation (CHM)"
                   Target="[DOCSDIR]BrightstarDB.chm"
-                  WorkingDirectory="DOCSDIR"/>
+                  WorkingDirectory="DOCSDIR"/>-->
         <Shortcut Id="APICHMShortcut"
                   Name="BrightstarDB API (CHM)"
                   Target="[DOCSDIR]BrightstarDB_API.chm"
                   WorkingDirectory="DOCSDIR"/>
         <util:InternetShortcut Id="OnlineDocsShortcut"
                                Directory="DOCSDIR"
-                               Target="http://brightstardb.com/documentation/"
+                               Target="http://brightstardb.readthedocs.org/"
                                Name="BrightstarDB Online Documentation"/>
         <util:InternetShortcut Id="OnlineDocsStartMenuShortcut"
                                Directory="BrightstarProgramMenuFolder"
-                               Target="http://brightstardb.com/documentation/"
+                               Target="http://brightstardb.readthedocs.org/"
                                Name="BrightstarDB Online Documentation"/>
         <RemoveFolder Id="BrightstarProgramMenuFolder" On="uninstall"/>
         <RegistryValue Root="HKCU" Key="Software\BrightstarDB" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
@@ -190,7 +200,13 @@
       <ComponentGroupRef Id="samplesFilesComponentGroup"/>
 
       <ComponentGroupRef Id="sparqlServiceFilesComponentGroup"/>
+
+      <ComponentGroupRef Id="sdshareServiceFilesComponentGroup"/>
+
+      <ComponentGroupRef Id="sdshareSamplesFilesComponentGroup"/>
       
+      <ComponentGroupRef Id="sdshareDocFilesComponentGroup"/>
+
       <ComponentRef Id="DocsShortcuts"/>
 
       <Component Guid="{844DEDDC-DB9E-421E-8D58-D0932399193E}" Directory="INSTALLLOCATION">

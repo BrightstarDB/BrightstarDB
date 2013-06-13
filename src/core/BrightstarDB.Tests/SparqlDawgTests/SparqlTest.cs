@@ -82,7 +82,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                         );
                 }
             }
-            _service.ExecuteTransaction(_storeName, null, null, sw.ToString(), true);
+            _service.ExecuteTransaction(_storeName, null, null, sw.ToString());
             //_store.Commit(Guid.NewGuid());
         }
 

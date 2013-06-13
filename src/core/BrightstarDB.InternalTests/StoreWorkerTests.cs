@@ -36,7 +36,7 @@ namespace BrightstarDB.Tests
             // execute transactions
             const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
             JobExecutionStatus status = storeWorker.GetJobStatus(jobId.ToString());
             while (status.JobStatus != JobStatus.CompletedOk)
             {
@@ -89,7 +89,7 @@ namespace BrightstarDB.Tests
             // execute transactions
             const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            var jobId = storeWorker.ProcessTransaction(preconds, "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction(preconds, "", data, Constants.DefaultGraphUri, "nt");
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.TransactionError)
             {
@@ -115,7 +115,7 @@ namespace BrightstarDB.Tests
                 @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np> .\n
                   <http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/core/version> ""1""^^<http://www.w3.org/2000/01/rdf-schema#integer> .";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
             {
@@ -130,7 +130,7 @@ namespace BrightstarDB.Tests
             data =
                 @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            jobId = storeWorker.ProcessTransaction(preconds, "", data, "nt");
+            jobId = storeWorker.ProcessTransaction(preconds, "", data, Constants.DefaultGraphUri, "nt");
             jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
             {
@@ -153,7 +153,7 @@ namespace BrightstarDB.Tests
             var data =
                 @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
 
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
@@ -174,7 +174,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1, i);
 
             data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
-            jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
 
             jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
@@ -207,7 +207,7 @@ namespace BrightstarDB.Tests
             // execute transactions
             const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
 
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
@@ -261,7 +261,7 @@ namespace BrightstarDB.Tests
             var data =
                 @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk && jobStatus.JobStatus != JobStatus.TransactionError)
             {
@@ -288,7 +288,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(TransactionStatus.Failed, tinfo.TransactionStatus);
 
             data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
-            jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
 
             jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
@@ -321,7 +321,7 @@ namespace BrightstarDB.Tests
             // execute transactions
             const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
 
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.TransactionError)
@@ -347,7 +347,7 @@ namespace BrightstarDB.Tests
             // execute transactions
             const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
             {
@@ -355,7 +355,7 @@ namespace BrightstarDB.Tests
                 jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             }
 
-            storeWorker.Query("select * where { ?s ?p ?o }", SparqlResultsFormat.Xml);
+            storeWorker.Query("select * where { ?s ?p ?o }", SparqlResultsFormat.Xml, new string[]{Constants.DefaultGraphUri});
             storeWorker.Shutdown(true, () => _storeManager.DeleteStore(Configuration.StoreLocation + "\\"+ sid));            
         }
 
@@ -372,7 +372,7 @@ namespace BrightstarDB.Tests
             // execute transactions
             const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
             {
@@ -400,7 +400,7 @@ namespace BrightstarDB.Tests
             var data =
                 @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
             {
@@ -420,7 +420,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(JobStatus.CompletedOk, jobStatus.JobStatus);
 
             // open store and find all triples
-            var results = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            var results = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             var doc = XDocument.Parse(results);
             XNamespace sparqlNs = "http://www.w3.org/2005/sparql-results#";
             Assert.AreEqual(1, doc.Descendants(sparqlNs + "result").Count());
@@ -428,7 +428,7 @@ namespace BrightstarDB.Tests
             data =
                 @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            jobId = storeWorker.ProcessTransaction("", data, "", "nt");
+            jobId = storeWorker.ProcessTransaction("", data, "", Constants.DefaultGraphUri, "nt");
             jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk)
             {
@@ -450,7 +450,7 @@ namespace BrightstarDB.Tests
 
             Assert.AreEqual(JobStatus.CompletedOk, jobStatus.JobStatus);
 
-            results = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            results = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             doc = XDocument.Parse(results);
             Assert.AreEqual(0, doc.Descendants(sparqlNs + "result").Count());
         }
@@ -470,7 +470,7 @@ namespace BrightstarDB.Tests
             // execute transactions
             const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
-            var jobId = storeWorker.ProcessTransaction("", "", data, "nt");
+            var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk && jobStatus.JobStatus != JobStatus.TransactionError)
             {
@@ -481,14 +481,14 @@ namespace BrightstarDB.Tests
 
             var sw = new Stopwatch();
             sw.Start();
-            var queryResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            var queryResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             sw.Stop();
             Console.WriteLine("initial query took : " + sw.ElapsedMilliseconds);
             var initTime = sw.ElapsedMilliseconds;
 
             sw = new Stopwatch();
             sw.Start();
-            var cachedResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            var cachedResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             sw.Stop();
             Console.WriteLine("warm query took : " + sw.ElapsedMilliseconds);
 
@@ -496,13 +496,18 @@ namespace BrightstarDB.Tests
 
             sw = new Stopwatch();
             sw.Start();
-            cachedResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml);
+            cachedResult = storeWorker.Query("select * where { ?a ?b ?c }", SparqlResultsFormat.Xml, new string[] { Constants.DefaultGraphUri });
             sw.Stop();
             Console.WriteLine("cached query took : " + sw.ElapsedMilliseconds);
             var cachedTime = sw.ElapsedMilliseconds;
 
             Assert.AreEqual(queryResult, cachedResult);
-            Assert.IsTrue(cachedTime < initTime);
+            if (cachedTime >= initTime)
+            {
+                Assert.Inconclusive(
+                    "Expected time to read from cache ({0}ms) to be less than time to execute query ({1}ms).",
+                    cachedTime, initTime);
+            }
 
             Configuration.EnableQueryCache = false;
         }
