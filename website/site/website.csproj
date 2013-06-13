@@ -95,6 +95,7 @@
     <Content Include="css\style.css" />
     <Content Include="css\unsemantic-grid-responsive.css" />
     <Content Include="css\vs.min.css" />
+    <Content Include="documentation\index.html" />
     <Content Include="download\index.html" />
     <Content Include="privacypolicy.html" />
     <Content Include="ecosystem\index.html" />
