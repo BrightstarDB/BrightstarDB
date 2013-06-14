@@ -16,8 +16,8 @@ namespace BrightstarDB.Tests.BPlusTreeTests
         {
             var config = new BPlusTreeConfiguration(8, 8, 4096);
 
-            var leftNode = new DirectLeafNode(1ul, 0ul, 0ul, config);
-            var rightNode = new DirectLeafNode(2ul, 0ul, 0ul, config);
+            var leftNode = new LeafNode(1ul, 0ul, 0ul, config);
+            var rightNode = new LeafNode(2ul, 0ul, 0ul, config);
             byte[] testBytes = new byte[] { 1, 2, 3, 4 };
             leftNode.Insert(BitConverter.GetBytes(1ul), testBytes);
             leftNode.Insert(BitConverter.GetBytes(2ul), testBytes);
@@ -44,8 +44,8 @@ namespace BrightstarDB.Tests.BPlusTreeTests
         public void TestBorrowRight()
         {
             var config = new BPlusTreeConfiguration(8, 8, 4096);
-            var leftNode = new DirectLeafNode(1, 0, 0, config);
-            var rightNode = new DirectLeafNode(2, 0, 0, config);
+            var leftNode = new LeafNode(1, 0, 0, config);
+            var rightNode = new LeafNode(2, 0, 0, config);
 
             byte[] testBytes = new byte[] { 1, 2, 3, 4 };
 

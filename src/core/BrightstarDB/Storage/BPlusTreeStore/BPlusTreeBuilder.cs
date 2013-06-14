@@ -15,13 +15,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         private readonly BPlusTreeConfiguration _config;
         private readonly int _leafLoadFactor;
         private readonly int _internalBranchFactor;
-        private INodeFactory _nodeFactory;
 
         public BPlusTreeBuilder(IPageStore targetPageStore, BPlusTreeConfiguration targetTreeConfiguration, Type nodeFactoryType = null)
         {
             _pageStore = targetPageStore;
             _config = targetTreeConfiguration;
-            CreateNodeFactory(nodeFactoryType);
             // These values are copied locally to allow us to later change the default loading from 100% to something lower if we want
             _leafLoadFactor = _config.LeafLoadFactor;
             _internalBranchFactor = _config.InternalBranchFactor;
@@ -36,21 +34,6 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
             return nodeList[0].Value;
         }
-
-        private void CreateNodeFactory(Type nodeFactoryType)
-        {
-            if (nodeFactoryType == null)
-            {
-                //_nodeFactory = new DefaultNodeFactory(_pageStore, _config);
-                _nodeFactory = new DirectNodeFactory(_pageStore, _config);
-            }
-            else
-            {
-                _nodeFactory = Activator.CreateInstance(nodeFactoryType, _pageStore, _config) as INodeFactory;
-            }
-        }
-
-
 
         private IEnumerable<KeyValuePair<byte[], ulong>>MakeInternalNodes(ulong txnId, IEnumerable<KeyValuePair<byte[], ulong >> children, BrightstarProfiler profiler)
         {
@@ -109,7 +92,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         private IInternalNode MakeInternalNode(KeyValuePair<byte[], ulong > onlyChild)
         {
             var nodePage = _pageStore.Create();
-            return _nodeFactory.MakeInternalNode(nodePage, onlyChild.Value);
+            return MakeInternalNode(nodePage, onlyChild.Value);
         }
 
         private IInternalNode MakeInternalNode(List<KeyValuePair<byte[], ulong >> keyValuePairs)
@@ -126,7 +109,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                                                     Array.Copy(kvp.Key, key, _config.KeySize);
                                                     return key;
                                                 }).ToList();
-            return _nodeFactory.MakeInternalNode(nodePage, keys, childPointers);
+            return MakeInternalNode(nodePage, keys, childPointers);
         }
 
         private IInternalNode MakeInternalNode(KeyValuePair<byte[], ulong> firstChild, IEnumerator<KeyValuePair<byte[], ulong>> enumerator, int internalBranchFactor)
@@ -150,7 +133,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 Array.Copy(enumerator.Current.Key, keys[i], _config.KeySize);
             }
              */
-            return _nodeFactory.MakeInternalNode(nodePage, keys, childPointers);
+            return MakeInternalNode(nodePage, keys, childPointers);
         }
 
         private IEnumerable<KeyValuePair<byte[], ulong >> MakeLeafNodes(ulong txnId, IEnumerator<KeyValuePair<byte[], byte[]>> orderedValues, BrightstarProfiler profiler = null)
@@ -198,9 +181,27 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         private ILeafNode MakeLeafNode(IEnumerable<KeyValuePair<byte [], byte []>> orderedValues)
         {
             var leafPage = _pageStore.Create();
-            return _nodeFactory.MakeLeafNode(leafPage, _pageStore.Retrieve(leafPage, null), orderedValues,
+            return MakeLeafNode(leafPage, _pageStore.Retrieve(leafPage, null), orderedValues,
                                              _leafLoadFactor);
-            //return new LeafNode(leafPage, 0, 0, _config, orderedValues, _leafLoadFactor);
         }
+
+        #region Node factory methods
+
+        private ILeafNode MakeLeafNode(ulong leafPage, byte[] nodePage, IEnumerable<KeyValuePair<byte[], byte[]>> orderedValues, int numToLoad)
+        {
+            return new LeafNode(leafPage, 0, 0, _config, orderedValues, numToLoad);
+        }
+
+        private IInternalNode MakeInternalNode(ulong nodeId, ulong onlyChild)
+        {
+            return new InternalNode(nodeId, onlyChild, _config);
+        }
+
+        private IInternalNode MakeInternalNode(ulong nodeId, List<byte[]> keys, List<ulong> childPointers)
+        {
+            return new InternalNode(nodeId, keys, childPointers, _config);
+        }
+
+        #endregion
     }
 }

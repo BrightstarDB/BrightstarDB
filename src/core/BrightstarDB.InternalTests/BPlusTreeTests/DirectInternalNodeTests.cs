@@ -14,7 +14,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
         public void TestRightShiftFrom()
         {
             var config = new BPlusTreeConfiguration(8, 8, 1024);
-            var n = new DirectInternalNode(1, BitConverter.GetBytes(50ul), 2,3, config);
+            var n = new InternalNode(1, BitConverter.GetBytes(50ul), 2,3, config);
             n.Insert(BitConverter.GetBytes(100ul), 4);
             Assert.AreEqual(50ul, BitConverter.ToUInt64(n.LeftmostKey, 0));
             Assert.AreEqual(100ul, BitConverter.ToUInt64(n.RightmostKey, 0));

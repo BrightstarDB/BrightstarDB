@@ -14,7 +14,6 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         private readonly IPageStore _pageStore;
         private readonly Dictionary<ulong, INode> _modifiedNodes;
         private readonly INodeCache _nodeCache;
-        private INodeFactory _nodeFactory;
 
         public BPlusTreeConfiguration Configuration { get { return _config; } }
 
@@ -29,9 +28,8 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             _config = new BPlusTreeConfiguration(keySize, dataSize, pageStore.PageSize);
             _pageStore = pageStore;
-            CreateNodeFactory(nodeFactoryType);
             _modifiedNodes = new Dictionary<ulong, INode>();
-            _root = _nodeFactory.MakeLeafNode();
+            _root = MakeLeafNode();
             _nodeCache = new WeakReferenceNodeCache();
             _modifiedNodes[_root.PageId] = _root;
             _nodeCache.Add(_root);
@@ -51,7 +49,6 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             _config = new BPlusTreeConfiguration(keySize, dataSize, pageStore.PageSize);
             _pageStore = pageStore;
-            CreateNodeFactory(nodeFactoryType);
             _modifiedNodes = new Dictionary<ulong, INode>();
             _nodeCache = new WeakReferenceNodeCache();
             _root = GetNode(rootPageId, profiler);
@@ -93,11 +90,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     var header = BitConverter.ToInt32(nodePage, 0);
                     if (header < 0)
                     {
-                        ret = _nodeFactory.MakeInternalNode(nodeId, nodePage, ~header);
+                        ret = MakeInternalNode(nodeId, nodePage, ~header);
                     }
                     else
                     {
-                        ret = _nodeFactory.MakeLeafNode(nodeId, nodePage, header);
+                        ret = MakeLeafNode(nodeId, nodePage, header);
                     }
                     _nodeCache.Add(ret);
                     return ret;
@@ -130,7 +127,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 Insert(txnId, _root, key, value, out splitRoot, out rightNode, out rootSplitKey, overwrite, profiler);
                 if (splitRoot)
                 {
-                    var newRoot = _nodeFactory.MakeInternalNode(_pageStore.Create(), rootSplitKey, _root.PageId,
+                    var newRoot = MakeInternalNode(_pageStore.Create(), rootSplitKey, _root.PageId,
                                                                 rightNode.PageId);
                     //var newRoot = new InternalNode(_pageStore.Create(), rootSplitKey, _root.PageId, rightNode.PageId,
                     //                               _config);
@@ -630,19 +627,28 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             Delete(txnId, BitConverter.GetBytes(key), profiler);
         }
 
-        private void CreateNodeFactory(Type nodeFactoryType)
+        #region Node factory methods
+
+        private ILeafNode MakeLeafNode()
         {
-            if (nodeFactoryType == null)
-            {
-                //_nodeFactory = new DefaultNodeFactory(_pageStore, _config);
-                _nodeFactory = new DirectNodeFactory(_pageStore, _config);
-            }
-            else
-            {
-                _nodeFactory = Activator.CreateInstance(nodeFactoryType, _pageStore, _config) as INodeFactory;
-            }
+            return new LeafNode(_pageStore.Create(), 0, 0, _config);
         }
 
+        private ILeafNode MakeLeafNode(ulong nodeId, byte[] nodePage, int keyCount)
+        {
+            return new LeafNode(nodeId, nodePage, keyCount, _config);
+        }
 
+        private INode MakeInternalNode(ulong nodeId, byte[] nodePage, int keyCount)
+        {
+            return new InternalNode(nodeId, nodePage, keyCount, _config);
+        }
+
+        private INode MakeInternalNode(ulong nodeId, byte[] rootSplitKey, ulong leftPageId, ulong rightPageId)
+        {
+            return new InternalNode(nodeId, rootSplitKey, leftPageId, rightPageId, _config);
+        }
+
+        #endregion
     }
 }
