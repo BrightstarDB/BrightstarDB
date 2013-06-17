@@ -77,6 +77,8 @@
     <Compile Include="BPlusTreeTests\DirectLeafNodeTests.cs" />
     <Compile Include="BPlusTreeTests\GraphIndexTests.cs" />
     <Compile Include="BPlusTreeTests\LeafNodeTests.cs" />
+    <Compile Include="BPlusTreeTests\MemoryPage.cs" />
+    <Compile Include="BPlusTreeTests\MemoryPageStore.cs" />
     <Compile Include="BPlusTreeTests\PageFileTests.cs" />
     <Compile Include="BPlusTreeTests\PerformanceTests.cs" />
     <Compile Include="BPlusTreeTests\ReadWriteStoreModifiedTests.cs" />

@@ -59,16 +59,16 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             if (PersistenceManager.FileExists(PageFilePath)) PersistenceManager.DeleteFile(PageFilePath);
             using (var readWritePageStore = new AppendOnlyFilePageStore(PersistenceManager, PageFilePath, 8192, false, false))
             {
-                var createdPage = readWritePageStore.Create();
-                Assert.AreEqual(1ul, createdPage);
-                readWritePageStore.Write(1, createdPage, TestBuffer);
-                ValidateBuffer(readWritePageStore.Retrieve(createdPage, null));
+                var createdPage = readWritePageStore.Create(1);
+                Assert.AreEqual(1ul, createdPage.Id);
+                createdPage.SetData(TestBuffer);
+                ValidateBuffer(readWritePageStore.Retrieve(createdPage.Id, null).Data);
                 readWritePageStore.Commit(1ul, null);
             }
             using (var readPageStore = new AppendOnlyFilePageStore(PersistenceManager, PageFilePath, 8192, true, false))
             {
-                var data = readPageStore.Retrieve(1ul, null);
-                ValidateBuffer(data);
+                var page = readPageStore.Retrieve(1ul, null);
+                ValidateBuffer(page.Data);
             }
         }
 

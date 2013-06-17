@@ -56,20 +56,20 @@ namespace BrightstarDB.Storage.Persistence
 
         #region Implementation of IPageStore
 
-        public byte[] Retrieve(ulong pageId, BrightstarProfiler profiler)
+        public IPage Retrieve(ulong pageId, BrightstarProfiler profiler)
         {
             using (profiler.Step("PageStore.Retrieve"))
             {
                 if (!_readonly && pageId >= _newPageOffset)
                 {
                     var newPage = _newPages[(int) (pageId - _newPageOffset)];
-                    return newPage.Data;
+                    return newPage;
                 }
                 var page = PageCache.Instance.Lookup(_path, pageId) as FilePage;
                 if (page != null)
                 {
                     profiler.Incr("PageCache Hit");
-                    return page.Data;
+                    return page;
                 }
                 using (profiler.Step("Load Page"))
                 {
@@ -86,18 +86,25 @@ namespace BrightstarDB.Storage.Persistence
                     {
                         PageCache.Instance.InsertOrUpdate(_path, page);
                     }
-                    return page.Data;
+                    return page;
                 }
             }
         }
 
-        public ulong Create()
+        public IPage Create(ulong commitId)
         {
             if (_readonly) throw new InvalidOperationException("Cannot create new pages in readonly page store");
             var dataPage = new FilePage(_nextPageId, _pageSize);
             _newPages.Add(dataPage);
             _nextPageId++;
-            return dataPage.Id;
+            return dataPage;
+        }
+
+        private IPage Create(ulong txnId, byte[] pageData, int srcOffset = 0, int pageOffset = 0, int len = -1)
+        {
+            var page = Create(txnId);
+            page.SetData(pageData, srcOffset, pageOffset, len);
+            return page;
         }
 
         public void Commit(ulong commitId, BrightstarProfiler profiler)
@@ -170,13 +177,19 @@ namespace BrightstarDB.Storage.Persistence
         /// <summary>
         /// Returns a boolean flag indicating if the page with the specified page ID is writeable
         /// </summary>
-        /// <param name="pageId">The ID of the page to test</param>
+        /// <param name="page">The page to test</param>
         /// <returns>True if the page is writeable, false otherwise</returns>
         /// <remarks>In an append-only store, only pages created since the last commit are writeable. In a binary-page store, all pages are always writeable. 
         /// Client code should use this method to determine if an update to a page can be done by a call to Write() or if a new page needs to be created using Create()</remarks>
-        public bool IsWriteable(ulong pageId)
+        public bool IsWriteable(IPage page)
         {
-            return pageId >= _newPageOffset;
+            return page.Id >= _newPageOffset;
+        }
+
+        public IPage GetWriteablePage(ulong txnId, IPage page)
+        {
+            if (IsWriteable(page)) return page;
+            return Create(txnId, page.Data);
         }
 
         /// <summary>

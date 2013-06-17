@@ -97,17 +97,18 @@ namespace BrightstarDB.Storage.Persistence
         /// <param name="pageId">The ID of the page</param>
         /// <param name="profiler"></param>
         /// <returns>The data buffer for the page</returns>
-        public byte[] Retrieve(ulong pageId, BrightstarProfiler profiler)
+        public IPage Retrieve(ulong pageId, BrightstarProfiler profiler)
         {
             var page = GetPage(pageId, profiler);
-            return page == null ? null : page.GetReadBuffer(CurrentTransactionId);
+            return page == null ? null : new BinaryPageAdapter(this, page, CurrentTransactionId, _modifiedPages.ContainsKey(pageId));
         }
 
         /// <summary>
         /// Creates a new empty page in the page store
         /// </summary>
-        /// <returns>The ID of the new page</returns>
-        public ulong Create()
+        /// <param name="commitId"></param>
+        /// <returns>The new page</returns>
+        public IPage Create(ulong commitId)
         {
             if (_isReadOnly)
             {
@@ -116,8 +117,15 @@ namespace BrightstarDB.Storage.Persistence
             lock (_pageCacheLock)
             {
                 var page = new BinaryFilePage(_nextPageId++, _nominalPageSize, CurrentTransactionId);
-                _modifiedPages.Add(page.Id, page);
-                return page.Id;
+                if (!_modifiedPages.ContainsKey(page.Id))
+                {
+                    _modifiedPages.Add(page.Id, page);
+                    return new BinaryPageAdapter(this, page, CurrentTransactionId, commitId, true);
+                }
+                else
+                {
+                    return new BinaryPageAdapter(this, page, CurrentTransactionId, commitId, true);
+                }
             }
         }
 
@@ -175,16 +183,42 @@ namespace BrightstarDB.Storage.Persistence
             }
         }
 
+        internal void MarkDirty(BinaryFilePage page)
+        {
+            _modifiedPages[page.Id] = page;
+        }
+
         /// <summary>
         /// Returns a boolean flag indicating if the page with the specified page ID is writeable
         /// </summary>
-        /// <param name="pageId">The ID of the page to test</param>
+        /// <param name="page">The page to test</param>
         /// <returns>True if the page is writeable, false otherwise</returns>
-        /// <remarks>In an append-only store, only pages created since the last commit are writeable. In a binary-page store, all pages are always writeable. 
-        /// Client code should use this method to determine if an update to a page can be done by a call to Write() or if a new page needs to be created using Create()</remarks>
-        public bool IsWriteable(ulong pageId)
+        /// <remarks>In an append-only store, only pages created since the last commit are writeable. In a binary-page store, all pages can be made writeable, by a call to
+        /// GetWriteablePage()
+        /// Client code should use this method to determine if an update to a page can be done by a call to SetData() on the page or if
+        /// a new page should be retrieved by calling GetWriteablePage()</remarks>
+        public bool IsWriteable(IPage page)
         {
-            return true;
+            var binaryPage = page as BinaryPageAdapter;
+            if (binaryPage == null) return false;
+            return binaryPage.IsDirty || binaryPage.WriteTransactionId > 0;
+        }
+
+        /// <summary>
+        /// Returns a writeable copy of the specified page
+        /// </summary>
+        /// <param name="commitId">The transaction id for the write operation</param>
+        /// <param name="page">The page to return a writeable version of</param>
+        /// <returns></returns>
+        public IPage GetWriteablePage(ulong commitId, IPage page)
+        {
+            var bfp = page as BinaryPageAdapter;
+            if (bfp == null)
+            {
+                throw new ArgumentException("Expected a BinaryPageAdapter instance.", "page");
+            }
+            bfp.MakeWriteable(commitId);
+            return bfp;
         }
 
         /// <summary>

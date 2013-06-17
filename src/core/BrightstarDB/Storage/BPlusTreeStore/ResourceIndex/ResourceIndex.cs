@@ -18,9 +18,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
         /// <summary>
         /// Creates a new empty resource index in the specified page store
         /// </summary>
+        /// <param name="txnId"></param>
         /// <param name="pageStore"></param>
         /// <param name="resourceTable"></param>
-        public ResourceIndex(IPageStore pageStore, IResourceTable resourceTable)  : base(pageStore)
+        public ResourceIndex(ulong txnId, IPageStore pageStore, IResourceTable resourceTable)  : base(txnId, pageStore)
         {
             _resourceCache = new ConcurrentResourceCache();
             _resourceIdCache = new ConcurrentResourceIdCache();

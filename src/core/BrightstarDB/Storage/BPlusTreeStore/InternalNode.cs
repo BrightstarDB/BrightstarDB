@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
@@ -9,82 +10,113 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private readonly BPlusTreeConfiguration _config;
         private int _keyCount;
-        private ulong _pageId;
-        private byte[] _pageData;
+        private IPage _page;
 
-        private InternalNode(ulong pageId, BPlusTreeConfiguration treeConfig)
+        /// <summary>
+        /// Creates a new empty node backed by the specified persistant storage page
+        /// </summary>
+        /// <param name="page">The page to be used to back the node</param>
+        /// <param name="treeConfig">The tree configuration parameters</param>
+        private InternalNode(IPage page,  BPlusTreeConfiguration treeConfig)
         {
-            // TODO: Replace this with a version that takes the IPage
-            _pageId = pageId;
+            _page = page;
             _config = treeConfig;
-            _pageData = new byte[treeConfig.PageSize];
             _keyCount = 0;
         }
 
-        public InternalNode(ulong pageId, byte[] pageData, int keyCount, BPlusTreeConfiguration treeConfig)
+        /// <summary>
+        /// Initializes a new node using the data contained in the specified persisten storage page
+        /// </summary>
+        /// <param name="page">The page used to back the node</param>
+        /// <param name="keyCount">The number of keys in the node (as read from page data)</param>
+        /// <param name="treeConfig">The tree configuration parameters</param>
+        /// <remarks>Strictly speaking we don't have to pass the key count because it can be read from
+        /// the page data. However, the code that invokes this constructor needs to check the key
+        /// count value to see if a node contains a leaf or an internal node and having this constructor
+        /// separate from one that specifies that the page is empty initially is also convenient</remarks>
+        public InternalNode(IPage page, int keyCount, BPlusTreeConfiguration treeConfig)
         {
-            _pageId = pageId;
             _config = treeConfig;
-            _pageData = pageData;
+            _page = page;
             _keyCount = keyCount;
         }
 
-        public InternalNode(ulong pageId, byte[] splitKey, ulong leftPageId, ulong rightPageId,
+        /// <summary>
+        /// Creates a new node backed by the specified persistent storage page with a single
+        /// key and left and right pointers.
+        /// </summary>
+        /// <param name="page">The page used to back the node. Must be writeable.</param>
+        /// <param name="splitKey">The key that separates left and right child pointers</param>
+        /// <param name="leftPageId">The left child node pointer</param>
+        /// <param name="rightPageId">The right child node pointer</param>
+        /// <param name="treeConfiguration">The tree configuration</param>
+        /// <exception cref="InvalidOperationException">Raised if <paramref name="page"/> is not a writeable page</exception>
+        public InternalNode(IPage page, byte[] splitKey, ulong leftPageId, ulong rightPageId,
                                   BPlusTreeConfiguration treeConfiguration)
         {
-            _pageId = pageId;
             _config = treeConfiguration;
-            _pageData = new byte[treeConfiguration.PageSize];
-            Array.Copy(splitKey, 0, _pageData, KeyOffset(0), _config.KeySize);
-            Array.Copy(BitConverter.GetBytes(leftPageId), 0, _pageData, PointerOffset(0), 8);
-            Array.Copy(BitConverter.GetBytes(rightPageId), 0, _pageData, PointerOffset(1), 8);
+            AssertWriteable(page);
+            _page = page;
+            _page.SetData(splitKey, 0, KeyOffset(0), _config.KeySize);
+            _page.SetData(BitConverter.GetBytes(leftPageId), 0, PointerOffset(0), 8);
+            _page.SetData(BitConverter.GetBytes(rightPageId), 0, PointerOffset(1), 8);
             KeyCount = 1;
         }
 
-        public InternalNode(ulong pageId, ulong onlyChild, BPlusTreeConfiguration treeConfiguration)
+        /// <summary>
+        /// Creates a new node backed by the specified persistent storage page that has only
+        /// a single child node pointer
+        /// </summary>
+        /// <param name="page">The page used to back the node. Must be writeable.</param>
+        /// <param name="onlyChild">The child node pointer</param>
+        /// <param name="treeConfiguration">The tree configuration</param>
+        /// <exception cref="InvalidOperationException">Raised if <paramref name="page"/> is not a writeable page</exception>
+        public InternalNode(IPage page, ulong onlyChild, BPlusTreeConfiguration treeConfiguration)
         {
-            _pageId = pageId;
             _config = treeConfiguration;
-            _pageData = new byte[treeConfiguration.PageSize];
-            Array.Copy(BitConverter.GetBytes(onlyChild), 0, _pageData, PointerOffset(0), 8);
+            AssertWriteable(page);
+            _page = page;
+            _page.SetData(BitConverter.GetBytes(onlyChild), 0, PointerOffset(0), 8);
             KeyCount = 0;
         }
 
-        public InternalNode(ulong pageId, List<byte[]> keys, List<ulong> values, BPlusTreeConfiguration treeConfiguration)
+        /// <summary>
+        /// Creates a new node backed by the specified persistent storage page 
+        /// containing a list of keys and child values
+        /// </summary>
+        /// <param name="page">The page used to back the node. Must be writeable</param>
+        /// <param name="keys">The list of keys for the node</param>
+        /// <param name="values">The list of values for the node</param>
+        /// <param name="treeConfiguration">The tree configuration</param>
+        public InternalNode(IPage page, List<byte[]> keys, List<ulong> values, BPlusTreeConfiguration treeConfiguration)
         {
-            _pageId = pageId;
             _config = treeConfiguration;
-            _pageData = new byte[treeConfiguration.PageSize];
+            AssertWriteable(page);
+            _page = page;
             KeyCount = keys.Count;
             int i, keyOffset, pointerOffset;
             for (i = 0, keyOffset = KeyOffset(0); i < keys.Count; i++, keyOffset+=_config.KeySize)
             {
-                Array.Copy(keys[i], 0, _pageData, keyOffset, _config.KeySize);
+                _page.SetData(keys[i], 0, keyOffset, _config.KeySize);
             }
             for (i = 0, pointerOffset = PointerOffset(0); i < KeyCount + 1; i++, pointerOffset += 8)
             {
-                Array.Copy(BitConverter.GetBytes(values[i]), 0, _pageData, pointerOffset, 8);
+                _page.SetData(BitConverter.GetBytes(values[i]), 0, pointerOffset, 8);
             }
         }
 
-        public ulong PageId { get { return _pageId; } set { _pageId = value; } }
+        public ulong PageId { get { return _page.Id; } }
 
-        public bool IsDirty { get; set; }
+        public bool IsDirty { get { return _page.IsDirty; } }
 
-        public bool IsLeaf
-        {
-            get { return false; }
-        }
+        public bool IsLeaf { get { return false; } }
 
         public bool IsFull { get { return _keyCount == _config.InternalBranchFactor; } }
 
         public byte[] RightmostKey { get { return GetKey(_keyCount - 1); } }
         public byte[] LeftmostKey { get { return GetKey(0); } }
 
-        public byte[] GetData()
-        {
-            return _pageData;
-        }
+        public byte[] GetData() { return _page.Data; }
 
         public int KeyCount
         {
@@ -92,8 +124,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             private set
             {
                 _keyCount = value;
-                Array.Copy(BitConverter.GetBytes(~_keyCount), _pageData, 4);
-                IsDirty = true;
+                _page.SetData(BitConverter.GetBytes(~_keyCount), 0, 0, 4);
             }
         }
 
@@ -118,7 +149,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public bool NeedJoin { get { return KeyCount < _config.InternalSplitIndex; } }
 
-        public bool Merge(INode s, byte[] joinKey)
+        public bool Merge(ulong txnId, INode s, byte[] joinKey)
         {
             var sibling = s as InternalNode;
             if (sibling == null)
@@ -129,14 +160,15 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             {
                 if (sibling.LeftmostKey.Compare(RightmostKey) > 0)
                 {
+                    EnsureWriteable(txnId);
                     // Append join key followed by all of sibling's entries
-                    Array.Copy(joinKey, 0, _pageData, KeyOffset(KeyCount), _config.KeySize);
-                    Array.Copy(sibling._pageData, KeyOffset(0),
-                               _pageData, KeyOffset(KeyCount + 1),
-                               sibling.KeyCount*_config.KeySize);
-                    Array.Copy(sibling._pageData, PointerOffset(0),
-                               _pageData, PointerOffset(KeyCount + 1),
-                               (sibling.KeyCount + 1)*8);
+                    _page.SetData(joinKey, 0, KeyOffset(KeyCount), _config.KeySize);
+                    _page.SetData(sibling.GetData(), KeyOffset(0),
+                                  KeyOffset(KeyCount + 1),
+                                  sibling.KeyCount*_config.KeySize);
+                    _page.SetData(sibling.GetData(), PointerOffset(0),
+                                  PointerOffset(KeyCount + 1),
+                                  (sibling.KeyCount + 1)*8);
                     KeyCount = KeyCount + sibling.KeyCount + 1;
                     return true;
                 }
@@ -149,7 +181,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             for (int i = 0, offset = KeyOffset(0); i < _keyCount; i++, offset+=_config.KeySize)
             {
-                if (key.Compare(0, _pageData, offset, _config.KeySize) < 0)
+                if (key.Compare(0, _page.Data, offset, _config.KeySize) < 0)
                 {
                     return GetPointer(i);
                 }
@@ -160,29 +192,31 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <summary>
         /// Splits this node into two internal nodes, creating a new node for the right-hand (upper) half of the keys
         /// </summary>
-        /// <param name="rightNodeId">The ID of the page reserved to receive the newly created internal node</param>
+        /// <param name="txnId"></param>
+        /// <param name="rightNodePage">The new page reserved to receive the newly created internal node</param>
         /// <param name="splitKey">Receives the value of the key used for the split</param>
         /// <returns>The new right-hand node</returns>
-        public IInternalNode Split(ulong rightNodeId, out byte[] splitKey)
+        public IInternalNode Split(ulong txnId, IPage rightNodePage, out byte[] splitKey)
         {
-            var rightNode = new InternalNode(rightNodeId, _config);
+            EnsureWriteable(txnId);
             var splitIndex = _config.InternalSplitIndex;
             splitKey = GetKey(splitIndex);
-
-            Array.Copy(_pageData, KeyOffset(splitIndex + 1),
-                       rightNode._pageData, KeyOffset(0),
-                       (KeyCount - (splitIndex + 1))*_config.KeySize);
+            rightNodePage.SetData(_page.Data, KeyOffset(splitIndex + 1),
+                                  KeyOffset(0),
+                                  (KeyCount - (splitIndex + 1))*_config.KeySize);
             var pointerCopyStart = PointerOffset(splitIndex + 1);
             var pointerCopyLength = (KeyCount - splitIndex)*8;
-            Array.Copy(_pageData, pointerCopyStart,
-                       rightNode._pageData, PointerOffset(0),
-                       pointerCopyLength);
-            rightNode.KeyCount = KeyCount - (splitIndex + 1);
+            rightNodePage.SetData(_page.Data, pointerCopyStart,
+                                  PointerOffset(0),
+                                  pointerCopyLength);
+            var rightNodeKeyCount = KeyCount - (splitIndex + 1);
+            rightNodePage.SetData(BitConverter.GetBytes(~rightNodeKeyCount), 0, 0, 4);
+            var rightNode = new InternalNode(rightNodePage, rightNodeKeyCount, _config);
             KeyCount = splitIndex;
             return rightNode;
         }
 
-        public void Insert(byte[] key, ulong childPointer)
+        public void Insert(ulong txnId, byte[] key, ulong childPointer)
         {
             if (_keyCount == _config.InternalBranchFactor)
             {
@@ -195,31 +229,34 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 throw new DuplicateKeyException();
             }
 
+            EnsureWriteable(txnId);
             insertIndex = ~insertIndex;
             RightShiftFrom(insertIndex, 1);
-            Array.Copy(key, 0, _pageData, KeyOffset(insertIndex), _config.KeySize);
-            Array.Copy(BitConverter.GetBytes(childPointer), 0,
-                       _pageData, PointerOffset(insertIndex + 1),
-                       8);
+            _page.SetData(key, 0,
+                          KeyOffset(insertIndex), _config.KeySize);
+            _page.SetData(BitConverter.GetBytes(childPointer), 0,
+                          PointerOffset(insertIndex + 1), 8);
             KeyCount++;
         }
 
         /// <summary>
         /// Updates the node ID pointed to be a child pointer
         /// </summary>
+        /// <param name="txnId"></param>
         /// <param name="oldChildPointer">The old child node ID to be replaced</param>
         /// <param name="newChildPointer">The new child node ID</param>
-        public void UpdateChildPointer(ulong oldChildPointer, ulong newChildPointer)
+        public void UpdateChildPointer(ulong txnId, ulong oldChildPointer, ulong newChildPointer)
         {
             if (oldChildPointer == newChildPointer) return;
+            EnsureWriteable(txnId);
             int i, pointerOffset;
             byte[] ocp = BitConverter.GetBytes(oldChildPointer);
             byte[] ncp = BitConverter.GetBytes(newChildPointer);
             for (i = 0, pointerOffset = PointerOffset(0); i <= KeyCount; i++, pointerOffset += 8)
             {
-                if (_pageData.Compare(pointerOffset, ocp, 0, 8) == 0)
+                if (_page.Data.Compare(pointerOffset, ocp, 0, 8) == 0)
                 {
-                    Array.Copy(ncp, 0, _pageData, pointerOffset, 8);
+                    _page.SetData(ncp, 0, pointerOffset, 8);
                     return;
                 }
             }
@@ -237,7 +274,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             byte[] cni = BitConverter.GetBytes(childNodeId);
             for(i=0,pointerOffset=PointerOffset(0); i < KeyCount; i++, pointerOffset+=8)
             {
-                if (_pageData.Compare(pointerOffset, cni, 0, 8) == 0)
+                if (_page.Data.Compare(pointerOffset, cni, 0, 8) == 0)
                 {
                     rightSiblingId = GetPointer(i + 1);
                     return true;
@@ -257,7 +294,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             int i, pointerOffset;
             byte[] cni = BitConverter.GetBytes(childNodeId);
-            if (_pageData.Compare(PointerOffset(0), cni, 0, 8) == 0)
+            if (_page.Data.Compare(PointerOffset(0), cni, 0, 8) == 0)
             {
                 // First child has no left sibling
                 leftSiblingId = 0;
@@ -267,7 +304,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             
             for (i = 1, pointerOffset=PointerOffset(1); i <= KeyCount; i++, pointerOffset += 8)
             {
-                if (_pageData.Compare(pointerOffset, cni, 0, 8) == 0)
+                if (_page.Data.Compare(pointerOffset, cni, 0, 8) == 0)
                 {
                     leftSiblingId = GetPointer(i - 1);
                     return true;
@@ -281,16 +318,17 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <summary>
         /// Attempts to ensure that the minimum size for this node is achieved by transferring entries from the left-hand sibling
         /// </summary>
+        /// <param name="txnId"></param>
         /// <param name="leftSibling">The left-hand sibling that will provide entries</param>
         /// <param name="joinKey">The value of the key that is present in the parent node between the pointer to this node and its left sibling</param>
         /// <param name="newJoinKey">The replacement value for the join key in the parent node</param>
         /// <returns>True if the node achieves its minimum size by the redistribution process, false otherwise</returns>
-        public bool RedistributeFromLeft(IInternalNode leftSibling, byte[] joinKey, byte[] newJoinKey)
+        public bool RedistributeFromLeft(ulong txnId, IInternalNode leftSibling, byte[] joinKey, byte[] newJoinKey)
         {
             InternalNode left = leftSibling as InternalNode;
             if (left == null)
             {
-                throw new ArgumentException("Expected a DirectInternalNode as left sibling", "leftSibling");
+                throw new ArgumentException("Expected a InternalNode as left sibling", "leftSibling");
             }
 
             int required = _config.InternalSplitIndex - KeyCount;
@@ -306,22 +344,24 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 required = evenOut;
             }
 
+            EnsureWriteable(txnId);
+            left.EnsureWriteable(txnId);
+
             // Make space for new keys and child pointers
             RightShift(required);
-            Array.Copy(joinKey, 0, _pageData, KeyOffset(required - 1), _config.KeySize);
-            Array.Copy(left._pageData, KeyOffset(left.KeyCount - (required- 1)),
-                       _pageData, KeyOffset(0),
-                       (required - 1)*_config.KeySize);
-            Array.Copy(left._pageData, PointerOffset(left.KeyCount - (required - 1)),
-                       _pageData, PointerOffset(0),
-                       (required)*8);
-            Array.Copy(left._pageData, KeyOffset(left.KeyCount-required), newJoinKey, 0, _config.KeySize);
+
+            _page.SetData(joinKey, 0, KeyOffset(required - 1), _config.KeySize);
+            _page.SetData(left.GetData(), KeyOffset(left.KeyCount - (required - 1)),
+                          KeyOffset(0), (required - 1)*_config.KeySize);
+            _page.SetData(left.GetData(), PointerOffset(left.KeyCount - (required - 1)),
+                          PointerOffset(0), (required)*8);
+            Array.Copy(left.GetData(), KeyOffset(left.KeyCount-required), newJoinKey, 0, _config.KeySize);
             KeyCount += required;
             left.KeyCount -= required;
             return true;
         }
 
-        public bool RedistributeFromRight(IInternalNode rightSibling, byte[] joinKey, byte[] newJoinKey)
+        public bool RedistributeFromRight(ulong txnId, IInternalNode rightSibling, byte[] joinKey, byte[] newJoinKey)
         {
             var right = rightSibling as InternalNode;
             if (right == null) throw new ArgumentException("Expected a DirectInternalNode as right sibling", "rightSibling");
@@ -332,29 +372,31 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 return false;
             }
 
+            EnsureWriteable(txnId);
+            right.EnsureWriteable(txnId);
+
             // Copy keys and child pointers
-            Array.Copy(joinKey, 0, _pageData, KeyOffset(KeyCount), _config.KeySize); // Set key[KeyCount+1] to joinKey
-            Array.Copy(right._pageData, KeyOffset(0),
-                       _pageData, KeyOffset(KeyCount + 1),
-                       (required - 1)*_config.KeySize);
-            Array.Copy(right._pageData, PointerOffset(0),
-                       _pageData, PointerOffset(KeyCount + 1),
-                       required*8);
-            Array.Copy(right._pageData, KeyOffset(required - 1),
+            _page.SetData(joinKey, 0, KeyOffset(KeyCount), _config.KeySize); // Set key[KeyCount+1] to joinKey
+            _page.SetData(right.GetData(), KeyOffset(0),
+                          KeyOffset(KeyCount + 1), (required - 1)*_config.KeySize);
+            _page.SetData(right.GetData(), PointerOffset(0),
+                          PointerOffset(KeyCount + 1), required*8);
+            Array.Copy(right.GetData(), KeyOffset(required - 1),
                        newJoinKey, 0, _config.KeySize);
             right.LeftShift(required);
             KeyCount += required;
             return true;
         }
 
-        public void SetLeftKey(ulong childNodeId, byte[] childNodeKey)
+        public void SetLeftKey(ulong txnId, ulong childNodeId, byte[] childNodeKey)
         {
             if (childNodeKey == null)
             {
                 throw new ArgumentNullException("childNodeKey");
             }
+
             byte[] cni = BitConverter.GetBytes(childNodeId);
-            if (_pageData.Compare(PointerOffset(0), cni, 0, 8) == 0)
+            if (_page.Data.Compare(PointerOffset(0), cni, 0, 8) == 0)
             {
                 // First pointer doesn't have a corresponding key to update
                 return;
@@ -362,9 +404,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             int i, pointerOffset;
             for (i = 1, pointerOffset = PointerOffset(1); i <= KeyCount; i++, pointerOffset += 8)
             {
-                if (_pageData.Compare(pointerOffset, cni, 0, 8) == 0)
+                if (_page.Data.Compare(pointerOffset, cni, 0, 8) == 0)
                 {
-                    Array.Copy(childNodeKey, 0, _pageData, KeyOffset(i - 1), _config.KeySize);
+                    EnsureWriteable(txnId);
+                    _page.SetData(childNodeKey, 0, KeyOffset(i - 1), _config.KeySize);
                 }
             }
         }
@@ -376,20 +419,22 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return null;
         }
 
-        public void SetKey(ulong childNodeId, byte[] newKey)
+        public void SetKey(ulong txnId, ulong childNodeId, byte[] newKey)
         {
             var ix = Search(childNodeId);
             if (ix < 0) throw new ArgumentException("Cannot find child node " + childNodeId, "childNodeId");
-            Array.Copy(newKey, 0, _pageData, KeyOffset(ix), _config.KeySize);
+            EnsureWriteable(txnId);
+            _page.SetData(newKey, 0, KeyOffset(ix), _config.KeySize);
         }
 
-        public byte[] RemoveChildPointer(ulong childNodeId)
+        public byte[] RemoveChildPointer(ulong txnId, ulong childNodeId)
         {
             var pointerIndex = Search(childNodeId);
             if (pointerIndex < 0)
             {
                     throw new ArgumentException("Cannot find child node " + childNodeId, "childNodeId");
             }
+            EnsureWriteable(txnId);
             if (pointerIndex == KeyCount)
             {
                 // Removed the end pointer, so retrieve the last key (to be returned) and then chop it off 
@@ -418,15 +463,15 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                  i < KeyCount;
                  i++, pointerOffset += 8, keyOffset += _config.KeySize)
             {
-                if (fromKey.Compare(0, _pageData, keyOffset, _config.KeySize) < 0)
+                if (fromKey.Compare(0, _page.Data, keyOffset, _config.KeySize) < 0)
                 {
                     yield return GetPointer(i);
-                    if (toKey.Compare(0, _pageData, keyOffset, _config.KeySize) < 0)
+                    if (toKey.Compare(0, _page.Data, keyOffset, _config.KeySize) < 0)
                     {
                         yield break;
                     }
                 }
-                if (toKey.Compare(0, _pageData, keyOffset, _config.KeySize) < 0)
+                if (toKey.Compare(0, _page.Data, keyOffset, _config.KeySize) < 0)
                 {
                     yield return GetPointer(i);
                     yield break;
@@ -468,7 +513,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private void GetKey(int keyIx, byte[] buff)
         {
-            Array.Copy(_pageData, KeyOffset(keyIx), buff, 0, _config.KeySize);
+            Array.Copy(_page.Data, KeyOffset(keyIx), buff, 0, _config.KeySize);
         }
 
         private ulong GetPointer(int pointerIx)
@@ -480,7 +525,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private void GetPointer(int pointerIx, byte[] buff)
         {
-            Array.Copy(_pageData, PointerOffset(pointerIx), buff, 0, 8);
+            Array.Copy(_page.Data, PointerOffset(pointerIx), buff, 0, 8);
         }
 
         private int Search(byte[] key)
@@ -490,7 +535,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                  i < KeyCount;
                  i++, keyOffset += _config.KeySize)
             {
-                var cmp = key.Compare(0, _pageData, keyOffset, _config.KeySize);
+                var cmp = key.Compare(0, _page.Data, keyOffset, _config.KeySize);
                 if (cmp == 0) return i;
                 if (cmp < 0) return ~i;
             }
@@ -504,7 +549,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             byte[] p = BitConverter.GetBytes(pointer);
             for (i = 0, pointerOffset = PointerOffset(0); i < KeyCount + 1; i++, pointerOffset+=8)
             {
-                var cmp = _pageData.Compare(pointerOffset, p, 0, 8);
+                var cmp = _page.Data.Compare(pointerOffset, p, 0, 8);
                 if ( cmp == 0)
                 {
                     return i;
@@ -519,15 +564,15 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             int keyShift = numPlaces * _config.KeySize;
             int pointerShift = numPlaces*8;
             int lastPointerOffset = PointerOffset(KeyCount);
-            Array.Copy(_pageData, lastPointerOffset, _pageData, lastPointerOffset+pointerShift, 8);
+            _page.SetData(_page.Data, lastPointerOffset, lastPointerOffset+pointerShift, 8);
             for (i = KeyCount - 1,
                  keyOffset = KeyOffset(KeyCount - 1),
                  pointerOffset = PointerOffset(KeyCount - 1);
                  i >= ix;
                  i--, keyOffset -= _config.KeySize, pointerOffset -= 8)
             {
-                Array.Copy(_pageData, keyOffset, _pageData, keyOffset + keyShift, _config.KeySize);
-                Array.Copy(_pageData, pointerOffset, _pageData, pointerOffset + pointerShift, 8);
+                _page.SetData(_page.Data, keyOffset, keyOffset + keyShift, _config.KeySize);
+                _page.SetData(_page.Data, pointerOffset, pointerOffset + pointerShift, 8);
             }
         }
 
@@ -543,13 +588,29 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private void LeftShiftFrom(int ix, int numPlaces)
         {
-            Array.Copy(_pageData, KeyOffset(ix + numPlaces),
-                       _pageData, KeyOffset(ix),
-                       (KeyCount - ix - numPlaces) * _config.KeySize);
-            Array.Copy(_pageData, PointerOffset(ix + numPlaces),
-                       _pageData, PointerOffset(ix),
-                       (KeyCount - ix - numPlaces + 1) * 8);
+            _page.SetData(_page.Data, KeyOffset(ix + numPlaces),
+                          KeyOffset(ix), (KeyCount - ix - numPlaces)*_config.KeySize);
+            _page.SetData(_page.Data, PointerOffset(ix + numPlaces),
+                          PointerOffset(ix), (KeyCount - ix - numPlaces + 1)*8);
             KeyCount -= numPlaces;
         }
+
+        private void EnsureWriteable(ulong txnId)
+        {
+            if (!_config.PageStore.IsWriteable(_page))
+            {
+                _page = _config.PageStore.GetWriteablePage(txnId, _page);
+            }
+        }
+
+        private void AssertWriteable(IPage page)
+        {
+            if (!_config.PageStore.IsWriteable(page))
+            {
+                throw new InvalidOperationException(Strings.INode_Attempt_to_write_to_a_fixed_page);
+            }
+        }
+
+
     }
 }

@@ -363,6 +363,7 @@
     <Compile Include="Storage\Persistence\BackgroundPageWriter.cs" />
     <Compile Include="Storage\Persistence\BinaryFilePage.cs" />
     <Compile Include="Storage\Persistence\BinaryFilePageStore.cs" />
+    <Compile Include="Storage\Persistence\BinaryPageAdapter.cs" />
     <Compile Include="Storage\Persistence\BlockProviderStream.cs" />
     <Compile Include="Storage\Persistence\CachingBlockProvider.cs" />
     <Compile Include="Storage\Persistence\CircularBufferPageCache.cs" />

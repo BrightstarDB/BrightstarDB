@@ -28,14 +28,15 @@ namespace BrightstarDB.Tests
         [TestMethod]
         public void TestCreateAndUpdatePage()
         {
-            ulong newPage;
             using (var pageStore = CreateEmptyPageStore("TestCreateAndUpdatePage.dat"))
             {
-                newPage = pageStore.Create();
-                pageStore.Write(1, newPage, _testBuffer1);
+                var newPage = pageStore.Create(1);
+                newPage = pageStore.GetWriteablePage(1, newPage);
+                newPage.SetData(_testBuffer1);
                 pageStore.Commit(1, null);
+                Assert.AreEqual(1ul, newPage.Id);
             }
-            Assert.AreEqual(1ul, newPage);
+
             using (var fs = new FileStream("TestCreateAndUpdatePage.dat", FileMode.Open, FileAccess.Read))
             {
                 Assert.AreEqual(8192L, fs.Length);
@@ -43,16 +44,29 @@ namespace BrightstarDB.Tests
 
             using (var pageStore = new BinaryFilePageStore(_pm, "TestCreateAndUpdatePage.dat", 4096, true, 1))
             {
-                var pageData = pageStore.Retrieve(newPage, null);
-                Assert.AreEqual(0, _testBuffer1.Compare(pageData));
-                pageStore.Write(2, newPage, _testBuffer2);
+                var page = pageStore.Retrieve(1ul, null);
+                Assert.IsFalse(pageStore.IsWriteable(page));
+                try
+                {
+                    page.SetData(_testBuffer2);
+                    Assert.Fail("Expected an InvalidOperationException when attempting to write to a non-writeable page");
+                }
+                catch (InvalidOperationException)
+                {
+                    // Expected
+                }
+
+                page = pageStore.GetWriteablePage(2, page);
+                Assert.IsTrue(pageStore.IsWriteable(page));
+                Assert.AreEqual(0, _testBuffer1.Compare(page.Data));
+                page.SetData(_testBuffer2);
                 pageStore.Commit(2, null);
             }
 
             using (var pageStore = new BinaryFilePageStore(_pm, "TestCreateAndUpdatePage.dat", 4096, true, 2))
             {
-                var pageData = pageStore.Retrieve(newPage, null);
-                Assert.AreEqual(0, _testBuffer2.Compare(pageData));
+                var page = pageStore.Retrieve(1ul, null);
+                Assert.AreEqual(0, _testBuffer2.Compare(page.Data));
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BrightstarDB.Profiling;
+using BrightstarDB.Storage.Persistence;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
@@ -28,34 +29,37 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// </summary>
         ulong Prev { get; }
 
-        
+
         /// <summary>
         /// Attempt to merge this node with the specified sibling node
         /// </summary>
+        /// <param name="txnId">The transaction ID for this update</param>
         /// <param name="s">The sibling to merge with</param>
         /// <returns>True if the merge completed successfully, false otherwise</returns>
-        bool Merge(INode s);
+        bool Merge(ulong txnId, INode s);
 
 
         /// <summary>
         /// Inserts a key-value pair into this leaf node
         /// </summary>
+        /// <param name="txnId">The transaction ID for this update</param>
         /// <param name="key">The key to be inserted</param>
         /// <param name="value">The value to be inserted</param>
         /// <param name="overwrite">Boolean flag indicating if an existing value with the same key should be overwritten</param>
         /// <param name="profiler"></param>
         /// <exception cref="NodeFullException">Raised if this leaf node is currently full</exception>
         /// <exception cref="DuplicateKeyException">Raised if a value already exists for <paramref name="key"/> and <paramref name="overwrite"/> is set to false</exception>
-        void Insert(byte[] key, byte[] value, bool overwrite = false, BrightstarProfiler profiler = null);
+        void Insert(ulong txnId, byte[] key, byte[] value, bool overwrite = false, BrightstarProfiler profiler = null);
 
         /// <summary>
         /// Split this leaf node into two
         /// </summary>
-        /// <param name="newNodeId">The ID of the page reserved to store the new node</param>
+        /// <param name="txnId">The transaction ID for this update</param>
+        /// <param name="newNodePage">The page reserved to store the new node</param>
         /// <param name="splitKey">Receives the key that was used for the split</param>
         /// <returns>The new node created by the split</returns>
         /// <remarks>The split operation always creates a new node for the upper (right-hand) half of the keys and keeps the lower (left-hand) half in this leaf node.</remarks>
-        ILeafNode Split(ulong newNodeId, out byte[] splitKey);
+        ILeafNode Split(ulong txnId, IPage newNodePage , out byte[] splitKey);
 
         /// <summary>
         /// Retrieves the value associated with the specified key in this leaf node
@@ -68,22 +72,25 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <summary>
         /// Removes the key-value pair indexed by <paramref name="key"/> from this node
         /// </summary>
+        /// <param name="txnId">The transaction ID for this update</param>
         /// <param name="key">The key of the entry to be removed</param>
-        void Delete(byte[] key);
+        void Delete(ulong txnId, byte[] key);
 
         /// <summary>
         /// Attempts to ensure that the minimum size for this node is achieved by transferring entries from the left-hand sibling
         /// </summary>
+        /// <param name="txnId">The transaction ID for this update</param>
         /// <param name="leftNode">The left-hand sibling that will provide entries</param>
         /// <returns>True if the node achieves its minimum size by the redistribution process, false otherwise</returns>
-        bool RedistributeFromLeft(ILeafNode leftNode);
+        bool RedistributeFromLeft(ulong txnId, ILeafNode leftNode);
 
         /// <summary>
         /// Attempts to ensure that the minimum size for this node is achieved by transferring entries from the right-hand sibling
         /// </summary>
+        /// <param name="txnId">The transaction ID For this update</param>
         /// <param name="rightNode">The right-hand sibling that will provide entries</param>
         /// <returns>True if the node achieves its minimum size by the redistribution process, false otherwise</returns>
-        bool RedistributeFromRight(ILeafNode rightNode);
+        bool RedistributeFromRight(ulong txnId, ILeafNode rightNode);
 
         IEnumerable<KeyValuePair<byte[], byte []>> Scan();
     }

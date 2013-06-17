@@ -7,12 +7,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <summary>
         /// Get or set the ID of the page where this node is persisted
         /// </summary>
-        ulong PageId { get; set;  }
+        ulong PageId { get; }
 
         /// <summary>
         /// Get or set the boolean flag that indicates if this node has been modified since it was loaded
         /// </summary>
-        bool IsDirty { get; set; }
+        bool IsDirty { get;}
 
         /// <summary>
         /// Get the boolean flag that indicates if this node is a leaf node
@@ -51,5 +51,6 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="tree">The tree that contains this node</param>
         /// <param name="indentLevel">The indent level to use when writing the structure</param>
         void DumpStructure(BPlusTree tree, int indentLevel);
+
     }
 }

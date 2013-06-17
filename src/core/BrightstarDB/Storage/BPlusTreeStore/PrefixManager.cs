@@ -162,7 +162,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// </summary>
         /// <param name="page"></param>
         /// <param name="profiler"></param>
-        private void Load(byte[] page, BrightstarProfiler profiler)
+        private void Load(IPage page, BrightstarProfiler profiler)
         {
 #if WINDOWS_PHONE
             lock (_lock)
@@ -188,18 +188,18 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="page"></param>
         /// <param name="profiler"></param>
         /// <remarks>Calls to this method should be made inside a critical section of code protected with a mutex or reader/writer lock</remarks>
-        private void InterlockedLoad(byte[] page, BrightstarProfiler profiler)
+        private void InterlockedLoad(IPage page, BrightstarProfiler profiler)
         {
             using (profiler.Step("PrefixManager.InterlockedLoad"))
             {
                 int offset = 0;
                 while (offset < _pageStore.PageSize)
                 {
-                    ushort prefixLength = BitConverter.ToUInt16(page, offset);
+                    ushort prefixLength = BitConverter.ToUInt16(page.Data, offset);
                     offset += 2;
                     if (prefixLength == ushort.MaxValue)
                     {
-                        ulong nextPageId = BitConverter.ToUInt64(page, offset);
+                        ulong nextPageId = BitConverter.ToUInt64(page.Data, offset);
                         if (nextPageId == 0)
                         {
                             // End of data
@@ -210,11 +210,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     }
                     else
                     {
-                        var prefix = Encoding.UTF8.GetString(page, offset, prefixLength);
+                        var prefix = Encoding.UTF8.GetString(page.Data, offset, prefixLength);
                         offset += prefixLength;
-                        var uriLen = BitConverter.ToUInt16(page, offset);
+                        var uriLen = BitConverter.ToUInt16(page.Data, offset);
                         offset += 2;
-                        var uri = Encoding.UTF8.GetString(page, offset, uriLen);
+                        var uri = Encoding.UTF8.GetString(page.Data, offset, uriLen);
                         offset += uriLen;
                         _prefixMappings[uri] = prefix;
                         _shortValueMappings[prefix] = uri;
@@ -234,9 +234,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public ulong Write(IPageStore pageStore, ulong transactionId, BrightstarProfiler profiler)
         {
-            ulong startPageId = pageStore.Create();
-            ulong currentPageId = startPageId;
-            byte[] currentPage = new byte[pageStore.PageSize];
+            IPage startPage = pageStore.Create(transactionId);
+            IPage currentPage = startPage;
+            byte[] buff = new byte[pageStore.PageSize];
             int offset = 0;
             foreach (var entry in _shortValueMappings)
             {
@@ -248,30 +248,30 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     // Not enough room for the entry and the next page pointer
                     // So create a new page for this entry and write a pointer to it
                     // onto the current page
-                    ulong nextPage = pageStore.Create();
-                    BitConverter.GetBytes(ushort.MaxValue).CopyTo(currentPage, offset);
+                    IPage nextPage = pageStore.Create(transactionId);
+                    BitConverter.GetBytes(ushort.MaxValue).CopyTo(buff, offset);
                     offset += 2;
-                    BitConverter.GetBytes(nextPage).CopyTo(currentPage, offset);
-                    pageStore.Write(transactionId, currentPageId, currentPage, profiler: profiler);
-                    currentPageId = nextPage;
-                    currentPage = new byte[pageStore.PageSize];
+                    BitConverter.GetBytes(nextPage.Id).CopyTo(buff, offset);
+                    currentPage.SetData(buff);
+                    currentPage = nextPage;
+                    buff = new byte[pageStore.PageSize];
                     offset = 0;
                 }
-                BitConverter.GetBytes((ushort)encodedPrefix.Length).CopyTo(currentPage, offset);
+                BitConverter.GetBytes((ushort)encodedPrefix.Length).CopyTo(buff, offset);
                 offset += 2;
-                encodedPrefix.CopyTo(currentPage, offset);
+                encodedPrefix.CopyTo(buff, offset);
                 offset += encodedPrefix.Length;
-                BitConverter.GetBytes((ushort)encodedUri.Length).CopyTo(currentPage, offset);
+                BitConverter.GetBytes((ushort)encodedUri.Length).CopyTo(buff, offset);
                 offset += 2;
-                encodedUri.CopyTo(currentPage, offset);
+                encodedUri.CopyTo(buff, offset);
                 offset += encodedUri.Length;
             }
             // Write the end marker
-            BitConverter.GetBytes(ushort.MaxValue).CopyTo(currentPage, offset);
+            BitConverter.GetBytes(ushort.MaxValue).CopyTo(buff, offset);
             offset += 2;
-            BitConverter.GetBytes(0ul).CopyTo(currentPage, offset);
-            pageStore.Write(transactionId, currentPageId, currentPage, profiler: profiler);
-            return startPageId;
+            BitConverter.GetBytes(0ul).CopyTo(buff, offset);
+            currentPage.SetData(buff);
+            return startPage.Id;
         }
     }
 }

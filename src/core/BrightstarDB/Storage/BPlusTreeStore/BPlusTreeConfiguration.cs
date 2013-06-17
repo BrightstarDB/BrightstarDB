@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
@@ -63,8 +64,14 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// </summary>
         public const int MaxValueSize = 255;
 
-        public BPlusTreeConfiguration(int keySize, int valueSize, int pageSize)
+        /// <summary>
+        /// Get the IPageStore instance that manages the backing pages for the tree
+        /// </summary>
+        public IPageStore PageStore { get; private set; }
+
+        public BPlusTreeConfiguration(IPageStore pageStore, int keySize, int valueSize, int pageSize)
         {
+            PageStore = pageStore;
             KeySize = keySize;
             ValueSize = valueSize;
             PageSize = pageSize;

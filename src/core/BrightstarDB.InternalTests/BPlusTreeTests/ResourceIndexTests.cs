@@ -14,7 +14,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
         public void TestAssertShortLiteral()
         {
             var pageStore = TestUtils.CreateEmptyPageStore("TestAssertShortLiteral.data");
-            var resourceIndex = new ResourceIndex(pageStore, null);
+            var resourceIndex = new ResourceIndex(0, pageStore, null);
 
             var resourceId = resourceIndex.AssertResourceInIndex(0, "Short string value", true,
                                                                    "http://example.org/datatypes/string",
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             var pageStore = TestUtils.CreateEmptyPageStore("TestAssertLongLiteral.data");
             var resourceStore = TestUtils.CreateEmptyPageStore("TestAssertLongLiteral.resources");
             var resourceTable = new ResourceTable(resourceStore);
-            var resourceIndex = new ResourceIndex(pageStore, resourceTable);
+            var resourceIndex = new ResourceIndex(0, pageStore, resourceTable);
 
             var resourceId = resourceIndex.AssertResourceInIndex(0, longStringValue, true, "http://example.org/datatypes/string",
                                                 "en-us");
@@ -131,7 +131,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             var shortenedUri = "p0:" + Guid.Empty;
             using (pageStore = TestUtils.CreateEmptyPageStore("TestAssertShortUri.data"))
             {
-                var resourceIndex = new ResourceIndex(pageStore, null);
+                var resourceIndex = new ResourceIndex(0, pageStore, null);
                 resourceId = resourceIndex.AssertResourceInIndex(0, shortenedUri);
                 Assert.AreEqual(resourceId, resourceIndex.GetResourceId(shortenedUri, false, null, null, true));
                 var resource = resourceIndex.GetResource(resourceId, true);
@@ -164,7 +164,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             {
                 using (var resourceTable = new ResourceTable(TestUtils.CreateEmptyPageStore("TestAssertLongUri.resources")))
                 {
-                    var resourceIndex = new ResourceIndex(pageStore, resourceTable);
+                    var resourceIndex = new ResourceIndex(0, pageStore, resourceTable);
                     resourceId = resourceIndex.AssertResourceInIndex(0, shortenedUri);
                     Assert.AreEqual(resourceId, resourceIndex.GetResourceId(shortenedUri, false, null, null, true));
                     var resource = resourceIndex.GetResource(resourceId, true);
