@@ -23,7 +23,7 @@ BrightstarDB provides three different levels of API:
      BrightstarDB allowing you to add or remove RDF triples and to execute SPARQL queries.
 
 If you are new to BrightstarDB and to RDF, we recommend you start with the Entity Framework 
-and take a walk through our :ref:`Developer Quick Start <Developing_with_BrightstarDB>`. If 
+and take a walk through our :ref:`Developer Quick Start <Developer_Quick_Start>`. If 
 you are already comfortable with RDF and SPARQL you may wish to start with the lower level APIs.
 
 If you are the kind of person that just likes to dive straight into sample code, please take a 
