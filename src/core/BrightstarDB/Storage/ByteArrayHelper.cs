@@ -55,7 +55,7 @@ namespace BrightstarDB.Storage
             {
                 return "[null]";
             }
-            return "[" + String.Join("", array.Select(x=>x.ToString("X2"))) + "]";
+            return "[" + String.Join("", array.Reverse().Select(x=>x.ToString("X2"))) + "]";
         }
 
         public static void Increment(byte[] mergedNodeKey)

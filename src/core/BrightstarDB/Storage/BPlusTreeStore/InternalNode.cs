@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
 
@@ -147,6 +148,21 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             childNode.DumpStructure(tree, indentLevel + 1);
         }
 
+        public string Dump()
+        {
+            var sb = new StringBuilder();
+            sb.AppendFormat("InternalNode @{0}:", PageId);
+            for (int i = 0; i < _keyCount; i++)
+            {
+                var childPointer = GetPointer(i);
+                sb.AppendFormat("\n PTR[{0}]: {1}", i, childPointer);
+                sb.AppendFormat("\nKEY[{0}]: {1}", i, GetKey(i).Dump());
+            }
+            var lastPointer = GetPointer(KeyCount);
+            sb.AppendFormat("\n PTR[{0}]: {1}", _keyCount, lastPointer);
+            return sb.ToString();
+        }
+
         public bool NeedJoin { get { return KeyCount < _config.InternalSplitIndex; } }
 
         public bool Merge(ulong txnId, INode s, byte[] joinKey)
@@ -198,6 +214,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <returns>The new right-hand node</returns>
         public IInternalNode Split(ulong txnId, IPage rightNodePage, out byte[] splitKey)
         {
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.Split. Id={0}. Structure Before: {1}", PageId, Dump());
+#endif
             EnsureWriteable(txnId);
             var splitIndex = _config.InternalSplitIndex;
             splitKey = GetKey(splitIndex);
@@ -213,11 +232,19 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             rightNodePage.SetData(BitConverter.GetBytes(~rightNodeKeyCount), 0, 0, 4);
             var rightNode = new InternalNode(rightNodePage, rightNodeKeyCount, _config);
             KeyCount = splitIndex;
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.Split. Structure After: Id={0} {1}\nRight Node After: Id={2} {3}",
+                PageId, Dump(), rightNode.PageId, rightNode.Dump());
+#endif
             return rightNode;
         }
 
         public void Insert(ulong txnId, byte[] key, ulong childPointer)
         {
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.Insert. Key={0}. Before: Id={1} {2}",
+                key.Dump(), PageId, Dump());
+#endif
             if (_keyCount == _config.InternalBranchFactor)
             {
                 throw new NodeFullException();
@@ -237,6 +264,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             _page.SetData(BitConverter.GetBytes(childPointer), 0,
                           PointerOffset(insertIndex + 1), 8);
             KeyCount++;
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.Insert. Key={0}. After: Id={1} {2}",
+                key.Dump(), PageId, Dump());
+#endif
         }
 
         /// <summary>
@@ -247,6 +278,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="newChildPointer">The new child node ID</param>
         public void UpdateChildPointer(ulong txnId, ulong oldChildPointer, ulong newChildPointer)
         {
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.UpdateChildPointer. Old={0}, New={1}. Before: Id={2} {3}",
+                oldChildPointer, newChildPointer, PageId, Dump());
+#endif
             if (oldChildPointer == newChildPointer) return;
             EnsureWriteable(txnId);
             int i, pointerOffset;
@@ -257,9 +292,17 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 if (_page.Data.Compare(pointerOffset, ocp, 0, 8) == 0)
                 {
                     _page.SetData(ncp, 0, pointerOffset, 8);
+#if DEBUG_BTREE
+                    _config.BTreeDebug("InternalNode.UpdateChildPointer. Old={0}, New={1}. After: Id={2} {3}",
+                        oldChildPointer, newChildPointer, PageId, Dump());
+#endif
                     return;
                 }
             }
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.UpdateChildPointer. Old={0}, New={1}. No match found for old child pointer.",
+                oldChildPointer, newChildPointer);
+#endif
         }
 
         /// <summary>

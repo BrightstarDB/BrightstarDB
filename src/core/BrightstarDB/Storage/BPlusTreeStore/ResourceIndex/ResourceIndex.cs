@@ -26,6 +26,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
             _resourceCache = new ConcurrentResourceCache();
             _resourceIdCache = new ConcurrentResourceIdCache();
             _resourceStore = new ResourceStore(resourceTable);
+#if DEBUG_BTREE
+            Configuration.DebugId = "ResIx";
+            Logging.LogDebug("Created new {0} BTree with root page {1}", Configuration.DebugId, RootId);
+#endif
         }
 
         /// <summary>
@@ -39,6 +43,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
             _resourceCache = new ConcurrentResourceCache();
             _resourceIdCache = new ConcurrentResourceIdCache();
             _resourceStore = new ResourceStore(resourceTable);
+#if DEBUG_BTREE
+            Configuration.DebugId = "ResIx";
+            Logging.LogDebug("Opened new {0} BTree with root page {1}", Configuration.DebugId, rootNodeId);
+#endif
         }
 
         #region Implementation of IResourceIndex
@@ -169,6 +177,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
                     _resourceCache.Add(resourceId, resource);
                     return resource;
                 }
+#if DEBUG
+                if (resourceId > 0)
+                {
+                    // Repeat the search for debug purposes
+                    Search(resourceId, buff, profiler);
+                }
+#endif
                 return null;
             }
         }
@@ -214,6 +229,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
             return sb.ToString();
         }
 
+        //private static ulong _targetResourceId = 15806097072303636481;
 
         private ulong AssertResourceInBTree(ulong txnId, string resourceValue, bool isLiteral, ulong dataTypeId, ulong langCodeId, uint hashCode, BrightstarProfiler profiler)
         {

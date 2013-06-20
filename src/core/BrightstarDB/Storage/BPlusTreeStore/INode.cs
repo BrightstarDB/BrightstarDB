@@ -52,5 +52,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="indentLevel">The indent level to use when writing the structure</param>
         void DumpStructure(BPlusTree tree, int indentLevel);
 
+        /// <summary>
+        /// Dump the structure of this node to a string.
+        /// </summary>
+        /// <returns>The node structure dumped as a string</returns>
+        /// <remarks>This method does not recurse into child nodes - it returns only the structure of the node it is called on. To dump
+        /// the entire subtree, use the <see cref="DumpStructure"/> method.</remarks>
+        string Dump();
     }
 }

@@ -83,10 +83,16 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     if (header < 0)
                     {
                         ret = MakeInternalNode(nodePage, ~header);
+#if DEBUG_BTREE
+                        _config.BTreeDebug("{0}: Loaded INTERNAL node from page {1}. {2}",_config.DebugId, nodePage.Id, ret.ToString());
+#endif
                     }
                     else
                     {
                         ret = MakeLeafNode(nodePage, header);
+#if DEBUG_BTREE
+                        _config.BTreeDebug("{0}: Loaded LEAF node from page {1}. {2}", _config.DebugId, nodePage.Id, ret.ToString());
+#endif
                     }
                     _nodeCache.Add(ret);
                     return ret;
@@ -126,6 +132,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     //                               _config);
                     MarkDirty(txnId, root, profiler);
                     _rootId = newRoot.PageId;
+#if DEBUG_BTREE
+                    _config.BTreeDebug("BPlusTree.Insert: Root node has split. New root ID {0}: {1}",_rootId, newRoot.Dump());
+#endif
                 }
                 else
                 {
@@ -135,6 +144,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     // is a leaf node or if a lower level split bubbled up to insert a new key into 
                     // the root node.
                     _rootId = root.PageId;
+#if DEBUG_BTREE
+                    _config.BTreeDebug("BPlusTree.Insert: Updated root node id is {0}", _rootId);
+#endif
                 }
             }
         }
@@ -475,9 +487,15 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             if (node is ILeafNode)
             {
+#if DEBUG_BTREE
+                _config.BTreeDebug("BPlusTree.Insert Key={0} into LEAF node {1}", key.Dump(), node.PageId);
+#endif
                 var leaf = node as ILeafNode;
                 if (leaf.IsFull)
                 {
+#if DEBUG_BTREE
+                    _config.BTreeDebug("BPlusTree.Insert. Target leaf node is full.");
+#endif
                     var newNode = leaf.Split(txnId, _pageStore.Create(txnId), out splitKey);
                     if (key.Compare(splitKey) < 0)
                     {
@@ -503,6 +521,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
             else
             {
+#if DEBUG_BTREE
+                _config.BTreeDebug("BPlusTree.Insert Key={0} into INTERNAL node {1}", key.Dump(), node.PageId);
+#endif
                 var internalNode = node as IInternalNode;
                 var childNodeId = internalNode.GetChildNodeId(key);
                 var childNode = GetNode(childNodeId, profiler);
@@ -514,6 +535,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 {
                     if (internalNode.IsFull)
                     {
+#if DEBUG_BTREE
+                        _config.BTreeDebug("BPlusTree.Insert: Root node is full.");
+#endif
                         using (profiler.Step("Split Internal Node"))
                         {
                             // Need to split this node to insert the new child node

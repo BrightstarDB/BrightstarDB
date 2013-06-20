@@ -21,14 +21,14 @@ namespace BrightstarDB.Storage.Persistence
         private bool _disposed;
         private readonly IPersistenceManager _persistenceManager;
         private Stream _inputStream;
-        private readonly Dictionary<ulong, BinaryFilePage> _modifiedPages;
+        private readonly Dictionary<ulong, Tuple<BinaryFilePage, ulong>> _modifiedPages;
         private readonly object _pageCacheLock = new object();
         private ulong _nextPageId;
 
         /// <summary>
         /// Get or set the identifier for the current transaction being read
         /// </summary>
-        public ulong CurrentTransactionId { get; set; }
+        private ulong CurrentTransactionId { get; set; }
 
         public BinaryFilePageStore(IPersistenceManager persistenceManager, string filePath, int pageSize, bool readOnly, ulong currentTransactionId)
         {
@@ -36,7 +36,7 @@ namespace BrightstarDB.Storage.Persistence
             _filePath = filePath;
             _nominalPageSize = pageSize;
             _isReadOnly = readOnly;
-            _modifiedPages = new Dictionary<ulong, BinaryFilePage>();
+            _modifiedPages = new Dictionary<ulong, Tuple<BinaryFilePage, ulong>>();
             CurrentTransactionId = currentTransactionId;
             if(!_persistenceManager.FileExists(filePath))
             {
@@ -99,8 +99,13 @@ namespace BrightstarDB.Storage.Persistence
         /// <returns>The data buffer for the page</returns>
         public IPage Retrieve(ulong pageId, BrightstarProfiler profiler)
         {
+            Tuple<BinaryFilePage, ulong> modifiedPage;
+            if (_modifiedPages.TryGetValue(pageId, out modifiedPage))
+            {
+                return new BinaryPageAdapter(this, modifiedPage.Item1, modifiedPage.Item2, true);
+            }
             var page = GetPage(pageId, profiler);
-            return page == null ? null : new BinaryPageAdapter(this, page, CurrentTransactionId, _modifiedPages.ContainsKey(pageId));
+            return page == null ? null : new BinaryPageAdapter(this, page, CurrentTransactionId, false);
         }
 
         /// <summary>
@@ -117,15 +122,8 @@ namespace BrightstarDB.Storage.Persistence
             lock (_pageCacheLock)
             {
                 var page = new BinaryFilePage(_nextPageId++, _nominalPageSize, CurrentTransactionId);
-                if (!_modifiedPages.ContainsKey(page.Id))
-                {
-                    _modifiedPages.Add(page.Id, page);
-                    return new BinaryPageAdapter(this, page, CurrentTransactionId, commitId, true);
-                }
-                else
-                {
-                    return new BinaryPageAdapter(this, page, CurrentTransactionId, commitId, true);
-                }
+                    _modifiedPages.Add(page.Id, new Tuple<BinaryFilePage, ulong>(page, commitId));
+                    return new BinaryPageAdapter(this, page, commitId, true);
             }
         }
 
@@ -144,10 +142,11 @@ namespace BrightstarDB.Storage.Persistence
                     {
                         foreach (var entry in _modifiedPages.OrderBy(e => e.Key))
                         {
-                            entry.Value.Write(outputStream, commitId);
+                            // TODO: Ensure we are writing the correct commit
+                            entry.Value.Item1.Write(outputStream, commitId);
                             lock (_pageCacheLock)
                             {
-                                PageCache.Instance.InsertOrUpdate(_filePath, entry.Value);
+                                PageCache.Instance.InsertOrUpdate(_filePath, entry.Value.Item1);
                             }
                         }
                         _modifiedPages.Clear();
@@ -179,13 +178,16 @@ namespace BrightstarDB.Storage.Persistence
                 var page = GetPage(pageId, profiler);
                 var writeBuff = page.GetWriteBuffer(commitId);
                 Array.Copy(buff, srcOffset, writeBuff, pageOffset, len < 0 ? buff.Length : len);
-                _modifiedPages[pageId] = page;
+                _modifiedPages[pageId] = new Tuple<BinaryFilePage, ulong>(page, commitId);
             }
         }
 
-        internal void MarkDirty(BinaryFilePage page)
+        internal void EnsureWriteable(ulong pageId)
         {
-            _modifiedPages[page.Id] = page;
+            if (!_modifiedPages.ContainsKey(pageId))
+            {
+                throw new InvalidOperationException("Attempt to write to a read-only page.");
+            }
         }
 
         /// <summary>
@@ -200,8 +202,7 @@ namespace BrightstarDB.Storage.Persistence
         public bool IsWriteable(IPage page)
         {
             var binaryPage = page as BinaryPageAdapter;
-            if (binaryPage == null) return false;
-            return binaryPage.IsDirty || binaryPage.WriteTransactionId > 0;
+            return binaryPage != null && binaryPage.IsDirty;
         }
 
         /// <summary>
@@ -212,13 +213,20 @@ namespace BrightstarDB.Storage.Persistence
         /// <returns></returns>
         public IPage GetWriteablePage(ulong commitId, IPage page)
         {
-            var bfp = page as BinaryPageAdapter;
-            if (bfp == null)
+            Tuple<BinaryFilePage, ulong> bfpTuple;
+            if (!_modifiedPages.TryGetValue(page.Id, out bfpTuple))
             {
-                throw new ArgumentException("Expected a BinaryPageAdapter instance.", "page");
+#if DEBUG_BTREE
+                Logging.LogDebug("Initialized Write Buffer for page@{0} in commit {1}", page.Id, commitId);
+#endif
+                var bfp = GetPage(page.Id, null);
+                Array.ConstrainedCopy(bfp.GetReadBuffer(CurrentTransactionId), 0,
+                                      bfp.GetWriteBuffer(commitId), 0,
+                                      PageSize);
+                bfpTuple = new Tuple<BinaryFilePage, ulong>(bfp, commitId);
+                _modifiedPages[bfp.Id] = bfpTuple;
             }
-            bfp.MakeWriteable(commitId);
-            return bfp;
+            return new BinaryPageAdapter(this, bfpTuple.Item1, commitId, true);
         }
 
         /// <summary>
@@ -263,10 +271,11 @@ namespace BrightstarDB.Storage.Persistence
                 lock (_pageCacheLock)
                 {
                     BinaryFilePage page;
-                    if (_modifiedPages.TryGetValue(pageId, out page))
+                    Tuple<BinaryFilePage, ulong> modifiedPage;
+                    if (_modifiedPages.TryGetValue(pageId, out modifiedPage))
                     {
                         profiler.Incr("PageCache Hit");
-                        return page;
+                        return modifiedPage.Item1;
                     }
                     page = PageCache.Instance.Lookup(_filePath, pageId) as BinaryFilePage;
                     if (page != null)

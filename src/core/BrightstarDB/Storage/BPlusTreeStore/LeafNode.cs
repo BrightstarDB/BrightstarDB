@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BrightstarDB.Profiling;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
@@ -167,15 +168,23 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     _page.SetData(value, 0, ValueOffset(insertIndex), Math.Min(_config.ValueSize, value.Length));
                 }
                 KeyCount++;
+#if DEBUG_BTREE
+_config.BTreeDebug("LeafNode.Insert. Key={0}. Updated Node: {1}", key.Dump(), Dump());
+#endif
             }
         }
 
         public ILeafNode Split(ulong txnId, IPage rightNodePage, out byte[] splitKey)
         {
+            EnsureWriteable(txnId);
             Next = rightNodePage.Id;
             splitKey = new byte[_config.KeySize];
             int numToMove = KeyCount - _config.LeafSplitIndex;
             Array.Copy(_page.Data, KeyOffset(_config.LeafSplitIndex), splitKey, 0, _config.KeySize);
+#if DEBUG_BTREE
+            _config.BTreeDebug("LeafNode.Split. SplitKey={0}. NumToMove={1}. Structure Before: {2}", splitKey.Dump(), numToMove, Dump());
+            _config.BTreeDebug("LeafNode.Split@{0}. Keys before: {1}", PageId, DumpKeys());
+#endif
             rightNodePage.SetData(_page.Data, KeyOffset(_config.LeafSplitIndex),
                                   KeyOffset(0), numToMove*_config.KeySize);
             if (_config.ValueSize > 0)
@@ -187,6 +196,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             rightNodePage.SetData(BitConverter.GetBytes(rightNodeKeyCount), 0, 0, 4);
             var rightNode = new LeafNode(rightNodePage, rightNodeKeyCount, _config);
             KeyCount = _config.LeafSplitIndex;
+#if DEBUG_BTREE
+_config.BTreeDebug("LeafNode.Split. Structure After : {0}. Right Node After: {1}",
+    Dump(), rightNode.Dump());
+_config.BTreeDebug("LeafNode.Split@{0}. Keys after: {1}", PageId, DumpKeys());
+#endif
             return rightNode;
         }
 
@@ -347,6 +361,32 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             Console.WriteLine("{0}LEAF@{1}[{2} keys: {3} - {4}]",
                 new string(' ', indentLevel*4), PageId, KeyCount, LeftmostKey.Dump(), RightmostKey.Dump());
         }
+
+        public string Dump()
+        {
+            if (KeyCount == 0)
+            {
+                return "EMPTY LEAF NODE";
+            }
+            return String.Format("LEAF@{0}[{1} keys: {2} - {3}]",
+                                 PageId, KeyCount, LeftmostKey.Dump(),
+                                 RightmostKey.Dump());
+        }
+
+        private string DumpKeys()
+        {
+            if (KeyCount == 0)
+            {
+                return "[]";
+            }
+            var ret = new StringBuilder();
+            for (int i = 0; i < KeyCount; i++)
+            {
+                ret.AppendFormat("[{0}]=>{1}", i, GetKey(i).Dump());
+            }
+            return ret.ToString();
+        }
+
         #endregion
 
         /// <summary>

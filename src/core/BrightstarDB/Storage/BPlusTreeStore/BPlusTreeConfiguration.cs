@@ -69,6 +69,18 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// </summary>
         public IPageStore PageStore { get; private set; }
 
+#if DEBUG_BTREE
+        public string DebugId { get; set; }
+
+        public void BTreeDebug(string fmt, params object[] args)
+        {
+            if (!string.IsNullOrEmpty(DebugId))
+            {
+                Logging.LogDebug(fmt, args);
+            }
+        }
+#endif
+
         public BPlusTreeConfiguration(IPageStore pageStore, int keySize, int valueSize, int pageSize)
         {
             PageStore = pageStore;
