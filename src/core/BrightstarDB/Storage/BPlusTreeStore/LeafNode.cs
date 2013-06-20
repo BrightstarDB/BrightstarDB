@@ -1,434 +1,568 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BrightstarDB.Profiling;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
-    internal class LeafNode : INode
+    internal class LeafNode : ILeafNode
     {
+        private IPage _page;
         private readonly BPlusTreeConfiguration _config;
-        private readonly byte[][] _dataSegments;
-        private readonly byte[][] _keys;
-        private readonly ulong _prevPointer;
         private int _keyCount;
+        private ulong _prevPointer;
         private ulong _nextPointer;
 
-        public LeafNode(ulong reservedPageId, ulong prevPointer, ulong nextPointer, BPlusTreeConfiguration treeConfig)
-        {
-            _config = treeConfig;
-            _keyCount = 0;
-            _prevPointer = prevPointer;
-            _nextPointer = nextPointer;
-            _keys = new byte[_config.LeafLoadFactor][];
-            _dataSegments = new byte[_config.LeafLoadFactor][];
-            PageId = reservedPageId;
-            IsDirty = true;
-        }
-
         /// <summary>
-        /// Creates a new leaf node with content loaded from an ordered enumeration of key/value pairs
+        /// Creates a leaf node that will be backed by a new page
         /// </summary>
-        /// <param name="reservedPageId"></param>
-        /// <param name="prevPointer"></param>
-        /// <param name="nextPointer"></param>
-        /// <param name="treeConfiguration"></param>
-        /// <param name="orderedValues">The enumerateion of key-value pairs to load into the leaf node</param>
-        /// <param name="numValuesToLoad">The maximum number of key-value pairs to insert into the new leaf node</param>
-        public LeafNode(ulong reservedPageId, ulong prevPointer, ulong nextPointer, BPlusTreeConfiguration treeConfiguration, IEnumerable<KeyValuePair<byte[], byte []>> orderedValues, int numValuesToLoad)
+        /// <param name="reservedPage">The backing page for this node. Must be writeable</param>
+        /// <param name="prevPointer">UNUSED</param>
+        /// <param name="nextPointer">UNUSED</param>
+        /// <param name="treeConfiguration">The tree configuration parameters</param>
+        public LeafNode(IPage reservedPage, ulong prevPointer, ulong nextPointer,
+                              BPlusTreeConfiguration treeConfiguration)
         {
             _config = treeConfiguration;
-            _prevPointer = prevPointer;
-            _nextPointer = nextPointer;
-            _keys = new byte[_config.LeafLoadFactor][];
-            _dataSegments = new byte[_config.LeafLoadFactor][];
-            PageId = reservedPageId;
-            IsDirty = true;
-            _keyCount = 0;
-            foreach(var kvp in orderedValues.Take(numValuesToLoad))
+            AssertWriteable(reservedPage);
+            _page = reservedPage;
+            KeyCount = 0;
+            Prev = prevPointer;
+            Next = nextPointer;
+        }
+
+        public LeafNode(IPage page, int keyCount, BPlusTreeConfiguration treeConfiguration)
+        {
+            _page = page;
+            _keyCount = keyCount;
+            _prevPointer = BitConverter.ToUInt64(_page.Data, 4);
+            _nextPointer = BitConverter.ToUInt64(_page.Data, 12);
+            _config = treeConfiguration;
+        }
+
+        public LeafNode(IPage page, ulong prevPointer, ulong nextPointer,
+                              BPlusTreeConfiguration treeConfiguration,
+                              IEnumerable<KeyValuePair<byte[], byte[]>> orderedValues, int numValuesToLoad)
+        {
+            _page = page;
+            _config = treeConfiguration;
+            Prev = prevPointer;
+            Next = nextPointer;
+            int numLoaded = 0;
+            foreach (var kvp in orderedValues.Take(numValuesToLoad))
             {
-                _keys[_keyCount] = new byte[_config.KeySize];
-                _dataSegments[_keyCount] = new byte[_config.ValueSize];
-                Array.Copy(kvp.Key, _keys[_keyCount], _config.KeySize);
+                SetKey(numLoaded, kvp.Key);
                 if (_config.ValueSize > 0)
                 {
-                    Array.Copy(kvp.Value, _dataSegments[_keyCount], _config.ValueSize);
+                    SetValue(numLoaded, kvp.Value);
                 }
-                _keyCount++;
+                numLoaded++;
             }
+            KeyCount = numLoaded;
         }
 
-        public LeafNode(ulong nodeId, byte[] nodePage, int keyCount, BPlusTreeConfiguration treeConfiguration)
-        {
-            _config = treeConfiguration;
-            _keyCount = keyCount;
-            _prevPointer = BitConverter.ToUInt64(nodePage, 4);
-            _nextPointer = BitConverter.ToUInt64(nodePage, 12);
-            _keys = new byte[_config.LeafLoadFactor][];
-            _dataSegments = new byte[_config.LeafLoadFactor][];
-
-            for (int i = 0, j = BPlusTreeConfiguration.LeafNodeHeaderSize; i < _keyCount; i++,j += _config.KeySize)
-            {
-                _keys[i] = new byte[_config.KeySize];
-                Array.Copy(nodePage, j, _keys[i], 0, _config.KeySize);
-            }
-            if (_config.ValueSize > 0)
-            {
-                for (int i = 0, j = _config.LeafDataStartOffset; i < _keyCount; i++, j += (_config.ValueSize + 1))
-                {
-                    byte dataLength = nodePage[j];
-                    _dataSegments[i] = new byte[dataLength];
-                    Array.Copy(nodePage, j + 1, _dataSegments[i], 0, dataLength);
-                }
-            }
-            PageId = nodeId;
-            IsDirty = false;
-        }
-
-        /// <summary>
-        /// Returns an enumeration of all key-value pairs in this leaf node that fall in the range <paramref name="fromKey"/> to <paramref name="toKey"/> (inclusive)
-        /// </summary>
-        /// <param name="fromKey">The lowest key to return in the enumeration</param>
-        /// <param name="toKey">The highest key to return in the enumeration</param>
-        /// <returns>An enumeration of key value pairs</returns>
-        public IEnumerable<KeyValuePair<byte[], byte[]>> Scan(byte[] fromKey, byte[] toKey)
-        {
-            int startIx;
-            for (startIx = 0; (startIx < _keyCount) && _keys[startIx].Compare(fromKey) < 0; startIx++)
-            {
-            }
-            for (int i = startIx; i < _keyCount && (_keys[i].Compare(toKey) <= 0); i++)
-            {
-                yield return new KeyValuePair<byte[], byte[]>(_keys[i], _dataSegments[i]);
-            }
-        }
-
-        /// <summary>
-        /// Boolean flag indicating if the number of elements in this leaf node has fallen below the minimum allowed
-        /// </summary>
-        public bool NeedsJoin
-        {
-            get { return _keyCount < _config.LeafSplitIndex; }
-        }
-
-        /// <summary>
-        /// Get the ID of the next leaf node in the btree
-        /// </summary>
-        public ulong Next
-        {
-            get { return _nextPointer; }
-        }
-
-        /// <summary>
-        /// Get the ID of the previous leaf node in the btree
-        /// </summary>
         public ulong Prev
         {
             get { return _prevPointer; }
+            private set
+            {
+                _prevPointer = value;
+                _page.SetData(BitConverter.GetBytes(_prevPointer), 0, 4, 8);
+            }
         }
 
-        #region INode Members
 
-        /// <summary>
-        /// Get or set the ID of the page where this node is persisted
-        /// </summary>
-        public ulong PageId { get; set; }
 
-        /// <summary>
-        /// Get or set the boolean flag that indicates if this node has been modified since it was loaded
-        /// </summary>
-        public bool IsDirty { get; set; }
+        public bool NeedsJoin { get { return KeyCount < _config.LeafSplitIndex; } }
 
-        /// <summary>
-        /// Get the boolean flag that indicates if this node is a leaf node
-        /// </summary>
-        public bool IsLeaf
+        public ulong Next
         {
-            get { return true; }
+            get { return _nextPointer; }
+            private set
+            {
+                _nextPointer = value;
+                _page.SetData(BitConverter.GetBytes(_nextPointer), 0, 12, 8);
+            }
         }
 
-        /// <summary>
-        /// Get the boolean flag that indicates if this node has reached the limit for the number of keys it can contain
-        /// </summary>
-        public bool IsFull
-        {
-            get { return _keyCount == _config.LeafLoadFactor; }
-        }
-
-        /// <summary>
-        /// Get the current count of keys stored in this node
-        /// </summary>
         public int KeyCount
         {
             get { return _keyCount; }
+            private set
+            {
+                _keyCount = value;
+                _page.SetData(BitConverter.GetBytes(_keyCount), 0, 0, 4);
+            }
         }
 
-        /// <summary>
-        /// Attempt to merge this node with the specified sibling node
-        /// </summary>
-        /// <param name="s">The sibling to merge with</param>
-        /// <returns>True if the merge completed successfully, false otherwise</returns>
-        public bool Merge(INode s)
+        #region ILeafNode methods
+
+        public bool Merge(ulong txnId, INode s)
         {
             var sibling = s as LeafNode;
             if (sibling == null)
             {
-                throw new ArgumentException("Merge node is null or not a LeafNode", "s");
+                throw new ArgumentException("Merge node is null or not a DirectLeafNode", "s");
             }
 
             if (sibling.KeyCount + KeyCount <= _config.LeafLoadFactor)
             {
+                EnsureWriteable(txnId);
                 if (sibling.LeftmostKey.Compare(RightmostKey) > 0)
                 {
-                    // Append all of siblings entries
-                    Array.Copy(sibling._keys, 0, _keys, _keyCount, sibling._keyCount);
-                    Array.Copy(sibling._dataSegments, 0, _dataSegments, _keyCount, sibling._keyCount);
-                    _keyCount += sibling._keyCount;
-                    return true;
+                    // Append all of the siblings entries
+                    _page.SetData(sibling.GetData(), KeyOffset(0),
+                               KeyOffset(KeyCount),
+                               sibling.KeyCount*_config.KeySize);
+                    if (_config.ValueSize > 0)
+                    {
+                        _page.SetData(sibling.GetData(), ValueOffset(0),
+                                   ValueOffset(KeyCount),
+                                   sibling.KeyCount*_config.ValueSize);
+                    }
                 }
-                // Prepend all of siblings entries
-                for (int i = _keyCount - 1; i >= 0; i--)
+                else
                 {
-                    _keys[i + sibling._keyCount] = _keys[i];
-                    _dataSegments[i + sibling._keyCount] = _dataSegments[i];
+                    // Prepend all of the sibling entries
+                    RightShift(sibling.KeyCount);
+                    _page.SetData(sibling.GetData(), KeyOffset(0),
+                               KeyOffset(0),
+                               sibling.KeyCount*_config.KeySize);
+                    _page.SetData(sibling.GetData(), ValueOffset(0),
+                               ValueOffset(0),
+                               sibling.KeyCount*_config.ValueSize);
                 }
-                Array.Copy(sibling._keys, 0, _keys, 0, sibling._keyCount);
-                Array.Copy(sibling._dataSegments, 0, _dataSegments, 0, sibling._keyCount);
-                _keyCount += sibling._keyCount;
+                KeyCount += sibling.KeyCount;
                 return true;
             }
             return false;
         }
 
-        /// <summary>
-        /// Dump a trace of the structure of this node to the console
-        /// </summary>
-        /// <param name="tree">The tree that contains this node</param>
-        /// <param name="indentLevel">The indent level to use when writing the structure</param>
-        public void DumpStructure(BPlusTree tree, int indentLevel)
+        public void Insert(ulong txnId, byte[] key, byte[] value, bool overwrite = false, BrightstarProfiler profiler = null)
         {
-            if (_keyCount == 0)
+            using (profiler.Step("LeafNode.Insert"))
             {
-                Console.WriteLine("EMPTY LEAF NODE");
-                return;
+                if (IsFull) throw new NodeFullException();
+                int insertIndex = Search(key);
+                if (insertIndex >= 0)
+                {
+                    if (overwrite)
+                    {
+                        EnsureWriteable(txnId);
+                        _page.SetData(value, 0, 
+                            ValueOffset(insertIndex),
+                            Math.Min(value.Length, _config.ValueSize));
+                        return;
+                    }
+                    throw new DuplicateKeyException();
+                }
+                EnsureWriteable(txnId);
+                insertIndex = ~insertIndex;
+                RightShiftFrom(insertIndex, 1);
+                _page.SetData(key, 0, KeyOffset(insertIndex), _config.KeySize);
+                if (_config.ValueSize > 0 && value != null)
+                {
+                    _page.SetData(value, 0, ValueOffset(insertIndex), Math.Min(_config.ValueSize, value.Length));
+                }
+                KeyCount++;
+#if DEBUG_BTREE
+_config.BTreeDebug("LeafNode.Insert. Key={0}. Updated Node: {1}", key.Dump(), Dump());
+#endif
             }
-            Console.WriteLine("{0}LEAF@{1}[{2} keys: {3} - {4}]", new string(' ', indentLevel*4), PageId, _keyCount, _keys[0].Dump(), _keys[_keyCount - 1].Dump());
         }
 
-        /// <summary>
-        /// Get the highest key stored in this node
-        /// </summary>
-        public byte[] RightmostKey
+        public ILeafNode Split(ulong txnId, IPage rightNodePage, out byte[] splitKey)
         {
-            get { return _keys[_keyCount - 1]; }
-        }
-
-        /// <summary>
-        /// Get the lowest key stored in this node
-        /// </summary>
-        public byte[] LeftmostKey
-        {
-            get { return _keys[0]; }
-        }
-
-        /// <summary>
-        /// Get the serialized representation of this node
-        /// </summary>
-        /// <returns>The serialized node representation as a byte array</returns>
-        public byte[] GetData()
-        {
-            var buff = new byte[_config.PageSize];
-            Array.Copy(BitConverter.GetBytes(_keyCount), buff, 4);
-            Array.Copy(BitConverter.GetBytes(_prevPointer), 0, buff, 4, 8);
-            Array.Copy(BitConverter.GetBytes(_nextPointer), 0, buff, 12, 8);
-            for (int i = 0, offset = BPlusTreeConfiguration.LeafNodeHeaderSize;
-                 i < _keyCount;
-                 i++,offset += _config.KeySize)
-            {
-                Array.Copy(_keys[i], 0, buff, offset, _config.KeySize);
-            }
+            EnsureWriteable(txnId);
+            Next = rightNodePage.Id;
+            splitKey = new byte[_config.KeySize];
+            int numToMove = KeyCount - _config.LeafSplitIndex;
+            Array.Copy(_page.Data, KeyOffset(_config.LeafSplitIndex), splitKey, 0, _config.KeySize);
+#if DEBUG_BTREE
+            _config.BTreeDebug("LeafNode.Split. SplitKey={0}. NumToMove={1}. Structure Before: {2}", splitKey.Dump(), numToMove, Dump());
+            _config.BTreeDebug("LeafNode.Split@{0}. Keys before: {1}", PageId, DumpKeys());
+#endif
+            rightNodePage.SetData(_page.Data, KeyOffset(_config.LeafSplitIndex),
+                                  KeyOffset(0), numToMove*_config.KeySize);
             if (_config.ValueSize > 0)
             {
-                for (int i = 0, offset = _config.LeafDataStartOffset;
-                     i < _keyCount;
-                     i++, offset += _config.ValueSize + 1)
-                {
-                    buff[offset] = (byte) _dataSegments[i].Length;
-                    Array.Copy(_dataSegments[i], 0, buff, offset + 1, _dataSegments[i].Length);
-                }
+                rightNodePage.SetData(_page.Data, ValueOffset(_config.LeafSplitIndex),
+                                      ValueOffset(0), numToMove*_config.ValueSize);
             }
-            return buff;
+            var rightNodeKeyCount = numToMove;
+            rightNodePage.SetData(BitConverter.GetBytes(rightNodeKeyCount), 0, 0, 4);
+            var rightNode = new LeafNode(rightNodePage, rightNodeKeyCount, _config);
+            KeyCount = _config.LeafSplitIndex;
+#if DEBUG_BTREE
+_config.BTreeDebug("LeafNode.Split. Structure After : {0}. Right Node After: {1}",
+    Dump(), rightNode.Dump());
+_config.BTreeDebug("LeafNode.Split@{0}. Keys after: {1}", PageId, DumpKeys());
+#endif
+            return rightNode;
+        }
+
+        public bool GetValue(byte[] key, byte[] buffer)
+        {
+            int index = Search(key);
+            if (index >= 0)
+            {
+                if (_config.ValueSize > 0)
+                {
+                    Array.Copy(_page.Data, ValueOffset(index), buffer, 0, _config.ValueSize);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public void Delete(ulong txnId, byte[] key)
+        {
+            int deleteIndex = Search(key);
+            if (deleteIndex >= 0)
+            {
+                EnsureWriteable(txnId);
+                int moveUp = KeyCount - (deleteIndex + 1);
+                if (moveUp > 0)
+                {
+                    Array.Copy(_page.Data, KeyOffset(deleteIndex + 1),
+                               _page.Data, KeyOffset(deleteIndex),
+                               moveUp*_config.KeySize);
+                    Array.Copy(_page.Data, ValueOffset(deleteIndex + 1),
+                               _page.Data, ValueOffset(deleteIndex),
+                               moveUp*_config.ValueSize);
+                }
+                KeyCount--;
+            }
+        }
+
+        public bool RedistributeFromLeft(ulong txnId, ILeafNode leftNode)
+        {
+            var left = leftNode as LeafNode;
+            if (left == null) throw new ArgumentException("Expected a LeafNode instance", "leftNode");
+
+            int copyCount = (KeyCount + left.KeyCount)/2 - KeyCount;
+            if (copyCount > 0)
+            {
+                EnsureWriteable(txnId);
+                RightShift(copyCount);
+                // Copy keys and data from left node
+                int keyOffset = KeyOffset(left.KeyCount - copyCount);
+                _page.SetData(left.GetData(), keyOffset, KeyOffset(0), copyCount*_config.KeySize);
+                if (_config.ValueSize > 0)
+                {
+                    int valueOffset = ValueOffset(left.KeyCount - copyCount);
+                    _page.SetData(left.GetData(), valueOffset, ValueOffset(0), copyCount*_config.ValueSize);
+                }
+                KeyCount += copyCount;
+                left.KeyCount -= copyCount;
+                return true;
+            }
+            return false;
+        }
+
+
+        public bool RedistributeFromRight(ulong txnId, ILeafNode rightNode)
+        {
+            var right = rightNode as LeafNode;
+            if (right == null) throw new ArgumentException("Expected a LeafNode instance", "rightNode");
+
+            int copyCount = (KeyCount + rightNode.KeyCount)/2 - KeyCount;
+            if (copyCount > 0)
+            {
+                EnsureWriteable(txnId);
+                // Copy keys and data from right
+                _page.SetData(right.GetData(), BPlusTreeConfiguration.LeafNodeHeaderSize,
+                              KeyOffset(KeyCount), copyCount*_config.KeySize);
+                if (_config.ValueSize > 0)
+                {
+                    _page.SetData(right.GetData(), _config.LeafDataStartOffset,
+                        ValueOffset(KeyCount), copyCount * _config.ValueSize);
+                }
+                // Shift up the remaining keys in the right
+                right.LeftShift(copyCount);
+                // Update my key count
+                KeyCount += copyCount;
+                return true;
+            }
+            return false;
+        }
+
+        public IEnumerable<KeyValuePair<byte[], byte[]>> Scan()
+        {
+            for (int i = 0; i < _keyCount; i++)
+            {
+                yield return new KeyValuePair<byte[], byte[]>(GetKey(i), GetValue(i));
+            }
+        }
+
+        public IEnumerable<KeyValuePair<byte[], byte[]>> Scan(byte[] fromKey, byte[] toKey)
+        {
+            // TODO: Replace this with a version that passes in a key/value buffer to fill instead of always creating a new KeyValuePair
+            int startOffset, startIx, offset, ix;
+            int endIx = BPlusTreeConfiguration.LeafNodeHeaderSize + (_keyCount*_config.KeySize);
+            for (startOffset = BPlusTreeConfiguration.LeafNodeHeaderSize, startIx = 0; startOffset < endIx && _page.Data.Compare(startOffset, fromKey, 0, _config.KeySize) < 0; startOffset+=_config.KeySize, startIx++ ){}
+            for (offset = startOffset, ix = startIx;
+                 offset < endIx && (_page.Data.Compare(offset, toKey, 0, _config.KeySize) <= 0);
+                 offset += _config.KeySize, ix++)
+            {
+                yield return new KeyValuePair<byte[], byte[]>(GetKey(ix), GetValue(ix));
+            }
+        }
+
+        #endregion
+
+        #region Implementation of INode
+
+        public ulong PageId
+        {
+            get { return _page.Id; }
+        }
+
+        public bool IsDirty { get { return _page.IsDirty; } }
+        public bool IsLeaf { get { return true; } }
+        public bool IsFull { get { return KeyCount == _config.LeafLoadFactor; } }
+
+        public byte[] RightmostKey
+        {
+            get
+            {
+                var buff = new byte[_config.KeySize];
+                GetKey(KeyCount - 1, buff);
+                return buff;
+            }
+        }
+
+        public byte[] LeftmostKey
+        {
+            get
+            {
+                var buff = new byte[_config.KeySize];
+                GetKey(0, buff);
+                return buff;
+            }
+        }
+
+        public byte[] GetData()
+        {
+            return _page.Data;
+        }
+
+        public void DumpStructure(BPlusTree tree, int indentLevel)
+        {
+            if (KeyCount == 0)
+            {
+                Console.WriteLine("{0}EMPTY LEAF NODE",
+                    new string(' ', indentLevel));
+                return;
+            }
+            Console.WriteLine("{0}LEAF@{1}[{2} keys: {3} - {4}]",
+                new string(' ', indentLevel*4), PageId, KeyCount, LeftmostKey.Dump(), RightmostKey.Dump());
+        }
+
+        public string Dump()
+        {
+            if (KeyCount == 0)
+            {
+                return "EMPTY LEAF NODE";
+            }
+            return String.Format("LEAF@{0}[{1} keys: {2} - {3}]",
+                                 PageId, KeyCount, LeftmostKey.Dump(),
+                                 RightmostKey.Dump());
+        }
+
+        private string DumpKeys()
+        {
+            if (KeyCount == 0)
+            {
+                return "[]";
+            }
+            var ret = new StringBuilder();
+            for (int i = 0; i < KeyCount; i++)
+            {
+                ret.AppendFormat("[{0}]=>{1}", i, GetKey(i).Dump());
+            }
+            return ret.ToString();
         }
 
         #endregion
 
         /// <summary>
-        /// Inserts a key-value pair into this leaf node
+        /// Remove <paramref name="count"/> entries from the left of this node and move remaining entries up
         /// </summary>
-        /// <param name="key">The key to be inserted</param>
-        /// <param name="value">The value to be inserted</param>
-        /// <param name="overwrite">Boolean flag indicating if an existing value with the same key should be overwritten</param>
-        /// <param name="profiler"></param>
-        /// <exception cref="NodeFullException">Raised if this leaf node is currently full</exception>
-        /// <exception cref="DuplicateKeyException">Raised if a value already exists for <paramref name="key"/> and <paramref name="overwrite"/> is set to false</exception>
-        public void Insert(byte[] key, byte[] value, bool overwrite = false, BrightstarProfiler profiler = null)
+        /// <param name="count"></param>
+        private void LeftShift(int count)
         {
-            using (profiler.Step("LeafNode.Insert"))
-            {
-                if (IsFull) throw new NodeFullException();
-                int insertIndex = Array.BinarySearch(_keys, 0, _keyCount, key, _config);
-                if (insertIndex >= 0)
-                {
-                    if (overwrite)
-                    {
-                        Array.Copy(value, 0, _dataSegments[insertIndex], 0, value.Length);
-                        return;
-                    }
-                    throw new DuplicateKeyException();
-                }
-                using (profiler.Step("Memory Copy"))
-                {
-                    insertIndex = ~insertIndex;
-                    for (int i = _keyCount; i > insertIndex; i--)
-                    {
-                        _keys[i] = _keys[i - 1];
-                        _dataSegments[i] = _dataSegments[i - 1];
-                    }
-                }
-                using (profiler.Step("Insert KVP"))
-                {
-                    _keys[insertIndex] = new byte[_config.KeySize];
-                    Array.Copy(key, _keys[insertIndex], _config.KeySize);
-                    _dataSegments[insertIndex] = new byte[_config.ValueSize];
-                    if (_config.ValueSize > 0 && value != null)
-                    {
-                        Array.Copy(value, _dataSegments[insertIndex], value.Length);
-                    }
-                }
-                _keyCount++;
-            }
+            int remaining = KeyCount - count;
+            _page.SetData(_page.Data, BPlusTreeConfiguration.LeafNodeHeaderSize + (count*_config.KeySize),
+                          BPlusTreeConfiguration.LeafNodeHeaderSize, remaining*_config.KeySize);
+            _page.SetData(_page.Data, _config.LeafDataStartOffset + (count*_config.ValueSize),
+                          _config.LeafDataStartOffset, remaining*_config.ValueSize);
+            KeyCount -= count;
         }
 
         /// <summary>
-        /// Split this leaf node into two
+        /// Move all keys and values in this node right by <paramref name="count"/> places
         /// </summary>
-        /// <param name="newNodeId">The ID of the page reserved to store the new node</param>
-        /// <param name="splitKey">Receives the key that was used for the split</param>
-        /// <returns>The new node created by the split</returns>
-        /// <remarks>The split operation always creates a new node for the upper (right-hand) half of the keys and keeps the lower (left-hand) half in this leaf node.</remarks>
-        public LeafNode Split(ulong newNodeId, out byte[] splitKey)
+        /// <param name="count"></param>
+        private void RightShift(int count)
         {
-            var rightNode = new LeafNode(newNodeId, PageId, _nextPointer, _config);
-            _nextPointer = newNodeId;
-            splitKey = new byte[_config.KeySize];
-            Array.Copy(_keys[_config.LeafSplitIndex], splitKey, _config.KeySize);
-            Array.Copy(_keys, _config.LeafSplitIndex, rightNode._keys, 0, _keyCount - _config.LeafSplitIndex);
-            Array.Copy(_dataSegments, _config.LeafSplitIndex, rightNode._dataSegments, 0,
-                       _keyCount - _config.LeafSplitIndex);
-            rightNode._keyCount = _keyCount - _config.LeafSplitIndex;
-            _keyCount = _config.LeafSplitIndex;
-            return rightNode;
+            int i, keyOffset;
+            int keyShift = count*_config.KeySize;
+            if (_config.ValueSize > 0)
+            {
+                int valueOffset;
+                int valueShift = count * _config.ValueSize;
+                for (i = KeyCount - 1,
+                     keyOffset = BPlusTreeConfiguration.LeafNodeHeaderSize + ((KeyCount - 1)*_config.KeySize),
+                     valueOffset = _config.LeafDataStartOffset + ((KeyCount - 1)*_config.ValueSize);
+                     i >= 0;
+                     i--, keyOffset -= _config.KeySize, valueOffset -= _config.ValueSize)
+                {
+                    _page.SetData(_page.Data, keyOffset, keyOffset + keyShift, _config.KeySize);
+                    _page.SetData(_page.Data, valueOffset, valueOffset + valueShift, _config.ValueSize);
+                }
+            }
+            else
+            {
+                for (i = KeyCount - 1,
+                     keyOffset = BPlusTreeConfiguration.LeafNodeHeaderSize + ((KeyCount - 1) * _config.KeySize);
+                     i >= 0;
+                     i--, keyOffset -= _config.KeySize)
+                {
+                    _page.SetData(_page.Data, keyOffset, keyOffset + keyShift, _config.KeySize);
+                }
+            }
+        }
+
+        private void RightShiftFrom(int ix, int numPlaces)
+        {
+            int i, keyOffset;
+            int keyShift = numPlaces*_config.KeySize;
+            if (_config.ValueSize > 0)
+            {
+                int valueOffset;
+                int valueShift = numPlaces*_config.ValueSize;
+                for (i = KeyCount - 1,
+                     keyOffset = BPlusTreeConfiguration.LeafNodeHeaderSize + ((KeyCount - 1) * _config.KeySize),
+                     valueOffset = _config.LeafDataStartOffset + ((KeyCount - 1) * _config.ValueSize);
+                     i >= ix;
+                     i--, keyOffset -= _config.KeySize, valueOffset -= _config.ValueSize)
+                {
+                    _page.SetData(_page.Data, keyOffset, keyOffset + keyShift, _config.KeySize);
+                    _page.SetData(_page.Data, valueOffset, valueOffset + valueShift, _config.ValueSize);
+                }
+            }
+            else
+            {
+                for (i = KeyCount - 1,
+                     keyOffset = BPlusTreeConfiguration.LeafNodeHeaderSize + ((KeyCount - 1) * _config.KeySize);
+                     i >= ix;
+                     i--, keyOffset -= _config.KeySize)
+                {
+                    _page.SetData(_page.Data, keyOffset, keyOffset + keyShift, _config.KeySize);
+                }
+            }
+        }
+        private byte[] GetKey(int ix)
+        {
+            var buff = new byte[_config.KeySize];
+            GetKey(ix, buff);
+            return buff;
         }
 
         /// <summary>
-        /// Retrieves the value associated with the specified key in this leaf node
+        /// Reads the key at offset <paramref name="ix"/> into the provided buffer
         /// </summary>
-        /// <param name="key">The key to lookup</param>
-        /// <param name="buffer">Receives the value associated with <paramref name="key"/></param>
-        /// <returns>True if an entry was found for <paramref name="key"/> in this node, false otherwise</returns>
-        public bool GetValue(byte[] key, byte[] buffer)
+        /// <param name="ix">The offset of the key to be read</param>
+        /// <param name="buff">The buffer to load the key into</param>
+        private void GetKey(int ix, byte[] buff)
         {
-            int index = Array.BinarySearch(_keys, 0, _keyCount, key, _config);
-            if (index >= 0)
-            {
-                if (_config.ValueSize > 0)
-                {
-                    Array.Copy(_dataSegments[index], buffer, _dataSegments[index].Length);
-                }
-                return true;
-            }
-            return false;
+            var offset = BPlusTreeConfiguration.LeafNodeHeaderSize + (_config.KeySize*ix);
+            Array.Copy(_page.Data, offset, buff, 0, _config.KeySize);
         }
 
         /// <summary>
-        /// Removes the key-value pair indexed by <paramref name="key"/> from this node
+        /// Writes the key at offset <paramref name="ix"/> from the provided buffer
         /// </summary>
-        /// <param name="key">The key of the entry to be removed</param>
-        public void Delete(byte[] key)
+        /// <param name="ix">The offset of the key to be written</param>
+        /// <param name="buff">The value to be written for the key</param>
+        private void SetKey(int ix, byte[] buff)
         {
-            int deleteIndex = Array.BinarySearch(_keys, 0, _keyCount, key, _config);
-            if (deleteIndex >= 0)
-            {
-                for (int i = deleteIndex + 1; i < _keyCount; i++)
-                {
-                    _keys[i - 1] = _keys[i];
-                    _dataSegments[i - 1] = _dataSegments[i];
-                }
-                _keyCount--;
-            }
+            var offset = BPlusTreeConfiguration.LeafNodeHeaderSize + (_config.KeySize * ix);
+            _page.SetData(buff, 0, offset, _config.KeySize);
+        }
+
+        private byte[] GetValue(int ix)
+        {
+            var buff = new byte[_config.ValueSize];
+            GetValue(ix, buff);
+            return buff;
         }
 
         /// <summary>
-        /// Attempts to ensure that the minimum size for this node is achieved by transferring entries from the left-hand sibling
+        /// Reads the value at offset <paramref name="ix"/> into the provided buffer
         /// </summary>
-        /// <param name="leftNode">The left-hand sibling that will provide entries</param>
-        /// <returns>True if the node achieves its minimum size by the redistribution process, false otherwise</returns>
-        public bool RedistributeFromLeft(LeafNode leftNode)
+        /// <param name="ix">The offset of the value to be read</param>
+        /// <param name="buff">The buffer to load the value into</param>
+        private void GetValue(int ix , byte[] buff)
         {
-            int copyCount = (_keyCount + leftNode.KeyCount)/2 - _keyCount;
-            if (copyCount > 0)
-            {
-                // Move down my data segments to make room for the copied ones
-                for (int i = _keyCount - 1; i >= 0; i--)
-                {
-                    _keys[i + copyCount] = _keys[i];
-                    _dataSegments[i + copyCount] = _dataSegments[i];
-                }
-                // Copy keys and data segments from left node
-                Array.Copy(leftNode._keys, leftNode._keyCount - copyCount, _keys, 0, copyCount);
-                Array.Copy(leftNode._dataSegments, leftNode._keyCount - copyCount, _dataSegments, 0, copyCount);
-                _keyCount += copyCount;
-                leftNode._keyCount -= copyCount;
-                return true;
-            }
-            return false;
+            var offset = _config.LeafDataStartOffset + (_config.ValueSize*ix);
+            Array.Copy(_page.Data, offset, buff, 0, _config.ValueSize);
         }
+
 
         /// <summary>
-        /// Attempts to ensure that the minimum size for this node is achieved by transferring entries from the right-hand sibling
+        /// Writes the value at offset <paramref name="ix"/> from the provided buffer
         /// </summary>
-        /// <param name="rightNode">The right-hand sibling that will provide entries</param>
-        /// <returns>True if the node achieves its minimum size by the redistribution process, false otherwise</returns>
-        public bool RedistributeFromRight(LeafNode rightNode)
+        /// <param name="ix">The offset of the value to be written</param>
+        /// <param name="buff">The new value to write</param>
+        private void SetValue(int ix, byte[] buff)
         {
-            int copyCount = (_keyCount + rightNode._keyCount)/2 - _keyCount;
-            if (copyCount > 0)
-            {
-                // Copy keys and data segments from right node
-                Array.Copy(rightNode._keys, 0, _keys, _keyCount, copyCount);
-                Array.Copy(rightNode._dataSegments, 0, _dataSegments, _keyCount, copyCount);
-                // Shift up the remaining keys and data segments in the right node
-                for (int i = 0; i < rightNode._keyCount - copyCount; i++)
-                {
-                    rightNode._keys[i] = rightNode._keys[i + copyCount];
-                    rightNode._dataSegments[i] = rightNode._dataSegments[i + copyCount];
-                }
-                rightNode._keyCount -= copyCount;
-                _keyCount += copyCount;
-                return true;
-            }
-            return false;
+            var offset = _config.LeafDataStartOffset + (_config.ValueSize*ix);
+            _page.SetData(buff, 0, offset, _config.ValueSize);
         }
 
-        public IEnumerable<KeyValuePair<byte[], byte []>> Scan()
+        private int Search(byte[] key)
         {
-            for(int i = 0 ; i < _keyCount;i++)
+            // TODO: replace with a binary search algorithm
+            for (int i = 0, keyOffset = BPlusTreeConfiguration.LeafNodeHeaderSize;
+                 i < KeyCount;
+                 i++,keyOffset += _config.KeySize)
             {
-                yield return new KeyValuePair<byte[], byte[]>(_keys[i], _dataSegments[i]);
+                var cmp = key.Compare(0, _page.Data, keyOffset, _config.KeySize);
+                if (cmp == 0) return i;
+                if (cmp < 0) return ~i;
+            }
+            return ~KeyCount;
+        }
+
+        private int KeyOffset(int keyIndex)
+        {
+            return BPlusTreeConfiguration.LeafNodeHeaderSize + (keyIndex*_config.KeySize);
+        }
+
+        private int ValueOffset(int valueIndex)
+        {
+            return _config.LeafDataStartOffset + (valueIndex*_config.ValueSize);
+        }
+
+        private void EnsureWriteable(ulong txnId)
+        {
+            if (!_config.PageStore.IsWriteable(_page))
+            {
+                _page = _config.PageStore.GetWriteablePage(txnId, _page);
             }
         }
 
+        private void AssertWriteable(IPage page)
+        {
+            if (!_config.PageStore.IsWriteable(page))
+            {
+                throw new InvalidOperationException(Strings.INode_Attempt_to_write_to_a_fixed_page);
+            }
+        }
     }
 }

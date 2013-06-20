@@ -223,6 +223,15 @@ namespace BrightstarDB {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempt to write to a fixed page..
+        /// </summary>
+        internal static string INode_Attempt_to_write_to_a_fixed_page {
+            get {
+                return ResourceManager.GetString("INode_Attempt_to_write_to_a_fixed_page", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Identity is not a valid URI nor CURIE with regards to the current namespace mappings..
         /// </summary>
         internal static string InvalidDataObjectIdentity {

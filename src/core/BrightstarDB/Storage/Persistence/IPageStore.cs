@@ -11,13 +11,14 @@ namespace BrightstarDB.Storage.Persistence
         /// <param name="pageId">The ID of the page</param>
         /// <param name="profiler"></param>
         /// <returns>The data buffer for the page</returns>
-        byte[] Retrieve(ulong pageId, BrightstarProfiler profiler);
+        IPage Retrieve(ulong pageId, BrightstarProfiler profiler);
 
         /// <summary>
         /// Creates a new empty page in the page store
         /// </summary>
-        /// <returns>The ID of the new page</returns>
-        ulong Create();
+        /// <param name="commitId">The transaction identifier for the update</param>
+        /// <returns>The new page</returns>
+        IPage Create(ulong commitId);
 
         /// <summary>
         /// Commits all changed and new pages to the page store
@@ -41,11 +42,19 @@ namespace BrightstarDB.Storage.Persistence
         /// <summary>
         /// Returns a boolean flag indicating if the page with the specified page ID is writeable
         /// </summary>
-        /// <param name="pageId">The ID of the page to test</param>
+        /// <param name="page">The page to test</param>
         /// <returns>True if the page is writeable, false otherwise</returns>
         /// <remarks>In an append-only store, only pages created since the last commit are writeable. In a binary-page store, all pages are always writeable. 
         /// Client code should use this method to determine if an update to a page can be done by a call to Write() or if a new page needs to be created using Create()</remarks>
-        bool IsWriteable(ulong pageId);
+        bool IsWriteable(IPage page);
+
+        /// <summary>
+        /// Returns a writeable copy of the specified page
+        /// </summary>
+        /// <param name="commitId">The transaction identifier for the update</param>
+        /// <param name="page">The page to be copied</param>
+        /// <returns>If <paramref name="page"/> is writeable, it is returned. Otherwise a new writeable copy of <paramref name="page"/> is returned.</returns>
+        IPage GetWriteablePage(ulong commitId, IPage page);
 
         /// <summary>
         /// Get the size (in bytes) of each data page

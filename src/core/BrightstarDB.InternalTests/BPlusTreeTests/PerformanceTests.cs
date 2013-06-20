@@ -45,7 +45,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             // Create empty store
             if (File.Exists("40m_batch.data")) File.Delete("40m_batch.data");
             var pageStore = new AppendOnlyFilePageStore(persistenceManager, "40m_batch.data", 4096, false, false);
-            var tree = new BPlusTree(pageStore);
+            var tree = new BPlusTree(0, pageStore);
             ulong lastRoot = tree.RootId;
             tree.Save(0, null);
             pageStore.Commit(0ul, null);

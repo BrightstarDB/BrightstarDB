@@ -11,7 +11,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
         private readonly Dictionary<ulong, PredicateRelatedResourceIndex> _predicateIndexes;
         internal const int KeySize = 20;
 
-        public RelatedResourceIndex(IPageStore pageStore): base(pageStore, 8, 8)
+        public RelatedResourceIndex(ulong txnId, IPageStore pageStore): base(txnId, pageStore, 8, 8)
         {
             _predicateIndexes = new Dictionary<ulong, PredicateRelatedResourceIndex>();
         }
@@ -36,7 +36,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
         {
             using (profiler.Step("Add Related Resource"))
             {
-                var predicateIndex = AssertPredicateIndex(predicateId, profiler);
+                var predicateIndex = AssertPredicateIndex(txnId, predicateId, profiler);
                 var key = MakePredicateIndexKey(resourceId, graphId, relatedResourceId);
                 try
                 {
@@ -63,7 +63,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
         /// <param name="profiler"></param>
         public void DeleteRelatedResource(ulong txnId, ulong resourceId, ulong predicateId, ulong relatedResourceId, int graphId, BrightstarProfiler profiler)
         {
-            var predicateIndex = AssertPredicateIndex(predicateId, null);
+            var predicateIndex = AssertPredicateIndex(txnId, predicateId, null);
             predicateIndex.Delete(txnId, MakePredicateIndexKey(resourceId, graphId, relatedResourceId), profiler);
         }
 
@@ -208,8 +208,8 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
                 {
                     if (entry.Value.IsModified)
                     {
-                        entry.Value.Save(transactionId, profiler);
-                        Insert(transactionId, entry.Key, BitConverter.GetBytes(entry.Value.RootId), true);
+                        var indexRoot = entry.Value.Save(transactionId, profiler);
+                        Insert(transactionId, entry.Key, BitConverter.GetBytes(indexRoot), true);
                     }
                 }
                 return base.Save(transactionId, profiler);
@@ -226,7 +226,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
         }
 
         #endregion
-        private PredicateRelatedResourceIndex AssertPredicateIndex(ulong predicateId, BrightstarProfiler profiler)
+        private PredicateRelatedResourceIndex AssertPredicateIndex(ulong transactionId, ulong predicateId, BrightstarProfiler profiler)
         {
             using (profiler.Step("AssertPredicateIndex"))
             {
@@ -235,7 +235,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
                 {
                     using (profiler.Step("New Predicate Index"))
                     {
-                        predicateIndex = new PredicateRelatedResourceIndex(PageStore);
+                        predicateIndex = new PredicateRelatedResourceIndex(transactionId, PageStore);
                         _predicateIndexes[predicateId] = predicateIndex;
                     }
                 }

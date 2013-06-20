@@ -117,26 +117,26 @@ namespace BrightstarDB.Tests
 
             var jobId = storeWorker.ProcessTransaction("", "", data, Constants.DefaultGraphUri, "nt");
             JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
-            while (jobStatus.JobStatus != JobStatus.CompletedOk)
+            while (jobStatus.JobStatus != JobStatus.CompletedOk && jobStatus.JobStatus != JobStatus.TransactionError)
             {
                 Thread.Sleep(1000);
                 jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             }
+            Assert.IsTrue(jobStatus.JobStatus == JobStatus.CompletedOk, "Initial insert failed: {0} : {1}", jobStatus.Information, jobStatus.ExceptionDetail);
 
             // now test precondition
             const string preconds = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/core/version> ""1""^^<http://www.w3.org/2000/01/rdf-schema#integer>";
-
-            // execute transactions
             data =
                 @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
 
             jobId = storeWorker.ProcessTransaction(preconds, "", data, Constants.DefaultGraphUri, "nt");
             jobStatus = storeWorker.GetJobStatus(jobId.ToString());
-            while (jobStatus.JobStatus != JobStatus.CompletedOk)
+            while (jobStatus.JobStatus != JobStatus.CompletedOk && jobStatus.JobStatus != JobStatus.TransactionError)
             {
                 Thread.Sleep(1000);
                 jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             }
+            Assert.IsTrue(jobStatus.JobStatus == JobStatus.CompletedOk, "Transaction execution failed: {0} : {1}", jobStatus.Information, jobStatus.ExceptionDetail);
         }
 
         [TestMethod]

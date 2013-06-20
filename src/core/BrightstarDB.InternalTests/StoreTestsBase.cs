@@ -1320,6 +1320,53 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(10000, row.GetColumnValue(0), "Unexpected results count after final import");
         }
 
+
+        public virtual void TestBatchedInsertsRepeatable()
+        {
+            var sid = "TestBatchedInsertsRepeatable_" + DateTime.Now.Ticks;
+            var store = StoreManager.CreateStore(Configuration.StoreLocation + "\\" + sid);
+
+            string result;
+            XDocument resultDoc;
+            XElement row;
+            for (int i = 1; i <= 10000; i++)
+            {
+                string subjectId = "TestSubjectId_" + i;
+                store.InsertTriple(
+                    String.Format("http://www.brightstardb.com/.well-known/genid/{0}", subjectId),
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                    "http://www.example.org/schema/Entity",
+                    false, null, null, Constants.DefaultGraphUri);
+                store.InsertTriple(
+                    String.Format("http://www.brightstardb.com/.well-known/genid/{0}", subjectId),
+                    "http://www.example.org/schema/someString",
+                    String.Format("Entity {0}", i),
+                    true,
+                    "http://www.w3.org/2001/XMLSchema#string",
+                    null,
+                    Constants.DefaultGraphUri);
+                if (i % 2000 == 0)
+                {
+                    store.Commit(Guid.NewGuid());
+                    var tripleCount = store.Match(null, null, null, false, null, null, Constants.DefaultGraphUri).Count();
+                    Assert.AreEqual(i * 2, tripleCount, "Unexpected triple count after import batch to {0}", i);
+                    result = store.ExecuteSparqlQuery("SELECT COUNT(?x) WHERE { ?x a <http://www.example.org/schema/Entity>}", SparqlResultsFormat.Xml);
+                    resultDoc = XDocument.Parse(result);
+                    Assert.AreEqual(1, resultDoc.SparqlResultRows().Count());
+                    row = resultDoc.SparqlResultRows().First();
+                    Assert.AreEqual(i, row.GetColumnValue(0), "Unexpected results count after import batch.");
+                    store.Close();
+                    store = StoreManager.OpenStore(Configuration.StoreLocation + "\\" + sid);
+                }
+            }
+            store.Commit(Guid.NewGuid());
+
+            result = store.ExecuteSparqlQuery("SELECT COUNT(?x) WHERE { ?x a <http://www.example.org/schema/Entity>}", SparqlResultsFormat.Xml);
+            resultDoc = XDocument.Parse(result);
+            Assert.AreEqual(1, resultDoc.SparqlResultRows().Count());
+            row = resultDoc.SparqlResultRows().First();
+            Assert.AreEqual(10000, row.GetColumnValue(0), "Unexpected results count after final import");
+        }
         public virtual void TestMultiThreadedReadAccess()
         {
             var sid = "TestMultiThreadedReadAccess_" + DateTime.Now.Ticks;

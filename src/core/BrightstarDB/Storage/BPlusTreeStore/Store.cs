@@ -45,11 +45,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             DirectoryPath = storeLocation;
             _pageStore = dataPageStore;
             _graphIndex = new ConcurrentGraphIndex(_pageStore);
-            _subjectRelatedResourceIndex = new RelatedResourceIndex.RelatedResourceIndex(_pageStore);
-            _objectRelatedResourceIndex = new RelatedResourceIndex.RelatedResourceIndex(_pageStore);
+            _subjectRelatedResourceIndex = new RelatedResourceIndex.RelatedResourceIndex(_currentTxnId + 1, _pageStore);
+            _objectRelatedResourceIndex = new RelatedResourceIndex.RelatedResourceIndex(_currentTxnId + 1, _pageStore);
             _prefixManager = new PrefixManager(_pageStore);
             _resourceTable = resourceTable;
-            _resourceIndex = new ResourceIndex.ResourceIndex(_pageStore, _resourceTable);
+            _resourceIndex = new ResourceIndex.ResourceIndex(1, _pageStore, _resourceTable);
         }
 
         #region Implementation of IStore
@@ -365,17 +365,17 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             var objectRelatedResourceIndexId = _objectRelatedResourceIndex.Write(consolidatePageStore, txnId, null);
             var buff = CreateStoreHeader(graphIndexId, prefixManagerId, resourceIndexId, subjectRelatedResourceIndexId,
                                          objectRelatedResourceIndexId);
-            var storePageId = consolidatePageStore.Create();
-            consolidatePageStore.Write(txnId, storePageId, buff);
-            consolidatePageStore.Write(txnId, storePageId, buff, 0, 128);
+            var storePage = consolidatePageStore.Create(txnId);
+            storePage.SetData(buff);
+            storePage.SetData(buff, 0, 128);
             consolidatePageStore.Commit(txnId, null);
             // Close the stores to allow the rename to happen
             Close();
             consolidatePageStore.Close();
             
             storeManager.ActivateConsolidationStore(DirectoryPath);
-            storeManager.GetMasterFile(DirectoryPath).AppendCommitPoint(new CommitPoint(storePageId, txnId,
-                                                                                        DateTime.UtcNow, jobId), true);
+            storeManager.GetMasterFile(DirectoryPath).AppendCommitPoint(
+                new CommitPoint(storePage.Id, txnId, DateTime.UtcNow, jobId), true);
         }
 
         public void CopyGraph(string srcGraphUri, string targetGraphUri)
@@ -456,7 +456,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
          * 128-255: Repeat of the above structure
         */
 
-        private bool Load(byte[] storePageData, BrightstarProfiler profiler)
+        private bool Load(IPage storePage, BrightstarProfiler profiler)
         {
             using (profiler.Step("Store.Load"))
             {
@@ -464,8 +464,8 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 using (var sha1 = new SHA1Managed())
                 {
                     var recordedHash = new byte[20];
-                    Array.Copy(storePageData, 108, recordedHash, 0, 20);
-                    var calculatedHash = sha1.ComputeHash(storePageData, 0, 108);
+                    Array.Copy(storePage.Data, 108, recordedHash, 0, 20);
+                    var calculatedHash = sha1.ComputeHash(storePage.Data, 0, 108);
                     if (recordedHash.Compare(calculatedHash) != 0)
                     {
                         return false;
@@ -473,20 +473,20 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 }
 
                 // Load indexes from the pointers
-                int storeVersion = BitConverter.ToInt32(storePageData, 0);
+                int storeVersion = BitConverter.ToInt32(storePage.Data, 0);
                 if (storeVersion == 1)
                 {
-                    _currentTxnId = BitConverter.ToUInt64(storePageData, 4);
-                    var graphIndexId = BitConverter.ToUInt64(storePageData, 12);
+                    _currentTxnId = BitConverter.ToUInt64(storePage.Data, 4);
+                    var graphIndexId = BitConverter.ToUInt64(storePage.Data, 12);
                     _graphIndex = new ConcurrentGraphIndex(_pageStore, graphIndexId, profiler);
-                    var prefixManagerId = BitConverter.ToUInt64(storePageData, 20);
+                    var prefixManagerId = BitConverter.ToUInt64(storePage.Data, 20);
                     _prefixManager = new PrefixManager(_pageStore, prefixManagerId, profiler);
-                    var resourceIndexId = BitConverter.ToUInt64(storePageData, 28);
+                    var resourceIndexId = BitConverter.ToUInt64(storePage.Data, 28);
                     _resourceIndex = new ResourceIndex.ResourceIndex(_pageStore, _resourceTable, resourceIndexId);
-                    var relatedResourceIndexId = BitConverter.ToUInt64(storePageData, 36);
+                    var relatedResourceIndexId = BitConverter.ToUInt64(storePage.Data, 36);
                     _subjectRelatedResourceIndex = new RelatedResourceIndex.RelatedResourceIndex(_pageStore,
                                                                                                  relatedResourceIndexId, profiler);
-                    var objectRelatedResourceIndexId = BitConverter.ToUInt64(storePageData, 44);
+                    var objectRelatedResourceIndexId = BitConverter.ToUInt64(storePage.Data, 44);
                     _objectRelatedResourceIndex = new RelatedResourceIndex.RelatedResourceIndex(_pageStore,
                                                                                                 objectRelatedResourceIndexId, profiler);
                 }
@@ -509,12 +509,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 var buff = CreateStoreHeader(graphIndexId, prefixManagerId, resourceIndexId,
                                              subjectRelatedResourceIndexId, objectRelatedResourceIndexId);
 
-                var page = _pageStore.Create();
-                _pageStore.Write(txnId, page, buff, profiler: profiler);
-                _pageStore.Write(txnId, page, buff, 0, 128, profiler: profiler);
+                var page = _pageStore.Create(txnId);
+                page.SetData(buff);
+                page.SetData(buff, 0, 128);
                 _pageStore.Commit(txnId, profiler);
-                return page;
-
+                return page.Id;
             }
         }
 

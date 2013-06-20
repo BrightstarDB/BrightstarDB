@@ -293,13 +293,13 @@
     <Compile Include="Storage\BPlusTreeStore\BPlusTreeStoreManager.cs" />
     <Compile Include="Storage\BPlusTreeStore\DuplicateKeyException.cs" />
     <Compile Include="Storage\BPlusTreeStore\GraphIndex\IPageStoreGraphIndex.cs" />
+    <Compile Include="Storage\BPlusTreeStore\IInternalNode.cs" />
+    <Compile Include="Storage\BPlusTreeStore\ILeafNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\INode.cs" />
     <Compile Include="Storage\BPlusTreeStore\INodeCache.cs" />
-    <Compile Include="Storage\BPlusTreeStore\InternalNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\IPageStoreObject.cs" />
     <Compile Include="Storage\BPlusTreeStore\IPageStorePrefixManager.cs" />
     <Compile Include="Storage\BPlusTreeStore\IResourceTable.cs" />
-    <Compile Include="Storage\BPlusTreeStore\LeafNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\NodeCache.cs" />
     <Compile Include="Storage\BPlusTreeStore\NodeFullException.cs" />
     <Compile Include="Storage\BPlusTreeStore\PrefixManager.cs" />
@@ -310,6 +310,8 @@
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LongLiteralResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LongUriResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceTable.cs" />
+    <Compile Include="Storage\BPlusTreeStore\InternalNode.cs" />
+    <Compile Include="Storage\BPlusTreeStore\LeafNode.cs" />
     <Compile Include="Storage\IPrefixManager.cs" />
     <Compile Include="Storage\BPlusTreeStore\Store.cs" />
     <Compile Include="Storage\BTreeStore\AbstractStoreManager.cs" />
@@ -354,6 +356,7 @@
     <Compile Include="Storage\Persistence\BackgroundPageWriter.cs" />
     <Compile Include="Storage\Persistence\BinaryFilePage.cs" />
     <Compile Include="Storage\Persistence\BinaryFilePageStore.cs" />
+    <Compile Include="Storage\Persistence\BinaryPageAdapter.cs" />
     <Compile Include="Storage\Persistence\BlockProviderStream.cs" />
     <Compile Include="Storage\Persistence\CachingBlockProvider.cs" />
     <Compile Include="Storage\Persistence\CircularBufferPageCache.cs" />

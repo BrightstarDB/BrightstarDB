@@ -7,12 +7,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <summary>
         /// Get or set the ID of the page where this node is persisted
         /// </summary>
-        ulong PageId { get; set;  }
+        ulong PageId { get; }
 
         /// <summary>
         /// Get or set the boolean flag that indicates if this node has been modified since it was loaded
         /// </summary>
-        bool IsDirty { get; set; }
+        bool IsDirty { get;}
 
         /// <summary>
         /// Get the boolean flag that indicates if this node is a leaf node
@@ -51,5 +51,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="tree">The tree that contains this node</param>
         /// <param name="indentLevel">The indent level to use when writing the structure</param>
         void DumpStructure(BPlusTree tree, int indentLevel);
+
+        /// <summary>
+        /// Dump the structure of this node to a string.
+        /// </summary>
+        /// <returns>The node structure dumped as a string</returns>
+        /// <remarks>This method does not recurse into child nodes - it returns only the structure of the node it is called on. To dump
+        /// the entire subtree, use the <see cref="DumpStructure"/> method.</remarks>
+        string Dump();
     }
 }

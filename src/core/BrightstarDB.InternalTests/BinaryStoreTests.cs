@@ -242,6 +242,13 @@ namespace BrightstarDB.Tests
         }
 
         [TestMethod]
+        public override void TestBatchedInsertsRepeatable()
+        {
+            Logging.EnableConsoleOutput(true);
+            base.TestBatchedInsertsRepeatable();
+        }
+
+        [TestMethod]
         public override void TestMultiThreadedReadAccess()
         {
             base.TestMultiThreadedReadAccess();
