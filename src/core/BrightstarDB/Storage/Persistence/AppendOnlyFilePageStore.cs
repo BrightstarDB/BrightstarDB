@@ -52,6 +52,42 @@ namespace BrightstarDB.Storage.Persistence
                     new BackgroundPageWriter(persistenceManager.GetOutputStream(filePath, FileMode.Open));
             }
 
+            PageCache.Instance.BeforeEvict += BeforePageCacheEvict;
+        }
+
+        /// <summary>
+        /// Handles notification of page eviction from the page cache
+        /// </summary>
+        /// <param name="sender">The page cache performing the eviction</param>
+        /// <param name="args">The evication event arguments</param>
+        /// <remarks>When the eviction event is for a writeable page, this handler 
+        /// ensures that the page is queued with the background page writer. If there
+        /// is no background page writer because the page store was created with the 
+        /// disableBackgroundWriter option, then this method cancels an eviction
+        /// for a writeable page.</remarks>
+        private void BeforePageCacheEvict(object sender, EvictionEventArgs args)
+        {
+            if (args.Partition.Equals(_path))
+            {
+                // Evicting a page from this store
+                if (args.PageId > _newPageOffset)
+                {
+                    // Evicting a writeable page - add the page to the background write queue to ensure it gets written out.
+                    // Note: the background page writer will hold on to the page data until it is written
+                    if (_backgroundPageWriter == null)
+                    {
+                        // Do not evict this page
+                        args.CancelEviction = true;
+                    }
+                    else
+                    {
+                        // Queue the page with the background page writer
+                        var pageToEvict = _newPages[(int) (args.PageId - _newPageOffset)];
+                        _backgroundPageWriter.QueueWrite(pageToEvict, 0ul);
+                            // Passing 0 for the transaction id is OK because it is not used for writing append-only pages
+                    }
+                }
+            }
         }
 
         #region Implementation of IPageStore

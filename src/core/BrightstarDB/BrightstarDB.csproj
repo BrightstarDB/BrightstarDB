@@ -376,6 +376,7 @@
     <Compile Include="Storage\BPlusTreeStore\RelatedResourceIndex\PredicateRelatedResourceIndex.cs" />
     <Compile Include="Storage\BPlusTreeStore\RelatedResourceIndex\RelatedResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\RelatedResourceIndex\RelatedResourceIndex.cs" />
+    <Compile Include="Storage\Persistence\LruPageCache.cs" />
     <Compile Include="Storage\Persistence\PageCache.cs" />
     <Compile Include="Storage\Persistence\ReadWriteStoreModifiedException.cs" />
     <Compile Include="Storage\ResourceIdCache.cs" />

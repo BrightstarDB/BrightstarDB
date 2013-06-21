@@ -21,6 +21,7 @@ namespace BrightstarDB.Storage.Persistence
         private bool _disposed;
         private readonly IPersistenceManager _persistenceManager;
         private Stream _inputStream;
+        private Stream _outputStream;
         private readonly Dictionary<ulong, Tuple<BinaryFilePage, ulong>> _modifiedPages;
         private readonly object _pageCacheLock = new object();
         private ulong _nextPageId;
@@ -52,6 +53,21 @@ namespace BrightstarDB.Storage.Persistence
             }
             _inputStream = _persistenceManager.GetInputStream(filePath);
             _nextPageId = (ulong)_inputStream.Length/((uint)pageSize*2) + 1;
+            PageCache.Instance.BeforeEvict += BeforePageCacheEvict;
+        }
+
+        private void BeforePageCacheEvict(object sender, EvictionEventArgs args)
+        {
+            if (args.Partition.Equals(_filePath))
+            {
+                Tuple<BinaryFilePage, ulong> bfpTuple;
+                if (_modifiedPages.TryGetValue(args.PageId, out bfpTuple))
+                {
+                    EnsureOutputStream();
+                    bfpTuple.Item1.Write(_outputStream, bfpTuple.Item2);
+                }
+                _modifiedPages.Remove(args.PageId);
+            }
         }
 
         #region Implementation of IDisposable
@@ -134,30 +150,31 @@ namespace BrightstarDB.Storage.Persistence
         /// <param name="profiler"></param>
         public void Commit(ulong commitId, BrightstarProfiler profiler)
         {
+            EnsureOutputStream();
             using (profiler.Step("PageStore.Commit"))
             {
-                using (var outputStream = _persistenceManager.GetOutputStream(_filePath, FileMode.Open))
+                try
                 {
-                    try
+                    foreach (var entry in _modifiedPages.OrderBy(e => e.Key))
                     {
-                        foreach (var entry in _modifiedPages.OrderBy(e => e.Key))
+                        // TODO: Ensure we are writing the correct commit
+                        entry.Value.Item1.Write(_outputStream, commitId);
+                        lock (_pageCacheLock)
                         {
-                            // TODO: Ensure we are writing the correct commit
-                            entry.Value.Item1.Write(outputStream, commitId);
-                            lock (_pageCacheLock)
-                            {
-                                PageCache.Instance.InsertOrUpdate(_filePath, entry.Value.Item1);
-                            }
+                            PageCache.Instance.InsertOrUpdate(_filePath, entry.Value.Item1);
                         }
-                        _modifiedPages.Clear();
                     }
-                    catch (Exception)
-                    {
-                        _modifiedPages.Clear();
-                        throw;
-                    }
+                    _modifiedPages.Clear();
+                }
+                catch (Exception)
+                {
+                    _modifiedPages.Clear();
+                    throw;
                 }
                 CurrentTransactionId = commitId;
+                _outputStream.Flush();
+                _outputStream.Close();
+                _outputStream = null;
             }
         }
 
@@ -260,6 +277,12 @@ namespace BrightstarDB.Storage.Persistence
         {
             _inputStream.Close();
             _inputStream = null;
+            if (_outputStream != null)
+            {
+                _outputStream.Flush();
+                _outputStream.Close();
+                _outputStream = null;
+            }
         }
 
         #endregion
@@ -292,6 +315,11 @@ namespace BrightstarDB.Storage.Persistence
                     return page;
                 }
             }
+        }
+
+        private void EnsureOutputStream()
+        {
+            _outputStream = _persistenceManager.GetOutputStream(_filePath, FileMode.Open);
         }
     }
 }

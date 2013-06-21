@@ -20,6 +20,9 @@ namespace BrightstarDB.Storage.Persistence
 
         #region Implementation of IPageCache
 
+        public event PreEvictionDelegate BeforeEvict;
+        public event PostEvictionDelegate AfterEvict;
+
         public void InsertOrUpdate(string partition, IPageCacheItem page)
         {
             var ppk = new PartitionPageKey(AssertPartitionId(partition), page.Id);
@@ -38,7 +41,12 @@ namespace BrightstarDB.Storage.Persistence
             var partitionId = AssertPartitionId(partition);
             foreach(var k in _pages.Keys.Where(k=>k.PartitionId == partitionId).ToList())
             {
-                _pages.Remove(k);
+                var eventArgs = new EvictionEventArgs(partition, k.PageId);
+                if (FirePreEvict(eventArgs))
+                {
+                    _pages.Remove(k);
+                    FirePostEvict(eventArgs);
+                }
             }
         }
 
@@ -54,6 +62,24 @@ namespace BrightstarDB.Storage.Persistence
                                                       }
                                                   });
         }
+
+        private bool FirePreEvict(EvictionEventArgs args)
+        {
+            if (BeforeEvict != null)
+            {
+                BeforeEvict(this, args);
+            }
+            return !args.CancelEviction;
+        }
+
+        private void FirePostEvict(EvictionEventArgs args)
+        {
+            if (AfterEvict != null)
+            {
+                AfterEvict(this, args);
+            }
+        }
+
         class PartitionPageKey
         {
             public int PartitionId { get; private set; }
