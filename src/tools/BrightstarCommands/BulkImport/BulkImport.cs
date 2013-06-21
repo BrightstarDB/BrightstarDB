@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using BrightstarDB.Client;
 
 namespace BulkImport
@@ -57,13 +59,30 @@ namespace BulkImport
                 }
             }
 
+            ManualResetEvent stopFlag = new ManualResetEvent(false);
             using (var logWriter = new StreamWriter(logFile))
             {
+                var tokenSource = new CancellationTokenSource();
+                var token = tokenSource.Token;
+
                 if (!client.DoesStoreExist(parsedArgs.StoreName))
                 {
                     logWriter.Write("Creating new store with name '{0}'", parsedArgs.StoreName);
                     client.CreateStore(parsedArgs.StoreName);
                 }
+
+                var t = Task.Factory.StartNew(w =>
+                    {
+                        token.ThrowIfCancellationRequested();
+                        while (true)
+                        {
+                            Thread.Sleep(1000);
+                            var memoryUsed = Process.GetCurrentProcess().PeakWorkingSet64;
+                            (w as StreamWriter).WriteLine("Memory used: {0} bytes", memoryUsed);
+                            token.ThrowIfCancellationRequested();
+                        }
+                    }, logWriter, token);
+
                 var timer = new Stopwatch();
                 foreach (var file in importDirectory.EnumerateFiles(parsedArgs.FilePattern))
                 {
@@ -83,6 +102,27 @@ namespace BulkImport
                     else
                     {
                         logWriter.WriteLine("Import of file '{0}' failed. Last message was: {1}", file.FullName, finalMessage);
+                    }
+                }
+                
+                tokenSource.Cancel();
+
+                try
+                {
+                    t.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    if (e.InnerException is OperationCanceledException)
+                    {
+                        // This is expected
+                    }
+                    else
+                    {
+                        foreach (var v in e.InnerExceptions)
+                        {
+                            logWriter.WriteLine("Unexpected exception: " + v);
+                        }
                     }
                 }
             }

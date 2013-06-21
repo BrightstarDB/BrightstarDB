@@ -26,5 +26,8 @@ namespace BulkImport
 
         [Argument(ArgumentType.AtMostOnce, ShortName = "l", HelpText = "The path to the file to write logging information to.")]
         public string LogFile = "import.log";
+
+        [Argument(ArgumentType.AtMostOnce, DefaultValue = false, ShortName = "mu", HelpText = "Periodically log the memory usage of the process to the console.")]
+        public bool LogMemoryUsage = false;
     }
 }
