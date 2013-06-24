@@ -3,7 +3,7 @@ using System.IO;
 
 namespace BrightstarDB.Storage.Persistence
 {
-    internal class FilePage : IPage
+    internal class FilePage : IPage, IDisposable
     {
         private long _modified;
         private readonly ulong _writeOffset;
@@ -118,6 +118,25 @@ namespace BrightstarDB.Storage.Persistence
                 }
                 return ret;
             }
+        }
+        #endregion
+
+        #region Implementation of IDisposable
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+        private void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                Logging.LogDebug("Disposed page @{0}", _writeOffset);
+            }
+            _disposed = true;
         }
         #endregion
     }
