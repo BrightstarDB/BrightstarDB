@@ -636,7 +636,7 @@ class Helper {
 	
 	public static bool TryParseGenericTypeName(string genericTypeName, out string generic, out string t)
 	{
-		var regex = new System.Text.RegularExpressions.Regex(@"^([a-zA-Z0-9\.]+)<([a-zA-Z0-9\.]+)>$");
+		var regex = new System.Text.RegularExpressions.Regex(@"^([a-zA-Z0-9\.]+)<([^>]+)>$");
 		var match = regex.Match(genericTypeName);
 		if (match.Success) 
 		{
