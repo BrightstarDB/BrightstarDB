@@ -40,6 +40,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             _config = treeConfig;
             _page = page;
             _keyCount = keyCount;
+#if DEBUG_BTREE
+            treeConfig.BTreeDebug("+Internal {0}", page.Id);
+#endif
         }
 
         /// <summary>
@@ -62,6 +65,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             _page.SetData(BitConverter.GetBytes(leftPageId), 0, PointerOffset(0), 8);
             _page.SetData(BitConverter.GetBytes(rightPageId), 0, PointerOffset(1), 8);
             KeyCount = 1;
+#if DEBUG_BTREE
+            _config.BTreeDebug("+Internal {0}", _page.Id);
+#endif
         }
 
         /// <summary>
@@ -79,6 +85,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             _page = page;
             _page.SetData(BitConverter.GetBytes(onlyChild), 0, PointerOffset(0), 8);
             KeyCount = 0;
+#if DEBUG_BTREE
+            _config.BTreeDebug("+Internal {0}", _page.Id);
+#endif
         }
 
         /// <summary>
@@ -104,6 +113,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             {
                 _page.SetData(BitConverter.GetBytes(values[i]), 0, pointerOffset, 8);
             }
+#if DEBUG_BTREE
+            _config.BTreeDebug("+Internal {0}", _page.Id);
+#endif
         }
 
         public ulong PageId { get { return _page.Id; } }

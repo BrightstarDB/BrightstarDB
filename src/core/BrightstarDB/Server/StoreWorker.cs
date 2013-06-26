@@ -197,10 +197,16 @@ namespace BrightstarDB.Server
         {
             lock(_readStoreLock)
             {
-                if (_readStore != null)
-                {
-                    _readStore.Close();
-                }
+                // KA: Don't close the read store at this point
+                // as export jobs or queries may still be using it
+                // instead the store should dispose of any resources
+                // when it is garbage collected.
+                // This fixes an issue found in ClientTests.TestExportWhileWriting
+                //if (_readStore != null)
+                //{
+                //    _readStore.Close();
+                //}
+
                 _readStore = null;
             }
         }

@@ -131,6 +131,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     //var newRoot = new InternalNode(_pageStore.Create(), rootSplitKey, _root.PageId, rightNode.PageId,
                     //                               _config);
                     MarkDirty(txnId, root, profiler);
+                    MarkDirty(txnId, newRoot, profiler);
                     _rootId = newRoot.PageId;
 #if DEBUG_BTREE
                     _config.BTreeDebug("BPlusTree.Insert: Root node has split. New root ID {0}: {1}",_rootId, newRoot.Dump());
@@ -496,7 +497,8 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 #if DEBUG_BTREE
                     _config.BTreeDebug("BPlusTree.Insert. Target leaf node is full.");
 #endif
-                    var newNode = leaf.Split(txnId, _pageStore.Create(txnId), out splitKey);
+                    var newPage = _pageStore.Create(txnId);
+                    var newNode = leaf.Split(txnId, newPage, out splitKey);
                     if (key.Compare(splitKey) < 0)
                     {
                         leaf.Insert(txnId, key, value, overwrite: overwrite, profiler: profiler);
@@ -506,6 +508,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                         newNode.Insert(txnId, key, value, overwrite: overwrite, profiler: profiler);
                     }
                     MarkDirty(txnId, leaf, profiler);
+                    MarkDirty(txnId, newNode, profiler);
                     split = true;
                     rightNode = newNode;
                 }
@@ -542,6 +545,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                         {
                             // Need to split this node to insert the new child node
                             rightNode = internalNode.Split(txnId, _pageStore.Create(txnId), out splitKey);
+                            MarkDirty(txnId, rightNode, profiler);
                             split = true;
                             if (childSplitKey.Compare(splitKey) < 0)
                             {
@@ -600,6 +604,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         private void MarkDirty(ulong txnId, INode node, BrightstarProfiler profiler)
         {
             _isDirty = true;
+            _pageStore.MarkDirty(txnId, node.PageId);
         }
 
         public virtual ulong Save(ulong transactionId, BrightstarProfiler profiler)

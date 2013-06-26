@@ -49,6 +49,9 @@ namespace BrightstarDB.Storage.Persistence
 
         public void QueueWrite(IPage pageToWrite, ulong transactionId)
         {
+#if DEBUG_PAGESTORE
+            Logging.LogDebug("Queue {0}", pageToWrite.Id);
+#endif
             _writeTasks.Enqueue(new WriteTask{PageToWrite = pageToWrite, TransactionId = transactionId});
             _taskAdded.Set();
         }
@@ -83,11 +86,18 @@ namespace BrightstarDB.Storage.Persistence
                     //Logging.LogInfo("Background write of page {0} @ {1} completed.", writeTask.PageToWrite.Id,
                     //                writeTimestamp);
                      */
-                    long writeTimestamp;
-                    _writeTimestamps.TryGetValue(writeTask.PageToWrite.Id, out writeTimestamp);
-                    _writeTimestamps[writeTask.PageToWrite.Id] =
-                        writeTask.PageToWrite.WriteIfModifiedSince(writeTimestamp, _outputStream,
-                                                                   writeTask.TransactionId);
+                    try
+                    {
+                        long writeTimestamp;
+                        _writeTimestamps.TryGetValue(writeTask.PageToWrite.Id, out writeTimestamp);
+                        _writeTimestamps[writeTask.PageToWrite.Id] =
+                            writeTask.PageToWrite.WriteIfModifiedSince(writeTimestamp, _outputStream,
+                                                                       writeTask.TransactionId);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.LogError(BrightstarEventId.StoreBackgroundWriteError, "Error in BackgroundPageWriter: {0}", ex);
+                    }
                 }
                 else
                 {
@@ -128,6 +138,11 @@ namespace BrightstarDB.Storage.Persistence
         ~BackgroundPageWriter()
         {
             Dispose(false);
+        }
+
+        public void ResetTimestamp(ulong pageId)
+        {
+            _writeTimestamps[pageId] = 0;
         }
     }
 

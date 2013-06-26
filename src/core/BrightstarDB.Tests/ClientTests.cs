@@ -505,19 +505,20 @@ namespace BrightstarDB.Tests
         [TestMethod]
         public void TestExportWhileWriting()
         {
+            int firstBatchSize = 50000;
             var storeName = Guid.NewGuid().ToString();
             var client = GetClient();
             client.CreateStore(storeName);
-            var batch1 = MakeTriples(0, 50000);
-            var batch2 = MakeTriples(50000, 51000);
-            var batch3 = MakeTriples(51000, 52000);
-            var batch4 = MakeTriples(52000, 53000);
+            var batch1 = MakeTriples(0, firstBatchSize);
+            var batch2 = MakeTriples(firstBatchSize, firstBatchSize+1000);
+            var batch3 = MakeTriples(firstBatchSize+1000, firstBatchSize+2000);
+            var batch4 = MakeTriples(firstBatchSize+2000, firstBatchSize+3000);
 
             // Verify batch size
             var p = new NTriplesParser();
             var counterSink = new CounterTripleSink();
             p.Parse(new StringReader(batch1), counterSink, Constants.DefaultGraphUri);
-            Assert.AreEqual(50000, counterSink.Count);
+            Assert.AreEqual(firstBatchSize, counterSink.Count);
 
             var jobInfo = client.ExecuteTransaction(storeName, String.Empty, String.Empty, batch1);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
@@ -527,7 +528,14 @@ namespace BrightstarDB.Tests
             jobInfo = client.ExecuteTransaction(storeName, null, null, batch2);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
             exportJobInfo = client.GetJobInfo(storeName, exportJobInfo.JobId);
-            Assert.IsTrue(exportJobInfo.JobStarted, "Test inconclusive - export job completed before end of first concurrent import job."); // This is just to check that the export is still running while at least one commit occurs
+            if (exportJobInfo.JobCompletedWithErrors)
+            {
+                Assert.Fail("Export job completed with errors: {0} : {1}", exportJobInfo.StatusMessage, exportJobInfo.ExceptionInfo);
+            }
+            if (exportJobInfo.JobCompletedOk)
+            {
+                Assert.Inconclusive("Export job completed before end of first concurrent import job.");
+            }
             jobInfo = client.ExecuteTransaction(storeName, null, null, batch3);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
             jobInfo = client.ExecuteTransaction(storeName, null, null, batch4);
@@ -542,7 +550,7 @@ namespace BrightstarDB.Tests
             var exportFile = new FileInfo("c:\\brightstar\\import\\" + storeName + "_export.nt");
             Assert.IsTrue(exportFile.Exists);
             var lineCount = File.ReadAllLines(exportFile.FullName).Where(x => !String.IsNullOrEmpty(x)).Count();
-            Assert.AreEqual(50000, lineCount);
+            Assert.AreEqual(firstBatchSize, lineCount);
         }
 
         public class CounterTripleSink : ITripleSink

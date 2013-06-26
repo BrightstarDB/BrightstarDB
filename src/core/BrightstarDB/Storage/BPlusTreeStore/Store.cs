@@ -607,12 +607,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private IResource Resolve(ulong resourceId)
         {
-            // TODO: This is for testing purpose. When done, change it back to just returning the result of _resourceIndex.GetResource();
             var ret = _resourceIndex.GetResource(resourceId);
+#if DEBUG
             if (ret == null && resourceId != StoreConstants.NullUlong)
             {
                 throw new Exception(String.Format("Could not resolve resource id {0}", resourceId));
             }
+#endif
             return ret;
         }
 

@@ -75,5 +75,12 @@ namespace BrightstarDB.Storage.Persistence
         /// Close the store, releasing any resources (such as file handles) it may be using
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// Notifies the store that a page has been updated
+        /// </summary>
+        /// <param name="commitId">The ID of the update transaction that modified the page</param>
+        /// <param name="pageId">The ID of the page modified</param>
+        void MarkDirty(ulong commitId, ulong pageId);
     }
 }

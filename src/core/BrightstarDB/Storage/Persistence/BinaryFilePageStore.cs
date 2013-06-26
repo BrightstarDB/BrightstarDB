@@ -285,6 +285,20 @@ namespace BrightstarDB.Storage.Persistence
             }
         }
 
+        public void MarkDirty(ulong commitId, ulong pageId)
+        {
+            Tuple<BinaryFilePage, ulong> bfp;
+            if (_modifiedPages.TryGetValue(pageId, out bfp))
+            {
+                if (bfp.Item1.Id == pageId && bfp.Item2 == commitId)
+                {
+                    return;
+                }
+            }
+            bfp = new Tuple<BinaryFilePage, ulong>(GetPage(pageId, null), commitId);
+            _modifiedPages[pageId] = bfp;
+        }
+
         #endregion
 
         private BinaryFilePage GetPage(ulong pageId, BrightstarProfiler profiler)

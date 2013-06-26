@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace BrightstarDB.Storage.Persistence
 {
@@ -81,6 +82,9 @@ namespace BrightstarDB.Storage.Persistence
                 Array.ConstrainedCopy(data, srcOffset, _data, pageOffset, len);
                 IsDirty = true;
                 _modified++;
+#if DEBUG_PAGESTORE
+                Logging.LogDebug("Update {0} {1} {2}", Id, _modified, BitConverter.ToInt32(_data, 0));
+#endif
             }
         }
 
@@ -113,9 +117,18 @@ namespace BrightstarDB.Storage.Persistence
                 {
                     outputStream.Seek((long) _writeOffset, SeekOrigin.Begin);
                     outputStream.Write(_data, 0, _pageSize);
+#if DEBUG_PAGESTORE
+                    Logging.LogDebug("Write {0} {1}", Id, _modified);
+#endif
                     // KA: See comment in Write() method above.
                     //outputStream.Flush();
                 }
+#if DEBUG_PAGESTORE
+                else
+                {
+                    Logging.LogDebug("Skip {0} {1}", Id, _modified);
+                }
+#endif
                 return ret;
             }
         }

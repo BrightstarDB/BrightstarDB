@@ -14,6 +14,7 @@
         // Store errors 51-99
         StoreCommitException = 51, // Indicates an error committing and update to the store
         StoreFlushException = 52, // Indicates an error flushing changes to the store
+        StoreBackgroundWriteError = 53, // Indicates an error in the background page writing thread
 
         // Server errors 100 - 199
         ServerCoreException = 100, // Indicates an error in processing a request 
@@ -43,5 +44,11 @@
         AddressAccessDenied = 501, // Indicates that the user running the service does not have permission to register the service endpoints
         ServiceHostStartupFailed = 502, // Indicates the StartService() method in the console app threw an exception
         NoValidLicense = 503,  // Indicates that a valid activated license could not be found
+
+        // Warnings
+
+        UndefinedWarning = 10000,
+        // Store warnings 10001 - 10500
+        StorePerformanceWarning = 10001,
     }
 }

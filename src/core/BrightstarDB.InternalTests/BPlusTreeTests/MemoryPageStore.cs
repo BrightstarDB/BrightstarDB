@@ -60,5 +60,10 @@ namespace BrightstarDB.Tests.BPlusTreeTests
         {
             throw new NotImplementedException();
         }
+
+        public void MarkDirty(ulong commitId, ulong pageId)
+        {
+            // No-op
+        }
     }
 }

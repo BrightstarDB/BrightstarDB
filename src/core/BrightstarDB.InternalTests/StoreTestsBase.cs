@@ -1367,6 +1367,7 @@ namespace BrightstarDB.Tests
             row = resultDoc.SparqlResultRows().First();
             Assert.AreEqual(10000, row.GetColumnValue(0), "Unexpected results count after final import");
         }
+
         public virtual void TestMultiThreadedReadAccess()
         {
             var sid = "TestMultiThreadedReadAccess_" + DateTime.Now.Ticks;
@@ -1375,11 +1376,13 @@ namespace BrightstarDB.Tests
                 for (int i = 1; i <= 10000; i++)
                 {
                     Guid subjectId = Guid.NewGuid();
+
                     store.InsertTriple(
                         String.Format("http://www.brightstardb.com/.well-known/genid/{0}", subjectId),
                         "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                         "http://www.example.org/schema/Entity",
                         false, null, null, Constants.DefaultGraphUri);
+
                     store.InsertTriple(
                         String.Format("http://www.brightstardb.com/.well-known/genid/{0}", subjectId),
                         "http://www.example.org/schema/someString",
@@ -1388,11 +1391,23 @@ namespace BrightstarDB.Tests
                         "http://www.w3.org/2001/XMLSchema#string",
                         null,
                         Constants.DefaultGraphUri);
+
                 }
                 store.Commit(Guid.NewGuid());
+
+                // Should be able to enumerate all resources using the same store we wrote to
+                var count = EnumerateStore(store);
+                Assert.AreEqual(20000, count);
             }
 
-            
+            // Should be able to enumerate all triples in a single-threaded operation on a new read-only store
+            using (var readStore = StoreManager.OpenStore(sid, true))
+            {
+                var count = EnumerateStore(readStore);
+                Assert.AreEqual(20000, count);
+            }
+
+            // Should be able to enumerate all triples in a multi-thredaed operation on a new read-only store
             var tf = new TaskFactory();
             using (var readStore = StoreManager.OpenStore(sid, true))
             {
@@ -1403,7 +1418,8 @@ namespace BrightstarDB.Tests
                 try
                 {
                     Task.WaitAll(new Task[] {task1, task2, task3, task4});
-                } catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Assert.Fail("Unexpected exception: {0}", ex);
                 }
@@ -1414,6 +1430,11 @@ namespace BrightstarDB.Tests
             }
         }
 
+        /// <summary>
+        /// Helper method for enumerating all of the triples in a store
+        /// </summary>
+        /// <param name="state">Thread state object. Expected to be the IStore instance to enumerate</param>
+        /// <returns>The number of triples enumerated by the thread.</returns>
         private static int EnumerateStore(object state)
         {
             var store = state as IStore;

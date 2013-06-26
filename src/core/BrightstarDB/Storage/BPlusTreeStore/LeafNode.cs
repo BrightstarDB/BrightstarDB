@@ -32,6 +32,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             KeyCount = 0;
             Prev = prevPointer;
             Next = nextPointer;
+#if DEBUG_BTREE
+            _config.BTreeDebug("+Leaf1 {0}", _page.Id);
+#endif
         }
 
         public LeafNode(IPage page, int keyCount, BPlusTreeConfiguration treeConfiguration)
@@ -41,6 +44,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             _prevPointer = BitConverter.ToUInt64(_page.Data, 4);
             _nextPointer = BitConverter.ToUInt64(_page.Data, 12);
             _config = treeConfiguration;
+#if DEBUG_BTREE
+            _config.BTreeDebug("+Leaf2 {0}", _page.Id);
+#endif
         }
 
         public LeafNode(IPage page, ulong prevPointer, ulong nextPointer,
@@ -62,6 +68,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 numLoaded++;
             }
             KeyCount = numLoaded;
+#if DEBUG_BTREE
+            _config.BTreeDebug("+Leaf3 {0}", _page.Id);
+#endif
         }
 
         public ulong Prev
@@ -169,7 +178,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 }
                 KeyCount++;
 #if DEBUG_BTREE
-_config.BTreeDebug("LeafNode.Insert. Key={0}. Updated Node: {1}", key.Dump(), Dump());
+_config.BTreeDebug("LeafNode.Insert@{0}. Key={1}. Updated Node: {2}",PageId, key.Dump(), DumpKeys());
 #endif
             }
         }
