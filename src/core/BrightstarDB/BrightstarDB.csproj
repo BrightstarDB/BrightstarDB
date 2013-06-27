@@ -309,6 +309,8 @@
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\IPageStoreResourceIndex.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LongLiteralResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LongUriResource.cs" />
+    <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LruResourceCache.cs" />
+    <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LruResourceIdCache.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceTable.cs" />
     <Compile Include="Storage\BPlusTreeStore\InternalNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\LeafNode.cs" />
@@ -417,6 +419,7 @@
     <Compile Include="Utils\CircularBufferIndex.cs" />
     <Compile Include="Storage\StoreExtensions.cs" />
     <Compile Include="Utils\IEnumeratorExtensions.cs" />
+    <Compile Include="Utils\LruCache.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
