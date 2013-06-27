@@ -52,7 +52,7 @@ namespace BrightstarDB
 #else
         private const int DefaultPageCacheSize = 2048; // in MB
         private const int DefaultQueryCacheMemory = 256; // in MB
-        private const int DefaultResourceCacheLimit = 100000; // number of entries
+        private const int DefaultResourceCacheLimit = 1000000; // number of entries
 #endif   
 
         static Configuration()
