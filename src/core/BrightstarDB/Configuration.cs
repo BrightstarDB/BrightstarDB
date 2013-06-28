@@ -38,6 +38,7 @@ namespace BrightstarDB
         private const string NetNamedPipeName = "BrightstarDB.NetNamedPipeName";
         private const string PersistenceTypeName = "BrightstarDB.PersistenceType";
         private const string ClusterNodePortName = "BrightstarDB.ClusterNodePort";
+        private const string ResourceCacheLimitName = "BrightstarDB.ResourceCacheLimit";
 
         private const string PersistenceTypeAppendOnly = "appendonly";
         private const string PersistenceTypeRewrite = "rewrite";
@@ -47,9 +48,11 @@ namespace BrightstarDB
         private const long MegabytesToBytes = 1024*1024;
 #if WINDOWS_PHONE
         private const int DefaultPageCacheSize = 4; // in MB
+        private const int DefaultResourceCacheLimit = 10000; // number of entries
 #else
         private const int DefaultPageCacheSize = 2048; // in MB
         private const int DefaultQueryCacheMemory = 256; // in MB
+        private const int DefaultResourceCacheLimit = 1000000; // number of entries
 #endif   
 
         static Configuration()
@@ -127,6 +130,18 @@ namespace BrightstarDB
                     {
                         ReadStoreObjectCacheSize = val;
                     }
+                }
+            }
+
+            // ResourceCacheLimit
+            var resourceCacheLimitString = appSettings.Get(ResourceCacheLimitName);
+            ResourceCacheLimit = DefaultResourceCacheLimit;
+            if (!String.IsNullOrEmpty(resourceCacheLimitString))
+            {
+                int val;
+                if (int.TryParse(resourceCacheLimitString, out val) && val > 0)
+                {
+                    ResourceCacheLimit = val;
                 }
             }
 
@@ -228,6 +243,11 @@ namespace BrightstarDB
         /// Size of the page cache in MB
         /// </summary>
         public static int PageCacheSize { get; set; }
+
+        /// <summary>
+        /// The size of resource cache (in number of entries) for each store opened.
+        /// </summary>
+        public static int ResourceCacheLimit { get; set; }
 
         public static bool EnableOptimisticLocking { get; set; }
 

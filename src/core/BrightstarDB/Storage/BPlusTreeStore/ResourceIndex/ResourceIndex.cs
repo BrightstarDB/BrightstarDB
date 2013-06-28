@@ -23,8 +23,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
         /// <param name="resourceTable"></param>
         public ResourceIndex(ulong txnId, IPageStore pageStore, IResourceTable resourceTable)  : base(txnId, pageStore)
         {
-            _resourceCache = new ConcurrentResourceCache();
-            _resourceIdCache = new ConcurrentResourceIdCache();
+            //_resourceCache = new ConcurrentResourceCache();
+            //_resourceIdCache = new ConcurrentResourceIdCache();
+            _resourceCache = new LruResourceCache();
+            _resourceIdCache = new LruResourceIdCache();
             _resourceStore = new ResourceStore(resourceTable);
 #if DEBUG_BTREE
             Configuration.DebugId = "ResIx";
@@ -40,8 +42,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
         /// <param name="rootNodeId">The ID of the page that contains the root node of the resource index</param>
         public ResourceIndex(IPageStore pageStore, IResourceTable resourceTable, ulong rootNodeId) : base(pageStore, rootNodeId)
         {
-            _resourceCache = new ConcurrentResourceCache();
-            _resourceIdCache = new ConcurrentResourceIdCache();
+            //_resourceCache = new ConcurrentResourceCache();
+            //_resourceIdCache = new ConcurrentResourceIdCache();
+            _resourceCache= new LruResourceCache();
+            _resourceIdCache = new LruResourceIdCache();
             _resourceStore = new ResourceStore(resourceTable);
 #if DEBUG_BTREE
             Configuration.DebugId = "ResIx";

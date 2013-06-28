@@ -10,6 +10,19 @@
 
 This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are marked with FIX
 
+****************************
+ BrightstarDB Develop Branch
+****************************
+
+The following features/fixes are present in the current develop branch of the project's Git repository.
+This list is subject to change!
+
+  - FIX: Reduced memory usage for BTree's by half.
+  
+  - FIX: Fixed a memory leak in the page cache code that prevented expired pages from being released to the garbage collector.
+  
+  - FIX: Fixed the resource ID and resource caches to support a (configurable) limit on the number of entries cached.
+  
 *************************
  BrightstarDB 1.3 Release
 *************************
