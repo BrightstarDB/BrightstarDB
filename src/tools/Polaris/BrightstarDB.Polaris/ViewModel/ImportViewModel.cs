@@ -157,19 +157,7 @@ namespace BrightstarDB.Polaris.ViewModel
                             {
                                 var nQuadsFormatter = new NQuadsFormatter();
                                 var writeThroughHandler = new WriteThroughHandler(nQuadsFormatter, textWriter);
-                                if (isGZipped)
-                                {
-                                    using (var fileStream = new FileStream(_importFileName, FileMode.Open))
-                                    {
-                                        var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
-                                        var streamReader = new StreamReader(gzipStream);
-                                        rdfReader.Load(writeThroughHandler, streamReader);
-                                    }
-                                }
-                                else
-                                {
-                                    rdfReader.Load(writeThroughHandler, _importFileName);
-                                }
+                                rdfReader.Load(writeThroughHandler, _importFileName);
                                 lines = textWriter.ToString();
                             }
                             catch (Exception ex)
