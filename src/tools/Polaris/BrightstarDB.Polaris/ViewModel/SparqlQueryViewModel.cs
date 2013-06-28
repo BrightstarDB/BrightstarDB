@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml.Linq;
@@ -155,6 +156,11 @@ namespace BrightstarDB.Polaris.ViewModel
                 Messages = "No target store selected.";
                 return;
             }
+            ThreadPool.QueueUserWorkItem(RunSparqlQuery);
+        }
+
+        private void RunSparqlQuery(object o)
+        {
             XDocument sparqlResults;
             try
             {
