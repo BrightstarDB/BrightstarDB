@@ -46,8 +46,15 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store</param>
         /// <param name="optimisticLockingEnabled">Optional parameter to override the context-default optimistic locking setting for the store opened.</param>
         /// <param name="namespaceMappings">A collection of namespace mappings.</param>
+        /// <param name="updateGraph">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// not defined, the default graph in the store will be updated.</param>
+        /// <param name="defaultDataSet">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve data objects and their properties.
+        /// If not defined, all graphs in the store will be queried.</param>
+        /// <param name="versionTrackingGraph">OPTIONAL: The URI identifier of the graph that contains version number statements for data objects. 
+        /// If not defined, the <paramref name="updateGraph"/> will be used.</param>
         /// <returns>A IDataObjectStore instance</returns>
-        public IDataObjectStore OpenStore(string storeName, Dictionary<string, string> namespaceMappings = null, bool? optimisticLockingEnabled = null)
+        public IDataObjectStore OpenStore(string storeName, Dictionary<string, string> namespaceMappings = null, bool? optimisticLockingEnabled = null,
+            string updateGraph = null, IEnumerable<string> defaultDataSet = null, string versionTrackingGraph = null)
         {
             if (!DoesStoreExist(storeName)) throw new BrightstarClientException("Store does not exist");
 
@@ -60,7 +67,8 @@ namespace BrightstarDB.Client
             namespaceMappings["rdfs"] = "http://www.w3.org/2000/01/rdf-schema#";
 
             return new NamedPipeDataObjectStore(_endpointUri, storeName, namespaceMappings, 
-                optimisticLockingEnabled.HasValue ? optimisticLockingEnabled.Value : _optimisticLockingEnabled);
+                optimisticLockingEnabled.HasValue ? optimisticLockingEnabled.Value : _optimisticLockingEnabled,
+                updateGraph, defaultDataSet, versionTrackingGraph);
         }
 
         /// <summary>
@@ -91,13 +99,31 @@ namespace BrightstarDB.Client
         /// <param name="namespaceMappings">A collection of namespace mappings.</param>
         /// <param name="optimisticLockingEnabled">Optional parameter to override the context-default optimistic locking setting for the store opened.</param>
         /// <param name="persistenceType">The type of persistence to use in the newly created store. If not specified, defaults to the value specified in the application configuration file or <see cref="PersistenceType.AppendOnly"/></param>
+        /// <param name="updateGraph">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// not defined, the default graph in the store will be updated.</param>
+        /// <param name="versionTrackingGraph">OPTIONAL: The URI identifier of the graph that contains version number statements for data objects. 
+        /// If not defined, the <paramref name="updateGraph"/> will be used.</param>
         /// <returns>A IDataObjectStore instance</returns>
-        public IDataObjectStore CreateStore(string storeName, Dictionary<string, string> namespaceMappings = null, bool? optimisticLockingEnabled = null, PersistenceType? persistenceType = null)
+        public IDataObjectStore CreateStore(string storeName, Dictionary<string, string> namespaceMappings = null, 
+            bool? optimisticLockingEnabled = null, 
+            PersistenceType? persistenceType = null,
+            string updateGraph = null, string versionTrackingGraph = null)
         {
             Client.CreateStore(storeName,
                 persistenceType.HasValue ? persistenceType.Value : Configuration.PersistenceType);
+
+            if (namespaceMappings == null)
+            {
+                namespaceMappings = new Dictionary<string, string>();
+            }
+            namespaceMappings["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            namespaceMappings["rdfs"] = "http://www.w3.org/2000/01/rdf-schema#";
+
+            if (String.IsNullOrEmpty(updateGraph)) updateGraph = Constants.DefaultGraphUri;
+
             return new NamedPipeDataObjectStore(_endpointUri, storeName, namespaceMappings, 
-                optimisticLockingEnabled.HasValue ? optimisticLockingEnabled.Value : _optimisticLockingEnabled);
+                optimisticLockingEnabled.HasValue ? optimisticLockingEnabled.Value : _optimisticLockingEnabled,
+                updateGraph, new []{updateGraph}, versionTrackingGraph);
         }
 
         /// <summary>

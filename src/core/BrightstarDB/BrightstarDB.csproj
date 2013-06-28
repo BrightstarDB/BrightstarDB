@@ -145,6 +145,7 @@
     <Compile Include="Client\ReplyMessageInspector.cs" />
     <Compile Include="Client\RestClientHelper.cs" />
     <Compile Include="Client\RestDataObjectContext.cs" />
+    <Compile Include="Client\RestDataObjectStore.cs" />
     <Compile Include="Client\RestJobInfo.cs" />
     <Compile Include="Client\SignatureType.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />

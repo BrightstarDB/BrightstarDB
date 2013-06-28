@@ -15,14 +15,13 @@ namespace BrightstarDB.Client
         private readonly ServerCore _serverCore;
         private readonly string _storeName;
         private readonly bool _optimisticLockingEnabled;
-        private readonly string _defaultGraphUri;
 
-        internal EmbeddedDataObjectStore(ServerCore serverCore, string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled)
-            : base(namespaceMappings)
+        internal EmbeddedDataObjectStore(ServerCore serverCore, string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
+            string updateGraphUri, IEnumerable<string> datasetGraphUris, string versionGraphUri)
+            : base(namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             _serverCore = serverCore;
             _storeName = storeName;
-            _defaultGraphUri = Constants.DefaultGraphUri;
             _optimisticLockingEnabled = optimisticLockingEnabled;
             ResetTransactionData();
         }
@@ -38,14 +37,14 @@ namespace BrightstarDB.Client
             DataObject registeredDataObject = RegisterDataObject(new DataObject(this, resolvedIdentity));
             if (!registeredDataObject.IsLoaded)
             {
-                IEnumerable<Triple> triples =
-                    _serverCore.GetResourceStatements(_storeName, resolvedIdentity).Union(
-                        AddTriples.Where(p => p.Subject.Equals(resolvedIdentity)));
+                var triples = GetFilteredResourceStatements(_storeName, resolvedIdentity)
+                    .Union(AddTriples.Where(p => p.Subject.Equals(resolvedIdentity)));
                 registeredDataObject.BindTriples(triples);
             }
             return registeredDataObject;
         }
 
+        
         public override IEnumerable<IDataObject> BindDataObjectsWithSparql(string sparqlExpression)
         {
             var helper = new SparqlResultDataObjectHelper(this);
@@ -54,13 +53,13 @@ namespace BrightstarDB.Client
 
         public override SparqlResult ExecuteSparql(string sparqlExpression)
         {
-            var xml = _serverCore.Query(_storeName, sparqlExpression, new string[]{_defaultGraphUri},  SparqlResultsFormat.Xml);
+            var xml = _serverCore.Query(_storeName, sparqlExpression, DataSetGraphUris,  SparqlResultsFormat.Xml);
             return new SparqlResult(xml);
         }
 
         public override bool BindDataObject(DataObject dataObject)
         {
-            IEnumerable<Triple> triples = _serverCore.GetResourceStatements(_storeName, dataObject.Identity);
+            var triples = GetFilteredResourceStatements(_storeName, dataObject.Identity);
             return dataObject.BindTriples(triples);
         }
 
@@ -81,7 +80,7 @@ namespace BrightstarDB.Client
                     var version = entity.GetPropertyValue(Constants.VersionPredicateUri);
                     if (version == null)
                     {
-                        // no existing version information so assume this is the first time using it with OL
+                        // no existing version information so assume this is the first time using it with 1
                         entity.SetProperty(Constants.VersionPredicateUri, 1);
                     }
                     else
@@ -92,7 +91,7 @@ namespace BrightstarDB.Client
                         entity.SetProperty(Constants.VersionPredicateUri, intVersion);
                         Preconditions.Add(new Triple
                                                 {
-                                                    Graph = Constants.DefaultGraphUri,
+                                                    Graph = VersionGraphUri,
                                                     DataType = RdfDatatypes.Integer,
                                                     IsLiteral = true,
                                                     LangCode = null,
@@ -128,7 +127,7 @@ namespace BrightstarDB.Client
             }
             preconditionsData.Close();
 
-            var jobId = _serverCore.ProcessTransaction(_storeName, preconditionsData.ToString(), deleteData.ToString(), addData.ToString(), Constants.DefaultGraphUri);
+            var jobId = _serverCore.ProcessTransaction(_storeName, preconditionsData.ToString(), deleteData.ToString(), addData.ToString(), UpdateGraphUri);
             var status = _serverCore.GetJobStatus(_storeName, jobId.ToString());
             while (!(status.JobStatus == JobStatus.CompletedOk || status.JobStatus == JobStatus.TransactionError))
             {
@@ -155,6 +154,23 @@ namespace BrightstarDB.Client
         }
 
         #endregion
+
+        private IEnumerable<Triple> GetFilteredResourceStatements(string storeId, string resourceUri)
+        {
+            if (DataSetGraphUris == null)
+            {
+                return _serverCore.GetResourceStatements(storeId, resourceUri);
+            }
+            else
+            {
+                return _serverCore.GetResourceStatements(storeId, resourceUri)
+                                  .Where(t =>
+                                         DataSetGraphUris.Contains(t.Graph) ||
+                                         (_optimisticLockingEnabled && t.Predicate.Equals(Constants.VersionPredicateUri) &&
+                                          t.Graph.Equals(VersionGraphUri)));
+            }
+        }
+
     }
 }
 #endif
