@@ -70,6 +70,8 @@ The following list describes all the available configuration options for Brights
 
   - BrightstarDB.PageCacheSize - specifies the amount of memory in MB to be used by the BrightstarDB store page cache. This setting applies only to applications that open a BrightstarDB store as the cache is used to cache pages of data from the data.bs and resources.bs data files. The default value is 2048 on .NET 4.0 and 4 on Windows Phone 7.1. Note that this memory is not all allocated on startup so actual memory usage by the application may initially be lower than this value.
 
+  - BrightstarDB.ResourceCacheLimit - specifies the number of resource entries to keep cached for each open store. Default values are 1,000,000 on .NET 4.0 and 10,000 on Windows Phone.
+  
   - BrightstarDB.EnableQueryCache - specifies whether or not the application should cache the results of SPARQL queries. Allowed values are "true" or "false" and the setting defaults to "true". Query caching is only available on .NET 4.0 so this setting has no effect on Windows Phone 7.1
 
   - BrightstarDB.QueryCacheDirectory - specifies the folder location where cached results are stored.
@@ -85,8 +87,6 @@ The following list describes all the available configuration options for Brights
   - BrightstarDB.NetNamedPipeName - specifies the name of the pipe used by the BrighstarDB WCF service to listen for incoming named pipe requests. The default value is "brightstar".
 
   - BrightstarDB.PersistenceType - specifies the default type of persistence used for the main BrighstarDB index files. Allowed values are "appendonly" or "rewrite" (values are case-insensitive). For more information about the store persistence types please refer to the section :ref:`Store Persistence Types <Store_Persistence_Types>`.
-
-
 
 
 **********************

@@ -31,7 +31,6 @@ moment to read about Running the BrightstarDB Samples first.
 
 
 .. toctree::
-    :hidden:
     
     Developer Quick Start <Developer_Quick_Start>
     Connection Strings <Connection_Strings>
