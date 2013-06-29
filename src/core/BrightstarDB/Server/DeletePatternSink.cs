@@ -55,7 +55,7 @@ namespace BrightstarDB.Server
 
             if (wildCards)
             {
-                var triples = _store.Match(s, p, o, graph: g).ToList();
+                var triples = _store.Match(s, p, o, isLiteral, dataType, langCode, g).ToList();
                 foreach (var t in triples)
                 {
                     _store.DeleteTriple(t);

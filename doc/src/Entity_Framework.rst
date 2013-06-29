@@ -970,3 +970,39 @@ context's you create - these handlers are intended only for tracking changes mad
 properties in the context before a ``SaveChanges()`` is invoked. The properties are also useful 
 for data binding in applications where you want the user interface to update as the properties 
 are modified.
+
+Graph Targeting
+===============
+
+The Entity Framwork supports updating a specific named graph in the BrightstarDB store.
+The graph to be updated is specified when creating the context object using the following
+optional parameters in the context constructor:
+
+  * ``updateGraph`` : The identifier of the graph that new statements will be added to. Defaults to the BrightstarDB default graph (``http://www.brightstardb.com/.well-known/model/defaultgraph``)
+  * ``defaultDataSet`` : The identifier of the graphs that statements will be retrieved from. Defaults to all graphs in the store.
+  * ``versionGraph`` : The identifier of the graph that contains version information for optimistic locking. Defaults to the same graph as ``updateGraph``.
+
+To create a context that reads properties from the default graph and adds properties to a specific graph (e.g. for recording the results of inferences), use the following::
+
+    // Set storeName, prefixes and inferredGraphUri here
+	var context = new MyEntityContext(
+	  connectionString,
+	  enableOptimisticLocking,
+	  "http://example.org/graphs/graphToUpdate",
+	  new string[] { Constants.DefaultGraphUri },
+	  Constants.DefaultGraphUri);
+
+  ..note::
+	Note that you need to be careful when using optimistic locking to ensure that you are 
+	consistent about which graph manages the version information. We recommend that you 
+	either use the BrightstarDB default graph (as shown in the example above)
+	or use another named graph seperate from the graphs that store the rest of the data 
+	(and define a constant for that	graph URI).
+
+  ..note::
+    For LINQ queries to work, the triple that assigns the entity type must be in one of
+	the graphs in the defaultDataSet or in the graph to be updated. This makes the 
+	Entity Framework a bit more difficult to use across multiple graphs. When 
+	writing an application that will regularly deal with different named graphs
+	you may want to consider using the ref:`Data Object Layer API <Data_Object_Layer>`
+	and SPARQL queries for update operations.

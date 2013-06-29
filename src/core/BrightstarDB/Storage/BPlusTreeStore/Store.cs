@@ -679,7 +679,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 .Select(r => new Tuple<ulong, ulong, ulong, int>(sid, pid, oid, r.GraphId));
         }
 
-        private IEnumerable<Tuple<ulong, ulong, ulong, int>> BindSubjectPredicate(ulong sid, ulong pid, IEnumerable<int> graphs)
+        private IEnumerable<Tuple<ulong, ulong, ulong, int>> BindSubjectPredicate(ulong sid, ulong pid, List<int> graphs)
         {
             if (graphs.Any(g => g < 0))
             {
@@ -689,11 +689,14 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     yield return new Tuple<ulong, ulong, ulong, int>(sid, pid, r.ResourceId, r.GraphId);
                 }
             }
-            foreach (var g in graphs)
+            else
             {
-                foreach (var r in _subjectRelatedResourceIndex.EnumerateRelatedResources(sid, pid, g))
+                foreach (var g in graphs)
                 {
-                    yield return new Tuple<ulong, ulong, ulong, int>(sid, pid, r.ResourceId, g);
+                    foreach (var r in _subjectRelatedResourceIndex.EnumerateRelatedResources(sid, pid, g))
+                    {
+                        yield return new Tuple<ulong, ulong, ulong, int>(sid, pid, r.ResourceId, g);
+                    }
                 }
             }
         }
