@@ -1288,12 +1288,103 @@ namespace BrightstarDB.Tests
                     Assert.Fail("Found a statement with an unexpected predicate: {0}", p);
                 }
             }
+
         }
 
-        private static IDataObjectContext MakeDataObjectContext()
+        [TestMethod]
+        public void TestDeleteObjectFromGraph()
         {
-            return new EmbeddedDataObjectContext(
-                new ConnectionString("type=embedded;storesDirectory="+ Configuration.StoreLocation + "\\"));
+            IDataObjectContext context = MakeDataObjectContext();
+            var storeName = "TestDeleteObjectFromGraph_" + DateTime.Now.Ticks;
+
+            var prefixes = new Dictionary<string, string>
+            {
+                {"foaf", "http://xmlns.com/foaf/0.1/"},
+                {"resource", "http://example.org/resource/"}
+            };
+
+            // Create an object with some properties in the default graph
+            var store1 = context.CreateStore(storeName, prefixes);
+            var baseDataObject = store1.MakeDataObject("resource:Alice");
+            baseDataObject.SetProperty("foaf:name", "Alice Test");
+            baseDataObject.SetProperty("foaf:mbox", "alice@example.org");
+            store1.SaveChanges();
+
+            // Add a new property in a separate graph
+            var graph1 = "http://example.org/graphs/graph1";
+            var store2 = context.OpenStore(storeName, prefixes, updateGraph: graph1);
+            var updateDataObject = store2.GetDataObject("resource:Alice");
+            Assert.IsNotNull(updateDataObject);
+            updateDataObject.SetProperty("foaf:mbox_sha1", "ABCD1234");
+            store2.SaveChanges();
+
+            // Check access to properties in both graphs then delete the object from one of the graphs
+            var store3 = context.OpenStore(storeName, prefixes, updateGraph: graph1);
+            updateDataObject = store3.GetDataObject("resource:Alice");
+            Assert.IsNotNull(updateDataObject);
+            Assert.AreEqual("ABCD1234", updateDataObject.GetPropertyValue("foaf:mbox_sha1").ToString());
+            Assert.AreEqual("Alice Test", updateDataObject.GetPropertyValue("foaf:name").ToString());
+            Assert.AreEqual("alice@example.org", updateDataObject.GetPropertyValue("foaf:mbox").ToString());
+            updateDataObject.Delete();
+            store3.SaveChanges();
+
+            // Check that the object and properties are still accessible through the default graph
+            var store4 = context.OpenStore(storeName, prefixes, updateGraph: graph1);
+            updateDataObject = store4.GetDataObject("resource:Alice");
+            Assert.IsNotNull(updateDataObject);
+            Assert.AreEqual("Alice Test", updateDataObject.GetPropertyValue("foaf:name").ToString());
+            Assert.AreEqual("alice@example.org", updateDataObject.GetPropertyValue("foaf:mbox").ToString());
+            
+        }
+
+        [TestMethod]
+        public void TestVersioningGraph()
+        {
+            var context = MakeDataObjectContext(true);
+            var storeName = "TestVersioningGraph_" + DateTime.Now.Ticks;
+            const string versionGraph = "http://example.org/graphs/versioning";
+
+            var store1 = context.CreateStore(storeName, versionTrackingGraph:versionGraph);
+            var store1Alice = store1.MakeDataObject("http://example.org/alice");
+            store1Alice.SetProperty("http://example.org/age", 21);
+            store1.SaveChanges();
+
+            var store2 = context.OpenStore(storeName, versionTrackingGraph:versionGraph);
+            var store2Alice = store2.GetDataObject("http://example.org/alice");
+            store2Alice.SetProperty("http://example.org/age", 22);
+            store2.SaveChanges();
+
+            store1Alice.SetProperty("http://example.org/age", 20);
+            try
+            {
+                store1.SaveChanges();
+                Assert.Fail("Expected a TransactionPreconditionsFailed exception");
+            }
+            catch (TransactionPreconditionsFailedException ex)
+            {
+                // Expected
+                Assert.AreEqual(1, ex.InvalidSubjects.Count());
+                Assert.AreEqual("http://example.org/alice", ex.InvalidSubjects.First());
+            }
+
+            // Check that the versioning info has been managed in the correct graph
+            var client = MakeRdfClient();
+            var resultsStream = client.ExecuteQuery(storeName, "SELECT ?s ?p ?o FROM <" + versionGraph + "> WHERE { ?s ?p ?o }");
+            var results = XDocument.Load(resultsStream);
+            var rows = results.SparqlResultRows().ToList();
+            Assert.AreEqual(1, rows.Count);
+            var row = rows[0];
+            Assert.AreEqual("http://example.org/alice", row.GetColumnValue("s").ToString());
+            Assert.AreEqual(Constants.VersionPredicateUri, row.GetColumnValue("p").ToString());
+            Assert.AreEqual(2, row.GetColumnValue("o"));
+        }
+
+        private static IDataObjectContext MakeDataObjectContext(bool optimisticLockingEnabled = false)
+        {
+            var connectionString = "type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\";
+            if (optimisticLockingEnabled) connectionString += ";optimisticLocking=true";
+
+            return new EmbeddedDataObjectContext(new ConnectionString(connectionString));
         }
 
         private static IBrightstarService MakeRdfClient()
