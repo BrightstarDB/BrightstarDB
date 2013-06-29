@@ -1089,7 +1089,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [ExpectedException(typeof(TransactionPreconditionsFailedException))]
         public void TestOptimisticLocking()
         {
-            var storeName = Guid.NewGuid().ToString();
+            var storeName = "TestOptimisticLocking_" + DateTime.Now.Ticks;
             var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName, true);
             var person = context.Persons.Create();
             context.SaveChanges();

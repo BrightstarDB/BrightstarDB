@@ -13,6 +13,21 @@ namespace BrightstarDB.Client
         bool BindDataObject(DataObject dataObject);
 
         /// <summary>
+        /// The URI identifier of the graph to be updated
+        /// </summary>
+        string UpdateGraphUri { get; }
+
+        /// <summary>
+        /// The URI identifiers of the graphs that contribute properties
+        /// </summary>
+        string[] DataSetGraphUris { get; } 
+
+        /// <summary>
+        /// The URI identifier of the graph that stores data object version numbers
+        /// </summary>
+        string VersionGraphUri { get; }
+
+        /// <summary>
         /// The current transaction delete patterns
         /// </summary>
         List<Triple> DeletePatterns { get; }
@@ -31,5 +46,6 @@ namespace BrightstarDB.Client
         /// <param name="pred">The predicate resource</param>
         /// <returns>An enumeration of all matching subject resources</returns>
         IEnumerable<IDataObject> GetInverseOf(IDataObject obj, IDataObject pred);
+
     }
 }
