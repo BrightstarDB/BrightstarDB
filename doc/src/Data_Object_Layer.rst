@@ -216,6 +216,8 @@ the results to a data object, and passes back the enumeration of these instances
       Console.WriteLine("Skill is " + s.Identity);
   }
 
+.. _optimistic_locking_in_dol:
+
 Optimistic Locking in the Data Object Layer
 ===========================================
 
