@@ -221,14 +221,17 @@ Optimistic Locking in the Data Object Layer
 
 The Data Object Layer provides a basic level of optimistic locking support using the 
 conditional update support provided by the RDF Client API and a special version property that 
-gets assigned to data objects. Optimistic locking is enabled in one of two ways:
+gets assigned to data objects. Optimistic locking is enabled in one of two ways. The
+first option is to enable optimistic locking in the connection string used to create the 
+``IDataObjectContext``::
 
-  1. By enabling optimistic locking in the connection string used to create the ``IDataObjectContext``::
-     var context = BrightstarService.GetDataObjectContext(
-	              "type=http;endpoint=http://localhost:8090/brightstar;optimisticLocking=true");
-  2. By enabling optimistic locking in the ``OpenStore()`` or ``CreateStore()`` method used to 
-     retrieve the IDataObjectStore instance from the IDataObjectContext::
-	 var store = context.OpenStore("MyStore", optimisticLockingEnabled:true);
+    var context = BrightstarService.GetDataObjectContext(
+                      "type=http;endpoint=http://localhost:8090/brightstar;optimisticLocking=true");
+
+The other option is to enable optimistic locking in the ``OpenStore()`` or ``CreateStore()`` method used to 
+retrieve the IDataObjectStore instance from the IDataObjectContext::
+ 
+    var store = context.OpenStore("MyStore", optimisticLockingEnabled:true);
 
 .. note::
   The optimisticLockingEnabled parameter of ``OpenStore()`` and ``CreateStore()`` is optional.
