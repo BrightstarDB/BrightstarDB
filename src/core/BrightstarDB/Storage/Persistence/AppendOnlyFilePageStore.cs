@@ -76,7 +76,6 @@ namespace BrightstarDB.Storage.Persistence
                 if (args.PageId > _newPageOffset)
                 {
                     // Evicting a writeable page - add the page to the background write queue to ensure it gets written out.
-                    // Note: the background page writer will hold on to the page data until it is written
                     if (_backgroundPageWriter == null)
                     {
                         // Do not evict this page
@@ -91,9 +90,12 @@ namespace BrightstarDB.Storage.Persistence
                         var pageToEvict = _newPages[(int) (args.PageId - _newPageOffset)];
                         if (pageToEvict.IsAlive)
                         {
+                            // Passing 0 for the transaction id is OK because it is not used for writing append-only pages
                             _backgroundPageWriter.QueueWrite(pageToEvict.Target as IPage, 0ul);
                         }
-                        // Passing 0 for the transaction id is OK because it is not used for writing append-only pages
+                        // Once the page write is queued, the cache entry can be evicted.
+                        // The background page writer will hold on to the page data object until it is written
+                        args.CancelEviction = false;
                     }
                 }
             }

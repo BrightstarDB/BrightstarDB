@@ -362,6 +362,7 @@
     <Compile Include="Storage\Persistence\BlockProviderStream.cs" />
     <Compile Include="Storage\Persistence\CachingBlockProvider.cs" />
     <Compile Include="Storage\Persistence\CircularBufferPageCache.cs" />
+    <Compile Include="Storage\Persistence\EvictionEventArgs.cs" />
     <Compile Include="Storage\Persistence\FilePage.cs" />
     <Compile Include="Storage\Persistence\FilePersistenceManager.cs" />
     <Compile Include="Storage\Persistence\IBlockInfo.cs" />
