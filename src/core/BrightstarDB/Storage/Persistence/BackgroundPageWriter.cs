@@ -11,7 +11,7 @@ namespace BrightstarDB.Storage.Persistence
         private readonly ConcurrentQueue<WriteTask> _writeTasks;
         private bool _shutdownRequested;
         private bool _stopRequested;
-        private readonly AutoResetEvent _taskAdded;
+        //private readonly AutoResetEvent _taskAdded;
         private readonly Dictionary<ulong, long> _writeTimestamps;
         private readonly Thread _writerThread;
         private readonly Stream _outputStream;
@@ -22,7 +22,7 @@ namespace BrightstarDB.Storage.Persistence
             _writeTasks = new ConcurrentQueue<WriteTask>();
             _shutdownRequested = false;
             _stopRequested = false;
-            _taskAdded = new AutoResetEvent(false);
+            //_taskAdded = new AutoResetEvent(false);
             _writeTimestamps = new Dictionary<ulong, long>();
             _writerThread = new Thread(Run);
             _writerThread.Start();
@@ -32,7 +32,7 @@ namespace BrightstarDB.Storage.Persistence
         {
             if (_writerThread.IsAlive)
             {
-                _taskAdded.Set();
+                //_taskAdded.Set();
                 _shutdownRequested = true;
                 _writerThread.Join();
             }
@@ -53,7 +53,7 @@ namespace BrightstarDB.Storage.Persistence
             Logging.LogDebug("Queue {0}", pageToWrite.Id);
 #endif
             _writeTasks.Enqueue(new WriteTask{PageToWrite = pageToWrite, TransactionId = transactionId});
-            _taskAdded.Set();
+            //_taskAdded.Set();
         }
 
         public void Flush()
@@ -106,7 +106,9 @@ namespace BrightstarDB.Storage.Persistence
                         Logging.LogInfo("Stop requested and no further pages left to write.");
                         return;
                     }
-                    _taskAdded.WaitOne(3000);
+                    //_taskAdded.WaitOne(3000);
+                    // Instead of waiting on a event, just spin wait
+                    Thread.Sleep(0);
                 }
             }
         }
