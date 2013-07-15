@@ -35,7 +35,8 @@ namespace BrightstarDB.Tests.EntityFramework
         [DataType(DataType.Date)]
         DateTime? BirthDate { get; set; }
 
-        
+        [PropertyType("http://xmlns.com/foaf/0.1/homepage")]
+        Uri Homepage { get; set; }
     }
 
     public class MyCustomValidator

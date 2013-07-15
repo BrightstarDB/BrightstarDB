@@ -1261,5 +1261,54 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual("Person", displayAttribute.DisplayName);
         }
 
+        [TestMethod]
+        public void TestSingleUriProperty()
+        {
+            var storeName = "TestSingleUriProperty_" + DateTime.Now.Ticks;
+            var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName);
+
+            var person = context.FoafPersons.Create();
+            person.Name = "Kal Ahmed";
+            person.Homepage = new Uri("http://www.techquila.com/");
+            context.SaveChanges();
+
+            context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName);
+            var retrieved = context.FoafPersons.FirstOrDefault(p => p.Id.Equals(person.Id));
+            Assert.IsNotNull(retrieved);
+            Assert.AreEqual("Kal Ahmed", retrieved.Name);
+            Assert.AreEqual(new Uri("http://www.techquila.com/"), retrieved.Homepage);
+        }
+
+        [TestMethod]
+        public void TestUriCollectionProperty()
+        {
+            var storeName = "TestUriCollectionProperty_" + DateTime.Now.Ticks;
+            var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName);
+
+            var person = context.Persons.Create();
+            person.Name = "Kal Ahmed";
+            person.Websites.Add(new Uri("http://www.techquila.com/"));
+            person.Websites.Add(new Uri("http://brightstardb.com/"));
+            person.Websites.Add(new Uri("http://www.networkedplanet.com/"));
+            context.SaveChanges();
+
+            context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName);
+            var retrieved = context.Persons.FirstOrDefault(p => p.Id.Equals(person.Id));
+            Assert.IsNotNull(retrieved);
+            Assert.AreEqual("Kal Ahmed", retrieved.Name);
+            Assert.AreEqual(3, retrieved.Websites.Count);
+            Assert.IsTrue(retrieved.Websites.Any(w=>w.Equals(new Uri("http://www.techquila.com/"))));
+            retrieved.Websites.Remove(new Uri("http://www.techquila.com/"));
+            context.SaveChanges();
+
+            context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName);
+            retrieved = context.Persons.FirstOrDefault(p => p.Id.Equals(person.Id));
+            Assert.IsNotNull(retrieved);
+            Assert.AreEqual("Kal Ahmed", retrieved.Name);
+            Assert.AreEqual(2, retrieved.Websites.Count);
+            Assert.IsFalse(retrieved.Websites.Any(w => w.Equals(new Uri("http://www.techquila.com/"))));
+            Assert.IsTrue(retrieved.Websites.Contains(new Uri("http://brightstardb.com/")));
+
+        }
     }
 }

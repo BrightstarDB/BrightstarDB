@@ -27,5 +27,7 @@ namespace BrightstarDB.Tests.EntityFramework
         int EmployeeId { get; set; }
 
         IJobRole JobRole { get; set; }
+
+        ICollection<Uri> Websites { get; set; } 
     }
 }

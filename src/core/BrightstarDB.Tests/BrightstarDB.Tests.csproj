@@ -107,9 +107,10 @@
     <Compile Include="EntityFramework\IPerson.cs" />
     <Compile Include="EntityFramework\ISkill.cs" />
     <Compile Include="EntityFramework\MyEntityContext.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>MyEntityContext.tt</DependentUpon>
+      <SubType>Code</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="EntityFramework\OptimisticLockingTestsBase.cs" />
     <Compile Include="EntityFramework\PropertyChangeNotificationTests.cs" />

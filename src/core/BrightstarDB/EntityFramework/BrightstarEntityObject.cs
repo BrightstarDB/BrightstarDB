@@ -249,6 +249,12 @@ namespace BrightstarDB.EntityFramework
                            ? (T)Enum.ToObject(typeof(T), DataObject.GetPropertyValue(propertyType))
                            : default(T);
             }
+            if (typeof (T) == typeof (Uri))
+            {
+                var value = DataObject.GetPropertyValue(propertyType) as IDataObject;
+                object ret = value == null ? null : new Uri(value.Identity);
+                return (T) ret;
+            }
             if (typeof(T).IsNullable() && typeof(T).GetGenericArguments()[0].IsEnum)
             {
                 var enumType = typeof (T).GetGenericArguments()[0];

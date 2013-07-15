@@ -812,6 +812,12 @@ namespace BrightstarDB.Tests.EntityFramework
             		get { return GetRelatedProperty<System.Nullable<System.DateTime>>("BirthDate"); }
             		set { SetRelatedProperty("BirthDate", value); }
     	}
+    
+    	public System.Uri Homepage
+    	{
+            		get { return GetRelatedProperty<System.Uri>("Homepage"); }
+            		set { SetRelatedProperty("Homepage", value); }
+    	}
     	#endregion
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IFoafAgent
     	public System.Collections.Generic.ICollection<System.String> MboxSums
@@ -994,6 +1000,11 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
             get { return GetRelatedObject<BrightstarDB.Tests.EntityFramework.IJobRole>("JobRole"); }
             set { SetRelatedObject<BrightstarDB.Tests.EntityFramework.IJobRole>("JobRole", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.Uri> Websites
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.Uri>("Websites"); }
+    		set { SetRelatedLiteralPropertiesCollection<System.Uri>("Websites", value); }
     	}
     	#endregion
     }

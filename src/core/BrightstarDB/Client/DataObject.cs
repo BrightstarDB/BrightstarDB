@@ -156,6 +156,7 @@ namespace BrightstarDB.Client
         public IDataObject SetProperty(IDataObject type, object value, string langCode = null)
         {
             if (value is IDataObject) return SetRelatedObject(type, value as IDataObject);
+            if (value is Uri) return SetRelatedObject(type, _store.MakeDataObject(value.ToString()));
             if (type == null) throw new ArgumentNullException("type");
             if (value == null) throw new ArgumentNullException("value");
             string dataType = RdfDatatypes.GetRdfDatatype(value.GetType());
@@ -190,6 +191,10 @@ namespace BrightstarDB.Client
             if (value is IDataObject)
             {
                 AddDataObjectProperty(type, value as IDataObject);
+            }
+            else if (value is Uri)
+            {
+                AddDataObjectProperty(type, _store.MakeDataObject(value.ToString()));
             }
             else
             {
@@ -242,6 +247,10 @@ namespace BrightstarDB.Client
             if (value is IDataObject)
             {
                 RemoveDataObjectProperty(type, value as IDataObject);
+            }
+            else if (value is Uri)
+            {
+                RemoveDataObjectProperty(type, _store.MakeDataObject(value.ToString()));
             }
             else
             {
