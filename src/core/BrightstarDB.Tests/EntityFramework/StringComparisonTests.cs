@@ -8,10 +8,9 @@ namespace BrightstarDB.Tests.EntityFramework
     [TestClass]
     public class StringComparisonTests
     {
-        private static MyEntityContext _context;
+        private readonly MyEntityContext _context;
 
-        [ClassInitialize]
-        public static void SetUp(TestContext context)
+        public StringComparisonTests()
         {
             _context = new MyEntityContext("type=embedded;storesDirectory=" + Configuration.StoreLocation + ";storeName=EFStringComparisonTests_" + DateTime.Now.Ticks);
             var np = new Company {Name = "NetworkedPlanet"};
