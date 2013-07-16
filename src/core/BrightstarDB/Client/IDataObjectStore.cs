@@ -8,7 +8,7 @@ namespace BrightstarDB.Client
     /// The interface for accessing and updating data in a Brightstar store using the 
     /// data object abstraction.
     /// </summary>
-    public interface IDataObjectStore
+    public interface IDataObjectStore : IDisposable
     {
         /// <summary>
         /// Occurs when changes are being saved to the Brightstar store

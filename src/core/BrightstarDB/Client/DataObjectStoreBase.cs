@@ -45,6 +45,8 @@ namespace BrightstarDB.Client
         private const string InverseOfSparql = "SELECT ?s WHERE {{ ?s <{0}> <{1}> }}";
         private static readonly string GetVersionSparql = "SELECT ?v WHERE {{ <{0}> <" + Constants.VersionPredicateUri + "> ?v }}";
 
+        private bool _disposed;
+
         /// <summary>
         /// Creates a new instance
         /// </summary>
@@ -351,6 +353,32 @@ namespace BrightstarDB.Client
             dataObject.SetProperty(Constants.VersionPredicateUri, value);
         }
 
+        ~DataObjectStoreBase()
+        {
+            Dispose(false);
+        }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    Cleanup();
+                }
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// This method is invoked when the store is being disposed.
+        /// </summary>
+        protected abstract void Cleanup();
     }
 }

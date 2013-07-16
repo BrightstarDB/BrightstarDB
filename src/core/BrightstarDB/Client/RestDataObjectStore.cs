@@ -28,5 +28,10 @@ namespace BrightstarDB.Client
         }
 
         #endregion
+
+        protected override void Cleanup()
+        {
+            // Nothing to clean up
+        }
     }
 }

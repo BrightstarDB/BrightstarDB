@@ -212,5 +212,10 @@ namespace BrightstarDB.Client
                 yield return triple;
             }
         }
+
+        protected override void Cleanup()
+        {
+            // Nothing to cleanup
+        }
     }
 }

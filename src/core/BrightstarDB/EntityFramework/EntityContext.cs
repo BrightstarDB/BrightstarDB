@@ -11,12 +11,14 @@ namespace BrightstarDB.EntityFramework
     /// <summary>
     /// The base class for an EntityFramework context
     /// </summary>
-    public abstract class EntityContext
+    public abstract class EntityContext : IDisposable
     {
         /// <summary>
         /// Gets the <see cref="EntityMappingStore"/> for this entity context
         /// </summary>
         public EntityMappingStore Mappings { get; private set; }
+
+        private bool _disposed;
 
         /// <summary>
         /// Constructor for an EntityContext object
@@ -174,5 +176,43 @@ namespace BrightstarDB.EntityFramework
         /// <returns>The RDF datatype URI for the specified system type</returns>
         /// <exception cref="ArgumentException">Raised of <paramref name="systemType"/> is not mapped to any RDF datatype known to this entity context</exception>
         public abstract string GetDatatype(Type systemType);
+
+        #region Partial implementation of IDisposable
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        internal void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    Cleanup();
+                }
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// This method is invoked when the entity context is being disposed.
+        /// </summary>
+        protected abstract void Cleanup();
+
+        /// <summary>
+        /// Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
+        /// </summary>
+        ~EntityContext()
+        {
+            Dispose(false);
+        }
+        #endregion
     }
 }

@@ -63,6 +63,11 @@ namespace BrightstarDB.Client
             return dataObject.BindTriples(triples);
         }
 
+        protected override void Cleanup()
+        {
+            _serverCore.Shutdown(true);
+        }
+
         /// <summary>
         /// Commits all changes. Waits for the operation to complete.
         /// </summary>

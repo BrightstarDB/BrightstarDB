@@ -113,6 +113,11 @@ namespace BrightstarDB.EntityFramework.Tests
             return null;
         }
 
+        protected override void Cleanup()
+        {
+            // Nothing to clean up
+        }
+
         #endregion
 
         public IQueryable<IDinner> Dinners { get { return new MockLdoSet<IDinner>(this); } }

@@ -472,6 +472,14 @@ namespace BrightstarDB.EntityFramework
             return RdfDatatypes.GetRdfDatatype(systemType);
         }
 
+        /// <summary>
+        /// This method is invoked when the entity context is being disposed.
+        /// </summary>
+        protected override void Cleanup()
+        {
+            _store.Dispose();
+        }
+
         #endregion
 
         ///<summary>
