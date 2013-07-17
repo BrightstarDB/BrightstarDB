@@ -344,20 +344,23 @@ namespace BrightstarDB.Server
 
         private void ReleaseResources()
         {
-            // close file handles
-            if (_readStore != null)
+            lock (this)
             {
-                _readStore.Close();
-                _readStore.Dispose();
-                _readStore = null;
-            }
+                // close read and write stores
+                if (_readStore != null)
+                {
+                    _readStore.Close();
+                    _readStore.Dispose();
+                    _readStore = null;
+                }
 
-            if (_writeStore != null)
-            {
-                _writeStore.Close();
-                _writeStore.Dispose();
-                _writeStore = null;
-            }            
+                if (_writeStore != null)
+                {
+                    _writeStore.Close();
+                    _writeStore.Dispose();
+                    _writeStore = null;
+                }
+            }
         }
 
         public void Shutdown(bool completeJobs, ShutdownContinuation c = null)
