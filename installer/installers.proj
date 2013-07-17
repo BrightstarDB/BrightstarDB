@@ -106,7 +106,7 @@
 			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe"/>
 	  <ServiceExe Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.config"
 			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe.config"/>
-      <Docs Include="..\doc\build\BrightstarDB_API.chm"/>
+      <Docs Include="..\doc\build\api\BrightstarDB_API.chm"/>
       <VisualStudio Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.vsi"/>
       <Root Include="PackageFiles\README.txt;PackageFiles\EULA.rtf;PackageFiles\NOTICE.txt"/>
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.zip"/>
