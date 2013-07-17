@@ -20,7 +20,7 @@
 	</Target>
 
 	<Target Name="Server">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Server Tests" /testsettings:local.testsettings /resultsfile:server.trx' />
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"ServerTests" /testsettings:local.testsettings /resultsfile:server.trx' />
 	</Target>
     
 	<Target Name="OData">
