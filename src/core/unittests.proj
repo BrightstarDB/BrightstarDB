@@ -16,12 +16,13 @@
 	</Target>
 
 	<Target Name="Client">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Client Tests" /testsettings:local.testsettings /resultsfile:bplus.trx' />
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Client Tests" /testsettings:local.testsettings /resultsfile:client.trx' />
 	</Target>
 
 	<Target Name="Server">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Server Tests" /testsettings:local.testsettings /resultsfile:bplus.trx' />
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Server Tests" /testsettings:local.testsettings /resultsfile:server.trx' />
 	</Target>
+    
 	<Target Name="OData">
 		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"OData Tests" /testsettings:local.testsettings /resultsfile:odata.trx' />
 	</Target>
@@ -41,7 +42,7 @@
 	</Target>
 	
 	<Target Name="Performance" DependsOnTargets="CleanResults">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Client Scaling Tests" /testlist:"Scaling Tests" /testsettings:local.testsettings /resultsfile:testresults.trx' />
+		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Client Scaling Tests" /testlist:"Scaling Tests" /testsettings:local.testsettings /resultsfile:performance.trx' />
 	</Target>
 	
 	<UsingTask TaskName="SparqlTestGenerator" AssemblyFile="../tools/SparqlTestTasks/SparqlTestTasks/bin/Debug/SparqlTestTasks.dll" />
