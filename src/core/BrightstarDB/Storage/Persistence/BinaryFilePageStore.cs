@@ -275,13 +275,19 @@ namespace BrightstarDB.Storage.Persistence
         /// </summary>
         public void Close()
         {
-            _inputStream.Close();
-            _inputStream = null;
-            if (_outputStream != null)
+            lock (this)
             {
-                _outputStream.Flush();
-                _outputStream.Close();
-                _outputStream = null;
+                if (_inputStream != null)
+                {
+                    _inputStream.Close();
+                    _inputStream = null;
+                }
+                if (_outputStream != null)
+                {
+                    _outputStream.Flush();
+                    _outputStream.Close();
+                    _outputStream = null;
+                }
             }
         }
 

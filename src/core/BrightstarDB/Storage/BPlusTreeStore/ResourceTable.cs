@@ -160,7 +160,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             {
                 if (!_disposed)
                 {
-                    _pageStore.Dispose();
+                    _pageStore.Close();
                     _disposed = true;
                 }
             }

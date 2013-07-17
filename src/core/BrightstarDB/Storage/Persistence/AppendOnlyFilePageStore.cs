@@ -276,15 +276,18 @@ namespace BrightstarDB.Storage.Persistence
         /// </summary>
         public void Close()
         {
-            if (_stream != null)
+            lock (this)
             {
-                _stream.Close();
-            }
-            if (_backgroundPageWriter != null)
-            {
-                _backgroundPageWriter.Shutdown();
-                _backgroundPageWriter.Dispose();
-                _backgroundPageWriter = null;
+                if (_stream != null)
+                {
+                    _stream.Close();
+                }
+                if (_backgroundPageWriter != null)
+                {
+                    _backgroundPageWriter.Shutdown();
+                    _backgroundPageWriter.Dispose();
+                    _backgroundPageWriter = null;
+                }
             }
         }
 
