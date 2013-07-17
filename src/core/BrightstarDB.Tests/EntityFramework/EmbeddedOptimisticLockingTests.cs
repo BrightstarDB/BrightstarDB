@@ -1,4 +1,5 @@
 ﻿using System;
+using BrightstarDB.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BrightstarDB.Tests.EntityFramework

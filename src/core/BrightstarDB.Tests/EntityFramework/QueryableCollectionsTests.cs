@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
 using System.Linq;
-using BrightstarDB.EntityFramework;
+using BrightstarDB.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
     [TestClass]
-    public class QueryableCollectionsTests
+    public class QueryableCollectionsTests : IDisposable
     {
         private const string ConnectionString = "type=embedded;StoresDirectory=c:\\brightstar;";
 
@@ -44,7 +42,7 @@ namespace BrightstarDB.Tests.EntityFramework
             _dept.Persons.Add(bert);
             _context.SaveChanges();
         }
-        
+
         [TestMethod]
         public void TestSimpleCollectionFilter()
         {
@@ -68,6 +66,11 @@ namespace BrightstarDB.Tests.EntityFramework
             var popularSkills = andy.Skills.Where(s => s.SkilledPeople.Count > 1).ToList();
             Assert.AreEqual(1, popularSkills.Count);
             Assert.AreEqual("Painting", popularSkills.First().Name);
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
         }
     }
 }

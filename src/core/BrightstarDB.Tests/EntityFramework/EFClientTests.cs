@@ -33,21 +33,26 @@ namespace BrightstarDB.Tests.EntityFramework
             embeddedClient.ExecuteTransaction(storeName,null, null, triples.ToString());
 
             //check EF can access all properties
-            var context = new MyEntityContext(string.Format(@"type=embedded;storesDirectory=c:\\brightstar;storeName={0}", storeName));
+            using (
+                var context =
+                    new MyEntityContext(string.Format(@"type=embedded;storesDirectory=c:\\brightstar;storeName={0}",
+                                                      storeName)))
+            {
 
-            Assert.IsNotNull(context.FoafPersons);
-            Assert.AreEqual(1, context.FoafPersons.Count());
-            var person = context.FoafPersons.FirstOrDefault();
-            Assert.IsNotNull(person);
+                Assert.IsNotNull(context.FoafPersons);
+                Assert.AreEqual(1, context.FoafPersons.Count());
+                var person = context.FoafPersons.FirstOrDefault();
+                Assert.IsNotNull(person);
 
-            Assert.IsNotNull(person.Id);
-            Assert.AreEqual("j.williams", person.Id);
-            Assert.IsNotNull(person.Name);
-            Assert.AreEqual("Jen Williams", person.Name);
-            Assert.IsNotNull(person.Nickname);
-            Assert.AreEqual("Jen", person.Nickname);
-            Assert.IsNotNull(person.Organisation);
-            Assert.AreEqual("Networked Planet", person.Organisation);
+                Assert.IsNotNull(person.Id);
+                Assert.AreEqual("j.williams", person.Id);
+                Assert.IsNotNull(person.Name);
+                Assert.AreEqual("Jen Williams", person.Name);
+                Assert.IsNotNull(person.Nickname);
+                Assert.AreEqual("Jen", person.Nickname);
+                Assert.IsNotNull(person.Organisation);
+                Assert.AreEqual("Networked Planet", person.Organisation);
+            }
         }
 
         [TestMethod]
@@ -68,18 +73,23 @@ namespace BrightstarDB.Tests.EntityFramework
             embeddedClient.ExecuteTransaction(storeName, null, null, triples.ToString());
 
             //check EF can access all properties
-            var context = new MyEntityContext(string.Format(@"type=embedded;storesDirectory=c:\\brightstar;storeName={0}", storeName));
+            using (
+                var context =
+                    new MyEntityContext(string.Format(@"type=embedded;storesDirectory=c:\\brightstar;storeName={0}",
+                                                      storeName)))
+            {
 
-            Assert.IsNotNull(context.FoafPersons);
-            Assert.AreEqual(1, context.FoafPersons.Count());
-            var person = context.FoafPersons.FirstOrDefault();
-            Assert.IsNotNull(person);
+                Assert.IsNotNull(context.FoafPersons);
+                Assert.AreEqual(1, context.FoafPersons.Count());
+                var person = context.FoafPersons.FirstOrDefault();
+                Assert.IsNotNull(person);
 
-            Assert.IsNotNull(person.Id);
-            Assert.AreEqual("j.williams", person.Id);
-            Assert.IsNotNull(person.Name);
-            Assert.AreEqual("Jen Williams", person.Name);
-            Assert.IsNotNull(person.BirthDate);
+                Assert.IsNotNull(person.Id);
+                Assert.AreEqual("j.williams", person.Id);
+                Assert.IsNotNull(person.Name);
+                Assert.AreEqual("Jen Williams", person.Name);
+                Assert.IsNotNull(person.BirthDate);
+            }
         }
 
         //[TestMethod]
@@ -131,21 +141,26 @@ namespace BrightstarDB.Tests.EntityFramework
             httpClient.ExecuteTransaction(storeName,null, null, triples.ToString());
 
             //check EF can access all properties
-            var context = new MyEntityContext(string.Format(@"type=http;endpoint=http://localhost:8090/brightstar;storeName={0}", storeName));
+            using (
+                var context =
+                    new MyEntityContext(
+                        string.Format(@"type=http;endpoint=http://localhost:8090/brightstar;storeName={0}", storeName)))
+            {
 
-            Assert.IsNotNull(context.FoafPersons);
-            Assert.AreEqual(1, context.FoafPersons.Count());
-            var person = context.FoafPersons.FirstOrDefault();
-            Assert.IsNotNull(person);
+                Assert.IsNotNull(context.FoafPersons);
+                Assert.AreEqual(1, context.FoafPersons.Count());
+                var person = context.FoafPersons.FirstOrDefault();
+                Assert.IsNotNull(person);
 
-            Assert.IsNotNull(person.Id);
-            Assert.AreEqual("j.williams", person.Id);
-            Assert.IsNotNull(person.Name);
-            Assert.AreEqual("Jen Williams", person.Name);
-            Assert.IsNotNull(person.Nickname);
-            Assert.AreEqual("Jen", person.Nickname);
-            Assert.IsNotNull(person.Organisation);
-            Assert.AreEqual("Networked Planet", person.Organisation);
+                Assert.IsNotNull(person.Id);
+                Assert.AreEqual("j.williams", person.Id);
+                Assert.IsNotNull(person.Name);
+                Assert.AreEqual("Jen Williams", person.Name);
+                Assert.IsNotNull(person.Nickname);
+                Assert.AreEqual("Jen", person.Nickname);
+                Assert.IsNotNull(person.Organisation);
+                Assert.AreEqual("Networked Planet", person.Organisation);
+            }
         }
     }
 }

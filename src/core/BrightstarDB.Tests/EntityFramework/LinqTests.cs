@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BrightstarDB.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BrightstarDB.Tests.EntityFramework

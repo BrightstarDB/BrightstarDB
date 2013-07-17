@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using BrightstarDB.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
     [TestClass]
-    public class StringComparisonTests
+    public class StringComparisonTests : IDisposable
     {
         private readonly MyEntityContext _context;
 
@@ -118,6 +119,11 @@ namespace BrightstarDB.Tests.EntityFramework
             results = _context.Companies.Where(c => c.Name.Length<10).ToList();
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("Apple", results[0].Name);
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
         }
     }
 }

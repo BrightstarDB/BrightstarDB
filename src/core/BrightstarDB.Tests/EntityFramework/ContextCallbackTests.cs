@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -22,78 +23,86 @@ namespace BrightstarDB.Tests.EntityFramework
         [TestMethod]
         public void TestSavingCallbackCalled()
         {
-            var context = new MyEntityContext(_connectionString);
-            _changedItems.Clear();
-            context.SavingChanges += LogChangedItems;
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                _changedItems.Clear();
+                context.SavingChanges += LogChangedItems;
 
-            var alice = new Person {Name = "Alice"};
-            context.Persons.Add(alice);
-            var bob = context.Persons.Create();
-            bob.Name = "Bob";
-            context.SaveChanges();
+                var alice = new Person {Name = "Alice"};
+                context.Persons.Add(alice);
+                var bob = context.Persons.Create();
+                bob.Name = "Bob";
+                context.SaveChanges();
 
-            Assert.AreEqual(2, _changedItems.Count);
-            Assert.IsTrue(_changedItems.Cast<Person>().Any(p=>p.Id.Equals(alice.Id)));
-            Assert.IsTrue(_changedItems.Cast<Person>().Any(p=>p.Id.Equals(bob.Id)));
-            _changedItems.Clear();
+                Assert.AreEqual(2, _changedItems.Count);
+                Assert.IsTrue(_changedItems.Cast<Person>().Any(p => p.Id.Equals(alice.Id)));
+                Assert.IsTrue(_changedItems.Cast<Person>().Any(p => p.Id.Equals(bob.Id)));
+                _changedItems.Clear();
 
-            bob.Friends.Add(alice);
-            context.SaveChanges();
-            Assert.AreEqual(1, _changedItems.Count);
-            Assert.IsTrue(_changedItems.Cast<Person>().Any(p => p.Id.Equals(bob.Id)));
-            _changedItems.Clear();
+                bob.Friends.Add(alice);
+                context.SaveChanges();
+                Assert.AreEqual(1, _changedItems.Count);
+                Assert.IsTrue(_changedItems.Cast<Person>().Any(p => p.Id.Equals(bob.Id)));
+                _changedItems.Clear();
 
-            var skill = new Skill {Name = "Programming"};
-            context.Skills.Add(skill);
-            context.SaveChanges();
-            _changedItems.Clear();
+                var skill = new Skill {Name = "Programming"};
+                context.Skills.Add(skill);
+                context.SaveChanges();
+                _changedItems.Clear();
 
-            skill.SkilledPeople.Add(bob);
-            context.SaveChanges();
-            Assert.AreEqual(1, _changedItems.Count);
-            Assert.IsTrue(_changedItems.Cast<Person>().Any(p => p.Id.Equals(bob.Id)));
-            _changedItems.Clear();
-
+                skill.SkilledPeople.Add(bob);
+                context.SaveChanges();
+                Assert.AreEqual(1, _changedItems.Count);
+                Assert.IsTrue(_changedItems.Cast<Person>().Any(p => p.Id.Equals(bob.Id)));
+                _changedItems.Clear();
+            }
         }
 
         [TestMethod]
         public void TestSaveWorksWhenNoCallback()
         {
-            var context = new MyEntityContext(_connectionString);
-            var carol = new Person { Name = "Carol" };
-            context.Persons.Add(carol);
-            context.SaveChanges();
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                var carol = new Person {Name = "Carol"};
+                context.Persons.Add(carol);
+                context.SaveChanges();
 
-            var found = context.Persons.FirstOrDefault(p => p.Name.Equals("Carol"));
-            Assert.IsNotNull(found);
+                var found = context.Persons.FirstOrDefault(p => p.Name.Equals("Carol"));
+                Assert.IsNotNull(found);
+            }
         }
 
         [TestMethod]
         public void TestSavingChangesUpdatesTimestamp()
         {
-            var context = new MyEntityContext(_connectionString);
-            context.SavingChanges += UpdateTrackable;
-            var article  = context.Articles.Create();
-            article.Title = "My Test Article";
-            DateTime saving = DateTime.Now;
-            context.SaveChanges();
-
-            context = new MyEntityContext(_connectionString);
-            context.SavingChanges += UpdateTrackable;
-            article = context.Articles.FirstOrDefault(a => a.Id.Equals(article.Id));
-            Assert.IsNotNull(article);
-            Assert.IsTrue(article.Created >= saving);
-            Assert.IsTrue(article.LastModified >= saving);
-            article.BodyText = "Some body text";
-            DateTime updating = DateTime.Now;
-            context.SaveChanges();
-
-            context = new MyEntityContext(_connectionString);
-            article = context.Articles.FirstOrDefault(a => a.Id.Equals(article.Id));
-            Assert.IsNotNull(article);
-            Assert.IsTrue(article.Created >= saving);
-            Assert.IsTrue(article.LastModified >= updating);
-
+            IArticle article;
+            DateTime saving, updating;
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                context.SavingChanges += UpdateTrackable;
+                article = context.Articles.Create();
+                article.Title = "My Test Article";
+                saving = DateTime.Now;
+                context.SaveChanges();
+            }
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                context.SavingChanges += UpdateTrackable;
+                article = context.Articles.FirstOrDefault(a => a.Id.Equals(article.Id));
+                Assert.IsNotNull(article);
+                Assert.IsTrue(article.Created >= saving);
+                Assert.IsTrue(article.LastModified >= saving);
+                article.BodyText = "Some body text";
+                updating = DateTime.Now;
+                context.SaveChanges();
+            }
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                article = context.Articles.FirstOrDefault(a => a.Id.Equals(article.Id));
+                Assert.IsNotNull(article);
+                Assert.IsTrue(article.Created >= saving);
+                Assert.IsTrue(article.LastModified >= updating);
+            }
         }
 
         private void UpdateTrackable(object sender, EventArgs e)
@@ -110,20 +119,25 @@ namespace BrightstarDB.Tests.EntityFramework
         [TestMethod]
         public void TestThrowingExceptionAbortsChanges()
         {
-            var context = new MyEntityContext(_connectionString);
-            context.SavingChanges += ThrowOnChange;
-            var dave = new Person {Name = "Dave"};
-            context.Persons.Add(dave);
-            try
+            using (var context = new MyEntityContext(_connectionString))
             {
-                context.SaveChanges();
-            } catch(ApplicationException)
-            {
-                // Expected
+                context.SavingChanges += ThrowOnChange;
+                var dave = new Person {Name = "Dave"};
+                context.Persons.Add(dave);
+                try
+                {
+                    context.SaveChanges();
+                }
+                catch (ApplicationException)
+                {
+                    // Expected
+                }
             }
-            context = new MyEntityContext(_connectionString);
-            var found = context.Persons.FirstOrDefault(p => p.Name.Equals("Dave"));
-            Assert.IsNull(found);
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                var found = context.Persons.FirstOrDefault(p => p.Name.Equals("Dave"));
+                Assert.IsNull(found);
+            }
         }
 
         private void LogChangedItems(object sender, EventArgs e)
