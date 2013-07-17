@@ -247,12 +247,12 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                 {
                     tree.Insert(txnId, (ulong) i, BitConverter.GetBytes((ulong) i));
                 }
-                Console.WriteLine("Before deletes:");
-                tree.DumpStructure();
+                //Console.WriteLine("Before deletes:");
+                //tree.DumpStructure();
                 tree.Delete(txnId, 13ul, null);
                 tree.Delete(txnId, 12ul, null); // Should force a borrow frrom the right node
-                Console.WriteLine("After Deletes");
-                tree.DumpStructure();
+                //Console.WriteLine("After Deletes");
+                //tree.DumpStructure();
                 for (int i = 0; i <= config.LeafLoadFactor; i++)
                 {
                     Assert.IsTrue(i == 12 ^ i == 13 ^ tree.Search((ulong) i, buff, null),
@@ -332,8 +332,8 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                 {
                     var deleteKey = deleteFrom + i;
                     tree.Delete(txnId, deleteKey, null); // Should be enough to force a right merge
-                    Console.WriteLine("\n\nDeleted {0}\n", deleteKey);
-                    tree.DumpStructure();
+                    //Console.WriteLine("\n\nDeleted {0}\n", deleteKey);
+                    //tree.DumpStructure();
                     Assert.IsTrue(tree.Search(10395ul, buff, null));
                 }
 
@@ -380,7 +380,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                 tree.Save(0, null);
                 treeRoot = tree.RootId;
                 pageStore.Commit(0ul, null);
-                tree.DumpStructure();
+                //tree.DumpStructure();
             }
 
             using (var pageStore = TestUtils.OpenPageStore("TestValuelessBTree.data", false))
@@ -421,8 +421,8 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                     {
                         tree.Save((ulong)i / 250, null);
                         pageStore.Commit((ulong)i / 250, null);
-                        Console.WriteLine("Dump tree @ commit after {0}", i);
-                        tree.DumpStructure();
+                        //Console.WriteLine("Dump tree @ commit after {0}", i);
+                        //tree.DumpStructure();
                         Assert.AreEqual(i, tree.Scan(0, ulong.MaxValue, null).Count());
                     }
                 }
