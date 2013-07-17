@@ -1,14 +1,16 @@
-﻿using BrightstarDB.Utils;
+﻿using System;
+using BrightstarDB.Utils;
 
 namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
 {
     internal class LruResourceCache : IResourceCache
     {
-        private readonly LruCache<ulong, IResource> _cache;
- 
-        public LruResourceCache() : this(Configuration.ResourceCacheLimit)
+        private LruCache<ulong, IResource> _cache;
+
+        public LruResourceCache()
+            : this(Configuration.ResourceCacheLimit)
         {
-            
+
         }
 
         public LruResourceCache(int limit, int highWatermark = 0, int lowWatermark = 0)
@@ -30,6 +32,26 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
         public void Clear()
         {
             _cache.Clear();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!_disposed)
+                {
+                    _cache = null;
+                    _disposed = true;
+                }
+            }
         }
     }
 }

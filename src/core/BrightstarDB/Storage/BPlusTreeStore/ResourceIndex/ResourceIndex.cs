@@ -291,6 +291,33 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
             return (uint)resourceId & uint.MaxValue;
         }
 
-        #endregion  
+        #endregion
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!_disposed)
+                {
+                    _resourceCache.Dispose();
+                    _resourceIdCache.Dispose();
+                    _resourceStore.Dispose();
+                    _disposed = true;
+                }
+            }
+        }
+
+        ~ResourceIndex()
+        {
+            Dispose(false);
+        }
+
     }
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BrightstarDB.Utils;
 
 namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
@@ -35,6 +32,32 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
         public void Clear()
         {
             _cache.Clear();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!_disposed)
+                {
+                    _cache.Clear();
+                    _cache = null;
+                    _disposed = true;
+                }
+            }
+        }
+
+        ~LruResourceIdCache()
+        {
+            Dispose(false);
         }
     }
 }

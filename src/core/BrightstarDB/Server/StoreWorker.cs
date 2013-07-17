@@ -348,11 +348,15 @@ namespace BrightstarDB.Server
             if (_readStore != null)
             {
                 _readStore.Close();
+                _readStore.Dispose();
+                _readStore = null;
             }
 
             if (_writeStore != null)
             {
                 _writeStore.Close();
+                _writeStore.Dispose();
+                _writeStore = null;
             }            
         }
 
@@ -361,6 +365,7 @@ namespace BrightstarDB.Server
             _shutdownContinuation = c;
             _shutdownRequested = true;
             _completeRemainingJobs = completeJobs;
+            ReleaseResources();
         }
 
         public void Consolidate(Guid jobId)

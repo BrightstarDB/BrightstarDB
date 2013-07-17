@@ -1,6 +1,8 @@
-﻿namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
+﻿using System;
+
+namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
 {
-    interface IResourceIdCache
+    interface IResourceIdCache : IDisposable
     {
         /// <summary>
         /// Returns the number of items currently held in the cache

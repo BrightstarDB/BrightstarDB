@@ -1,10 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 
 namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
 {
     internal class ConcurrentResourceIdCache : IResourceIdCache
     {
-        private readonly ConcurrentDictionary<string, ulong > _cache = new ConcurrentDictionary<string, ulong>();
+        private ConcurrentDictionary<string, ulong > _cache = new ConcurrentDictionary<string, ulong>();
 
         #region Implementation of IResourceIdCache
 
@@ -46,5 +47,29 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!_disposed)
+                {
+                    _cache = null;
+                    _disposed = true;
+                }
+            }
+        }
+
+        ~ConcurrentResourceIdCache()
+        {
+            Dispose(false);
+        }
     }
 }

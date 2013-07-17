@@ -65,7 +65,10 @@ namespace BrightstarDB.Client
 
         protected override void Cleanup()
         {
-            _serverCore.Shutdown(true);
+            // Can't really close down the ServerCore here as it may be shared by
+            // multiple context objects
+            // Perhaps it would be an idea to implement some sort of reference counting ?
+            //_serverCore.Shutdown(true);
         }
 
         /// <summary>

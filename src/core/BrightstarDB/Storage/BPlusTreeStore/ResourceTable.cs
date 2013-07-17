@@ -148,9 +148,29 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
-            _pageStore.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
+        private bool _disposed;
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!_disposed)
+                {
+                    _pageStore.Dispose();
+                    _disposed = true;
+                }
+            }
+        }
         #endregion
+
+        ~ResourceTable()
+        {
+            Dispose(false);
+        }
+
     }
 }

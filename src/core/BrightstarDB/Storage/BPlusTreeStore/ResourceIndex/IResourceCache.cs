@@ -1,6 +1,8 @@
-﻿namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
+﻿using System;
+
+namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
 {
-    interface IResourceCache
+    interface IResourceCache : IDisposable
     {
         void Add(ulong resourceId, IResource resource);
         bool TryGetValue(ulong resourceId, out IResource resource);

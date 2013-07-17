@@ -70,5 +70,29 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
             _resourceTable.Insert(txnId, uri, out pageId, out segId, profiler);
             return new LongUriResource(uri, pageId, segId);
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!_disposed)
+                {
+                    _resourceTable.Dispose();
+                    _disposed = true;
+                }
+            }
+        }
+
+        ~ResourceStore()
+        {
+            Dispose(false);
+        }
     }
 }

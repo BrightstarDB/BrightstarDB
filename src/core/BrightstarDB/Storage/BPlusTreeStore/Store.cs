@@ -434,6 +434,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             _pageStore.Close();
             _pageStore.Dispose();
+            _resourceIndex.Dispose();
             _resourceTable.Dispose();
         }
 
