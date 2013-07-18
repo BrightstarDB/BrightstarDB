@@ -10,7 +10,7 @@ LINQ rather than SPARQL for query purposes.
 For details and documentation, please see our website at http://brightstardb.com/
 
 To get started with BrightstarDB you may want to check out the following resources:
- * [Getting Started](http://brightstardb.readthedocs.org/en/latest/Getting_Started/) provides you with links into the Uesr and Developer documentation
+ * [Getting Started](http://brightstardb.readthedocs.org/en/latest/Getting_Started/) provides you with links into the User and Developer documentation
  * [API Documentation](http://brightstardb.com/api/1.3/)
  
 If you want a binary installer that includes BrightstarDB, the BrightstarDB service and the Polaris management tool, 
