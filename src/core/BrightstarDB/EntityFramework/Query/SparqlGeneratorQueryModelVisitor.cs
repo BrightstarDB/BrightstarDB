@@ -35,6 +35,12 @@ namespace BrightstarDB.EntityFramework.Query
             _queryBuilder  = new SparqlQueryBuilder(context);
         }
 
+        internal SparqlGeneratorQueryModelVisitor(EntityContext context, SparqlQueryBuilder queryBuilder)
+        {
+            _context = context;
+            _queryBuilder = queryBuilder;
+        }
+
         public override void VisitQueryModel(QueryModel queryModel)
         {
             if (queryModel.BodyClauses.Count == 1 
@@ -131,7 +137,20 @@ namespace BrightstarDB.EntityFramework.Query
                     _instanceUri = instanceId;
                 }
             }
-
+            else if (queryModel.MainFromClause != null)
+            {
+                VisitMainFromClause(queryModel.MainFromClause, queryModel);
+                if (queryModel.ResultOperators != null)
+                {
+                    for (int i = 0; i < queryModel.ResultOperators.Count; i++)
+                    {
+                        foreach (var ro in queryModel.ResultOperators)
+                        {
+                            VisitResultOperator(ro, queryModel, i);
+                        }
+                    }
+                }
+            }
             base.VisitQueryModel(queryModel);
         }
 
@@ -334,13 +353,14 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 var groupOperator = resultOperator as GroupResultOperator;
                 var keyExpr = groupOperator.KeySelector;
-                var exprVar = GetExpressionVariable(keyExpr);
+                var exprVar = GetExpressionSelector(keyExpr);
                 if (exprVar == null)
                 {
                     throw new EntityFrameworkException("Unable to convert GroupBy '{0}' operator to SPARQL.",
                                                        groupOperator);
                 }
-                _queryBuilder.AddGroupByExpression("?" + exprVar);
+                var groupingExpression = new SparqlGroupingExpression(new [] {exprVar}, groupOperator.ItemType);
+                _queryBuilder.AddGroupByExpression(groupOperator, groupingExpression);
                 return;
             }
             if (resultOperator is CastResultOperator)
@@ -362,6 +382,21 @@ namespace BrightstarDB.EntityFramework.Query
             }
             throw new NotSupportedException(
                 String.Format("LINQ-to-SPARQL does not currently support the result operator '{0}'", resultOperator));
+        }
+
+        private SelectVariableNameExpression GetExpressionSelector(Expression expression)
+        {
+            if (expression is QuerySourceReferenceExpression)
+            {
+                var querySource = expression as QuerySourceReferenceExpression;
+                Expression mappedExpression;
+                _queryBuilder.TryGetQuerySourceMapping(querySource.ReferencedQuerySource, out mappedExpression);
+                if (mappedExpression is SelectVariableNameExpression)
+                    return (mappedExpression as SelectVariableNameExpression);
+            }
+            return
+                SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(expression, _queryBuilder) as
+                SelectVariableNameExpression;
         }
 
         private string GetExpressionVariable(Expression expression)

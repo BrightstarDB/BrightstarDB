@@ -58,6 +58,7 @@
     <Compile Include="ContextObjects\Person.cs" />
     <Compile Include="ContextObjects\Rsvp.cs" />
     <Compile Include="DateTimeFunctionTests.cs" />
+    <Compile Include="GroupingTests.cs" />
     <Compile Include="LinqToSparqlTestBase.cs" />
     <Compile Include="LinqToSparqlTests.cs" />
     <Compile Include="MathFunctionTests.cs" />

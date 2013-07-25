@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Remotion.Linq.Clauses;
+using Remotion.Linq.Clauses.ResultOperators;
 
 namespace BrightstarDB.EntityFramework.Query
 {
@@ -23,6 +24,7 @@ namespace BrightstarDB.EntityFramework.Query
         private readonly List<Tuple<MemberInfo, string>>_membersMap;
         private readonly List<string> _groupByExpressions;
         private readonly List<string> _constructorArgs;
+        private readonly Dictionary<GroupResultOperator, SparqlGroupingExpression> _groupingExpressions; 
         private readonly Dictionary<string, string> _prefixes = new Dictionary<string, string>();
 
         /// <summary>
@@ -48,6 +50,7 @@ namespace BrightstarDB.EntityFramework.Query
             _membersMap = new List<Tuple<MemberInfo, string>>();
             _groupByExpressions = new List<string>();
             _constructorArgs= new List<string>();
+            _groupingExpressions = new Dictionary<GroupResultOperator, SparqlGroupingExpression>();
             AllTriples = new List<TripleInfo>();
         }
 
@@ -250,9 +253,13 @@ namespace BrightstarDB.EntityFramework.Query
             AllTriples.Add(new TripleInfo(subjectType, subject, verbType, verb, objectType, obj));
         }
 
-        public void AddGroupByExpression(string groupByExpr)
+        public void AddGroupByExpression(GroupResultOperator groupResultOperator, SparqlGroupingExpression groupingExpression)
         {
-            _groupByExpressions.Add(groupByExpr);
+            foreach (var varNameBinding in groupingExpression.GroupVars)
+            {
+                _groupByExpressions.Add("?" + varNameBinding.Name);
+            }
+            _groupingExpressions.Add(groupResultOperator, groupingExpression);
         }
 
         private static String Stringify(GraphNode nodeType, string nodeValue)
@@ -414,6 +421,11 @@ namespace BrightstarDB.EntityFramework.Query
             prefix = "ns" + _prefixes.Count;
             _prefixes[extensionNamespace] = prefix;
             return prefix;
+        }
+
+        public bool TryGetGroupingExpression(GroupResultOperator grouping, out SparqlGroupingExpression sparqlGroupingExpression)
+        {
+            return _groupingExpressions.TryGetValue(grouping, out sparqlGroupingExpression);
         }
     }
 }
