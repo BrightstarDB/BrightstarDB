@@ -3,11 +3,11 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.EntityFramework;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class IdentifierEncodingTests
     {
                 private readonly MyEntityContext _myEntityContext;
@@ -21,7 +21,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestCreateItemWithSpecialCharactersInIdentifier()
         {
             var person = new DBPediaPerson

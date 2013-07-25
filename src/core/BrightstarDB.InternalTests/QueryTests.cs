@@ -5,17 +5,17 @@ using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Model;
 using BrightstarDB.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using VDS.RDF.Parsing;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class QueryTests
     {
         private readonly IStoreManager _storeManager = StoreManagerFactory.GetStoreManager();
 
-        [TestMethod]
+        [Test]
         public void TestParser()
         {
             const string exp = "select ?t where { ?t a ?tt }";
@@ -24,7 +24,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(query);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSimpleQuery()
         {
             var sid = Guid.NewGuid().ToString();
@@ -52,7 +52,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestLookupByIdentifierAndType()
         {
             var sid = Guid.NewGuid().ToString();
@@ -83,7 +83,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestJoinTwoSingleVarClauses()
         {
             var sid = Guid.NewGuid().ToString();
@@ -106,7 +106,7 @@ SELECT ?entry ?sector WHERE {
         }
 
 
-        [TestMethod]
+        [Test]
         public void BugzId5205()
         {
             var client = BrightstarService.GetClient("Type=embedded;storesDirectory=c:\\brightstar");
@@ -200,7 +200,7 @@ SELECT ?entry ?sector WHERE {
             Assert.AreEqual(20, ugh);
         }
 
-        [TestMethod]
+        [Test]
         [Ignore]
         public void TestSparqlLimit()
         {

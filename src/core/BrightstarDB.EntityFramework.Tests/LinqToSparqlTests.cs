@@ -1,27 +1,27 @@
 ﻿using System.Linq;
 using BrightstarDB.EntityFramework.Tests.ContextObjects;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.EntityFramework.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class LinqToSparqlTests : LinqToSparqlTestBase
     {
 
-        [TestInitialize]
+        [SetUp]
         public void SetUp()
         {
             InitializeContext();
         }
 
-        [TestMethod]
+        [Test]
         public void CheckContextTypeMappings()
         {
             Assert.AreEqual("http://www.networkedplanet.com/schemas/test/Dinner", Context.MapTypeToUri(typeof (IDinner)));
             Assert.AreEqual("http://www.networkedplanet.com/schemas/test/Rsvp", Context.MapTypeToUri(typeof(IRsvp)));
         }
 
-        [TestMethod]
+        [Test]
         public void TestDinnerPropertyMappings()
         {
             var dinnerType = typeof (IDinner);
@@ -42,7 +42,7 @@ namespace BrightstarDB.EntityFramework.Tests
             Assert.AreEqual("http://www.networkedplanet.com/schemas/test/attendees", hint.SchemaTypeUri);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetAllDinners()
         {
             var q = from p in Context.Dinners select p;
@@ -54,7 +54,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 NormalizeSparql(lastSparql));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetDinnerById()
         {
             var q = from p in Context.Dinners where p.Id.Equals("http://www.networkedplanet.com/dinners/1") select p;
@@ -73,7 +73,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 NormalizeSparql(lastSparql));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetRsvpByDinnerId()
         {
             var q = from r in Context.Rsvps where r.Dinner.Id.Equals("http://www.networkedplanet.com/dinners/1") select r;
@@ -85,7 +85,7 @@ namespace BrightstarDB.EntityFramework.Tests
 <http://www.networkedplanet.com/dinners/1> <http://www.networkedplanet.com/schemas/test/attendees> ?r.}");
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetDinnersProperty()
         {
             var q = from p in Context.Dinners select p.Title;
@@ -98,7 +98,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 NormalizeSparql(lastSparql));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetAllDinnerRsvps()
         {
             var q = from p in Context.Dinners
@@ -115,7 +115,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 NormalizeSparql(lastSparql));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetAllDinnerRsvps2()
         {
             // This query uses == instead of .Equals but should result in the same SPARQL
@@ -133,7 +133,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 NormalizeSparql(lastSparql));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetAllClashesWithSpecificDinner()
         {
             var q = from x in Context.Dinners
@@ -156,7 +156,7 @@ FILTER ((?v0=?v1) && (!sameTerm(<address>, ?y)))
                 NormalizeSparql(lastSparql));
         }
 
-        [TestMethod]
+        [Test]
         public void TestOneHopWithoutFilter()
         {
             var q = from x in Context.Dinners
@@ -175,7 +175,7 @@ FILTER ((?v0=?v1) && (!sameTerm(<address>, ?y)))
                 NormalizeSparql(lastSparql));
         }
 
-        [TestMethod]
+        [Test]
         public void TestOneHopSelect()
         {
             var q = Context.People.Where(p => p.Father.Id == "address");
@@ -189,7 +189,7 @@ FILTER ((?v0=?v1) && (!sameTerm(<address>, ?y)))
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestDinnerByAttendee()
         {
             var q = from x in Context.Dinners
@@ -210,7 +210,7 @@ FILTER(?v1 = 'kal@networkedplanet.com') . }"),
                 NormalizeSparql(lastSparql));
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqJoin()
         {
             var q = from x in Context.Dinners
@@ -226,7 +226,7 @@ FILTER(?v1 = 'kal@networkedplanet.com') . }"),
 FILTER (?v0=?v1) . }");
         }
 
-        [TestMethod]
+        [Test]
         public void TestDecimalComparators()
         {
             var q = from x in Context.Companies
@@ -278,7 +278,7 @@ FILTER ((?v0 >= '1.00'^^<http://www.w3.org/2001/XMLSchema#decimal>) && (?v0 <= '
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestDoubleConstant()
         {
             var q = from x in Context.Companies
@@ -293,7 +293,7 @@ FILTER (?v0 < '1.000000E+006'^^<http://www.w3.org/2001/XMLSchema#double>) . }");
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestIntegerConstant()
         {
             var q = from x in Context.Companies
@@ -307,7 +307,7 @@ FILTER (?v0 < '1.000000E+006'^^<http://www.w3.org/2001/XMLSchema#double>) . }");
 FILTER (?v0 < '100'^^<http://www.w3.org/2001/XMLSchema#integer>) . }");
         }
 
-        [TestMethod]
+        [Test]
         public void TestBooleanConstants()
         {
             var q = from x in Context.Companies
@@ -331,7 +331,7 @@ OPTIONAL { ?x <http://www.networkedplanet.com/schemas/test/isListed> ?v0 . }
 FILTER (!bound(?v0) || (?v0 = false)) . }");
         }
 
-        [TestMethod]
+        [Test]
         public void TestBooleanAsserts()
         {
 
@@ -401,7 +401,7 @@ FILTER ((!(?v0)) && (!(?v1))) . }");
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLiteralInCollection()
         {
             var tickers = new string[] {"AAA", "AAB", "AAC", "AAD"};
@@ -416,7 +416,7 @@ FILTER ((!(?v0)) && (!(?v1))) . }");
 FILTER (?v0 IN ('AAA', 'AAB', 'AAC', 'AAD')) . }");
         }
 
-        [TestMethod]
+        [Test]
         public void TestSelectProperty()
         {
             var q = from x in Context.Companies select x.Name;
@@ -427,7 +427,7 @@ FILTER (?v0 IN ('AAA', 'AAB', 'AAC', 'AAD')) . }");
                 );
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateAnonymous()
         {
             var q = from x in Context.Companies select new {x.Name, x.TickerSymbol};
@@ -457,7 +457,7 @@ OPTIONAL { ?v2 <http://www.networkedplanet.com/schemas/test/listing> ?x . } }");
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestAggregates()
         {
             var q = Context.Companies.Average(x => x.HeadCount);
@@ -486,7 +486,7 @@ FILTER(?v0 > '100'^^<http://www.w3.org/2001/XMLSchema#integer>).
 }");
         }
 
-        [TestMethod]
+        [Test]
         public void TestSelectMany()
         {
             var q = Context.Dinners.SelectMany(d => d.Rsvps);
@@ -499,7 +499,7 @@ FILTER(?v0 > '100'^^<http://www.w3.org/2001/XMLSchema#integer>).
 
         }
 
-        [TestMethod]
+        [Test]
         [Ignore] // Subqueries not currently supported.
         public void TestSelectManyWithSubquery()
         {
@@ -515,7 +515,7 @@ FILTER(?v0 > '100'^^<http://www.w3.org/2001/XMLSchema#integer>).
 FILTER (?v1 == 'kal@networkedplanet.com') .}");
         }
 
-        [TestMethod]
+        [Test]
         public void TestOfType()
         {
             var q = Context.Companies.OfType<ContextObjects.IPerson>().ToList();
@@ -526,7 +526,7 @@ FILTER (?v1 == 'kal@networkedplanet.com') .}");
 }");
         }
 
-        [TestMethod]
+        [Test]
         public void TestDistinct()
         {
             var q = Context.Dinners.Select(x => x.Host).Distinct();
@@ -538,7 +538,7 @@ FILTER (?v1 == 'kal@networkedplanet.com') .}");
 }");
         }
 
-        [TestMethod]
+        [Test]
         public void TestGroupBy()
         {
             var q = Context.Dinners.GroupBy(x => x.Host);
@@ -559,7 +559,7 @@ FILTER (?v1 == 'kal@networkedplanet.com') .}");
 } GROUP BY ?v1");
         }
 
-        [TestMethod]
+        [Test]
         public void TestCast()
         {
             var q = Context.Companies.Cast<IDinner>();
@@ -579,7 +579,7 @@ FILTER (?v1 == 'kal@networkedplanet.com') .}");
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestJoinWithAverage()
         {
             var q =
@@ -597,7 +597,7 @@ FILTER(sameTerm(?m,?v0)) .
 }");
         }
 
-        [TestMethod]
+        [Test]
         public void TestAny()
         {
             var q = from d in Context.Dinners

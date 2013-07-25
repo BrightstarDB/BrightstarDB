@@ -4,11 +4,11 @@ using System.Linq;
 using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     [Ignore]
     public class BrightstarQueryProcessorTests
     {
@@ -47,7 +47,7 @@ namespace BrightstarDB.Tests
             return store;
         }
 
-        [TestMethod]
+        [Test]
         public void TestBrutalJoin()
         {
             var timer = new Stopwatch();
@@ -66,7 +66,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine("Returned {0} rows in {1}ms", resultsDoc.SparqlResultRows().Count(), timer.ElapsedMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         public void TestAllResourceProperties()
         {
             var timer = new Stopwatch();
@@ -78,7 +78,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine("Returned {0} rows in {1}ms", resultsDoc.SparqlResultRows().Count(), timer.ElapsedMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         public void TestTwoHop()
         {
             var timer = new Stopwatch();
@@ -91,7 +91,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine("Returned {0} rows in {1}ms", resultsDoc.SparqlResultRows().Count(), timer.ElapsedMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         public void TestInternalSort()
         {
             var timer = new Stopwatch();

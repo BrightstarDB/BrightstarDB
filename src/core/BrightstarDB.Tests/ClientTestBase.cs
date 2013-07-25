@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 #if !SDK_TESTS
 using BrightstarDB.Service;
 #endif
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {

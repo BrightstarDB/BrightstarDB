@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class GraphTests
     {
-        [TestMethod]
+        [Test]
         public void TestAddQuads()
         {
             var storeName = "TestAddQuads_" + DateTime.Now.Ticks;
@@ -51,14 +51,14 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestImportIntoGraph()
         {
             var storeName = "TestImportIntoGraph_" + DateTime.Now.Ticks;
             var client = BrightstarService.GetClient("type=embedded;storesdirectory=C:\\brightstar");
             client.CreateStore(storeName);
 
-            var importFile = new FileInfo("graph_triples.nt");
+            var importFile = new FileInfo(Configuration.DataLocation+"graph_triples.nt");
             var targetDir = new DirectoryInfo("c:\\brightstar\\import");
             if (!targetDir.Exists)
             {
@@ -94,14 +94,14 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestExportGraphs()
         {
             var storeName = "TestExportGraphs_" + DateTime.Now.Ticks;
             var client = BrightstarService.GetClient("type=embedded;storesDirectory=C:\\brightstar");
             client.CreateStore(storeName);
 
-            FileInfo importFile = new FileInfo("graph_triples.nt");
+            FileInfo importFile = new FileInfo(Configuration.DataLocation+"graph_triples.nt");
             var targetDir = new DirectoryInfo("c:\\brightstar\\import");
             if (!targetDir.Exists)
             {
@@ -149,7 +149,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteFromGraph()
         {
             var storeName = "TestDeleteFromGraph_" + DateTime.Now.Ticks;

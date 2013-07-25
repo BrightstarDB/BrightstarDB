@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class SparqlUpdateTests
     {
         private IBrightstarService _client;
@@ -23,7 +23,7 @@ namespace BrightstarDB.Tests
 #endif
         }
         
-        [TestMethod]
+        [Test]
         public void TestInsert()
         {
             var storeName = CreateStore("TestInsert");
@@ -53,7 +53,7 @@ WHERE { ?a dc:title ""A new book"" }");
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteData()
         {
             var storeName = CreateStore("TestDelete");
@@ -81,7 +81,7 @@ DELETE DATA
             Assert.AreEqual(42, row.GetColumnValue("o"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteInsert()
         {
             var storeName = CreateStore("TestDeleteInsert");
@@ -108,7 +108,7 @@ WHERE
             Assert.IsTrue(resultsDoc.SparqlResultRows().All(r=>r.GetColumnValue("fn").Equals("William")));
         }
 
-        [TestMethod]
+        [Test]
         public void TestDelete()
         {
             var storeName = CreateStore("TestDelete");
@@ -146,7 +146,7 @@ WHERE
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteFromGraph()
         {
             var storeName = CreateStore("TestDeleteFromGraph");
@@ -185,7 +185,7 @@ WHERE { ?person ?property ?value ; foaf:givenName 'Fred' } ");
             Assert.AreEqual(new Uri("http://example/william"), row.GetColumnValue("p"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestGraphCopy()
         {
             var storeName = CreateStore("TestGraphCopy");
@@ -245,7 +245,7 @@ WHERE
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGraphManagement()
         {
             var sid = CreateStore("GraphManagement");
@@ -272,12 +272,12 @@ INSERT DATA
             Assert.AreEqual(0, resultsDoc.SparqlResultRows().Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestGraphLoad()
         {
 #if !WINDOWS_PHONE
             var storeName = CreateStore("TestGraphLoad");
-            var importFile = new FileInfo("simple.txt");
+            var importFile = new FileInfo(Configuration.DataLocation+"simple.txt");
             Assert.IsTrue(importFile.Exists);
             var importUri = new Uri(importFile.FullName).ToString().Replace(" ", "%20");
 
@@ -300,7 +300,7 @@ INSERT DATA
 #endif
         }
 
-        [TestMethod]
+        [Test]
         public void TestGraphClear()
         {
             var storeName = CreateStore("TestGraphCopy");
@@ -337,7 +337,7 @@ INSERT DATA {
             Assert.AreEqual(0, resultsDoc.SparqlResultRows().Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestGraphCopyCmd()
         {
             var storeName = CreateStore("TestGraphCopyCmd");
@@ -366,7 +366,7 @@ INSERT DATA {
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestGraphMove()
         {
             var storeName = CreateStore("TestGraphCopyCmd");
@@ -397,7 +397,7 @@ INSERT DATA {
             Assert.AreEqual(0, resultsDoc.SparqlResultRows().Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestGraphAdd()
         {
             var storeName = CreateStore("TestGraphCopyCmd");

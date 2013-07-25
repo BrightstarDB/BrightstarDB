@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class LinqTests
     {
         private const string _connectionString = "type=embedded;StoresDirectory=c:\\brightstar;";
 
-        [TestMethod]
+        [Test]
         public void TestLinqCount()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -46,7 +46,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(200, count2);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqLongCount()
         {
             var connectionString = _connectionString + "StoreName=" +Guid.NewGuid();
@@ -71,7 +71,7 @@ namespace BrightstarDB.Tests.EntityFramework
           
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqAverage()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -120,7 +120,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqAverage2()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -149,7 +149,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(ages.Average(), context.Entities.Average(e => e.SomeInt));
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqSum()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -202,7 +202,7 @@ namespace BrightstarDB.Tests.EntityFramework
         {
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqContainsString()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -232,7 +232,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual("Samarind", matchCompanies.First().SomeString);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqContainsInt()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -256,7 +256,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqContainsDateTime()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -285,7 +285,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqContainsDouble()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -309,7 +309,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqContainsFloat()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -333,7 +333,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqContainsDecimal()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -357,7 +357,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqContainsBool()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -381,7 +381,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqContainsLong()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -406,7 +406,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestLinqDistinct()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -441,7 +441,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsTrue(categories.Contains("Carrots"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqFirst()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -471,7 +471,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual("Annie", first.Name);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqFirstOrDefault()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -501,7 +501,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsNull(notfound);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestLinqFirstFail()
         {
@@ -533,7 +533,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Ignore]
-        [TestMethod]
+        [Test]
         public void TestLinqGroupBy()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -600,7 +600,7 @@ namespace BrightstarDB.Tests.EntityFramework
             
         }
         
-        [TestMethod]
+        [Test]
         public void TestLinqMax()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -646,7 +646,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(15.99, maxDbl);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqMin()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -693,7 +693,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Ignore] // how do I properly test OfType? I think I'm testing the built in OfType on an ArrayList rather than our own EF
-        [TestMethod]
+        [Test]
         public void TestLinqOfType()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -726,7 +726,7 @@ namespace BrightstarDB.Tests.EntityFramework
             
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqOrderByString()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -810,7 +810,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqOrderByDate()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -908,7 +908,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqOrderByInteger()
         {
             var connectionString = _connectionString + "StoreName=LinqOrderByInteger_" + DateTime.Now.Ticks;
@@ -1008,7 +1008,7 @@ namespace BrightstarDB.Tests.EntityFramework
             
         }
 
-        [TestMethod]
+        [Test]
         //note - not sure if this is an adequate test of Select()
         public void TestLinqSelect()
         {
@@ -1028,7 +1028,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(10, select.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqSelectMany()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1077,7 +1077,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(5, daskillz.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqSingle()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1093,7 +1093,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual("An entity", single.SomeString);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestLinqSingleFail()
         {
@@ -1103,7 +1103,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var sod = context.Entities.Single();
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestLinqSingleFail2()
         {
@@ -1121,7 +1121,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var singleFail = context.Entities.Single();
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqSingleOrDefault()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1152,7 +1152,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestLinqSingleOrDefaultFail()
         {
@@ -1174,7 +1174,7 @@ namespace BrightstarDB.Tests.EntityFramework
             
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqSkip()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1222,7 +1222,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(4, i);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqTake()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1264,7 +1264,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(2, i);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqThenBy()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1331,7 +1331,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqThenByDescending()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1397,7 +1397,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqWhere()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1496,7 +1496,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqRelatedWhere()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1533,7 +1533,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqQuery1()
         {
             //string connectionString = string.Format(@"Type=http;endpoint=http://localhost:8090/brightstar;StoreName={0};", Guid.NewGuid());
@@ -1605,7 +1605,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqJoin1()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1636,7 +1636,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(2, rolesThatHavePeople.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqJoinOnProperty()
         {
             var connectionString = _connectionString + "StoreName=TestLinqJoinOnProperty_" + DateTime.Now.Ticks;
@@ -1682,7 +1682,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(100, allPublishersWithArticles.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqJoinOnId()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1729,7 +1729,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(100, allPublishersWithArticles.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqJoinOnId2()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1776,7 +1776,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(10, allPublishersWithArticles.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqJoinWithFilter()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1823,7 +1823,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqRelatedCount()
         {
             var connectionString = _connectionString + "StoreName=" + Guid.NewGuid();
@@ -1862,7 +1862,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Ignore]
-        [TestMethod]
+        [Test]
         public void TestLinqRelatedFilter()
         {
             var connectionString = _connectionString + "StoreName=12e9bc5b-b1a8-413b-b41a-60ae8235ce4c";// +Guid.NewGuid();
@@ -1900,7 +1900,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(3800, articlesByOldPeople.Count);
         }
 
-        [TestMethod]
+        [Test]
        public void TestLinqAny()
        {
            var connectionString = _connectionString + "StoreName=TestLinqAny_" + DateTime.Now.Ticks;
@@ -1928,7 +1928,7 @@ namespace BrightstarDB.Tests.EntityFramework
            Assert.AreEqual(deptB.Id, departmentsWithOldies[0].Id);
        }
 
-        [TestMethod]
+        [Test]
         public void TestLinqAll()
         {
             var connectionString = _connectionString + "StoreName=TestLinqAll_" + DateTime.Now.Ticks;
@@ -1965,7 +1965,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsTrue(results.Contains("Edith"));
         }
         
-        [TestMethod]
+        [Test]
         public void TestLinqQueryEnum()
         {
             var connectionString = _connectionString + "StoreName=TestLinqQueryEnum_" + DateTime.Now.Ticks;
@@ -2026,7 +2026,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsTrue(results.Any(x => x.Id.Equals(entity1.Id)));
         }
 
-        [TestMethod]
+        [Test]
         public void TestLinqNullComparison()
         {
             var connectionString = _connectionString + "StoreName=TestLinqAll_" + DateTime.Now.Ticks;

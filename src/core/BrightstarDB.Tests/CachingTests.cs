@@ -2,14 +2,14 @@
 using System.IO;
 using System.Threading;
 using BrightstarDB.Caching;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class CachingTests
     {
-        [TestMethod]
+        [Test]
         public void TestMemoryCacheBasicOperations()
         {
             ICache cache = new MemoryCache(2000, new LruCacheEvictionPolicy());
@@ -43,7 +43,7 @@ namespace BrightstarDB.Tests
         }
 
 #if !SILVERLIGHT
-        [TestMethod]
+        [Test]
         public void TestDirectoryCacheBasicOperations()
         {
             string cacheDirPath = Path.Combine(Path.GetTempPath(), "cachetest_" + DateTime.Now.Ticks);
@@ -62,7 +62,7 @@ namespace BrightstarDB.Tests
         }
 #endif
 
-        [TestMethod]
+        [Test]
         public void TestLruPolicy()
         {
             var hundredBytes = new byte[100];
@@ -95,7 +95,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLruPriority()
         {
             var hundredBytes = new byte[100];
@@ -129,7 +129,7 @@ namespace BrightstarDB.Tests
             Assert.IsFalse(cache.ContainsKey("Entry 4"), "Expected Entry 4 to be removed after third eviction"); 
         }
 
-        [TestMethod]
+        [Test]
         public void TestTwoLevelCache()
         {
             var hundredBytes = new byte[100];

@@ -3,14 +3,14 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using BrightstarDB.Server;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class StreamTests
     {
-        [TestMethod]
+        [Test]
         public void TestConnectionStream()
         {
             var connStream = new ConnectionStream();
@@ -33,7 +33,7 @@ namespace BrightstarDB.Tests
             Task.WaitAll(t);
         }
 
-        [TestMethod]
+        [Test]
         public void TestConnectionStreamLotsOfData()
         {
             var connStream = new ConnectionStream();
@@ -58,7 +58,7 @@ namespace BrightstarDB.Tests
             Task.WaitAll(t);
         }
 
-        [TestMethod]
+        [Test]
         public void TestConnectionStreamLotsOfDataAndCheckAllReads()
         {
             var connStream = new ConnectionStream();
@@ -87,7 +87,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestConnectionClientTermination()
         {
             var connStream = new ConnectionStream();
@@ -110,7 +110,7 @@ namespace BrightstarDB.Tests
             Task.WaitAll(t);
         }
 
-        [TestMethod]
+        [Test]
         public void TestConnectionClientUsingStatement()
         {
             var connStream = new ConnectionStream();
@@ -135,7 +135,7 @@ namespace BrightstarDB.Tests
             Task.WaitAll(t);
         }
 
-        [TestMethod]
+        [Test]
         public void TestConnectionStreamBuffering()
         {
             var connStream = new ConnectionStream();
@@ -162,7 +162,7 @@ namespace BrightstarDB.Tests
 
 #if !SILVERLIGHT
         // Cannot run this test under SL as it uses the FileInfo and FileStream classes
-        [TestMethod]
+        [Test]
         public void TestConcurrentReadWriteOfFileStream()
         {
             // create the file

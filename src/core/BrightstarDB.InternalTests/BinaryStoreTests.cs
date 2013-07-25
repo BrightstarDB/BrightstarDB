@@ -2,11 +2,11 @@ using System;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class BinaryStoreTests : StoreTestsBase
     {
         private readonly IStoreManager _storeManager =
@@ -22,226 +22,226 @@ namespace BrightstarDB.Tests
 
         #endregion
 
-        [TestMethod]
-        [ExpectedException(typeof(StoreManagerException), "Master file not found")]
+        [Test]
+        [ExpectedException(typeof(StoreManagerException), ExpectedMessage="Master file not found")]
         public override void TestOpenStoreFailure()
         {
             base.TestOpenStoreFailure();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestCreateStore()
         {
             base.TestCreateStore();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestOpenStore()
         {
             base.TestOpenStore();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestDeleteStore()
         {
             base.TestDeleteStore();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestInsertTriple()
         {
             base.TestInsertTriple();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestGetAllTriples()
         {
             base.TestGetAllTriples();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestInsertAndRetrieveTriplesInNamedGraphs()
         {
             base.TestInsertAndRetrieveTriplesInNamedGraphs();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestInsertAndRetrieveTriplesInNamedGraphs2()
         {
             base.TestInsertAndRetrieveTriplesInNamedGraphs2();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestDuplicateTriplesAreNotInserted()
         {
             base.TestDuplicateTriplesAreNotInserted();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestDuplicateTriplesAreAllowedInDifferentGraphs()
         {
             base.TestDuplicateTriplesAreAllowedInDifferentGraphs();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestInsertMulitpleTriples()
         {
             base.TestInsertMulitpleTriples();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestFetchResourceStatements()
         {
             base.TestFetchResourceStatements();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestFetchMultipleResourceStatements()
         {
             base.TestFetchMultipleResourceStatements();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestDeleteTriples()
         {
             base.TestDeleteTriples();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestInsertAndRetrieveTripleWithLiteral()
         {
             base.TestInsertAndRetrieveTripleWithLiteral();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestInsertAndRetrieveTripleWithSameLiteralAndDifferentLanguageCode()
         {
             base.TestInsertAndRetrieveTripleWithSameLiteralAndDifferentLanguageCode();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestInsertAndRetrieveTripleWithSameLiteralAndDifferentDataType()
         {
             base.TestInsertAndRetrieveTripleWithSameLiteralAndDifferentDataType();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestInsertAndRetrieveLiteralObjectTriple()
         {
             base.TestInsertAndRetrieveLiteralObjectTriple();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestInsertAndRetrieveXmlLiteral()
         {
             base.TestInsertAndRetrieveXmlLiteral();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestMatchTriples()
         {
             base.TestMatchTriples();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestMatchTriplesWithNulls()
         {
             base.TestMatchTriplesWithNulls();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestSparql1()
         {
             base.TestSparql1();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestReadConfiguration()
         {
             base.TestReadConfiguration();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestListCommitPoints()
         {
             base.TestListCommitPoints();
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Client.BrightstarClientException))]
         public override void TestRevertToCommitPoint()
         {
             base.TestRevertToCommitPoint();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestGetCommitPoint()
         {
             base.TestGetCommitPoint();
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(Client.BrightstarClientException))]
         public override void TestQueryAtCommitPoint()
         {
             base.TestQueryAtCommitPoint();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestListStoreGraphs()
         {
             base.TestListStoreGraphs();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestListStores()
         {
             base.TestListStores();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestRecoverFromBadCommitPointWrite()
         {
             base.TestRecoverFromBadCommitPointWrite();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestRecoverFromBadCommitPointWrite2()
         {
             base.TestRecoverFromBadCommitPointWrite2();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestWriteAllowedAfterRecoverFromBadCommitPointWrite()
         {
             base.TestWriteAllowedAfterRecoverFromBadCommitPointWrite();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestBadXmlInSparqlResult()
         {
             base.TestBadXmlInSparqlResult();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestConsolidateStore()
         {
             base.TestConsolidateStore();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestConsolidateEmptyStore()
         {
             base.TestConsolidateEmptyStore();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestBatchedInserts()
         {
             base.TestBatchedInserts();
         }
 
-        [TestMethod]
+        [Test]
         public override void TestMultiThreadedReadAccess()
         {
             base.TestMultiThreadedReadAccess();

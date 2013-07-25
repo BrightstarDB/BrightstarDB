@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class StringComparisonTests
     {
         private static MyEntityContext _context;
 
-        [ClassInitialize]
+        [TestFixtureSetUp]
         public static void SetUp(TestContext context)
         {
             _context = new MyEntityContext("type=embedded;storesDirectory=" + Configuration.StoreLocation + ";storeName=EFStringComparisonTests_" + DateTime.Now.Ticks);
@@ -21,7 +21,7 @@ namespace BrightstarDB.Tests.EntityFramework
             _context.SaveChanges();
         }
 
-        [TestMethod]
+        [Test]
         public void TestStartsWith()
         {
             var results = _context.Companies.Where(c => c.Name.StartsWith("Net")).ToList();
@@ -57,7 +57,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(0, results.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestEndsWith()
         {
             var results = _context.Companies.Where(c => c.Name.EndsWith("net")).ToList();
@@ -96,7 +96,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(0, results.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestContains()
         {
             var results = _context.Companies.Where(c => c.Name.Contains("Pl")).ToList();
@@ -109,7 +109,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestStringLengthFilter()
         {
             var results = _context.Companies.Where(c => c.Name.Length > 10).ToList();

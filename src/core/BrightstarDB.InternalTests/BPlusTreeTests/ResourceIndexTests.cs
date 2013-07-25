@@ -3,14 +3,14 @@ using BrightstarDB.Storage;
 using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.BPlusTreeStore.ResourceIndex;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class ResourceIndexTests
     {
-        [TestMethod]
+        [Test]
         public void TestAssertShortLiteral()
         {
             var pageStore = TestUtils.CreateEmptyPageStore("TestAssertShortLiteral.data");
@@ -66,7 +66,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestAssertLongLiteral()
         {
             var longStringValue = "Long string value " + new string('!', 100);
@@ -123,7 +123,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestAssertShortUri()
         {
             IPageStore pageStore;
@@ -154,7 +154,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestAssertLongUri()
         {
             IPageStore pageStore;

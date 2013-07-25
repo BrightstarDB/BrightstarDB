@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class ExtendedContextTests
     {
         private string _storeName;
@@ -26,7 +26,7 @@ namespace BrightstarDB.Tests.EntityFramework
             return new MyEntityContext("type=embedded;storesDirectory=c:\\brightstar;storeName=" + _storeName);            
         }
 
-        [TestMethod]
+        [Test]
         public void TestSelectProperty()
         {
             var context = GetContext();
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsTrue(results.Contains("NetworkedPlanet"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateAnonymous()
         {
             var context = GetContext();
@@ -66,7 +66,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestAggregates()
         {
             var context = GetContext();
@@ -95,7 +95,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(200, largestCompanyHeadcount);
         }
 
-        [TestMethod]
+        [Test]
         public void TestOrdering()
         {
             var context = GetContext();
@@ -117,7 +117,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestSingle()
         {
             var context = GetContext();
@@ -169,7 +169,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsNull(singleCompany);
         }
 
-        [TestMethod]
+        [Test]
         public void TestFirst()
         {
             var context = GetContext();

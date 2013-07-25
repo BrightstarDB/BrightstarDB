@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.DataObjectsTests
 {
-    [TestClass]
+    [TestFixture]
     public class StoreCallbackTests
     {
         private readonly string _storeName;
@@ -21,7 +21,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
             _connectionString = "type=embedded;storesDirectory=c:\\brightstar;storeName=" + _storeName;
         }
 
-        [TestMethod]
+        [Test]
         public void TestSaveWorksWithNoCallback()
         {
             var store = GetDataObjectStore();
@@ -33,7 +33,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
             Assert.AreEqual(1, results.ResultDocument.SparqlResultRows().Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestSavingChangesCallback()
         {
             var store = GetDataObjectStore();
@@ -59,7 +59,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestThrowingCancelsSave()
         {
             var store = GetDataObjectStore();

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using BrightstarDB.EntityFramework;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class InterfaceInheritanceTests
     {
         private const string ConnectionString = "type=embedded;storesDirectory=c:\\brightstar\\;storeName=";
@@ -16,7 +16,7 @@ namespace BrightstarDB.Tests.EntityFramework
             return String.Format("{0:02d}{1:02d}{2:02d}_{3}", dt.Hour, dt.Minute, dt.Second, suffix);
         }
 
-        [TestMethod]
+        [Test]
         public void TestRetrieveDerivedInstancesFromBaseCollection()
         {
             var storeName = MakeStoreName("retrieveDerviedInstances");
@@ -40,7 +40,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsTrue(derivedEntities.Any(x=>x.BaseStringValue.Equals("This is a dervied entity")));
         }
 
-        [TestMethod]
+        [Test]
         public void TestUseDerivedInstanceInBaseClassCollectionProperty()
         {
             var storeName = MakeStoreName("useDerivedInstance");
@@ -68,7 +68,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestBecomeAndUnbecome()
         {
             var storeName = MakeStoreName("becomeAndUnbecome");

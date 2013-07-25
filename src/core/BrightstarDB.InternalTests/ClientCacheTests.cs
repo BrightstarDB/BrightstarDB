@@ -5,30 +5,32 @@ using System.Linq;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
 using BrightstarDB.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using BrightstarDB.Tests;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class ClientCacheTests : ClientTestBase
     {
         private static IBrightstarService GetClient(ICache queryCache = null)
         {
             return BrightstarService.GetHttpClient(new Uri("http://localhost:8090/brightstar"), queryCache);
         }
-        [ClassInitialize]
-        public static void SetUp(TestContext context)
+
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             StartService();
         }
 
-        [ClassCleanup]
-        public static void TearDown()
+        [TestFixtureTearDown]
+        public void TearDown()
         {
             CloseService();
         }
 
-        [TestMethod]
+        [Test]
         public void TestQueryCacheInsertAndInvalidation()
         {
             var testCache = new MemoryCache(8192, new LruCacheEvictionPolicy());

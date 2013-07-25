@@ -4,11 +4,11 @@ using System.Linq;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class BPlusTreeBuilderTests
     {
         private readonly List<KeyValuePair<byte[], byte[]>> _testOrderedValues = new List<KeyValuePair<byte[], byte[]>>(20000);
@@ -23,19 +23,19 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestBuildSingleLeafNode()
         {
             RunTest(TestBuildSingleLeafNode, "TestBuildSingleLeafNode");
         }
 
-        [TestMethod]
+        [Test]
         public void TestBuildSingleInternalNode()
         {
             RunTest((pageStore, pageStoreName, persistenceType)=>BuildAndScan(pageStore, pageStoreName, persistenceType, 200), "TestBuildSingleInternalNode");
         }
 
-        [TestMethod]
+        [Test]
         public void TestBuildFullTree()
         {
             RunTest((pageStore, pageStoreName, persistenceType)=>BuildAndScan(pageStore, pageStoreName,persistenceType, 20000), "TestBuildFullTree");

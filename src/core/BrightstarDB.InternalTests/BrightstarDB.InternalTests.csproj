@@ -9,7 +9,7 @@
     <ProjectGuid>{B7BB84F3-3CB8-4D9D-B1C1-2CF4EEAE5A22}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BrightstarDB.Tests</RootNamespace>
+    <RootNamespace>BrightstarDB.InternalTests</RootNamespace>
     <AssemblyName>BrightstarDB.InternalTests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -41,7 +41,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\dotNetRDF.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -57,7 +57,6 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblySetUp.cs" />
     <Compile Include="BinaryPageStoreTests.cs" />
     <Compile Include="BinaryStoreTests.cs" />
     <Compile Include="BPlusTreeTests\BasicTreeTests.cs" />
@@ -75,6 +74,7 @@
     <Compile Include="BrokenStoreTests.cs" />
     <Compile Include="BTreeStoreTests.cs" />
     <Compile Include="BTreeTests.cs" />
+    <Compile Include="TestPaths.cs" />
     <Compile Include="DataObjectTests.cs" />
     <Compile Include="MasterFileTests.cs" />
     <Compile Include="NTriplesParserTests.cs" />

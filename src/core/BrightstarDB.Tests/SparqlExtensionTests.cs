@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class SparqlExtensionTests
     {
         private IBrightstarService _client;
@@ -28,7 +28,7 @@ namespace BrightstarDB.Tests
 #endif
         }
 
-        [TestMethod]
+        [Test]
         public void TestBitwiseAnd()
         {
             var storeName = "TestBitwiseAnd_" + DateTime.Now.Ticks;
@@ -48,7 +48,7 @@ SELECT ?s WHERE {
             Assert.AreEqual("http://example.org/y", row.GetColumnValue("s").ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void TestBitwiseOr()
         {
             var storeName = "TestBitwiseOr_" + DateTime.Now.Ticks;

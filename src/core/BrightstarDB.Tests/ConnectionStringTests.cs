@@ -2,35 +2,35 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class ConnectionStringTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestNullConnectionString()
         {
             var cs = new ConnectionString(null);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void TestBlankConnectionString()
         {
             var cs = new ConnectionString(String.Empty);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(FormatException))]
         public void TestHttpWithoutEndpoint()
         {
             var cs = new ConnectionString("type=http");
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(FormatException))]
         public void TestEmbeddedWithoutStoresDirectory()
         {

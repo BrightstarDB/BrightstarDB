@@ -10,11 +10,11 @@ using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Server;
 using BrightstarDB.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     [Ignore]
     public class ScalingTests
     {
@@ -23,13 +23,13 @@ namespace BrightstarDB.Tests
     @"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
 
-        [TestInitialize]
+        [SetUp]
         public void SetUp()
         {
             _storeManager = StoreManagerFactory.GetStoreManager();
         }
 
-        [TestMethod]
+        [Test]
         public void TestImportAndValidateSingleFile()
         {
             const string fileName = "bsbm_1M.nt";
@@ -180,7 +180,7 @@ namespace BrightstarDB.Tests
 
             #endregion
         }
-        [TestMethod]
+        [Test]
         public void TestRepeatedSmallUnitsOfWork()
         {
             var st = DateTime.UtcNow;
@@ -276,14 +276,14 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestDataObjectLookupScales()
         {
             // generate data for 1million unique resources and common vocab
             // kickoff a new thread for each activity
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsert1000000TriplesWithLargeLiteralProperty()
         {
             var sid = Guid.NewGuid().ToString();
@@ -306,7 +306,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine("Commit triples took " + (end - start).TotalMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsert10000TriplesWithUniqueSubjectAndUniqueLiteral()
         {
             var sid = Guid.NewGuid().ToString();
@@ -324,7 +324,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine("Commit triples took " + sw.ElapsedMilliseconds);
         }
 
-        [Timeout(5400000), TestMethod]
+        [Timeout(5400000), Test]
         public void TestInsert100MTriplesWithSubjectAndObjectReuse()
         {
             var sid = Guid.NewGuid().ToString();
@@ -356,7 +356,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestInsert1000000TriplesWithSubjectAndObjectReuse()
         {
             var sid = Guid.NewGuid().ToString();
@@ -379,7 +379,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine("Commit triples took " + (end - start).TotalMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsert1000000TriplesWithUniqueSubjectResources()
         {
             var sid = Guid.NewGuid().ToString();
@@ -406,7 +406,7 @@ namespace BrightstarDB.Tests
         }
 
         /* Cannot run this test any more because ulong is not in AbstractStoreManager.PersistentTypeIdentifiers
-        [TestMethod]
+        [Test]
         public void TestBtreePerformanceAfterManyInsertsOfLongs()
         {
             var timer = new Stopwatch();
@@ -427,7 +427,7 @@ namespace BrightstarDB.Tests
         }
         */
 #if BTREESTORE
-        [TestMethod]
+        [Test]
         public void TestBtreePerformanceAfterManyInsertsOfObjectRefPayload()
         {
             var timer = new Stopwatch();
@@ -453,7 +453,7 @@ namespace BrightstarDB.Tests
         }
 #endif
 
-        [TestMethod]
+        [Test]
         public void TestQuickLookupIndex()
         {
             var dict = new Dictionary<string, ulong>(10000);
@@ -474,7 +474,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine("time to check and insert from cache : " + timer.ElapsedMilliseconds);
         }
 
-            [TestMethod]
+            [Test]
             public void TestImportAndLookupPerformance()
             {
                 if (!File.Exists(BrightstarDB.Configuration.StoreLocation + "\\import\\bsbm_5m.nt"))
@@ -516,7 +516,7 @@ namespace BrightstarDB.Tests
                 }
             }
 
-            [TestMethod]
+            [Test]
             public void TestImportPerformance25M()
             {
                 const string fileName = "bsbm_25m.nt";
@@ -543,7 +543,7 @@ namespace BrightstarDB.Tests
                 Console.WriteLine("Time to import test file '" + fileName + "': " + timer.ElapsedMilliseconds);
             }
 
-        [TestMethod]
+        [Test]
         public void TestIntersectQueryPerformance()
         {
             var storeId = Guid.NewGuid().ToString();

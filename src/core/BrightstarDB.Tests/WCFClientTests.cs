@@ -1,16 +1,16 @@
 ﻿using System;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class WCFClientTests
     {
         /// <summary>
         /// This test checks that the configuration for using the http clients works as expected for a single operation.
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestBasicHttpBindingClient()
         {
             var client = BrightstarService.GetClient("type=http;endpoint=http://localhost:8090/brightstar");
@@ -19,7 +19,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestNamedPipeBindingClient()
         {
             var client = BrightstarService.GetClient("type=namedPipe;endpoint=net.pipe://localhost/brightstar");
@@ -27,7 +27,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(stores);
         }
 
-        [TestMethod]
+        [Test]
         public void TestNetTcpBindingClient()
         {
             var client = BrightstarService.GetClient("type=tcp;endpoint=net.tcp://localhost:8095/brightstar");

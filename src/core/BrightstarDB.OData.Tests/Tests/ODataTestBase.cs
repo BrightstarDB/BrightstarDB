@@ -7,7 +7,7 @@ using System.Net;
 using System.Threading;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.OData.Tests.Tests
 {

@@ -1,12 +1,12 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class SerializationTests
     {
-        [TestMethod]
+        [Test]
         public void TestWriteVarint()
         {
             var rdn = new Random();

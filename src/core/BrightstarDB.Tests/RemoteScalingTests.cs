@@ -6,18 +6,18 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     [Ignore]
     public class RemoteScalingTests : ClientTestBase
     {
         private static string _importDirPath;
 
-        [ClassInitialize]
-        public static void SetUp(TestContext context)
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             StartService();
             var importDir = Path.Combine(Configuration.StoreLocation, "import");
@@ -28,14 +28,14 @@ namespace BrightstarDB.Tests
             _importDirPath = importDir;
         }
 
-        [ClassCleanup]
-        public static void TearDown()
+        [TestFixtureTearDown]
+        public void TearDown()
         {
             CloseService();
         }
 
-        [TestMethod]
-        [TestCategory("ScalingTests")]
+        [Test]
+        [Category("ScalingTests")]
         public void TestRepeatedSmallUnitsOfWork()
         {
             // ServicePointManager.DefaultConnectionLimit = 1000;
@@ -64,8 +64,8 @@ namespace BrightstarDB.Tests
             Console.WriteLine(duration);
         }
 
-        [TestMethod]
-        [TestCategory("ScalingTests")]
+        [Test]
+        [Category("ScalingTests")]
         public void TestBulkLoad24M()
         {
             var testTarget = new FileInfo(_importDirPath + Path.DirectorySeparatorChar + "BSBM_24M.nt");
@@ -96,8 +96,8 @@ namespace BrightstarDB.Tests
             Console.WriteLine("24M triples imported in {0} ms", timer.ElapsedMilliseconds);
         }
 
-        [TestMethod]
-        [TestCategory("ScalingTests")]
+        [Test]
+        [Category("ScalingTests")]
         public void TestBulkLoad370K()
         {
             var testTarget = new FileInfo(_importDirPath + Path.DirectorySeparatorChar + "BSBM_370k.nt");

@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Text;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class EFClientTests
     {
         private static IBrightstarService GetClient()
@@ -15,7 +15,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestEmbeddedClientMapToRdf()
         {
             var storeName = "foaf_" + Guid.NewGuid().ToString();
@@ -50,7 +50,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual("Networked Planet", person.Organisation);
         }
 
-        [TestMethod]
+        [Test]
         public void TestMapToRdfDataTypeDate()
         {
             var storeName = "foaf_" + Guid.NewGuid().ToString();
@@ -82,7 +82,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsNotNull(person.BirthDate);
         }
 
-        //[TestMethod]
+        //[Test]
         //public void TestMapToRdfDataTypeTime()
         //{
         //    var storeName = "foaf_" + Guid.NewGuid().ToString();
@@ -114,7 +114,7 @@ namespace BrightstarDB.Tests.EntityFramework
         //    Assert.IsNotNull(person.BirthDate);
         //}
 
-        [TestMethod]
+        [Test]
         public void TestHttpClientMapToRdf()
         {
             var storeName = "foaf_" + Guid.NewGuid().ToString();

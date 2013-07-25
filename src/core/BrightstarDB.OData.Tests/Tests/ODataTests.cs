@@ -4,15 +4,15 @@ using System.Linq;
 using System.Net;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.OData.Tests.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class ODataTests : ODataTestBase
     {
-        [ClassInitialize]
-        public static void SetUp(TestContext context)
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             var client = BrightstarService.GetClient("type=embedded;storesDirectory=c:\\brightstar");
 
@@ -28,18 +28,18 @@ namespace BrightstarDB.OData.Tests.Tests
             StartService(new Uri("http://localhost:8090/odata"));
         }
 
-        [ClassCleanup]
-        public static void TearDown()
+        [TestFixtureTearDown]
+        public void TearDown()
         {
             StopService();
         }
 
-        [TestInitialize]
+        [SetUp]
         public void TestSetUp()
         {
         }
 
-        [TestCleanup]
+        [TearDown]
         public void TestCleanup()
         {
         }
@@ -162,7 +162,7 @@ namespace BrightstarDB.OData.Tests.Tests
                                                               "Children_Parent",
                                                           };
 
-        [TestMethod]
+        [Test]
         public void TestMetadataContent()
         {
             var metadataDoc = Get(".");
@@ -180,7 +180,7 @@ namespace BrightstarDB.OData.Tests.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetFullMetadataModel()
         {
             var metadataDoc = Get("$metadata");
@@ -245,7 +245,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
         #endregion
 
-        [TestMethod]
+        [Test]
         public void TestGetMetadata()
         {
             var metadataDoc = Get(".");
@@ -259,7 +259,7 @@ namespace BrightstarDB.OData.Tests.Tests
         #region Test Collections
 
         [Ignore]
-        [TestMethod]
+        [Test]
         public void TestGetArticles()
         {
             var doc = Get("Article");
@@ -284,7 +284,7 @@ namespace BrightstarDB.OData.Tests.Tests
             CheckProperties(singleEntryDoc.Root, expectedProperties);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetCompanies()
         {
             var doc = Get("Company");
@@ -310,7 +310,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetDepts()
         {
             var doc = Get("Department");
@@ -336,7 +336,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetJobRoles()
         {
             var doc = Get("JobRole");
@@ -364,7 +364,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         //GetPeople collection fails when the Age property is included.
 
-        [TestMethod]
+        [Test]
         public void TestGetPeople()
         {
             var doc = Get("Person");
@@ -390,7 +390,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetSkills()
         {
             var doc = Get("Skill");
@@ -417,7 +417,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         #endregion
 
-        [TestMethod]
+        [Test]
         public void TestJobRoleRelationships()
         {
             var doc = Get("JobRole");
@@ -451,7 +451,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(2, relatedEntities.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestDepartmentRelationships()
         {
             var doc = Get("Department");
@@ -479,7 +479,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(5, relatedEntities.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestPeopleRelationships()
         {
             var doc = Get("Person");
@@ -528,7 +528,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestSkillRelationships()
         {
             var doc = Get("Skill");
@@ -582,7 +582,7 @@ namespace BrightstarDB.OData.Tests.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCompanyRelationships()
         {
             var doc = Get("Company");
@@ -611,7 +611,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestJobRoleRelationshipLinks()
         {
             var doc = Get("JobRole");
@@ -638,7 +638,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(2, uris.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestDepartmentRelationshipLinks()
         {
             var doc = Get("Department");
@@ -666,7 +666,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(5, uris.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestPeopleRelationshipLinks()
         {
             var doc = Get("Person");
@@ -706,7 +706,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestSkillRelationshipLinks()
         {
             var doc = Get("Skill");
@@ -756,7 +756,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetById()
         {
             var skillDoc = Get("Skill");
@@ -785,7 +785,7 @@ namespace BrightstarDB.OData.Tests.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetProperty()
         {
             var lookup = Skills.Where(s => s.Name.Equals("Skill7")).FirstOrDefault();
@@ -800,7 +800,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(lookup.Name, propertyDoc.Root.Value);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetRelatedProperty()
         {
             var doc = Get("Person");
@@ -827,7 +827,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetPropertyValue()
         {
             var lookup = Skills.Where(s => s.Name.Equals("Skill7")).FirstOrDefault();
@@ -840,7 +840,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(lookup.Name, value);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetRelatedPropertyValue()
         {
             var doc = Get("Person");
@@ -865,7 +865,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestOrderBy()
         {
             var doc = Get("Skill");
@@ -884,7 +884,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestTop()
         {
             var doc = Get("Skill");
@@ -902,7 +902,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(2, top2.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestSkip()
         {
             var doc = Get("Skill");
@@ -920,7 +920,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(5, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestPagedRelationship()
         {
             var doc = Get("Department");
@@ -938,7 +938,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         #region Filtering
 
-        [TestMethod]
+        [Test]
         public void TestFilterEqual()
         {
             // salary = 29000 (should be 1)
@@ -957,7 +957,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterNotEqual()
         {
             // salary != 29000 (should be 9)
@@ -976,7 +976,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(9, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterGreaterThan()
         {
             // salary > 29000 (should be 4)
@@ -995,7 +995,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(4, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterGreaterThanOrEqual()
         {
             // salary >= 29000 (should be 5)
@@ -1015,7 +1015,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestFilterLessThan()
         {
             // salary < 29000 (should be 5)
@@ -1034,7 +1034,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(5, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterLessThanOrEqual()
         {
             // salary <= 29000 (should be 6)
@@ -1053,7 +1053,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(6, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterLogicalAnd()
         {
             //less than 29K and greater than 27.5K = 3 people
@@ -1072,7 +1072,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(3, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterLogicalOr()
         {
             var doc = Get("Person");
@@ -1090,7 +1090,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(2, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterLogicalNot()
         {
             var doc = Get("Person");
@@ -1108,7 +1108,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(9, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterAdd()
         {
             // salary + 1000 = 30000 (should be 1)
@@ -1126,7 +1126,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.IsNotNull(results);
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
-        [TestMethod]
+        [Test]
         public void TestFilterSubtract()
         {
             // salary - 1000 = 28000 (should be 1)
@@ -1145,7 +1145,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterMultiply()
         {
             // salary * 2 = 58000 (should be 1)
@@ -1163,7 +1163,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.IsNotNull(results);
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
-        [TestMethod]
+        [Test]
         public void TestFilterDivide()
         {
             // salary / 2 = 14500 (should be 1)
@@ -1183,7 +1183,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
         [Ignore] //unsupported
-        [TestMethod]
+        [Test]
         public void TestFilterMod()
         {
             var doc = Get("Person");
@@ -1201,7 +1201,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterPrecedenceGrouping()
         {
             //29000
@@ -1230,7 +1230,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterStringStartsWith()
         {
             var doc = Get("Company");
@@ -1248,7 +1248,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterStringEndsWith()
         {
             var doc = Get("Company");
@@ -1266,7 +1266,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterStringSubstringOf()
         {
             var doc = Get("Company");
@@ -1284,7 +1284,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterStringLength()
         {
             var doc = Get("Company");
@@ -1303,7 +1303,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
         [Ignore] //unsupported
-        [TestMethod]
+        [Test]
         public void TestFilterStringIndexOf()
         {
             var doc = Get("Company");
@@ -1321,7 +1321,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         [Ignore] // BUG 5690 : Currently not working - may be a reflection provider issue
         public void TestFilterStringReplace()
         {
@@ -1340,7 +1340,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterStringSubstring()
         {
             var doc = Get("Company");
@@ -1358,7 +1358,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterStringSubstring2()
         {
             var doc = Get("Company");
@@ -1376,7 +1376,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterStringToLower()
         {
             var doc = Get("Company");
@@ -1394,7 +1394,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterStringToUpper()
         {
             var doc = Get("Company");
@@ -1413,7 +1413,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
       
-        [TestMethod]
+        [Test]
         public void TestFilterStringConcat()
         {
             //e.g. http://services.odata.org/Northwind/Northwind.svc/Customers?$filter=concat(concat(City, ', '), Country) eq 'Berlin, Germany'
@@ -1435,7 +1435,7 @@ namespace BrightstarDB.OData.Tests.Tests
         #endregion
 
         [Ignore]
-        [TestMethod]
+        [Test]
         public void TestExpand()
         {
             var doc = Get("Department");
@@ -1464,7 +1464,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
         [Ignore] //bug 5376 - [documented for now]
-        [TestMethod]
+        [Test]
         public void TestExpand2()
         {
             var doc = Get("Department");
@@ -1502,7 +1502,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
         [Ignore]
-        [TestMethod]
+        [Test]
         public void TestSelect()
         {
             //select only name and salary
@@ -1521,7 +1521,7 @@ namespace BrightstarDB.OData.Tests.Tests
             CheckProperties(item, expectedProperties, false);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSelectAll()
         {
             //select only name and salary
@@ -1541,7 +1541,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
         [Ignore]
-        [TestMethod]
+        [Test]
         public void TestSelectAndExpand()
         {
             var doc = Get("Person?$select=Name,Skills"); //&$expand=Skills
@@ -1584,7 +1584,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, skills.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestInlineCount()
         {
             var doc = Get("Person?$inlinecount=allpages");
@@ -1600,7 +1600,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual("10", inlineCountElem.Value);
         }
 
-        [TestMethod]
+        [Test]
         public void TestInlineCountAfterFilter()
         {
             var doc = Get("Person?$inlinecount=allpages");
@@ -1624,7 +1624,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual("5", inlineCountElem.Value);
         }
 
-        [TestMethod]
+        [Test]
         public void TestInlineCountNone()
         {
             var doc = Get("Person?$inlinecount=none");
@@ -1640,7 +1640,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         #region date functions
 
-        [TestMethod]
+        [Test]
         public void TestFilterDateDay()
         {
             var doc = Get("Company");
@@ -1658,7 +1658,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
         
-        [TestMethod]
+        [Test]
         public void TestFilterDateHour()
         {
             var doc = Get("Company");
@@ -1676,7 +1676,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterDateMinute()
         {
             var doc = Get("Company");
@@ -1694,7 +1694,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterDateMonth()
         {
             var doc = Get("Company");
@@ -1712,7 +1712,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterDateSecond()
         {
             var doc = Get("Company");
@@ -1730,7 +1730,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterDateYear()
         {
             var doc = Get("Company");
@@ -1753,7 +1753,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         #region math functions
 
-        [TestMethod]
+        [Test]
         public void TestFilterMathRoundDouble()
         {
             var doc = Get("Company");
@@ -1771,7 +1771,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
         
-        [TestMethod]
+        [Test]
         public void TestFilterMathRoundDecimal()
         {
             var doc = Get("Company");
@@ -1789,7 +1789,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterMathFloorDouble()
         {
             var doc = Get("Company");
@@ -1807,7 +1807,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterMathFloorDecimal()
         {
             var doc = Get("Company");
@@ -1825,7 +1825,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterMathCeilingDouble()
         {
             var doc = Get("Company");
@@ -1843,7 +1843,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [TestMethod]
+        [Test]
         public void TestFilterMathCeilingDecimal()
         {
             var doc = Get("Company");
@@ -1866,7 +1866,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         #region Formatting
 
-        [TestMethod]
+        [Test]
         public void TestFormatAtom()
         {
             var targetUri = new Uri("http://localhost:8090/odata/Department");
@@ -1880,7 +1880,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
         [Ignore] //not supported - bug 5328
-        [TestMethod]
+        [Test]
         public void TestFormatJson()
         {
             var targetUri = new Uri("http://localhost:8090/odata/Department?$format=json");
@@ -1893,7 +1893,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual("application/json", contentType);
         }
 
-        [TestMethod]
+        [Test]
         public void TestFormatJsonUsingAcceptHeaders()
         {
             var json = GetJson("Person");
@@ -1901,7 +1901,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
         [Ignore] //not supported - bug 5328
-        [TestMethod]
+        [Test]
         public void TestFormatXml()
         {
             var targetUri = new Uri("http://localhost:8090/odata/Department?$format=xml");
@@ -1915,7 +1915,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
         [Ignore]
-        [TestMethod]
+        [Test]
         public void TestFormatXmlUsingAcceptHeaders()
         {
             var xml = GetXml("Person");
@@ -1926,7 +1926,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         #region Data Type Tests 
 
-        [TestMethod]
+        [Test]
         public void TestDataTypes()
         {
             var doc = Get("DataTypeTestEntity");
@@ -1960,7 +1960,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
         #endregion
 
-        [TestMethod]
+        [Test]
         public void TestSkipToken()
         {
             var doc = Get("Article?$top=20");
@@ -1999,7 +1999,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestSkipTokenOrdered()
         {
             //?$orderby=Name

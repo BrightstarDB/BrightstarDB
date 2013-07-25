@@ -1,11 +1,11 @@
 ﻿using BrightstarDB.Storage;
 using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class ResourceTableTests
     {
         private static readonly IPersistenceManager PersistenceManager;
@@ -18,7 +18,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             PersistenceManager = new FilePersistenceManager();
 #endif
         }
-        [TestMethod]
+        [Test]
         public void TestResourceTableInsert()
         {
             const string testString = "this is a test string";
@@ -45,7 +45,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertLongResources()
         {
             var longResourceA = new string('A', 3070);

@@ -5,9 +5,9 @@ using System.Text;
 using BrightstarDB.Profiling;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
     internal static class TestUtils
     {

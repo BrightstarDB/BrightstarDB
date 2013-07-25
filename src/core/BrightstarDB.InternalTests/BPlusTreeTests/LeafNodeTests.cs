@@ -1,13 +1,13 @@
 ﻿using System;
 using BrightstarDB.Storage.BPlusTreeStore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class LeafNodeTests
     {
-        [TestMethod]
+        [Test]
         public void TestBorrowLeft()
         {
             var config = new BPlusTreeConfiguration(8, 8, 4096);
@@ -36,7 +36,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             Assert.IsFalse(rightNode.RedistributeFromLeft(leftNode));
         }
 
-        [TestMethod]
+        [Test]
         public void TestBorrowRight()
         {
             var config = new BPlusTreeConfiguration(8, 8, 4096);

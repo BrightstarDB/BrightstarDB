@@ -7,22 +7,22 @@ using System.Threading;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
 using BrightstarDB.Storage;
-using BrightstarDB.Utils;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using BrightstarDB.Tests;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class DataObjectTests : ClientTestBase
     {
-        [ClassInitialize]
-        public static void SetUp(TestContext context)
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             StartService();
         }
 
-        [ClassCleanup]
-        public static void TearDown()
+        [TestFixtureTearDown]
+        public void TearDown()
         {
             CloseService();
         }
@@ -41,7 +41,7 @@ namespace BrightstarDB.Tests
             return null;
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectContext()
         {
             var connectionString =
@@ -50,7 +50,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(context);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetHttpDataContextByConnectionString()
         {
             var connectionString = "Type=http;endpoint=http://localhost:8090/brightstar;StoreName=DataObjectTests" + Guid.NewGuid();
@@ -60,7 +60,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(typeof(HttpDataObjectContext), context.GetType());
         }
        
-        [TestMethod]
+        [Test]
         public void TestGetEmbeddedDataContextByConnectionString()
         {
             var connectionString = "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=DataObjectTests" + Guid.NewGuid();
@@ -70,7 +70,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(typeof(EmbeddedDataObjectContext), context.GetType());
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetHttpDataContextCreateStore()
         {
             var connectionString = "Type=http;endpoint=http://localhost:8090/brightstar;StoreName=DataObjectTests" + Guid.NewGuid();
@@ -81,7 +81,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(BrightstarClientException))]
         public void TestGetHttpDataContextDeleteStore()
         {
@@ -95,7 +95,7 @@ namespace BrightstarDB.Tests
             context.OpenStore(storeId);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetEmbeddedDataContextCreateStore()
         {
             var connectionString = "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=DataObjectTests" + Guid.NewGuid();
@@ -106,7 +106,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store, "store is null");
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetHttpDataContextOpenStore()
         {
             var connectionString = "Type=http;endpoint=http://localhost:8090/brightstar;StoreName=DataObjectTests" + Guid.NewGuid();
@@ -118,7 +118,7 @@ namespace BrightstarDB.Tests
             store = context.OpenStore(cs.StoreName);
             Assert.IsNotNull(store);
         }
-        [TestMethod]
+        [Test]
         public void TestGetEmbeddedDataContextOpenStore()
         {
             var connectionString = "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=DataObjectTests" + Guid.NewGuid();
@@ -131,7 +131,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectStore()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -140,7 +140,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
+        [Test]
         public void TestOpenDataObjectStore()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -152,7 +152,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
+        [Test]
         public void TestOpenDataObjectStoreWithNamespaceMappings()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -164,7 +164,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
+        [Test]
         public void TestOpenDataObjectStoreWithNamespaceMappingsHttp()
         {
             var context = GetContext("http");
@@ -176,7 +176,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
+        [Test]
         public void TestOpenDataObjectStoreWithNamespaceMappingsEmbedded()
         {
             var context = GetContext("embedded");
@@ -188,7 +188,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectWithUri()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -199,7 +199,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(p1);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectWithUriHttp()
         {
             var context = GetContext("http");
@@ -210,7 +210,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(p1);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectWithUriEmbedded()
         {
             var context = GetContext("embedded");
@@ -221,7 +221,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(p1);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectWithString()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -232,7 +232,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(p1);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectWithStringHttp()
         {
             var context = GetContext("http");
@@ -243,7 +243,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(p1);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectWithStringEmbedded()
         {
             var context = GetContext("embedded");
@@ -254,7 +254,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(p1);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObject()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -266,7 +266,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(0, ((DataObject)p1).Triples.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectWithIdentity()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -280,7 +280,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("http://www.networkedplanet.com/staff/jen", p1.Identity);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDataObjectWithCurie()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -296,7 +296,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("http://www.networkedplanet.com/people/gra", p1.Identity);
         }
 
-        [TestMethod]
+        [Test]
         public void TestRetrieveNonExistantDataObject()
         {
             var context = GetContext("http");
@@ -307,7 +307,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(0, ((DataObject)p1).Triples.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestSaveAndFetchDataObject()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -330,7 +330,7 @@ namespace BrightstarDB.Tests
             
         }
 
-        [TestMethod]
+        [Test]
         public void TestSavedDataObjectPropertyIsSameAfterSave()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -355,7 +355,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("graham", label);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLocalStateAfterSetProperty()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -371,7 +371,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(propValue, "graham");
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetSamePropertyResultsInOnlyOneProperty()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -391,7 +391,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1, ((EmbeddedDataObjectStore)store).AddTriples.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestRemoveProperty()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -412,7 +412,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestRemovePropertyPersisted()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -438,7 +438,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestAddAndRemovePropertyPersisted()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -466,7 +466,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestSetSamePropertyResultsInOnlyOnePropertyAfterSave()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -486,7 +486,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1, ((DataObject)p2).Triples.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestDataObjectFluentApi()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -519,7 +519,7 @@ namespace BrightstarDB.Tests
             store.SaveChanges();
         }
 
-        [TestMethod]
+        [Test]
         public void TestDataObjectList()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -533,7 +533,7 @@ namespace BrightstarDB.Tests
             var list = store.MakeListDataObject(new[] {"bob", "gra"});
 
             Assert.AreEqual("bob", list.GetPropertyValue("rdf:first"));
-            Assert.IsInstanceOfType(list.GetPropertyValue("rdf:rest"), typeof(IDataObject));
+            Assert.IsInstanceOfType(typeof(IDataObject), list.GetPropertyValue("rdf:rest"));
             var dataobj = list.GetPropertyValue("rdf:rest") as IDataObject;
             Assert.IsNotNull(dataobj);
             Assert.AreEqual("gra", dataobj.GetPropertyValue("rdf:first"));
@@ -541,7 +541,7 @@ namespace BrightstarDB.Tests
             store.SaveChanges();
         }
 
-        [TestMethod]
+        [Test]
         public void TestAddProperty()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -561,7 +561,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, ((DataObject)p2).Triples.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetProperty()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -579,7 +579,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, ((DataObject)p2).Triples.Count());            
         }
 
-        [TestMethod]
+        [Test]
         public void TestCurieObjectGetProperty()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -601,7 +601,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("graham", label);
         }
 
-        [TestMethod]
+        [Test]
         public void TestTypedObjectGetProperty()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -629,7 +629,7 @@ namespace BrightstarDB.Tests
         
             
 
-        [TestMethod]
+        [Test]
         public void TestCurieObjectGetPropertyPersisted()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -662,7 +662,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("graham", label2);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetPropertyDataObject()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -681,7 +681,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1, ((DataObject)p3).Triples.Count());                        
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetProperties()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -706,7 +706,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, propValues.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestRemoveSpecificValueProperty()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -746,7 +746,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestGetRelatedProxies()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -776,7 +776,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(p1.Identity, np.Identity);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetRelatedProxiesWithSafeCurie()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -810,7 +810,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(p1.Identity, np.Identity);
         }
 
-        [TestMethod]
+        [Test]
         public void TestAnonymousDataObjects()
         {
             // a resource with an anon data object which links to two other objects
@@ -843,7 +843,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestRemoveProperty2()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -884,7 +884,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(TransactionPreconditionsFailedException))]
         public void TestOptimisticLocking()
         {
@@ -918,7 +918,7 @@ namespace BrightstarDB.Tests
             store2.SaveChanges();
         }
 
-        [TestMethod]
+        [Test]
         public void TestDataObjectProperties()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -944,7 +944,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestDataObjectPropertiesUsingMappings()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -978,7 +978,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestDataObjectDeleteObjectsUsedInProperties()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -1023,7 +1023,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestRemoveLiteralProperty()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -1055,7 +1055,7 @@ namespace BrightstarDB.Tests
             Assert.IsNull(o4.GetPropertyValue(p1));
         }
 
-        [TestMethod]
+        [Test]
         public void TestQueryLessThan()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -1076,7 +1076,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestQueryGreaterThan()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -1096,7 +1096,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(5, result.SparqlResultRows().Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestPreconditionsFailedException()
         {
             IDataObjectContext context =
@@ -1128,7 +1128,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestRefreshSingleClientWins()
         {
             IDataObjectContext context =
@@ -1165,7 +1165,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestRefreshSingleStoreWins()
         {
             IDataObjectContext context =

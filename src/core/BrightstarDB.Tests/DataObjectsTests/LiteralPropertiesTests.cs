@@ -1,13 +1,13 @@
 ﻿using System;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.DataObjectsTests
 {
-    [TestClass]
+    [TestFixture]
     public class LiteralPropertiesTests
     {
-        [TestMethod]
+        [Test]
         public void TestOverwriteSingleProperty()
         {
             string storeName = "OverwriteSingleProperty_" + DateTime.Now.Ticks;

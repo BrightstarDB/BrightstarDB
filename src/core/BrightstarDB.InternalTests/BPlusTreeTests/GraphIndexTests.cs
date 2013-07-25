@@ -1,12 +1,12 @@
 ﻿using BrightstarDB.Storage.BPlusTreeStore.GraphIndex;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class GraphIndexTests
     {
-        [TestMethod]
+        [Test]
         public void TestGraphIndexCrud()
         {
             using(var pageStore = TestUtils.CreateEmptyPageStore("TestGraphIndexCrud.data"))

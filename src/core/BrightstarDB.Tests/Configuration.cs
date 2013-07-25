@@ -15,5 +15,10 @@ namespace BrightstarDB.Tests
                     System.Configuration.ConfigurationManager.AppSettings["BrightstarDB.StoreLocation"];
             }
         }
+
+        public  static string DataLocation
+        {
+            get { return "..\\..\\Data\\"; }
+        }
     }
 }
