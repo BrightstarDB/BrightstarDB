@@ -1,4 +1,6 @@
 ﻿using System;
+using BrightstarDB.Portable.Adaptation;
+using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
 #if BTREESTORE
 using BrightstarDB.Storage.BTreeStore;
@@ -28,6 +30,8 @@ namespace BrightstarDB.Storage
 #else
 #if WINDOWS_PHONE
             return  new BPlusTreeStore.BPlusTreeStoreManager(storeConfiguration, new IsolatedStoragePersistanceManager());
+#elif PORTABLE
+            return new BPlusTreeStoreManager(storeConfiguration, PlatformAdapter.Resolve<IPersistenceManager>());
 #else
             return storeConfiguration.UseIsolatedStorage ? new BPlusTreeStore.BPlusTreeStoreManager(storeConfiguration, new IsolatedStoragePersistanceManager()) : new BPlusTreeStore.BPlusTreeStoreManager(storeConfiguration, new FilePersistenceManager());
 #endif

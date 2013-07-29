@@ -1,4 +1,4 @@
-﻿namespace BrightstarDB.EntityFramework
+﻿namespace BrightstarDB.Client
 {
     /// <summary>
     /// An enumeration of values that specify whether property changes

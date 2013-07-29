@@ -1,7 +1,6 @@
-﻿#if SILVERLIGHT
+﻿#if SILVERLIGHT || PORTABLE
 #else
 using System.Diagnostics;
-
 #endif
 
 namespace BrightstarDB
@@ -12,7 +11,7 @@ namespace BrightstarDB
     /// <remarks>This class will be subject to review prior to the 1.0 release of Brightstar and may change significantly for the final release.</remarks>
     public class Logging
     {
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
         internal static void LogInfo(string msg, params object[] args){}
         internal static void LogError(BrightstarEventId eventId, string msg, params object[] args){}
         internal static void LogWarning(BrightstarEventId eventId, string msg, params object[] args){}

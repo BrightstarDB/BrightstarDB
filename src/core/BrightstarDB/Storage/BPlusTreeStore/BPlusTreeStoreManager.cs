@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Storage.TransactionLog;
+#if PORTABLE
+using Path=VDS.RDF.Path;
+#endif
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
@@ -32,7 +35,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             foreach(var directory in _persistenceManager.ListSubDirectories(baseLocation))
             {
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                 // Silverlight does not have a Path.Combine that takes three params
                 var path = Path.Combine(Path.Combine(baseLocation, directory), MasterFile.MasterFileName);
 #else
@@ -203,10 +206,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public void ActivateConsolidationStore(string storeLocation)
         {
-#if !WINDOWS_PHONE
-            var tempFileName = Path.Combine(storeLocation, Path.GetRandomFileName());
+#if WINDOWS_PHONE || PORTABLE
+            var tempFileName = Path.Combine(storeLocation, Guid.NewGuid().ToString("N"));            
 #else
-            var tempFileName = Path.Combine(storeLocation, Guid.NewGuid().ToString("N"));
+            var tempFileName = Path.Combine(storeLocation, Path.GetRandomFileName());
 #endif
             var consolidateDataPath = Path.Combine(storeLocation, ConsolidateFileName);
             var storeDataPath = Path.Combine(storeLocation, DataFileName);
@@ -221,7 +224,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 _persistenceManager.RenameFile(tempFileName, storeDataPath);
                 throw;
             }
-            File.Delete(tempFileName);
+            _persistenceManager.DeleteFile(tempFileName);
         }
 
         #endregion

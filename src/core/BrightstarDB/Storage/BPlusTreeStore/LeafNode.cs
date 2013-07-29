@@ -5,6 +5,7 @@ using System.Text;
 using BrightstarDB.Profiling;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
+using VDS.RDF;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {

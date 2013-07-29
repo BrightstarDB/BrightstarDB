@@ -20,7 +20,7 @@ namespace BrightstarDB.EntityFramework.Query
             _converter = converter;
         }
 
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
         protected internal override Expression VisitExtensionExpression(ExtensionExpression expression)
 #else
         protected override Expression  VisitExtensionExpression(ExtensionExpression expression)
@@ -76,6 +76,18 @@ namespace BrightstarDB.EntityFramework.Query
         {
             if(memberBinding.BindingType == MemberBindingType.Assignment)
             {
+#if PORTABLE
+                var propertyInfo = memberBinding.Member as PropertyInfo;
+                var assignment = memberBinding as MemberAssignment;
+                if (propertyInfo != null 
+                    && assignment != null 
+                    && assignment.Expression.Type.IsValueType 
+                    && !propertyInfo.PropertyType.IsValueType)
+                {
+                    var valueExpression = Expression.TypeAs(VisitExpression(assignment.Expression), propertyInfo.PropertyType);
+                    return Expression.Bind(memberBinding.Member, valueExpression);
+                }
+#else
                 if (memberBinding.Member.MemberType == MemberTypes.Property)
                 {
                     var propertyInfo = memberBinding.Member as PropertyInfo;
@@ -86,6 +98,7 @@ namespace BrightstarDB.EntityFramework.Query
                         return Expression.Bind(memberBinding.Member, valueExpression);
                     }
                 }
+#endif
             }
             return base.VisitMemberBinding(memberBinding);
         }

@@ -6,11 +6,12 @@ using System.Text;
 using System.Xml.Linq;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
-using BrightstarDB.Model;
 using BrightstarDB.Storage;
 using System.Threading;
+using VDS.RDF;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 using TransactionType = BrightstarDB.Storage.TransactionType;
+using Triple = BrightstarDB.Model.Triple;
 
 namespace BrightstarDB.Server
 {
@@ -170,7 +171,11 @@ namespace BrightstarDB.Server
             }
             catch (Exception)
             {
+#if PORTABLE
+                System.CloseExtensions.Close(responseStream);
+#else
                 responseStream.Close();
+#endif
                 throw;
             }
         }
@@ -230,7 +235,11 @@ namespace BrightstarDB.Server
             }
             catch(Exception)
             {
+#if PORTABLE
+                System.CloseExtensions.Close(responseStream);
+#else
                 responseStream.Close();
+#endif
                 throw;
             }
         }

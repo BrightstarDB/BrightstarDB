@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
 using System.IO.Compression;
 #endif
 
@@ -166,7 +166,7 @@ namespace BrightstarDB.Rdf
             _sink = sink;
             _defaultGraphUri = defaultGraphUri;
             using (
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
                 var streamReader = _decompressStream
                                        ? new StreamReader(new GZipStream(data, CompressionMode.Decompress))
                                        : new StreamReader(data))

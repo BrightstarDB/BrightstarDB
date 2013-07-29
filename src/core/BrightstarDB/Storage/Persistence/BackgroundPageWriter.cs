@@ -1,8 +1,12 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#else
+using System.Collections.Concurrent;
+#endif
 
 namespace BrightstarDB.Storage.Persistence
 {

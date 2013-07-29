@@ -73,7 +73,11 @@ namespace BrightstarDB.EntityFramework.Query
 
             if (sourceVarName != null)
             {
+#if PORTABLE
+                if (expression.Member is PropertyInfo)
+#else
                 if (expression.Member.MemberType == MemberTypes.Property)
+#endif
                 {
                     var propertyInfo = expression.Member as PropertyInfo;
                     var hint = QueryBuilder.Context.GetPropertyHint(propertyInfo);

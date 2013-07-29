@@ -1,9 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using BrightstarDB.Model;
+#if PORTABLE
+using Path = VDS.RDF.Path;
+using BrightstarDB.Portable.Compatibility;
+#else
+using System.Collections.Concurrent;
+#endif
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
 #if !SILVERLIGHT
@@ -122,7 +127,7 @@ namespace BrightstarDB.Server
                                 var st = DateTime.UtcNow;
                                 job.Run();
                                 var et = DateTime.UtcNow;
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                                 Logging.LogInfo("Job completed in {0}", et.Subtract(st).TotalMilliseconds);
 #else
                                 Logging.LogInfo("Job completed in {0} : Current memory usage : {1}",et.Subtract(st).TotalMilliseconds, System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 );

@@ -20,7 +20,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         // maps short value to prefix
         private readonly Dictionary<string, string> _shortValueMappings = new Dictionary<string, string>();
 
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
         private readonly object _lock =new object();
 #else
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
@@ -52,7 +52,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public string MakePrefixedUri(string uri)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock (_lock)
             {
                 var pos = uri.LastIndexOf("/");
@@ -124,7 +124,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             var shortValue = uri.Substring(0, pos);
             var rest = uri.Substring(pos + 1);
 
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock(_lock)
             {
                 string prefix;
@@ -164,7 +164,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <param name="profiler"></param>
         private void Load(IPage page, BrightstarProfiler profiler)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock (_lock)
             {
                 InterlockedLoad(page, profiler);

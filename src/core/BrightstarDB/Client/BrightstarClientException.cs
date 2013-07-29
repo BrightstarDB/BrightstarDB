@@ -7,7 +7,7 @@ using System.ServiceModel;
 
 namespace BrightstarDB.Client
 {
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
     /// <summary>
     /// Base class for client errors reported from Brightstar.
     /// </summary>

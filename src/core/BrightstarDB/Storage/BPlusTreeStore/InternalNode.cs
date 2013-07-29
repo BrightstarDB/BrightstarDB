@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
+using VDS.RDF;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {

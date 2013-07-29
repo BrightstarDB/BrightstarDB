@@ -114,6 +114,28 @@ namespace BrightstarDB.Client
         /// <returns>A stream containing XML SPARQL results</returns>
         Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression, IEnumerable<string> defaultGraphUris, SparqlResultsFormat resultsFormat = null);
 
+#if PORTABLE
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="preconditions">NTriples or NQuads that must be in the store in order for the transaction to execute</param>
+        /// <param name="deletePatterns">The delete patterns that will be removed from the store</param>
+        /// <param name="insertData">The NTriples or NQuads data that will be inserted into the store.</param>
+        /// <param name="defaultGraphUri">The URI of the default graph that the transaction will be applied to</param>
+        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <remarks>If <paramref name="preconditions"/>, <paramref name="deletePatterns"/> or <paramref name="insertData"/> contain
+        /// quads, the graph URI specified by the quad will override the value provided by <paramref name="defaultGraphUri"/>. </remarks>
+        IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri = Constants.DefaultGraphUri);
+
+        /// <summary>
+        /// Execute a SPARQL Update expression against a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to be updated</param>
+        /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
+        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        IJobInfo ExecuteUpdate(string storeName, string updateExpression);
+#else
         /// <summary>
         /// Execute an update transaction.
         /// </summary>
@@ -136,6 +158,7 @@ namespace BrightstarDB.Client
         /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
         /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
         IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true);
+#endif
 
         /// <summary>
         /// Gets the information about a job. Including status and any messages.

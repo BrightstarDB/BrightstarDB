@@ -16,7 +16,7 @@ namespace BrightstarDB.EntityFramework
         private readonly bool _isAttached;
         private readonly BrightstarEntityObject _beo;
         private readonly string _propertyTypeUri;
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
         private readonly List<T> _items;
 #else
         private readonly HashSet<T> _items;
@@ -28,7 +28,7 @@ namespace BrightstarDB.EntityFramework
         /// <param name="initialValues"></param>
         internal LiteralsCollection(IEnumerable<T> initialValues)
         {
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
             _items = new List<T>(initialValues);
 #else
             _items = new HashSet<T>(initialValues);
@@ -88,7 +88,7 @@ namespace BrightstarDB.EntityFramework
             {
                 _items.Add(item);
             }
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, 0));
 #else
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
@@ -156,7 +156,7 @@ namespace BrightstarDB.EntityFramework
                 if (GetPropertyValues().Any(x => x.Equals(item)))
                 {
                     _beo.DataObject.RemoveProperty(_propertyTypeUri, item);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
                     OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, 0));
 #else
                     OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
@@ -168,7 +168,7 @@ namespace BrightstarDB.EntityFramework
             bool removed = _items.Remove(item);
             if (removed)
             {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, 0));
 #else
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
@@ -214,7 +214,7 @@ namespace BrightstarDB.EntityFramework
             if (items == null) throw new ArgumentNullException("items");
             var addItems = items.ToList();
             foreach(var item in addItems) Add(item);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, addItems, 0));
 #else
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, addItems));

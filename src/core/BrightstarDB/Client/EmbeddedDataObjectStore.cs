@@ -140,7 +140,9 @@ namespace BrightstarDB.Client
             while (!(status.JobStatus == JobStatus.CompletedOk || status.JobStatus == JobStatus.TransactionError))
             {
                 // wait for completion.
+#if !PORTABLE
                 Thread.Sleep(5);
+#endif
                 status = _serverCore.GetJobStatus(_storeName, jobId.ToString());
             }
 

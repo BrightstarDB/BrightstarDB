@@ -1,5 +1,9 @@
 ﻿using System;
+#if !PORTABLE
 using System.Collections.Concurrent;
+#else
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
 {

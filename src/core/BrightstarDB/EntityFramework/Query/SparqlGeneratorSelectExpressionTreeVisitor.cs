@@ -69,7 +69,7 @@ namespace BrightstarDB.EntityFramework.Query
                 var updatedExpression = VisitExpression(expression.Expression) as UnaryExpression;
                 if (updatedExpression != null && updatedExpression.Operand is SelectVariableNameExpression)
                 {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
                     return Expression.MakeMemberAccess(updatedExpression, expression.Member);
 #else
                     return expression.Update(updatedExpression);
@@ -78,7 +78,11 @@ namespace BrightstarDB.EntityFramework.Query
             }
             if (!String.IsNullOrEmpty(sourceVarName))
             {
+#if PORTABLE
+                if (expression.Member is PropertyInfo)
+#else
                 if (expression.Member.MemberType == MemberTypes.Property)
+#endif
                 {
                     var propertyInfo = expression.Member as PropertyInfo;
                     var propertyHint = _queryBuilder.Context.GetPropertyHint(propertyInfo);
@@ -179,7 +183,7 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 updatedBindings.Add(VisitMemberBinding(b));
             }
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             var updatedExpression = Expression.MemberInit(expression.NewExpression, updatedBindings);
 #else
             var updatedExpression =  expression.Update(expression.NewExpression, updatedBindings);
@@ -255,12 +259,16 @@ namespace BrightstarDB.EntityFramework.Query
                 var fieldInfo = m as FieldInfo;
                 return fieldInfo.FieldType;
             }
+#if PORTABLE
+            throw new ArgumentException("Unexpected member type", "m");
+#else
             throw new ArgumentException(String.Format("Unexpected member type: {0}", m.MemberType), "m");
+#endif
         }
 
         protected override MemberBinding VisitMemberAssignment(MemberAssignment memberAssignment)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             return Expression.Bind(memberAssignment.Member, VisitExpression(memberAssignment.Expression));
 #else
             return memberAssignment.Update(VisitExpression(memberAssignment.Expression));
@@ -269,7 +277,7 @@ namespace BrightstarDB.EntityFramework.Query
 
         protected override Expression VisitConditionalExpression(ConditionalExpression expression)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             return Expression.Condition(VisitExpression(expression.Test),
                                         VisitExpression(expression.IfTrue),
                                         VisitExpression(expression.IfFalse));
@@ -281,7 +289,7 @@ namespace BrightstarDB.EntityFramework.Query
 
         protected override Expression VisitBinaryExpression(BinaryExpression expression)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             return Expression.MakeBinary(expression.NodeType,
                                          VisitExpression(expression.Left), VisitExpression(expression.Right),
                                          expression.IsLiftedToNull, expression.Method,
@@ -416,7 +424,7 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 return VisitExpression(expression.Operand);
             }
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             return Expression.MakeUnary(expression.NodeType, expression.Operand, expression.Type, expression.Method);
 #else
             return expression.Update(VisitExpression(expression.Operand));

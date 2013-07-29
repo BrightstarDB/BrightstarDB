@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
-using BrightstarDB.Storage.BTreeStore;
 
 namespace BrightstarDB.Storage
 {
@@ -17,6 +15,12 @@ namespace BrightstarDB.Storage
         /// </summary>
         public bool UseIsolatedStorage { get; set; }
 #endif
+        
+        /// <summary>
+        /// The implementation of the abstract persistence layer used by the store.
+        /// </summary>
+        public IPersistenceManager PersistenceManager { get; set; }
+
         /// <summary>
         /// Get or set the <see cref="System.Type"/> of the 
         /// <see cref="IStoreManager"/> instance to be used by the store.

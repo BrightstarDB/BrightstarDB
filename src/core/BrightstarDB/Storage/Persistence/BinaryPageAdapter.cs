@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+#if PORTABLE
+using Array = BrightstarDB.Portable.Compatibility.Array;
+#endif
 
 namespace BrightstarDB.Storage.Persistence
 {

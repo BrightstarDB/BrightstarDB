@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+#if !PORTABLE
 using System.Threading.Tasks;
+#endif
 using BrightstarDB.Storage;
 using BrightstarDB.Server;
 #if !SILVERLIGHT
@@ -193,6 +195,9 @@ namespace BrightstarDB.Client
                 var t = new Thread(ExecuteQuery);
                 t.Start(new QueryParams(storeName, queryExpression, ifNotModifiedSince, resultsFormat, pStream));
                 t.Join();
+#elif PORTABLE
+                _serverCore.Query(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince, resultsFormat,
+                                  pStream);
 #else
                 var t = new Task(() => _serverCore.Query(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince, resultsFormat, pStream));
                 t.Start();
@@ -264,6 +269,9 @@ namespace BrightstarDB.Client
                 var t = new Thread(ExecuteQuery);
                 t.Start(new QueryParams(commitPoint, queryExpression, resultsFormat, pStream));
                 t.Join();
+#elif PORTABLE
+                _serverCore.Query(commitPoint.StoreName, commitPoint.Id, queryExpression, defaultGraphUris,
+                                  resultsFormat, pStream);
 #else
                 var t =
                     new Task(() => _serverCore.Query(commitPoint.StoreName, commitPoint.Id, queryExpression, defaultGraphUris, resultsFormat, pStream));
@@ -277,6 +285,7 @@ namespace BrightstarDB.Client
                 pStream.Seek(0, SeekOrigin.Begin);
                 return pStream;
             }
+#if !PORTABLE
             catch (AggregateException aggregateException)
             {
                 Logging.LogError(BrightstarEventId.ServerCoreException,
@@ -295,6 +304,7 @@ namespace BrightstarDB.Client
                         "Error querying store {0}@{1} with expression {2}. Multiple errors occurred: {3}",
                         commitPoint.StoreName, commitPoint.Id, queryExpression, messages));
             }
+#endif
             catch (Exception ex)
             {
                 Logging.LogError(BrightstarEventId.ServerCoreException,
@@ -306,6 +316,32 @@ namespace BrightstarDB.Client
             }
         }
 
+#if PORTABLE
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="preconditions">NTriples that must be in the store in order for the transaction to execute</param>
+        /// <param name="deletePatterns">The delete patterns that will be removed from the store</param>
+        /// <param name="insertData">The NTriples data that will be inserted into the store.</param>
+        /// <param name="defaultGraphUri">The URI of the default graph to apply the transaction to.</param>
+        /// <returns>Job Info</returns>
+        public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
+                                           string insertData, string defaultGraphUri)
+        {
+            try
+            {
+                var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData,
+                                                           defaultGraphUri);
+                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error Queing Transaction {0} {1} {2}", storeName, deletePatterns, insertData);
+                throw new BrightstarClientException("Error queing transaction in store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+#else
         /// <summary>
         /// Execute an update transaction.
         /// </summary>
@@ -351,7 +387,23 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException("Error queing transaction in store " + storeName + ". " + ex.Message, ex);
             }
         }
+#endif
 
+#if PORTABLE
+        public IJobInfo ExecuteUpdate(string storeName, string updateExpression)
+        {
+            try
+            {
+                var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
+                return new JobInfoWrapper(new JobInfo { JobId = jobId.ToString(), JobPending = true });
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error queing SPARQL update {0} {1}", storeName, updateExpression);
+                throw new BrightstarClientException("Error queing SPARQL update in store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+#else
         /// <summary>
         /// Execute a SPARQL Update expression against a store
         /// </summary>
@@ -392,6 +444,7 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException("Error queing SPARQL update in store " + storeName + ". " + ex.Message, ex);
             }
         }
+#endif
 
 #if SILVERLIGHT
         
@@ -688,7 +741,7 @@ namespace BrightstarDB.Client
                                              JobId = t.JobId,
                                              StartTime = t.TransactionStartTime,
                                              StoreName = storeName,
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                                              Status = (BrightstarTransactionStatus)((int)t.TransactionStatus),
                                              TransactionType = (BrightstarTransactionType)((int)t.TransactionType)
 #else

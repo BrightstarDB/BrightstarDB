@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BrightstarDB.Profiling;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+using Array = BrightstarDB.Portable.Compatibility.Array;
+#endif
 
 namespace BrightstarDB.Storage.Persistence
 {
@@ -43,7 +47,7 @@ namespace BrightstarDB.Storage.Persistence
             {
                 if (readOnly)
                 {
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                     throw new FileNotFoundException(String.Format("Could not find file at {0}", filePath));
 #else
                     throw new FileNotFoundException(String.Format("Could not find file at {0}", filePath), filePath);

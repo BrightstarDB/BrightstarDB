@@ -4,6 +4,10 @@ using System.IO;
 using System.Linq;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Storage.TransactionLog;
+#if PORTABLE
+using Path=VDS.RDF.Path;
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.BTreeStore
 {
@@ -245,15 +249,15 @@ namespace BrightstarDB.Storage.BTreeStore
                         }
                         catch (Exception ex)
                         {
-#if !WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
+                            Logging.LogError(BrightstarEventId.ObjectWriteError,
+                 "Error writing object {0} with Id {1} and type {2}. Cause: {3}.",
+                 obj, obj.ObjectId, obj.GetType().FullName, ex);
+#else
                             Logging.LogError(BrightstarEventId.ObjectWriteError,
                                              "Error writing object {0} with Id {1} and type {2}. Cause: {3}. Call stack: {4}",
                                              obj, obj.ObjectId, obj.GetType().FullName, ex,
                                              Environment.StackTrace);
-#else
-                            Logging.LogError(BrightstarEventId.ObjectWriteError,
-                 "Error writing object {0} with Id {1} and type {2}. Cause: {3}.",
-                 obj, obj.ObjectId, obj.GetType().FullName, ex);
 #endif
                             throw;
                         }

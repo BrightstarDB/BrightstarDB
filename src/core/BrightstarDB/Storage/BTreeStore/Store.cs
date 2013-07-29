@@ -4,10 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BrightstarDB.Client;
-using BrightstarDB.Model;
 using BrightstarDB.Profiling;
 using BrightstarDB.Query;
 using BrightstarDB.Rdf;
+using VDS.RDF;
+using Triple = BrightstarDB.Model.Triple;
 
 namespace BrightstarDB.Storage.BTreeStore
 {
@@ -103,7 +104,7 @@ namespace BrightstarDB.Storage.BTreeStore
         /// <param name="readOnly">Create a read only store</param>
         internal Store(string storeLocation, bool readOnly)
         {
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
             _tmpPath = Path.GetTempPath();
 #endif
             _instanceId = Guid.NewGuid().ToString();
@@ -125,7 +126,7 @@ namespace BrightstarDB.Storage.BTreeStore
         {
             _graphIndex = new GraphIndex();
             _prefixManager = new PrefixManager();
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
             _tmpPath = Path.GetTempPath();
 #endif
             _instanceId = Guid.NewGuid().ToString();
@@ -613,12 +614,12 @@ namespace BrightstarDB.Storage.BTreeStore
         {
             Close();
             _loadedObjects.Clear();
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
             RemoveCachedQueries();
 #endif
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
         private void RemoveCachedQueries()
         {
             var directoryInfo = new DirectoryInfo(_tmpPath);
@@ -636,7 +637,11 @@ namespace BrightstarDB.Storage.BTreeStore
                 if (_inputStream != null)
                 {
                     _inputStream.Dispose();
+#if PORTABLE
+                    System.CloseExtensions.Close(_inputStream);
+#else
                     _inputStream.Close();
+#endif
                     _inputStream = null;
                 }
             }
@@ -1514,7 +1519,7 @@ namespace BrightstarDB.Storage.BTreeStore
 
         public void DeleteGraphs(IEnumerable<string> graphUris)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             var graphUriSet = new VDS.RDF.HashSet<ulong>(graphUris.Select(g => _graphIndex.LookupGraphId(g)));
 #else
             var graphUriSet = new HashSet<ulong>(graphUris.Select(g=>_graphIndex.LookupGraphId(g)));
