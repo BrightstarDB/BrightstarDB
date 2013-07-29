@@ -32,15 +32,7 @@ namespace BrightstarDB.Server
         {
             _errorCallback = errorCallback;
             _successCallback = successCallback;
-            var writerThread = new Thread(RunExport);
-            try
-            {
-                writerThread.Start(this);
-            }
-            catch (Exception ex)
-            {
-                errorCallback(_jobId, ex);
-            }
+            ThreadPool.QueueUserWorkItem(RunExport, this);
         }
 
         private static void RunExport(object jobData)

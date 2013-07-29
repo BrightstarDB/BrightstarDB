@@ -14,41 +14,24 @@ namespace BrightstarDB.Storage.Persistence
     {
         private readonly ConcurrentQueue<WriteTask> _writeTasks;
         private bool _shutdownRequested;
-        private bool _stopRequested;
-        //private readonly AutoResetEvent _taskAdded;
         private readonly Dictionary<ulong, long> _writeTimestamps;
-        private readonly Thread _writerThread;
         private readonly Stream _outputStream;
+        private readonly ManualResetEvent _shutdownCompleted;
 
         public BackgroundPageWriter(Stream outputStream)
         {
             _outputStream = outputStream;
             _writeTasks = new ConcurrentQueue<WriteTask>();
             _shutdownRequested = false;
-            _stopRequested = false;
-            //_taskAdded = new AutoResetEvent(false);
+            _shutdownCompleted = new ManualResetEvent(false);
             _writeTimestamps = new Dictionary<ulong, long>();
-            _writerThread = new Thread(Run);
-            _writerThread.Start();
+            ThreadPool.QueueUserWorkItem(Run);
         }
 
         public void Shutdown()
         {
-            if (_writerThread.IsAlive)
-            {
-                //_taskAdded.Set();
-                _shutdownRequested = true;
-                _writerThread.Join();
-            }
-        }
-
-        public void Stop()
-        {
-            if (_writerThread.IsAlive)
-            {
-                _stopRequested = true;
-                _writerThread.Join();
-            }
+            _shutdownRequested = true;
+            _shutdownCompleted.WaitOne();
         }
 
         public void QueueWrite(IPage pageToWrite, ulong transactionId)
@@ -57,39 +40,24 @@ namespace BrightstarDB.Storage.Persistence
             Logging.LogDebug("Queue {0}", pageToWrite.Id);
 #endif
             _writeTasks.Enqueue(new WriteTask{PageToWrite = pageToWrite, TransactionId = transactionId});
-            //_taskAdded.Set();
         }
 
         public void Flush()
         {
             while(!_writeTasks.IsEmpty)
             {
-                Thread.Sleep(10); // Spin until the queue is empty
+                _shutdownCompleted.WaitOne(10); // Spin until the queue is empty
             }
             _outputStream.Flush();
         }
 
-        public void Run()
+        private void Run(object state)
         {
             while (!_shutdownRequested)
             {
                 WriteTask writeTask;
                 if (_writeTasks.TryDequeue(out writeTask))
                 {
-                    /*
-                    long writeTimestamp;
-                    if (_writeTimestamps.TryGetValue(writeTask.PageToWrite.Id, out writeTimestamp) &&
-                        writeTimestamp >= writeTask.PageToWrite.Modified)
-                    {
-                        // Page already written
-                        //Logging.LogInfo("Page {0} already written at timestamp {1}. Skipping write", writeTask.PageToWrite.Id, writeTask.PageToWrite.Modified);
-                        continue;
-                    }
-                    writeTimestamp = writeTask.PageToWrite.Write(_outputStream, writeTask.TransactionId);
-                    _writeTimestamps[writeTask.PageToWrite.Id] = writeTimestamp;
-                    //Logging.LogInfo("Background write of page {0} @ {1} completed.", writeTask.PageToWrite.Id,
-                    //                writeTimestamp);
-                     */
                     try
                     {
                         long writeTimestamp;
@@ -105,16 +73,11 @@ namespace BrightstarDB.Storage.Persistence
                 }
                 else
                 {
-                    if (_writeTasks.IsEmpty && _stopRequested)
-                    {
-                        Logging.LogInfo("Stop requested and no further pages left to write.");
-                        return;
-                    }
-                    //_taskAdded.WaitOne(3000);
                     // Instead of waiting on a event, just spin wait
-                    Thread.Sleep(0);
+                    _shutdownCompleted.WaitOne(1);
                 }
             }
+            _shutdownCompleted.Set();
         }
 
         #region Implementation of IDisposable
