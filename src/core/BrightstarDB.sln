@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.EntityFramewor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.InternalTests", "BrightstarDB.InternalTests\BrightstarDB.InternalTests.csproj", "{B7BB84F3-3CB8-4D9D-B1C1-2CF4EEAE5A22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "relinq", "relinq\relinq.csproj", "{9B258A0E-AA34-433C-B2D3-D768C47227BC}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = BrightstarDB.vsmdi
@@ -132,6 +134,16 @@ Global
 		{B7BB84F3-3CB8-4D9D-B1C1-2CF4EEAE5A22}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{B7BB84F3-3CB8-4D9D-B1C1-2CF4EEAE5A22}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{B7BB84F3-3CB8-4D9D-B1C1-2CF4EEAE5A22}.Release|x86.ActiveCfg = Release|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9B258A0E-AA34-433C-B2D3-D768C47227BC}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

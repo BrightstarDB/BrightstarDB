@@ -467,9 +467,8 @@ namespace BrightstarDB.EntityFramework.Query
             if (expression.QueryModel.ResultOperators.Any(r => r is GroupResultOperator))
             {
                 // Handle grouped subquery
-                var grouping = expression.QueryModel.ResultOperators.First(r => r is GroupResultOperator);
                 SparqlGroupingExpression sparqlGroupingExpression;
-                if (_queryBuilder.TryGetGroupingExpression(grouping as GroupResultOperator, out sparqlGroupingExpression))
+                if (_queryBuilder.TryGetGroupingExpression(expression.QueryModel, out sparqlGroupingExpression))
                 {
                     return sparqlGroupingExpression;
                 }
