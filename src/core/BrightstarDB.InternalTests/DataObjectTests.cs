@@ -1318,20 +1318,28 @@ namespace BrightstarDB.InternalTests
             updateDataObject.SetProperty("foaf:mbox_sha1", "ABCD1234");
             store2.SaveChanges();
 
-            // Check access to properties in both graphs then delete the object from one of the graphs
+            // Check access to properties in both graphs
             var store3 = context.OpenStore(storeName, prefixes, updateGraph: graph1);
             updateDataObject = store3.GetDataObject("resource:Alice");
             Assert.IsNotNull(updateDataObject);
             Assert.AreEqual("ABCD1234", updateDataObject.GetPropertyValue("foaf:mbox_sha1").ToString());
             Assert.AreEqual("Alice Test", updateDataObject.GetPropertyValue("foaf:name").ToString());
             Assert.AreEqual("alice@example.org", updateDataObject.GetPropertyValue("foaf:mbox").ToString());
-            updateDataObject.Delete();
-            store3.SaveChanges();
 
-            // Check that the object and properties are still accessible through the default graph
-            var store4 = context.OpenStore(storeName, prefixes, updateGraph: graph1);
+
+            var store4 = context.OpenStore(storeName, prefixes, updateGraph: graph1,
+                                           defaultDataSet: new string[] {graph1});
             updateDataObject = store4.GetDataObject("resource:Alice");
             Assert.IsNotNull(updateDataObject);
+            updateDataObject.Delete();
+            store4.SaveChanges();
+
+            // Check that the object and properties are still accessible through the default graph
+            var store5 = context.OpenStore(storeName, prefixes, updateGraph: graph1);
+            updateDataObject = store5.GetDataObject("resource:Alice");
+            Assert.IsNotNull(updateDataObject);
+            Assert.IsNotNull(updateDataObject.GetPropertyValue("foaf:mbox"));
+            Assert.IsNotNull(updateDataObject.GetPropertyValue("foaf:name"));
             Assert.AreEqual("Alice Test", updateDataObject.GetPropertyValue("foaf:name").ToString());
             Assert.AreEqual("alice@example.org", updateDataObject.GetPropertyValue("foaf:mbox").ToString());
             
