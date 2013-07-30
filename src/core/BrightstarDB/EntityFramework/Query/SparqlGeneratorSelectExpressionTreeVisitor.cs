@@ -5,13 +5,10 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.Expressions;
-using Remotion.Linq.Clauses.ResultOperators;
-using Remotion.Linq.Parsing;
 
 namespace BrightstarDB.EntityFramework.Query
 {
-    internal class SparqlGeneratorSelectExpressionTreeVisitor 
-        : ExpressionTreeVisitorBase
+    internal class SparqlGeneratorSelectExpressionTreeVisitor : ExpressionTreeVisitorBase
     {
         private readonly SparqlQueryBuilder _queryBuilder;
 
@@ -38,21 +35,9 @@ namespace BrightstarDB.EntityFramework.Query
                 var source = expression.Expression as QuerySourceReferenceExpression;
                 Expression mappedSourceExpression;
                 sourceVarName = source.ReferencedQuerySource.ItemName;
-                if (!_queryBuilder.TryGetQuerySourceMapping(source.ReferencedQuerySource, out mappedSourceExpression))
-                {
-                    mappedSourceExpression = VisitExpression(expression.Expression);
-                }
-                if (mappedSourceExpression is SelectVariableNameExpression)
+                if (_queryBuilder.TryGetQuerySourceMapping(source.ReferencedQuerySource, out mappedSourceExpression) && mappedSourceExpression is SelectVariableNameExpression)
                 {
                     sourceVarName = (mappedSourceExpression as SelectVariableNameExpression).Name;
-                }
-                else if (mappedSourceExpression is SparqlGroupingExpression)
-                {
-                    var groupingExpression = mappedSourceExpression as SparqlGroupingExpression;
-                    if (expression.Member.Name.Equals("Key"))
-                    {
-                        return groupingExpression.GroupVars.First();
-                    }
                 }
             }
             else if (expression.Expression is MemberExpression)
@@ -417,10 +402,6 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     return VisitExpression((expression.ReferencedQuerySource as AdditionalFromClause).FromExpression);
                 }
-                else if (expression.ReferencedQuerySource is MainFromClause)
-                {
-                    return VisitExpression((expression.ReferencedQuerySource as MainFromClause).FromExpression);
-                }
                 else
                 {
                     _queryBuilder.AddSelectVariable(expression.ReferencedQuerySource.ItemName);
@@ -460,27 +441,6 @@ namespace BrightstarDB.EntityFramework.Query
                 }
             }
             return expression;
-        }
-
-        protected override Expression VisitSubQueryExpression(SubQueryExpression expression)
-        {
-            if (expression.QueryModel.ResultOperators.Any(r => r is GroupResultOperator))
-            {
-                // Handle grouped subquery
-                var grouping = expression.QueryModel.ResultOperators.First(r => r is GroupResultOperator);
-                SparqlGroupingExpression sparqlGroupingExpression;
-                if (_queryBuilder.TryGetGroupingExpression(grouping as GroupResultOperator, out sparqlGroupingExpression))
-                {
-                    return sparqlGroupingExpression;
-                }
-            }
-            else
-            {
-                var subqueryVistor = new SparqlGeneratorQueryModelVisitor(_queryBuilder.Context, _queryBuilder);
-                subqueryVistor.VisitQueryModel(expression.QueryModel);
-                return expression;
-            }
-            return base.VisitSubQueryExpression(expression);
         }
 
         #region Overrides of ThrowingExpressionTreeVisitor

@@ -150,7 +150,6 @@
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
-    <Compile Include="EntityFramework\Query\SparqlGroupingExpression.cs" />
     <Compile Include="SparqlResultsFormat.cs" />
     <Compile Include="Client\TransactionInfoWrapper.cs" />
     <Compile Include="Client\TransactionPreconditionsFailedException.cs" />
