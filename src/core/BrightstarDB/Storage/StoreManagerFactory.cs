@@ -1,9 +1,11 @@
 ﻿using System;
-using BrightstarDB.Portable.Adaptation;
 using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
 #if BTREESTORE
 using BrightstarDB.Storage.BTreeStore;
+#endif
+#if PORTABLE
+using BrightstarDB.Portable.Adaptation;
 #endif
 
 namespace BrightstarDB.Storage

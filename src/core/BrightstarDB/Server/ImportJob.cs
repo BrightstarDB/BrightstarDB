@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using BrightstarDB.Portable.Adaptation;
 using BrightstarDB.Profiling;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
@@ -10,6 +9,10 @@ using VDS.RDF.Parsing.Tokens;
 
 #if !SILVERLIGHT
 using System.ServiceModel;
+#endif
+
+#if PORTABLE
+using BrightstarDB.Portable.Adaptation;
 #endif
 
 namespace BrightstarDB.Server

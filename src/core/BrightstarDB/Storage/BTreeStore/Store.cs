@@ -28,7 +28,9 @@ namespace BrightstarDB.Storage.BTreeStore
         private readonly GraphIndex _graphIndex;
 
         private string _instanceId; // used to identify cache query results for this instantiation.
+#if !SILVERLIGHT && !PORTABLE
         private string _tmpPath;
+#endif
         private readonly PrefixManager _prefixManager;
         private List<IPersistable> _commitList;
         private Stream _inputStream;
