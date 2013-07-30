@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class ContextCallbackTests
     {
         private readonly string _storeName;
@@ -20,7 +20,7 @@ namespace BrightstarDB.Tests.EntityFramework
             _connectionString = "type=embedded;storesDirectory=c:\\brightstar;storeName=" + _storeName;
         }
 
-        [TestMethod]
+        [Test]
         public void TestSavingCallbackCalled()
         {
             using (var context = new MyEntityContext(_connectionString))
@@ -58,7 +58,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSaveWorksWhenNoCallback()
         {
             using (var context = new MyEntityContext(_connectionString))
@@ -72,7 +72,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSavingChangesUpdatesTimestamp()
         {
             IArticle article;
@@ -116,7 +116,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestThrowingExceptionAbortsChanges()
         {
             using (var context = new MyEntityContext(_connectionString))

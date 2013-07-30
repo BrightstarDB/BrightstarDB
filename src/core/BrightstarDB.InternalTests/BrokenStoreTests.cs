@@ -4,10 +4,10 @@ using BrightstarDB.Client;
 using BrightstarDB.Server;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.BTreeStore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
     /*
      * KA 08/11/2011
@@ -16,14 +16,14 @@ namespace BrightstarDB.Tests
      * Note that it relies heavily on internals.
      */
     
-    [TestClass]
+    [TestFixture]
     [Ignore]
     public class BrokenStoreTests
     {
         private const string TestQuery =
     "SELECT ?x003Cgeneratedx003Ex005Fx0030 WHERE {?x003Cgeneratedx003Ex005Fx0030 a <http://brightstardb.com/namespaces/default/User> .}";
 
-        [TestMethod]
+        [Test]
         public void FindWorkingTransaction()
         {
            Store store = new Store("c:\\brightstar\\twitteringtest\\", false);

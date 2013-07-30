@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 using BrightstarDB;
 using BrightstarDB.Rdf;
@@ -12,18 +12,18 @@ using BrightstarDB.Server;
 
 namespace BrightstarDB.Tests.SparqlDawgTests {
 
-    [TestClass]
+    [TestFixture]
     [Ignore] // For now just run the SPARQL 1.1 tests that are in InternalTests
     public partial class ManifestAll : SparqlTest
     {
-        [TestInitialize]
+        [SetUp]
         public void SetUp()
         {
             CreateStore();
 
         }
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
             DeleteStore();
@@ -32,7 +32,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         #region Test Methods
 
-        [TestMethod]
+        [Test]
         public void Count1()
         {
 
@@ -45,7 +45,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Count2()
         {
 
@@ -58,7 +58,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Count3()
         {
 
@@ -71,7 +71,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Count4()
         {
 
@@ -84,7 +84,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Count5()
         {
 
@@ -97,7 +97,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Count6()
         {
 
@@ -110,7 +110,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Count7()
         {
 
@@ -123,7 +123,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Count8b()
         {
 
@@ -136,7 +136,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ErrorInAvg()
         {
 
@@ -149,7 +149,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ProtectFromErrorInAvg()
         {
 
@@ -162,7 +162,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Constructwhere01ConstructWhere()
         {
 
@@ -175,7 +175,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Constructwhere02ConstructWhere()
         {
 
@@ -188,7 +188,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Constructwhere03ConstructWhere()
         {
 
@@ -201,7 +201,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Csv01CsvResultFormat()
         {
 
@@ -214,7 +214,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Cvs02CsvResultFormat()
         {
 
@@ -227,7 +227,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Csv03CsvResultFormat()
         {
 
@@ -240,7 +240,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Tsv01TsvResultFormat()
         {
 
@@ -253,7 +253,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Tvs02TsvResultFormat()
         {
 
@@ -266,7 +266,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Tsv03TsvResultFormat()
         {
 
@@ -279,7 +279,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ExistsWithinGraphPattern()
         {
 
@@ -295,7 +295,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Plus1()
         {
 
@@ -308,7 +308,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Plus2()
         {
 
@@ -321,7 +321,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Group1()
         {
 
@@ -334,7 +334,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Group2()
         {
 
@@ -347,7 +347,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Group3()
         {
 
@@ -360,7 +360,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Group4()
         {
 
@@ -373,7 +373,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Group5()
         {
 
@@ -386,7 +386,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Jsonres01JsonResultFormat()
         {
 
@@ -399,7 +399,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Jsonres02JsonResultFormat()
         {
 
@@ -412,7 +412,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Jsonres03JsonResultFormat()
         {
 
@@ -425,7 +425,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Jsonres04JsonResultFormat()
         {
 
@@ -438,7 +438,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp37Nested_Asterix__Asterix_()
         {
 
@@ -451,7 +451,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sq11SubqueryLimitPerResource()
         {
 
@@ -464,7 +464,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sq12SubqueryInConstructWithBuiltIns()
         {
 
@@ -477,7 +477,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sq13SubqueriesDonTInjectBindings()
         {
 
@@ -490,7 +490,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Group_concat1()
         {
 
@@ -503,7 +503,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Group_concat2()
         {
 
@@ -516,7 +516,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Group_concatWithSeparator()
         {
 
@@ -529,7 +529,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Avg()
         {
 
@@ -542,7 +542,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void AvgWithGroupBy()
         {
 
@@ -555,7 +555,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Min()
         {
 
@@ -568,7 +568,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void MinWithGroupBy()
         {
 
@@ -581,7 +581,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Max()
         {
 
@@ -594,7 +594,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void MaxWithGroupBy()
         {
 
@@ -607,7 +607,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sum()
         {
 
@@ -620,7 +620,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SumWithGroupBy()
         {
 
@@ -633,7 +633,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sample()
         {
 
@@ -646,7 +646,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void AggEmptyGroup()
         {
 
@@ -659,7 +659,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void AggregateOverEmptyGroupResultingInARowWithUnboundVariables()
         {
 
@@ -672,7 +672,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind01Bind()
         {
 
@@ -685,7 +685,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind02Bind()
         {
 
@@ -698,7 +698,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind03Bind()
         {
 
@@ -711,7 +711,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind04Bind()
         {
 
@@ -724,7 +724,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind05Bind()
         {
 
@@ -737,7 +737,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind06Bind()
         {
 
@@ -750,7 +750,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind07Bind()
         {
 
@@ -763,7 +763,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind08Bind()
         {
 
@@ -776,7 +776,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind10BindScopingVariableInFilterNotInScope()
         {
 
@@ -789,7 +789,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bind11BindScopingVariableInFilterInScope()
         {
 
@@ -802,7 +802,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PostQueryValuesWithSubjVar1Row()
         {
 
@@ -815,7 +815,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PostQueryValuesWithObjVar1Row()
         {
 
@@ -828,7 +828,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PostQueryValuesWith2ObjVars1Row()
         {
 
@@ -841,7 +841,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PostQueryValuesWith2ObjVars1RowWithUndef()
         {
 
@@ -854,7 +854,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PostQueryValuesWith2ObjVars2RowsWithUndef()
         {
 
@@ -867,7 +867,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PostQueryValuesWithPredVar1Row()
         {
 
@@ -880,7 +880,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PostQueryValuesWithOptionalObjVar1Row()
         {
 
@@ -893,7 +893,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PostQueryValuesWithSubjObjVars2RowsWithUndef()
         {
 
@@ -906,7 +906,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void InlineValuesGraphPattern()
         {
 
@@ -919,7 +919,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PostSubqueryValues()
         {
 
@@ -932,7 +932,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ExistsWithOneConstant()
         {
 
@@ -945,7 +945,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ExistsWithGroundTriple()
         {
 
@@ -958,7 +958,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void NestedPositiveExists()
         {
 
@@ -971,7 +971,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void NestedNegativeExistsInPositiveExists()
         {
 
@@ -984,7 +984,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Strdt()
         {
 
@@ -997,7 +997,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void StrdtStr()
         {
 
@@ -1010,7 +1010,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void StrdtTypeerrors()
         {
 
@@ -1023,7 +1023,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Strlang()
         {
 
@@ -1036,7 +1036,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void StrlangStr()
         {
 
@@ -1049,7 +1049,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void StrlangTypeerrors()
         {
 
@@ -1062,7 +1062,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Isnumeric()
         {
 
@@ -1075,7 +1075,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Abs()
         {
 
@@ -1088,7 +1088,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Ceil()
         {
 
@@ -1101,7 +1101,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Floor()
         {
 
@@ -1114,7 +1114,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Round()
         {
 
@@ -1127,7 +1127,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Concat()
         {
 
@@ -1140,7 +1140,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Concat2()
         {
 
@@ -1153,7 +1153,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Substr3Argument()
         {
 
@@ -1166,7 +1166,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Substr2Argument()
         {
 
@@ -1179,7 +1179,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Strlen()
         {
 
@@ -1192,7 +1192,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Ucase()
         {
 
@@ -1205,7 +1205,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Lcase()
         {
 
@@ -1218,7 +1218,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Encode_for_uri()
         {
 
@@ -1231,7 +1231,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Contains()
         {
 
@@ -1244,7 +1244,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Strstarts()
         {
 
@@ -1257,7 +1257,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Strends()
         {
 
@@ -1270,7 +1270,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Md5()
         {
 
@@ -1283,7 +1283,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Md5OverUnicodeData()
         {
 
@@ -1296,7 +1296,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sha1()
         {
 
@@ -1309,7 +1309,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sha1OnUnicodeData()
         {
 
@@ -1322,7 +1322,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sha256()
         {
 
@@ -1335,7 +1335,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sha256OnUnicodeData()
         {
 
@@ -1348,7 +1348,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sha512()
         {
 
@@ -1361,7 +1361,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sha512OnUnicodeData()
         {
 
@@ -1374,7 +1374,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Hours()
         {
 
@@ -1387,7 +1387,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Minutes()
         {
 
@@ -1400,7 +1400,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Seconds()
         {
 
@@ -1413,7 +1413,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Year()
         {
 
@@ -1426,7 +1426,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Month()
         {
 
@@ -1439,7 +1439,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Day()
         {
 
@@ -1452,7 +1452,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Timezone()
         {
 
@@ -1465,7 +1465,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Tz()
         {
 
@@ -1478,7 +1478,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void BnodeStr()
         {
 
@@ -1491,7 +1491,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void In1()
         {
 
@@ -1504,7 +1504,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void In2()
         {
 
@@ -1517,7 +1517,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void NotIn1()
         {
 
@@ -1530,7 +1530,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void NotIn2()
         {
 
@@ -1543,7 +1543,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Now()
         {
 
@@ -1556,7 +1556,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Rand()
         {
 
@@ -1569,7 +1569,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Bnode()
         {
 
@@ -1582,7 +1582,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void IriUri()
         {
 
@@ -1595,7 +1595,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void If()
         {
 
@@ -1608,7 +1608,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void IfErrorPropogation()
         {
 
@@ -1621,7 +1621,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Coalesce()
         {
 
@@ -1634,7 +1634,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Strbefore()
         {
 
@@ -1647,7 +1647,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void StrbeforeAlt()
         {
 
@@ -1660,7 +1660,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void StrbeforeDatatyping()
         {
 
@@ -1673,7 +1673,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Strafter()
         {
 
@@ -1686,7 +1686,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void StrafterAlt()
         {
 
@@ -1699,7 +1699,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void StrafterDatatyping()
         {
 
@@ -1712,7 +1712,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Replace()
         {
 
@@ -1725,7 +1725,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ReplaceWithOverlappingPattern()
         {
 
@@ -1738,7 +1738,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ReplaceWithCapturedSubstring()
         {
 
@@ -1751,7 +1751,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void UuidPatternMatch()
         {
 
@@ -1764,7 +1764,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void StruuidPatternMatch()
         {
 
@@ -1777,7 +1777,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SubsetsByExclusionNotExists()
         {
 
@@ -1790,7 +1790,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SubsetsByExclusionMinus()
         {
 
@@ -1803,7 +1803,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void MedicalTemporalProximityByExclusionNotExists()
         {
 
@@ -1816,7 +1816,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void MedicalTemporalProximityByExclusionMinus()
         {
 
@@ -1829,7 +1829,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void CalculateWhichSetsAreSubsetsOfOthersIncludeASubsetofA()
         {
 
@@ -1842,7 +1842,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void CalculateWhichSetsAreSubsetsOfOthersExcludeASubsetofA()
         {
 
@@ -1855,7 +1855,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void CalculateWhichSetsHaveTheSameElements()
         {
 
@@ -1868,7 +1868,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void CalculateProperSubset()
         {
 
@@ -1881,7 +1881,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PositiveExists1()
         {
 
@@ -1894,7 +1894,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void PositiveExists2()
         {
 
@@ -1907,7 +1907,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SubtractionWithMinusFromAFullyBoundMinuend()
         {
 
@@ -1920,7 +1920,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SubtractionWithMinusFromAPartiallyBoundMinuend()
         {
 
@@ -1933,7 +1933,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ExpressionIsEquality()
         {
 
@@ -1946,7 +1946,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ExpressionRaiseAnError()
         {
 
@@ -1959,7 +1959,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ReuseAProjectExpressionVariableInSelect()
         {
 
@@ -1972,7 +1972,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ReuseAProjectExpressionVariableInOrderBy()
         {
 
@@ -1985,7 +1985,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ExpressionMayReturnNoValue()
         {
 
@@ -1998,7 +1998,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ExpressionHasUndefinedVariable()
         {
 
@@ -2011,7 +2011,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ExpressionHasVariableThatMayBeUnbound()
         {
 
@@ -2024,7 +2024,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp01SimplePath()
         {
 
@@ -2037,7 +2037,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp02StarPath()
         {
 
@@ -2050,7 +2050,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp03SimplePathWithLoop()
         {
 
@@ -2063,7 +2063,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp04VariableLengthPathWithLoop()
         {
 
@@ -2076,7 +2076,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp05ZeroLengthPath()
         {
 
@@ -2089,7 +2089,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp08ReversePath()
         {
 
@@ -2102,7 +2102,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp09ReverseSequencePath()
         {
 
@@ -2115,7 +2115,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp10PathWithNegation()
         {
 
@@ -2128,7 +2128,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp11SimplePathAndTwoPathsToSameTargetNode()
         {
 
@@ -2141,7 +2141,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp12VariableLengthPathAndTwoPathsToSameTargetNode()
         {
 
@@ -2154,7 +2154,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp13ZeroLengthPathsWithLiterals()
         {
 
@@ -2167,7 +2167,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp14StarPathOverFoafKnows()
         {
 
@@ -2180,7 +2180,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp15ZeroLengthPathsOnAnEmptyGraph()
         {
 
@@ -2193,7 +2193,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp16DuplicatePathsAndCyclesThroughFoafKnows_Asterix_()
         {
 
@@ -2206,7 +2206,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp20DiamondP2()
         {
 
@@ -2219,7 +2219,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp21DiamondP_Plus_()
         {
 
@@ -2232,7 +2232,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp22DiamondWithTailP3()
         {
 
@@ -2245,7 +2245,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp23DiamondWithTailP_Plus_()
         {
 
@@ -2258,7 +2258,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp24DiamondWithLoopP2()
         {
 
@@ -2271,7 +2271,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp25DiamondWithLoopP_Plus_()
         {
 
@@ -2284,7 +2284,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp26DiamondWithLoopP24()
         {
 
@@ -2297,7 +2297,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp27DiamondWithLoopP3()
         {
 
@@ -2310,7 +2310,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp28aDiamondWithLoopPP_QuestionMark_()
         {
 
@@ -2323,7 +2323,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp29DiamondWithLoopP2()
         {
 
@@ -2336,7 +2336,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp30OperatorPrecedence1()
         {
 
@@ -2349,7 +2349,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp31OperatorPrecedence2()
         {
 
@@ -2362,7 +2362,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp32OperatorPrecedence3()
         {
 
@@ -2375,7 +2375,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp33OperatorPrecedence4()
         {
 
@@ -2388,7 +2388,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Pp36ArbitraryPathWithBoundEndpoints()
         {
 
@@ -2401,7 +2401,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ServiceTest1()
         {
 
@@ -2414,7 +2414,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ServiceTest4aWithValuesClause()
         {
 
@@ -2427,7 +2427,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ServiceTest5()
         {
 
@@ -2440,7 +2440,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ServiceTest7()
         {
 
@@ -2453,7 +2453,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sq04SubqueryWithinGraphPatternDefaultGraphDoesNotApply()
         {
 
@@ -2469,7 +2469,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sq06SubqueryWithGraphPatternFromNamedApplies()
         {
 
@@ -2482,7 +2482,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sq08SubqueryWithAggregate()
         {
 
@@ -2495,7 +2495,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sq09NestedSubqueries()
         {
 
@@ -2508,7 +2508,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sq10SubqueryWithExists()
         {
 
@@ -2521,7 +2521,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void Sq14LimitByResource()
         {
 
@@ -2534,7 +2534,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ClearDefault()
         {
             ImportData(@"sparqlDawgTests/clear/clear-default.ttl");
@@ -2547,7 +2547,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ClearGraph()
         {
             ImportData(@"sparqlDawgTests/clear/clear-default.ttl");
@@ -2560,7 +2560,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ClearNamed()
         {
             ImportData(@"sparqlDawgTests/clear/clear-default.ttl");
@@ -2573,7 +2573,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ClearAll()
         {
             ImportData(@"sparqlDawgTests/clear/clear-default.ttl");
@@ -2586,7 +2586,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDeleteData1()
         {
             ImportData(@"sparqlDawgTests/delete-data/delete-pre-01.ttl");
@@ -2595,7 +2595,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDeleteData2()
         {
             ImportGraph(@"sparqlDawgTests/delete-data/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2604,7 +2604,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDeleteData3()
         {
             ImportData(@"sparqlDawgTests/delete-data/delete-pre-01.ttl");
@@ -2613,7 +2613,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDeleteData4()
         {
             ImportGraph(@"sparqlDawgTests/delete-data/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2622,7 +2622,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDeleteData1()
         {
             ImportData(@"sparqlDawgTests/delete-data/delete-pre-01.ttl");
@@ -2635,7 +2635,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDeleteData2()
         {
             ImportData(@"sparqlDawgTests/delete-data/delete-pre-01.ttl");
@@ -2648,7 +2648,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DeleteInsert1()
         {
             ImportData(@"sparqlDawgTests/delete-insert/delete-insert-pre-01.ttl");
@@ -2657,7 +2657,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DeleteInsert1b()
         {
             ImportData(@"sparqlDawgTests/delete-insert/delete-insert-pre-01.ttl");
@@ -2666,7 +2666,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DeleteInsert1c()
         {
             ImportData(@"sparqlDawgTests/delete-insert/delete-insert-pre-01.ttl");
@@ -2675,7 +2675,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DeleteInsert2()
         {
             ImportData(@"sparqlDawgTests/delete-insert/delete-insert-pre-01.ttl");
@@ -2684,7 +2684,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DeleteInsert4()
         {
             ImportData(@"sparqlDawgTests/delete-insert/delete-insert-pre-01.ttl");
@@ -2693,7 +2693,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DeleteInsert4b()
         {
             ImportData(@"sparqlDawgTests/delete-insert/delete-insert-pre-01.ttl");
@@ -2702,7 +2702,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DeleteInsert5b()
         {
             ImportData(@"sparqlDawgTests/delete-insert/delete-insert-pre-01.ttl");
@@ -2711,7 +2711,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DeleteInsert6b()
         {
             ImportData(@"sparqlDawgTests/delete-insert/delete-insert-pre-06.ttl");
@@ -2720,7 +2720,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDeleteWhere1()
         {
             ImportData(@"sparqlDawgTests/delete-where/delete-pre-01.ttl");
@@ -2729,7 +2729,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDeleteWhere2()
         {
             ImportGraph(@"sparqlDawgTests/delete-where/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2738,7 +2738,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDeleteWhere3()
         {
             ImportData(@"sparqlDawgTests/delete-where/delete-pre-01.ttl");
@@ -2747,7 +2747,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDeleteWhere4()
         {
             ImportGraph(@"sparqlDawgTests/delete-where/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2756,7 +2756,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDeleteWhere1()
         {
             ImportData(@"sparqlDawgTests/delete-where/delete-pre-01.ttl");
@@ -2769,7 +2769,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDeleteWhere2()
         {
             ImportData(@"sparqlDawgTests/delete-where/delete-pre-01.ttl");
@@ -2782,7 +2782,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete1()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-01.ttl");
@@ -2791,7 +2791,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete2()
         {
             ImportGraph(@"sparqlDawgTests/delete/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2800,7 +2800,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete3()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-01.ttl");
@@ -2809,7 +2809,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete4()
         {
             ImportGraph(@"sparqlDawgTests/delete/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2818,7 +2818,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDelete1()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-01.ttl");
@@ -2831,7 +2831,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDelete2()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-01.ttl");
@@ -2844,7 +2844,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete7()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-01.ttl");
@@ -2853,7 +2853,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete1With()
         {
             ImportGraph(@"sparqlDawgTests/delete/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2862,7 +2862,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete2With()
         {
             ImportGraph(@"sparqlDawgTests/delete/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2873,7 +2873,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete3With()
         {
             ImportGraph(@"sparqlDawgTests/delete/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2882,7 +2882,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete4With()
         {
             ImportGraph(@"sparqlDawgTests/delete/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2893,7 +2893,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDelete1With()
         {
             ImportGraph(@"sparqlDawgTests/delete/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2906,7 +2906,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDelete2With()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-01.ttl");
@@ -2919,7 +2919,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete1Using()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-01.ttl");
@@ -2930,7 +2930,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete2Using()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-01.ttl");
@@ -2943,7 +2943,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete3Using()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-01.ttl");
@@ -2954,7 +2954,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void SimpleDelete4Using()
         {
             ImportData(@"sparqlDawgTests/delete/delete-pre-03.ttl");
@@ -2967,7 +2967,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDelete1Using()
         {
             ImportGraph(@"sparqlDawgTests/delete/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2980,7 +2980,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GraphSpecificDelete2Using()
         {
             ImportGraph(@"sparqlDawgTests/delete/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
@@ -2993,7 +2993,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DropDefault()
         {
             ImportData(@"sparqlDawgTests/drop/drop-default.ttl");
@@ -3005,7 +3005,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DropGraph()
         {
             ImportData(@"sparqlDawgTests/drop/drop-default.ttl");
@@ -3017,7 +3017,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DropNamed()
         {
             ImportData(@"sparqlDawgTests/drop/drop-default.ttl");
@@ -3028,7 +3028,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DropAll()
         {
             ImportData(@"sparqlDawgTests/drop/drop-default.ttl");
@@ -3038,21 +3038,21 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void LoadSilent()
         {
             ExecuteUpdate(@"sparqlDawgTests/update-silent/load-silent.ru");
 
         }
 
-        [TestMethod]
+        [Test]
         public void LoadSilentInto()
         {
             ExecuteUpdate(@"sparqlDawgTests/update-silent/load-silent-into.ru");
 
         }
 
-        [TestMethod]
+        [Test]
         public void ClearSilentGraphIri()
         {
             ImportData(@"sparqlDawgTests/update-silent/spo.ttl");
@@ -3061,14 +3061,14 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ClearSilentDefault()
         {
             ExecuteUpdate(@"sparqlDawgTests/update-silent/clear-default-silent.ru");
 
         }
 
-        [TestMethod]
+        [Test]
         public void CreateSilentIri()
         {
             ImportGraph(@"sparqlDawgTests/update-silent/spo.ttl", new Uri(@"http://example.org/g1"));
@@ -3077,7 +3077,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DropSilentGraphIri()
         {
             ImportData(@"sparqlDawgTests/update-silent/spo.ttl");
@@ -3086,14 +3086,14 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DropSilentDefault()
         {
             ExecuteUpdate(@"sparqlDawgTests/update-silent/drop-default-silent.ru");
 
         }
 
-        [TestMethod]
+        [Test]
         public void CopySilent()
         {
             ImportGraph(@"sparqlDawgTests/update-silent/spo.ttl", new Uri(@"http://example.org/g2"));
@@ -3102,14 +3102,14 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void CopySilentToDefault()
         {
             ExecuteUpdate(@"sparqlDawgTests/update-silent/copy-to-default-silent.ru");
 
         }
 
-        [TestMethod]
+        [Test]
         public void MoveSilent()
         {
             ImportGraph(@"sparqlDawgTests/update-silent/spo.ttl", new Uri(@"http://example.org/g2"));
@@ -3118,14 +3118,14 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void MoveSilentToDefault()
         {
             ExecuteUpdate(@"sparqlDawgTests/update-silent/move-to-default-silent.ru");
 
         }
 
-        [TestMethod]
+        [Test]
         public void AddSilent()
         {
             ImportGraph(@"sparqlDawgTests/update-silent/spo.ttl", new Uri(@"http://example.org/g2"));
@@ -3134,7 +3134,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void AddSilentToDefault()
         {
             ExecuteUpdate(@"sparqlDawgTests/update-silent/add-to-default-silent.ru");

@@ -2,7 +2,7 @@
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using BrightstarDB.EntityFramework;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class IdentifierEncodingTests
     {
         private MyEntityContext _myEntityContext;
@@ -12,19 +13,19 @@ namespace BrightstarDB.Tests.EntityFramework
         private readonly string _connectionString =
             "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=IdentifierEncodingTests_" + DateTime.Now.Ticks;
 
-        [TestInitialize]
+        [TestFixtureSetUp]
         public void SetUp()
         {
             _myEntityContext = new MyEntityContext(_connectionString);
         }
 
-        [TestCleanup]
+        [TestFixtureTearDown]
         public void TearDown()
         {
             _myEntityContext.Dispose();
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateItemWithSpecialCharactersInIdentifier()
         {
             var person = new DBPediaPerson

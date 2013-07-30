@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using UnitTesting = Microsoft.VisualStudio.TestTools.UnitTesting;
+using UnitTesting = NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class SimpleContextTests : ClientTestBase
     {
         private readonly IDataObjectContext _dataObjectContext;
@@ -20,19 +20,19 @@ namespace BrightstarDB.Tests.EntityFramework
             _dataObjectContext = new EmbeddedDataObjectContext(connectionString);
         }
 
-        [ClassInitialize]
-        public static void SetUp(TestContext context)
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             StartService();
         }
 
-        [ClassCleanup]
-        public static void TearDown()
+        [TestFixtureTearDown]
+        public void TearDown()
         {
             CloseService();
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateAndRetrieve()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -59,7 +59,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetAndGetSimpleProperty()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -106,7 +106,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestOrderingOfResults()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -166,7 +166,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetAndSetDateTimeProperty()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -225,7 +225,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestLoopThroughEntities()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -262,7 +262,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetAndGetSingleRelatedObject()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -304,7 +304,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestPopulateEntityCollectionWithExistingEntities()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -345,7 +345,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetEntityCollection()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -407,7 +407,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestOneToOneInverse()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -506,7 +506,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestManyToManyInverse()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -582,7 +582,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         [UnitTesting::Description("Tests a property that in the forward direction is a many-to-one relationship and its inverse property as a one to many relationship")]
         public void TestManyToOneInverse()
         {
@@ -702,7 +702,7 @@ namespace BrightstarDB.Tests.EntityFramework
         /// Tests for a property that in its forward direction is a one-to-many property (i.e. a collection)
         /// and in its inverse is a many-to-one property (i.e. a single-valued property).
         /// </summary>
-        [TestMethod]
+        [Test]
         public void TestOneToManyInverse()
         {
             string storeName = "SimpleContextTests.TestOneToManyInverse_" + DateTime.Now.Ticks;
@@ -812,7 +812,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestSetContextAndIdentityProperties()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -842,7 +842,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetPropertiesThenAttach()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -889,7 +889,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestBaseResourceAddress()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -923,7 +923,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Ignore]
-        [TestMethod]
+        [Test]
         public void TestAddGeneratesIdentity()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -963,7 +963,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestIdentifierPrefix()
         {
             var dataStoreName = "TestIdentifierPrefix_" + DateTime.Now.Ticks;
@@ -988,7 +988,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSkipAndTake()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -1040,7 +1040,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestConnectionString()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1066,7 +1066,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestConnectionStringCreatesStore()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1093,7 +1093,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestMultipleConnections()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1124,7 +1124,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetTwoInverse()
         {
             var storeName = "TestSetTwoInverse_" + DateTime.Now.Ticks;
@@ -1149,7 +1149,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestQueryOnPrefixedIdentifier()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1171,7 +1171,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestGreaterThanLessThan()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1207,7 +1207,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetAndGetLiteralsCollection()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1259,7 +1259,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetByteArray()
         {
             var storeName = "SetByteArray_" + Guid.NewGuid();
@@ -1286,7 +1286,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetEnumeration()
         {
             var storeName = "SetEnumeration_" + DateTime.Now.Ticks;
@@ -1308,7 +1308,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestQueryOnEnumeration()
         {
             var storeName = "QueryEnumeration_" + DateTime.Now.Ticks;
@@ -1336,8 +1336,8 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
-        [ExpectedException(typeof (TransactionPreconditionsFailedException))]
+        [Test]
+        [ExpectedException(typeof(TransactionPreconditionsFailedException))]
         public void TestOptimisticLocking()
         {
             var storeName = "TestOptimisticLocking_" + DateTime.Now.Ticks;
@@ -1376,9 +1376,8 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-
-        [TestMethod]
-        [ExpectedException(typeof(TransactionPreconditionsFailedException), "Method does not throw error for optimistic locking")]
+        [Test]
+        [ExpectedException(typeof(TransactionPreconditionsFailedException))]
         public void TestOptimisticLockingHttp()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1419,7 +1418,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
        
-        [TestMethod]
+        [Test]
         public void TestDeleteEntity()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1451,7 +1450,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeletionOfEntities()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1519,7 +1518,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestGeneratedPropertyAttributes()
         {
             var foafPerson = typeof(FoafPerson);
@@ -1553,7 +1552,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestGeneratedClassAttributes()
         {
             var foafPerson = typeof(FoafPerson);
@@ -1564,7 +1563,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual("Person", displayAttribute.DisplayName);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSingleUriProperty()
         {
             var storeName = "TestSingleUriProperty_" + DateTime.Now.Ticks;
@@ -1592,7 +1591,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestUriCollectionProperty()
         {
             var storeName = "TestUriCollectionProperty_" + DateTime.Now.Ticks;

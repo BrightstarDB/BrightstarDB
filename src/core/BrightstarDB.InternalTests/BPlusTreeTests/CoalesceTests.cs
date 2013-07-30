@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using BrightstarDB.Storage.BPlusTreeStore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class CoalesceTests
     {
-        [TestMethod]
+        [Test]
         public void TestCoalesceEmptyTree()
         {
             const string storeName = "Coalesce.EmptyTree.data";
@@ -38,7 +38,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCoalesceRootLeafNode()
         {
             const string storeName = "Coalesce.RootLeafNode.data";
@@ -89,7 +89,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCoalesceLeafLoadPlusOne()
         {
             const string storeName = "Coalesce.LeafLoadPlusOne.data";

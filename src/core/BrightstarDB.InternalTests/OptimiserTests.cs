@@ -1,10 +1,10 @@
 ﻿using System;
 using BrightstarDB.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class OptimiserTests
     {
         private readonly IStoreManager _storeManager;
@@ -42,7 +42,7 @@ namespace BrightstarDB.Tests
             return store;
         }
 
-        [TestMethod]
+        [Test]
         public void TestVariableEqualsOptimiser()
         {
             const string sparql = @"SELECT ?d WHERE { ?d <http://www.bs.com/name> ?v . FILTER (?v = 'Foo') . }";

@@ -5,19 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class MasterFileTests
     {
 
-        [TestMethod]
+        [Test]
         public void TestCreateNewMaster()
         {
             var pm = new FilePersistenceManager();
             var dirName = "TestCreateNewMaster1";
+            if (pm.DirectoryExists(dirName)) pm.DeleteDirectory(dirName);
             pm.CreateDirectory(dirName);
             var storeConfig = new StoreConfiguration {PersistenceType = PersistenceType.AppendOnly};
             var storeSetId = Guid.NewGuid();
@@ -30,6 +31,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(PersistenceType.AppendOnly, mf.PersistenceType);
 
             dirName = "TestCreateNewMaster2";
+            if (pm.DirectoryExists(dirName)) pm.DeleteDirectory(dirName);
             pm.CreateDirectory(dirName);
             storeConfig.PersistenceType = PersistenceType.Rewrite;
             storeSetId = Guid.NewGuid();
@@ -45,11 +47,12 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(0, mf.GetCommitPoints().Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestAppendCommitPoint()
         {
             var pm = new FilePersistenceManager();
-            var dirName = "TestAppendCommitPoint";
+            const string dirName = "TestAppendCommitPoint";
+            if (pm.DirectoryExists(dirName)) pm.DeleteDirectory(dirName);
             pm.CreateDirectory(dirName);
             var storeConfig = new StoreConfiguration {PersistenceType = PersistenceType.AppendOnly};
             var storeSetId = Guid.NewGuid();
@@ -84,11 +87,12 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestCorruptCommitPoint()
         {
             var pm = new FilePersistenceManager();
-            var dirName = "TestCorruptCommitPoint";
+            const string dirName = "TestCorruptCommitPoint";
+            if (pm.DirectoryExists(dirName)) pm.DeleteDirectory(dirName);
             pm.CreateDirectory(dirName);
             var storeConfig = new StoreConfiguration { PersistenceType = PersistenceType.AppendOnly };
             var storeSetId = Guid.NewGuid();
@@ -138,5 +142,6 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(commit1Time.Ticks, lastCommit.CommitTime.Ticks);
 
         }
+
     }
 }

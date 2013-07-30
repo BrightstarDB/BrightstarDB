@@ -2,14 +2,14 @@
 using System.Linq;
 using System.Text;
 using BrightstarDB.Storage.BPlusTreeStore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class DirectInternalNodeTests
     {
-        [TestMethod]
+        [Test]
         public void TestRightShiftFrom()
         {
             var pageStore = new MemoryPageStore(1024);

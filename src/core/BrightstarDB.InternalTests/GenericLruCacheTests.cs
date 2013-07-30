@@ -1,12 +1,12 @@
 ﻿using BrightstarDB.Utils;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class GenericLruCacheTests
     {
-        [TestMethod]
+        [Test]
         public void TestLookup()
         {
             var cache = new LruCache<int, string>(10);
@@ -22,7 +22,7 @@ namespace BrightstarDB.Tests
             Assert.IsFalse(cache.TryLookup(3, out retrieved));
         }
 
-        [TestMethod]
+        [Test]
         public void TestEvictionOnInsert()
         {
             var cache = new LruCache<int, string>(10, 9, 7);
@@ -46,7 +46,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestOverwriteOnInsert()
         {
             var cache = new LruCache<int, string>(10, 9, 7);

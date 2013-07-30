@@ -2,16 +2,15 @@ using System.Collections.Generic;
 using System.IO;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
-using BrightstarDB.Storage.BTreeStore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 using System.Linq;
 
-namespace BrightstarDB.Tests.SparqlTestSuite {
-    [TestClass]
+namespace BrightstarDB.InternalTests.SparqlTestSuite {
+    [TestFixture]
 	public partial class ManifestSyntax {
 
 		private IStoreManager _storeManager;
@@ -23,14 +22,14 @@ namespace BrightstarDB.Tests.SparqlTestSuite {
             _storeManager = StoreManagerFactory.GetStoreManager();
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 		    _storeLocation = "brightstar\\" + Guid.NewGuid();
 		    _store = _storeManager.CreateStore(_storeLocation);
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
             _storeManager.DeleteStore(_storeLocation);

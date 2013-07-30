@@ -1,30 +1,23 @@
 ﻿using System;
 using System.Linq;
-using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class DataTypeTests
     {
         private MyEntityContext _myEntityContext;
 
         private readonly string _connectionString = "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=" + Guid.NewGuid();
 
-        [TestInitialize]
+        [TestFixtureSetUp]
         public void SetUp()
         {
             _myEntityContext = new MyEntityContext(_connectionString);
         }
 
-        [TestCleanup]
-        public void TearDown()
-        {
-            _myEntityContext.Dispose();
-        }
-
-        [TestMethod]
+        [Test]
         public void TestCreateAndSetProperties()
         {
             var entity = _myEntityContext.Entities.Create();
@@ -68,7 +61,7 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestCreateAndSetCollections()
         {
             var entity = _myEntityContext.Entities.Create();
@@ -156,7 +149,7 @@ namespace BrightstarDB.Tests.EntityFramework
             
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetByte()
         {
             var entity = _myEntityContext.Entities.Create();
@@ -181,7 +174,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsNull(entity.AnotherNullableByte);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetChar()
         {
             var entity = _myEntityContext.Entities.Create();
@@ -209,7 +202,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetSbyte()
         {
             var entity = _myEntityContext.Entities.Create();
@@ -233,7 +226,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetShort()
         {
             var entity = _myEntityContext.Entities.Create();
@@ -256,7 +249,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreNotEqual(32767, entity.AnotherShort);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetUint()
         {
             var entity = _myEntityContext.Entities.Create();
@@ -279,7 +272,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreNotEqual(4294967295U, entity.AnotherUInt);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetUlong()
         {
             var entity = _myEntityContext.Entities.Create();
@@ -302,7 +295,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreNotEqual(18446744073709551615, entity.AnotherULong);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetUShort()
         {
             var entity = _myEntityContext.Entities.Create();
@@ -325,7 +318,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreNotEqual(65535, entity.AnotherUShort);
         }
 
-        [TestMethod]
+        [Test]
         public void TestEnums()
         {
             var entity1 = _myEntityContext.Entities.Create();

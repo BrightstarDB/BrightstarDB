@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.EntityFramework.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class StringFunctionTests : LinqToSparqlTestBase
     {
-        [TestInitialize]
+        [SetUp]
         public void SetUp()
         {
             base.InitializeContext();
         }
 
-        [TestMethod]
+        [Test]
         public void TestStartsWith()
         {
             var q = Context.Companies.Where(c => c.Name.StartsWith("Netw"));
@@ -59,7 +59,7 @@ FILTER (regex(?v0, '^Netw', 'i')).}");
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestEndsWith()
         {
             var q = Context.Companies.Where(c => c.Name.EndsWith("net"));
@@ -129,7 +129,7 @@ FILTER (regex(?v0, 'net$', 'i')).}");
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestContains()
         {
             var q = Context.Companies.Where(c => c.Name.Contains("work"));
@@ -141,7 +141,7 @@ FILTER (regex(?v0, 'net$', 'i')).}");
 FILTER (CONTAINS(?v0, 'work')).}");
         }
 
-        [TestMethod]
+        [Test]
         public void TestLength()
         {
             var q = Context.Companies.Where(c => c.Name.Length > 10);
@@ -152,7 +152,7 @@ FILTER (CONTAINS(?v0, 'work')).}");
 FILTER ((STRLEN(?v0)) > '10'^^<http://www.w3.org/2001/XMLSchema#integer>).}");
         }
 
-        [TestMethod]
+        [Test]
         public void TestSubstring()
         {
             var q = Context.Companies.Where(c => c.Name.Substring(5).Equals("rkedPlanet"));
@@ -170,7 +170,7 @@ FILTER ((SUBSTR(?v0, '6'^^<http://www.w3.org/2001/XMLSchema#integer>)) = 'rkedPl
 FILTER ((SUBSTR(?v0, '6'^^<http://www.w3.org/2001/XMLSchema#integer>, '3'^^<http://www.w3.org/2001/XMLSchema#integer>)) = 'rke').}");
         }
 
-        [TestMethod]
+        [Test]
         public void TestToUpper()
         {
             var q = Context.Companies.Where(c => c.Name.ToUpper().Equals("NETWORKEDPLANET"));
@@ -181,7 +181,7 @@ FILTER ((SUBSTR(?v0, '6'^^<http://www.w3.org/2001/XMLSchema#integer>, '3'^^<http
 FILTER ((UCASE(?v0)) = 'NETWORKEDPLANET').}");
         }
 
-        [TestMethod]
+        [Test]
         public void TestToLower()
         {
             var q = Context.Companies.Where(c => c.Name.ToLower().Equals("networkedplanet"));

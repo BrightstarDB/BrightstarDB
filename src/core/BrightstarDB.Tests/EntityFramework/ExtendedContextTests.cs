@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
-using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class ExtendedContextTests
     {
         private readonly string _storeName;
@@ -43,7 +42,7 @@ namespace BrightstarDB.Tests.EntityFramework
             return new MyEntityContext("type=embedded;storesDirectory=c:\\brightstar;storeName=" + _storeName);            
         }
 
-        [TestMethod]
+        [Test]
         public void TestSelectProperty()
         {
             using (var context = GetContext())
@@ -56,7 +55,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateAnonymous()
         {
             using (var context = GetContext())
@@ -86,7 +85,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestAggregates()
         {
             using (var context = GetContext())
@@ -117,7 +116,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestOrdering()
         {
             using (var context = GetContext())
@@ -142,7 +141,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestSingle()
         {
             using (var context = GetContext())
@@ -196,7 +195,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestFirst()
         {
             using (var context = GetContext())

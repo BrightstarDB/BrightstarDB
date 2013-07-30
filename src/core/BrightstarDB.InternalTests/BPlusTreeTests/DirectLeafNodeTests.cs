@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.BPlusTreeStore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using BrightstarDB.Tests.BPlusTreeTests;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class DirectLeafNodeTests
     {
-        [TestMethod]
+        [Test]
         public void TestBorrowLeft()
         {
             var pageStore = new MemoryPageStore(4096);
@@ -41,7 +42,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             Assert.IsFalse(rightNode.RedistributeFromLeft(1, leftNode));
         }
 
-        [TestMethod]
+        [Test]
         public void TestBorrowRight()
         {
             var pageStore = new MemoryPageStore(4096);

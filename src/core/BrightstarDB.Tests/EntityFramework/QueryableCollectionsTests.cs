@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
-using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using BrightstarDB.EntityFramework;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
-    public class QueryableCollectionsTests : IDisposable
+    [TestFixture]
+    public class QueryableCollectionsTests
     {
         private const string ConnectionString = "type=embedded;StoresDirectory=c:\\brightstar;";
 
@@ -42,8 +42,8 @@ namespace BrightstarDB.Tests.EntityFramework
             _dept.Persons.Add(bert);
             _context.SaveChanges();
         }
-
-        [TestMethod]
+        
+        [Test]
         public void TestSimpleCollectionFilter()
         {
             

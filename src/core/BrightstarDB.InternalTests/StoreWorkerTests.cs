@@ -6,11 +6,11 @@ using System.Threading;
 using System.Xml.Linq;
 using BrightstarDB.Server;
 using BrightstarDB.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class StoreWorkerTests
     {
         private readonly IStoreManager _storeManager = StoreManagerFactory.GetStoreManager();
@@ -23,7 +23,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestTransaction()
         {
             // create a store
@@ -45,7 +45,7 @@ namespace BrightstarDB.Tests
             }            
         }
 
-        [TestMethod]
+        [Test]
         public void TestExportJob()
         {
             var sid = Guid.NewGuid().ToString();
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestTransactionWithPreconditionFails()
         {
             // create a store
@@ -100,7 +100,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(jobStatus.JobStatus, JobStatus.TransactionError);
         }
 
-        [TestMethod]
+        [Test]
         public void TestTransactionWithPrecondition()
         {
             // create a store
@@ -139,7 +139,7 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(jobStatus.JobStatus == JobStatus.CompletedOk, "Transaction execution failed: {0} : {1}", jobStatus.Information, jobStatus.ExceptionDetail);
         }
 
-        [TestMethod]
+        [Test]
         public void TestReadTransactionList()
         {
             // create a store
@@ -194,7 +194,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, i);
         }
 
-        [TestMethod]
+        [Test]
         public void TestRecoverTransactionData()
         {
             // create a store
@@ -247,7 +247,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestFailedTransactionAppearsInTransactionList()
         {
             // create a store
@@ -308,7 +308,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, i);
         }
 
-        [TestMethod]
+        [Test]
         public void TestGetErrorMessage()
         {
             // create a store
@@ -334,7 +334,7 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(jobStatus.ExceptionDetail.Message.Contains("Syntax error in triples to add."), "Unexpected job message: '{0}'", jobStatus.ExceptionDetail.Message);
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteStoreAfterQuery()
         {
             // create a store
@@ -359,7 +359,7 @@ namespace BrightstarDB.Tests
             storeWorker.Shutdown(true, () => _storeManager.DeleteStore(Configuration.StoreLocation + "\\"+ sid));            
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteStoreAfterUpdate()
         {
             // create a store
@@ -385,7 +385,7 @@ namespace BrightstarDB.Tests
             
         }
 
-        [TestMethod]
+        [Test]
         [Ignore]
         public void TestConsolidateStore()
         {
@@ -455,7 +455,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(0, doc.Descendants(sparqlNs + "result").Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestQueryCaching()
         {
             Configuration.EnableQueryCache = true;

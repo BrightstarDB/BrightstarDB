@@ -10,17 +10,17 @@ using BrightstarDB.Utils;
 #if !SILVERLIGHT
 #endif
 #endif
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class BTreeStoreTests
     {
 #if BTREESTORE
         private readonly IStoreManager _storeManager = StoreManagerFactory.GetStoreManager();
 
-        [TestMethod]
+        [Test]
         public void TestCreateBtree()
         {
             var sid = Guid.NewGuid().ToString();
@@ -40,7 +40,7 @@ namespace BrightstarDB.Tests
 
 #if !SILVERLIGHT
         // on the phone we can't test import from / export to a file
-        [TestMethod]
+        [Test]
         public void TestImport()
         {
             var sid = Guid.NewGuid().ToString();
@@ -67,7 +67,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestImportEncodedUris()
         {
             var sid = "TestImportEncodedUris_" + DateTime.Now.Ticks;
@@ -87,7 +87,7 @@ namespace BrightstarDB.Tests
 
 #endif
 
-        [TestMethod]
+        [Test]
         public void TestHashIdUtilities()
         {
             var uri = "http://www.networkedplanet.com/people/gra";
@@ -117,7 +117,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(3u, bucketOffset);
         }
 
-        [TestMethod]
+        [Test]
         public void TestReadStoreCacheValueRespected()
         {
             var sid = Guid.NewGuid().ToString();

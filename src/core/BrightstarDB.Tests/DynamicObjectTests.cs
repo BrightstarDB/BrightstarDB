@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Dynamic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class DynamicObjectTests
     {
         private IDataObjectContext GetContext(string type)
@@ -29,14 +29,14 @@ namespace BrightstarDB.Tests
             return new BrightstarDynamicContext(GetContext("embedded"));
         } 
 
-        [TestMethod]
+        [Test]
         public void TestCreateDynamicContext()
         {
             var dc = GetDynamicContext();
             Assert.IsNotNull(dc);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateDynamicObject()
         {
             var storeId = Guid.NewGuid();
@@ -47,7 +47,7 @@ namespace BrightstarDB.Tests
             store.SaveChanges();
         }
 
-        [TestMethod]
+        [Test]
         public void TestFetchDynamicObject()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -64,7 +64,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(o.Name.FirstOrDefault(), p.Name.FirstOrDefault());
         }
 
-        [TestMethod]
+        [Test]
         public void TestUseIndexerOnDynamicObject()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -84,7 +84,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(o.Name.FirstOrDefault(), names.FirstOrDefault());
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetGetPropertyWithLiteral()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -109,7 +109,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("graham", nameList.FirstOrDefault());
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetGetPropertyLiteralCollection()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -125,7 +125,7 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(name.Contains("graham"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetUsingGetValue()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -145,7 +145,7 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(names.Contains("graham"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestNamespaceMappings()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -161,7 +161,7 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(names.Contains("Graham"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetGetWithDataObject()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -185,7 +185,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("billybob", o4.Name.FirstOrDefault());
         }
 
-        [TestMethod]
+        [Test]
         public void TestListOfRelatedDataObjects()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -209,7 +209,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, friends.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestListOfRelatedDataObjectsDataValues()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -237,7 +237,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetRelatedListWithListValues()
         {
             var storeId = Guid.NewGuid().ToString();
@@ -265,7 +265,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSampleCode()
         {
             // gets a new BrightstarDB DataObjectContext

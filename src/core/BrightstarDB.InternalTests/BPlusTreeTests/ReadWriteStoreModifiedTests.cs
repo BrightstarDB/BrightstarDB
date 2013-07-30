@@ -5,14 +5,14 @@ using System.Linq;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class ReadWriteStoreModifiedTests
     {
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof (ReadWriteStoreModifiedException))]
         public void TestStoreModifiedExceptionThrown()
         {
@@ -70,7 +70,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestReopenAfterReadWriteStoreModifiedException()
         {
             ulong pageId;

@@ -1,21 +1,21 @@
 ﻿using BrightstarDB.Storage;
 using BrightstarDB.Storage.BTreeStore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class ObjectLocationManagerTests
     {
 
-        [TestMethod]
+        [Test]
         public void TestInitialInsert()
         {
             var objectLocationManager = new ObjectLocationManager();
             objectLocationManager.SetObjectOffset(1, 500, 1, 1);
         }
 
-        [TestMethod]
+        [Test]
         public void TestInitialLookup()
         {
             var objectLocationManager = new ObjectLocationManager();
@@ -24,7 +24,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(500u, offset);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSetExistingValueLookup()
         {
             var objectLocationManager = new ObjectLocationManager();
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1001u, offset);
         }
 
-        [TestMethod]
+        [Test]
         public void Test1001Inserts()
         {
             var objectLocationManager = new ObjectLocationManager();
@@ -56,7 +56,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, objectLocationManager.NumberOfContainers);
         }
 
-        [TestMethod]
+        [Test]
         public void Test1001InsertsAndSomeUpdates()
         {
             var objectLocationManager = new ObjectLocationManager();

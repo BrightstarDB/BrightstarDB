@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class EntityFrameworkGraphTargetingTests : ClientTestBase
     {
         private const string TestStoreLocation = "c:\\brightstar";
@@ -29,7 +29,7 @@ namespace BrightstarDB.Tests.EntityFramework
             return BrightstarService.GetClient(connectionString);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateInNamedGraph()
         {
             const string update = "http://example.org/graphs/update";
@@ -50,7 +50,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsTrue(resultsDoc.SparqlResultRows().All(r=>r.GetColumnValue("g").ToString().Equals(update)));
         }
 
-        [TestMethod]
+        [Test]
         public void TestAddAndDeletePropertyInSeparateGraph()
         {
             const string inferred = "http://example.org/graphs/inferred";

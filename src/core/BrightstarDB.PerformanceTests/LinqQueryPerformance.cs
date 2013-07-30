@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using BrightstarDB.PerformanceTests.Model;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.PerformanceTests
 {
-    [TestClass]
+    [TestFixture]
     public class LinqQueryPerformance : PerformanceTestBase
     {
         private const string StoresDirectory = "C:\\brightstar";
@@ -13,8 +13,8 @@ namespace BrightstarDB.PerformanceTests
         private static string _embeddedConnectionString;
         private static MyEntityContext _context;
 
-        [ClassInitialize]
-        public static void StoreSetup(TestContext testContext)
+        [TestFixtureSetUp]
+        public void StoreSetup()
         {
             _embeddedConnectionString = String.Format("type=embedded;storesdirectory={0};storename={1}",
                                                      StoresDirectory, StoreName);
@@ -23,7 +23,7 @@ namespace BrightstarDB.PerformanceTests
 
         
         
-        [TestMethod]
+        [Test]
         public void CountInstances()
         {
             Assert.AreEqual(1000, _context.Skills.Count());
@@ -34,7 +34,7 @@ namespace BrightstarDB.PerformanceTests
             Assert.AreEqual(10000, _context.Articles.Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery1()
         {
             var personsWithHighSalaryUnderAgeOf30 = (from person in _context.Persons where person.Salary > 300000 && person.Age < 30 select person);
@@ -42,7 +42,7 @@ namespace BrightstarDB.PerformanceTests
             Assert.AreEqual(49, results.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery1WithRetrieval()
         {
             var personsWithHighSalaryUnderAgeOf30 = (from person in _context.Persons where person.Salary > 300000 && person.Age < 30 select person);
@@ -52,7 +52,7 @@ namespace BrightstarDB.PerformanceTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery2()
         {
             var personsOrdered = (from person in _context.Persons orderby person.Fullname descending select person);
@@ -60,7 +60,7 @@ namespace BrightstarDB.PerformanceTests
             Assert.AreEqual(1000, results.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery2WithRetrieval()
         {
             var personsOrdered = (from person in _context.Persons orderby person.Fullname descending select person);
@@ -70,7 +70,7 @@ namespace BrightstarDB.PerformanceTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery3()
         {
             var personsHavingSkill = _context.Skills.Where(s => s.Title.Contains("7")).SelectMany(s => s.SkilledPeople);
@@ -78,7 +78,7 @@ namespace BrightstarDB.PerformanceTests
             Assert.AreEqual(271, results.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery3WithRetrieval()
         {
             var personsHavingSkill = _context.Skills.Where(s => s.Title.Contains("7")).SelectMany(s => s.SkilledPeople);
@@ -88,7 +88,7 @@ namespace BrightstarDB.PerformanceTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery4()
         {
             var managers =
@@ -98,7 +98,7 @@ namespace BrightstarDB.PerformanceTests
             Assert.AreEqual(200, results.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery4WithRetrieval()
         {
             var managers =
@@ -110,7 +110,7 @@ namespace BrightstarDB.PerformanceTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery5()
         {
             var articles = _context.Articles.Where(a => a.Publisher.Age > 30 && a.Website.Name.Equals("website2")).Distinct();
@@ -118,7 +118,7 @@ namespace BrightstarDB.PerformanceTests
             Assert.AreEqual(3900, results.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery5WithRetrieval()
         {
             var articles = _context.Articles.Where(a => a.Publisher.Age > 30 && a.Website.Name.Equals("website2")).Distinct();
@@ -128,14 +128,14 @@ namespace BrightstarDB.PerformanceTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery6()
         {
             var average = _context.Articles.Select(a => a.Publisher).Average(p => p.Age);
             Assert.AreEqual(44.5, average);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery7()
         {
             var deptArticles = _context.Articles.Where(a => a.Publisher.Department.Name.Equals("Department4")).OrderBy(a => a.Title)
@@ -143,7 +143,7 @@ namespace BrightstarDB.PerformanceTests
             Assert.AreEqual(100, deptArticles.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery7WithRetrieval()
         {
             var deptArticles =
@@ -159,7 +159,7 @@ namespace BrightstarDB.PerformanceTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery8()
         {
             var articlesByOldPeople = _context.Articles.Where(a => a.Publisher.Age > 50).Distinct();
@@ -167,7 +167,7 @@ namespace BrightstarDB.PerformanceTests
             Assert.AreEqual(3800, results.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery8WithRetrieval()
         {
             var articlesByOldPeople = _context.Articles.Where(a => a.Publisher.Age > 50).Distinct();
@@ -177,7 +177,7 @@ namespace BrightstarDB.PerformanceTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery9()
         {
             var firstArticle = _context.Articles.First();
@@ -185,7 +185,7 @@ namespace BrightstarDB.PerformanceTests
             string tests = singleArticle.A; //make sure it is retrieved and not lazy loaded cached somehow   
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery11()
         {
             var youngpeople = (from person in _context.Persons where person.Age < 30 select person);
@@ -193,7 +193,7 @@ namespace BrightstarDB.PerformanceTests
             Assert.AreEqual(200, results.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery11WithRetrieval()
         {
             var youngpeople = (from person in _context.Persons where person.Age < 30 select person);

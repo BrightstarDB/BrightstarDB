@@ -5,15 +5,15 @@ using System.Text;
 using System.Collections.Generic;
 using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     [Ignore]
     public class PerformanceTests
     {
-        [TestMethod]
+        [Test]
         public void MakeTestData()
         {
             int batchSize = 50000;
@@ -21,7 +21,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             WriteTestData(testList, "c:\\brightstar\\testdata.dat");
         }
 
-        [TestMethod]
+        [Test]
         public void TestBatchInsert()
         {
             const int target = 40000000;

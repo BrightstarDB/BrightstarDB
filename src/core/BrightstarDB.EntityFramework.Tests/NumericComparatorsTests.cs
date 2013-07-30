@@ -1,18 +1,18 @@
 ﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.EntityFramework.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class NumericComparatorsTests : LinqToSparqlTestBase
     {
-        [TestInitialize]
+        [SetUp]
         public void SetUp()
         {
             InitializeContext();
         }
 
-        [TestMethod]
+        [Test]
         public void TestLessThanIntegerProperty()
         {
             var q = from c in Context.Companies
@@ -25,7 +25,7 @@ namespace BrightstarDB.EntityFramework.Tests
 FILTER (?v0 < '10'^^<http://www.w3.org/2001/XMLSchema#integer>) .}");
         }
 
-        [TestMethod]
+        [Test]
         public void TestNotLessThanIntegerProperty()
         {
             var q = from c in Context.Companies

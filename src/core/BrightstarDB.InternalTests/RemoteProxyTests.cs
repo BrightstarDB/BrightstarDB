@@ -2,38 +2,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using BrightstarDB.Tests;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class RemoteProxyTests : ClientTestBase
     {
         private readonly ConnectionString _connectionString = new ConnectionString("type=http;endpoint=http://localhost:8090/brightstar");
 
-        [ClassInitialize]
-        public static void SetUp(TestContext context)
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             StartService();
         }
 
-        [ClassCleanup]
-        public static void TearDown()
+        [TestFixtureTearDown]
+        public void TearDown()
         {
             CloseService();
         }
 
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestCreateDataObjectContext()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestCreateDataObjectStore()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -42,8 +43,8 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestOpenDataObjectStore()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -55,8 +56,8 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestOpenDataObjectStoreWithNamespaceMappings()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -68,8 +69,8 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(store);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestCreateDataObjectWithUri()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -80,8 +81,8 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(p1);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestCreateDataObjectWithString()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -92,8 +93,8 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(p1);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestCreateDataObject()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -104,8 +105,8 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(p1);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestCreateDataObjectWithCurie()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -121,8 +122,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("http://www.networkedplanet.com/people/gra", p1.Identity.ToString());
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestSaveAndFetchDataObject()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -141,8 +142,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(p1.Identity, p2.Identity);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestSavedDataObjectPropertyIsSameAfterSave()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -165,8 +166,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual("graham", label);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestLocalStateAfterSetProperty()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -182,8 +183,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(propValue, "graham");
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestSetSamePropertyResultsInOnlyOneProperty()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -203,8 +204,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1, ((RemoteDataObjectStore)store).AddTriples.Count());
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestRemoveProperty()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -225,8 +226,8 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestRemovePropertyPersisted()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -252,8 +253,8 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestAddAndRemovePropertyPersisted()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -278,8 +279,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(0, ((RemoteDataObjectStore)store).AddTriples.Count());
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestSetSamePropertyResultsInOnlyOnePropertyAfterSave()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -300,9 +301,9 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1, ((DataObject)p2).Triples.Count());
         }
 
-        [TestMethod]
+        [Test]
         [Ignore]
-        [TestCategory("RemoteProxyTests")]
+        [Category("RemoteProxyTests")]
         public void TestDataObjectFluids()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -332,8 +333,8 @@ namespace BrightstarDB.Tests
             store.SaveChanges();
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestAddProperty()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -351,8 +352,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, ((DataObject)p2).Triples.Count());
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestGetProperty()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -370,8 +371,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, ((DataObject)p2).Triples.Count());
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestSetPropertyDataObject()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -390,8 +391,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1, ((DataObject)p3).Triples.Count());
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestGetProperties()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -416,8 +417,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, propValues.Count());
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestRemoveSpecificValueProperty()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -457,8 +458,8 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestGetRelatedProxies()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -486,8 +487,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(p1.Identity, np.Identity);
         }
 
-        [TestMethod]
-        [TestCategory("RemoteProxyTests")]
+        [Test]
+        [Category("RemoteProxyTests")]
         public void TestGetRelatedProxiesWithSafeCurie()
         {
             IDataObjectContext context = new HttpDataObjectContext(_connectionString);
@@ -515,7 +516,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(p1.Identity, np.Identity);
         }
 
-        [TestMethod]
+        [Test]
         public void TestPreconditionsFailedException()
         {
             IDataObjectContext context =

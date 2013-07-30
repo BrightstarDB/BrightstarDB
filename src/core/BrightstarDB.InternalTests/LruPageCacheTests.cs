@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using BrightstarDB.Storage.Persistence;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class LruPageCacheTests
     {
-        [TestMethod]
+        [Test]
         public void TestLookup()
         {
             var cache = new LruPageCache(10);
@@ -29,7 +25,7 @@ namespace BrightstarDB.Tests
             Assert.IsNull(wrongPartition);
         }
 
-        [TestMethod]
+        [Test]
         public void TestEvictionOnInsert()
         {
             var cache = new LruPageCache(10);
@@ -48,7 +44,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(cache.Lookup("test", 4ul));
         }
 
-        [TestMethod]
+        [Test]
         public void TestOverwriteOnInsert()
         {
             var cache = new LruPageCache(10);
@@ -71,7 +67,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, retreived.Version);
         }
 
-        [TestMethod]
+        [Test]
         public void TestCancelEviction()
         {
             var cache = new LruPageCache(10);

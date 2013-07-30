@@ -4,19 +4,19 @@ using System.Diagnostics;
 using System.Linq;
 using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 #if WINDOWS_PHONE
 using Remotion.Linq;
 using Microsoft.Silverlight.Testing;
 #endif
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class BasicTreeTests
     {
-        [TestMethod]
+        [Test]
         public void TestInsertNoSplit()
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestInsertNoSplit.data"))
@@ -43,7 +43,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertSingleRootSplit()
         {
             ulong rootId;
@@ -85,7 +85,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestSplitRootNode()
         {
             ulong treeRootId;
@@ -129,7 +129,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertInReverseOrder()
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestInsertInReverseOrder.data"))
@@ -154,7 +154,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertInRandomOrder()
         {
             ulong treeRootId;
@@ -184,7 +184,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
 
 
 
-        [TestMethod]
+        [Test]
         public void TestDeleteFromLeafRoot()
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestDeleteFromLeafRoot.data"))
@@ -206,7 +206,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestBorrowLeft()
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestBorrowLeft.data"))
@@ -234,7 +234,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
     
-        [TestMethod]
+        [Test]
         public void TestBorrowRight()
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestBorrowRight.data"))
@@ -261,7 +261,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestMergeLeft()
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestMergeLeft.data"))
@@ -291,7 +291,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestMergeRight()
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestMergeRight.data"))
@@ -344,7 +344,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
                         Assert.IsTrue(tree.Search(i, buff, null) ^ (i - deleteFrom >= 0 && i - deleteFrom < 4),
                                       "Could not find key {0}. deleteFrom={1}", i, deleteFrom);
                     }
-                    catch (AssertFailedException)
+                    catch (AssertionException)
                     {
                         Console.WriteLine("\nFailed tree structure:\n");
                         tree.DumpStructure();
@@ -362,7 +362,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestValuelessBTree()
         {
             var insertedValues = new List<Guid>();
@@ -395,7 +395,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestBatchedInserts()
         {
             var rng = new Random();
@@ -429,7 +429,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertAndDeleteAllEntries()
         {
             var value = new byte[64];
@@ -500,7 +500,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertAndDeleteInReverseOrder()
         {
             const string pageStoreName = "TestInsertAndDeleteInReverseOrder.data";
@@ -544,7 +544,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteInRandomOrder()
         {
             const string pageStoreName = "DeleteInRandomOrder.data";

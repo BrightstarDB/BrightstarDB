@@ -10,11 +10,11 @@ using BrightstarDB.Caching;
 using BrightstarDB.Client;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class ClientTests : ClientTestBase
     {
 
@@ -23,19 +23,19 @@ namespace BrightstarDB.Tests
             return BrightstarService.GetClient("type=http;endpoint=http://localhost:8090/brightstar");
         }
 
-        [ClassInitialize]
-        public static void SetUp(TestContext context)
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             StartService();
         }
 
-        [ClassCleanup]
-        public static void TearDown()
+        [TestFixtureTearDown]
+        public void TearDown()
         {
             CloseService();
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateStore()
         {
             var bc = GetClient();
@@ -43,7 +43,7 @@ namespace BrightstarDB.Tests
             bc.CreateStore(sid);
         }
 
-        [TestMethod]
+        [Test]
         public void TestInvalidStoreNames()
         {
             var bc = GetClient();
@@ -84,7 +84,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestIfStoreExistsFalseWhenNoStoreCreated()
         {
             var bc = GetClient();
@@ -93,7 +93,7 @@ namespace BrightstarDB.Tests
             Assert.IsFalse(exists);
         }
 
-        [TestMethod]
+        [Test]
         public void TestIfStoreExistsTrueAfterStoreCreated()
         {
             var bc = GetClient();
@@ -103,7 +103,7 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(exists);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(System.ServiceModel.FaultException<ExceptionDetail>))]
         public void TestCreateDuplicateStoreFails()
         {
@@ -114,7 +114,7 @@ namespace BrightstarDB.Tests
             bc.CreateStore(sid);
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteStore()
         {
             var bc = GetClient();
@@ -135,7 +135,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(0, stores.Where(s => s.Equals(sid)).Count());
         }
 
-        [TestMethod]
+        [Test]
         public void TestListStores()
         {
             var bc = GetClient();
@@ -143,7 +143,7 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(stores.Count() > 0);
         }
 
-        [TestMethod]
+        [Test]
         public void TestQuery()
         {
             var client = GetClient();
@@ -152,7 +152,7 @@ namespace BrightstarDB.Tests
             client.ExecuteQuery(storeName, "SELECT ?s WHERE { ?s ?p ?o }");
         }
 
-        [TestMethod]
+        [Test]
         public void TestQueryIfNotModifiedSince()
         {
             var client = GetClient();
@@ -184,7 +184,7 @@ namespace BrightstarDB.Tests
         // Tel: 240439
 
         /*
-        [TestMethod]
+        [Test]
         public void TestGetStoreData()
         {
             var bc = GetClient();
@@ -197,7 +197,7 @@ namespace BrightstarDB.Tests
         }
         */
 
-        [TestMethod]
+        [Test]
         public void TestTransactionAddStatements()
         {
             var bc = GetClient();
@@ -223,7 +223,7 @@ namespace BrightstarDB.Tests
             //Assert.IsTrue(0 < memoryStream.Length);
         }
 
-        [TestMethod] public void TestTransactiondDeleteStatements()
+        [Test] public void TestTransactiondDeleteStatements()
         {
             var bc = GetClient();
             var storeName = Guid.NewGuid().ToString();
@@ -262,7 +262,7 @@ namespace BrightstarDB.Tests
             //Assert.AreEqual(0, memoryStream.Length);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSparqlQuery()
         {
             var bc = GetClient();
@@ -291,7 +291,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(result);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSparqlQueryWithDefaultGraph()
         {
             var client = GetClient();
@@ -322,7 +322,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(new Uri("http://example.org/resource2"), rows[0].GetColumnValue("o"));
         }
 
-        [TestMethod]
+        [Test]
         public void TestSparqlQueryWithDefaultGraphs()
         {
             var client = GetClient();
@@ -358,7 +358,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(new Uri("http://example.org/resource2"), rows[0].GetColumnValue("o"));
             
         }
-        [TestMethod]
+        [Test]
         public void TestSparqlXDocumentExtensions()
         {
             var bc = GetClient();
@@ -416,11 +416,11 @@ namespace BrightstarDB.Tests
                 Assert.IsNull(row.GetColumnValue("z"));
                 Assert.IsFalse(row.IsLiteral("p"));
                 Assert.IsTrue(row.IsLiteral("o"));
-                Assert.IsInstanceOfType(o, typeof(Int32));
+                Assert.IsInstanceOfType(typeof(Int32), o);
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestPassingNullForData()
         {
             var bc = GetClient();
@@ -446,7 +446,7 @@ namespace BrightstarDB.Tests
             //Assert.IsTrue(0 < memoryStream.Length);
         }
 
-        [TestMethod]
+        [Test]
         public void TestBadDataGetsUsefulErrorMessage()
         {
             string sid = null;
@@ -463,7 +463,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestEmbeddedClient()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -477,7 +477,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestEmbeddedClientDeleteCreatePattern()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -502,7 +502,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestExportWhileWriting()
         {
             int firstBatchSize = 50000;
@@ -591,7 +591,7 @@ namespace BrightstarDB.Tests
             return triples.ToString();
         }
 
-        [TestMethod]
+        [Test]
         public void TestSpecialCharsInIdentities()
         {
             var importDir = Path.Combine(Configuration.StoreLocation, "import");
@@ -639,7 +639,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestConsolidateEmptyStore()
         {
             var storeName = "ConsolidateEmptyStore_" + DateTime.Now.Ticks;
@@ -660,7 +660,7 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(job.JobCompletedOk, "Job did not complete successfully: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
         }
 
-        [TestMethod]
+        [Test]
         public void TestConsolidatePopulatedStore()
         {
             var storeName = "ConsolidatePopulatedStore_" + DateTime.Now.Ticks;
@@ -692,7 +692,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestConsolidatePopulatedStoreAfterQuery()
         {
             var storeName = "ConsolidatePopulatedStore_" + DateTime.Now.Ticks;
@@ -727,7 +727,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertQuadsIntoDefaultGraph()
         {
             var client = GetClient();
@@ -745,7 +745,7 @@ namespace BrightstarDB.Tests
                 "http://example.org/graphs/alice");
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertQuadsIntoNonDefaultGraph()
         {
             var client = GetClient();
@@ -764,7 +764,7 @@ namespace BrightstarDB.Tests
                 "http://example.org/graphs/bob");
         }
 
-        [TestMethod]
+        [Test]
         public void TestUpdateQuadsUsingDefaultGraph()
         {
             var client = GetClient();
@@ -796,7 +796,7 @@ namespace BrightstarDB.Tests
                                        @"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins""");
         }
 
-        [TestMethod]
+        [Test]
         public void TestUpdateQuadsUsingNonDefaultGraph()
         {
             var client = GetClient();
@@ -833,7 +833,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestTransactionWithWildcardGraph()
         {
             var client = GetClient();

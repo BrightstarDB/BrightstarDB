@@ -1,12 +1,12 @@
 ﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.EntityFramework.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class ConstructorTests : LinqToSparqlTestBase
     {
-        [TestInitialize]
+        [SetUp]
         public void SetUp()
         {
             base.InitializeContext();
@@ -18,7 +18,7 @@ namespace BrightstarDB.EntityFramework.Tests
             public decimal Price { get; set; }
         }
 
-        [TestMethod]
+        [Test]
         public void TestNoArgsWithPublicProperties()
         {
             var q =

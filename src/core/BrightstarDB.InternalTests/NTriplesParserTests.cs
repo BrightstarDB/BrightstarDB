@@ -2,24 +2,24 @@
 using System.IO;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using VDS.RDF;
 using VDS.RDF.Parsing.Handlers;
 using System.Diagnostics;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class NTriplesParserTests
     {
         private readonly IStoreManager _storeManager = StoreManagerFactory.GetStoreManager();
 
-        [TestMethod]
+        [Test]
         public void TestBrightstarParser()
         {
             var t = new Stopwatch();
             t.Start();
-            using (var fs = new FileStream("BSBM_370k.nt", FileMode.Open))
+            using (var fs = new FileStream(TestPaths.DataPath + "BSBM_370k.nt", FileMode.Open))
             {
                 var parser = new NTriplesParser();
                 parser.Parse(fs, new NoopParser(), Constants.DefaultGraphUri);                
@@ -28,13 +28,13 @@ namespace BrightstarDB.Tests
             Console.WriteLine("Time for Brightstar Parser is " + t.ElapsedMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         [Ignore]
         public void TestVdsParser()
         {
             var t = new Stopwatch();
             t.Start();
-            using (var fs = new FileStream("BSBM_370k.nt", FileMode.Open))
+            using (var fs = new FileStream(TestPaths.DataPath + "BSBM_370k.nt", FileMode.Open))
             {
                 var parser = new VDS.RDF.Parsing.NTriplesParser();
                 parser.Load(new NoopParser(), new StreamReader(fs));                
@@ -43,31 +43,31 @@ namespace BrightstarDB.Tests
             Console.WriteLine("Time for Brightstar Parser is " + t.ElapsedMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         public void TestEncodingAndEscaping()
         {
             var sid = Guid.NewGuid().ToString();
             var store = _storeManager.CreateStore(Configuration.StoreLocation + "\\" + sid);
-            store.Import(Guid.Empty, new FileStream("escaping.nt", FileMode.Open));
+            store.Import(Guid.Empty, new FileStream(TestPaths.DataPath + "escaping.nt", FileMode.Open));
             store.Export(new FileStream(@"escaping-out.nt", FileMode.Create));
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestBasicNtriples()
         {
             var ntp = new NTriplesParser();
-            using (var fs = new FileStream("simple.txt", FileMode.Open))
+            using (var fs = new FileStream(TestPaths.DataPath+"simple.txt", FileMode.Open))
             {
                 ntp.Parse(fs, new NoopParser(), Constants.DefaultGraphUri);
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestBasicNQuads()
         {
             var ntp = new NTriplesParser();
-            ntp.Parse(new FileStream("nquads.txt", FileMode.Open), new NoopParser(), Constants.DefaultGraphUri);
+            ntp.Parse(new FileStream(TestPaths.DataPath+"nquads.txt", FileMode.Open), new NoopParser(), Constants.DefaultGraphUri);
         }
 
         public class NoopParser : BaseRdfHandler , ITripleSink

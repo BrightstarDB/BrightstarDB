@@ -1,13 +1,13 @@
 ﻿using System.Linq;
 using BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class RelatedResourceIndexTests
     {
-        [TestMethod]
+        [Test]
         public void TestInsertRelatedResource()
         {
             ulong relatedResourceIndexRoot;
@@ -32,7 +32,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestEnumerateMultipleRelatedResources()
         {
             ulong relatedResourceIndexRoot;
@@ -80,7 +80,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteRelatedResource()
         {
             ulong relatedResourceIndexRoot;

@@ -2,11 +2,11 @@
 using System.IO;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests.BPlusTreeTests
+namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
-    [TestClass]
+    [TestFixture]
     public class PageFileTests
     {
         private const string PageFilePath = "readonly_store.bs";
@@ -27,7 +27,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateAppendOnlyPageStore()
         {
             if (PersistenceManager.FileExists(PageFilePath)) PersistenceManager.DeleteFile(PageFilePath);
@@ -52,7 +52,7 @@ namespace BrightstarDB.Tests.BPlusTreeTests
             Assert.AreEqual(0, PersistenceManager.GetFileLength(PageFilePath));
         }
 
-        [TestMethod]
+        [Test]
         public void TestAddFirstPageToEmptyPageStore()
         {
             //if (File.Exists(PageFilePath)) File.Delete(PageFilePath);

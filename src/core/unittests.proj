@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <!-- Import CommunityTasks for the NUnit task -->
+    <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  
 	<PropertyGroup>
-		<MSTest Condition=" '$(MSTest)' == '' ">MSTest.exe</MSTest>
+		<NUnitPath Condition=" '$(NUnitPath)' == '' ">C:\Program Files (x86)\NUnit 2.6.2\bin</NUnitPath>
 	</PropertyGroup>
 	<ItemGroup>
 		<TestResults Include="*.trx" />
@@ -11,38 +15,38 @@
 		<Delete Files="@(TestResults)" />
 	</Target>
 
-	<Target Name="Frameworks">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:DataObjectTests /testlist:"EntityFramework Tests" /testlist:Dynamics /testlist:"LinqToSparql Tests" /testsettings:local.testsettings /resultsfile:frameworks.trx' />
+	<Target Name="EntityFramework">
+		<NUnit Assemblies="BrightstarDB.EntityFramework.Tests\bin\Debug\BrightstarDB.EntityFramework.Tests.dll"
+			   ToolPath="$(NUnitPath)"
+			   OutputXmlFile="TestResults\BrightstarDB.EntityFramework.Tests.xml" />
 	</Target>
 
-	<Target Name="Client">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Client Tests" /testsettings:local.testsettings /resultsfile:client.trx' />
+	<Target Name="Internal">
+		<NUnit Assemblies="BrightstarDB.InternalTests\bin\Debug\BrightstarDB.InternalTests.dll"
+			   ToolPath="$(NUnitPath)"
+			   OutputXmlFile="TestResults\BrightstarDB.InternalTests.xml" />
 	</Target>
 
-	<Target Name="Server">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"ServerTests" /testsettings:local.testsettings /resultsfile:server.trx' />
-	</Target>
-    
 	<Target Name="OData">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"OData Tests" /testsettings:local.testsettings /resultsfile:odata.trx' />
+		<NUnit Assemblies="BrightstarDB.OData.Tests\bin\Debug\BrightstarDB.OData.Tests.dll"
+			   ToolPath="$(NUnitPath)"
+			   OutputXmlFile="TestResults\BrightstarDB.OData.Tests.xml" />
 	</Target>
 
-	<Target Name="SPARQL">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"SPARQL Dawg Tests" /testlist:"SPARQL Evaluation Tests" /testsettings:local.testsettings /resultsfile:sparql.trx' />
-	</Target>
 
 	<Target Name="Core">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:ServerTests /testlist:"BPlusTree and PageStore Tests" /testsettings:local.testsettings /resultsfile:core.trx' />
+		<NUnit Assemblies="BrightstarDB.Tests\bin\Debug\BrightstarDB.Tests.dll"
+			   ToolPath="$(NUnitPath)"
+			   OutputXmlFile="TestResults\BrightstarDB.Tests.xml" />
 	</Target>
 
-	<Target Name="Build" DependsOnTargets="CleanResults;Core;Frameworks;Client;OData;SPARQL">
-	<!--
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:DataObjectTests /testlist:"EntityFramework Tests" /testlist:ServerTests /testlist:"SPARQL Evaluation Tests" /testlist:"SPARQL 11 Tests" /testlist:Dynamics /testlist:"OData Tests" /testsettings:local.testsettings /resultsfile:testresults.trx' />
-	-->
+	<Target Name="Build" DependsOnTargets="CleanResults;EntityFramework;Internal;OData;Core">
 	</Target>
 	
 	<Target Name="Performance" DependsOnTargets="CleanResults">
-		<Exec Command='"$(MSTest)" /nologo /testmetadata:BrightstarDB.vsmdi /testlist:"Client Scaling Tests" /testlist:"Scaling Tests" /testsettings:local.testsettings /resultsfile:performance.trx' />
+		<NUnit Assemblies="BrightstarDB.PerformanceTests\bin\Debug\BrightstarDB.PerformanceTests.dll"
+			   ToolPath="$(NUnitPath)"
+			   OutputXmlFile="TestResults\BrightstarDB.PerformanceTests.xml" />
 	</Target>
 	
 	<UsingTask TaskName="SparqlTestGenerator" AssemblyFile="../tools/SparqlTestTasks/SparqlTestTasks/bin/Debug/SparqlTestTasks.dll" />

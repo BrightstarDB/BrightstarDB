@@ -6,7 +6,7 @@ using System.Threading;
 using BrightstarDB.Client;
 using BrightstarDB.Rdf;
 using BrightstarDB.Server;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
@@ -160,7 +160,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                     Assert.Fail("Don't know how to compare results to results file {0}", expectedResultPath);
                 }
             }
-            catch (AssertFailedException)
+            catch (AssertionException)
             {
                 Console.WriteLine("Expected Results Path: {0}", expectedResultPath);
                 Console.WriteLine("Actual Results:");

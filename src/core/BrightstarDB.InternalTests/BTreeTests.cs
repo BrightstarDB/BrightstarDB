@@ -6,12 +6,12 @@ using System.IO;
 using System.Linq;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.BTreeStore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
 
-    [TestClass]
+    [TestFixture]
     public class BTreeTests
     {
         private readonly IStoreManager _storeManager = StoreManagerFactory.GetStoreManager();
@@ -31,7 +31,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestFirstInsert()
         {
             var store = new Store();
@@ -43,7 +43,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1ul, btree.Root.Keys[0].Key);
         }
 
-        [TestMethod]
+        [Test]
         public void TestSecondInsert()
         {
             var store = new Store();
@@ -57,7 +57,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2ul, btree.Root.Keys[1].Key);
         }
 
-        [TestMethod]
+        [Test]
         public void TestRootSplit()
         {
             var store = new Store();
@@ -77,7 +77,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(3ul, btree.LoadNode(btree.Root.ChildNodes[1]).Keys[0].Key);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(BrightstarInternalException), "Key Already Exists")]
         public void TestDuplicateInsertFails()
         {
@@ -101,7 +101,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestInsertAfterRootSplit()
         {
             var store = new Store();
@@ -128,7 +128,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(4ul, btree.LoadNode(btree.Root.ChildNodes[1]).Keys[1].Key);
         }
 
-        [TestMethod]
+        [Test]
         public void TestEntryLookup()
         {
             var store = new Store();
@@ -151,7 +151,7 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(node);
         }
 
-        [TestMethod]
+        [Test]
         public void TestNonRootSplit()
         {
             var store = new Store();
@@ -195,7 +195,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertAfterNonRootSplit()
         {
             var store = new Store();
@@ -235,7 +235,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestPropagatingSplit()
         {
             var store = new Store();
@@ -267,7 +267,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestNonSequentialInsert()
         {
             var store = new Store();
@@ -288,7 +288,7 @@ namespace BrightstarDB.Tests
             AssertOrderInList(inorderKeys);
         }
 
-        [TestMethod]
+        [Test]
         public void TestFindExistingKey()
         {
             var store = new Store();
@@ -314,7 +314,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestFindNonExistantKey()
         {
             var store = new Store();
@@ -332,7 +332,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteInLeaf()
         {
             var store = new Store();
@@ -349,7 +349,7 @@ namespace BrightstarDB.Tests
             AssertOrderInList(InOrderTraversal(btree));
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteInLeafWithRightSiblingBorrow()
         {
             var store = new Store();
@@ -371,7 +371,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(4ul, btree.LoadNode(btree.Root.ChildNodes[1]).Keys[0].Key);
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteInLeafWithLeftSiblingBorrow()
         {
             var store = new Store();
@@ -396,7 +396,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(3ul, btree.LoadNode(btree.Root.ChildNodes[1]).Keys[0].Key);
         }
 
-        [TestMethod]
+        [Test]
         public void TestOutOfOrderInsert()
         {
             var store = new Store();
@@ -426,7 +426,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(20, InOrderTraversal(btree).Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestBuildTestTree()
         {
             var tree = BuildTree(Guid.NewGuid());
@@ -434,7 +434,7 @@ namespace BrightstarDB.Tests
             AssertOrderInList(InOrderTraversal(tree));
         }
 
-        [TestMethod]
+        [Test]
         public void TestLeafNodeDelete()
         {
             var tree = BuildTree(Guid.NewGuid());
@@ -447,7 +447,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, tree.LoadNode(tree.LoadNode(tree.Root.ChildNodes[0]).ChildNodes[2]).Keys.Count);
         }
 
-        [TestMethod]
+        [Test]
         public void TestInternalNodeDelete()
         {
             var tree = BuildTree(Guid.NewGuid());
@@ -461,7 +461,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual('x', tree.LoadNode(tree.LoadNode(tree.Root.ChildNodes[1]).ChildNodes[2]).Keys[0].Key);
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteLeafNodeWithBorrowRight()
         {
             var tree = BuildTree(Guid.NewGuid());
@@ -488,7 +488,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual('z', tree.LoadNode(tree.LoadNode(tree.Root.ChildNodes[1]).ChildNodes[2]).Keys[1].Key);
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteInternalNodeWithBorrowLeft()
         {
             var tree = BuildTree3(Guid.NewGuid());
@@ -502,7 +502,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         public void TestDeleteLeafNodeWithCollapse()
         {
             var tree = BuildTree(Guid.NewGuid());
@@ -536,7 +536,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestLeftMerge()
         {
             var tree = BuildTree(Guid.NewGuid());
@@ -614,14 +614,14 @@ namespace BrightstarDB.Tests
             return tree;
         }
         
-        [TestMethod]
+        [Test]
         public void TestBuildTree2()
         {            
             var tree = BuildTree2(Guid.NewGuid());
             AssertOrderInList(InOrderTraversal(tree));
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteFromTree2()
         {
             var tree = BuildTree2(Guid.NewGuid());
@@ -770,7 +770,7 @@ namespace BrightstarDB.Tests
         }
 
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(BrightstarInternalException))]
         public void TestExceptionWhenInsertingDuplicateKey()
         {
@@ -814,7 +814,7 @@ namespace BrightstarDB.Tests
 
 
 #if !SILVERLIGHT // WP7 emulator dies with these tests, presumably due to memory limitations.
-        [TestMethod]
+        [Test]
         public void TestMillionIds()
         {
             var start = DateTime.UtcNow;
@@ -828,7 +828,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine(end.Subtract(start).TotalMilliseconds);
         }
         
-        [TestMethod]
+        [Test]
         public void TestMillionIdsPersisted()
         {
             var start = DateTime.UtcNow;
@@ -877,7 +877,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine("Commit new changes:" + end.Subtract(start).TotalMilliseconds);
         }
 #else
-        [TestMethod]
+        [Test]
         public void TestMillionIds()
         {
             var start = DateTime.UtcNow;
@@ -891,7 +891,7 @@ namespace BrightstarDB.Tests
             Console.WriteLine(end.Subtract(start).TotalMilliseconds);
         }
 
-        [TestMethod]
+        [Test]
         public void TestManyBTreeInsertsPersisted()
         {
             var start = DateTime.UtcNow;
@@ -942,7 +942,7 @@ namespace BrightstarDB.Tests
 
 #endif
 
-        [TestMethod]
+        [Test]
         public void TestFirstInsertPersisted()
         {
             var storeId = Guid.NewGuid();
@@ -968,7 +968,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(1ul, btree.Root.Keys[0].Key);
         }
 
-        [TestMethod]
+        [Test]
         public void TestOutOfOrderInsertPersisted()
         {
             var storeId = Guid.NewGuid();
@@ -1011,7 +1011,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestOutOfOrderInsertPersistedWithTreeSize7()
         {
             var storeId = Guid.NewGuid();
@@ -1054,7 +1054,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestInsertAfterRootSplitPersisted()
         {
             var storeId = Guid.NewGuid();
@@ -1106,7 +1106,7 @@ namespace BrightstarDB.Tests
             AssertOrderInList(InOrderTraversal(btree));
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteFromTree2Persisted()
         {
             var storeId = Guid.NewGuid();
@@ -1150,7 +1150,7 @@ namespace BrightstarDB.Tests
             Assert.AreEqual('u', tree.LoadNode(tree.Root.ChildNodes[1]).Keys[1].Key);
         }
 
-        [TestMethod]
+        [Test]
         public void TestDeleteLeafNodeWithCollapsePersisted()
         {
             var storeId = Guid.NewGuid();

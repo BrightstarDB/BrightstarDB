@@ -1,21 +1,21 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
+    [TestFixture]
     public class HttpOptimisticLockingTests : OptimisticLockingTestsBase
     {
         private readonly string _storeName = "HttpOptimisticLockingTests_" + DateTime.Now.Ticks;
 
-        [ClassInitialize]
-        public static void SetUp(TestContext context)
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             StartService();
         }
 
-        [ClassCleanup]
-        public static void TearDown()
+        [TestFixtureTearDown]
+        public void TearDown()
         {
             CloseService();
         }
@@ -31,50 +31,50 @@ namespace BrightstarDB.Tests.EntityFramework
         #endregion
 
         #region Single Object Updates
-        [TestMethod]
+        [Test]
         public new void TestSimplePropertyRefreshWithClientWins()
         {
             base.TestSimplePropertyRefreshWithClientWins();
         }
 
-        [TestMethod]
+        [Test]
         public new void TestSimplePropertyRefreshWithStoreWins()
         {
             base.TestSimplePropertyRefreshWithStoreWins();
 
         }
 
-        [TestMethod]
+        [Test]
         public new void TestRelatedObjectRefreshWithClientWins()
         {
             base.TestRelatedObjectRefreshWithClientWins();
         }
 
-        [TestMethod]
+        [Test]
         public new void TestRelatedObjectRefreshWithStoreWins()
         {
             base.TestRelatedObjectRefreshWithStoreWins();
         }
 
-        [TestMethod]
+        [Test]
         public new void TestLiteralCollectionRefreshWithClientWins()
         {
             base.TestLiteralCollectionRefreshWithClientWins();
         }
 
-        [TestMethod]
+        [Test]
         public new void TestLiteralCollectionRefreshWithStoreWins()
         {
             base.TestLiteralCollectionRefreshWithStoreWins();
         }
 
-        [TestMethod]
+        [Test]
         public new void TestObjectCollectionRefreshWithClientWins()
         {
             base.TestObjectCollectionRefreshWithClientWins();
         }
 
-        [TestMethod]
+        [Test]
         public new void TestObjectCollectionRefreshWithStoreWins()
         {
             base.TestObjectCollectionRefreshWithStoreWins();
@@ -84,19 +84,19 @@ namespace BrightstarDB.Tests.EntityFramework
 
         #region Multiple Object Updates
 
-        [TestMethod]
+        [Test]
         public new void MultiLiteralPropertyRefreshClientWins()
         {
             base.MultiLiteralPropertyRefreshClientWins();
         }
 
-        [TestMethod]
+        [Test]
         public new void MultiLiteralPropertyRefreshStoreWins()
         {
             base.MultiLiteralPropertyRefreshStoreWins();
         }
 
-        [TestMethod]
+        [Test]
         public new void MultiLiteralPropertyRefreshMixedModes()
         {
             base.MultiLiteralPropertyRefreshMixedModes();

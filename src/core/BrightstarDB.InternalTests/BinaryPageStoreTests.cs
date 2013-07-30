@@ -2,12 +2,12 @@
 using System.IO;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using BrightstarDB.Utils;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
-    [TestClass]
+    [TestFixture]
     public class BinaryPageStoreTests
     {
         private readonly IPersistenceManager _pm = new FilePersistenceManager();
@@ -25,7 +25,7 @@ namespace BrightstarDB.Tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestCreateAndUpdatePage()
         {
             using (var pageStore = CreateEmptyPageStore("TestCreateAndUpdatePage.dat"))

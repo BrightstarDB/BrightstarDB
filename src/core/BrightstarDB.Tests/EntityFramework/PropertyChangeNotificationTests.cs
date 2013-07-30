@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using BrightstarDB.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Text;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestClass]
-    public class PropertyChangeNotificationTests : IDisposable
+    [TestFixture]
+    public class PropertyChangeNotificationTests
     {
         private readonly MyEntityContext _context;
         private readonly string _storeName;
@@ -46,13 +48,13 @@ namespace BrightstarDB.Tests.EntityFramework
 
         
 
-        [TestCleanup]
+        [TearDown]
         public void TestCleanUp()
         {
             _lastPropertyChanged = null;
         }
 
-        [TestMethod]
+        [Test]
         public void TestStringPropertySetAndChanged()
         {
             _lastPropertyChanged = null;
@@ -78,7 +80,7 @@ namespace BrightstarDB.Tests.EntityFramework
             _lastPropertyChanged = null;
         }
 
-        [TestMethod]
+        [Test]
         public void TestIntegerPropertyChanged()
         {
             _lastPropertyChanged = null;
@@ -101,7 +103,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual("HeadCount", _lastPropertyChanged);
         }
 
-        [TestMethod]
+        [Test]
         public void TestRelatedEntityChanged()
         {
             _lastPropertyChanged = null;
@@ -121,7 +123,7 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual("ListedOn", _lastPropertyChanged);
         }
 
-        [TestMethod]
+        [Test]
         public void TestLiteralCollectionChangeEvents()
         {
             _lastCollectionChangeEvent = null;

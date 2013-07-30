@@ -9,9 +9,9 @@ using BrightstarDB.Client;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.InternalTests
 {
     public abstract class StoreTestsBase
     {
