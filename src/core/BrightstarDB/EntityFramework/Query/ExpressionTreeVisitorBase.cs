@@ -28,7 +28,11 @@ namespace BrightstarDB.EntityFramework.Query
             if (expression is MemberExpression)
             {
                 var memberExpression = expression as MemberExpression;
+#if PORTABLE
+                if (memberExpression.Member is PropertyInfo)
+#else
                 if (memberExpression.Member.MemberType == MemberTypes.Property)
+#endif
                 {
                     var propertyInfo = memberExpression.Member as PropertyInfo;
                     return QueryBuilder.Context.GetPropertyHint(propertyInfo);
@@ -42,10 +46,14 @@ namespace BrightstarDB.EntityFramework.Query
             if (expression is MemberExpression)
             {
                 var memberExpression = expression as MemberExpression;
+#if PORTABLE
+                return memberExpression.Member as PropertyInfo;
+#else
                 if (memberExpression.Member.MemberType == MemberTypes.Property)
                 {
                     return memberExpression.Member as PropertyInfo;
                 }
+#endif
             }
             return null;
         }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BrightstarDB.EntityFramework;
 using BrightstarDB.Model;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Client
 {
@@ -253,7 +255,7 @@ namespace BrightstarDB.Client
 
         public IEnumerable<IDataObject> TrackedObjects
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             get { return _managedProxies.Values.Cast<IDataObject>(); }
 #else
             get { return _managedProxies.Values; }

@@ -4,8 +4,11 @@ using System.Linq;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
 using VDS=VDS.RDF;
+#endif
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
 #endif
 
 namespace BrightstarDB.Client

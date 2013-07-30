@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if !WINDOWS_PHONE
+#if !WINDOWS_PHONE && !PORTABLE
 using System.Threading;
 #endif
 using BrightstarDB.Profiling;
@@ -15,7 +15,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
         private readonly IPageStore _pageStore;
         private readonly Dictionary<string, int> _graphUriIndex;
         private readonly List<GraphIndexEntry> _allEntries;
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
         private readonly object _lock = new object();
 #else
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
@@ -47,7 +47,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
         /// <returns></returns>
         public IEnumerable<GraphIndexEntry> EnumerateEntries()
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock(_lock)
             {
                 return _allEntries.Where(x => !x.IsDeleted).ToList();
@@ -73,7 +73,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
         /// <remarks>Returns null if no graph exists with the specified URI or if the graph is marked as deleted</remarks>
         public string GetGraphUri(int graphId)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock(_lock)
             {
                 if (graphId < _allEntries.Count && !_allEntries[graphId].IsDeleted)
@@ -116,7 +116,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
                 throw new ArgumentException(
                     String.Format("Graph URI string exceeds maximum allowed length of {0} bytes", short.MaxValue), "graphUri");
             }
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock(_lock)
             {
                 int entryId;
@@ -171,7 +171,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
         /// <returns>True if an ID was found, false otherwise</returns>
         public bool TryFindGraphId(string graphUri, out int graphId)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock (_lock)
             {
                 int entryId;
@@ -205,7 +205,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
 
         public void DeleteGraph(int graphId)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock(_lock)
             {
                 if (graphId < _allEntries.Count)

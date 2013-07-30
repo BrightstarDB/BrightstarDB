@@ -120,7 +120,7 @@ namespace BrightstarDB.Rdf
         private static readonly RdfDatatype RdfString = new RdfDatatype(String, (o => o as string), (s=>s));
         private static readonly RdfDatatype RdfBoolean = new RdfDatatype(Boolean, (o => ((bool) o) ? "true" : "false"), (s)=>Convert.ToBoolean(s));
         private static readonly RdfDatatype RdfDateTime = new RdfDatatype(DateTime, (o => ((DateTime) o).ToString("O")), s=>Convert.ToDateTime(s));
-        private static readonly RdfDatatype RdfDate = new RdfDatatype(Date, (o => ((DateTime)o).ToShortDateString()), s => Convert.ToDateTime(s));
+        private static readonly RdfDatatype RdfDate = new RdfDatatype(Date, (o => ((DateTime)o).ToString("yyyy-MM-dd")), s => Convert.ToDateTime(s));
         private static readonly RdfDatatype RdfDouble = new RdfDatatype(Double, (o => ((double) o).ToString()), s=>Convert.ToDouble(s));
         private static readonly RdfDatatype RdfInteger = new RdfDatatype(Integer, (o => ((int) o).ToString()), s=>Convert.ToInt32(s));
         private static readonly RdfDatatype RdfFloat = new RdfDatatype(Float, (o => ((float) o).ToString()), s=>Convert.ToSingle(s));
@@ -132,7 +132,11 @@ namespace BrightstarDB.Rdf
         private static readonly RdfDatatype RdfUnsignedInt = new RdfDatatype(UnsignedInteger, (o=>((uint)o).ToString()), s=>Convert.ToUInt32(s));
         private static readonly RdfDatatype RdfUnsignedShort = new RdfDatatype(UnsignedShort, (o=>((ushort)o).ToString()), s=>Convert.ToUInt16(s));
         private static readonly RdfDatatype RdfUnsignedByte = new RdfDatatype(UnsignedByte, (o=>((byte)o).ToString()), s=>Convert.ToByte(s));
+#if PORTABLE
+        private static readonly RdfDatatype RdfChar = new RdfDatatype(Char, o=>((char)o).ToString(), s=>s.ToCharArray().FirstOrDefault());
+#else
         private static readonly RdfDatatype RdfChar = new RdfDatatype(Char, o=>((char)o).ToString(), s=>s.FirstOrDefault());
+#endif
         private static readonly RdfDatatype RdfByteArray = new RdfDatatype(Base64Binary, o=>Convert.ToBase64String((byte[])o), s=>Convert.FromBase64String(s));
 
         private static readonly Dictionary<Type, RdfDatatype> SystemTypeToRdfType =

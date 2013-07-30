@@ -8,7 +8,7 @@ namespace BrightstarDB.EntityFramework.Query
     internal class SelectVariableNameExpression : ExtensionExpression 
     {
         public SelectVariableNameExpression(string varName, VariableBindingType bindingType, Type resultType) : 
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             base(resultType) // Results in an Extension ExpressionType (according to the docs)
 #else
             base(resultType, ExpressionType.Extension)
@@ -21,7 +21,7 @@ namespace BrightstarDB.EntityFramework.Query
         public string Name { get; set; }
         public VariableBindingType BindingType { get; set; }
 
-#if !WINDOWS_PHONE
+#if !WINDOWS_PHONE && !PORTABLE
         public override ExpressionType NodeType
         {
             get
@@ -46,7 +46,7 @@ namespace BrightstarDB.EntityFramework.Query
         ///             be returned holding the new child nodes. If the node has no children or the visitor does not replace any child node, the method should
         ///             return this <see cref="T:Remotion.Linq.Clauses.Expressions.ExtensionExpression"/>. 
         /// </remarks>
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
         protected internal override Expression VisitChildren(ExpressionTreeVisitor visitor)
 #else
         protected override Expression  VisitChildren(ExpressionTreeVisitor visitor)

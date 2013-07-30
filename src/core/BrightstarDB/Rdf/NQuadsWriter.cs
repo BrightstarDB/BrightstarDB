@@ -80,7 +80,7 @@ namespace BrightstarDB.Rdf
                         line.Append("\\\\");
                         break;
                     default:
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                         if (c <= 0x8 || c == 0xB || c == 0xC || (c >= 0x0E && c <= 0x1F) ||
                                  (c > 0x7F && c <= 0xFFFF))
                         {
@@ -151,7 +151,11 @@ namespace BrightstarDB.Rdf
             line.Append(" ");
             if (objIsLiteral)
             {
+#if PORTABLE
+                AppendEscapedLiteral(line, obj.ToCharArray(), dataType, langCode);
+#else
                 AppendEscapedLiteral(line, obj, dataType, langCode);
+#endif
             }
             else
             {

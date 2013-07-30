@@ -2,7 +2,7 @@
 
 namespace BrightstarDB.Server
 {
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
     [Serializable]
 #endif
     internal class PreconditionFailedException : BrightstarInternalException

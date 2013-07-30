@@ -6,11 +6,12 @@ using System.Text;
 using System.Xml.Linq;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
-using BrightstarDB.Model;
 using BrightstarDB.Storage;
 using System.Threading;
+using VDS.RDF;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 using TransactionType = BrightstarDB.Storage.TransactionType;
+using Triple = BrightstarDB.Model.Triple;
 
 namespace BrightstarDB.Server
 {
@@ -91,6 +92,16 @@ namespace BrightstarDB.Server
             return _storeManager.DoesStoreExist(_baseLocation + "\\" + storeName);
         }
 
+#if PORTABLE
+        public void DeleteStore(string storeName)
+        {
+            Logging.LogInfo("Delete store {0}", storeName);
+            var storeWorker = GetStoreWorker(storeName);
+            // remove store worker from collection
+            RemoveStoreWorker(storeName);
+            storeWorker.Shutdown(false, () => _storeManager.DeleteStore(_baseLocation + "\\" + storeName));            
+        }
+#else
         public void DeleteStore(string storeName, bool waitForCompletion = true)
         {
             Logging.LogInfo("Delete store {0}", storeName);
@@ -99,13 +110,15 @@ namespace BrightstarDB.Server
             RemoveStoreWorker(storeName);
             storeWorker.Shutdown(false, () => _storeManager.DeleteStore(_baseLocation + "\\" + storeName));
 
-            if (waitForCompletion) {
+            if (waitForCompletion) 
+            {
                 while (DoesStoreExist(storeName))
                 {
                     Thread.Sleep(10);
                 }
             }
         }
+#endif
 
         private void RemoveStoreWorker(string storeName)
         {
@@ -170,7 +183,11 @@ namespace BrightstarDB.Server
             }
             catch (Exception)
             {
+#if PORTABLE
+                System.CloseExtensions.Close(responseStream);
+#else
                 responseStream.Close();
+#endif
                 throw;
             }
         }
@@ -230,7 +247,11 @@ namespace BrightstarDB.Server
             }
             catch(Exception)
             {
+#if PORTABLE
+                System.CloseExtensions.Close(responseStream);
+#else
                 responseStream.Close();
+#endif
                 throw;
             }
         }

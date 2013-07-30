@@ -142,6 +142,7 @@
     <Compile Include="Client\NamedPipeDataObjectStore.cs" />
     <Compile Include="Client\NetTcpDataObjectContext.cs" />
     <Compile Include="Client\NetTcpDataObjectStore.cs" />
+    <Compile Include="Client\RefreshMode.cs" />
     <Compile Include="Client\ReplyMessageInspector.cs" />
     <Compile Include="Client\RestClientHelper.cs" />
     <Compile Include="Client\RestDataObjectContext.cs" />
@@ -204,7 +205,6 @@
     <Compile Include="EntityFramework\Query\VariableBindingType.cs" />
     <Compile Include="EntityFramework\ReflectionMappingException.cs" />
     <Compile Include="EntityFramework\ReflectionMappingProvider.cs" />
-    <Compile Include="EntityFramework\RefreshMode.cs" />
     <Compile Include="EntityFramework\RelativeOrAbsoluteIdentifierAttribute.cs" />
     <Compile Include="EntityFramework\ServiceProvider.cs" />
     <Compile Include="EntityFramework\Strings1.Designer.cs">

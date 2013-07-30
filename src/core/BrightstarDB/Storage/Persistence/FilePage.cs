@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+#if PORTABLE
+using Array = BrightstarDB.Portable.Compatibility.Array;
+#endif
 
 namespace BrightstarDB.Storage.Persistence
 {

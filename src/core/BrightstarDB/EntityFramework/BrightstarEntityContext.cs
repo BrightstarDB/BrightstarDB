@@ -8,6 +8,11 @@ using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Rdf;
+using BrightstarDB.Storage.Persistence;
+
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.EntityFramework
 {
@@ -107,7 +112,7 @@ namespace BrightstarDB.EntityFramework
                     context = new EmbeddedDataObjectContext(connectionString);
                     break;
 #endif
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
 #if !REST_CLIENT
                 case ConnectionType.Http:
                     context = new HttpDataObjectContext(connectionString);

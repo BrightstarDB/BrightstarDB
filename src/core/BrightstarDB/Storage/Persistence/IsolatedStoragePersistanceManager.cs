@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
@@ -147,3 +148,4 @@ namespace BrightstarDB.Storage.Persistence
         #endregion
     }
 }
+#endif

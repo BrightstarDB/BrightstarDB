@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
+using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 
 namespace BrightstarDB.EntityFramework

@@ -2,6 +2,7 @@
 
 namespace BrightstarDB.Server
 {
+#if !PORTABLE
     internal class MemoryUtils
     {
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
@@ -37,4 +38,5 @@ namespace BrightstarDB.Server
             return 100;
         }
     }
+#endif
 }

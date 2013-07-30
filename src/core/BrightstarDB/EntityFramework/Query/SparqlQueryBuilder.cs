@@ -5,6 +5,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 using Remotion.Linq.Clauses;
 
 namespace BrightstarDB.EntityFramework.Query
@@ -149,7 +152,11 @@ namespace BrightstarDB.EntityFramework.Query
         public static string SafeSparqlVarName(string varName)
         {
             var sb = new StringBuilder();
+#if PORTABLE
+            foreach (var c in varName.ToCharArray())
+#else
             foreach(var c in varName)
+#endif
             {
                 if ( (c >= 0x41 && c <= 0x5A) ||
                     (c>=0x61 && c<=0x7A) ||

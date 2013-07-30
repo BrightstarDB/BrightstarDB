@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.Persistence
 {
@@ -55,6 +58,18 @@ namespace BrightstarDB.Storage.Persistence
             _flushRequired = false;
         }
 
+#if PORTABLE
+        /// <summary>
+        /// Closes the current stream and releases any resources (such as sockets and file handles) associated with the current stream.
+        /// </summary>
+        public void Close()
+        {
+            if (_flushRequired)
+            {
+                Flush();
+            }
+        }
+#else
         /// <summary>
         /// Closes the current stream and releases any resources (such as sockets and file handles) associated with the current stream.
         /// </summary>
@@ -67,6 +82,8 @@ namespace BrightstarDB.Storage.Persistence
             }
             base.Close();
         }
+#endif
+
         /// <summary>
         /// When overridden in a derived class, sets the position within the current stream.
         /// </summary>

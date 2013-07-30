@@ -1,9 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using BrightstarDB.Model;
+#if PORTABLE
+using Path = VDS.RDF.Path;
+using BrightstarDB.Portable.Compatibility;
+#else
+using System.Collections.Concurrent;
+#endif
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
 #if !SILVERLIGHT
@@ -50,7 +55,7 @@ namespace BrightstarDB.Server
 
         private bool _shutdownRequested;
         private bool _completeRemainingJobs;
-        private Thread _jobProcessingThread;
+        private readonly ManualResetEvent _shutdownCompleted;
 
         /// <summary>
         /// Event fired after a successful job execution but before the job status is updated to completed
@@ -73,10 +78,10 @@ namespace BrightstarDB.Server
             _storeLocation = Path.Combine(baseLocation, storeName);
             Logging.LogInfo("StoreWorker created with location {0}", _storeLocation);
             _jobs = new ConcurrentQueue<Job>();
-            // _jobStatus = new ConcurrentDictionary<string, JobStatus>();
             _jobExecutionStatus = new ConcurrentDictionary<string, JobExecutionStatus>();
             _storeManager = StoreManagerFactory.GetStoreManager();
             _transactionLog = _storeManager.GetTransactionLog(_storeLocation);
+            _shutdownCompleted = new ManualResetEvent(false);
         }
 
         /// <summary>
@@ -84,8 +89,7 @@ namespace BrightstarDB.Server
         /// </summary>
         public void Start()
         {
-            _jobProcessingThread = new Thread(ProcessJobs);
-            _jobProcessingThread.Start();
+            ThreadPool.QueueUserWorkItem(ProcessJobs);
         }
 
         public ITransactionLog TransactionLog
@@ -93,7 +97,7 @@ namespace BrightstarDB.Server
             get { return _transactionLog; }
         }
 
-        private void ProcessJobs()
+        private void ProcessJobs(object state)
         {
             Logging.LogInfo("Process Jobs Started");
 
@@ -122,7 +126,7 @@ namespace BrightstarDB.Server
                                 var st = DateTime.UtcNow;
                                 job.Run();
                                 var et = DateTime.UtcNow;
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                                 Logging.LogInfo("Job completed in {0}", et.Subtract(st).TotalMilliseconds);
 #else
                                 Logging.LogInfo("Job completed in {0} : Current memory usage : {1}",et.Subtract(st).TotalMilliseconds, System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 );
@@ -150,7 +154,7 @@ namespace BrightstarDB.Server
                             }
                         }
                     }
-                    Thread.Sleep(1);
+                    _shutdownCompleted.WaitOne(1);
                 }
                 catch (Exception ex)
                 {

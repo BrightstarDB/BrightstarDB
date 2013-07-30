@@ -6,6 +6,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 using Remotion.Linq;
 using Remotion.Linq.Parsing.Structure;
 
@@ -217,7 +220,7 @@ namespace BrightstarDB.EntityFramework
             }
             else
             {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, 0));
 #else
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
@@ -353,7 +356,7 @@ namespace BrightstarDB.EntityFramework
             if (_loadedObjects == null)
             {
                 // Still do the notification, even if the collection is not loaded
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, o, 0));
 #else
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, o));
@@ -363,7 +366,7 @@ namespace BrightstarDB.EntityFramework
             if (!_loadedObjects.Any(x => x.DataObject.Identity.Equals(o.DataObject.Identity)))
             {
                 _loadedObjects.Add(o);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, o, 0));
 #else
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, o));
@@ -388,7 +391,7 @@ namespace BrightstarDB.EntityFramework
                 }
                 else
                 {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
                     OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
                                                                              removedItem, 0));
 #else
@@ -401,7 +404,7 @@ namespace BrightstarDB.EntityFramework
             }
             var toRemove = _loadedObjects.Where(o => o.DataObject.Identity.Equals(identity)).ToList();
             _loadedObjects.RemoveAll(o => o.DataObject.Identity.Equals(identity));
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, toRemove, 0));
 #else
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, toRemove));

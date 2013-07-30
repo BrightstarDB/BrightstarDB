@@ -53,7 +53,8 @@ namespace Remotion.Linq.Clauses.Expressions
     /// <param name="nodeType">The <see cref="ExpressionType"/> value to use as this expression's <see cref="Expression.NodeType"/> value.
     /// LINQ providers should use values starting from 150001 and above.</param>
     protected ExtensionExpression (Type type, ExpressionType nodeType)
-        : base (nodeType, ArgumentUtility.CheckNotNull ("", type))
+        :base()
+        //: base (nodeType, ArgumentUtility.CheckNotNull ("", type))
     {
     }
 

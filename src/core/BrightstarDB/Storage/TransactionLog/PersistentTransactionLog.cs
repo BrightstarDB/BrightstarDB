@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+using Path = VDS.RDF.Path;
+#endif
 
 namespace BrightstarDB.Storage.TransactionLog
 {

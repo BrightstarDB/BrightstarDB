@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BrightstarDB.EntityFramework;
 
 namespace BrightstarDB.Client
 {

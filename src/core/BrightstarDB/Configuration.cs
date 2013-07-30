@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.Configuration;
 using BrightstarDB.Caching;
 using BrightstarDB.Storage;
 
+#if !PORTABLE
+using System.Configuration;
+#endif
+
 #if SILVERLIGHT
 using System.IO.IsolatedStorage;
-#else
-
 #endif
 
 namespace BrightstarDB
@@ -67,8 +68,15 @@ namespace BrightstarDB
             LogLevel = "Error";
             TransactionFlushTripleCount = 1000;
             QueryCache = new NullCache();
-
-
+#elif PORTABLE
+            StoreLocation = "brightstar";
+            LogLevel = "Error";
+            TransactionFlushTripleCount = 1000;
+            PageCacheSize = DefaultPageCacheSize;
+            ResourceCacheLimit = DefaultResourceCacheLimit;
+            EnableOptimisticLocking = false;
+            EnableQueryCache = false;
+            PersistenceType = DefaultPersistenceType;
 #else
             var appSettings = ConfigurationManager.AppSettings;
             StoreLocation = appSettings.Get(StoreLocationPropertyName);
@@ -204,6 +212,7 @@ namespace BrightstarDB
             }
 
 #endif
+#if !PORTABLE
             var pageCacheSizeSetting = GetApplicationSetting(PageCacheSizeName);
             int pageCacheSize;
             if (!String.IsNullOrEmpty(pageCacheSizeSetting) && Int32.TryParse(pageCacheSizeSetting, out pageCacheSize))
@@ -224,6 +233,7 @@ namespace BrightstarDB
             {
                 ClusterNodePort = 10001;
             }
+#endif
         }
 
         public static string StoreLocation { get; set; }
@@ -274,6 +284,8 @@ namespace BrightstarDB
         public static int ClusterNodePort { get; set; }
 
         public static PersistenceType PersistenceType { get; set; }
+
+#if !PORTABLE
         private static ICache GetQueryCache()
         {
             if (EnableQueryCache == false)
@@ -301,7 +313,9 @@ namespace BrightstarDB
                 return memoryCache;
             }
         }
+#endif
 
+#if !PORTABLE
         private static string GetApplicationSetting(string key)
         {
 #if WINDOWS_PHONE
@@ -315,5 +329,6 @@ namespace BrightstarDB
             return ConfigurationManager.AppSettings.Get(key);
 #endif
         }
+#endif
     }
 }

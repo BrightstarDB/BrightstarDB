@@ -11,6 +11,10 @@ using VDS.RDF.Parsing.Tokens;
 using System.ServiceModel;
 #endif
 
+#if PORTABLE
+using BrightstarDB.Portable.Adaptation;
+#endif
+
 namespace BrightstarDB.Server
 {
     internal class ImportJob : UpdateJob, ITripleSink
@@ -46,12 +50,8 @@ namespace BrightstarDB.Server
                                             _contentFileName);
                 var profiler = Logging.IsProfilingEnabled ? new BrightstarProfiler("Import " + _contentFileName) : null;
                 Logging.LogDebug("Import file path calculated as '{0}'", filePath);
-                if (!File.Exists(filePath))
-                {
-                    ErrorMessage = String.Format("Cannot find file {0} in import directory", _contentFileName);
-                    throw new FileNotFoundException(ErrorMessage);
-                }
-                using (_fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+
+                using (_fileStream = GetImportFileStream(filePath))
                 {
                     _importTripleSink = new StoreTripleSink(StoreWorker.WriteStore, JobId,
                                                             Configuration.TransactionFlushTripleCount,
@@ -82,6 +82,26 @@ namespace BrightstarDB.Server
                 Logging.LogInfo("Error processing import job on file " + _contentFileName + ". Error Message: " + ex.Message + " Stack trace: " + ex.StackTrace);
                 throw;
             }
+        }
+
+        private Stream GetImportFileStream(string filePath)
+        {
+#if PORTABLE
+            var persistenceManager = PlatformAdapter.Resolve<IPersistenceManager>();
+            if (!persistenceManager.FileExists(filePath))
+            {
+                ErrorMessage = String.Format("Cannot find file {0} in import directory", _contentFileName);
+                throw new FileNotFoundException(ErrorMessage);                
+            }
+            return persistenceManager.GetInputStream(filePath);
+#else
+            if (!File.Exists(filePath))
+                {
+                    ErrorMessage = String.Format("Cannot find file {0} in import directory", _contentFileName);
+                    throw new FileNotFoundException(ErrorMessage);
+                }
+                return _fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+#endif
         }
 
         #region implementation of ILoggable
@@ -148,7 +168,12 @@ namespace BrightstarDB.Server
         {
             Options.DefaultTokenQueueMode = TokenQueueMode.SynchronousBufferDuringParsing;
             var fileExtension = MimeTypesHelper.GetTrueFileExtension(fileName);
+#if PORTABLE
+            bool isGZiped =
+                fileExtension.ToLowerInvariant().EndsWith(MimeTypesHelper.DefaultGZipExtension.ToLowerInvariant());
+#else
             bool isGZiped = fileExtension.EndsWith(MimeTypesHelper.DefaultGZipExtension, StringComparison.InvariantCultureIgnoreCase);
+#endif
             var parserDefinition = MimeTypesHelper.GetDefinitionsByFileExtension(fileExtension).FirstOrDefault(
                 def => def.CanParseRdf);
             if (parserDefinition != null)

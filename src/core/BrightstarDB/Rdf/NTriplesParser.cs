@@ -332,10 +332,17 @@ namespace BrightstarDB.Rdf
             while(loc >= 0)
             {
                 string unicodeValues = value.Substring(loc + 2, 8);
+#if PORTABLE
+                if (!unicodeValues.ToCharArray().All(IsHexDigit))
+                {
+                    throw new FormatException("Unexpected non-hex digit in unicode escaped string: \\U" + unicodeValues);
+                }
+#else
                 if (!unicodeValues.All(IsHexDigit))
                 {
                     throw new FormatException("Unexpected non-hex digit in unicode escaped string: \\U" + unicodeValues);
                 }
+#endif
                 string replacementChar = ConvertToUtf32Char(unicodeValues);
                 res = res.Replace("\\U" + unicodeValues, replacementChar);
                 loc = res.IndexOf("\\U");
@@ -391,6 +398,8 @@ namespace BrightstarDB.Rdf
         {
 #if SILVERLIGHT
             throw new FormatException("The Silverlight library does not support UTF-32 encoded characters.");
+#elif PORTABLE
+            throw new FormatException("The Portable Class Library library does not support UTF-32 encoded characters.");
 #else
             try
             {
