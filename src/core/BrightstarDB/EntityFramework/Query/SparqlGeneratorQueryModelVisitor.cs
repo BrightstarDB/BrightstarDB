@@ -2,10 +2,8 @@
 using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Linq;
-using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ResultOperators;
-using Remotion.Linq.Transformations;
 
 namespace BrightstarDB.EntityFramework.Query
 {
@@ -16,7 +14,6 @@ namespace BrightstarDB.EntityFramework.Query
         private bool _isInstanceQuery;
         private string _instanceUri;
         private string _typeUri;
-        //private readonly bool _inSubquery;
 
         public static SparqlQueryContext GenerateSparqlQuery(EntityContext context, QueryModel queryModel)
         {
@@ -36,14 +33,12 @@ namespace BrightstarDB.EntityFramework.Query
         {
             _context = context;
             _queryBuilder  = new SparqlQueryBuilder(context);
-            //_inSubquery = false;
         }
 
         internal SparqlGeneratorQueryModelVisitor(EntityContext context, SparqlQueryBuilder queryBuilder)
         {
             _context = context;
             _queryBuilder = queryBuilder;
-            //_inSubquery = true;
         }
 
         public override void VisitQueryModel(QueryModel queryModel)
@@ -142,9 +137,20 @@ namespace BrightstarDB.EntityFramework.Query
                     _instanceUri = instanceId;
                 }
             }
-
-            
-            // Base class implementation visits MainFromClause, BodyClauses, SelectClause and ResultOperators in that order.
+            else if (queryModel.MainFromClause != null)
+            {
+                VisitMainFromClause(queryModel.MainFromClause, queryModel);
+                if (queryModel.ResultOperators != null)
+                {
+                    for (int i = 0; i < queryModel.ResultOperators.Count; i++)
+                    {
+                        foreach (var ro in queryModel.ResultOperators)
+                        {
+                            VisitResultOperator(ro, queryModel, i);
+                        }
+                    }
+                }
+            }
             base.VisitQueryModel(queryModel);
         }
 
@@ -155,19 +161,9 @@ namespace BrightstarDB.EntityFramework.Query
                 var subquery = fromClause.FromExpression as SubQueryExpression;
                 VisitQueryModel(subquery.QueryModel);
             }
-            else if (fromClause.FromExpression is QuerySourceReferenceExpression &&
-                (fromClause.FromExpression as QuerySourceReferenceExpression).ReferencedQuerySource is MainFromClause)
-            {
-                VisitMainFromClause((fromClause.FromExpression as QuerySourceReferenceExpression).ReferencedQuerySource as MainFromClause,
-                    queryModel);
-            }
             else
             {
-                Expression mappedExpression;
-                if (!_queryBuilder.TryGetQuerySourceMapping(fromClause, out mappedExpression))
-                {
-                    _queryBuilder.AddFromPart(fromClause);
-                }
+                _queryBuilder.AddFromPart(fromClause);
             }
             base.VisitMainFromClause(fromClause, queryModel);
         }
@@ -358,14 +354,13 @@ namespace BrightstarDB.EntityFramework.Query
                 var groupOperator = resultOperator as GroupResultOperator;
                 var keyExpr = groupOperator.KeySelector;
                 var exprVar = GetExpressionSelector(keyExpr);
-                var elementVar = GetExpressionSelector(groupOperator.ElementSelector);
                 if (exprVar == null)
                 {
                     throw new EntityFrameworkException("Unable to convert GroupBy '{0}' operator to SPARQL.",
                                                        groupOperator);
                 }
-                var groupingExpression = new SparqlGroupingExpression(elementVar, new [] {exprVar}, groupOperator.ItemType);
-                _queryBuilder.AddGroupByExpression(queryModel, groupingExpression);
+                var groupingExpression = new SparqlGroupingExpression(new [] {exprVar}, groupOperator.ItemType);
+                _queryBuilder.AddGroupByExpression(groupOperator, groupingExpression);
                 return;
             }
             if (resultOperator is CastResultOperator)
@@ -413,24 +408,6 @@ namespace BrightstarDB.EntityFramework.Query
                 _queryBuilder.TryGetQuerySourceMapping(querySource.ReferencedQuerySource, out mappedExpression);
                 if (mappedExpression is SelectVariableNameExpression)
                     return (mappedExpression as SelectVariableNameExpression).Name;
-                if (querySource.ReferencedQuerySource is MainFromClause)
-                {
-                    if ((querySource.ReferencedQuerySource as MainFromClause).FromExpression is SubQueryExpression)
-                    {
-                        SparqlGroupingExpression sparqlGroupingExpression;
-                        var subQuery =
-                            (querySource.ReferencedQuerySource as MainFromClause).FromExpression as SubQueryExpression;
-                        if (_queryBuilder.TryGetGroupingExpression(subQuery.QueryModel, out sparqlGroupingExpression))
-                        {
-                            var elementExpression = sparqlGroupingExpression.ElementExpression;
-                            if (elementExpression is SelectVariableNameExpression)
-                            {
-                                return (elementExpression as SelectVariableNameExpression).Name;
-                            }
-                        }
-
-                    }
-                }
             }
             var selector = SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(expression, _queryBuilder);
             if (selector is SelectVariableNameExpression) return (selector as SelectVariableNameExpression).Name;

@@ -18,9 +18,9 @@ namespace BrightstarDB.EntityFramework.Tests
             var q = Context.Dinners.GroupBy(d => d.Host).Select(g => new {host = g.Key, dinnerCount = g.Count()});
             q.ToList();
             AssertQuerySparql(
-                "SELECT (?v0 as ?host) (count(?d) as ?dinnerCount) WHERE { " +
-                "  ?d a <http://www.networkedplanet.com/schema/test/dinner> ." +
-                "  ?d <http://www.networkedplanet.com/schema/test/host> ?v0 ." +
+                "SELECT (? v1 as ?host) (count(?v0) as ?dinnerCount) WHERE { " +
+                "  ?v0 a <http://www.networkedplanet.com/schema/test/dinner> ." +
+                "  ?v0 <http://www.networkedplanet.com/schema/test/host> ?v1 ." +
                 "} GROUP BY ?v1");
         }
     }

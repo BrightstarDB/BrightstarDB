@@ -5,9 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using Remotion.Linq;
 using Remotion.Linq.Clauses;
-using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ResultOperators;
 
 namespace BrightstarDB.EntityFramework.Query
@@ -26,7 +24,7 @@ namespace BrightstarDB.EntityFramework.Query
         private readonly List<Tuple<MemberInfo, string>>_membersMap;
         private readonly List<string> _groupByExpressions;
         private readonly List<string> _constructorArgs;
-        private readonly Dictionary<QueryModel, SparqlGroupingExpression> _groupingExpressions; 
+        private readonly Dictionary<GroupResultOperator, SparqlGroupingExpression> _groupingExpressions; 
         private readonly Dictionary<string, string> _prefixes = new Dictionary<string, string>();
 
         /// <summary>
@@ -52,7 +50,7 @@ namespace BrightstarDB.EntityFramework.Query
             _membersMap = new List<Tuple<MemberInfo, string>>();
             _groupByExpressions = new List<string>();
             _constructorArgs= new List<string>();
-            _groupingExpressions = new Dictionary<QueryModel, SparqlGroupingExpression>();
+            _groupingExpressions = new Dictionary<GroupResultOperator, SparqlGroupingExpression>();
             AllTriples = new List<TripleInfo>();
         }
 
@@ -96,7 +94,6 @@ namespace BrightstarDB.EntityFramework.Query
 
         public string AddFromPart(IQuerySource querySource)
         {
-            
             var typeUri = _context.MapTypeToUri(querySource.ItemType);
             var itemVarName = IntroduceNamedVariable(querySource.ItemName);
             AddTripleConstraint(
@@ -256,16 +253,13 @@ namespace BrightstarDB.EntityFramework.Query
             AllTriples.Add(new TripleInfo(subjectType, subject, verbType, verb, objectType, obj));
         }
 
-        public void AddGroupByExpression(QueryModel groupedQueryModel, SparqlGroupingExpression groupingExpression)
+        public void AddGroupByExpression(GroupResultOperator groupResultOperator, SparqlGroupingExpression groupingExpression)
         {
-            if (!_groupingExpressions.ContainsKey(groupedQueryModel))
+            foreach (var varNameBinding in groupingExpression.GroupVars)
             {
-                foreach (var varNameBinding in groupingExpression.GroupVars)
-                {
-                    _groupByExpressions.Add("?" + varNameBinding.Name);
-                }
-                _groupingExpressions.Add(groupedQueryModel, groupingExpression);
+                _groupByExpressions.Add("?" + varNameBinding.Name);
             }
+            _groupingExpressions.Add(groupResultOperator, groupingExpression);
         }
 
         private static String Stringify(GraphNode nodeType, string nodeValue)
@@ -326,11 +320,6 @@ namespace BrightstarDB.EntityFramework.Query
             }
             mappedExpression = null;
             return false;
-        }
-
-        public bool TryGetGroupingExpression(QueryModel queryModel, out SparqlGroupingExpression sparqlGroupingExpression)
-        {
-            return _groupingExpressions.TryGetValue(queryModel, out sparqlGroupingExpression);
         }
 
         public void ConvertVariableToConstantUri(string varName, string uri)
@@ -434,5 +423,9 @@ namespace BrightstarDB.EntityFramework.Query
             return prefix;
         }
 
+        public bool TryGetGroupingExpression(GroupResultOperator grouping, out SparqlGroupingExpression sparqlGroupingExpression)
+        {
+            return _groupingExpressions.TryGetValue(grouping, out sparqlGroupingExpression);
+        }
     }
 }

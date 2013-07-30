@@ -34,6 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="Remotion.Linq">
+      <HintPath>..\..\lib\Remotion.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -69,10 +72,6 @@
     <ProjectReference Include="..\BrightstarDB\BrightstarDB.csproj">
       <Project>{121A81F3-EB1C-4228-81FB-0D7505A438FB}</Project>
       <Name>BrightstarDB</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\relinq\relinq.csproj">
-      <Project>{9b258a0e-aa34-433c-b2d3-d768c47227bc}</Project>
-      <Name>relinq</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
