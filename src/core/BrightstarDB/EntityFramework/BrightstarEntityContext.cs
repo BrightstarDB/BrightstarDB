@@ -463,6 +463,7 @@ namespace BrightstarDB.EntityFramework
             }
             var identity = bsObject.DataObject.Identity;
             _trackedObjects.Remove(identity);
+            RemoveReferences(bsObject);
             bsObject.DataObject.Delete();
             bsObject.DataObject = null;
         }
@@ -696,6 +697,24 @@ namespace BrightstarDB.EntityFramework
                     {
                         destObject.UpdateProperty(destProperty.Name, null);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes any reference to <paramref name="toRemove"/> from locally 
+        /// tracked objects in this context.
+        /// </summary>
+        /// <param name="toRemove">The entity object that is to be removed</param>
+        /// <remarks>This method is used when <paramref name="toRemove"/> has been locally deleted
+        /// in the context.</remarks>
+        private void RemoveReferences(BrightstarEntityObject toRemove)
+        {
+            foreach (var trackedList in _trackedObjects.Values)
+            {
+                foreach (var tracked in trackedList)
+                {
+                    tracked.RemoveReferences(toRemove);
                 }
             }
         }

@@ -416,7 +416,7 @@ namespace BrightstarDB.Tests
                 Assert.IsNull(row.GetColumnValue("z"));
                 Assert.IsFalse(row.IsLiteral("p"));
                 Assert.IsTrue(row.IsLiteral("o"));
-                Assert.IsInstanceOfType(typeof(Int32), o);
+                Assert.IsInstanceOf(typeof(Int32), o);
             }
         }
 

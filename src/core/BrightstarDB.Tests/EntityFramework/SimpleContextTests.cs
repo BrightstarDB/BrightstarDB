@@ -1636,5 +1636,51 @@ namespace BrightstarDB.Tests.EntityFramework
                 Assert.IsTrue(retrieved.Websites.Contains(new Uri("http://brightstardb.com/")));
             }
         }
+
+        [Test]
+        public void TestCollectionUpdatedByInverseProperty()
+        {
+            var storeName = "TestCollectionUpdatedByInverseProperty_" + DateTime.Now.Ticks;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var dept = new Department {Name = "Research"};
+                context.Departments.Add(dept);
+                
+                // Attach before property is set
+                var alice = new Person {Name = "Alice"};
+                context.Persons.Add(alice);
+                alice.Department = dept;
+                Assert.AreEqual(1, dept.Persons.Count);
+                
+                // Attach after property set
+                var bob = new Person {Name = "Bob", Department = dept};
+                context.Persons.Add(bob);
+                Assert.AreEqual(2, dept.Persons.Count);
+
+                // Attach after property set by explicit call
+                var charlie = new Person { Name = "Charlie"};
+                charlie.Department = dept;
+                context.Persons.Add(charlie);
+                Assert.AreEqual(3, dept.Persons.Count);
+
+                // Not attached before checking inverse property
+                var dave = new Person { Name = "Dave", Department = dept };
+                Assert.AreEqual(3, dept.Persons.Count);
+                context.Persons.Add(dave);
+                Assert.AreEqual(4, dept.Persons.Count);
+                
+                context.SaveChanges();
+
+                context.DeleteObject(bob);
+                context.SaveChanges();
+
+                Assert.AreEqual(3, dept.Persons.Count);
+            }
+        }
+
+        MyEntityContext CreateEntityContext(string storeName)
+        {
+            return new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName);
+        }
     }
 }

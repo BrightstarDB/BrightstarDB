@@ -938,5 +938,27 @@ namespace BrightstarDB.EntityFramework
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        /// <summary>
+        /// Removes all references to the specified object from locally loaded properties
+        /// on this object.
+        /// </summary>
+        /// <param name="toRemove">The object to be removed</param>
+        /// <remarks>This method is used internally when an object is deleted to ensure that the object
+        /// is removed from the properties and property collections of all locally tracked object</remarks>
+        internal void RemoveReferences(BrightstarEntityObject toRemove)
+        {
+            var propertyNames = _currentPropertyValues.Where(p => p.Value.Equals(toRemove)).Select(p => p.Key).ToList();
+            foreach (var propertyName in propertyNames)
+            {
+                _currentPropertyValues.Remove(propertyName);
+                OnPropertyChanged(propertyName);
+            }
+
+           foreach (var c in _currentPropertyCollections.Values)
+           {
+               c.RemoveFromLoadedObjects(toRemove.Identity);
+           }
+        }
     }
 }

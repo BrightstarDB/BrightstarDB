@@ -534,7 +534,7 @@ namespace BrightstarDB.InternalTests
             var list = store.MakeListDataObject(new[] {"bob", "gra"});
 
             Assert.AreEqual("bob", list.GetPropertyValue("rdf:first"));
-            Assert.IsInstanceOfType(typeof(IDataObject), list.GetPropertyValue("rdf:rest"));
+            Assert.IsInstanceOf(typeof(IDataObject), list.GetPropertyValue("rdf:rest"));
             var dataobj = list.GetPropertyValue("rdf:rest") as IDataObject;
             Assert.IsNotNull(dataobj);
             Assert.AreEqual("gra", dataobj.GetPropertyValue("rdf:first"));
