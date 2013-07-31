@@ -2,15 +2,58 @@
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using BrightstarDB.Client;
+using BrightstarDB.Portable.Compatibility;
+using BrightstarDB.Storage;
 using NUnit.Framework;
+using VDS.RDF;
 
 namespace BrightstarDB.Tests
 {
     [TestFixture]
     public class GraphTests
     {
+#if PORTABLE
+        private IPersistenceManager _persistenceManager;
+#endif
+
+        [TestFixtureSetUp]
+        public void SetUp()
+        {
+#if PORTABLE
+        _persistenceManager = new Storage.Persistence.Adaptation.PersistenceManager();
+#endif
+            CopyTestDataToImportFolder("graph_triples.nt");
+        }
+
+        private void CopyTestDataToImportFolder(string testDataFileName, string targetFileName = null)
+        {
+#if PORTABLE
+            using (var srcStream = _persistenceManager.GetInputStream(Configuration.DataLocation + testDataFileName))
+            {
+                var targetDir = Configuration.StoreLocation + "\\import";
+                var targetPath = targetDir + targetFileName ?? testDataFileName;
+                if (!_persistenceManager.DirectoryExists(targetDir)) _persistenceManager.CreateDirectory(targetDir);
+                if (_persistenceManager.FileExists(targetPath)) _persistenceManager.DeleteFile(targetPath);
+                _persistenceManager.CreateFile(targetPath);
+                using (var targetStream = _persistenceManager.GetOutputStream(targetPath, FileMode.CreateNew))
+                {
+                    srcStream.CopyTo(targetStream);
+                }
+            }
+#else
+            var importFile = new FileInfo(Configuration.DataLocation+testDataFileName);
+            var targetDir = new DirectoryInfo(Configuration.StoreLocation + "\\import");
+            if (!targetDir.Exists)
+            {
+                targetDir.Create();
+            }
+            importFile.CopyTo(Configuration.StoreLocation + "import\\" + targetFileName ?? testDataFileName, true);
+#endif
+        }
+
         [Test]
         public void TestAddQuads()
         {
@@ -55,21 +98,15 @@ namespace BrightstarDB.Tests
         public void TestImportIntoGraph()
         {
             var storeName = "TestImportIntoGraph_" + DateTime.Now.Ticks;
-            var client = BrightstarService.GetClient("type=embedded;storesdirectory=C:\\brightstar");
+            var client = BrightstarService.GetClient("type=embedded;storesdirectory=" + Configuration.StoreLocation);
             client.CreateStore(storeName);
 
-            var importFile = new FileInfo(Configuration.DataLocation+"graph_triples.nt");
-            var targetDir = new DirectoryInfo("c:\\brightstar\\import");
-            if (!targetDir.Exists)
-            {
-                targetDir.Create();
-            }
-            importFile.CopyTo("C:\\brightstar\\import\\graph_triples.nt", true);
+
 
             var job = client.StartImport(storeName, "graph_triples.nt", "http://np.com/g2");
             while (!job.JobCompletedOk && !job.JobCompletedWithErrors)
             {
-                Thread.Sleep(10);
+                Sleep(10);
                 job = client.GetJobInfo(storeName, job.JobId);
             }
 
@@ -94,6 +131,8 @@ namespace BrightstarDB.Tests
 
         }
 
+        
+
         [Test]
         public void TestExportGraphs()
         {
@@ -101,32 +140,29 @@ namespace BrightstarDB.Tests
             var client = BrightstarService.GetClient("type=embedded;storesDirectory=C:\\brightstar");
             client.CreateStore(storeName);
 
-            FileInfo importFile = new FileInfo(Configuration.DataLocation+"graph_triples.nt");
-            var targetDir = new DirectoryInfo("c:\\brightstar\\import");
-            if (!targetDir.Exists)
-            {
-                targetDir.Create();
-            }
-            importFile.CopyTo("C:\\brightstar\\import\\graph_triples.nt", true);
 
             var job = client.StartImport(storeName, "graph_triples.nt", "http://np.com/g2");
             while (!job.JobCompletedOk && !job.JobCompletedWithErrors)
             {
-                Thread.Sleep(10);
+                Sleep(10);
                 job = client.GetJobInfo(storeName, job.JobId);
             }
 
             var exportFileName = "C:\\brightstar\\import\\graph_triples_out.nt";
-            if (File.Exists(exportFileName)) File.Delete(exportFileName);
+            EnsureFileDoesNotExist(exportFileName);
 
             job = client.StartExport(storeName, "graph_triples_out.nt");
             while (!job.JobCompletedOk && !job.JobCompletedWithErrors)
             {
-                Thread.Sleep(10);
+                Sleep(10);
                 job = client.GetJobInfo(storeName, job.JobId);
             }
 
+#if PORTABLE
+            using (var sr = new StreamReader(_persistenceManager.GetInputStream(exportFileName)))
+#else
             using (var sr = new StreamReader(exportFileName))
+#endif
             {
                 var content = sr.ReadToEnd();
                 Assert.AreEqual(2, content.Split(new string[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries).Count());
@@ -134,19 +170,33 @@ namespace BrightstarDB.Tests
             }
 
             exportFileName = "C:\\brightstar\\import\\graph_triples_out_2.nt";
-            if (File.Exists(exportFileName)) File.Delete(exportFileName);
+            EnsureFileDoesNotExist(exportFileName);
             job = client.StartExport(storeName, "graph_triples_out_2.nt", "http://np.com/g1");
             while (!job.JobCompletedOk && !job.JobCompletedWithErrors)
             {
-                Thread.Sleep(10);
+                Sleep(10);
                 job = client.GetJobInfo(storeName, job.JobId);
             }
+
+#if PORTABLE
+            using(var sr = new StreamReader(_persistenceManager.GetInputStream(exportFileName)))
+#else
             using (var sr = new StreamReader(exportFileName))
+#endif
             {
                 var content = sr.ReadToEnd();
                 Assert.AreEqual(1, content.Split(new string[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries).Count());
                 sr.Close();
             }
+        }
+
+        private void Sleep(int ms)
+        {
+#if PORTABLE
+            Task.Delay(ms).RunSynchronously();
+#else
+            Thread.Sleep(ms);
+#endif
         }
 
         [Test]
@@ -176,6 +226,15 @@ namespace BrightstarDB.Tests
             resultDoc = XDocument.Load(result);
             Assert.AreEqual(0, resultDoc.SparqlResultRows().Count());
 
+        }
+
+        private void EnsureFileDoesNotExist(string path)
+        {
+#if PORTABLE
+            if (_persistenceManager.FileExists(path)) _persistenceManager.DeleteFile(path);
+#else
+            if (File.Exists(path)) File.Delete(path);
+#endif
         }
     }
 }

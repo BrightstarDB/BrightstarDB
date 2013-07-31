@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading;
 using BrightstarDB.Model;
 #if PORTABLE
-using Path = VDS.RDF.Path;
 using BrightstarDB.Portable.Compatibility;
 #else
 using System.Collections.Concurrent;

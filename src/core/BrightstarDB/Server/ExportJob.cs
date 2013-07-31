@@ -5,7 +5,6 @@ using System.Threading;
 using BrightstarDB.Portable.Adaptation;
 using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
-using VDS.RDF;
 #endif
 using BrightstarDB.Rdf;
 

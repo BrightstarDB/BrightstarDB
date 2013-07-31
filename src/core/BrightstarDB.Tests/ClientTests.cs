@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETFX_CORE
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -902,3 +903,5 @@ namespace BrightstarDB.Tests
 
     }
 }
+
+#endif

@@ -42,7 +42,7 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(cache.ContainsKey("String"));
         }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
         [Test]
         public void TestDirectoryCacheBasicOperations()
         {
@@ -62,6 +62,7 @@ namespace BrightstarDB.Tests
         }
 #endif
 
+#if !NETFX_CORE
         [Test]
         public void TestLruPolicy()
         {
@@ -158,9 +159,10 @@ namespace BrightstarDB.Tests
             Assert.IsTrue(primary.ContainsKey("Entry 10"));
             Assert.IsTrue(secondary.ContainsKey("Entry 10"));
         }
+#endif
     }
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETFX_CORE
     [Serializable]
 #endif
     public class TestObject

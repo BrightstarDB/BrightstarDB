@@ -38,6 +38,7 @@
     <Compile Include="Compatibility\CollectionExtensions.cs" />
     <Compile Include="Compatibility\ConcurrentDictionary.cs" />
     <Compile Include="Compatibility\ConcurrentQueue.cs" />
+    <Compile Include="Compatibility\Path.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Compatibility\Converter.cs" />
     <Compile Include="Compatibility\FileMode.cs" />

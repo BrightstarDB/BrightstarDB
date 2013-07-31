@@ -6,9 +6,9 @@ using System.Text;
 using System.Xml.Linq;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
+using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
 using System.Threading;
-using VDS.RDF;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 using TransactionType = BrightstarDB.Storage.TransactionType;
 using Triple = BrightstarDB.Model.Triple;
@@ -72,7 +72,7 @@ namespace BrightstarDB.Server
         {
             Logging.LogInfo("Create Store");
             var sid = Guid.NewGuid().ToString();
-            _storeManager.CreateStore(_baseLocation + "\\" + sid, true);
+            _storeManager.CreateStore(Path.Combine(_baseLocation, sid), true);
             Logging.LogInfo("Store id is {0}", sid);
             return sid;
         }
@@ -80,7 +80,7 @@ namespace BrightstarDB.Server
         public string CreateStore(string storeName, PersistenceType persistenceType)
         {
             Logging.LogInfo("Create Store");
-            var store = _storeManager.CreateStore(_baseLocation + "\\" + storeName, persistenceType, true);
+            var store = _storeManager.CreateStore(Path.Combine(_baseLocation, storeName), persistenceType, true);
             store.Close();
             Logging.LogInfo("Store id is {0}", storeName);
             return storeName;
@@ -89,7 +89,7 @@ namespace BrightstarDB.Server
         public bool DoesStoreExist(string storeName)
         {
             Logging.LogInfo("check store exists store {0}", storeName);
-            return _storeManager.DoesStoreExist(_baseLocation + "\\" + storeName);
+            return _storeManager.DoesStoreExist(Path.Combine(_baseLocation, storeName));
         }
 
 #if PORTABLE

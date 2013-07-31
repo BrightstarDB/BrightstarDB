@@ -49,7 +49,7 @@ namespace BrightstarDB.Portable.Adaptation
 
         private static string MakeAdapaterTypeName(Type interfaceType)
         {
-            return interfaceType.Namespace + interfaceType.Name.Substring(1);
+            return interfaceType.Namespace + "." + interfaceType.Name.Substring(1);
         }
 
         private Assembly GetPlatformSpecificAssembly()

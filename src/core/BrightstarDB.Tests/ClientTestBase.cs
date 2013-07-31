@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETFX_CORE
+using System;
 using System.Diagnostics;
 using System.ServiceModel;
 using System.Threading;
@@ -87,3 +88,4 @@ namespace BrightstarDB.Tests
          */
     }
 }
+#endif

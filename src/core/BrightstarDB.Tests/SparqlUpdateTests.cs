@@ -275,7 +275,7 @@ INSERT DATA
         [Test]
         public void TestGraphLoad()
         {
-#if !WINDOWS_PHONE
+#if !WINDOWS_PHONE && !PORTABLE
             var storeName = CreateStore("TestGraphLoad");
             var importFile = new FileInfo(Configuration.DataLocation+"simple.txt");
             Assert.IsTrue(importFile.Exists);
