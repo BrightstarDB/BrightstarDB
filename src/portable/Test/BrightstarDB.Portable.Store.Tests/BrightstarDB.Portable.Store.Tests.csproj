@@ -111,6 +111,7 @@
   <ItemGroup>
     <Compile Include="StoreTests.cs" />
     <Compile Include="TestConfiguration.cs" />
+    <Compile Include="TestHelper.cs" />
     <Compile Include="TestPersistenceManagerOperations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -134,11 +135,9 @@
     <Content Include="Images\UnitTestStoreLogo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
-    </Reference>
+    <Content Include="TestData\simple.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BrightstarDB.Portable.Store\BrightstarDB.Portable.Store.csproj">

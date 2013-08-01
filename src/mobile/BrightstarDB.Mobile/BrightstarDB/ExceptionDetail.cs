@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace BrightstarDB
 {
@@ -42,6 +43,38 @@ namespace BrightstarDB
             }
             StackTrace = exception.StackTrace;
             Message = exception.Message;
+        }
+
+        public override string ToString()
+        {
+            return ToString(0);
+        }
+
+        private string ToString(int indent)
+        {
+            var indentString = new string(' ', indent*4);
+            StringBuilder exceptionDetail = new StringBuilder();
+            exceptionDetail.Append(indentString);
+            exceptionDetail.Append(Type);
+            if (!String.IsNullOrEmpty(Message))
+            {
+                exceptionDetail.Append(": ");
+                exceptionDetail.Append(Message);
+            }
+            if (!String.IsNullOrEmpty(StackTrace))
+            {
+                exceptionDetail.Append("\r\n");
+                exceptionDetail.Append(indentString);
+                exceptionDetail.Append(StackTrace);
+            }
+            if (InnerException != null)
+            {
+                exceptionDetail.Append("\r\n");
+                exceptionDetail.Append(indent);
+                exceptionDetail.Append("Cause:\r\n");
+                exceptionDetail.Append(InnerException.ToString(indent + 1));
+            }
+            return exceptionDetail.ToString();
         }
     }
 }

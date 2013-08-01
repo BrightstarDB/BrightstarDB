@@ -132,7 +132,19 @@ namespace BrightstarDB.Storage
 
         public long GetFileLength(string pathName)
         {
-            var file = AppDataLocation.GetFileAsync(pathName).AsTask().Result;
+            IStorageFile file;
+            try
+            {
+                file = AppDataLocation.GetFileAsync(pathName).AsTask().Result;
+            }
+            catch (AggregateException agg)
+            {
+                if (agg.InnerExceptions.Any(x => x is FileNotFoundException))
+                {
+                    return 0;
+                }
+                throw;
+            }
             var properties = file.GetBasicPropertiesAsync().AsTask().Result;
             return (long) properties.Size;
         }

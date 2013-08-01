@@ -41,6 +41,39 @@ namespace BrightstarDB.Portable.Store.Tests
             Assert.IsFalse(client.DoesStoreExist(storeName));
         }
 
+        [TestMethod]
+        public void TestRdfImportExport()
+        {
+            var client = GetEmbeddedClient();
+            var storeName = "TestRdfImportExport_" + _runId;
+            var importPath = Path.Combine(TestConfiguration.StoreLocation, "import");
+
+            TestHelper.CopyFile("TestData\\simple.txt", importPath, "simple.txt");
+            client.CreateStore(storeName);
+
+            var job = client.StartImport(storeName, "simple.txt");
+            while (!(job.JobCompletedOk || job.JobCompletedWithErrors))
+            {
+                Task.Delay(3).Wait();
+                job = client.GetJobInfo(storeName, job.JobId);
+            }
+
+            Assert.IsTrue(job.JobCompletedOk, "Import job failed with message: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
+
+            job = client.StartExport(storeName, "simple.export.nt");
+            while (!(job.JobCompletedOk || job.JobCompletedWithErrors))
+            {
+                Task.Delay(3).Wait();
+                job = client.GetJobInfo(storeName, job.JobId);
+            }
+
+            Assert.IsTrue(job.JobCompletedOk, "Export job failed with message: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
+
+            var exportFilePath = Path.Combine(importPath, "simple.export.nt");
+            Assert.IsTrue(_pm.FileExists(exportFilePath));
+
+        }
+
         private IBrightstarService GetEmbeddedClient()
         {
             return BrightstarService.GetClient("type=embedded;storesDirectory=" + TestConfiguration.StoreLocation);

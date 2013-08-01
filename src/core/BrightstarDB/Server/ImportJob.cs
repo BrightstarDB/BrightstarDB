@@ -13,6 +13,7 @@ using System.ServiceModel;
 
 #if PORTABLE
 using BrightstarDB.Portable.Adaptation;
+using Path = BrightstarDB.Portable.Compatibility.Path;
 #endif
 
 namespace BrightstarDB.Server
@@ -45,9 +46,8 @@ namespace BrightstarDB.Server
 
                 var parser = GetParser(_contentFileName);
                 var storeDirectory = StoreWorker.WriteStore.DirectoryPath;
-                var filePath = Path.Combine(storeDirectory,
-                                            ".." + Path.DirectorySeparatorChar + "import" + Path.DirectorySeparatorChar +
-                                            _contentFileName);
+                var importDirectory = Path.Combine(Path.GetDirectoryName(storeDirectory), "import");
+                var filePath = Path.Combine(importDirectory, _contentFileName);
                 var profiler = Logging.IsProfilingEnabled ? new BrightstarProfiler("Import " + _contentFileName) : null;
                 Logging.LogDebug("Import file path calculated as '{0}'", filePath);
 

@@ -146,5 +146,12 @@ namespace BrightstarDB.Portable.Store.Tests
             Assert.AreEqual(1, subdirs.Count());
             Assert.IsTrue(subdirs.Any(x => x.Equals("grandchild1")));
         }
+
+        [TestMethod]
+        public void TestFileLengthForNonExistantFile()
+        {
+            // GetFileLength should return 0 if the file is not found, not throw an exception
+            Assert.AreEqual(0, _pm.GetFileLength("nonexistantfile"));
+        }
     }
 }

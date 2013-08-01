@@ -300,7 +300,7 @@ namespace BrightstarDB.Storage.Persistence
             Logging.LogDebug("Mark {0}", pageId);
 #endif
             var dirtyPage = Retrieve(pageId, null);
-            if (dirtyPage != null)
+            if (dirtyPage != null && _backgroundPageWriter != null)
             {
                 _backgroundPageWriter.QueueWrite(dirtyPage, commitId);
             }
@@ -346,12 +346,15 @@ namespace BrightstarDB.Storage.Persistence
 
         private void RestartBackgroundWriter()
         {
-            lock (this)
+            if (_backgroundPageWriter != null)
             {
-                _backgroundPageWriter.Shutdown();
-                _backgroundPageWriter.Dispose();
-                _backgroundPageWriter =
-                    new BackgroundPageWriter(_peristenceManager.GetOutputStream(_path, FileMode.Open));
+                lock (this)
+                {
+                    _backgroundPageWriter.Shutdown();
+                    _backgroundPageWriter.Dispose();
+                    _backgroundPageWriter =
+                        new BackgroundPageWriter(_peristenceManager.GetOutputStream(_path, FileMode.Open));
+                }
             }
         }
     }
