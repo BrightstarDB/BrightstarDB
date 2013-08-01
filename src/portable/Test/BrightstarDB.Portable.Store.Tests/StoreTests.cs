@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
@@ -51,27 +52,92 @@ namespace BrightstarDB.Portable.Store.Tests
             TestHelper.CopyFile("TestData\\simple.txt", importPath, "simple.txt");
             client.CreateStore(storeName);
 
+            // RDF import
             var job = client.StartImport(storeName, "simple.txt");
-            while (!(job.JobCompletedOk || job.JobCompletedWithErrors))
-            {
-                Task.Delay(3).Wait();
-                job = client.GetJobInfo(storeName, job.JobId);
-            }
+            AssertJobSuccessful(client, storeName, job);
 
-            Assert.IsTrue(job.JobCompletedOk, "Import job failed with message: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
-
+            // RDF export
             job = client.StartExport(storeName, "simple.export.nt");
-            while (!(job.JobCompletedOk || job.JobCompletedWithErrors))
-            {
-                Task.Delay(3).Wait();
-                job = client.GetJobInfo(storeName, job.JobId);
-            }
-
-            Assert.IsTrue(job.JobCompletedOk, "Export job failed with message: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
+            AssertJobSuccessful(client, storeName, job);
 
             var exportFilePath = Path.Combine(importPath, "simple.export.nt");
             Assert.IsTrue(_pm.FileExists(exportFilePath));
+        }
 
+        [TestMethod]
+        public void TestExecuteTransaction()
+        {
+            var client = GetEmbeddedClient();
+            var storeName = "TestExecuteTransaction_" + _runId;
+            
+            client.CreateStore(storeName);
+
+            // Test a simple addition of triples
+            var insertData = new StringBuilder();
+            insertData.AppendLine(@"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"".");
+            insertData.AppendLine(
+                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"".");
+            var job = client.ExecuteTransaction(storeName, null, null, insertData.ToString());
+            AssertJobSuccessful(client, storeName, job);
+
+            // Test an update with a precondition which is met
+            const string tripleToDelete = @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"".";
+            const string tripleToInsert = @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox_sha1sum> ""FAKESHA1""";
+            job = client.ExecuteTransaction(storeName, tripleToDelete, tripleToDelete, tripleToInsert);
+            AssertJobSuccessful(client, storeName, job);
+
+            // Test an update with a precondition which is not met
+            job = client.ExecuteTransaction(storeName, tripleToDelete, tripleToDelete, tripleToInsert);
+            while (!(job.JobCompletedOk || job.JobCompletedWithErrors))
+            {
+                Task.Delay(3).Wait();
+                job = client.GetJobInfo(storeName, job.JobId);
+            }
+            Assert.IsTrue(job.JobCompletedWithErrors);
+        }
+
+        [TestMethod]
+        public void TestQuery()
+        {
+            var client = GetEmbeddedClient();
+            var storeName = "TestQuery_" + _runId;
+            client.CreateStore(storeName);
+
+            var insertData = new StringBuilder();
+            insertData.AppendLine(@"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"".");
+            insertData.AppendLine(
+                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/knows> <http://example.org/people/bob> .");
+            insertData.AppendLine(@"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/knows> <http://example.org/people/carol> .");
+            insertData.AppendLine(@"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
+            insertData.AppendLine(@"<http://example.org/people/carol> <http://xmlns.com/foaf/0.1/name> ""Carol"" .");
+
+            var job = client.ExecuteTransaction(storeName, null, null, insertData.ToString());
+            AssertJobSuccessful(client, storeName, job);
+
+            const string query = "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?p ?n WHERE { <http://example.org/people/alice> foaf:knows ?p . ?p foaf:name ?n }";
+            var resultStream = client.ExecuteQuery(storeName, query);
+            var doc = XDocument.Load(resultStream);
+            Assert.IsNotNull(doc.Root);
+            var rows = doc.SparqlResultRows().ToList();
+            Assert.AreEqual(2, rows.Count);
+
+            foreach (var row in rows)
+            {
+                Assert.IsNotNull(row.GetColumnValue("p"));
+                Assert.IsNotNull(row.GetColumnValue("n"));
+            }
+
+        }
+
+
+        private void AssertJobSuccessful(IBrightstarService client,string storeName, IJobInfo job)
+        {
+            while (!(job.JobCompletedOk || job.JobCompletedWithErrors))
+            {
+                Task.Delay(3).Wait();
+                job = client.GetJobInfo(storeName, job.JobId);
+            }
+            Assert.IsTrue(job.JobCompletedOk, "Job failed with message: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
         }
 
         private IBrightstarService GetEmbeddedClient()
