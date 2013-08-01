@@ -1,18 +1,18 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
-using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
-using FileMode=BrightstarDB.Portable.Compatibility.FileMode;
+using FileMode = BrightstarDB.Portable.Compatibility.FileMode;
 
-namespace BrightstarDB.Portable.Tests
+namespace BrightstarDB.Portable.Phone.Tests
 {
     [TestClass]
-    public class TestPersistenceManagerOperations
+    public class PersistenceManagerTests
     {
         private readonly IPersistenceManager _pm;
 
-        public TestPersistenceManagerOperations()
+        public PersistenceManagerTests()
         {
             _pm = new PersistenceManager();
         }
@@ -54,7 +54,7 @@ namespace BrightstarDB.Portable.Tests
         [TestMethod]
         public void TestDeleteNonEmptyDirectory()
         {
-           _pm.CreateDirectory("notempty");
+            _pm.CreateDirectory("notempty");
             _pm.CreateFile("notempty\\testfile.txt");
             Assert.IsTrue(_pm.DirectoryExists("notempty"));
             Assert.IsTrue(_pm.FileExists("notempty\\testfile.txt"));
@@ -135,8 +135,8 @@ namespace BrightstarDB.Portable.Tests
             _pm.CreateDirectory("parent\\child2");
             subdirs = _pm.ListSubDirectories("parent").ToList();
             Assert.AreEqual(2, subdirs.Count());
-            Assert.IsTrue(subdirs.Any(x=>x.Equals("child1")));
-            Assert.IsTrue(subdirs.Any(x=>x.Equals("child2")));
+            Assert.IsTrue(subdirs.Any(x => x.Equals("child1")));
+            Assert.IsTrue(subdirs.Any(x => x.Equals("child2")));
 
             _pm.CreateDirectory("parent\\child2\\grandchild1");
             subdirs = _pm.ListSubDirectories("parent").ToList();

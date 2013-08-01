@@ -3,7 +3,7 @@ using System.IO;
 using Windows.ApplicationModel;
 using Windows.Storage;
 
-namespace BrightstarDB.Portable.Tests
+namespace BrightstarDB.Portable.Phone.Tests
 {
     internal static class TestHelper
     {
@@ -28,4 +28,5 @@ namespace BrightstarDB.Portable.Tests
             await file.CopyAsync(folder, targetFileName, NameCollisionOption.ReplaceExisting);
         }
     }
+
 }

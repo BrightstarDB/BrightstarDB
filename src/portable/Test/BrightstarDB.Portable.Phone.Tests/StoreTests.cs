@@ -1,19 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
 using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
+using Windows.ApplicationModel;
+using Windows.Storage;
+using Path = BrightstarDB.Portable.Compatibility.Path;
 
-namespace BrightstarDB.Portable.Tests
+namespace BrightstarDB.Portable.Phone.Tests
 {
     [TestClass]
     public class StoreTests
     {
-        private readonly string _runId = DateTime.Now.Ticks.ToString();
+        private readonly string _runId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
         private readonly IPersistenceManager _pm = new PersistenceManager();
 
         [TestMethod]
@@ -40,7 +45,7 @@ namespace BrightstarDB.Portable.Tests
             Assert.IsFalse(_pm.FileExists(dataPath));
             Assert.IsFalse(client.DoesStoreExist(storeName));
         }
-
+        
         [TestMethod]
         public void TestRdfImportExport()
         {
@@ -63,12 +68,13 @@ namespace BrightstarDB.Portable.Tests
             Assert.IsTrue(_pm.FileExists(exportFilePath));
         }
 
+        /*
         [TestMethod]
         public void TestExecuteTransaction()
         {
             var client = GetEmbeddedClient();
             var storeName = "TestExecuteTransaction_" + _runId;
-            
+
             client.CreateStore(storeName);
 
             // Test a simple addition of triples
@@ -94,7 +100,8 @@ namespace BrightstarDB.Portable.Tests
             }
             Assert.IsTrue(job.JobCompletedWithErrors);
         }
-
+        
+        
         [TestMethod]
         public void TestQuery()
         {
@@ -127,9 +134,9 @@ namespace BrightstarDB.Portable.Tests
             }
 
         }
+        */
 
-
-        private void AssertJobSuccessful(IBrightstarService client,string storeName, IJobInfo job)
+        private void AssertJobSuccessful(IBrightstarService client, string storeName, IJobInfo job)
         {
             while (!(job.JobCompletedOk || job.JobCompletedWithErrors))
             {
@@ -144,4 +151,5 @@ namespace BrightstarDB.Portable.Tests
             return BrightstarService.GetClient("type=embedded;storesDirectory=" + TestConfiguration.StoreLocation);
         }
     }
+
 }

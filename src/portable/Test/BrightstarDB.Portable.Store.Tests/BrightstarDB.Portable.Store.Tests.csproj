@@ -9,7 +9,7 @@
     <ProjectGuid>{49B52EA0-94EF-4A8A-8955-686A80B7CD12}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BrightstarDB.Portable.Store.Tests</RootNamespace>
+    <RootNamespace>BrightstarDB.Portable.Tests</RootNamespace>
     <AssemblyName>BrightstarDB.Portable.Store.Tests</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>

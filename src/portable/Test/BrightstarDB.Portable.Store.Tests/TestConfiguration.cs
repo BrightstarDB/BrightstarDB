@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BrightstarDB.Portable.Store.Tests
+﻿namespace BrightstarDB.Portable.Tests
 {
     static class TestConfiguration
     {
