@@ -45,13 +45,13 @@ namespace BrightstarDB.Tests
                 }
             }
 #else
-            var importFile = new FileInfo(Configuration.DataLocation+testDataFileName);
-            var targetDir = new DirectoryInfo(Configuration.StoreLocation + "\\import");
+            var importFile = new FileInfo(Path.Combine(Configuration.DataLocation, testDataFileName));
+            var targetDir = new DirectoryInfo(Path.Combine(Configuration.StoreLocation,"import"));
             if (!targetDir.Exists)
             {
                 targetDir.Create();
             }
-            importFile.CopyTo(Configuration.StoreLocation + "import\\" + targetFileName ?? testDataFileName, true);
+            importFile.CopyTo(Path.Combine(targetDir.FullName, targetFileName ?? testDataFileName), true);
 #endif
         }
 
@@ -61,10 +61,12 @@ namespace BrightstarDB.Tests
             var storeName = "TestAddQuads_" + DateTime.Now.Ticks;
             var client = BrightstarService.GetClient("type=embedded;storesDirectory=C:\\brightstar");
             client.CreateStore(storeName);
-            client.ExecuteTransaction(storeName, null, null,
+            var job = client.ExecuteTransaction(storeName, null, null,
                                       @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .
 <http://np.com/s> <http://np.com/p> <http://np.com/o> .
 ");
+            TestHelper.AssertJobCompletesSuccessfully(client, storeName, job);
+
             var result = client.ExecuteQuery(storeName,
                                 "SELECT ?o FROM <http://np.com/g1> WHERE { <http://np.com/s> <http://np.com/p> ?o }");
             Assert.IsNotNull(result);
@@ -194,7 +196,7 @@ namespace BrightstarDB.Tests
         private void Sleep(int ms)
         {
 #if PORTABLE
-            Task.Delay(ms).RunSynchronously();
+            Task.Delay(ms).Wait();
 #else
             Thread.Sleep(ms);
 #endif
@@ -206,10 +208,12 @@ namespace BrightstarDB.Tests
             var storeName = "TestDeleteFromGraph_" + DateTime.Now.Ticks;
             var client = BrightstarService.GetClient("type=embedded;storesDirectory=C:\\brightstar");
             client.CreateStore(storeName);
-            client.ExecuteTransaction(storeName, null, null,
+            var job = client.ExecuteTransaction(storeName, null, null,
                                       @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .
 <http://np.com/s> <http://np.com/p> <http://np.com/o> .
 ");
+            TestHelper.AssertJobCompletesSuccessfully(client, storeName, job);
+
             var result = client.ExecuteQuery(storeName,
                                 "SELECT ?o FROM <http://np.com/g1> WHERE { <http://np.com/s> <http://np.com/p> ?o }");
             Assert.IsNotNull(result);
@@ -218,9 +222,10 @@ namespace BrightstarDB.Tests
             var resultRow = resultDoc.SparqlResultRows().First();
             Assert.AreEqual(new Uri("http://np.com/o2"), resultRow.GetColumnValue("o"));
 
-            client.ExecuteTransaction(storeName, @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .",
+            job = client.ExecuteTransaction(storeName, @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .",
                                       @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .",
                                       null);
+            TestHelper.AssertJobCompletesSuccessfully(client, storeName, job);
             result = client.ExecuteQuery(storeName,
                                 "SELECT ?o FROM <http://np.com/g1> WHERE { <http://np.com/s> <http://np.com/p> ?o }");
             Assert.IsNotNull(result);

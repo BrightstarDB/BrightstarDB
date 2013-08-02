@@ -71,6 +71,7 @@ namespace Remotion.Linq.Clauses.Expressions
             ArgumentUtility.CheckNotNull("visitor", visitor);
             return visitor.VisitExpression(this);
         }
+
     }
 #else
   /// <summary>

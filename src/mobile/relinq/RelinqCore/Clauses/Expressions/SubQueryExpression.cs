@@ -27,7 +27,8 @@ namespace Remotion.Linq.Clauses.Expressions
     {
         public const ExpressionType ExpressionType = (ExpressionType)100002;
 
-        public SubQueryExpression(QueryModel queryModel) : base(typeof (SubQueryExpression), ExpressionType)
+        public SubQueryExpression(QueryModel queryModel) 
+            : base(queryModel.GetOutputDataInfo().DataType, ExpressionType)
         {
             ArgumentUtility.CheckNotNull("queryModel", queryModel);
             QueryModel = queryModel;

@@ -1366,6 +1366,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
+#if !PORTABLE
         [Test]
         [ExpectedException(typeof(TransactionPreconditionsFailedException))]
         public void TestOptimisticLockingHttp()
@@ -1407,7 +1408,8 @@ namespace BrightstarDB.Tests.EntityFramework
                 }
             }
         }
-       
+#endif
+
         [Test]
         public void TestDeleteEntity()
         {

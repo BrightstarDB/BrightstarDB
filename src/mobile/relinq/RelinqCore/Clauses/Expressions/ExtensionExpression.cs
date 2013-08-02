@@ -31,13 +31,17 @@ namespace Remotion.Linq.Clauses.Expressions
   /// </remarks>
   public abstract class ExtensionExpression : Expression
   {
+      private readonly ExpressionType _nodeType;
+      private readonly Type _type;
+      
     /// <summary>
     /// Defines a standard <see cref="ExpressionType"/> value that is used by all <see cref="ExtensionExpression"/> subclasses unless they specify
     /// their own <see cref="ExpressionType"/> value.
     /// </summary>
     public const ExpressionType DefaultExtensionExpressionNodeType = (ExpressionType) 150000;
 
-    public new ExpressionType NodeType { get; private set; }
+    public override ExpressionType NodeType { get { return _nodeType; } }
+    public override System.Type Type { get { return _type; } }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExtensionExpression"/> class with a default <see cref="ExpressionType"/> value.
@@ -58,7 +62,9 @@ namespace Remotion.Linq.Clauses.Expressions
         :base()
         //: base (nodeType, ArgumentUtility.CheckNotNull ("", type))
     {
-        NodeType = nodeType;
+        ArgumentUtility.CheckNotNull("", type);
+        _type = type;
+        _nodeType = nodeType;
     }
 
       /// <summary>
@@ -205,5 +211,6 @@ namespace Remotion.Linq.Clauses.Expressions
     /// return this <see cref="ExtensionExpression"/>. 
     /// </remarks>
     protected internal abstract Expression VisitChildren (ExpressionTreeVisitor visitor);
+
   }
 }

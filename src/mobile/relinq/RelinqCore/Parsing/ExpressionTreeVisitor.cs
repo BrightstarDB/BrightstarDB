@@ -66,9 +66,11 @@ namespace Remotion.Linq.Parsing
       if (expression == null)
         return null;
 
+#if !PORTABLE
       var extensionExpression = expression as ExtensionExpression;
       if (extensionExpression != null)
         return extensionExpression.Accept (this);
+#endif // For portable this is handled in the default case of the following switch
 
       switch (expression.NodeType)
       {
@@ -139,6 +141,10 @@ namespace Remotion.Linq.Parsing
           return VisitQuerySourceReferenceExpression ((QuerySourceReferenceExpression) expression);
 
         default:
+#if PORTABLE
+            var extensionExpression = expression as ExtensionExpression;
+            if (extensionExpression != null) return extensionExpression.Accept (this);
+#endif
           return VisitUnknownNonExtensionExpression (expression);
       }
     }
