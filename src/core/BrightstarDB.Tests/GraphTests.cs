@@ -1,14 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using BrightstarDB.Portable.Compatibility;
-using BrightstarDB.Storage;
 using NUnit.Framework;
-using VDS.RDF;
+#if PORTABLE
+using BrightstarDB.Storage;
+using FileMode=BrightstarDB.Portable.Compatibility.FileMode;
+using System.Threading.Tasks;
+#else
+using System.Threading;
+#endif
 
 namespace BrightstarDB.Tests
 {
@@ -23,7 +25,7 @@ namespace BrightstarDB.Tests
         public void SetUp()
         {
 #if PORTABLE
-        _persistenceManager = new Storage.Persistence.Adaptation.PersistenceManager();
+        _persistenceManager = new PersistenceManager();
 #endif
             CopyTestDataToImportFolder("graph_triples.nt");
         }
@@ -33,11 +35,10 @@ namespace BrightstarDB.Tests
 #if PORTABLE
             using (var srcStream = _persistenceManager.GetInputStream(Configuration.DataLocation + testDataFileName))
             {
-                var targetDir = Configuration.StoreLocation + "\\import";
-                var targetPath = targetDir + targetFileName ?? testDataFileName;
+                var targetDir = Path.Combine(Configuration.StoreLocation, "import");
+                var targetPath = Path.Combine(targetDir, (targetFileName ?? testDataFileName));
                 if (!_persistenceManager.DirectoryExists(targetDir)) _persistenceManager.CreateDirectory(targetDir);
                 if (_persistenceManager.FileExists(targetPath)) _persistenceManager.DeleteFile(targetPath);
-                _persistenceManager.CreateFile(targetPath);
                 using (var targetStream = _persistenceManager.GetOutputStream(targetPath, FileMode.CreateNew))
                 {
                     srcStream.CopyTo(targetStream);
@@ -165,7 +166,7 @@ namespace BrightstarDB.Tests
 #endif
             {
                 var content = sr.ReadToEnd();
-                Assert.AreEqual(2, content.Split(new string[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries).Count());
+                Assert.AreEqual(2, content.Split(new [] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries).Count());
                 sr.Close();
             }
 
@@ -185,7 +186,7 @@ namespace BrightstarDB.Tests
 #endif
             {
                 var content = sr.ReadToEnd();
-                Assert.AreEqual(1, content.Split(new string[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries).Count());
+                Assert.AreEqual(1, content.Split(new [] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries).Count());
                 sr.Close();
             }
         }

@@ -1,4 +1,4 @@
-﻿#if !NETFX_CORE
+﻿#if !PORTABLE
 using System;
 using System.Collections.Generic;
 using System.IO;

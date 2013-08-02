@@ -6,12 +6,14 @@ using System.Text;
 using System.Xml.Linq;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
-using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
 using System.Threading;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 using TransactionType = BrightstarDB.Storage.TransactionType;
 using Triple = BrightstarDB.Model.Triple;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Server
 {

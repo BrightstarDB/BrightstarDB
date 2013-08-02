@@ -47,12 +47,21 @@ namespace Remotion.Linq.Clauses.ResultOperators
     {
       ArgumentUtility.CheckNotNull ("input", input);
 
+#if PORTABLE
+      var method = typeof(Enumerable).GetMethod("Average", new[] { typeof(IEnumerable<T>) });
+      if (method == null || !(method.IsPublic && method.IsStatic))
+      {
+          var message = string.Format("Cannot calculate the average of objects of type '{0}' in memory.", typeof(T).FullName);
+          throw new NotSupportedException(message);
+      }
+#else
       var method = typeof (Enumerable).GetMethod ("Average", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof (IEnumerable<T>) }, null);
       if (method == null)
       {
         var message = string.Format ("Cannot calculate the average of objects of type '{0}' in memory.", typeof (T).FullName);
         throw new NotSupportedException (message);
       }
+#endif
 
       Debug.Assert (GetOutputDataInfo (input.DataInfo).DataType == method.ReturnType, "ReturnType of method matches return type of this operator");
 

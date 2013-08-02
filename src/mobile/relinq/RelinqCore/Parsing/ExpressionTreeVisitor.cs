@@ -22,6 +22,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Utilities;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace Remotion.Linq.Parsing
 {

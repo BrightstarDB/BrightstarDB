@@ -1,4 +1,4 @@
-﻿#if !NETFX_CORE // Portable version of BrightstarDB does not contain BrightstarDB.Dynamic
+﻿#if !PORTABLE // Portable version of BrightstarDB does not contain BrightstarDB.Dynamic
 using System;
 using System.Collections.Generic;
 using System.Linq;

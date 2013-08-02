@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
-using BrightstarDB.EntityFramework;
 using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    public abstract class OptimisticLockingTestsBase : ClientTestBase
+    public abstract class OptimisticLockingTestsBase
+#if !PORTABLE
+        : ClientTestBase
+#endif
     {
         protected abstract MyEntityContext NewContext();
 

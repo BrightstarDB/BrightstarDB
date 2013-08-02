@@ -7,7 +7,8 @@ namespace BrightstarDB.Tests
 {
     internal static class Configuration
     {
-#if NETFX_CORE
+#if PORTABLE
+
         public static string StoreLocation
         {
             get { return "BrightstarDB"; }
@@ -15,7 +16,7 @@ namespace BrightstarDB.Tests
 
         public static string DataLocation
         {
-            get { return "..\\..\\..\\..\\..\\src\\core\\BrightstarDB.Tests\\Data\\"; }
+            get { return "..\\..\\..\\..\\..\\..\\src\\core\\BrightstarDB.Tests\\Data\\"; }
         }
 #else
         public static string StoreLocation

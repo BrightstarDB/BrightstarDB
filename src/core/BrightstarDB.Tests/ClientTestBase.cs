@@ -1,4 +1,4 @@
-﻿#if !NETFX_CORE
+﻿#if !PORTABLE
 using System;
 using System.Diagnostics;
 using System.ServiceModel;

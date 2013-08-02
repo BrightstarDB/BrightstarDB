@@ -37,6 +37,8 @@ namespace Remotion.Linq.Clauses.Expressions
     /// </summary>
     public const ExpressionType DefaultExtensionExpressionNodeType = (ExpressionType) 150000;
 
+    public new ExpressionType NodeType { get; private set; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ExtensionExpression"/> class with a default <see cref="ExpressionType"/> value.
     /// </summary>
@@ -56,29 +58,37 @@ namespace Remotion.Linq.Clauses.Expressions
         :base()
         //: base (nodeType, ArgumentUtility.CheckNotNull ("", type))
     {
+        NodeType = nodeType;
     }
 
-    /// <summary>
-    /// Gets a value indicating whether this instance can be reduced to a tree of standard expressions.
-    /// </summary>
-    /// <value>
-    /// 	<see langword="true"/> if this instance can be reduced; otherwise, <see langword="false"/>.
-    /// </value>
-    /// <remarks>
-    /// <para>
-    /// If this method returns <see langword="true"/>, the <see cref="Reduce"/> method can be called in order to produce a new 
-    /// <see cref="Expression"/> that has the same semantics as this <see cref="ExtensionExpression"/> but consists of 
-    /// expressions of standard node types.
-    /// </para>
-    /// <para>
-    /// Subclasses overriding the <see cref="CanReduce"/> property to return <see langword="true" /> must also override the <see cref="Reduce"/> 
-    /// method and cannot call its base implementation.
-    /// </para>
-    /// </remarks>
+      /// <summary>
+      /// Gets a value indicating whether this instance can be reduced to a tree of standard expressions.
+      /// </summary>
+      /// <value>
+      /// 	<see langword="true"/> if this instance can be reduced; otherwise, <see langword="false"/>.
+      /// </value>
+      /// <remarks>
+      /// <para>
+      /// If this method returns <see langword="true"/>, the <see cref="Reduce"/> method can be called in order to produce a new 
+      /// <see cref="Expression"/> that has the same semantics as this <see cref="ExtensionExpression"/> but consists of 
+      /// expressions of standard node types.
+      /// </para>
+      /// <para>
+      /// Subclasses overriding the <see cref="CanReduce"/> property to return <see langword="true" /> must also override the <see cref="Reduce"/> 
+      /// method and cannot call its base implementation.
+      /// </para>
+      /// </remarks>
+#if PORTABLE
+      public override bool CanReduce
+      {
+          get { return false; }
+      }
+#else
     public virtual bool CanReduce
     {
       get { return false; }
     }
+#endif
 
     /// <summary>
     /// Reduces this instance to a tree of standard expressions. If this instance cannot be reduced, the same <see cref="ExtensionExpression"/>
@@ -97,12 +107,19 @@ namespace Remotion.Linq.Clauses.Expressions
     /// call the base implementation.
     /// </para>
     /// </remarks>
+#if PORTABLE
+    public override Expression Reduce()
+    {
+        return this;
+    }
+#else
     public virtual Expression Reduce ()
     {
       if (CanReduce)
         throw new InvalidOperationException ("Reducible nodes must override the Reduce method.");
       return this;
     }
+#endif
 
     /// <summary>
     /// Calls the <see cref="Reduce"/> method and checks certain invariants before returning the result. This method can only be called when
@@ -122,6 +139,24 @@ namespace Remotion.Linq.Clauses.Expressions
     ///     </item>
     ///   </list>
     ///   </remarks>
+#if PORTABLE
+    public new Expression ReduceAndCheck()
+    {
+        if (!CanReduce)
+            throw new InvalidOperationException("Reduce and check can only be called on reducible nodes.");
+
+        var result = Reduce();
+
+        if (result == null)
+            throw new InvalidOperationException("Reduce cannot return null.");
+        if (result == this)
+            throw new InvalidOperationException("Reduce cannot return the original expression.");
+        if (!Type.IsAssignableFrom(result.Type))
+            throw new InvalidOperationException("Reduce must produce an expression of a compatible type.");
+
+        return result;
+    }
+#else
     public Expression ReduceAndCheck ()
     {
       if (!CanReduce)
@@ -138,6 +173,7 @@ namespace Remotion.Linq.Clauses.Expressions
 
       return result;
     }
+#endif
 
     /// <summary>
     /// Accepts the specified visitor, by default dispatching to <see cref="ExpressionTreeVisitor.VisitExtensionExpression"/>. 

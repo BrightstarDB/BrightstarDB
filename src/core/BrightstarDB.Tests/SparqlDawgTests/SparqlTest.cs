@@ -200,7 +200,11 @@ namespace BrightstarDB.Tests.SparqlDawgTests
         protected void ExecuteUpdate(string requestPath)
         {
             var updateExpression = File.ReadAllText(requestPath);
+#if PORTABLE
+            var result = _service.ExecuteUpdate(_storeName, updateExpression);
+#else
             var result = _service.ExecuteUpdate(_storeName, updateExpression, true);
+#endif
             Assert.IsTrue(result.JobCompletedOk, "SPARQL Update failed for update from file path {0} : {1} : {2}", requestPath, result.StatusMessage, result.ExceptionInfo);
         }
 

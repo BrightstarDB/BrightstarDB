@@ -46,12 +46,23 @@ namespace Remotion.Linq.Clauses.ResultOperators
     {
       ArgumentUtility.CheckNotNull ("input", input);
 
+#if PORTABLE
+        var method = typeof (Enumerable).GetMethod("Sum", new[] {typeof (IEnumerable<T>)});
+        if (method == null || !method.IsStatic)
+        {
+            var message = string.Format("Cannot calculate the sum of objects of type '{0}' in memory.",
+                                        typeof (T).FullName);
+            throw new NotSupportedException(message);
+        }
+#else
+        typeof(Enumerable).GetMethod()
       var method = typeof (Enumerable).GetMethod ("Sum", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof (IEnumerable<T>) }, null);
       if (method == null)
       {
         var message = string.Format ("Cannot calculate the sum of objects of type '{0}' in memory.", typeof (T).FullName);
         throw new NotSupportedException (message);
       }
+#endif
 
       var result = method.Invoke (null, new[] { input.GetTypedSequence<T> () });
       return new StreamedValue (result, (StreamedValueInfo) GetOutputDataInfo (input.DataInfo));

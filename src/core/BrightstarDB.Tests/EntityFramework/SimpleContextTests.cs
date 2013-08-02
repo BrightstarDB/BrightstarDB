@@ -4,32 +4,22 @@ using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
 using NUnit.Framework;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using UnitTesting = NUnit.Framework;
+#if !PORTABLE
+using System.ComponentModel.DataAnnotations;
+#endif
 
 namespace BrightstarDB.Tests.EntityFramework
 {
     [TestFixture]
-    public class SimpleContextTests : ClientTestBase
+    public class SimpleContextTests
     {
         private readonly IDataObjectContext _dataObjectContext;
         public SimpleContextTests()
         {
             var connectionString = new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation);
             _dataObjectContext = new EmbeddedDataObjectContext(connectionString);
-        }
-
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-            StartService();
-        }
-
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-            CloseService();
         }
 
         [Test]
@@ -1518,6 +1508,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
+#if !PORTABLE
         [Test]
         public void TestGeneratedPropertyAttributes()
         {
@@ -1548,9 +1539,8 @@ namespace BrightstarDB.Tests.EntityFramework
             var datatype = generatedAttributes.OfType<DataTypeAttribute>().FirstOrDefault();
             Assert.IsNotNull(datatype, "Could not find expected DataType attribute on Foaf.BirthDate property");
             Assert.AreEqual(DataType.Date, datatype.DataType);
-
-
         }
+#endif
 
         [Test]
         public void TestGeneratedClassAttributes()
