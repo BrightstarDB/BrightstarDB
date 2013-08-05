@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -198,3 +199,4 @@ namespace BrightstarDB.Tests
         }
     }
 }
+#endif

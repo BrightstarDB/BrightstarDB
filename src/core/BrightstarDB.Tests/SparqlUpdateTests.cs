@@ -150,7 +150,7 @@ WHERE
         public void TestDeleteFromGraph()
         {
             var storeName = CreateStore("TestDeleteFromGraph");
-            _client.ExecuteUpdate(storeName,
+            ExecuteUpdate(storeName,
                                   @"PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
 INSERT DATA {
   GRAPH <http://example/addresses> {
@@ -172,7 +172,7 @@ INSERT DATA {
             resultsDoc = XDocument.Load(results);
             Assert.AreEqual(3, resultsDoc.SparqlResultRows().Count());
 
-            _client.ExecuteUpdate(storeName,
+            ExecuteUpdate(storeName,
                                   @"PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
 WITH <http://example/addresses>
 DELETE { ?person ?property ?value } 
@@ -220,7 +220,7 @@ INSERT DATA {
             var resultsDoc = XDocument.Load(results);
             Assert.AreEqual(1, resultsDoc.SparqlResultRows().Count());
 
-            _client.ExecuteUpdate(storeName,
+            ExecuteUpdate(storeName,
                                   @"PREFIX dc:  <http://purl.org/dc/elements/1.1/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
@@ -250,22 +250,18 @@ WHERE
         {
             var sid = CreateStore("GraphManagement");
 
-            var jobInfo = _client.ExecuteUpdate(sid, @"PREFIX dc: <http://purl.org/dc/elements/1.1/>
+            ExecuteUpdate(sid, @"PREFIX dc: <http://purl.org/dc/elements/1.1/>
 INSERT DATA
 { 
   <http://example/book1> dc:title ""A new book"" ;
                          dc:creator ""A.N.Other"" .
 }");
-            Assert.IsTrue(jobInfo.JobCompletedOk);
 
-            jobInfo = _client.ExecuteUpdate(sid, "CREATE GRAPH <http://np.com/g1>");
-            Assert.IsTrue(jobInfo.JobCompletedOk);
+            ExecuteUpdate(sid, "CREATE GRAPH <http://np.com/g1>");
 
-            jobInfo = _client.ExecuteUpdate(sid, "CREATE SILENT GRAPH <http://np.com/g1>");
-            Assert.IsTrue(jobInfo.JobCompletedOk);
+            ExecuteUpdate(sid, "CREATE SILENT GRAPH <http://np.com/g1>");
 
-            jobInfo = _client.ExecuteUpdate(sid, "DROP GRAPH <" + Constants.DefaultGraphUri + ">");
-            Assert.IsTrue(jobInfo.JobCompletedOk);
+            ExecuteUpdate(sid, "DROP GRAPH <" + Constants.DefaultGraphUri + ">");
 
             var results = _client.ExecuteQuery(sid, "SELECT ?s ?p ?o WHERE { ?s ?p ?o}");
             var resultsDoc = XDocument.Load(results);
@@ -275,7 +271,7 @@ INSERT DATA
         [Test]
         public void TestGraphLoad()
         {
-#if !WINDOWS_PHONE
+#if !WINDOWS_PHONE && !PORTABLE
             var storeName = CreateStore("TestGraphLoad");
             var importFile = new FileInfo(Configuration.DataLocation+"simple.txt");
             Assert.IsTrue(importFile.Exists);
@@ -436,7 +432,7 @@ INSERT DATA {
         private void ExecuteUpdate(string storeName, string updateExpression)
         {
             IJobInfo jobInfo = _client.ExecuteUpdate(storeName, updateExpression);
-            Assert.IsFalse(jobInfo.JobCompletedWithErrors, "Update job failed with message: {0}", jobInfo.StatusMessage);
+            TestHelper.AssertJobCompletesSuccessfully(_client, storeName, jobInfo);
         }
     }
 }

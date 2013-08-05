@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using BrightstarDB.Client;
 using NUnit.Framework;
 
@@ -39,3 +40,4 @@ namespace BrightstarDB.Tests
 
     }
 }
+#endif

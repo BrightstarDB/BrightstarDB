@@ -5,7 +5,6 @@ using System.Threading;
 using BrightstarDB.Portable.Adaptation;
 using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
-using VDS.RDF;
 #endif
 using BrightstarDB.Rdf;
 
@@ -42,7 +41,7 @@ namespace BrightstarDB.Server
             try
             {
                 var storeDirectory = exportJob._storeWorker.WriteStore.DirectoryPath;
-                var exportDirectory = Path.Combine(storeDirectory, ".." + Path.DirectorySeparatorChar + "import");
+                var exportDirectory = Path.Combine(Path.GetDirectoryName(storeDirectory), "import");
 #if PORTABLE
                 var persistenceManager = PlatformAdapter.Resolve<IPersistenceManager>();
                 if (!persistenceManager.DirectoryExists(exportDirectory)) persistenceManager.CreateDirectory(exportDirectory);

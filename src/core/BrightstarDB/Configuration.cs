@@ -77,6 +77,7 @@ namespace BrightstarDB
             EnableOptimisticLocking = false;
             EnableQueryCache = false;
             PersistenceType = DefaultPersistenceType;
+            QueryCache = new NullCache();
 #else
             var appSettings = ConfigurationManager.AppSettings;
             StoreLocation = appSettings.Get(StoreLocationPropertyName);

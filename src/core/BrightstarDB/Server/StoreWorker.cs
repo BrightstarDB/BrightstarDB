@@ -4,7 +4,6 @@ using System.IO;
 using System.Threading;
 using BrightstarDB.Model;
 #if PORTABLE
-using Path = VDS.RDF.Path;
 using BrightstarDB.Portable.Compatibility;
 #else
 using System.Collections.Concurrent;
@@ -278,8 +277,8 @@ namespace BrightstarDB.Server
             var jobId = Guid.NewGuid();
             var job = new UpdateTransaction(jobId, this, preconditions, deletePatterns, insertData, defaultGraphUri);
             Logging.LogDebug("Queueing Job Id {0}", jobId);
-            _jobs.Enqueue(job);
             _jobExecutionStatus.TryAdd(jobId.ToString(), new JobExecutionStatus { JobId = jobId, JobStatus = JobStatus.Pending });
+            _jobs.Enqueue(job);
             return jobId;
         }
 

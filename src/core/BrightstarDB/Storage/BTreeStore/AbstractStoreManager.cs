@@ -5,7 +5,6 @@ using System.Linq;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Storage.TransactionLog;
 #if PORTABLE
-using Path=VDS.RDF.Path;
 using BrightstarDB.Portable.Compatibility;
 #endif
 

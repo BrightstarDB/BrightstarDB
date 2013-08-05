@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace BrightstarDB.Tests.EntityFramework
 {
     [TestFixture]
-    public class EntityFrameworkGraphTargetingTests : ClientTestBase
+    public class EntityFrameworkGraphTargetingTests
     {
         private const string TestStoreLocation = "c:\\brightstar";
         private readonly string _storeName = "EntityFrameworkGraphTargetingTests_" + DateTime.Now.Ticks;

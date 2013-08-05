@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
@@ -105,3 +106,4 @@ namespace BrightstarDB.Tests.EntityFramework
         #endregion
     }
 }
+#endif

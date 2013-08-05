@@ -33,7 +33,8 @@ namespace BrightstarDB.Tests
         {
             var storeName = "TestBitwiseAnd_" + DateTime.Now.Ticks;
             _client.CreateStore(storeName);
-            _client.ExecuteTransaction(storeName, null, null, _testData);
+            var job = _client.ExecuteTransaction(storeName, null, null, _testData);
+            TestHelper.AssertJobCompletesSuccessfully(_client, storeName, job);
 
             var results = _client.ExecuteQuery(storeName,
                                  @"PREFIX bsfunc: <http://brightstardb.com/.well-known/sparql/functions/>
@@ -53,7 +54,8 @@ SELECT ?s WHERE {
         {
             var storeName = "TestBitwiseOr_" + DateTime.Now.Ticks;
             _client.CreateStore(storeName);
-            _client.ExecuteTransaction(storeName, null, null, _testData);
+            var job = _client.ExecuteTransaction(storeName, null, null, _testData);
+            TestHelper.AssertJobCompletesSuccessfully(_client, storeName, job);
 
             var results = _client.ExecuteQuery(storeName,
                                                @"PREFIX bsfunc: <http://brightstardb.com/.well-known/sparql/functions/>

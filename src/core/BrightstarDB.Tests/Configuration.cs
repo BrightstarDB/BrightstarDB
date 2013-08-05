@@ -7,6 +7,18 @@ namespace BrightstarDB.Tests
 {
     internal static class Configuration
     {
+#if PORTABLE
+
+        public static string StoreLocation
+        {
+            get { return "BrightstarDB"; }
+        }
+
+        public static string DataLocation
+        {
+            get { return "..\\..\\..\\..\\..\\..\\src\\core\\BrightstarDB.Tests\\Data\\"; }
+        }
+#else
         public static string StoreLocation
         {
             get
@@ -20,5 +32,6 @@ namespace BrightstarDB.Tests
         {
             get { return "..\\..\\Data\\"; }
         }
+#endif
     }
 }

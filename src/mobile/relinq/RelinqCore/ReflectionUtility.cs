@@ -64,7 +64,15 @@ namespace Remotion.Linq
     public static Type GetMemberReturnType (MemberInfo member)
     {
       ArgumentUtility.CheckNotNull ("member", member);
-
+#if PORTABLE
+        var propertyInfo = member as PropertyInfo;
+        if (propertyInfo != null) return propertyInfo.PropertyType;
+        var fieldInfo = member as FieldInfo;
+        if (fieldInfo != null) return fieldInfo.FieldType;
+        var methodInfo = member as MethodInfo;
+        if (methodInfo != null) return methodInfo.ReturnType;
+        throw new ArgumentException("Argument must be FieldInfo, PropertyInfor or MethodInfo.", "member");
+#else
       switch (member.MemberType)
       {
         case MemberTypes.Property:
@@ -76,6 +84,7 @@ namespace Remotion.Linq
         default:
           throw new ArgumentException ("Argument must be FieldInfo, PropertyInfo, or MethodInfo.", "member");
       }
+#endif
     }
 
     public static Type TryGetItemTypeOfIEnumerable (Type possibleEnumerableType)

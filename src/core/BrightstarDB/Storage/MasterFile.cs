@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 #if PORTABLE 
-using Path=VDS.RDF.Path;
 using BrightstarDB.Portable.Compatibility;
 using Array = BrightstarDB.Portable.Compatibility.Array;
 #endif
