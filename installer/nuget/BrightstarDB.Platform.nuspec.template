@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>BrightstarDB.Platform</id>
+    <version>$version$</version>
+	<title>BrightstarDB Portable Platform Libraries</title>
+    <authors>kal_ahmed</authors>
+    <owners>kal_ahmed</owners>
+    <licenseUrl>http://www.opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>http://brightstardb.com/</projectUrl>
+    <iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This package contains the platform-specific assemblies for running BrightstarDB using Portable Class Library.</description>
+	<releaseNotes>$releaseNotes$</releaseNotes>
+    <copyright>Copyright 2013 Khalil Ahmed, Graham Moore</copyright>
+    <tags>brightstardb rdf nosql database sparql entityframework</tags>
+  </metadata>
+</package>
