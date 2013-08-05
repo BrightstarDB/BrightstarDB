@@ -51,6 +51,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="VDS.Common">
+      <HintPath>..\..\packages\VDS.Common.1.2.0\lib\portable-win+net40+sl40+wp\VDS.Common.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrightstarDB\Tests\EntityFramework\MyEntityContext.cs">
