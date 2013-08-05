@@ -31,8 +31,6 @@ namespace Remotion.Linq.Clauses.Expressions
   /// </remarks>
   public abstract class ExtensionExpression : Expression
   {
-      private readonly ExpressionType _nodeType;
-      private readonly Type _type;
       
     /// <summary>
     /// Defines a standard <see cref="ExpressionType"/> value that is used by all <see cref="ExtensionExpression"/> subclasses unless they specify
@@ -40,8 +38,12 @@ namespace Remotion.Linq.Clauses.Expressions
     /// </summary>
     public const ExpressionType DefaultExtensionExpressionNodeType = (ExpressionType) 150000;
 
+#if !WINDOWS_PHONE
+    private readonly ExpressionType _nodeType;
+    private readonly Type _type;
     public override ExpressionType NodeType { get { return _nodeType; } }
     public override System.Type Type { get { return _type; } }
+#endif
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExtensionExpression"/> class with a default <see cref="ExpressionType"/> value.
@@ -52,6 +54,7 @@ namespace Remotion.Linq.Clauses.Expressions
     {
     }
 
+#if !WINDOWS_PHONE
     /// <summary>
     /// Initializes a new instance of the <see cref="ExtensionExpression"/> class with a custom <see cref="ExpressionType"/> value.
     /// </summary>
@@ -60,12 +63,25 @@ namespace Remotion.Linq.Clauses.Expressions
     /// LINQ providers should use values starting from 150001 and above.</param>
     protected ExtensionExpression (Type type, ExpressionType nodeType)
         :base()
-        //: base (nodeType, ArgumentUtility.CheckNotNull ("", type))
     {
         ArgumentUtility.CheckNotNull("", type);
+
         _type = type;
         _nodeType = nodeType;
     }
+#else
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExtensionExpression"/> class with a custom <see cref="ExpressionType"/> value.
+    /// </summary>
+    /// <param name="type">The type of the value represented by the <see cref="ExtensionExpression"/>.</param>
+    /// <param name="nodeType">The <see cref="ExpressionType"/> value to use as this expression's <see cref="Expression.NodeType"/> value.
+    /// LINQ providers should use values starting from 150001 and above.</param>
+    protected ExtensionExpression(Type type, ExpressionType nodeType)
+        : base(nodeType, ArgumentUtility.CheckNotNull("", type))
+    {
+        ArgumentUtility.CheckNotNull("", type);
+    }
+#endif
 
       /// <summary>
       /// Gets a value indicating whether this instance can be reduced to a tree of standard expressions.

@@ -87,12 +87,14 @@
     <Compile Include="TypeNameConverter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <!-- These tests now require nunit
     <Compile Include="..\..\core\BrightStarDB.InternalTests\BPlusTreeTests\**\*.cs" Exclude="..\..\core\BrightstarDB.InternalTests\BPlusTreeTests\PerformanceTests.cs">
       <Link>BrightstarDB.Tests\%(recursivedir)\%(filename)</Link>
     </Compile>
     <Compile Include="..\..\core\BrightstarDB.Tests\CachingTests.cs;..\..\core\BrightstarDB.Tests\SparqlUpdateTests.cs">
       <Link>BrightstarDB.Tests\%(recursivedir)\%(filename)</Link>
     </Compile>
+    -->
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

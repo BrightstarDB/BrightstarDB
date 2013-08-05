@@ -55,7 +55,6 @@ namespace Remotion.Linq.Clauses.ResultOperators
             throw new NotSupportedException(message);
         }
 #else
-        typeof(Enumerable).GetMethod()
       var method = typeof (Enumerable).GetMethod ("Sum", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof (IEnumerable<T>) }, null);
       if (method == null)
       {
