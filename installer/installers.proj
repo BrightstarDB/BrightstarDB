@@ -248,7 +248,7 @@
 
   <Target Name="Portable" DependsOnTargets="Version">
 	<MSBuild Projects="..\src\portable\portable.sln"
-	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" />
+	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
   </Target>
   
   <!-- ============================================================ -->
@@ -273,7 +273,12 @@
     <MakeDir Directories="$(TempDir)"/>
   </Target>
 
-  <Target Name="Clean" DependsOnTargets="CleanInstallerTmp;CleanOutput">
+  <Target Name="CleanPortable">
+	<MSBuild Projects="..\src\portable\portable.sln"
+	         Targets="Clean"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+  </Target>
+  <Target Name="Clean" DependsOnTargets="CleanInstallerTmp;CleanOutput;CleanPortable">
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
 	     Targets="Clean"
 	     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
@@ -285,6 +290,7 @@
   
   <Target Name="NuGet" DependsOnTargets="Version;Prepare;Portable">
     <RemoveDir Directories="$(OutputPath)\nuget" />
+	<MakeDir Directories="$(OutputPath)\nuget" />
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDBLibs" />
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDB" />
 	<MakeDir Directories="$(OutputPath)\nuget\BrightstarDB.Platform" />
@@ -302,7 +308,7 @@
 		<PortableDesktop Include="..\src\portable\BrightstarDB.Portable.Desktop\bin\$(Configuration)\BrightstarDB.Portable.Desktop.dll" />
 		<PortablePhone Include="..\src\portable\BrightstarDB.Portable.Phone\bin\$(Configuration)\BrightstarDB.Portable.Phone.dll"/>
 		<PortableSilverlight Include="..\src\portable\BrightstarDB.Portable.Silverlight\bin\$(Configuration)\BrightstarDB.Portable.Silverlight.dll"/>
-		<PortableStore Include="..\src\portable\BrightstarDB.Portable.Store\bin\x86\$(Configuration)\BrightstarDB.Portable.Store.dll" />
+		<PortableStore Include="..\src\portable\BrightstarDB.Portable.Store\bin\$(Configuration)\BrightstarDB.Portable.Store.dll" />
     </ItemGroup>
     
     <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
@@ -339,7 +345,7 @@
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
     <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\wp71"/>
 	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\windowsphone8" />
-	<Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLics\lib\portable-net45+wp80+win8" />
+	<Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+wp80+win8" />
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs" />
     
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\net40"/>
@@ -349,7 +355,7 @@
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB" />
     <Copy SourceFiles="@(TextTemplates)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\content" />
     
-	<Copy SourceFiles="@(PortableDesktop)" DestinationFolder="$(OutputPath)\nuget\BrighstarDB.Platform\lib\net45" />
+	<Copy SourceFiles="@(PortableDesktop)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\net45" />
 	<Copy SourceFiles="@(PortablePhone)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\wp80" />
 	<Copy SourceFiles="@(PortableSilverlight)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl5" />
 	<Copy SourceFiles="@(PortableStore)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\win8" />
