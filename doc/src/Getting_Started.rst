@@ -97,4 +97,11 @@ To work programmatically with RDF, SPARQL, and SPARQL see update the
 
 If you are building apps for Windows Phone devices, there is 
 some additional information on this in the :ref:`Developing for Windows Phone 
-<Developing_for_Windows_Phone_7>` section.
+<Developing_for_Windows_Phone>` section.
+
+**Portable Class Library and Windows Store**
+
+If you are building a Windows Store application you can now make use of the
+Portable Class Library build of BrightstarDB. This build also supports
+targetting Silverlight 5 and Windows Phone 8. For more information
+please refer to :ref:`Developing Portable Apps <Developing_Portable_Apps>`.

@@ -157,7 +157,7 @@ This release introduces some BREAKING API changes (but data store format is unaf
 
   - BREAKING: A number of changes and improvements to data file format means that databases created with the initial Developer Preview cannot be used with the Developer Preview Refresh.
 
-  - NEW: Windows Phone 7.1 support. It is now possible to create applications that target Windows Phone OS 7.1 with BrightstarDB. Databases are portable between the desktop / server and the mobile version of BrightstarDB. For more information please refer to :ref:`Developing for Windows Phone 7 <Developing_for_Windows_Phone_7>`.
+  - NEW: Windows Phone 7.1 support. It is now possible to create applications that target Windows Phone OS 7.1 with BrightstarDB. Databases are portable between the desktop / server and the mobile version of BrightstarDB. For more information please refer to :ref:`Developing for Windows Phone <Developing_for_Windows_Phone>`.
 
   - NEW: The :ref:`Data Object Layer <Data_Object_Layer>` is now publicly exposed and documented for developers to use as a mid-point between the low-level RDF Client API and the data-binding provided by the Entity Framework.
 
