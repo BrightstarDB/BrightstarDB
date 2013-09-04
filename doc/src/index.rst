@@ -3,8 +3,8 @@ BrightstarDB Documentation
 =============================================================
 
 .. toctree::
-   :maxdepth: 3
-   
+    :maxdepth: 3
+
     Getting Started <Getting_Started>
     Concepts <Concepts>
     Why BrightstarDB? <Why_BrightstarDB_>
@@ -14,6 +14,7 @@ BrightstarDB Documentation
     SPARQL Endpoint <SPARQL_Endpoint>
     Polaris Management Tool <Using_Polaris>
     SdShare Server <SdShare_Server>
+    Building_BrightstarDB
     Whats New <Whats_New>
     Known Issues <Known_Issues>
     Getting Support <Getting_Support>
