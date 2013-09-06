@@ -128,6 +128,37 @@ Consolidating The Store
         }
 
 
+Creating Store Snapshots
+========================
+
+    From version 1.4, BrightstarDB now provides an API to allow you to create an independent
+    snapshot of a store. A snapshot is an entirely separate store that contains a consolidated
+    version of the data in the source store. You can use snapshots for a number of purposes,
+    for example creating replicas for query or branching the data in a store to allow two
+    different parallel modifications to the data.
+    
+    The API for creating a store snapshot is quite simple::
+    
+        var snapshotJob = client.CreateSnapshot(sourceStoreName, targetStoreName, 
+            persistenceType, commitPoint);
+            
+    The ``sourceStoreName`` and ``targetStoreName`` parameters name the source for the 
+    snapshot and the store that will be created by the snapshot respectively. The store
+    named by ``targetStoreName`` must not exist (the method will not overwrite existing
+    stores). The ``persistenceType`` parameter can be one of ``PersistenceType.AppendOnly``
+    or ``PersistenceType.Rewrite`` and specifies the type of persistence used by the 
+    target store. The target store can use a different persistence type to the source store.
+    The commitPointId parameter is optional. If it is not specified or if you pass null, 
+    the snapshot will be created from the most recent commit of the source store. If you
+    want to create a snapshot from a previous commit of the source store, you can pass
+    the ``ICommitPointInfo`` instance for that commit.
+    
+    ..note:
+    
+        A snapshot can be created from a previous commit point only if the source store
+        persistence type is ``PersistenceType.AppendOnly``
+        
+    
 Store Statistics
 ================
 
