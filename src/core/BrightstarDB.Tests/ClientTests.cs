@@ -473,7 +473,7 @@ namespace BrightstarDB.Tests
 
             var tripleData =
                 "<http://www.networkedplanet.com/people/gra> <<http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
-
+            client.CreateStore(storeName);
             client.ExecuteTransaction(storeName,null, null, tripleData);
         }
 
