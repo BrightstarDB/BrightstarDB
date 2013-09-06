@@ -74,6 +74,9 @@ The following list describes all the available configuration options for Brights
 
   - BrightstarDB.PersistenceType - specifies the default type of persistence used for the main BrighstarDB index files. Allowed values are "appendonly" or "rewrite" (values are case-insensitive). For more information about the store persistence types please refer to the section :ref:`Store Persistence Types <Store_Persistence_Types>`.
 
+  - BrightstarDB.StatsUpdate.Timespan - specifies the minimum number of seconds that must pass between automatic update of store statistics.
+  
+  - BrightstarDB.StatsUpdate.TransactionCount - specifies the minimum number of transactions that must occur between automatic update of store statistics.
 
 Example Configuration
 ======================
