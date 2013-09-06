@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using BrightstarDB.Model;
 #if PORTABLE
@@ -49,6 +50,10 @@ namespace BrightstarDB.Server
 
         private readonly ITransactionLog _transactionLog;
 
+        private readonly IStoreStatisticsLog _storeStatisticsLog;
+
+        private StatsMonitor _statsMonitor;
+
         // todo: might need to make this persistent or clear it out now and again.
         private readonly ConcurrentDictionary<string, JobExecutionStatus> _jobExecutionStatus;
 
@@ -80,6 +85,9 @@ namespace BrightstarDB.Server
             _jobExecutionStatus = new ConcurrentDictionary<string, JobExecutionStatus>();
             _storeManager = StoreManagerFactory.GetStoreManager();
             _transactionLog = _storeManager.GetTransactionLog(_storeLocation);
+            _storeStatisticsLog = _storeManager.GetStatisticsLog(_storeLocation);
+            _statsMonitor = new StatsMonitor();
+            InitializeStatsMonitor();
             _shutdownCompleted = new ManualResetEvent(false);
         }
 
@@ -94,6 +102,11 @@ namespace BrightstarDB.Server
         public ITransactionLog TransactionLog
         {
             get { return _transactionLog; }
+        }
+
+        public IStoreStatisticsLog StoreStatistics
+        {
+            get { return _storeStatisticsLog; }
         }
 
         private void ProcessJobs(object state)
@@ -258,8 +271,19 @@ namespace BrightstarDB.Server
         public void QueueJob(Job job)
         {
             Logging.LogDebug("Queueing Job Id {0}", job.JobId);
-            _jobExecutionStatus.TryAdd(job.JobId.ToString(), new JobExecutionStatus { JobId = job.JobId, JobStatus = JobStatus.Pending });
-            _jobs.Enqueue(job);
+            bool queuedJob = false;
+            while (!queuedJob)
+            {
+                if (
+                    _jobExecutionStatus.TryAdd(job.JobId.ToString(),
+                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending}))
+                {
+                    _jobs.Enqueue(job);
+                    queuedJob = true;
+                    Logging.LogDebug("Queued Job Id {0}", job.JobId);
+                    _statsMonitor.OnJobScheduled();
+                }
+            }
         }
 
         /// <summary>
@@ -273,34 +297,25 @@ namespace BrightstarDB.Server
         /// <returns></returns>
         public Guid ProcessTransaction(string preconditions, string deletePatterns, string insertData, string defaultGraphUri, string format)
         {
-            Logging.LogInfo("ProcessTransaction");           
+            Logging.LogDebug("ProcessTransaction");
             var jobId = Guid.NewGuid();
             var job = new UpdateTransaction(jobId, this, preconditions, deletePatterns, insertData, defaultGraphUri);
-            Logging.LogDebug("Queueing Job Id {0}", jobId);
-            _jobExecutionStatus.TryAdd(jobId.ToString(), new JobExecutionStatus { JobId = jobId, JobStatus = JobStatus.Pending });
-            _jobs.Enqueue(job);
+            QueueJob(job);
             return jobId;
         }
 
         public Guid Import(string contentFileName, string graphUri)
         {
+            Logging.LogDebug("Import {0}, {1}", contentFileName, graphUri);
             var jobId = Guid.NewGuid();
-            bool queuedJob = false;
-            while (!queuedJob)
-            {
-                if (_jobExecutionStatus.TryAdd(jobId.ToString(),
-                                               new JobExecutionStatus {JobId = jobId, JobStatus = JobStatus.Pending}))
-                {
-                    _jobs.Enqueue(new ImportJob(jobId, this, contentFileName, graphUri));
-                    queuedJob = true;
-                    Logging.LogInfo("Queued import job {0}", jobId);
-                }
-            }
+            var job = new ImportJob(jobId, this, contentFileName, graphUri);
+            QueueJob(job);
             return jobId;
         }
 
         public Guid Export(string fileName, string graphUri)
         {
+            Logging.LogDebug("Export {0}, {1}", fileName, graphUri);
             var jobId = Guid.NewGuid();
             var exportJob = new ExportJob(jobId, this, fileName, graphUri);
             _jobExecutionStatus.TryAdd(jobId.ToString(),
@@ -329,6 +344,14 @@ namespace BrightstarDB.Server
             return jobId;
         }
 
+        public Guid UpdateStatistics()
+        {
+            Logging.LogDebug("UpdateStatistics");
+            var jobId = Guid.NewGuid();
+            var job = new UpdateStatsJob(jobId, this);
+            QueueJob(job);
+            return jobId;
+        }
 
         public IEnumerable<Triple> GetResourceStatements(string resourceUri)
         {
@@ -385,5 +408,11 @@ namespace BrightstarDB.Server
             _readStore = null;    
         }
 
+        private void InitializeStatsMonitor()
+        {
+            var lastStats = _storeStatisticsLog.GetStatistics().FirstOrDefault();
+            var lastCommitPoint = WriteStore.GetCommitPoints().FirstOrDefault();
+            _statsMonitor.Initialize(lastStats, lastCommitPoint == null  ? 0 : lastCommitPoint.CommitNumber, ()=>UpdateStatistics());
+        }
     }
 }

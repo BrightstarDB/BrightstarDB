@@ -83,14 +83,6 @@ namespace BrightstarDB.Service
         JobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri);
 
         /// <summary>
-        /// Returns all the triples in the named store
-        /// </summary>
-        /// <param name="storeName">Store to retrieve triples from</param>
-        /// <returns>A stream containing triples encoded using NTriples format</returns>
-        //[OperationContract]
-        //Stream GetStoreData(string storeName);
-
-        /// <summary>
         /// Gets the information about a job. Including status and any messages.
         /// </summary>
         /// <param name="storeName">Name of the store where the job is running</param>
@@ -193,6 +185,38 @@ namespace BrightstarDB.Service
         /// <param name="storeName"></param>
         /// <param name="transactionInfo"></param>
         [OperationContract]
-        JobInfo ReExecuteTransaction(string storeName, TransactionInfo transactionInfo);        
+        JobInfo ReExecuteTransaction(string storeName, TransactionInfo transactionInfo);
+
+        /// <summary>
+        /// Retrieves the most recent statistics for the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for.</param>
+        /// <returns>A <see cref="StoreStatistics"/> instance containing the most recent statistics for the named store, or NULL if
+        /// there are no statistics availabe for the store.</returns>
+        [OperationContract]
+        StoreStatistics GetStatistics(string storeName);
+
+
+        /// <summary>
+        /// Retrieves a range of statistics records for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for</param>
+        /// <param name="latest">The latest date to retrieve statistics for</param>
+        /// <param name="earlierst">The earliest date to retrieve statisitcs for</param>
+        /// <param name="skip">The offset into the date-filters list to return from</param>
+        /// <param name="take">The number of results to return</param>
+        /// <returns>An enumeration over the specified subset of statistics records for the store.</returns>
+        /// <exception cref="ArgumentException">Raised if <paramref name="skip"/> is less than 0 or <paramref name="take"/> is greater than 100.</exception>
+        [OperationContract]
+        IEnumerable<StoreStatistics> GetStatisticsInDateRange(string storeName, DateTime latest, DateTime earlierst,
+                                                              int skip, int take);
+
+        /// <summary>
+        /// Queues a job to update the statistics for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store whose statistics are to be updated</param>
+        /// <returns>A <see cref="JobInfo"/> instance for tracking the current status of the job.</returns>
+        [OperationContract]
+        JobInfo UpdateStatistics(string storeName);
     }
 }

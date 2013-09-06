@@ -38,5 +38,12 @@ namespace BrightstarDB.Storage
         MasterFile GetMasterFile(string storeLocation);
         IPageStore CreateConsolidationStore(string storeLocation);
         void ActivateConsolidationStore(string storeLocation);
+
+        /// <summary>
+        /// Returns the log of store statistics
+        /// </summary>
+        /// <param name="storeLocation">The path to the store directory</param>
+        /// <returns></returns>
+        IStoreStatisticsLog GetStatisticsLog(string storeLocation);
     }
 }

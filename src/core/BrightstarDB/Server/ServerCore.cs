@@ -8,6 +8,7 @@ using BrightstarDB.Caching;
 using BrightstarDB.Client;
 using BrightstarDB.Storage;
 using System.Threading;
+using BrightstarDB.Storage.Statistics;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 using TransactionType = BrightstarDB.Storage.TransactionType;
 using Triple = BrightstarDB.Model.Triple;
@@ -457,6 +458,18 @@ namespace BrightstarDB.Server
                     return sparqlUpdateJob;
             }
             return null;
+        }
+
+        public IEnumerable<Storage.Statistics.StoreStatistics> GetStatistics(string store)
+        {
+            var storeWorker = GetStoreWorker(store);
+            return storeWorker.StoreStatistics.GetStatistics();
+        }
+
+        public Guid UpdateStatistics(string storeName)
+        {
+            var storeWorker = GetStoreWorker(storeName);
+            return storeWorker.UpdateStatistics();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BrightstarDB.Storage.Persistence;
+using BrightstarDB.Storage.Statistics;
 using BrightstarDB.Storage.TransactionLog;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
@@ -176,6 +177,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         public virtual ITransactionLog GetTransactionLog(string storeLocation)
         {
             return new PersistentTransactionLog(_persistenceManager, storeLocation);
+        }
+
+        public virtual IStoreStatisticsLog GetStatisticsLog(string storeLocation)
+        {
+            return new PersistentStatisticsLog(_persistenceManager, storeLocation);
         }
 
         public MasterFile GetMasterFile(string storeLocation)

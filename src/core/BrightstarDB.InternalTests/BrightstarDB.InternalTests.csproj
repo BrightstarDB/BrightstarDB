@@ -80,6 +80,8 @@
     <Compile Include="BrokenStoreTests.cs" />
     <Compile Include="BTreeStoreTests.cs" />
     <Compile Include="BTreeTests.cs" />
+    <Compile Include="StatisticsLogTests.cs" />
+    <Compile Include="StatsMonitorTests.cs" />
     <Compile Include="TestPaths.cs" />
     <Compile Include="DataObjectTests.cs" />
     <Compile Include="GenericLruCacheTests.cs" />

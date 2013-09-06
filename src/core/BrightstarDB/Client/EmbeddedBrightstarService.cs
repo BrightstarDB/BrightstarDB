@@ -668,6 +668,92 @@ namespace BrightstarDB.Client
             }
         }
 
+        /// <summary>
+        /// Retrieves the most recent statistics for the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for.</param>
+        /// <returns>A <see cref="IStoreStatistics"/> instance containing the most recent statistics for the named store, or NULL if
+        /// there are no statistics availabe for the store.</returns>
+        public IStoreStatistics GetStatistics(string storeName)
+        {
+            try
+            {
+                return _serverCore.GetStatistics(storeName).Select(
+                    s =>
+                    new StoreStatisticsWrapper(new StoreStatistics
+                        {
+                            CommitId = s.CommitNumber,
+                            CommitTimestamp = s.CommitTime,
+                            TotalTripleCount = s.TripleCount,
+                            PredicateTripleCounts = s.PredicateTripleCounts
+                        })
+                    ).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting statistics for store {0}", storeName);
+                throw new BrightstarClientException("Error getting statistics for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a range of statistics records for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for</param>
+        /// <param name="latest">The latest date to retrieve statistics for</param>
+        /// <param name="earlierst">The earliest date to retrieve statisitcs for</param>
+        /// <param name="skip">The offset into the date-filters list to return from</param>
+        /// <param name="take">The number of results to return</param>
+        /// <returns>An enumeration over the specified subset of statistics records for the store.</returns>
+        /// <exception cref="ArgumentException">Raised if <paramref name="skip"/> is less than 0 or <paramref name="take"/> is greater than 100.</exception>
+        public IEnumerable<IStoreStatistics> GetStatistics(string storeName, DateTime latest, DateTime earlierst,
+                                                           int skip, int take)
+        {
+            if (skip <0) throw new ArgumentOutOfRangeException("skip", Strings.BrightstarServiceClient_SkipMustNotBeNegative);
+            if (take > 100) throw new ArgumentOutOfRangeException("take", Strings.BrightstarServiceClient_GetStatistics_TakeTooLarge);
+            try
+            {
+                return _serverCore.GetStatistics(storeName)
+                                  .Where(s => s.CommitTime <= latest && s.CommitTime >= earlierst)
+                                  .Skip(skip)
+                                  .Take(take)
+                                  .Select(s => new StoreStatisticsWrapper(new StoreStatistics
+                                      {
+                                          CommitId = s.CommitNumber,
+                                          CommitTimestamp = s.CommitTime,
+                                          TotalTripleCount = s.TripleCount,
+                                          PredicateTripleCounts = s.PredicateTripleCounts
+                                      }));
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting statistics for store {0}",
+                                 storeName);
+                throw new BrightstarClientException(
+                    "Error getting statistics for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// Queues a job to update the statistics for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store whose statistics are to be updated</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
+        public IJobInfo UpdateStatistics(string storeName)
+        {
+            try
+            {
+                var jobId = _serverCore.UpdateStatistics(storeName);
+                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error queuing statistics update job for store {0}", storeName);
+                throw new BrightstarClientException(
+                    "Error queuing statistics update job for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
 
         /// <summary>
         /// Returns the commit point that was in effect at a given date/time
