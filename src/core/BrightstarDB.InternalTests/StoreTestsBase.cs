@@ -846,28 +846,29 @@ namespace BrightstarDB.InternalTests
             Thread.Sleep(100);
 
             var sid = Guid.NewGuid().ToString();
-            var store = StoreManager.CreateStore(Configuration.StoreLocation + "\\" + sid);
-            Assert.AreEqual(1, store.GetCommitPoints().Count());
+            using (var store = StoreManager.CreateStore(Configuration.StoreLocation + "\\" + sid))
+            {
+                Assert.AreEqual(1, store.GetCommitPoints().Count());
 
-            testTimestamps.Add(DateTime.UtcNow);
-            Thread.Sleep(100);
+                testTimestamps.Add(DateTime.UtcNow);
+                Thread.Sleep(100);
 
-            var t = new Triple
-                        {
-                            Subject = "http://www.networkedplanet.com/people/10",
-                            Predicate = "http://www.networkedplanet.com/model/isa",
-                            Object = "bob",
-                            DataType = RdfDatatypes.String,
-                            IsLiteral = true
-                        };
-            store.InsertTriple(t);
-            store.Commit(Guid.Empty);
-            Assert.AreEqual(2, store.GetCommitPoints().Count());
+                var t = new Triple
+                    {
+                        Subject = "http://www.networkedplanet.com/people/10",
+                        Predicate = "http://www.networkedplanet.com/model/isa",
+                        Object = "bob",
+                        DataType = RdfDatatypes.String,
+                        IsLiteral = true
+                    };
+                store.InsertTriple(t);
+                store.Commit(Guid.Empty);
+                Assert.AreEqual(2, store.GetCommitPoints().Count());
 
-            testTimestamps.Add(DateTime.UtcNow);
-            Thread.Sleep(100);
+                testTimestamps.Add(DateTime.UtcNow);
+                Thread.Sleep(100);
 
-            t = new Triple
+                t = new Triple
                     {
                         Subject = "http://www.networkedplanet.com/people/11",
                         Predicate = "http://www.networkedplanet.com/model/isa",
@@ -875,9 +876,10 @@ namespace BrightstarDB.InternalTests
                         DataType = RdfDatatypes.String,
                         IsLiteral = true
                     };
-            store.InsertTriple(t);
-            store.Commit(Guid.Empty);
-            Assert.AreEqual(3, store.GetCommitPoints().Count());
+                store.InsertTriple(t);
+                store.Commit(Guid.Empty);
+                Assert.AreEqual(3, store.GetCommitPoints().Count());
+            }
 
             testTimestamps.Add(DateTime.UtcNow);
             Thread.Sleep(100);

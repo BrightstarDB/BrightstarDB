@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
+using BrightstarDB.Rdf;
 using BrightstarDB.Server;
 using BrightstarDB.Storage;
 using NUnit.Framework;
@@ -71,6 +72,41 @@ namespace BrightstarDB.InternalTests
                     Assert.Fail("Export job failed with a transaction error. Message={0}. Exception Detail={1}", status.Information, status.ExceptionDetail);
                 }
             }
+        }
+
+        [Test]
+        public void TestStatsJob()
+        {
+            var sid = "StatsJob_" + DateTime.Now.Ticks;
+            using (var store = _storeManager.CreateStore(Configuration.StoreLocation + "\\" + sid))
+            {
+                store.InsertTriple("http://www.example.org/alice", "http://xmlns.org/foaf/0.1/knows",
+                                   "http://www.example.org/bob", false, null, null, Constants.DefaultGraphUri);
+                store.InsertTriple("http://www.example.org/alice", "http://xmlns.org/foaf/0.1/name", "Alice", true,
+                                   RdfDatatypes.String, null, Constants.DefaultGraphUri);
+                store.InsertTriple("http://www.example.org/bob", "http://xmlns.org/foaf/0.1/knows",
+                                   "http://www.example.org/alice", false, null, null, Constants.DefaultGraphUri);
+                store.Commit(Guid.NewGuid());
+            }
+
+            var storeWorker = new StoreWorker(Configuration.StoreLocation, sid);
+            storeWorker.Start();
+            var jobId = storeWorker.UpdateStatistics();
+            var status = storeWorker.GetJobStatus(jobId.ToString());
+            while (status.JobStatus != JobStatus.CompletedOk && status.JobStatus != JobStatus.TransactionError)
+            {
+                Thread.Sleep(1000);
+                status = storeWorker.GetJobStatus(jobId.ToString());
+            }
+            Assert.AreEqual(JobStatus.CompletedOk, status.JobStatus, "Expected UpdateStatsJob to complete OK");
+            var latestStats = storeWorker.StoreStatistics.GetStatistics().FirstOrDefault();
+            Assert.IsNotNull(latestStats);
+            Assert.AreEqual(3, latestStats.TripleCount);
+            Assert.AreEqual(2, latestStats.PredicateTripleCounts.Count);
+            Assert.IsTrue(latestStats.PredicateTripleCounts.ContainsKey("http://xmlns.org/foaf/0.1/knows"));
+            Assert.AreEqual(2, latestStats.PredicateTripleCounts["http://xmlns.org/foaf/0.1/knows"]);
+            Assert.IsTrue(latestStats.PredicateTripleCounts.ContainsKey("http://xmlns.org/foaf/0.1/name"));
+            Assert.AreEqual(1, latestStats.PredicateTripleCounts["http://xmlns.org/foaf/0.1/name"]);
         }
 
         [Test]

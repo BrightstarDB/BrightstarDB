@@ -418,5 +418,73 @@ namespace BrightstarDB.Service
                 throw new BrightstarClientException("Error getting commit points for store " + storeName + ". " + ex.Message, ex);
             }
         }
+
+        public StoreStatistics GetStatistics(string storeName)
+        {
+            try
+            {
+                return
+                    ServerCore.GetStatistics(storeName)
+                               .Select(
+                                   s =>
+                                   new StoreStatistics
+                                       {
+                                           CommitId = s.CommitNumber,
+                                           CommitTimestamp = s.CommitTime,
+                                           PredicateTripleCounts = s.PredicateTripleCounts,
+                                           TotalTripleCount = s.TripleCount
+                                       })
+                               .FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, 
+                    "Error getting statistics for store {0}", storeName);
+                throw new BrightstarClientException(
+                    "Error getting statistics for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        public IEnumerable<StoreStatistics> GetStatisticsInDateRange(string storeName, DateTime latest, DateTime earlierst, int skip, int take)
+        {
+            try
+            {
+                return ServerCore.GetStatistics(storeName)
+                                  .Where(s => s.CommitTime <= latest && s.CommitTime >= earlierst)
+                                  .Skip(skip)
+                                  .Take(take)
+                                  .Select(s =>
+                                          new StoreStatistics
+                                              {
+                                                  CommitId = s.CommitNumber,
+                                                  CommitTimestamp = s.CommitTime,
+                                                  PredicateTripleCounts = s.PredicateTripleCounts,
+                                                  TotalTripleCount = s.TripleCount
+                                              });
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException,
+                    "Error getting statistics for store {0}", storeName);
+                throw new BrightstarClientException(
+                    "Error getting statistics for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        public JobInfo UpdateStatistics(string storeName)
+        {
+            try
+            {
+                var jobId = ServerCore.UpdateStatistics(storeName);
+                return new JobInfo { JobId = jobId.ToString(), JobPending = true };
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException,
+                    "Error starting statistics update for store {0}", storeName);
+                throw new BrightstarClientException(
+                    "Error starting statistics update for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
     }
 }

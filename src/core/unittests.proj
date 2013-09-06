@@ -7,40 +7,45 @@
 	<PropertyGroup>
 		<NUnitPath Condition=" '$(NUnitPath)' == '' ">C:\Program Files (x86)\NUnit 2.6.2\bin</NUnitPath>
 	</PropertyGroup>
+    
 	<ItemGroup>
-		<TestResults Include="*.trx" />
+		<TestResults Include="TestResults\*.xml" />
 	</ItemGroup>
 	
 	<Target Name="CleanResults">
 		<Delete Files="@(TestResults)" />
 	</Target>
 
-	<Target Name="EntityFramework">
+    <Target Name="ResultsDir">
+        <MakeDir Directories="TestResults"/>
+    </Target>
+    
+	<Target Name="EntityFramework" DependsOnTargets="ResultsDir">
 		<NUnit Assemblies="BrightstarDB.EntityFramework.Tests\bin\Debug\BrightstarDB.EntityFramework.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.EntityFramework.Tests.xml" />
 	</Target>
 
-	<Target Name="Internal">
+	<Target Name="Internal" DependsOnTargets="ResultsDir">
 		<NUnit Assemblies="BrightstarDB.InternalTests\bin\Debug\BrightstarDB.InternalTests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.InternalTests.xml" />
 	</Target>
 
-	<Target Name="OData">
+	<Target Name="OData" DependsOnTargets="ResultsDir">
 		<NUnit Assemblies="BrightstarDB.OData.Tests\bin\Debug\BrightstarDB.OData.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.OData.Tests.xml" />
 	</Target>
 
 
-	<Target Name="Core">
+	<Target Name="Core" DependsOnTargets="ResultsDir">
 		<NUnit Assemblies="BrightstarDB.Tests\bin\Debug\BrightstarDB.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.Tests.xml" />
 	</Target>
 
-	<Target Name="Build" DependsOnTargets="CleanResults;EntityFramework;Internal;OData;Core">
+	<Target Name="Build" DependsOnTargets="CleanResults;Internal;Core;EntityFramework;OData">
 	</Target>
 	
 	<Target Name="Performance" DependsOnTargets="CleanResults">

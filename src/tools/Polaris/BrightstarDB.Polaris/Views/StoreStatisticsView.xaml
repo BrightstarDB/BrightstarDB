@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="BrightstarDB.Polaris.Views.StoreStatisticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Style x:Key="PaddedTextBlock" TargetType="TextBlock">
+            <Setter Property="Padding" Value="3"/>
+        </Style>
+        <Style x:Key="PaddedButton" TargetType="Button">
+            <Setter Property="Padding" Value="6"/>
+        </Style>
+        <Style x:Key="PropertyLabel" TargetType="TextBlock" BasedOn="{StaticResource PaddedTextBlock}">
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style x:Key="PropertyValue" TargetType="TextBlock" BasedOn="{StaticResource PaddedTextBlock}">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="White"></SolidColorBrush>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+          <Grid.RowDefinitions>
+              <RowDefinition Height="Auto"></RowDefinition>
+              <RowDefinition Height="*"></RowDefinition>
+              <RowDefinition Height="Auto"></RowDefinition>
+          </Grid.RowDefinitions>  
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource PropertyLabel}">Commit #</TextBlock>
+            <TextBlock Grid.Column="1" Text="{Binding Path=Statistics.CommitId, Mode=OneWay}" Style="{StaticResource PropertyValue}"/>
+            
+            <TextBlock Grid.Row="1" Style="{StaticResource PropertyLabel}">Created</TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Path=Statistics.CommitTimestamp, Mode=OneWay}" Style="{StaticResource PropertyValue}"/>
+            
+            <TextBlock Grid.Row="2" Style="{StaticResource PropertyLabel}">Total Triple Count</TextBlock>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Path=Statistics.TotalTripleCount, Mode=OneWay}" Style="{StaticResource PropertyValue}"/>
+        </Grid>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding Path=Statistics.PredicateTripleCounts, Mode=OneWay}" 
+                  CanUserAddRows="False" CanUserDeleteRows="False" 
+                  CanUserReorderColumns="True" CanUserResizeColumns="True"
+                  CanUserResizeRows="True" CanUserSortColumns="True"/>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding SummaryMessage}" Style="{StaticResource PropertyValue}"></TextBlock>
+            <Button Grid.Column="1" Content="Update Stats" Style="{StaticResource PaddedButton}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <Command:EventToCommand Command="{Binding UpdateStatsCommand, Mode=OneWay}" PassEventArgsToCommand="True"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>

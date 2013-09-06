@@ -37,6 +37,7 @@
         ExportDataError = 412, // Indicates an error while exporting data from a store
         ImportDataError = 413,
         ParserWarning = 414, // A non-fatal parser issue
+        StatsUpdateError = 415, // An error while updating store statistics
         CachingError = 420,
 
         // ServerRunner errors 500 - 599

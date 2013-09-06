@@ -647,8 +647,14 @@ namespace BrightstarDB.Tests
             var client = GetClient();
             client.CreateStore(storeName);
             var job = client.ConsolidateStore(storeName);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk, "Job did not complete successfully: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
+        }
+
+        private static IJobInfo WaitForJob(IJobInfo job, IBrightstarService client, string storeName)
+        {
             var cycleCount = 0;
-            while(!job.JobCompletedOk && !job.JobCompletedWithErrors && cycleCount < 100)
+            while (!job.JobCompletedOk && !job.JobCompletedWithErrors && cycleCount < 100)
             {
                 Thread.Sleep(500);
                 cycleCount++;
@@ -658,7 +664,7 @@ namespace BrightstarDB.Tests
             {
                 Assert.Fail("Job did not complete in time.");
             }
-            Assert.IsTrue(job.JobCompletedOk, "Job did not complete successfully: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
+            return job;
         }
 
         [Test]
@@ -867,6 +873,36 @@ namespace BrightstarDB.Tests
             AssertTriplePatternNotInDefaultGraph(client, storeName,
                                        @"<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> ""Bob""");
             
+        }
+
+        [Test]
+        public void TestGenerateAndRetrieveStats()
+        {
+            var client = GetClient();
+            var storeName = "GenerateAndRetrieveStats_" + DateTime.Now.Ticks;
+            client.CreateStore(storeName);
+
+            var txn1Adds = new StringBuilder();
+            txn1Adds.AppendLine(@"<http://example.org/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .");
+            txn1Adds.AppendLine(
+                @"<http://example.org/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"" <http://example.org/graphs/alice> .");
+            txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
+            txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/mbox> ""bob@example.org"" .");
+
+            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
+            Assert.IsTrue(result.JobCompletedOk);
+
+            var stats = client.GetStatistics(storeName);
+            Assert.IsNull(stats);
+
+            var job = client.UpdateStatistics(storeName);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+
+            stats = client.GetStatistics(storeName);
+            Assert.IsNotNull(stats);
+            Assert.AreEqual(4, stats.TotalTripleCount);
+            Assert.AreEqual(2, stats.PredicateTripleCounts.Count);
         }
 
         private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,

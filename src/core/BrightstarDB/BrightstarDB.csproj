@@ -135,7 +135,9 @@
     <Compile Include="Client\EmbeddedBrightstarService.cs" />
     <Compile Include="Client\IBrightStarService.cs" />
     <Compile Include="Client\ICommitPointInfo.cs" />
+    <Compile Include="Client\ICommitPointStats.cs" />
     <Compile Include="Client\IJobInfo.cs" />
+    <Compile Include="Client\IStoreStatistics.cs" />
     <Compile Include="Client\ITransactionInfo.cs" />
     <Compile Include="Client\JobInfoWrapper.cs" />
     <Compile Include="Client\NamedPipeDataObjectContext.cs" />
@@ -149,9 +151,12 @@
     <Compile Include="Client\RestDataObjectStore.cs" />
     <Compile Include="Client\RestJobInfo.cs" />
     <Compile Include="Client\SignatureType.cs" />
+    <Compile Include="Client\StoreStatisticsWrapper.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
+    <Compile Include="Server\StatsMonitor.cs" />
+    <Compile Include="Server\UpdateStatsJob.cs" />
     <Compile Include="SparqlResultsFormat.cs" />
     <Compile Include="Client\TransactionInfoWrapper.cs" />
     <Compile Include="Client\TransactionPreconditionsFailedException.cs" />
@@ -315,6 +320,7 @@
     <Compile Include="Storage\BPlusTreeStore\ResourceTable.cs" />
     <Compile Include="Storage\BPlusTreeStore\InternalNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\LeafNode.cs" />
+    <Compile Include="Storage\Statistics\PersistentStatisticsLog.cs" />
     <Compile Include="Storage\IPrefixManager.cs" />
     <Compile Include="Storage\BPlusTreeStore\Store.cs" />
     <Compile Include="Storage\BTreeStore\AbstractStoreManager.cs" />
@@ -351,6 +357,7 @@
     <Compile Include="Storage\InvalidWriteOffsetException.cs" />
     <Compile Include="Storage\IPersistenceManager.cs" />
     <Compile Include="Storage\IStore.cs" />
+    <Compile Include="Storage\IStoreStatisticsLog.cs" />
     <Compile Include="Storage\ITransactionInfo.cs" />
     <Compile Include="Storage\ITransactionLog.cs" />
     <Compile Include="Storage\MasterFile.cs" />
@@ -397,10 +404,13 @@
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\ShortLiteralResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\ShortUriResource.cs" />
     <Compile Include="Storage\SerializationUtils.cs" />
+    <Compile Include="Storage\Statistics\StoreStatisticsHeaderRecord.cs" />
+    <Compile Include="Storage\Statistics\StoreStatisticsRecord.cs" />
     <Compile Include="Storage\StoreConfiguration.cs" />
     <Compile Include="Storage\StoreConstants.cs" />
     <Compile Include="Storage\StoreManagerException.cs" />
     <Compile Include="Storage\StoreManagerFactory.cs" />
+    <Compile Include="Storage\Statistics\StoreStatistics.cs" />
     <Compile Include="Storage\StoreType.cs" />
     <Compile Include="Storage\TransactionInfoEnumerator.cs" />
     <Compile Include="Storage\TransactionLog\PersistentTransactionLog.cs" />

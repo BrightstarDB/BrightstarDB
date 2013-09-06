@@ -270,4 +270,7 @@ You currently have no connections defined. Would you like to create a new connec
   <data name="NoConnectionsTitle" xml:space="preserve">
     <value>No Connections Defined</value>
   </data>
+  <data name="StatisticsTabDefaultTitle" xml:space="preserve">
+    <value>{0} Statistics</value>
+  </data>
 </root>

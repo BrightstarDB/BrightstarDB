@@ -127,6 +127,23 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
             }
         }
 
+        public IEnumerable<ulong> EnumeratePredicates(BrightstarProfiler profiler)
+        {
+            return Scan(0ul, ulong.MaxValue, profiler).Select(entry => entry.Key);
+        }
+
+        public ulong CountPredicateRelationships(ulong predicateId, BrightstarProfiler profiler)
+        {
+            PredicateRelatedResourceIndex predicateIndex = GetPredicateIndex(predicateId, profiler);
+            if (predicateIndex != null)
+            {
+                return (ulong)predicateIndex.Scan(MakePredicateIndexKey(0, 0, 0),
+                                    MakePredicateIndexKey(ulong.MaxValue, int.MaxValue, ulong.MaxValue), profiler)
+                              .LongCount();
+            }
+            return 0UL;
+        }
+
         /// <summary>
         /// Enumerates all of the related resources stored for a single predicate
         /// </summary>

@@ -523,6 +523,49 @@ namespace BrightstarDB.Client
             }
         }
 
+        public IStoreStatistics GetStatistics(string storeName)
+        {
+            ValidateStoreName(storeName);
+            try
+            {
+                var toWrap = _service.GetStatistics(storeName);
+                return toWrap == null ? null : new StoreStatisticsWrapper(toWrap);
+            }
+            catch (FaultException<ExceptionDetail> fault)
+            {
+                throw new BrightstarClientException(fault);
+            }
+        }
+
+        public IEnumerable<IStoreStatistics> GetStatistics(string storeName, DateTime latest, DateTime earlierst, int skip, int take)
+        {
+            ValidateStoreName(storeName);
+            if (skip < 0) throw new ArgumentOutOfRangeException("skip", Strings.BrightstarServiceClient_SkipMustNotBeNegative);
+            if (take > 100) throw new ArgumentOutOfRangeException("take", Strings.BrightstarServiceClient_GetStatistics_TakeTooLarge);
+            try
+            {
+                return _service.GetStatisticsInDateRange(storeName, latest, earlierst, skip, take).Select(
+                    x => new StoreStatisticsWrapper(x));
+            }
+            catch (FaultException<ExceptionDetail> fault)
+            {
+                throw new BrightstarClientException(fault);
+            }
+        }
+
+        public IJobInfo UpdateStatistics(string storeName)
+        {
+            ValidateStoreName(storeName);
+            try
+            {
+                return new JobInfoWrapper(_service.UpdateStatistics(storeName));
+            }
+            catch (FaultException<ExceptionDetail> fault)
+            {
+                throw new BrightstarClientException(fault);
+            }
+        }
+
 
         /// <summary>
         /// Returns the commit point that was in effect at a given date/time

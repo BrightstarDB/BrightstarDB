@@ -653,6 +653,16 @@ namespace BrightstarDB.Storage.BTreeStore
             }
         }
 
+        public IEnumerable<string> GetPredicates(BrightstarProfiler profiler = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ulong GetTripleCount(string predicateUri, BrightstarProfiler profiler = null)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// All persisted objects both data and index are given a unique integer id.
         /// </summary>

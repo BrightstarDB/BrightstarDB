@@ -83,6 +83,7 @@ namespace BrightstarDB.Polaris.ViewModel
             ServerCreateStoreCommand = new RelayCommand<Connection>(ServerCreateStore);
             StoreDeleteCommand = new RelayCommand<Store>(StoreDelete);
             NewHistoryViewCommand = new RelayCommand<Store>(NewHistoryView);
+            NewStatisticsViewCommand = new RelayCommand<Store>(NewStatisticsView);
             AboutClickCommand = new RelayCommand(About);
             ExitCommand = new RelayCommand(Exit);
             PrefixSettingsCommand = new RelayCommand(PrefixSettings);
@@ -105,6 +106,7 @@ namespace BrightstarDB.Polaris.ViewModel
         public RelayCommand<Connection> ServerCreateStoreCommand { get; private set; }
         public RelayCommand<Store> StoreDeleteCommand { get; private set; }
         public RelayCommand<Store> NewHistoryViewCommand { get; private set; }
+        public RelayCommand<Store> NewStatisticsViewCommand { get; private set; }
         public RelayCommand AboutClickCommand { get; private set; }
         public RelayCommand ExitCommand { get; private set; }
         public RelayCommand PrefixSettingsCommand { get; private set; }
@@ -265,6 +267,16 @@ namespace BrightstarDB.Polaris.ViewModel
                                                         historyView);
             tabItemViewModel.Toolbars.Add("SparqlQueryToolbar");
             tabItemViewModel.Toolbars.Add("HistoryToolbar");
+            TabItems.Add(tabItemViewModel);
+            Messenger.Default.Send(new SelectTabMessage(tabItemViewModel));
+        }
+
+        public void NewStatisticsView(Store s)
+        {
+            var viewModel = new StoreStatisticsViewModel(s);
+            var statisticsView = new StoreStatisticsView {DataContext = viewModel};
+            var tabItemViewModel = new TabItemViewModel(String.Format(Strings.StatisticsTabDefaultTitle, s.Location),
+                                                        statisticsView);
             TabItems.Add(tabItemViewModel);
             Messenger.Default.Send(new SelectTabMessage(tabItemViewModel));
         }

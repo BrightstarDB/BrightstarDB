@@ -126,5 +126,20 @@ namespace BrightstarDB.Storage
         void DeleteGraph(string graphUri);
         void DeleteGraphs(IEnumerable<string> graphUris);
         void Close();
+
+        /// <summary>
+        /// Returns an enumeration over the unique predicate URIs in the store
+        /// </summary>
+        /// <param name="profiler"></param>
+        /// <returns></returns>
+        IEnumerable<string> GetPredicates(BrightstarProfiler profiler = null);
+
+        /// <summary>
+        /// Counts the total number of triples with the specified predicate in the store.
+        /// </summary>
+        /// <param name="predicateUri">The predicate URI to count triples for</param>
+        /// <param name="profiler"></param>
+        /// <returns>The number of triples matching the specified predicate</returns>
+        ulong GetTripleCount(string predicateUri, BrightstarProfiler profiler = null);
     }
 }

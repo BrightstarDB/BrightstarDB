@@ -438,6 +438,23 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             _resourceTable.Dispose();
         }
 
+        public IEnumerable<string> GetPredicates(BrightstarProfiler profiler = null)
+        {
+            return
+                from resource in
+                    _subjectRelatedResourceIndex.EnumeratePredicates(profiler)
+                                                .Select(rid => _resourceIndex.GetResource(rid))
+                where resource != null && !resource.IsLiteral
+                select _prefixManager.ResolvePrefixedUri(resource.Value);
+        }
+
+        public ulong GetTripleCount(string predicateUri, BrightstarProfiler profiler = null)
+        {
+            var predicateId = _resourceIndex.GetResourceId(_prefixManager.MakePrefixedUri(predicateUri));
+            if (predicateId == StoreConstants.NullUlong) return 0L;
+            return _subjectRelatedResourceIndex.CountPredicateRelationships(predicateId, profiler);
+        }
+
         #endregion
 
         #region Serialization
