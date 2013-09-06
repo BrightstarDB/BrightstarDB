@@ -11,7 +11,7 @@ namespace BrightstarDB.Tests.EntityFramework
         private MyEntityContext _context;
 
         [TestFixtureSetUp]
-        public void SetUp(TestContext context)
+        public void SetUp()
         {
             _context = new MyEntityContext("type=embedded;storesDirectory=" + Configuration.StoreLocation + ";storeName=EFStringComparisonTests_" + DateTime.Now.Ticks);
             var np = new Company {Name = "NetworkedPlanet"};
