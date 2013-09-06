@@ -233,6 +233,63 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             _persistenceManager.DeleteFile(tempFileName);
         }
 
+
+        public void CreateSnapshot(string srcStoreLocation, string destStoreLocation,
+                                   PersistenceType storePersistenceType, ulong commitPointId = StoreConstants.NullUlong)
+        {
+            Logging.LogInfo("Snapshot store {0} to new store {1} with persistence type {2}", srcStoreLocation,
+                            destStoreLocation, storePersistenceType);
+            if (_persistenceManager.DirectoryExists(destStoreLocation))
+            {
+                throw new StoreManagerException(destStoreLocation, "Store already exists");
+            }
+
+            // Open the source store for reading
+            using (IStore srcStore = commitPointId == StoreConstants.NullUlong
+                                         ? OpenStore(srcStoreLocation, true)
+                                         : OpenStore(srcStoreLocation, commitPointId))
+            {
+
+                // Create the directory for the destination store
+                _persistenceManager.CreateDirectory(destStoreLocation);
+
+                // Create empty data file
+                var dataFilePath = Path.Combine(destStoreLocation, DataFileName);
+                _persistenceManager.CreateFile(dataFilePath);
+
+                // Create initial master file
+                var destMasterFile = MasterFile.Create(_persistenceManager, destStoreLocation, _storeConfiguration,
+                                                       Guid.NewGuid());
+
+                // Copy resource files from source store
+                var resourceFilePath = Path.Combine(destStoreLocation, ResourceFileName);
+                _persistenceManager.CopyFile(Path.Combine(srcStoreLocation, ResourceFileName), resourceFilePath, true);
+
+                // Initialize data page store
+                IPageStore destPageStore = null;
+                switch (storePersistenceType)
+                {
+                    case PersistenceType.AppendOnly:
+                        destPageStore = new AppendOnlyFilePageStore(_persistenceManager, dataFilePath, PageSize, false,
+                                                                    _storeConfiguration.DisableBackgroundWrites);
+                        break;
+                    case PersistenceType.Rewrite:
+                        destPageStore = new BinaryFilePageStore(_persistenceManager, dataFilePath, PageSize, false, 0);
+                        break;
+                    default:
+                        throw new BrightstarInternalException("Unrecognized target store type: " + storePersistenceType);
+                }
+                
+                // Copy Data
+                ulong destStorePageId = srcStore.CopyTo(destPageStore, 1ul);
+
+                destPageStore.Close();
+
+                destMasterFile.AppendCommitPoint(
+                    new CommitPoint(destStorePageId, 1ul, DateTime.UtcNow, Guid.Empty), true);
+            }
+        }
+
         #endregion
 
     }

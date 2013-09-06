@@ -91,5 +91,13 @@ namespace BrightstarDB.Storage
         /// <param name="sourceFileName">The name of the file to be renamed</param>
         /// <param name="destinationFileName">The new file name</param>
         void RenameFile(string sourceFileName, string destinationFileName);
+
+        /// <summary>
+        /// Creates a copy of a file
+        /// </summary>
+        /// <param name="sourceFilePath">The path to the file to be copied</param>
+        /// <param name="destinationFilePath">The path to the file to be created by the copy</param>
+        /// <param name="overwrite">Flag indicating if the method should overwrite an existing file or throw an exception</param>
+        void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite);
     }
 }

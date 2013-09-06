@@ -378,6 +378,28 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 new CommitPoint(storePage.Id, txnId, DateTime.UtcNow, jobId), true);
         }
 
+        /// <summary>
+        /// Copies all the indexes from this store to the specified target page store
+        /// </summary>
+        /// <param name="pageStore">The page store to copy to</param>
+        /// <param name="txnId">The transaction Id to use in the target page store for the write</param>
+        /// <returns>The ID of the root store page in the target page store</returns>
+        public ulong CopyTo(IPageStore pageStore, ulong txnId)
+        {
+            var graphIndexId = _graphIndex.Write(pageStore, txnId, null);
+            var prefixManagerId = _prefixManager.Write(pageStore, txnId, null);
+            var resourceIndexId = _resourceIndex.Write(pageStore, txnId, null);
+            var subjectRelatedResourceIndexId = _subjectRelatedResourceIndex.Write(pageStore, txnId, null);
+            var objectRelatedResourceIndexId = _objectRelatedResourceIndex.Write(pageStore, txnId, null);
+            var buff = CreateStoreHeader(graphIndexId, prefixManagerId, resourceIndexId, subjectRelatedResourceIndexId,
+                                         objectRelatedResourceIndexId);
+            var storePage = pageStore.Create(txnId);
+            storePage.SetData(buff);
+            storePage.SetData(buff, 0, 128);
+            pageStore.Commit(txnId, null);
+            return storePage.Id;
+        }
+
         public void CopyGraph(string srcGraphUri, string targetGraphUri)
         {
             // Clear out existing data in target graph (if any) by deleting the graph entry itself

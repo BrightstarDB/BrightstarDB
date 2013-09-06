@@ -128,6 +128,11 @@ namespace BrightstarDB.Storage.Persistence
            _isolatedStorage.MoveFile(storeConsolidateFile, storeDataFile);
         }
 
+        public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite)
+        {
+            _isolatedStorage.CopyFile(sourceFilePath, destinationFilePath, overwrite);
+        }
+
         #endregion
 
         #region Implementation of IDisposable

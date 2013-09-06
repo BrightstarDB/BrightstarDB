@@ -5,6 +5,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Model;
 using BrightstarDB.Profiling;
 using BrightstarDB.Query;
+using BrightstarDB.Storage.Persistence;
 
 namespace BrightstarDB.Storage
 {
@@ -102,6 +103,14 @@ namespace BrightstarDB.Storage
         /// </summary>
         /// <param name="jobId"></param>
         void Consolidate(Guid jobId);
+
+        /// <summary>
+        /// Copies all the indexes from this store to the specified target page store
+        /// </summary>
+        /// <param name="pageStore">The page store to copy to</param>
+        /// <param name="txnId">The transaction Id to use in the target page store for the write</param>
+        /// <returns>The ID of the root store page created in the target page store</returns>
+        ulong CopyTo(IPageStore pageStore, ulong txnId);
 
         /// <summary>
         /// Clear out any existing data in the target graph, then copy all triples from the source graph to the target graph
