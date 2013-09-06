@@ -428,9 +428,17 @@ namespace BrightstarDB.Server
 
         private void InitializeStatsMonitor()
         {
-            var lastStats = _storeStatisticsLog.GetStatistics().FirstOrDefault();
-            var lastCommitPoint = ReadStore.GetCommitPoints().FirstOrDefault();
-            _statsMonitor.Initialize(lastStats, lastCommitPoint == null  ? 0 : lastCommitPoint.CommitNumber, ()=>UpdateStatistics());
+            if (Configuration.StatsUpdateTimespan > 0 || Configuration.StatsUpdateTransactionCount > 0)
+            {
+                var lastStats = _storeStatisticsLog.GetStatistics().FirstOrDefault();
+                CommitPoint lastCommitPoint;
+                using (var readStore = _storeManager.OpenStore(_storeLocation, true))
+                {
+                    lastCommitPoint = readStore.GetCommitPoints().FirstOrDefault();
+                }
+                _statsMonitor.Initialize(lastStats, lastCommitPoint == null ? 0 : lastCommitPoint.CommitNumber,
+                                         () => UpdateStatistics());
+            }
         }
     }
 }
