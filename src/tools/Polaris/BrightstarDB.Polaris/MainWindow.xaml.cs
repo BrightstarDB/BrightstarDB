@@ -317,5 +317,12 @@ namespace BrightstarDB.Polaris
             var mvm = DataContext as MainViewModel;
             mvm.ServerEdit(serverConnection);
         }
+
+        private void HandleStatisticsCMClick(object sender, RoutedEventArgs e)
+        {
+            var serverConnection = (sender as MenuItem).DataContext as Store;
+            var mvm = DataContext as MainViewModel;
+            mvm.NewStatisticsView(serverConnection);
+        }
     }
 }

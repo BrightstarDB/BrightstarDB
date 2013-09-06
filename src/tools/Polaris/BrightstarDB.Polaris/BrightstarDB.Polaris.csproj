@@ -120,9 +120,12 @@
     <Compile Include="ViewModel\ExportViewModel.cs" />
     <Compile Include="ViewModel\ImportViewModel.cs" />
     <Compile Include="ViewModel\Connection.cs" />
+    <Compile Include="ViewModel\PredicateTripleCountViewModel.cs" />
     <Compile Include="ViewModel\SparqlQueryException.cs" />
     <Compile Include="ViewModel\SparqlUpdateException.cs" />
     <Compile Include="ViewModel\SparqlUpdateViewModel.cs" />
+    <Compile Include="ViewModel\StatisticsViewModel.cs" />
+    <Compile Include="ViewModel\StoreStatisticsViewModel.cs" />
     <Compile Include="ViewModel\StoreAnalysisModel.cs" />
     <Compile Include="ViewModel\AnalysisViewModel.cs" />
     <Compile Include="ViewModel\BTreeAnalysisModel.cs" />
@@ -162,6 +165,9 @@
     </Compile>
     <Compile Include="Views\StorePropertiesDialog.xaml.cs">
       <DependentUpon>StorePropertiesDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StoreStatisticsView.xaml.cs">
+      <DependentUpon>StoreStatisticsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TransactionView.xaml.cs">
       <DependentUpon>TransactionView.xaml</DependentUpon>
@@ -211,6 +217,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\StorePropertiesDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StoreStatisticsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
