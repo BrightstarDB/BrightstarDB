@@ -754,6 +754,36 @@ namespace BrightstarDB.Client
             }
         }
 
+        /// <summary>
+        /// Queues a job to create a snapshot of a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to take a snapshot of</param>
+        /// <param name="targetStoreName">The name of the store to be created to receive the snapshot</param>
+        /// <param name="persistenceType">The type of persistence to use for the target store</param>
+        /// <param name="sourceCommitPoint">OPTIONAL: the commit point in the source store to take a snapshot from</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
+        public IJobInfo CreateSnapshot(string storeName, string targetStoreName,
+                                       PersistenceType persistenceType,
+                                       ICommitPointInfo sourceCommitPoint = null)
+        {
+            try
+            {
+                var jobId = _serverCore.CreateSnapshot(storeName, targetStoreName,
+                                                       persistenceType,
+                                                       sourceCommitPoint == null
+                                                           ? StoreConstants.NullUlong
+                                                           : sourceCommitPoint.Id);
+                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error queuing snapshot job for store {0}",
+                                 storeName);
+                throw new BrightstarClientException(
+                    "Error queuing snapshot job for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
 
         /// <summary>
         /// Returns the commit point that was in effect at a given date/time

@@ -42,6 +42,9 @@ namespace BrightstarDB.Server
         // store name
         private readonly string _storeName;
 
+        // store directory location
+        private readonly string _baseLocation;
+
         // store location
         private readonly string _storeLocation;
 
@@ -78,6 +81,7 @@ namespace BrightstarDB.Server
         /// <param name="storeName">Name of store</param>
         public StoreWorker(string baseLocation, string storeName)
         {
+            _baseLocation = baseLocation;
             _storeName = storeName;
             _storeLocation = Path.Combine(baseLocation, storeName);
             Logging.LogInfo("StoreWorker created with location {0}", _storeLocation);
@@ -268,7 +272,7 @@ namespace BrightstarDB.Server
             }
         }
 
-        public void QueueJob(Job job)
+        public void QueueJob(Job job, bool incrementTransactionCount = true)
         {
             Logging.LogDebug("Queueing Job Id {0}", job.JobId);
             bool queuedJob = false;
@@ -281,7 +285,7 @@ namespace BrightstarDB.Server
                     _jobs.Enqueue(job);
                     queuedJob = true;
                     Logging.LogDebug("Queued Job Id {0}", job.JobId);
-                    _statsMonitor.OnJobScheduled();
+                    _statsMonitor.OnJobScheduled(incrementTransactionCount);
                 }
             }
         }
@@ -351,6 +355,20 @@ namespace BrightstarDB.Server
             var job = new UpdateStatsJob(jobId, this);
             QueueJob(job);
             return jobId;
+        }
+
+        public Guid QueueSnapshotJob(string destinationStoreName, PersistenceType persistenceType, ulong commitPointId = StoreConstants.NullUlong)
+        {
+            Logging.LogDebug("QueueSnapshotJob {0}, {1}", destinationStoreName, commitPointId);
+            var jobId = Guid.NewGuid();
+            var snapshotJob = new SnapshotJob(jobId, this, destinationStoreName, persistenceType, commitPointId);
+            QueueJob(snapshotJob, false);
+            return jobId;
+        }
+
+        internal void CreateSnapshot(string destinationStoreName, PersistenceType persistenceType, ulong commitPointId)
+        {
+            _storeManager.CreateSnapshot(_storeLocation, Path.Combine(_baseLocation, destinationStoreName), persistenceType, commitPointId);
         }
 
         public IEnumerable<Triple> GetResourceStatements(string resourceUri)

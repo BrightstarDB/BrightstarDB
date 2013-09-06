@@ -905,6 +905,46 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(2, stats.PredicateTripleCounts.Count);
         }
 
+        [Test]
+        public void TestCreateSnapshot()
+        {
+            var storeName = "CreateSnapshot_" + DateTime.Now.Ticks;
+            var client = GetClient();
+            client.CreateStore(storeName);
+            const string addSet1 = "<http://example.org/people/alice> <http://www.w3.org/2000/01/rdf-schema#label> \"Alice\".";
+            const string addSet2 = "<http://example.org/people/bob> <http://www.w3.org/2000/01/rdf-schema#label> \"Bob\".";
+            const string addSet3 = "<http://example.org/people/carol> <http://www.w3.org/2000/01/rdf-schema#label> \"Carol\".";
+            var result = client.ExecuteTransaction(storeName, null, null, addSet1);
+            Assert.IsTrue(result.JobCompletedOk);
+            result = client.ExecuteTransaction(storeName, null, null, addSet2);
+            Assert.IsTrue(result.JobCompletedOk);
+            result = client.ExecuteTransaction(storeName, null, null, addSet3);
+            Assert.IsTrue(result.JobCompletedOk);
+
+            var resultsStream = client.ExecuteQuery(storeName, "SELECT * WHERE {?s ?p ?o}");
+            resultsStream.Close();
+
+            // Create a snapshot with default (latest) commit point
+            var job = client.CreateSnapshot(storeName, storeName + "_snapshot1", PersistenceType.AppendOnly);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+
+            resultsStream = client.ExecuteQuery(storeName + "_snapshot1", "SELECT * WHERE { ?s ?p ?o }");
+            var resultsDoc = XDocument.Load(resultsStream);
+            Assert.AreEqual(3, resultsDoc.SparqlResultRows().Count());
+
+            var commitPoints = client.GetCommitPoints(storeName, 0, 2).ToList();
+            Assert.AreEqual(2, commitPoints.Count);
+
+            job = client.CreateSnapshot(storeName, storeName + "_snapshot2", PersistenceType.AppendOnly, commitPoints[1]);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+
+            resultsStream = client.ExecuteQuery(storeName + "_snapshot2", "SELECT * WHERE {?s ?p ?o}");
+            resultsDoc = XDocument.Load(resultsStream);
+            Assert.AreEqual(2, resultsDoc.SparqlResultRows().Count());
+        }
+
         private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
                                               string graphUri)
         {

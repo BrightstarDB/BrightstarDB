@@ -566,6 +566,33 @@ namespace BrightstarDB.Client
             }
         }
 
+        public IJobInfo CreateSnapshot(string storeName, string targetStoreName, PersistenceType persistenceType,
+                                       ICommitPointInfo sourceCommitPoint = null)
+        {
+            ValidateStoreName(storeName);
+            ValidateStoreName(targetStoreName);
+            try
+            {
+                if (sourceCommitPoint == null)
+                {
+                    return new JobInfoWrapper(_service.CreateSnapshot(storeName, targetStoreName, persistenceType, null));
+                }
+                return
+                    new JobInfoWrapper(_service.CreateSnapshot(storeName, targetStoreName, persistenceType,
+                                                               new CommitPointInfo
+                                                                   {
+                                                                       Id = sourceCommitPoint.Id,
+                                                                       StoreName = sourceCommitPoint.StoreName,
+                                                                       CommitTime = sourceCommitPoint.CommitTime,
+                                                                       JobId = sourceCommitPoint.JobId
+                                                                   }));
+            }
+            catch (FaultException<ExceptionDetail> fault)
+            {
+                throw new BrightstarClientException(fault);
+            }
+        }
+
 
         /// <summary>
         /// Returns the commit point that was in effect at a given date/time

@@ -616,6 +616,14 @@ namespace BrightstarDB.Client
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/UpdateStatistics", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/UpdateStatisticsRespo" +
             "nse")]
         System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> UpdateStatisticsAsync(string storeName);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/CreateSnapshot", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/CreateSnapshotRespons" +
+            "e")]
+        BrightstarDB.Client.JobInfo CreateSnapshot(string sourceStoreName, string targetStoreName, BrightstarDB.Storage.PersistenceType storePersistenceType, BrightstarDB.Client.CommitPointInfo sourceCommitPoint);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/CreateSnapshot", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/CreateSnapshotRespons" +
+            "e")]
+        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> CreateSnapshotAsync(string sourceStoreName, string targetStoreName, BrightstarDB.Storage.PersistenceType storePersistenceType, BrightstarDB.Client.CommitPointInfo sourceCommitPoint);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -870,6 +878,16 @@ namespace BrightstarDB.Client
         public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> UpdateStatisticsAsync(string storeName)
         {
             return base.Channel.UpdateStatisticsAsync(storeName);
+        }
+        
+        public BrightstarDB.Client.JobInfo CreateSnapshot(string sourceStoreName, string targetStoreName, BrightstarDB.Storage.PersistenceType storePersistenceType, BrightstarDB.Client.CommitPointInfo sourceCommitPoint)
+        {
+            return base.Channel.CreateSnapshot(sourceStoreName, targetStoreName, storePersistenceType, sourceCommitPoint);
+        }
+        
+        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> CreateSnapshotAsync(string sourceStoreName, string targetStoreName, BrightstarDB.Storage.PersistenceType storePersistenceType, BrightstarDB.Client.CommitPointInfo sourceCommitPoint)
+        {
+            return base.Channel.CreateSnapshotAsync(sourceStoreName, targetStoreName, storePersistenceType, sourceCommitPoint);
         }
     }
 }
