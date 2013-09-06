@@ -507,6 +507,19 @@ namespace BrightstarDB.Client
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Queues a job to create a snapshot of a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to take a snapshot of</param>
+        /// <param name="targetStoreName">The name of the store to be created to receive the snapshot</param>
+        /// <param name="persistenceType">The type of persistence to use for the target store</param>
+        /// <param name="sourceCommitPoint">OPTIONAL: the commit point in the source store to take a snapshot from</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
+        public IJobInfo CreateSnapshot(string storeName, string targetStoreName, PersistenceType persistenceType, ICommitPointInfo sourceCommitPoint = null)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
 

@@ -45,5 +45,16 @@ namespace BrightstarDB.Storage
         /// <param name="storeLocation">The path to the store directory</param>
         /// <returns></returns>
         IStoreStatisticsLog GetStatisticsLog(string storeLocation);
+
+
+        /// <summary>
+        /// Creates a consolidated copy of a store, optionally from a given commit point
+        /// </summary>
+        /// <param name="srcStoreLocation">The source store to be copied</param>
+        /// <param name="destStoreLocation">The location where the destination store should be created</param>
+        /// <param name="storePersistenceType">The persistence type to use for the data in the destination store</param>
+        /// <param name="commitPointId">OPTIONAL: The commit point in the source store to copy from</param>
+        void CreateSnapshot(string srcStoreLocation, string destStoreLocation,
+                            PersistenceType storePersistenceType, ulong commitPointId = StoreConstants.NullUlong);
     }
 }

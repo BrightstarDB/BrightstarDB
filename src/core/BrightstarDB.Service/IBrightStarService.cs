@@ -218,5 +218,17 @@ namespace BrightstarDB.Service
         /// <returns>A <see cref="JobInfo"/> instance for tracking the current status of the job.</returns>
         [OperationContract]
         JobInfo UpdateStatistics(string storeName);
+
+        /// <summary>
+        /// Queues a job to create a snapshot of a store
+        /// </summary>
+        /// <param name="sourceStoreName">The store to create a snapshot from</param>
+        /// <param name="targetStoreName">The name of the store to create with the snapshot</param>
+        /// <param name="storePersistenceType">Specifies the persistence file type to use for the target store</param>
+        /// <param name="sourceCommitPoint">OPTIONAL: the commit point in the source store to create the snapshot from</param>
+        /// <returns>A <see cref="JobInfo"/> instance for tracking the current status of the job.</returns>
+        /// <remarks>If <paramref name="sourceCommitPoint"/> is NULL, the snapshot is created from the most recent commit of the source store.</remarks>
+        [OperationContract]
+        JobInfo CreateSnapshot(string sourceStoreName, string targetStoreName, PersistenceType storePersistenceType, CommitPointInfo sourceCommitPoint);
     }
 }

@@ -337,6 +337,12 @@ namespace BrightstarDB.Storage.BTreeStore
             return new PersistentStatisticsLog(_persistenceManager, storeLocation);
         }
 
+        public void CreateSnapshot(string srcStoreLocation, string destStoreLocation, PersistenceType storePersistenceType,
+                                   ulong commitPointId = StoreConstants.NullUlong)
+        {
+            throw new NotImplementedException();
+        }
+
         public MasterFile GetMasterFile(string storeLocation)
         {
             return MasterFile.Open(_persistenceManager, storeLocation);

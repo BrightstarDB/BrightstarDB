@@ -155,6 +155,7 @@
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
+    <Compile Include="Server\SnapshotJob.cs" />
     <Compile Include="Server\StatsMonitor.cs" />
     <Compile Include="Server\UpdateStatsJob.cs" />
     <Compile Include="SparqlResultsFormat.cs" />

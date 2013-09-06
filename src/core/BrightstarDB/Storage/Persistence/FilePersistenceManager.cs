@@ -114,6 +114,12 @@ namespace BrightstarDB.Storage.Persistence
             }
         }
 
+        public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite)
+        {
+            var fileInfo = new FileInfo(sourceFilePath);
+            WrapSharingViolations(()=> fileInfo.CopyTo(destinationFilePath, overwrite));
+        }
+
         #endregion
 
         private static void WrapSharingViolations(WrapSharingViolationsCallback action, WrapSharingViolationsExceptionsCallback exceptionsCallback = null, int retryCount = 10, int waitTime = 100)

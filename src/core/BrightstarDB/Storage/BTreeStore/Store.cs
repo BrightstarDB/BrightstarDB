@@ -7,6 +7,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Profiling;
 using BrightstarDB.Query;
 using BrightstarDB.Rdf;
+using BrightstarDB.Storage.Persistence;
 using VDS.RDF;
 using Triple = BrightstarDB.Model.Triple;
 
@@ -166,6 +167,11 @@ namespace BrightstarDB.Storage.BTreeStore
         public void Consolidate(Guid jobId)
         {
             GetStoreManager().ConsolidateStore(this, _storeLocation, jobId);
+        }
+
+        public ulong CopyTo(IPageStore pageStore, ulong txnId)
+        {
+            throw new NotImplementedException();
         }
 
         private ResourceIdIndex ResourceIdIndex

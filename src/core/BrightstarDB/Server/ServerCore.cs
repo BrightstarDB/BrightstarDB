@@ -8,7 +8,6 @@ using BrightstarDB.Caching;
 using BrightstarDB.Client;
 using BrightstarDB.Storage;
 using System.Threading;
-using BrightstarDB.Storage.Statistics;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 using TransactionType = BrightstarDB.Storage.TransactionType;
 using Triple = BrightstarDB.Model.Triple;
@@ -470,6 +469,13 @@ namespace BrightstarDB.Server
         {
             var storeWorker = GetStoreWorker(storeName);
             return storeWorker.UpdateStatistics();
+        }
+
+        public Guid CreateSnapshot(string sourceStoreName, string targetStoreName, PersistenceType persistenceType, ulong sourceCommitPointId)
+        {
+
+            var storeWorker = GetStoreWorker(sourceStoreName);
+            return storeWorker.QueueSnapshotJob(targetStoreName, persistenceType, sourceCommitPointId);
         }
     }
 }

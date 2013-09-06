@@ -486,5 +486,21 @@ namespace BrightstarDB.Service
                     "Error starting statistics update for store " + storeName + ". " + ex.Message, ex);
             }
         }
+
+        public JobInfo CreateSnapshot(string sourceStoreName, string targetStoreName, PersistenceType persistenceType, CommitPointInfo sourceCommitPoint)
+        {
+            try
+            {
+                var jobId = ServerCore.CreateSnapshot(sourceStoreName, targetStoreName, persistenceType, sourceCommitPoint == null ? StoreConstants.NullUlong : sourceCommitPoint.Id);
+                return new JobInfo {JobId = jobId.ToString(), JobPending = true};
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException,
+                    "Error starting snapshot for store {0}", sourceStoreName);
+                throw new BrightstarClientException(
+                    "Error starting snapshot for store " + sourceStoreName + ". " + ex.Message, ex);
+            }
+        }
     }
 }

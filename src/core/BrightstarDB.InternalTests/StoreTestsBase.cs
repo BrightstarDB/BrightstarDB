@@ -16,6 +16,7 @@ namespace BrightstarDB.InternalTests
     public abstract class StoreTestsBase
     {
         internal abstract IStoreManager StoreManager { get; }
+        internal abstract PersistenceType TestPersistenceType { get; }
 
         private static readonly XNamespace SparqlResult = "http://www.w3.org/2005/sparql-results#";
 
@@ -1204,40 +1205,10 @@ namespace BrightstarDB.InternalTests
         public virtual void TestConsolidateStore()
         {
             var sid = "TestConsolidateStore_" + DateTime.Now.Ticks;
-            var store = StoreManager.CreateStore(Configuration.StoreLocation + "\\" + sid);
-            Guid job1Id = Guid.NewGuid(),
-                 job2Id = Guid.NewGuid(),
-                 job3Id = Guid.NewGuid(),
-                 consolidateJobId = Guid.NewGuid();
-            store.InsertTriple(new Triple
-                                   {
-                                       Subject = "http://example.org/alice",
-                                       Predicate = "http://example.org/name",
-                                       Object = "Alice",
-                                       DataType = RdfDatatypes.String,
-                                       IsLiteral = true
-                                   });
-            store.Commit(job1Id);
-
-            store.InsertTriple(new Triple
-                                   {
-                                       Subject = "http://example.org/bob",
-                                       Predicate = "http://example.org/name",
-                                       Object = "Bob",
-                                       DataType = RdfDatatypes.String,
-                                       IsLiteral = true
-                                   });
-            store.Commit(job2Id);
-
-            store.InsertTriple(new Triple
-                                   {
-                                       Subject = "http://example.org/Charlie",
-                                       Predicate = "http://example.org/name",
-                                       Object = "Charlie",
-                                       DataType = RdfDatatypes.String,
-                                       IsLiteral = true
-                                   });
-            store.Commit(job3Id);
+            Guid job1Id;
+            Guid job2Id;
+            Guid job3Id;
+            var store = CreateStoreToConsolidate(sid, out job1Id, out job2Id, out job3Id);
 
             // Before consolidate there should be 4 commit points
             var commitPoints = store.GetCommitPoints().ToList();
@@ -1247,6 +1218,7 @@ namespace BrightstarDB.InternalTests
             Assert.AreEqual(job1Id, commitPoints[2].JobId);
             Assert.AreEqual(Guid.Empty, commitPoints[3].JobId);
 
+            Guid consolidateJobId = Guid.NewGuid();
             store.Consolidate(consolidateJobId);
 
             commitPoints = store.GetCommitPoints().ToList();
@@ -1263,6 +1235,44 @@ namespace BrightstarDB.InternalTests
             Assert.IsTrue(labels.Contains("Charlie"));
         }
 
+        private IStore CreateStoreToConsolidate(string sid, out Guid job1Id, out Guid job2Id, out Guid job3Id)
+        {
+            var store = StoreManager.CreateStore(Configuration.StoreLocation + "\\" + sid);
+            job1Id = Guid.NewGuid();
+            job2Id = Guid.NewGuid();
+            job3Id = Guid.NewGuid();
+            store.InsertTriple(new Triple
+                {
+                    Subject = "http://example.org/alice",
+                    Predicate = "http://example.org/name",
+                    Object = "Alice",
+                    DataType = RdfDatatypes.String,
+                    IsLiteral = true
+                });
+            store.Commit(job1Id);
+
+            store.InsertTriple(new Triple
+                {
+                    Subject = "http://example.org/bob",
+                    Predicate = "http://example.org/name",
+                    Object = "Bob",
+                    DataType = RdfDatatypes.String,
+                    IsLiteral = true
+                });
+            store.Commit(job2Id);
+
+            store.InsertTriple(new Triple
+                {
+                    Subject = "http://example.org/Charlie",
+                    Predicate = "http://example.org/name",
+                    Object = "Charlie",
+                    DataType = RdfDatatypes.String,
+                    IsLiteral = true
+                });
+            store.Commit(job3Id);
+            return store;
+        }
+
         public virtual void TestConsolidateEmptyStore()
         {
             var sid = "TestConsolidateStore_" + DateTime.Now.Ticks;
@@ -1273,6 +1283,46 @@ namespace BrightstarDB.InternalTests
             var commitPoints = store.GetCommitPoints().ToList();
             Assert.AreEqual(1, commitPoints.Count);
             Assert.AreEqual(consolidateJobId, commitPoints[0].JobId);
+        }
+
+
+        public virtual void TestSnapshotStore()
+        {
+            var sid = "TestSnapshotStore_" + DateTime.Now.Ticks;
+            Guid job1Id, job2Id, job3Id;
+            var store = CreateStoreToConsolidate(sid, out job1Id, out job2Id, out job3Id);
+            var commitPoints = store.GetCommitPoints().ToList();
+
+            var destinationStoreName = sid + "_snapshot1";
+            StoreManager.CreateSnapshot(Path.Combine(Configuration.StoreLocation, sid),
+                                        Path.Combine(Configuration.StoreLocation, destinationStoreName),
+                                        TestPersistenceType);
+            var snapshot1 = StoreManager.OpenStore(Path.Combine(Configuration.StoreLocation, destinationStoreName));
+            var results = snapshot1.ExecuteSparqlQuery("SELECT ?l WHERE { ?s <http://example.org/name> ?l }", SparqlResultsFormat.Xml);
+            var resultsDoc = XDocument.Parse(results);
+            var labels = resultsDoc.SparqlResultRows().Select(x => x.GetColumnValue("l")).ToList();
+            Assert.AreEqual(3, labels.Count);
+            Assert.IsTrue(labels.Contains("Alice"));
+            Assert.IsTrue(labels.Contains("Bob"));
+            Assert.IsTrue(labels.Contains("Charlie"));
+
+            if (TestPersistenceType == PersistenceType.AppendOnly)
+            {
+                // Test creating snapshot from an earlier commit point
+                Assert.AreEqual(job2Id, commitPoints[1].JobId);
+                destinationStoreName = sid + "_snapshot2";
+                StoreManager.CreateSnapshot(Path.Combine(Configuration.StoreLocation, sid),
+                                            Path.Combine(Configuration.StoreLocation, destinationStoreName),
+                                            TestPersistenceType, commitPoints[1].LocationOffset);
+                var snapshot2 = StoreManager.OpenStore(Path.Combine(Configuration.StoreLocation, destinationStoreName));
+                results = snapshot2.ExecuteSparqlQuery("SELECT ?l WHERE { ?s <http://example.org/name> ?l }",
+                                                       SparqlResultsFormat.Xml);
+                resultsDoc = XDocument.Parse(results);
+                labels = resultsDoc.SparqlResultRows().Select(x => x.GetColumnValue("l")).ToList();
+                Assert.AreEqual(2, labels.Count);
+                Assert.IsTrue(labels.Contains("Alice"));
+                Assert.IsTrue(labels.Contains("Bob"));
+            }
         }
 
         public virtual void TestBatchedInserts()
