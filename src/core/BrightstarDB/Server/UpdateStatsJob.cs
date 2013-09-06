@@ -32,7 +32,7 @@ namespace BrightstarDB.Server
                 var currentCommitPoint = StoreWorker.ReadStore.GetCommitPoints().First();
                 StoreWorker.StoreStatistics.AppendStatistics(
                     new StoreStatistics(
-                        currentCommitPoint.CommitNumber,
+                        currentCommitPoint.LocationOffset,
                         currentCommitPoint.CommitTime, totalTripleCount,
                         predicateTripleCounts));
             }

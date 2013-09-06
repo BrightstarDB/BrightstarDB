@@ -903,6 +903,9 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(stats);
             Assert.AreEqual(4, stats.TotalTripleCount);
             Assert.AreEqual(2, stats.PredicateTripleCounts.Count);
+
+            var commitPoint = client.GetCommitPoint(storeName, stats.CommitTimestamp);
+            Assert.AreEqual(commitPoint.Id, stats.CommitId);
         }
 
         [Test]
