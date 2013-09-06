@@ -5,7 +5,7 @@ namespace BrightstarDB.Storage
     /// <summary>
     /// Class that wraps the different store configuration options we support
     /// </summary>
-    public class StoreConfiguration
+    public class StoreConfiguration : ICloneable
     {
 
 #if !SILVERLIGHT // Not required for SL as it must always use Isolated Storage
@@ -44,5 +44,24 @@ namespace BrightstarDB.Storage
         /// by the caller.
         /// </summary>
         public static readonly StoreConfiguration DefaultStoreConfiguration = new StoreConfiguration();
+
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        /// <returns>
+        /// A new object that is a copy of this instance.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public object Clone()
+        {
+            return new StoreConfiguration
+                {
+                    UseIsolatedStorage = this.UseIsolatedStorage,
+                    PersistenceManager = this.PersistenceManager,
+                    StoreManagerType = this.StoreManagerType,
+                    PersistenceType = this.PersistenceType,
+                    DisableBackgroundWrites = this.DisableBackgroundWrites
+                };
+        }
     }
 }

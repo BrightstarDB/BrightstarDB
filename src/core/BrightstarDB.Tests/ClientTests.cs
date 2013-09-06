@@ -924,25 +924,41 @@ namespace BrightstarDB.Tests
             var resultsStream = client.ExecuteQuery(storeName, "SELECT * WHERE {?s ?p ?o}");
             resultsStream.Close();
 
-            // Create a snapshot with default (latest) commit point
-            var job = client.CreateSnapshot(storeName, storeName + "_snapshot1", PersistenceType.AppendOnly);
-            job = WaitForJob(job, client, storeName);
-            Assert.IsTrue(job.JobCompletedOk);
-
-            resultsStream = client.ExecuteQuery(storeName + "_snapshot1", "SELECT * WHERE { ?s ?p ?o }");
-            var resultsDoc = XDocument.Load(resultsStream);
-            Assert.AreEqual(3, resultsDoc.SparqlResultRows().Count());
-
             var commitPoints = client.GetCommitPoints(storeName, 0, 2).ToList();
             Assert.AreEqual(2, commitPoints.Count);
 
+            // Append Only targets
+            // Create from default (latest) commit
+            var job = client.CreateSnapshot(storeName, storeName + "_snapshot1", PersistenceType.AppendOnly);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+            resultsStream = client.ExecuteQuery(storeName + "_snapshot1", "SELECT * WHERE { ?s ?p ?o }");
+            var resultsDoc = XDocument.Load(resultsStream);
+            Assert.AreEqual(3, resultsDoc.SparqlResultRows().Count());
+            // Create from specific commit point
             job = client.CreateSnapshot(storeName, storeName + "_snapshot2", PersistenceType.AppendOnly, commitPoints[1]);
             job = WaitForJob(job, client, storeName);
             Assert.IsTrue(job.JobCompletedOk);
-
             resultsStream = client.ExecuteQuery(storeName + "_snapshot2", "SELECT * WHERE {?s ?p ?o}");
             resultsDoc = XDocument.Load(resultsStream);
             Assert.AreEqual(2, resultsDoc.SparqlResultRows().Count());
+
+            // Rewrite targets
+            // Create from default (latest) commit
+            job = client.CreateSnapshot(storeName, storeName + "_snapshot3", PersistenceType.Rewrite);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+            resultsStream = client.ExecuteQuery(storeName + "_snapshot3", "SELECT * WHERE { ?s ?p ?o }");
+            resultsDoc = XDocument.Load(resultsStream);
+            Assert.AreEqual(3, resultsDoc.SparqlResultRows().Count());
+            // Create from specific commit point
+            job = client.CreateSnapshot(storeName, storeName + "_snapshot4", PersistenceType.Rewrite, commitPoints[1]);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+            resultsStream = client.ExecuteQuery(storeName + "_snapshot4", "SELECT * WHERE {?s ?p ?o}");
+            resultsDoc = XDocument.Load(resultsStream);
+            Assert.AreEqual(2, resultsDoc.SparqlResultRows().Count());
+
         }
 
         private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,

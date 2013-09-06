@@ -1306,19 +1306,23 @@ namespace BrightstarDB.InternalTests
             Assert.IsTrue(labels.Contains("Bob"));
             Assert.IsTrue(labels.Contains("Charlie"));
 
-            // Test creating snapshot from an earlier commit point
-            Assert.AreEqual(job2Id, commitPoints[1].JobId);
-            destinationStoreName = sid + "_snapshot2";
-            StoreManager.CreateSnapshot(Path.Combine(Configuration.StoreLocation, sid),
-                                        Path.Combine(Configuration.StoreLocation, destinationStoreName),
-                                        TestPersistenceType, commitPoints[1].LocationOffset);
-            var snapshot2 = StoreManager.OpenStore(Path.Combine(Configuration.StoreLocation, destinationStoreName));
-            results = snapshot2.ExecuteSparqlQuery("SELECT ?l WHERE { ?s <http://example.org/name> ?l }", SparqlResultsFormat.Xml);
-            resultsDoc = XDocument.Parse(results);
-            labels = resultsDoc.SparqlResultRows().Select(x => x.GetColumnValue("l")).ToList();
-            Assert.AreEqual(2, labels.Count);
-            Assert.IsTrue(labels.Contains("Alice"));
-            Assert.IsTrue(labels.Contains("Bob"));
+            if (TestPersistenceType == PersistenceType.AppendOnly)
+            {
+                // Test creating snapshot from an earlier commit point
+                Assert.AreEqual(job2Id, commitPoints[1].JobId);
+                destinationStoreName = sid + "_snapshot2";
+                StoreManager.CreateSnapshot(Path.Combine(Configuration.StoreLocation, sid),
+                                            Path.Combine(Configuration.StoreLocation, destinationStoreName),
+                                            TestPersistenceType, commitPoints[1].LocationOffset);
+                var snapshot2 = StoreManager.OpenStore(Path.Combine(Configuration.StoreLocation, destinationStoreName));
+                results = snapshot2.ExecuteSparqlQuery("SELECT ?l WHERE { ?s <http://example.org/name> ?l }",
+                                                       SparqlResultsFormat.Xml);
+                resultsDoc = XDocument.Parse(results);
+                labels = resultsDoc.SparqlResultRows().Select(x => x.GetColumnValue("l")).ToList();
+                Assert.AreEqual(2, labels.Count);
+                Assert.IsTrue(labels.Contains("Alice"));
+                Assert.IsTrue(labels.Contains("Bob"));
+            }
         }
 
         public virtual void TestBatchedInserts()

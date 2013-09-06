@@ -70,7 +70,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             var resourceFilePath = Path.Combine(storeLocation, ResourceFileName);
             _persistenceManager.CreateFile(resourceFilePath);
 
-            MasterFile.Create(_persistenceManager, storeLocation, _storeConfiguration, Guid.NewGuid());
+            var targetStoreConfiguration = _storeConfiguration.Clone() as StoreConfiguration;
+            targetStoreConfiguration.PersistenceType = storePersistenceType;
+            MasterFile.Create(_persistenceManager, storeLocation, targetStoreConfiguration, Guid.NewGuid());
             IPageStore dataPageStore = null;
             switch (storePersistenceType)
             {
@@ -258,7 +260,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 _persistenceManager.CreateFile(dataFilePath);
 
                 // Create initial master file
-                var destMasterFile = MasterFile.Create(_persistenceManager, destStoreLocation, _storeConfiguration,
+                var destStoreConfiguration = _storeConfiguration.Clone() as StoreConfiguration;
+                destStoreConfiguration.PersistenceType = storePersistenceType;
+                var destMasterFile = MasterFile.Create(_persistenceManager, destStoreLocation, destStoreConfiguration,
                                                        Guid.NewGuid());
 
                 // Copy resource files from source store

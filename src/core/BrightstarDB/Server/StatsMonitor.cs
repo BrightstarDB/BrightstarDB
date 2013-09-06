@@ -26,15 +26,22 @@ namespace BrightstarDB.Server
 
         public void OnJobScheduled( bool incrementTransactionCount  =true)
         {
-            if (incrementTransactionCount) _jobCounter++;
-
             if (_statsUpdateAction == null) return;
-            if ((Configuration.StatsUpdateTransactionCount > 0 &&
-                 _jobCounter >= Configuration.StatsUpdateTransactionCount) &&
-                (Configuration.StatsUpdateTimespan > 0 &&
-                 DateTime.UtcNow.Subtract(_lastStatsUpdateTime).TotalSeconds >= Configuration.StatsUpdateTimespan))
+            if (Configuration.StatsUpdateTransactionCount == 0 && Configuration.StatsUpdateTimespan == 0) return;
+
+            lock (this)
             {
-                _statsUpdateAction();
+                if (incrementTransactionCount) _jobCounter++;
+
+                if ((Configuration.StatsUpdateTransactionCount == 0 ||
+                     _jobCounter >= Configuration.StatsUpdateTransactionCount) &&
+                    (Configuration.StatsUpdateTimespan == 0 ||
+                     DateTime.UtcNow.Subtract(_lastStatsUpdateTime).TotalSeconds >= Configuration.StatsUpdateTimespan))
+                {
+                    _statsUpdateAction();
+                    _lastStatsUpdateTime = DateTime.UtcNow;
+                    _jobCounter = 0;
+                }
             }
         }
     }
