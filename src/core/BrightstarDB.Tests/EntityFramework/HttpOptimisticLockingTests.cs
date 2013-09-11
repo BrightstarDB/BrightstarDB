@@ -104,6 +104,14 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         #endregion
+
+        #region CRUD
+        [Test]
+        public new void TestCreateAndDeleteInSameContext()
+        {
+            base.TestCreateAndDeleteInSameContext();
+        }
+        #endregion
     }
 }
 #endif

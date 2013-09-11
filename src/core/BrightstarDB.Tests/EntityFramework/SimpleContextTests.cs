@@ -1443,6 +1443,29 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
+        public void TestDeleteEntityInSameContext()
+        {
+            var storeName = "DeleteEntityInSameContext_" + DateTime.Now.Ticks;
+            using (
+                var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
+                )
+            {
+                var alice = context.Persons.Create();
+                alice.Name = "Alice";
+                context.SaveChanges();
+
+                string aliceId = alice.Id;
+
+                // Delete object
+                context.DeleteObject(alice);
+                context.SaveChanges();
+
+                // Object should no longer be discoverable
+                Assert.That(context.Persons.FirstOrDefault(p => p.Id.Equals(aliceId)), Is.Null);
+            }
+        }
+
+        [Test]
         public void TestDeletionOfEntities()
         {
             var storeName = Guid.NewGuid().ToString();

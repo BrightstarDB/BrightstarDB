@@ -525,5 +525,26 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
         #endregion
+
+        #region CRUD
+
+        public void TestCreateAndDeleteInSameContext()
+        {
+            using (var context = NewContext())
+            {
+                var alice = context.Persons.Create();
+                alice.Name = "Alice";
+                context.SaveChanges();
+
+                var aliceId = alice.Id;
+
+                context.DeleteObject(alice);
+                context.SaveChanges();
+
+                Assert.That(context.Persons.FirstOrDefault(p=>p.Id.Equals(aliceId)), Is.Null);
+            }
+        }
+
+        #endregion
     }
 }

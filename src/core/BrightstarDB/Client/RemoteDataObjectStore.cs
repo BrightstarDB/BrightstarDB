@@ -86,7 +86,12 @@ namespace BrightstarDB.Client
             if (_optimisticLockingEnabled)
             {
                 // get subject entity and see if there is a version triple
-                var subjects = AddTriples.Select(x => x.Subject).Distinct().Union(DeletePatterns.Select(x => x.Subject).Distinct()).ToList();
+                var subjects =
+                    AddTriples.Select(x => x.Subject)
+                              .Distinct()
+                              .Union(DeletePatterns.Select(x => x.Subject).Distinct())
+                              .Except(new[] {Constants.WildcardUri})
+                              .ToList();
                 foreach (var subject in subjects)
                 {
                     var entity = LookupDataObject(subject);
