@@ -713,6 +713,8 @@ namespace BrightstarDB.Client
             if (take > 100) throw new ArgumentOutOfRangeException("take", Strings.BrightstarServiceClient_GetStatistics_TakeTooLarge);
             try
             {
+                // ReSharper disable RedundantEnumerableCastCall
+                // not redundant for SILVERLIGHT build
                 return _serverCore.GetStatistics(storeName)
                                   .Where(s => s.CommitTime <= latest && s.CommitTime >= earlierst)
                                   .Skip(skip)
@@ -723,7 +725,8 @@ namespace BrightstarDB.Client
                                           CommitTimestamp = s.CommitTime,
                                           TotalTripleCount = s.TripleCount,
                                           PredicateTripleCounts = s.PredicateTripleCounts
-                                      }));
+                                      })).Cast<IStoreStatistics>();
+                // ReSharper restore RedundantEnumerableCastCall
             }
             catch (Exception ex)
             {

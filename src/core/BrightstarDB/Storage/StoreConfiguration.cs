@@ -5,7 +5,10 @@ namespace BrightstarDB.Storage
     /// <summary>
     /// Class that wraps the different store configuration options we support
     /// </summary>
-    public class StoreConfiguration : ICloneable
+    public class StoreConfiguration 
+#if !SILVERLIGHT
+        : ICloneable
+#endif
     {
 
 #if !SILVERLIGHT // Not required for SL as it must always use Isolated Storage
@@ -56,7 +59,9 @@ namespace BrightstarDB.Storage
         {
             return new StoreConfiguration
                 {
+#if !SILVERLIGHT
                     UseIsolatedStorage = this.UseIsolatedStorage,
+#endif
                     PersistenceManager = this.PersistenceManager,
                     StoreManagerType = this.StoreManagerType,
                     PersistenceType = this.PersistenceType,

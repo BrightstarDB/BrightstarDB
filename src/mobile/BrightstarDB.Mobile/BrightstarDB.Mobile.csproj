@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="BrightstarDB\Client\CommitPointInfo.cs" />
     <Compile Include="BrightstarDB\Client\JobInfo.cs" />
+    <Compile Include="BrightstarDB\Client\StoreStatistics.cs" />
     <Compile Include="BrightstarDB\Client\TransactionInfo.cs" />
     <Compile Include="BrightstarDB\Client\TransactionStatus.cs" />
     <Compile Include="BrightstarDB\Client\TransactionType.cs" />
