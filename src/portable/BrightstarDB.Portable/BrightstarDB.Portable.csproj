@@ -46,6 +46,7 @@
     <Compile Include="Compatibility\FileMode.cs" />
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Client\CommitPointInfo.cs" />
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Client\JobInfo.cs" />
+    <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Client\StoreStatistics.cs" />
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Client\TransactionInfo.cs" />
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Client\TransactionStatus.cs" />
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Client\TransactionType.cs" />

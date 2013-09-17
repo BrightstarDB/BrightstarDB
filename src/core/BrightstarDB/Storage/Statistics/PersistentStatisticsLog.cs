@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.Statistics
 {

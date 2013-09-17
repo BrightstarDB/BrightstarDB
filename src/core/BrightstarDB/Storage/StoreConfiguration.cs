@@ -6,7 +6,7 @@ namespace BrightstarDB.Storage
     /// Class that wraps the different store configuration options we support
     /// </summary>
     public class StoreConfiguration 
-#if !SILVERLIGHT
+#if !(SILVERLIGHT || PORTABLE)
         : ICloneable
 #endif
     {

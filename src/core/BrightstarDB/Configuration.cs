@@ -303,7 +303,6 @@ namespace BrightstarDB
             return ConfigurationManager.AppSettings.Get(key);
 #endif
         }
-#endif
 
         private static int GetApplicationSetting(string key, int defaultValue)
         {
@@ -315,6 +314,7 @@ namespace BrightstarDB
             }
             return defaultValue;
         }
+#endif
 
     }
 }

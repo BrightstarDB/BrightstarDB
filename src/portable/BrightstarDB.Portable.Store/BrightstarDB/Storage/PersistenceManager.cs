@@ -172,5 +172,20 @@ namespace BrightstarDB.Storage
                                     .ContinueWith(x => x.Result.RenameAsync(destinationFileName));
             t.RunSynchronously();
         }
+
+        public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite)
+        {
+            var destinationFolderPath = System.IO.Path.GetDirectoryName(destinationFilePath);
+            var destinationFileName = System.IO.Path.GetFileName(destinationFilePath);
+            var destinationFolder = AppDataLocation.GetFolderAsync(destinationFolderPath);
+            var t = AppDataLocation.GetFileAsync(sourceFilePath).AsTask()
+                                   .ContinueWith(
+                                       x =>
+                                       x.Result.CopyAsync(destinationFolder.GetResults(), destinationFileName,
+                                                          overwrite
+                                                              ? NameCollisionOption.ReplaceExisting
+                                                              : NameCollisionOption.FailIfExists));
+            t.RunSynchronously();
+        }
     }
 }
