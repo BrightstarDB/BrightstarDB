@@ -22,6 +22,11 @@ Before you can build BrightstarDB you need to install the following tools.
         
         *TBD: Check what can be built with VS 2012 Express*
         
+	#.  Windows Phone SDK
+		
+		This is required only to build the mobile solution that targets Windows Phone 7 and 8.
+		Get the Windows Phone SDK from htpp://dev.windowsphone.com/
+		
     #.  **MSBuild Community Tasks**
         
         You must install this from the MSI installer which can be found at
@@ -128,6 +133,22 @@ Before you can build BrightstarDB you need to install the following tools.
 
         msbuild unittests.proj
     
+.. _Build_BuildingThePortableClassLibraries:
+
+***************************************
+ Building the Portable Class Libraries
+***************************************
+
+	The portable class library solution can be found at ``src\portable\portable.sln``.
+	As with the core solution, the portable class library solution has some NuGet 
+	dependencies which need to be downloaded. Follow the same steps outlined above
+	for the core solution to download and install the dependencies before trying
+	to build this solution from the command line.
+	
+	This solution also requires that you have a Windows 8 developer license installed.
+	You should be prompted by to retrieve and install this license if 
+	necessary when you first open the solution file in Visual Studio.
+	
 .. _Build_BuildingTheTools:
 
 *********************
@@ -152,4 +173,11 @@ Before you can build BrightstarDB you need to install the following tools.
     for BrightstarDB. This project can be found at ``installer\\installers.proj``.
     The project will build all of the libraries and documentation and then make
     MSI and NuGet packages.
+	
+	..note:
+	
+		Building the full installer solution requires all the pre-requisites listed
+		above to be installed. It also requires that you have first restored NuGet
+		dependencies in both the core solution and the tools solution as described
+		in the sections above.
     
