@@ -7,7 +7,7 @@ into the main documentation.
 
 Version
 -------
-1.3
+1.4
 
 We welcome feedback, comments, feature requests and bug reports sent to 
 support@brightstardb.com.

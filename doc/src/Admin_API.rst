@@ -127,6 +127,7 @@ Consolidating The Store
            consolidateJob = client.GetJobInfo(storeName, consolidateJob.JobId);
         }
 
+.. _Admin_Snapshots:
 
 Creating Store Snapshots
 ========================
@@ -158,7 +159,8 @@ Creating Store Snapshots
         A snapshot can be created from a previous commit point only if the source store
         persistence type is ``PersistenceType.AppendOnly``
         
-    
+.. _Admin_Stats:
+   
 Store Statistics
 ================
 

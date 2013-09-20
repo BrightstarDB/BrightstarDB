@@ -1,6 +1,1 @@
-
-- First official release under the MIT open-source license
-
-- Added support for executing transactions against named graphs and for using N-Quads in transactional update.
-
-- Added support for overriding the default graph for SPARQL queries
+Please see http://brightstardb.readthedocs.org/en/latest/Whats_New/ for the updated release notes.
