@@ -31,7 +31,6 @@ moment to read about Running the BrightstarDB Samples first.
 
 
 .. toctree::
-    :hidden:
     
     Developer Quick Start <Developer_Quick_Start>
     Connection Strings <Connection_Strings>
@@ -40,6 +39,9 @@ moment to read about Running the BrightstarDB Samples first.
     BrightstarDB Entity Framework <Entity_Framework>
     Entity Framework Samples <Entity_Framework_Samples>
     Data Object Layer <Data_Object_Layer>
+	Dynamic API <Dynamic_API>
     RDF Client API <RDF_Client_API>
     Admin API <Admin_API>
+	Developing For Windows Phone <Developing_for_Windows_Phone>
+	Developing Portable Apps <Developing_Portable_Apps>
     API Documentation <API_Documentation>

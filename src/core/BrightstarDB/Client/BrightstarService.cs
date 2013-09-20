@@ -3,7 +3,7 @@
 using BrightstarDB.Server;
 #endif
 using System;
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
 using System.Xml;
 using System.ServiceModel;
 #endif
@@ -32,7 +32,7 @@ namespace BrightstarDB.Client
         }
 
 
-#if !SILVERLIGHT 
+#if !SILVERLIGHT && !PORTABLE
 
 #if !REST_CLIENT
         /// <summary>
@@ -154,7 +154,7 @@ namespace BrightstarDB.Client
                 case ConnectionType.Embedded:
                     return new EmbeddedBrightstarService(connectionString.StoresDirectory);
 #endif
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
 #if !REST_CLIENT
                 case ConnectionType.Http:
                     return GetHttpClient(new Uri(connectionString.ServiceEndpoint), GetConfiguredCache());
@@ -212,7 +212,7 @@ namespace BrightstarDB.Client
 #if !REST_CLIENT
                 case ConnectionType.Embedded:
                     return new EmbeddedDataObjectContext(connectionString);
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
                 case ConnectionType.Http:
                     return new HttpDataObjectContext(connectionString);
                 case ConnectionType.Tcp:

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using System.IO;
 
 namespace BrightstarDB.Server
@@ -133,3 +134,4 @@ namespace BrightstarDB.Server
         #endregion
     }
 }
+#endif

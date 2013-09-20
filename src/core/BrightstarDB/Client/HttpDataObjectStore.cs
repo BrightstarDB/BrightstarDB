@@ -8,7 +8,9 @@ namespace BrightstarDB.Client
     {
         private readonly string _serviceEndpoint;
 
-        public HttpDataObjectStore(string serviceEndpoint, string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled) : base(storeName, namespaceMappings, optimisticLockingEnabled)
+        public HttpDataObjectStore(string serviceEndpoint, string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
+            : base(storeName, namespaceMappings, optimisticLockingEnabled, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             _serviceEndpoint = serviceEndpoint;
         }

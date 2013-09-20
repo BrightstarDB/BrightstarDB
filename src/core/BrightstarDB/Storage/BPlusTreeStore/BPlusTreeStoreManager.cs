@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BrightstarDB.Storage.Persistence;
+using BrightstarDB.Storage.Statistics;
 using BrightstarDB.Storage.TransactionLog;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
@@ -32,7 +36,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             foreach(var directory in _persistenceManager.ListSubDirectories(baseLocation))
             {
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                 // Silverlight does not have a Path.Combine that takes three params
                 var path = Path.Combine(Path.Combine(baseLocation, directory), MasterFile.MasterFileName);
 #else
@@ -66,7 +70,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             var resourceFilePath = Path.Combine(storeLocation, ResourceFileName);
             _persistenceManager.CreateFile(resourceFilePath);
 
-            MasterFile.Create(_persistenceManager, storeLocation, _storeConfiguration, Guid.NewGuid());
+            var targetStoreConfiguration = _storeConfiguration.Clone() as StoreConfiguration;
+            targetStoreConfiguration.PersistenceType = storePersistenceType;
+            MasterFile.Create(_persistenceManager, storeLocation, targetStoreConfiguration, Guid.NewGuid());
             IPageStore dataPageStore = null;
             switch (storePersistenceType)
             {
@@ -175,6 +181,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return new PersistentTransactionLog(_persistenceManager, storeLocation);
         }
 
+        public virtual IStoreStatisticsLog GetStatisticsLog(string storeLocation)
+        {
+            return new PersistentStatisticsLog(_persistenceManager, storeLocation);
+        }
+
         public MasterFile GetMasterFile(string storeLocation)
         {
             return MasterFile.Open(_persistenceManager, storeLocation);
@@ -203,10 +214,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public void ActivateConsolidationStore(string storeLocation)
         {
-#if !WINDOWS_PHONE
-            var tempFileName = Path.Combine(storeLocation, Path.GetRandomFileName());
+#if WINDOWS_PHONE || PORTABLE
+            var tempFileName = Path.Combine(storeLocation, Guid.NewGuid().ToString("N"));            
 #else
-            var tempFileName = Path.Combine(storeLocation, Guid.NewGuid().ToString("N"));
+            var tempFileName = Path.Combine(storeLocation, Path.GetRandomFileName());
 #endif
             var consolidateDataPath = Path.Combine(storeLocation, ConsolidateFileName);
             var storeDataPath = Path.Combine(storeLocation, DataFileName);
@@ -221,7 +232,66 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 _persistenceManager.RenameFile(tempFileName, storeDataPath);
                 throw;
             }
-            File.Delete(tempFileName);
+            _persistenceManager.DeleteFile(tempFileName);
+        }
+
+
+        public void CreateSnapshot(string srcStoreLocation, string destStoreLocation,
+                                   PersistenceType storePersistenceType, ulong commitPointId = StoreConstants.NullUlong)
+        {
+            Logging.LogInfo("Snapshot store {0} to new store {1} with persistence type {2}", srcStoreLocation,
+                            destStoreLocation, storePersistenceType);
+            if (_persistenceManager.DirectoryExists(destStoreLocation))
+            {
+                throw new StoreManagerException(destStoreLocation, "Store already exists");
+            }
+
+            // Open the source store for reading
+            using (IStore srcStore = commitPointId == StoreConstants.NullUlong
+                                         ? OpenStore(srcStoreLocation, true)
+                                         : OpenStore(srcStoreLocation, commitPointId))
+            {
+
+                // Create the directory for the destination store
+                _persistenceManager.CreateDirectory(destStoreLocation);
+
+                // Create empty data file
+                var dataFilePath = Path.Combine(destStoreLocation, DataFileName);
+                _persistenceManager.CreateFile(dataFilePath);
+
+                // Create initial master file
+                var destStoreConfiguration = _storeConfiguration.Clone() as StoreConfiguration;
+                destStoreConfiguration.PersistenceType = storePersistenceType;
+                var destMasterFile = MasterFile.Create(_persistenceManager, destStoreLocation, destStoreConfiguration,
+                                                       Guid.NewGuid());
+
+                // Copy resource files from source store
+                var resourceFilePath = Path.Combine(destStoreLocation, ResourceFileName);
+                _persistenceManager.CopyFile(Path.Combine(srcStoreLocation, ResourceFileName), resourceFilePath, true);
+
+                // Initialize data page store
+                IPageStore destPageStore = null;
+                switch (storePersistenceType)
+                {
+                    case PersistenceType.AppendOnly:
+                        destPageStore = new AppendOnlyFilePageStore(_persistenceManager, dataFilePath, PageSize, false,
+                                                                    _storeConfiguration.DisableBackgroundWrites);
+                        break;
+                    case PersistenceType.Rewrite:
+                        destPageStore = new BinaryFilePageStore(_persistenceManager, dataFilePath, PageSize, false, 0);
+                        break;
+                    default:
+                        throw new BrightstarInternalException("Unrecognized target store type: " + storePersistenceType);
+                }
+                
+                // Copy Data
+                ulong destStorePageId = srcStore.CopyTo(destPageStore, 1ul);
+
+                destPageStore.Close();
+
+                destMasterFile.AppendCommitPoint(
+                    new CommitPoint(destStorePageId, 1ul, DateTime.UtcNow, Guid.Empty), true);
+            }
         }
 
         #endregion

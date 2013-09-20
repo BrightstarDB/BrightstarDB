@@ -114,6 +114,28 @@ namespace BrightstarDB.Client
         /// <returns>A stream containing XML SPARQL results</returns>
         Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression, IEnumerable<string> defaultGraphUris, SparqlResultsFormat resultsFormat = null);
 
+#if PORTABLE
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="preconditions">NTriples or NQuads that must be in the store in order for the transaction to execute</param>
+        /// <param name="deletePatterns">The delete patterns that will be removed from the store</param>
+        /// <param name="insertData">The NTriples or NQuads data that will be inserted into the store.</param>
+        /// <param name="defaultGraphUri">The URI of the default graph that the transaction will be applied to</param>
+        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <remarks>If <paramref name="preconditions"/>, <paramref name="deletePatterns"/> or <paramref name="insertData"/> contain
+        /// quads, the graph URI specified by the quad will override the value provided by <paramref name="defaultGraphUri"/>. </remarks>
+        IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri = Constants.DefaultGraphUri);
+
+        /// <summary>
+        /// Execute a SPARQL Update expression against a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to be updated</param>
+        /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
+        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        IJobInfo ExecuteUpdate(string storeName, string updateExpression);
+#else
         /// <summary>
         /// Execute an update transaction.
         /// </summary>
@@ -136,6 +158,7 @@ namespace BrightstarDB.Client
         /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
         /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
         IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true);
+#endif
 
         /// <summary>
         /// Gets the information about a job. Including status and any messages.
@@ -224,5 +247,46 @@ namespace BrightstarDB.Client
         /// <returns></returns>
         /// <exception cref="ArgumentException">Raised if <paramref name="skip"/> is less than 0 or <paramref name="take"/> is greater than 100.</exception>
         IEnumerable<ICommitPointInfo> GetCommitPoints(string storeName, DateTime latest, DateTime earliest, int skip, int take);
+
+        /// <summary>
+        /// Retrieves the most recent statistics for the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for.</param>
+        /// <returns>A <see cref="IStoreStatistics"/> instance containing the most recent statistics for the named store, or NULL if
+        /// there are no statistics availabe for the store.</returns>
+        IStoreStatistics GetStatistics(string storeName);
+
+
+        /// <summary>
+        /// Retrieves a range of statistics records for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for</param>
+        /// <param name="latest">The latest date to retrieve statistics for</param>
+        /// <param name="earlierst">The earliest date to retrieve statisitcs for</param>
+        /// <param name="skip">The offset into the date-filters list to return from</param>
+        /// <param name="take">The number of results to return</param>
+        /// <returns>An enumeration over the specified subset of statistics records for the store.</returns>
+        /// <exception cref="ArgumentException">Raised if <paramref name="skip"/> is less than 0 or <paramref name="take"/> is greater than 100.</exception>
+        IEnumerable<IStoreStatistics> GetStatistics(string storeName, DateTime latest, DateTime earlierst, int skip,
+                                                    int take);
+
+        /// <summary>
+        /// Queues a job to update the statistics for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store whose statistics are to be updated</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
+        IJobInfo UpdateStatistics(string storeName);
+
+        /// <summary>
+        /// Queues a job to create a snapshot of a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to take a snapshot of</param>
+        /// <param name="targetStoreName">The name of the store to be created to receive the snapshot</param>
+        /// <param name="persistenceType">The type of persistence to use for the target store</param>
+        /// <param name="sourceCommitPoint">OPTIONAL: the commit point in the source store to take a snapshot from</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
+        IJobInfo CreateSnapshot(string storeName, string targetStoreName, PersistenceType persistenceType, ICommitPointInfo sourceCommitPoint = null);
+        
     }
+
 }

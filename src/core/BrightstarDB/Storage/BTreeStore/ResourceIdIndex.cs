@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using BrightstarDB.Profiling;
 using BrightstarDB.Utils;
+using VDS.RDF;
 
 namespace BrightstarDB.Storage.BTreeStore
 {

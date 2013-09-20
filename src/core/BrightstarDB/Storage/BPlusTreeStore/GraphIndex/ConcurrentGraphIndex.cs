@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#if !WINDOWS_PHONE
+#if !WINDOWS_PHONE && !PORTABLE
 using System.Threading;
 #endif
 using BrightstarDB.Profiling;
@@ -15,7 +15,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
         private readonly IPageStore _pageStore;
         private readonly Dictionary<string, int> _graphUriIndex;
         private readonly List<GraphIndexEntry> _allEntries;
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
         private readonly object _lock = new object();
 #else
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
@@ -47,7 +47,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
         /// <returns></returns>
         public IEnumerable<GraphIndexEntry> EnumerateEntries()
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock(_lock)
             {
                 return _allEntries.Where(x => !x.IsDeleted).ToList();
@@ -73,7 +73,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
         /// <remarks>Returns null if no graph exists with the specified URI or if the graph is marked as deleted</remarks>
         public string GetGraphUri(int graphId)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock(_lock)
             {
                 if (graphId < _allEntries.Count && !_allEntries[graphId].IsDeleted)
@@ -116,7 +116,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
                 throw new ArgumentException(
                     String.Format("Graph URI string exceeds maximum allowed length of {0} bytes", short.MaxValue), "graphUri");
             }
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock(_lock)
             {
                 int entryId;
@@ -171,7 +171,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
         /// <returns>True if an ID was found, false otherwise</returns>
         public bool TryFindGraphId(string graphUri, out int graphId)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock (_lock)
             {
                 int entryId;
@@ -205,7 +205,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
 
         public void DeleteGraph(int graphId)
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             lock(_lock)
             {
                 if (graphId < _allEntries.Count)
@@ -256,8 +256,8 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
 
        public ulong Write(IPageStore pageStore, ulong transactionId, BrightstarProfiler profiler)
        {
-           ulong rootPage = pageStore.Create();
-           ulong currentPage = rootPage;
+           IPage rootPage = pageStore.Create(transactionId);
+           IPage currentPage = rootPage;
            var buff = new byte[pageStore.PageSize];
            int offset = 0;
            foreach (var graphIndexEntry in _allEntries)
@@ -267,10 +267,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
                                    : 3 + Encoding.UTF8.GetByteCount(graphIndexEntry.Uri);
                if (offset + entrySize > pageStore.PageSize - 9)
                {
-                   ulong nextPage = pageStore.Create();
+                   IPage nextPage = pageStore.Create(transactionId);
                    buff[offset] = 0xff;
-                   BitConverter.GetBytes(nextPage).CopyTo(buff, pageStore.PageSize - 8);
-                   pageStore.Write(transactionId, currentPage, buff, profiler: profiler);
+                   BitConverter.GetBytes(nextPage.Id).CopyTo(buff, pageStore.PageSize - 8);
+                   currentPage.SetData(buff);
                    currentPage = nextPage;
                    offset = 0;
                }
@@ -301,21 +301,21 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
            }
            buff[offset] = 0xff;
            BitConverter.GetBytes(0ul).CopyTo(buff, pageStore.PageSize - 8);
-           pageStore.Write(transactionId, currentPage, buff, profiler: profiler);
-           return rootPage;
+           currentPage.SetData(buff);
+           return rootPage.Id;
        }
 
         void Read(ulong rootPageId, BrightstarProfiler profiler)
         {
-            byte[] currentPage = _pageStore.Retrieve(rootPageId, profiler);
+            IPage currentPage = _pageStore.Retrieve(rootPageId, profiler);
             int offset = 0;
             int entryIndex = 0;
             while(true)
             {
-                var marker = currentPage[offset++];
+                var marker = currentPage.Data[offset++];
                 if (marker == 0xff)
                 {
-                    ulong nextPageId = BitConverter.ToUInt64(currentPage, _pageStore.PageSize - 8);
+                    ulong nextPageId = BitConverter.ToUInt64(currentPage.Data, _pageStore.PageSize - 8);
                     if (nextPageId == 0) return;
                     currentPage = _pageStore.Retrieve(nextPageId, profiler);
                     offset = 0;
@@ -326,9 +326,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore.GraphIndex
                 }
                 else
                 {
-                    int uriByteLength = BitConverter.ToInt32(currentPage, offset);
+                    int uriByteLength = BitConverter.ToInt32(currentPage.Data, offset);
                     offset += 4;
-                    var uri = Encoding.UTF8.GetString(currentPage, offset, uriByteLength);
+                    var uri = Encoding.UTF8.GetString(currentPage.Data, offset, uriByteLength);
                     offset += uriByteLength;
                     var newEntry = new GraphIndexEntry(entryIndex++, uri, marker == 1);
                     _allEntries.Add(newEntry);

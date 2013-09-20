@@ -61,7 +61,11 @@ namespace BrightstarDB.EntityFramework.Query
                             {
                                 var qsr = memberExpression.Expression as QuerySourceReferenceExpression;
                                 if (qsr.ReferencedQuerySource.Equals(queryModel.MainFromClause) &&
+#if PORTABLE
+                                    memberExpression.Member is PropertyInfo)
+#else
                                     memberExpression.Member.MemberType == MemberTypes.Property)
+#endif
                                 {
                                     var propertyHint =
                                         _queryBuilder.Context.GetPropertyHint(memberExpression.Member as PropertyInfo);
@@ -99,7 +103,11 @@ namespace BrightstarDB.EntityFramework.Query
                                             Equals(
                                                 queryModel.MainFromClause))
                                     {
+#if PORTABLE
+                                        if (member.Member is PropertyInfo)
+#else
                                         if (member.Member.MemberType == MemberTypes.Property)
+#endif
                                         {
                                             var propertyHint =
                                                 _queryBuilder.Context.GetPropertyHint(member.Member as PropertyInfo);

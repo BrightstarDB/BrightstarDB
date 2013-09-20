@@ -1,45 +1,34 @@
 ﻿.. _Running_BrightstarDB:
 
-###################################
- BrightstarDB Configuration Options
-###################################
+#######################
+ Running BrightstarDB
+#######################
 
-BrightstarDB can be used as an embedded database or accessed as a WCF service. In either case there are certain global configuration options that can be set in the application's config file.
-
-
-
-
-*********************************
- Configuring an Embedded Database
-*********************************
-
-
-There is no additional configuration required to create and use an embedded database. See the section on Getting Started or the Entity Framework for examples of creating and using an embedded database. However if you wish to override some of the default settings you can do so by adding an <appSettings> section to the applications's .config file (if one does not already exist) and then adding one or more of the configuration options details below.
-
-
-
+BrightstarDB can be used as an embedded database or accessed as a WCF service. 
+The WCF service can be hosted either in a Windows Service which can be configured
+to automatically start when the host machine starts; or it can be run as a command-line
+application. 
 
 *********************************************
- Configuring the BrightstarDB Windows Service
+ Running BrightstarDB as a Windows Service
 *********************************************
 
+The installer will create a windows service called "BrightstarDB". 
+This exposes a WCF service endpoint that can be used to access the database. 
+The configuration for this service can be found in BrightstarService.exe.config in the 
+`[INSTALLDIR]\Service` folder.
 
-The installer will create a windows service called "BrightstarDB". This exposes a WCF service endpoint that can be used to access the database. The configuration for this service can be found in BrightstarService.exe.config in the  [INSTALLDIR]\Service folder.
+*****************************************
+ Running BrightstarDB as an Application
+*****************************************
 
-
-
-
-***************************************************
- Running the BrightstarDB Service as an Application
-***************************************************
-
-
-Running the service as an application rather than a Windows service can be done by running the BrightstarService.exe located in the [INSTALLDIR]\Service folder. The configuration from the .config file is used by the service when it starts up. However, some properties can also be overridden using command line parameters passed to the service. Note that either no parameters are passed or all four parameters are required. 
-
-::
+Running the service as an application rather than a Windows service can be done by running 
+the BrightstarService.exe located in the `[INSTALLDIR]\Service` folder. The configuration 
+from the .config file is used by the service when it starts up. However, some properties 
+can also be overridden using command line parameters passed to the service. 
+Note that either no parameters are passed or all four parameters are required::
 
   BrightstarService.exe [<base location> <http port> <tcp port> <pipe name>]
-
 
 
   - <base location> specifies the path to the directory where the BrightstarDB stores are located. This overrides the BrightstarDB.StoreLocation configuration option.
@@ -49,9 +38,6 @@ Running the service as an application rather than a Windows service can be done 
   - <tcp port> specifies the port that the TCP interface to the BrightstarDB service will use to listen for connections. This overrides the BrightstarDB.TcpPort configuration option.
 
   - <pipe name> specifies the name of the named pipe that the named pipe interface to the BrightstarDB service will use to listen for connections. This overrides the BrightstarDB.NetNamedPipeName configuration option.
-
-
-
 
 ***********************************
  BrightstarDB Configuration Options
@@ -70,6 +56,8 @@ The following list describes all the available configuration options for Brights
 
   - BrightstarDB.PageCacheSize - specifies the amount of memory in MB to be used by the BrightstarDB store page cache. This setting applies only to applications that open a BrightstarDB store as the cache is used to cache pages of data from the data.bs and resources.bs data files. The default value is 2048 on .NET 4.0 and 4 on Windows Phone 7.1. Note that this memory is not all allocated on startup so actual memory usage by the application may initially be lower than this value.
 
+  - BrightstarDB.ResourceCacheLimit - specifies the number of resource entries to keep cached for each open store. Default values are 1,000,000 on .NET 4.0 and 10,000 on Windows Phone.
+  
   - BrightstarDB.EnableQueryCache - specifies whether or not the application should cache the results of SPARQL queries. Allowed values are "true" or "false" and the setting defaults to "true". Query caching is only available on .NET 4.0 so this setting has no effect on Windows Phone 7.1
 
   - BrightstarDB.QueryCacheDirectory - specifies the folder location where cached results are stored.
@@ -86,13 +74,12 @@ The following list describes all the available configuration options for Brights
 
   - BrightstarDB.PersistenceType - specifies the default type of persistence used for the main BrighstarDB index files. Allowed values are "appendonly" or "rewrite" (values are case-insensitive). For more information about the store persistence types please refer to the section :ref:`Store Persistence Types <Store_Persistence_Types>`.
 
+  - BrightstarDB.StatsUpdate.Timespan - specifies the minimum number of seconds that must pass between automatic update of store statistics.
+  
+  - BrightstarDB.StatsUpdate.TransactionCount - specifies the minimum number of transactions that must occur between automatic update of store statistics.
 
-
-
-**********************
- Example Configuration
-**********************
-
+Example Configuration
+======================
 
 The sample below shows all the BrightstarDB options with usage comments. ::
 
@@ -149,20 +136,14 @@ The sample below shows all the BrightstarDB options with usage comments. ::
   </configuration>
 
 
-
-
-
-
 .. _Caching:
 
-********
- Caching
-********
+*********************
+ Configuring Caching
+*********************
 
 
 BrightstarDB provides facilities for caching the results of SPARQL queries both in memory and to disk. Caching complex SPARQL queries or queries that potentially return large numbers of results can provide a significant performance improvement. Caching is controlled through a combination of settings in the application configuration file (the web.config for web apps, or the .exe.config for other executables).
-
-
 
 
 **AppSetting Key**  **Default Value**  **Description**  
@@ -172,18 +153,12 @@ BrightstarDB.QueryCacheDirectory  <undefined>  The path to the directory to be u
 BrightstarDB.QueryCacheDiskSpace  2048  The size in MB of the disk cache.  
 
 
+Example Caching Configurations
+==============================
 
-
-
-Example Configurations
-======================
-
-
-
-
-To cache in the _bscache subdirectory of a fixed store location (a good choice for server applications), it is necessary only to enable caching and ensure that the store location is specified in the configuration file:
-
-::
+To cache in the _bscache subdirectory of a fixed store location (a good choice for server 
+applications), it is necessary only to enable caching and ensure that the store location 
+is specified in the configuration file::
 
   <configuration>
     <appSettings>
@@ -195,9 +170,7 @@ To cache in the _bscache subdirectory of a fixed store location (a good choice f
 
 
 
-To cache in some other location (e.g. a fast disk dedicated to caching):
-
-::
+To cache in some other location (e.g. a fast disk dedicated to caching)::
 
   <configuration>
     <appSettings>
@@ -217,9 +190,7 @@ To cache in some other location (e.g. a fast disk dedicated to caching):
 
 
 
-This sample has no disk cache because there is no valid location for the cache to be created:
-
-::
+This sample has no disk cache because there is no valid location for the cache to be created::
 
   <configuration>
     <appSettings>
@@ -237,32 +208,33 @@ This sample has no disk cache because there is no valid location for the cache t
     </appSettings>
   </configuration>
 
-
+  
+  
 .. _Logging:
 
-********
- Logging
-********
+*********************
+ Configuring Logging
+*********************
 
 
 .. _TraceSource: http://msdn.microsoft.com/en-us/library/system.diagnostics.tracesource.aspx
 
 
-BrightstarDB uses the .NET diagnostics infrastructure for logging. This provides a good deal of runtime flexibility over what messages are logged and how/where they are logged. All logging performed by BrightstarDB is written to a `TraceSource`_ named "BrightstarDB". 
+BrightstarDB uses the .NET diagnostics infrastructure for logging. This provides a good deal 
+of runtime flexibility over what messages are logged and how/where they are logged. All 
+logging performed by BrightstarDB is written to a `TraceSource`_ named "BrightstarDB". 
 
+The default configuration for this trace source depends on whether or not the 
+`BrightstarDB.StoreLocation` configuration setting is provided in the application configuration 
+file. If this setting is provided then the BrightstarDB trace source will be automatically 
+configured to write to a log.txt file contained in the directory specified as the store location.
+By default the trace source is set to log Information level messages and above.
 
+Other logging options can be configured by entries in the <system.diagnostics> section of the 
+application configuration file.
 
-The default configuration for this trace source depends on whether or not the BrightstarDB.StoreLocation configuration setting is provided in the application configuration file. If this setting is provided then the BrightstarDB trace source will be automatically configured to write to a log.txt file contained in the directory specified as the store location. By default the trace source is set to log Information level messages and above.
-
-
-
-Other logging options can be configured by entries in the <system.diagnostics> section of the application configuration file.
-
-
-
-To log all messages (including debug messages), you can modify the TraceSource's switchLevel as follows:
-
-::
+To log all messages (including debug messages), you can modify the TraceSource's `switchLevel`
+as follows::
 
   <system.diagnostics>
     <sources>
@@ -270,7 +242,14 @@ To log all messages (including debug messages), you can modify the TraceSource's
     </sources>
   </system.diagnostics>
 
+Equally you can use other switchValue settings to reduce the amount of logging performed by 
+BrightstarDB.
 
 
-Equally you can use other switchValue settings to reduce the amount of logging performed by BrightstarDB.
+
+
+
+
+
+
 

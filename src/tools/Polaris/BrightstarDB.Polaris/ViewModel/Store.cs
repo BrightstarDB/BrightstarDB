@@ -84,5 +84,10 @@ namespace BrightstarDB.Polaris.ViewModel
         {
             Source.ExecuteUpdate(this, sparqlUpdateString);
         }
+
+        public StatisticsViewModel GetStatistics()
+        {
+            return Source.GetStatistics(this);
+        }
     }
 }

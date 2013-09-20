@@ -20,6 +20,10 @@ namespace BrightstarDB.InternalTests
             get { return _storeManager; }
         }
 
+        internal override PersistenceType TestPersistenceType
+        {
+            get { return PersistenceType.Rewrite; }
+        }
         #endregion
 
         [Test]
@@ -242,9 +246,22 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
+        public override void TestBatchedInsertsRepeatable()
+        {
+            Logging.EnableConsoleOutput(true);
+            base.TestBatchedInsertsRepeatable();
+        }
+
+        [Test]
         public override void TestMultiThreadedReadAccess()
         {
             base.TestMultiThreadedReadAccess();
+        }
+
+        [Test]
+        public override void TestSnapshotStore()
+        {
+            base.TestSnapshotStore();
         }
     }
 }

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.BTreeStore
 {
@@ -504,7 +507,8 @@ namespace BrightstarDB.Storage.BTreeStore
 
             if (timer.ElapsedMilliseconds > 30)
             {
-                Console.WriteLine(" count is " + insertCount + " : insert time:" + timer.ElapsedMilliseconds);                
+                Logging.LogWarning(BrightstarEventId.StorePerformanceWarning, "Long insert. Insert count={0}. Insert time={1}ms", insertCount,
+                                   timer.ElapsedMilliseconds);
             }
 
             //if (insertCount == 10000)

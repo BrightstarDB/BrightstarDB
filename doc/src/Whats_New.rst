@@ -10,13 +10,39 @@
 
 This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are marked with FIX
 
+****************************
+ BrightstarDB 1.4 Release
+****************************
+
+  - NEW: Stores can now extract and persist basic triple count statistics. See :ref:`Admin_Stats` for more information.
+  
+  - NEW: Stores can now be cloned into a new snapshot store. For stores using the append-only storage mechanism, a snapshot can be created from any previous commit point. See :ref:`Admin_Snapshots` for more information
+  
+  - NEW: Added support for System.Uri typed properties in Entity Framework. Thanks to github user jhashemi for the suggestion.
+  
+  - NEW: Portable class library build. Refer to :ref:`Developing_Portable_Apps` for more information.
+  
+  - NEW: Dynamic objects and Entity Framework APIs now support named graphs.
+  
+  - FIX: Reduced memory usage for BTree's by half.
+  
+  - FIX: Fixed a memory leak in the page cache code that prevented expired pages from being released to the garbage collector.
+  
+  - FIX: Fixed the resource ID and resource caches to support a (configurable) limit on the number of entries cached.
+  
+  - FIX: Fixed error in deleting an entity from the same entity framework context in which it was originally created. Thanks to github user cmerat for the report.
+  
+  - FIX: Fixed EntityFramework code to clean up InverseProperty collections correctly. Thanks to BrightstarDB user Alan for the bug report.
+  
+  - FIX: Fixed EntityFramework text template code for matching class names in generic collection properties. Thanks to github user Xsan-21 for the bug report.
+  
+  - FIX: Fix for Polaris hanging when trying to process a GZipped NTriples file.
+  
 *************************
  BrightstarDB 1.3 Release
 *************************
 
-  - NEW: First official open source release. 
-         All documentation and examples updated to remove references to commercial licensing and license protection code.
-		 Build updated to remove dependencies on third-party commercial tools
+  - NEW: First official open source release. All documentation and examples updated to remove references to commercial licensing and license protection code. Build updated to remove dependencies on third-party commercial tools
 
   - NEW: The ExecuteTransaction method now supports specifying a target graph.
   
@@ -144,7 +170,7 @@ This release introduces some BREAKING API changes (but data store format is unaf
 
   - BREAKING: A number of changes and improvements to data file format means that databases created with the initial Developer Preview cannot be used with the Developer Preview Refresh.
 
-  - NEW: Windows Phone 7.1 support. It is now possible to create applications that target Windows Phone OS 7.1 with BrightstarDB. Databases are portable between the desktop / server and the mobile version of BrightstarDB. For more information please refer to :ref:`Developing for Windows Phone 7 <Developing_for_Windows_Phone_7>`.
+  - NEW: Windows Phone 7.1 support. It is now possible to create applications that target Windows Phone OS 7.1 with BrightstarDB. Databases are portable between the desktop / server and the mobile version of BrightstarDB. For more information please refer to :ref:`Developing for Windows Phone <Developing_for_Windows_Phone>`.
 
   - NEW: The :ref:`Data Object Layer <Data_Object_Layer>` is now publicly exposed and documented for developers to use as a mid-point between the low-level RDF Client API and the data-binding provided by the Entity Framework.
 

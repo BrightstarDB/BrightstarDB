@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
@@ -127,6 +128,11 @@ namespace BrightstarDB.Storage.Persistence
            _isolatedStorage.MoveFile(storeConsolidateFile, storeDataFile);
         }
 
+        public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite)
+        {
+            _isolatedStorage.CopyFile(sourceFilePath, destinationFilePath, overwrite);
+        }
+
         #endregion
 
         #region Implementation of IDisposable
@@ -147,3 +153,4 @@ namespace BrightstarDB.Storage.Persistence
         #endregion
     }
 }
+#endif

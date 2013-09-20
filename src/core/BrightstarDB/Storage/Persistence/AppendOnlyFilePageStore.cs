@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 using BrightstarDB.Profiling;
 
 namespace BrightstarDB.Storage.Persistence
@@ -15,10 +18,10 @@ namespace BrightstarDB.Storage.Persistence
         private readonly bool _readonly;
         private bool _disposed;
         private ulong _newPageOffset;
-        private readonly List<IPage> _newPages;
+        private readonly List<WeakReference> _newPages;
         private readonly IPersistenceManager _peristenceManager;
         private BackgroundPageWriter _backgroundPageWriter;
-        
+
         public AppendOnlyFilePageStore(IPersistenceManager persistenceManager, string filePath, int pageSize, bool readOnly, bool disableBackgroundWrites)
         {
             _peristenceManager = persistenceManager;
@@ -40,7 +43,7 @@ namespace BrightstarDB.Storage.Persistence
             _nextPageId = ((ulong)_stream.Length >> _bitShift) + 1;
             if (!readOnly)
             {
-                _newPages = new List<IPage>(512);
+                _newPages = new List<WeakReference>(512);
                 _newPageOffset = _nextPageId;
             }
             _pageSize = pageSize;
@@ -52,24 +55,75 @@ namespace BrightstarDB.Storage.Persistence
                     new BackgroundPageWriter(persistenceManager.GetOutputStream(filePath, FileMode.Open));
             }
 
+            if (!readOnly)
+            {
+                PageCache.Instance.BeforeEvict += BeforePageCacheEvict;
+            }
+        }
+
+        /// <summary>
+        /// Handles notification of page eviction from the page cache
+        /// </summary>
+        /// <param name="sender">The page cache performing the eviction</param>
+        /// <param name="args">The evication event arguments</param>
+        /// <remarks>When the eviction event is for a writeable page, this handler 
+        /// ensures that the page is queued with the background page writer. If there
+        /// is no background page writer because the page store was created with the 
+        /// disableBackgroundWriter option, then this method cancels an eviction
+        /// for a writeable page.</remarks>
+        private void BeforePageCacheEvict(object sender, EvictionEventArgs args)
+        {
+            if (args.Partition.Equals(_path))
+            {
+                // Evicting a page from this store
+                if (args.PageId > _newPageOffset)
+                {
+                    // Evicting a writeable page - add the page to the background write queue to ensure it gets written out.
+                    if (_backgroundPageWriter == null)
+                    {
+                        // Do not evict this page
+                        args.CancelEviction = true;
+                    }
+                    else
+                    {
+                        // Queue the page with the background page writer
+#if DEBUG_PAGESTORE
+                        Logging.LogDebug( "Evict {0}", args.PageId );
+#endif
+                        var pageToEvict = _newPages[(int) (args.PageId - _newPageOffset)];
+                        if (pageToEvict.IsAlive)
+                        {
+                            // Passing 0 for the transaction id is OK because it is not used for writing append-only pages
+                            _backgroundPageWriter.QueueWrite(pageToEvict.Target as IPage, 0ul);
+                        }
+                        // Once the page write is queued, the cache entry can be evicted.
+                        // The background page writer will hold on to the page data object until it is written
+                        args.CancelEviction = false;
+                    }
+                }
+            }
         }
 
         #region Implementation of IPageStore
 
-        public byte[] Retrieve(ulong pageId, BrightstarProfiler profiler)
+        public IPage Retrieve(ulong pageId, BrightstarProfiler profiler)
         {
             using (profiler.Step("PageStore.Retrieve"))
             {
                 if (!_readonly && pageId >= _newPageOffset)
                 {
-                    var newPage = _newPages[(int) (pageId - _newPageOffset)];
-                    return newPage.Data;
+                    var newPageRef = _newPages[(int) (pageId - _newPageOffset)];
+                    if (newPageRef.IsAlive)
+                    {
+                        var newPage = newPageRef.Target as IPage;
+                        if (newPage != null) return newPage;
+                    }
                 }
                 var page = PageCache.Instance.Lookup(_path, pageId) as FilePage;
                 if (page != null)
                 {
                     profiler.Incr("PageCache Hit");
-                    return page.Data;
+                    return page;
                 }
                 using (profiler.Step("Load Page"))
                 {
@@ -80,42 +134,59 @@ namespace BrightstarDB.Storage.Persistence
                         lock (_stream)
                         {
                             page = new FilePage(_stream, pageId, _pageSize);
+                            if (_backgroundPageWriter != null)
+                            {
+                                _backgroundPageWriter.ResetTimestamp(pageId);
+                            }
+#if DEBUG_PAGESTORE
+                            Logging.LogDebug("Load {0} {1}", pageId, BitConverter.ToInt32(page.Data, 0));
+#endif
                         }
                     }
                     using (profiler.Step("Add FilePage To Cache"))
                     {
                         PageCache.Instance.InsertOrUpdate(_path, page);
                     }
-                    return page.Data;
+                    return page;
                 }
             }
         }
 
-        public ulong Create()
+        public IPage Create(ulong commitId)
         {
             if (_readonly) throw new InvalidOperationException("Cannot create new pages in readonly page store");
             var dataPage = new FilePage(_nextPageId, _pageSize);
-            _newPages.Add(dataPage);
+            _newPages.Add(new WeakReference(dataPage));
             _nextPageId++;
-            return dataPage.Id;
+            PageCache.Instance.InsertOrUpdate(_path, dataPage);
+            return dataPage;
+        }
+
+        private IPage Create(ulong txnId, byte[] pageData, int srcOffset = 0, int pageOffset = 0, int len = -1)
+        {
+            var page = Create(txnId);
+            page.SetData(pageData, srcOffset, pageOffset, len);
+            return page;
         }
 
         public void Commit(ulong commitId, BrightstarProfiler profiler)
         {
             using (profiler.Step("PageStore.Commit"))
             {
+                var livePages = new List<IPage>();
                 if (_backgroundPageWriter != null)
                 {
                     foreach (var p in _newPages)
                     {
-                        _backgroundPageWriter.QueueWrite(p, commitId);
+                        if (p.IsAlive)
+                        {
+                            _backgroundPageWriter.QueueWrite(p.Target as IPage, commitId);
+                            livePages.Add(p.Target as IPage);
+                        }
                     }
                     _backgroundPageWriter.Flush();
                     RestartBackgroundWriter();
-                    foreach (var p in _newPages)
-                    {
-                        PageCache.Instance.InsertOrUpdate(_path, p);
-                    }
+                    PageCache.Instance.Clear(_path);
                 }
                 else
                 {
@@ -123,27 +194,17 @@ namespace BrightstarDB.Storage.Persistence
                     {
                         foreach (var p in _newPages)
                         {
-                            p.Write(outputStream, commitId);
-                            PageCache.Instance.InsertOrUpdate(_path, p);
+                            if (p.IsAlive)
+                            {
+                                (p.Target as IPage).Write(outputStream, commitId);
+                            }
                         }
                     }
                 }
                 _newPages.Clear();
                 _newPageOffset = _nextPageId;
             }
-            /*
-            using (var writeStream = _peristenceManager.GetOutputStream(_path, FileMode.Open))
-            {
-                writeStream.Seek((long) ((_newPageOffset - 1)*(ulong) _pageSize), SeekOrigin.Begin);
-                foreach (var p in _newPages)
-                {
-                    writeStream.Write(p.Data, 0, _pageSize);
-                }
-                writeStream.Flush();
-                _newPages.Clear();
-                _newPageOffset = _nextPageId;
-            }
-             */
+            
         }
 
         public void Write(ulong commitId, ulong pageId, byte[] data, int srcOffset = 0, int pageOffset = 0, int len = -1, BrightstarProfiler profiler = null)
@@ -159,10 +220,14 @@ namespace BrightstarDB.Storage.Persistence
             }
             using (profiler.Step("Write Page"))
             {
-                _newPages[pageIx].SetData(data, srcOffset, pageOffset, len);
+                var page = Retrieve(pageId, profiler);
+                page.SetData(data, srcOffset, pageOffset, len);
                 if (_backgroundPageWriter != null)
                 {
-                    _backgroundPageWriter.QueueWrite(_newPages[pageIx], commitId);
+#if DEBUG_PAGESTORE
+                    Logging.LogDebug("Mark {0}", page.Id);
+#endif
+                    _backgroundPageWriter.QueueWrite(page, commitId);
                 }
             }
         }
@@ -170,13 +235,19 @@ namespace BrightstarDB.Storage.Persistence
         /// <summary>
         /// Returns a boolean flag indicating if the page with the specified page ID is writeable
         /// </summary>
-        /// <param name="pageId">The ID of the page to test</param>
+        /// <param name="page">The page to test</param>
         /// <returns>True if the page is writeable, false otherwise</returns>
         /// <remarks>In an append-only store, only pages created since the last commit are writeable. In a binary-page store, all pages are always writeable. 
         /// Client code should use this method to determine if an update to a page can be done by a call to Write() or if a new page needs to be created using Create()</remarks>
-        public bool IsWriteable(ulong pageId)
+        public bool IsWriteable(IPage page)
         {
-            return pageId >= _newPageOffset;
+            return page.Id >= _newPageOffset;
+        }
+
+        public IPage GetWriteablePage(ulong txnId, IPage page)
+        {
+            if (IsWriteable(page)) return page;
+            return Create(txnId, page.Data);
         }
 
         /// <summary>
@@ -208,15 +279,30 @@ namespace BrightstarDB.Storage.Persistence
         /// </summary>
         public void Close()
         {
-            if (_stream != null)
+            lock (this)
             {
-                _stream.Close();
+                if (_stream != null)
+                {
+                    _stream.Close();
+                }
+                if (_backgroundPageWriter != null)
+                {
+                    _backgroundPageWriter.Shutdown();
+                    _backgroundPageWriter.Dispose();
+                    _backgroundPageWriter = null;
+                }
             }
-            if (_backgroundPageWriter != null)
+        }
+
+        public void MarkDirty(ulong commitId, ulong pageId)
+        {
+#if DEBUG_PAGESTORE
+            Logging.LogDebug("Mark {0}", pageId);
+#endif
+            var dirtyPage = Retrieve(pageId, null);
+            if (dirtyPage != null && _backgroundPageWriter != null)
             {
-                _backgroundPageWriter.Shutdown();
-                _backgroundPageWriter.Dispose();
-                _backgroundPageWriter = null;
+                _backgroundPageWriter.QueueWrite(dirtyPage, commitId);
             }
         }
 
@@ -260,12 +346,15 @@ namespace BrightstarDB.Storage.Persistence
 
         private void RestartBackgroundWriter()
         {
-            lock (this)
+            if (_backgroundPageWriter != null)
             {
-                _backgroundPageWriter.Shutdown();
-                _backgroundPageWriter.Dispose();
-                _backgroundPageWriter =
-                    new BackgroundPageWriter(_peristenceManager.GetOutputStream(_path, FileMode.Open));
+                lock (this)
+                {
+                    _backgroundPageWriter.Shutdown();
+                    _backgroundPageWriter.Dispose();
+                    _backgroundPageWriter =
+                        new BackgroundPageWriter(_peristenceManager.GetOutputStream(_path, FileMode.Open));
+                }
             }
         }
     }

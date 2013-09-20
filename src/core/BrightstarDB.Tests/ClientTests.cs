@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -416,7 +417,7 @@ namespace BrightstarDB.Tests
                 Assert.IsNull(row.GetColumnValue("z"));
                 Assert.IsFalse(row.IsLiteral("p"));
                 Assert.IsTrue(row.IsLiteral("o"));
-                Assert.IsInstanceOfType(typeof(Int32), o);
+                Assert.IsInstanceOf(typeof(Int32), o);
             }
         }
 
@@ -472,7 +473,7 @@ namespace BrightstarDB.Tests
 
             var tripleData =
                 "<http://www.networkedplanet.com/people/gra> <<http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
-
+            client.CreateStore(storeName);
             client.ExecuteTransaction(storeName,null, null, tripleData);
         }
 
@@ -505,19 +506,20 @@ namespace BrightstarDB.Tests
         [Test]
         public void TestExportWhileWriting()
         {
+            int firstBatchSize = 50000;
             var storeName = Guid.NewGuid().ToString();
             var client = GetClient();
             client.CreateStore(storeName);
-            var batch1 = MakeTriples(0, 50000);
-            var batch2 = MakeTriples(50000, 51000);
-            var batch3 = MakeTriples(51000, 52000);
-            var batch4 = MakeTriples(52000, 53000);
+            var batch1 = MakeTriples(0, firstBatchSize);
+            var batch2 = MakeTriples(firstBatchSize, firstBatchSize+1000);
+            var batch3 = MakeTriples(firstBatchSize+1000, firstBatchSize+2000);
+            var batch4 = MakeTriples(firstBatchSize+2000, firstBatchSize+3000);
 
             // Verify batch size
             var p = new NTriplesParser();
             var counterSink = new CounterTripleSink();
             p.Parse(new StringReader(batch1), counterSink, Constants.DefaultGraphUri);
-            Assert.AreEqual(50000, counterSink.Count);
+            Assert.AreEqual(firstBatchSize, counterSink.Count);
 
             var jobInfo = client.ExecuteTransaction(storeName, String.Empty, String.Empty, batch1);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
@@ -527,7 +529,14 @@ namespace BrightstarDB.Tests
             jobInfo = client.ExecuteTransaction(storeName, null, null, batch2);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
             exportJobInfo = client.GetJobInfo(storeName, exportJobInfo.JobId);
-            Assert.IsTrue(exportJobInfo.JobStarted, "Test inconclusive - export job completed before end of first concurrent import job."); // This is just to check that the export is still running while at least one commit occurs
+            if (exportJobInfo.JobCompletedWithErrors)
+            {
+                Assert.Fail("Export job completed with errors: {0} : {1}", exportJobInfo.StatusMessage, exportJobInfo.ExceptionInfo);
+            }
+            if (exportJobInfo.JobCompletedOk)
+            {
+                Assert.Inconclusive("Export job completed before end of first concurrent import job.");
+            }
             jobInfo = client.ExecuteTransaction(storeName, null, null, batch3);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
             jobInfo = client.ExecuteTransaction(storeName, null, null, batch4);
@@ -542,7 +551,7 @@ namespace BrightstarDB.Tests
             var exportFile = new FileInfo("c:\\brightstar\\import\\" + storeName + "_export.nt");
             Assert.IsTrue(exportFile.Exists);
             var lineCount = File.ReadAllLines(exportFile.FullName).Where(x => !String.IsNullOrEmpty(x)).Count();
-            Assert.AreEqual(50000, lineCount);
+            Assert.AreEqual(firstBatchSize, lineCount);
         }
 
         public class CounterTripleSink : ITripleSink
@@ -638,8 +647,14 @@ namespace BrightstarDB.Tests
             var client = GetClient();
             client.CreateStore(storeName);
             var job = client.ConsolidateStore(storeName);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk, "Job did not complete successfully: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
+        }
+
+        private static IJobInfo WaitForJob(IJobInfo job, IBrightstarService client, string storeName)
+        {
             var cycleCount = 0;
-            while(!job.JobCompletedOk && !job.JobCompletedWithErrors && cycleCount < 100)
+            while (!job.JobCompletedOk && !job.JobCompletedWithErrors && cycleCount < 100)
             {
                 Thread.Sleep(500);
                 cycleCount++;
@@ -649,7 +664,7 @@ namespace BrightstarDB.Tests
             {
                 Assert.Fail("Job did not complete in time.");
             }
-            Assert.IsTrue(job.JobCompletedOk, "Job did not complete successfully: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
+            return job;
         }
 
         [Test]
@@ -860,6 +875,95 @@ namespace BrightstarDB.Tests
             
         }
 
+        [Test]
+        public void TestGenerateAndRetrieveStats()
+        {
+            var client = GetClient();
+            var storeName = "GenerateAndRetrieveStats_" + DateTime.Now.Ticks;
+            client.CreateStore(storeName);
+
+            var txn1Adds = new StringBuilder();
+            txn1Adds.AppendLine(@"<http://example.org/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .");
+            txn1Adds.AppendLine(
+                @"<http://example.org/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"" <http://example.org/graphs/alice> .");
+            txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
+            txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/mbox> ""bob@example.org"" .");
+
+            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
+            Assert.IsTrue(result.JobCompletedOk);
+
+            var stats = client.GetStatistics(storeName);
+            Assert.IsNull(stats);
+
+            var job = client.UpdateStatistics(storeName);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+
+            stats = client.GetStatistics(storeName);
+            Assert.IsNotNull(stats);
+            Assert.AreEqual(4, stats.TotalTripleCount);
+            Assert.AreEqual(2, stats.PredicateTripleCounts.Count);
+
+            var commitPoint = client.GetCommitPoint(storeName, stats.CommitTimestamp);
+            Assert.AreEqual(commitPoint.Id, stats.CommitId);
+        }
+
+        [Test]
+        public void TestCreateSnapshot()
+        {
+            var storeName = "CreateSnapshot_" + DateTime.Now.Ticks;
+            var client = GetClient();
+            client.CreateStore(storeName);
+            const string addSet1 = "<http://example.org/people/alice> <http://www.w3.org/2000/01/rdf-schema#label> \"Alice\".";
+            const string addSet2 = "<http://example.org/people/bob> <http://www.w3.org/2000/01/rdf-schema#label> \"Bob\".";
+            const string addSet3 = "<http://example.org/people/carol> <http://www.w3.org/2000/01/rdf-schema#label> \"Carol\".";
+            var result = client.ExecuteTransaction(storeName, null, null, addSet1);
+            Assert.IsTrue(result.JobCompletedOk);
+            result = client.ExecuteTransaction(storeName, null, null, addSet2);
+            Assert.IsTrue(result.JobCompletedOk);
+            result = client.ExecuteTransaction(storeName, null, null, addSet3);
+            Assert.IsTrue(result.JobCompletedOk);
+
+            var resultsStream = client.ExecuteQuery(storeName, "SELECT * WHERE {?s ?p ?o}");
+            resultsStream.Close();
+
+            var commitPoints = client.GetCommitPoints(storeName, 0, 2).ToList();
+            Assert.AreEqual(2, commitPoints.Count);
+
+            // Append Only targets
+            // Create from default (latest) commit
+            var job = client.CreateSnapshot(storeName, storeName + "_snapshot1", PersistenceType.AppendOnly);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+            resultsStream = client.ExecuteQuery(storeName + "_snapshot1", "SELECT * WHERE { ?s ?p ?o }");
+            var resultsDoc = XDocument.Load(resultsStream);
+            Assert.AreEqual(3, resultsDoc.SparqlResultRows().Count());
+            // Create from specific commit point
+            job = client.CreateSnapshot(storeName, storeName + "_snapshot2", PersistenceType.AppendOnly, commitPoints[1]);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+            resultsStream = client.ExecuteQuery(storeName + "_snapshot2", "SELECT * WHERE {?s ?p ?o}");
+            resultsDoc = XDocument.Load(resultsStream);
+            Assert.AreEqual(2, resultsDoc.SparqlResultRows().Count());
+
+            // Rewrite targets
+            // Create from default (latest) commit
+            job = client.CreateSnapshot(storeName, storeName + "_snapshot3", PersistenceType.Rewrite);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+            resultsStream = client.ExecuteQuery(storeName + "_snapshot3", "SELECT * WHERE { ?s ?p ?o }");
+            resultsDoc = XDocument.Load(resultsStream);
+            Assert.AreEqual(3, resultsDoc.SparqlResultRows().Count());
+            // Create from specific commit point
+            job = client.CreateSnapshot(storeName, storeName + "_snapshot4", PersistenceType.Rewrite, commitPoints[1]);
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+            resultsStream = client.ExecuteQuery(storeName + "_snapshot4", "SELECT * WHERE {?s ?p ?o}");
+            resultsDoc = XDocument.Load(resultsStream);
+            Assert.AreEqual(2, resultsDoc.SparqlResultRows().Count());
+
+        }
+
         private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
                                               string graphUri)
         {
@@ -894,3 +998,5 @@ namespace BrightstarDB.Tests
 
     }
 }
+
+#endif

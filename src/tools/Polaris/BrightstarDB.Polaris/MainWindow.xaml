@@ -26,6 +26,7 @@
                 <MenuItem Header="_Transaction" Click="HandleTransactionCMClick"/>
                 <MenuItem Header="SPARQL _Update" Click="HandleUpdateCMClick"/>
                 <MenuItem Header="_History View" Click="HandleHistoryCMClick"/>
+                <MenuItem Header="_Statistics" Click="HandleStatisticsCMClick"/>
             </MenuItem>
             <MenuItem Header="_Delete" Click="HandleStoreDeleteCMClick"/>
         </ContextMenu>
@@ -193,6 +194,13 @@
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">
                                 <Command:EventToCommand Command="{Binding NewHistoryViewCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="_Statistics">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <Command:EventToCommand Command="{Binding NewStatisticsViewCommand, Mode=OneWay}" CommandParameter="{Binding ElementName=StoreTreeView, Path=SelectedItem}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </MenuItem>

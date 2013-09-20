@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
+using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.EntityFramework.Tests.ContextObjects;
 
@@ -111,6 +112,11 @@ namespace BrightstarDB.EntityFramework.Tests
                 return Double;
             }
             return null;
+        }
+
+        protected override void Cleanup()
+        {
+            // Nothing to clean up
         }
 
         #endregion

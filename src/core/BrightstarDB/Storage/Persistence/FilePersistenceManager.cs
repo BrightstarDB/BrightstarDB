@@ -1,8 +1,10 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace BrightstarDB.Storage.Persistence
 {
@@ -113,6 +115,12 @@ namespace BrightstarDB.Storage.Persistence
             }
         }
 
+        public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite)
+        {
+            var fileInfo = new FileInfo(sourceFilePath);
+            WrapSharingViolations(()=> fileInfo.CopyTo(destinationFilePath, overwrite));
+        }
+
         #endregion
 
         private static void WrapSharingViolations(WrapSharingViolationsCallback action, WrapSharingViolationsExceptionsCallback exceptionsCallback = null, int retryCount = 10, int waitTime = 100)
@@ -164,9 +172,7 @@ namespace BrightstarDB.Storage.Persistence
             if (ioe == null) throw new ArgumentNullException("ioe");
             try
             {
-                return (int) ioe.GetType()
-                                 .GetProperty("HResult", BindingFlags.NonPublic | BindingFlags.Instance)
-                                 .GetValue(ioe, null);
+                return Marshal.GetHRForException(ioe);
             }
             catch
             {
@@ -175,3 +181,4 @@ namespace BrightstarDB.Storage.Persistence
         }
     }
 }
+#endif

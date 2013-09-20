@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Security.Cryptography.X509Certificates;
-using BrightstarDB.Storage.BTreeStore;
 
 namespace BrightstarDB.Storage
 {
     /// <summary>
     /// Class that wraps the different store configuration options we support
     /// </summary>
-    public class StoreConfiguration
+    public class StoreConfiguration 
+#if !(SILVERLIGHT || PORTABLE)
+        : ICloneable
+#endif
     {
 
 #if !SILVERLIGHT // Not required for SL as it must always use Isolated Storage
@@ -17,6 +18,12 @@ namespace BrightstarDB.Storage
         /// </summary>
         public bool UseIsolatedStorage { get; set; }
 #endif
+        
+        /// <summary>
+        /// The implementation of the abstract persistence layer used by the store.
+        /// </summary>
+        public IPersistenceManager PersistenceManager { get; set; }
+
         /// <summary>
         /// Get or set the <see cref="System.Type"/> of the 
         /// <see cref="IStoreManager"/> instance to be used by the store.
@@ -40,5 +47,26 @@ namespace BrightstarDB.Storage
         /// by the caller.
         /// </summary>
         public static readonly StoreConfiguration DefaultStoreConfiguration = new StoreConfiguration();
+
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        /// <returns>
+        /// A new object that is a copy of this instance.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
+        public object Clone()
+        {
+            return new StoreConfiguration
+                {
+#if !SILVERLIGHT
+                    UseIsolatedStorage = this.UseIsolatedStorage,
+#endif
+                    PersistenceManager = this.PersistenceManager,
+                    StoreManagerType = this.StoreManagerType,
+                    PersistenceType = this.PersistenceType,
+                    DisableBackgroundWrites = this.DisableBackgroundWrites
+                };
+        }
     }
 }

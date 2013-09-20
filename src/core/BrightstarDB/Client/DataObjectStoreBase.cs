@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BrightstarDB.EntityFramework;
 using BrightstarDB.Model;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Client
 {
@@ -38,17 +40,40 @@ namespace BrightstarDB.Client
 
         private EventHandler _savingChanges;
 
+        private readonly string _updateGraphUri;
+        private readonly string[] _datasetGraphUris;
+        private readonly string _versionGraphUri;
+
         private const string InverseOfSparql = "SELECT ?s WHERE {{ ?s <{0}> <{1}> }}";
         private static readonly string GetVersionSparql = "SELECT ?v WHERE {{ <{0}> <" + Constants.VersionPredicateUri + "> ?v }}";
-        
+
+        private bool _disposed;
+
         /// <summary>
         /// Creates a new instance
         /// </summary>
         /// <param name="namespaceMappings">The initial set of CURIE prefix mappings</param>
-        protected DataObjectStoreBase(Dictionary<string, string> namespaceMappings)
+        /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// not defined, the default graph in the store will be updated.</param>
+        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve data objects and their properties.
+        /// If not defined, all graphs in the store will be queried.</param>
+        /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for data objects. 
+        /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+        protected DataObjectStoreBase(Dictionary<string, string> namespaceMappings,
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
         {
             _namespaceMappings = namespaceMappings ?? new Dictionary<string, string>();
             _managedProxies = new Dictionary<string, DataObject>();
+
+            _updateGraphUri = String.IsNullOrEmpty(updateGraphUri) ? Constants.DefaultGraphUri : updateGraphUri;
+            _datasetGraphUris = datasetGraphUris == null ? null : datasetGraphUris.ToArray();
+            if (_datasetGraphUris != null && _datasetGraphUris.Length == 0)
+            {
+                // caller provided an empty enumeration, so default to all graphs
+                _datasetGraphUris = null;
+            }
+            _versionGraphUri = String.IsNullOrEmpty(versionGraphUri) ? _updateGraphUri : versionGraphUri;
+
         }
 
         protected DataObject LookupDataObject(string identifier)
@@ -230,7 +255,7 @@ namespace BrightstarDB.Client
 
         public IEnumerable<IDataObject> TrackedObjects
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             get { return _managedProxies.Values.Cast<IDataObject>(); }
 #else
             get { return _managedProxies.Values; }
@@ -242,6 +267,21 @@ namespace BrightstarDB.Client
         #region Implementation of IInternalDataObjectStore
 
         public abstract bool BindDataObject(DataObject dataObject);
+
+        /// <summary>
+        /// The URI identifier of the graph to be updated
+        /// </summary>
+        public string UpdateGraphUri { get { return _updateGraphUri; } }
+
+        /// <summary>
+        /// The URI identifiers of the graphs that contribute properties
+        /// </summary>
+        public string[] DataSetGraphUris { get { return _datasetGraphUris; } }
+
+        /// <summary>
+        /// The URI identifier of the graph that stores data object version numbers
+        /// </summary>
+        public string VersionGraphUri { get { return _versionGraphUri; } }
 
         /// <summary>
         /// The current transaction delete patterns
@@ -315,6 +355,32 @@ namespace BrightstarDB.Client
             dataObject.SetProperty(Constants.VersionPredicateUri, value);
         }
 
+        ~DataObjectStoreBase()
+        {
+            Dispose(false);
+        }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    Cleanup();
+                }
+                _disposed = true;
+            }
+        }
+
+        /// <summary>
+        /// This method is invoked when the store is being disposed.
+        /// </summary>
+        protected abstract void Cleanup();
     }
 }

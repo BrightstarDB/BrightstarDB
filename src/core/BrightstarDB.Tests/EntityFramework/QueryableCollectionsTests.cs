@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.EntityFramework;
 using NUnit.Framework;
@@ -68,6 +66,11 @@ namespace BrightstarDB.Tests.EntityFramework
             var popularSkills = andy.Skills.Where(s => s.SkilledPeople.Count > 1).ToList();
             Assert.AreEqual(1, popularSkills.Count);
             Assert.AreEqual("Painting", popularSkills.First().Name);
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
         }
     }
 }

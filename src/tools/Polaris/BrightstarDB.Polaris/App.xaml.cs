@@ -31,7 +31,11 @@ namespace BrightstarDB.Polaris
                     PolarisTraceSource.Switch.Level = SourceLevels.Verbose;
                 }
             }
-            VDS.RDF.Options.DefaultTokenQueueMode = TokenQueueMode.AsynchronousBufferDuringParsing;
+
+            // KA: Changed default token queue mode due to problem parsing GZipped files with the asynchronous buffer.
+            //VDS.RDF.Options.DefaultTokenQueueMode = TokenQueueMode.AsynchronousBufferDuringParsing;
+            VDS.RDF.Options.DefaultTokenQueueMode = TokenQueueMode.SynchronousBufferDuringParsing;
+
             DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnAppDomainUnhandledException;
         }

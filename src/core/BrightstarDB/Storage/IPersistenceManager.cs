@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
+
 namespace BrightstarDB.Storage
 {
     /// <summary>
     /// Interface that exposes the minimum set of operations required by
     /// the persistence store backing an IStoreManager implementation
     /// </summary>
-    internal interface IPersistenceManager
+    public interface IPersistenceManager
     {
         /// <summary>
         /// Returns true if <paramref name="pathName"/> represents
@@ -81,6 +85,19 @@ namespace BrightstarDB.Storage
         /// <returns></returns>
         IEnumerable<string> ListSubDirectories(string dirName);
 
+        /// <summary>
+        /// Renames a the specified file
+        /// </summary>
+        /// <param name="sourceFileName">The name of the file to be renamed</param>
+        /// <param name="destinationFileName">The new file name</param>
         void RenameFile(string sourceFileName, string destinationFileName);
+
+        /// <summary>
+        /// Creates a copy of a file
+        /// </summary>
+        /// <param name="sourceFilePath">The path to the file to be copied</param>
+        /// <param name="destinationFilePath">The path to the file to be created by the copy</param>
+        /// <param name="overwrite">Flag indicating if the method should overwrite an existing file or throw an exception</param>
+        void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite);
     }
 }

@@ -342,7 +342,11 @@ namespace BrightstarDB.EntityFramework.Query
             
             if (sourceVarName != null)
             {
+#if PORTABLE
+                if (expression.Member is PropertyInfo)
+#else
                 if (expression.Member.MemberType == MemberTypes.Property)
+#endif
                 {
                     var propertyInfo = expression.Member as PropertyInfo;
                     var hint = QueryBuilder.Context.GetPropertyHint(propertyInfo);
@@ -586,7 +590,9 @@ namespace BrightstarDB.EntityFramework.Query
             if ((arg1.Type == typeof(bool) && (bool)arg1.Value) ||
                 (arg1.Type == typeof(StringComparison) &&
                 ((StringComparison)arg1.Value == StringComparison.CurrentCultureIgnoreCase ||
+#if !PORTABLE
                 (StringComparison)arg1.Value == StringComparison.InvariantCultureIgnoreCase ||
+#endif
                 (StringComparison)arg1.Value == StringComparison.OrdinalIgnoreCase)))
             {
                 return "i";
@@ -614,7 +620,11 @@ namespace BrightstarDB.EntityFramework.Query
 
             if (!String.IsNullOrEmpty(sourceVarName))
             {
+#if PORTABLE
+                if (expression.Member is PropertyInfo)
+#else
                 if (expression.Member.MemberType == MemberTypes.Property)
+#endif
                 {
                     var propertyInfo = expression.Member as PropertyInfo;
                     var hint = QueryBuilder.Context.GetPropertyHint(propertyInfo);

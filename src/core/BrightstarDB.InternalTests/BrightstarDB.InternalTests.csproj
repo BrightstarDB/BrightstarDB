@@ -14,6 +14,8 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +43,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\dotNetRDF.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -62,8 +66,12 @@
     <Compile Include="BPlusTreeTests\BasicTreeTests.cs" />
     <Compile Include="BPlusTreeTests\BPlusTreeBuilderTests.cs" />
     <Compile Include="BPlusTreeTests\CoalesceTests.cs" />
+    <Compile Include="BPlusTreeTests\DirectInternalNodeTests.cs" />
+    <Compile Include="BPlusTreeTests\DirectLeafNodeTests.cs" />
     <Compile Include="BPlusTreeTests\GraphIndexTests.cs" />
     <Compile Include="BPlusTreeTests\LeafNodeTests.cs" />
+    <Compile Include="BPlusTreeTests\MemoryPage.cs" />
+    <Compile Include="BPlusTreeTests\MemoryPageStore.cs" />
     <Compile Include="BPlusTreeTests\PageFileTests.cs" />
     <Compile Include="BPlusTreeTests\PerformanceTests.cs" />
     <Compile Include="BPlusTreeTests\ReadWriteStoreModifiedTests.cs" />
@@ -74,8 +82,12 @@
     <Compile Include="BrokenStoreTests.cs" />
     <Compile Include="BTreeStoreTests.cs" />
     <Compile Include="BTreeTests.cs" />
+    <Compile Include="StatisticsLogTests.cs" />
+    <Compile Include="StatsMonitorTests.cs" />
     <Compile Include="TestPaths.cs" />
     <Compile Include="DataObjectTests.cs" />
+    <Compile Include="GenericLruCacheTests.cs" />
+    <Compile Include="LruPageCacheTests.cs" />
     <Compile Include="MasterFileTests.cs" />
     <Compile Include="NTriplesParserTests.cs" />
     <Compile Include="ObjectLocationManagerTests.cs" />
@@ -111,8 +123,10 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.EntityFramework;
 using NUnit.Framework;
@@ -10,16 +8,22 @@ namespace BrightstarDB.Tests.EntityFramework
     [TestFixture]
     public class IdentifierEncodingTests
     {
-                private readonly MyEntityContext _myEntityContext;
+        private MyEntityContext _myEntityContext;
 
         private readonly string _connectionString =
             "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=IdentifierEncodingTests_" + DateTime.Now.Ticks;
 
-        public IdentifierEncodingTests()
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             _myEntityContext = new MyEntityContext(_connectionString);
         }
 
+        [TestFixtureTearDown]
+        public void TearDown()
+        {
+            _myEntityContext.Dispose();
+        }
 
         [Test]
         public void TestCreateItemWithSpecialCharactersInIdentifier()
@@ -35,14 +39,11 @@ namespace BrightstarDB.Tests.EntityFramework
             _myEntityContext.SaveChanges();
 
             // Try to retrieve by Id 
-            var found = _myEntityContext.DBPediaPersons.Where(p => p.Id.Equals("Aleksandar_Đorđević")).FirstOrDefault();
+            var found = _myEntityContext.DBPediaPersons.FirstOrDefault(p => p.Id.Equals("Aleksandar_Đorđević"));
             Assert.IsNotNull(found);
             Assert.AreEqual("Aleksandar", found.GivenName);
             Assert.AreEqual("Aleksandar_Đorđević", found.Id);
 
-            //var foundEntity = found as BrightstarEntityObject;
-            //Assert.IsNotNull(foundEntity);
-            //Assert.AreEqual("http://dbpedia.org/resource/Aleksandar_Đorđević", foundEntity.DataObject.Identity);
         }
     }
 }

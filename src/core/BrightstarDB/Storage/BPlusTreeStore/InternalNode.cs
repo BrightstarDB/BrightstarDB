@@ -1,76 +1,204 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using BrightstarDB.Storage;
+using System.Text;
+using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
-using Remotion.Linq.Utilities;
+using VDS.RDF;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
-    internal class InternalNode : INode
+    internal class InternalNode : IInternalNode
     {
+
         private readonly BPlusTreeConfiguration _config;
         private int _keyCount;
-        private readonly byte[][] _keys;
-        private readonly ulong[] _childPointers;
+        private IPage _page;
 
         /// <summary>
-        /// Get or set the ID of the page where this node is persisted
+        /// Creates a new empty node backed by the specified persistant storage page
         /// </summary>
-        public ulong PageId { get; set; }
-
-        /// <summary>
-        /// Get or set the boolean flag that indicates if this node has been modified since it was loaded
-        /// </summary>
-        public bool IsDirty { get; set; }
-
-        /// <summary>
-        /// Get the boolean flag that indicates if this node is a leaf node
-        /// </summary>
-        public bool IsLeaf
+        /// <param name="page">The page to be used to back the node</param>
+        /// <param name="treeConfig">The tree configuration parameters</param>
+        private InternalNode(IPage page,  BPlusTreeConfiguration treeConfig)
         {
-            get { return false; }
+            _page = page;
+            _config = treeConfig;
+            _keyCount = 0;
         }
 
         /// <summary>
-        /// Get the boolean flag that indicates if this node has reached the limit for the number of keys it can contain
+        /// Initializes a new node using the data contained in the specified persisten storage page
         /// </summary>
-        public bool IsFull
+        /// <param name="page">The page used to back the node</param>
+        /// <param name="keyCount">The number of keys in the node (as read from page data)</param>
+        /// <param name="treeConfig">The tree configuration parameters</param>
+        /// <remarks>Strictly speaking we don't have to pass the key count because it can be read from
+        /// the page data. However, the code that invokes this constructor needs to check the key
+        /// count value to see if a node contains a leaf or an internal node and having this constructor
+        /// separate from one that specifies that the page is empty initially is also convenient</remarks>
+        public InternalNode(IPage page, int keyCount, BPlusTreeConfiguration treeConfig)
         {
-            get { return _keyCount == _config.InternalBranchFactor; }
+            _config = treeConfig;
+            _page = page;
+            _keyCount = keyCount;
+#if DEBUG_BTREE
+            treeConfig.BTreeDebug("+Internal {0}", page.Id);
+#endif
         }
 
         /// <summary>
-        /// Get the current count of keys stored in this node
+        /// Creates a new node backed by the specified persistent storage page with a single
+        /// key and left and right pointers.
         /// </summary>
+        /// <param name="page">The page used to back the node. Must be writeable.</param>
+        /// <param name="splitKey">The key that separates left and right child pointers</param>
+        /// <param name="leftPageId">The left child node pointer</param>
+        /// <param name="rightPageId">The right child node pointer</param>
+        /// <param name="treeConfiguration">The tree configuration</param>
+        /// <exception cref="InvalidOperationException">Raised if <paramref name="page"/> is not a writeable page</exception>
+        public InternalNode(IPage page, byte[] splitKey, ulong leftPageId, ulong rightPageId,
+                                  BPlusTreeConfiguration treeConfiguration)
+        {
+            _config = treeConfiguration;
+            AssertWriteable(page);
+            _page = page;
+            _page.SetData(splitKey, 0, KeyOffset(0), _config.KeySize);
+            _page.SetData(BitConverter.GetBytes(leftPageId), 0, PointerOffset(0), 8);
+            _page.SetData(BitConverter.GetBytes(rightPageId), 0, PointerOffset(1), 8);
+            KeyCount = 1;
+#if DEBUG_BTREE
+            _config.BTreeDebug("+Internal {0}", _page.Id);
+#endif
+        }
+
+        /// <summary>
+        /// Creates a new node backed by the specified persistent storage page that has only
+        /// a single child node pointer
+        /// </summary>
+        /// <param name="page">The page used to back the node. Must be writeable.</param>
+        /// <param name="onlyChild">The child node pointer</param>
+        /// <param name="treeConfiguration">The tree configuration</param>
+        /// <exception cref="InvalidOperationException">Raised if <paramref name="page"/> is not a writeable page</exception>
+        public InternalNode(IPage page, ulong onlyChild, BPlusTreeConfiguration treeConfiguration)
+        {
+            _config = treeConfiguration;
+            AssertWriteable(page);
+            _page = page;
+            _page.SetData(BitConverter.GetBytes(onlyChild), 0, PointerOffset(0), 8);
+            KeyCount = 0;
+#if DEBUG_BTREE
+            _config.BTreeDebug("+Internal {0}", _page.Id);
+#endif
+        }
+
+        /// <summary>
+        /// Creates a new node backed by the specified persistent storage page 
+        /// containing a list of keys and child values
+        /// </summary>
+        /// <param name="page">The page used to back the node. Must be writeable</param>
+        /// <param name="keys">The list of keys for the node</param>
+        /// <param name="values">The list of values for the node</param>
+        /// <param name="treeConfiguration">The tree configuration</param>
+        public InternalNode(IPage page, List<byte[]> keys, List<ulong> values, BPlusTreeConfiguration treeConfiguration)
+        {
+            _config = treeConfiguration;
+            AssertWriteable(page);
+            _page = page;
+            KeyCount = keys.Count;
+            int i, keyOffset, pointerOffset;
+            for (i = 0, keyOffset = KeyOffset(0); i < keys.Count; i++, keyOffset+=_config.KeySize)
+            {
+                _page.SetData(keys[i], 0, keyOffset, _config.KeySize);
+            }
+            for (i = 0, pointerOffset = PointerOffset(0); i < KeyCount + 1; i++, pointerOffset += 8)
+            {
+                _page.SetData(BitConverter.GetBytes(values[i]), 0, pointerOffset, 8);
+            }
+#if DEBUG_BTREE
+            _config.BTreeDebug("+Internal {0}", _page.Id);
+#endif
+        }
+
+        public ulong PageId { get { return _page.Id; } }
+
+        public bool IsDirty { get { return _page.IsDirty; } }
+
+        public bool IsLeaf { get { return false; } }
+
+        public bool IsFull { get { return _keyCount == _config.InternalBranchFactor; } }
+
+        public byte[] RightmostKey { get { return GetKey(_keyCount - 1); } }
+        public byte[] LeftmostKey { get { return GetKey(0); } }
+
+        public byte[] GetData() { return _page.Data; }
+
         public int KeyCount
         {
             get { return _keyCount; }
+            private set
+            {
+                _keyCount = value;
+                _page.SetData(BitConverter.GetBytes(~_keyCount), 0, 0, 4);
+            }
         }
 
-        /// <summary>
-        /// Attempt to merge this node with the specified sibling node
-        /// </summary>
-        /// <param name="s">The sibling to merge with</param>
-        /// <param name="joinKey">The key that separates this node from the sibling</param>
-        /// <returns>True if the merge completed successfully, false otherwise</returns>
-        public bool Merge(INode s, byte[] joinKey)
+        public void DumpStructure(BPlusTree tree, int indentLevel)
+        {
+            var keyPrefix = new string(' ', indentLevel * 4);
+            var pointerPrefix = keyPrefix + "  ";
+            INode childNode;
+            for (int i = 0; i < _keyCount; i++)
+            {
+                var childPointer = GetPointer(i);
+                Console.WriteLine("{0}PTR[{1}]: {2}", pointerPrefix, i, childPointer);
+                childNode = tree.GetNode(childPointer, null);
+                childNode.DumpStructure(tree, indentLevel + 1);
+                Console.WriteLine("{0}KEY[{1}]: {2}", keyPrefix, i, GetKey(i).Dump());
+            }
+            var lastPointer = GetPointer(KeyCount);
+            Console.WriteLine("{0}PTR[{1}]: {2}", pointerPrefix, _keyCount, lastPointer);
+            childNode = tree.GetNode(lastPointer, null);
+            childNode.DumpStructure(tree, indentLevel + 1);
+        }
+
+        public string Dump()
+        {
+            var sb = new StringBuilder();
+            sb.AppendFormat("InternalNode @{0}:", PageId);
+            for (int i = 0; i < _keyCount; i++)
+            {
+                var childPointer = GetPointer(i);
+                sb.AppendFormat("\n PTR[{0}]: {1}", i, childPointer);
+                sb.AppendFormat("\nKEY[{0}]: {1}", i, GetKey(i).Dump());
+            }
+            var lastPointer = GetPointer(KeyCount);
+            sb.AppendFormat("\n PTR[{0}]: {1}", _keyCount, lastPointer);
+            return sb.ToString();
+        }
+
+        public bool NeedJoin { get { return KeyCount < _config.InternalSplitIndex; } }
+
+        public bool Merge(ulong txnId, INode s, byte[] joinKey)
         {
             var sibling = s as InternalNode;
-            if(sibling == null)
+            if (sibling == null)
             {
-                throw new ArgumentException("Merge node is null or not an InternalNode", "s");
+                throw new ArgumentException("Merge node is null or not a DirectInternalNode", "s");
             }
             if (sibling.KeyCount + KeyCount < _config.InternalBranchFactor)
             {
                 if (sibling.LeftmostKey.Compare(RightmostKey) > 0)
                 {
-                    // Append all of siblings entries 
-                    _keys[KeyCount] = new byte[_config.KeySize];
-                    Array.Copy(joinKey, _keys[KeyCount], _config.KeySize);
-                    Array.Copy(sibling._keys, 0, _keys, KeyCount+1, sibling.KeyCount);
-                    Array.Copy(sibling.ChildPointers, 0, _childPointers, KeyCount+1, sibling.KeyCount+1);
-                    _keyCount = _keyCount + sibling.KeyCount + 1;
+                    EnsureWriteable(txnId);
+                    // Append join key followed by all of sibling's entries
+                    _page.SetData(joinKey, 0, KeyOffset(KeyCount), _config.KeySize);
+                    _page.SetData(sibling.GetData(), KeyOffset(0),
+                                  KeyOffset(KeyCount + 1),
+                                  sibling.KeyCount*_config.KeySize);
+                    _page.SetData(sibling.GetData(), PointerOffset(0),
+                                  PointerOffset(KeyCount + 1),
+                                  (sibling.KeyCount + 1)*8);
+                    KeyCount = KeyCount + sibling.KeyCount + 1;
                     return true;
                 }
                 throw new InvalidOperationException("Attempted to merge in left node.");
@@ -78,219 +206,116 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return false;
         }
 
-        /// <summary>
-        /// Dump a trace of the structure of this node to the console
-        /// </summary>
-        /// <param name="tree">The tree that contains this node</param>
-        /// <param name="indentLevel">The indent level to use when writing the structure</param>
-        public void DumpStructure(BPlusTree tree, int indentLevel)
-        {
-            var keyPrefix = new string(' ', indentLevel*4);
-            var pointerPrefix = keyPrefix + "  ";
-            INode childNode;
-            for (int i = 0; i < _keyCount; i++)
-            {
-                Console.WriteLine("{0}PTR[{1}]: {2}", pointerPrefix, i, _childPointers[i]);
-                childNode = tree.GetNode(_childPointers[i], null);
-                childNode.DumpStructure(tree, indentLevel + 1);
-                Console.WriteLine("{0}KEY[{1}]: {2}", keyPrefix, i, _keys[i].Dump());
-            }
-            Console.WriteLine("{0}PTR[{1}]: {2}", pointerPrefix, _keyCount, _childPointers[_keyCount]);
-            childNode = tree.GetNode(_childPointers[_keyCount], null);
-            childNode.DumpStructure(tree, indentLevel + 1);
-        }
-
-        private InternalNode(ulong pageId, BPlusTreeConfiguration treeConfiguration)
-        {
-            _config = treeConfiguration;
-            PageId = pageId;
-            _keys = new byte[_config.InternalBranchFactor][];
-            _childPointers = new ulong[_config.InternalBranchFactor + 1];
-            _keyCount = 0;
-            IsDirty = true;
-        }
-
-        public InternalNode(ulong pageId, byte[] key, ulong leftChild, ulong rightChild,
-                            BPlusTreeConfiguration treeConfiguration)
-        {
-            _config = treeConfiguration;
-            PageId = pageId;
-            _keys = new byte[_config.InternalBranchFactor][];
-            _childPointers = new ulong[_config.InternalBranchFactor + 1];
-            _keys[0] = key; // TODO: copy key ?
-            _childPointers[0] = leftChild;
-            _childPointers[1] = rightChild;
-            _keyCount = 1;
-            IsDirty = true;
-        }
-
-        public InternalNode(ulong id, byte[] nodePage, int keyCount, BPlusTreeConfiguration treeConfiguration)
-        {
-            _config = treeConfiguration;
-            PageId = id;
-            _keyCount = keyCount;
-            _keys = new byte[_config.InternalBranchFactor][];
-            for (int i = 0, offset = BPlusTreeConfiguration.InternalNodeHeaderSize;
-                 i < _keyCount;
-                 i++, offset += _config.KeySize)
-            {
-                _keys[i] = new byte[_config.KeySize];
-                Array.Copy(nodePage, offset, _keys[i], 0, _config.KeySize);
-            }
-            _childPointers = ByteArrayHelper.ToUlongArray(nodePage, _config.InternalNodeChildStartOffset,
-                                                          _config.InternalBranchFactor + 1);
-        }
-
-        public InternalNode(ulong id, List<byte[]> keys, List<ulong >childPointers, BPlusTreeConfiguration treeConfiguration)
-        {
-            _config = treeConfiguration;
-            PageId = id;
-            _keyCount = keys.Count;
-            _keys = new byte[_config.InternalBranchFactor][];
-            _childPointers = new ulong[_config.InternalBranchFactor + 1];
-            for (int i = 0; i < _keyCount; i++)
-            {
-                _keys[i] = keys[i];
-            }
-            for(int i = 0; i <= _keyCount; i++)
-            {
-                _childPointers[i] = childPointers[i];
-            }
-        }
-
-        public InternalNode(ulong id, ulong onlyChild, BPlusTreeConfiguration treeConfiguration)
-        {
-            _config = treeConfiguration;
-            PageId = id;
-            _keyCount = 0;
-            _keys = new byte[_config.InternalBranchFactor][];
-            _childPointers = new ulong[_config.InternalBranchFactor+1];
-            _childPointers[0] = onlyChild;
-        }
-
-        /// <summary>
-        /// Get the serialized representation of this node
-        /// </summary>
-        /// <returns>The serialized node representation as a byte array</returns>
-        public byte[] GetData()
-        {
-            var buff = new byte[_config.PageSize];
-            Array.Copy(BitConverter.GetBytes(~_keyCount), buff, 4);
-            ByteArrayHelper.MultiCopy(_keys, buff, 4, _keyCount, _config.KeySize);
-            ByteArrayHelper.ToByteArray(_childPointers, buff, _config.InternalNodeChildStartOffset, (_keyCount + 1)*8);
-            return buff;
-        }
-
-        /// <summary>
-        /// Returns the ID of the right-most child of this node that contains keys less than <paramref name="key"/>
-        /// </summary>
-        /// <param name="key">The key to lookup</param>
-        /// <returns>The child node ID</returns>
         public ulong GetChildNodeId(byte[] key)
         {
-            for (int i = 0; i < _keyCount; i++)
+            for (int i = 0, offset = KeyOffset(0); i < _keyCount; i++, offset+=_config.KeySize)
             {
-                if (key.Compare(_keys[i]) < 0)
+                if (key.Compare(0, _page.Data, offset, _config.KeySize) < 0)
                 {
-                    return _childPointers[i];
+                    return GetPointer(i);
                 }
             }
-            return _childPointers[_keyCount];
-        }
-
-        /// <summary>
-        /// Get the highest key stored in this node
-        /// </summary>
-        public byte[] RightmostKey
-        {
-            get { return _keys[_keyCount - 1]; }
-        }
-
-        /// <summary>
-        /// Get the lowest key stored in this node
-        /// </summary>
-        public byte[] LeftmostKey
-        {
-            get { return _keys[0]; }
+            return GetPointer(KeyCount);
         }
 
         /// <summary>
         /// Splits this node into two internal nodes, creating a new node for the right-hand (upper) half of the keys
         /// </summary>
-        /// <param name="rightNodeId">The ID of the page reserved to receive the newly created internal node</param>
+        /// <param name="txnId"></param>
+        /// <param name="rightNodePage">The new page reserved to receive the newly created internal node</param>
         /// <param name="splitKey">Receives the value of the key used for the split</param>
         /// <returns>The new right-hand node</returns>
-        public InternalNode Split(ulong rightNodeId, out byte[] splitKey)
+        public IInternalNode Split(ulong txnId, IPage rightNodePage, out byte[] splitKey)
         {
-            var rightNode = new InternalNode(rightNodeId, _config);
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.Split. Id={0}. Structure Before: {1}", PageId, Dump());
+#endif
+            EnsureWriteable(txnId);
             var splitIndex = _config.InternalSplitIndex;
-            splitKey = _keys[splitIndex];
-
-            Array.Copy(_keys, splitIndex + 1,
-                       rightNode._keys, 0,
-                       _keyCount - (splitIndex + 1));
-            int pointerCopyStart = splitIndex + 1;
-            int pointerCopyLength = (_keyCount - splitIndex);
-            Array.Copy(_childPointers, pointerCopyStart,
-                       rightNode._childPointers, 0,
-                       pointerCopyLength);
-
-            rightNode._keyCount = _keyCount - (splitIndex + 1);
-            _keyCount = splitIndex;
-
+            splitKey = GetKey(splitIndex);
+            rightNodePage.SetData(_page.Data, KeyOffset(splitIndex + 1),
+                                  KeyOffset(0),
+                                  (KeyCount - (splitIndex + 1))*_config.KeySize);
+            var pointerCopyStart = PointerOffset(splitIndex + 1);
+            var pointerCopyLength = (KeyCount - splitIndex)*8;
+            rightNodePage.SetData(_page.Data, pointerCopyStart,
+                                  PointerOffset(0),
+                                  pointerCopyLength);
+            var rightNodeKeyCount = KeyCount - (splitIndex + 1);
+            rightNodePage.SetData(BitConverter.GetBytes(~rightNodeKeyCount), 0, 0, 4);
+            var rightNode = new InternalNode(rightNodePage, rightNodeKeyCount, _config);
+            KeyCount = splitIndex;
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.Split. Structure After: Id={0} {1}\nRight Node After: Id={2} {3}",
+                PageId, Dump(), rightNode.PageId, rightNode.Dump());
+#endif
             return rightNode;
         }
 
-        /// <summary>
-        /// Inserts a new child pointer into this internal node
-        /// </summary>
-        /// <param name="key">The key for the child node</param>
-        /// <param name="childPointer">The child node ID</param>
-        /// <exception cref="NodeFullException">Raised if this node already contains the maximum number of child pointers allowed</exception>
-        /// <exception cref="DuplicateKeyException">Raised if this node already contains a child node pointer with the same key</exception>
-        public void Insert(byte[] key, ulong childPointer)
+        public void Insert(ulong txnId, byte[] key, ulong childPointer)
         {
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.Insert. Key={0}. Before: Id={1} {2}",
+                key.Dump(), PageId, Dump());
+#endif
             if (_keyCount == _config.InternalBranchFactor)
             {
                 throw new NodeFullException();
             }
 
-            var insertIndex = Array.BinarySearch(_keys, 0, _keyCount, key, _config);
+            var insertIndex = Search(key);
             if (insertIndex >= 0)
             {
                 throw new DuplicateKeyException();
             }
 
+            EnsureWriteable(txnId);
             insertIndex = ~insertIndex;
-            for (int i = _keyCount; i > insertIndex; i--)
-            {
-                _keys[i] = _keys[i - 1];
-            }
-            for (int i = _keyCount + 1; i > insertIndex + 1; i--)
-            {
-                _childPointers[i] = _childPointers[i - 1];
-            }
-            _keys[insertIndex] = key; // TODO: copy key ?
-            _childPointers[insertIndex + 1] = childPointer;
-            _keyCount++;
+            RightShiftFrom(insertIndex, 1);
+            _page.SetData(key, 0,
+                          KeyOffset(insertIndex), _config.KeySize);
+            _page.SetData(BitConverter.GetBytes(childPointer), 0,
+                          PointerOffset(insertIndex + 1), 8);
+            KeyCount++;
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.Insert. Key={0}. After: Id={1} {2}",
+                key.Dump(), PageId, Dump());
+#endif
         }
 
         /// <summary>
         /// Updates the node ID pointed to be a child pointer
         /// </summary>
+        /// <param name="txnId"></param>
         /// <param name="oldChildPointer">The old child node ID to be replaced</param>
         /// <param name="newChildPointer">The new child node ID</param>
-        public void UpdateChildPointer(ulong oldChildPointer, ulong newChildPointer)
+        public void UpdateChildPointer(ulong txnId, ulong oldChildPointer, ulong newChildPointer)
         {
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.UpdateChildPointer. Old={0}, New={1}. Before: Id={2} {3}",
+                oldChildPointer, newChildPointer, PageId, Dump());
+#endif
             if (oldChildPointer == newChildPointer) return;
-            for (var i = 0; i <= _keyCount; i++)
+            EnsureWriteable(txnId);
+            int i, pointerOffset;
+            byte[] ocp = BitConverter.GetBytes(oldChildPointer);
+            byte[] ncp = BitConverter.GetBytes(newChildPointer);
+            for (i = 0, pointerOffset = PointerOffset(0); i <= KeyCount; i++, pointerOffset += 8)
             {
-                if (_childPointers[i] == oldChildPointer)
+                if (_page.Data.Compare(pointerOffset, ocp, 0, 8) == 0)
                 {
-                    _childPointers[i] = newChildPointer;
+                    _page.SetData(ncp, 0, pointerOffset, 8);
+#if DEBUG_BTREE
+                    _config.BTreeDebug("InternalNode.UpdateChildPointer. Old={0}, New={1}. After: Id={2} {3}",
+                        oldChildPointer, newChildPointer, PageId, Dump());
+#endif
                     return;
                 }
             }
+#if DEBUG_BTREE
+            _config.BTreeDebug("InternalNode.UpdateChildPointer. Old={0}, New={1}. No match found for old child pointer.",
+                oldChildPointer, newChildPointer);
+#endif
         }
 
         /// <summary>
@@ -301,11 +326,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <returns>True if the child node has a right-hand sibling, false otherwise</returns>
         public bool GetRightSiblingId(ulong childNodeId, out ulong rightSiblingId)
         {
-            for (int i = 0; i < _keyCount; i++)
+            int i, pointerOffset;
+            byte[] cni = BitConverter.GetBytes(childNodeId);
+            for(i=0,pointerOffset=PointerOffset(0); i < KeyCount; i++, pointerOffset+=8)
             {
-                if (_childPointers[i] == childNodeId)
+                if (_page.Data.Compare(pointerOffset, cni, 0, 8) == 0)
                 {
-                    rightSiblingId = _childPointers[i + 1];
+                    rightSiblingId = GetPointer(i + 1);
                     return true;
                 }
             }
@@ -321,21 +348,25 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <returns>True if the child node has a left-hand sibling, false otherwise</returns>
         public bool GetLeftSibling(ulong childNodeId, out ulong leftSiblingId)
         {
-            if (_childPointers[0] == childNodeId)
+            int i, pointerOffset;
+            byte[] cni = BitConverter.GetBytes(childNodeId);
+            if (_page.Data.Compare(PointerOffset(0), cni, 0, 8) == 0)
             {
                 // First child has no left sibling
                 leftSiblingId = 0;
                 return false;
             }
 
-            for (int i = 1; i <= _keyCount; i++)
+            
+            for (i = 1, pointerOffset=PointerOffset(1); i <= KeyCount; i++, pointerOffset += 8)
             {
-                if (_childPointers[i] == childNodeId)
+                if (_page.Data.Compare(pointerOffset, cni, 0, 8) == 0)
                 {
-                    leftSiblingId = _childPointers[i - 1];
+                    leftSiblingId = GetPointer(i - 1);
                     return true;
                 }
             }
+
             leftSiblingId = 0;
             return false;
         }
@@ -343,211 +374,299 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <summary>
         /// Attempts to ensure that the minimum size for this node is achieved by transferring entries from the left-hand sibling
         /// </summary>
+        /// <param name="txnId"></param>
         /// <param name="leftSibling">The left-hand sibling that will provide entries</param>
         /// <param name="joinKey">The value of the key that is present in the parent node between the pointer to this node and its left sibling</param>
         /// <param name="newJoinKey">The replacement value for the join key in the parent node</param>
         /// <returns>True if the node achieves its minimum size by the redistribution process, false otherwise</returns>
-        public bool RedistributeFromLeft(InternalNode leftSibling, byte[] joinKey, byte[] newJoinKey)
+        public bool RedistributeFromLeft(ulong txnId, IInternalNode leftSibling, byte[] joinKey, byte[] newJoinKey)
         {
-            int required = _config.InternalSplitIndex - _keyCount;
+            InternalNode left = leftSibling as InternalNode;
+            if (left == null)
+            {
+                throw new ArgumentException("Expected a InternalNode as left sibling", "leftSibling");
+            }
+
+            int required = _config.InternalSplitIndex - KeyCount;
             if (leftSibling.KeyCount - required < _config.InternalSplitIndex)
             {
                 // Can't fulfill requirements with a borrow from left sibling
                 return false;
             }
 
-            int evenOut = (_keyCount + leftSibling._keyCount) / 2 - _keyCount;
-            if (leftSibling.KeyCount  - evenOut > _config.InternalSplitIndex)
+            int evenOut = (KeyCount + left.KeyCount)/2 - KeyCount;
+            if (leftSibling.KeyCount - evenOut > _config.InternalSplitIndex)
             {
                 required = evenOut;
             }
 
+            EnsureWriteable(txnId);
+            left.EnsureWriteable(txnId);
+
             // Make space for new keys and child pointers
-            _childPointers[_keyCount + required] = _childPointers[_keyCount];
-            for(int i = _keyCount -1; i >= 0; i-- )
-            {
-                _keys[i + required] = _keys[i];
-                _childPointers[i + required] = _childPointers[i];
-            }
-            SetKey(required-1, joinKey);
-            CopyKeys(leftSibling._keys, (leftSibling._keyCount - required) + 1, 0, required - 1);
-            //Array.Copy(leftSibling._keys, (leftSibling._keyCount - required) + 1, _keys, 0, required-1);
-            Array.Copy(leftSibling._childPointers, (leftSibling._keyCount-required) + 1, _childPointers, 0, required);
-            Array.Copy(leftSibling._keys[leftSibling.KeyCount-required], newJoinKey, _config.KeySize);
-            _keyCount += required;
-            leftSibling._keyCount -= required;
+            RightShift(required);
+
+            _page.SetData(joinKey, 0, KeyOffset(required - 1), _config.KeySize);
+            _page.SetData(left.GetData(), KeyOffset(left.KeyCount - (required - 1)),
+                          KeyOffset(0), (required - 1)*_config.KeySize);
+            _page.SetData(left.GetData(), PointerOffset(left.KeyCount - (required - 1)),
+                          PointerOffset(0), (required)*8);
+            Array.Copy(left.GetData(), KeyOffset(left.KeyCount-required), newJoinKey, 0, _config.KeySize);
+            KeyCount += required;
+            left.KeyCount -= required;
             return true;
         }
 
-        private void SetKey(int ix, byte [] value)
+        public bool RedistributeFromRight(ulong txnId, IInternalNode rightSibling, byte[] joinKey, byte[] newJoinKey)
         {
-            _keys[ix] = new byte[_config.KeySize];
-            Array.Copy(value, _keys[ix], _config.KeySize);
-        }
+            var right = rightSibling as InternalNode;
+            if (right == null) throw new ArgumentException("Expected a DirectInternalNode as right sibling", "rightSibling");
 
-        private void CopyKeys(byte[][] sourceKeys, int sourceOffset, int targetOffset, int count)
-        {
-            for(int i = 0; i <count; i++)
-            {
-                SetKey(targetOffset+i, sourceKeys[sourceOffset+i]);
-            }
-        }
-
-        public bool RedistributeFromRight(InternalNode rightSibling, byte[] joinKey, byte [] newJoinKey)
-        {
             int required = _config.InternalSplitIndex - _keyCount;
             if (rightSibling.KeyCount - required < _config.InternalSplitIndex)
             {
                 return false;
             }
 
-            // Copy keys and child pointers
-            SetKey(_keyCount, joinKey);
-            CopyKeys(rightSibling._keys, 0, _keyCount + 1, required - 1);
-            //Array.Copy(rightSibling._keys, 0, _keys, _keyCount + 1, required - 1);
-            Array.Copy(rightSibling._childPointers, 0, _childPointers, _keyCount + 1, required);
-            Array.Copy(rightSibling._keys[required - 1], newJoinKey, _config.KeySize);
+            EnsureWriteable(txnId);
+            right.EnsureWriteable(txnId);
 
-            // Shift up remaining keys and child pointers in the right node
-            for(int i  = 0; i < rightSibling._keyCount - required; i++)
-            {
-                rightSibling._keys[i] = rightSibling._keys[i + required];
-                rightSibling._childPointers[i] = rightSibling.ChildPointers[i + required];
-            }
-            rightSibling._childPointers[rightSibling._keyCount - required] = rightSibling._childPointers[rightSibling.KeyCount];
-            rightSibling._keyCount -= required;
-            _keyCount += required;
+            // Copy keys and child pointers
+            _page.SetData(joinKey, 0, KeyOffset(KeyCount), _config.KeySize); // Set key[KeyCount+1] to joinKey
+            _page.SetData(right.GetData(), KeyOffset(0),
+                          KeyOffset(KeyCount + 1), (required - 1)*_config.KeySize);
+            _page.SetData(right.GetData(), PointerOffset(0),
+                          PointerOffset(KeyCount + 1), required*8);
+            Array.Copy(right.GetData(), KeyOffset(required - 1),
+                       newJoinKey, 0, _config.KeySize);
+            right.LeftShift(required);
+            KeyCount += required;
             return true;
         }
 
-        /// <summary>
-        /// Modifies the key that is immediately before the one that indexes the specified child node
-        /// </summary>
-        /// <param name="childNodeId">The child node pointer</param>
-        /// <param name="childNodeKey">The new key value</param>
-        /// <remarks>If <paramref name="childNodeId"/> is the ID of the first child node, this operation returns without modifying this node at all</remarks>
-        public void SetLeftKey(ulong childNodeId, byte[] childNodeKey)
+        public void SetLeftKey(ulong txnId, ulong childNodeId, byte[] childNodeKey)
         {
             if (childNodeKey == null)
             {
                 throw new ArgumentNullException("childNodeKey");
             }
-            if (childNodeId == _childPointers[0])
+
+            byte[] cni = BitConverter.GetBytes(childNodeId);
+            if (_page.Data.Compare(PointerOffset(0), cni, 0, 8) == 0)
             {
                 // First pointer doesn't have a corresponding key to update
                 return;
             }
-            for (int i = 1; i <= _keyCount; i++)
+            int i, pointerOffset;
+            for (i = 1, pointerOffset = PointerOffset(1); i <= KeyCount; i++, pointerOffset += 8)
             {
-                if (_childPointers[i] == childNodeId)
+                if (_page.Data.Compare(pointerOffset, cni, 0, 8) == 0)
                 {
-                    if (_keys[i-1] == null)
-                    {
-                        _keys[i-1] = new byte[_config.KeySize];
-                    }
-                    Array.Copy(childNodeKey, _keys[i-1], _config.KeySize);
+                    EnsureWriteable(txnId);
+                    _page.SetData(childNodeKey, 0, KeyOffset(i - 1), _config.KeySize);
                 }
             }
         }
 
         public byte[] GetKey(ulong childNodeId)
         {
-            var ix = Array.IndexOf(_childPointers, childNodeId);
-            if (ix >= 0) return _keys[ix];
+            var ix = Search(childNodeId);
+            if (ix >= 0) return GetKey(ix);
             return null;
         }
 
-        public void SetKey(ulong  childNodeId, byte[] newKey)
+        public void SetKey(ulong txnId, ulong childNodeId, byte[] newKey)
         {
-            var ix = Array.IndexOf(_childPointers, childNodeId);
-            if(ix < 0) throw new ArgumentException("Cannot find child node", "childNodeId");
-            if (_keys[ix] == null)
-            {
-                _keys[ix] = new byte[_config.KeySize];
-            }
-            Array.Copy(newKey, _keys[ix], _config.KeySize);
+            var ix = Search(childNodeId);
+            if (ix < 0) throw new ArgumentException("Cannot find child node " + childNodeId, "childNodeId");
+            EnsureWriteable(txnId);
+            _page.SetData(newKey, 0, KeyOffset(ix), _config.KeySize);
         }
 
-        /// <summary>
-        /// Removes the pointer to the specified child node
-        /// </summary>
-        /// <param name="childNodeId">The child node pointer to be removed</param>
-        /// <remarks>The key that indexes the child node is also removed</remarks>
-        public byte[] RemoveChildPointer(ulong childNodeId)
+        public byte[] RemoveChildPointer(ulong txnId, ulong childNodeId)
         {
-            var pointerIndex = Array.IndexOf(_childPointers, childNodeId);
-            if (pointerIndex == _keyCount)
+            var pointerIndex = Search(childNodeId);
+            if (pointerIndex < 0)
             {
-                // Removed the end pointer, so chop off the last key
-                _keyCount--;
-                _childPointers[pointerIndex] = 0;
-                return _keys[_keyCount]; // Return the key we just chopped off the end of the array
+                    throw new ArgumentException("Cannot find child node " + childNodeId, "childNodeId");
+            }
+            EnsureWriteable(txnId);
+            if (pointerIndex == KeyCount)
+            {
+                // Removed the end pointer, so retrieve the last key (to be returned) and then chop it off 
+                byte[] ret = GetKey(KeyCount);
+                KeyCount--;
+                return ret;
             }
             else
             {
-                // Removed an internal pointer, so copy all keys to its right down one place (overwriting the key for the deleted entry)
-                var ret = _keys[pointerIndex];
-                // _keys.ShiftDown(pointerIndex - 1);
-                _keys.ShiftDown(pointerIndex);
-                _childPointers.ShiftDown(pointerIndex);
-                _keyCount--;
+                // Removed an internal pointer so copy all keys to its right up one place
+                var ret = GetKey(pointerIndex);
+                LeftShiftFrom(pointerIndex, 1);
                 return ret;
             }
         }
 
-        /// <summary>
-        /// Get the boolean flag that indicates if this node has fewer entries than the minimum allowed
-        /// </summary>
-        public bool NeedJoin
-        {
-            get { return _keyCount < _config.InternalSplitIndex; }
-        }
-
-        public ulong[] ChildPointers
-        {
-            get { return _childPointers; }
-        }
-
-        /// <summary>
-        /// Determine if this node contains the specified key
-        /// </summary>
-        /// <param name="key">The key to search for</param>
-        /// <returns>True if this node contains the specified key, false otherwise</returns>
         public bool ContainsKey(byte[] key)
         {
-            return (Array.BinarySearch(_keys, 0, _keyCount, key, _config) >= 0);
+            return Search(key) >= 0;
         }
 
-        /// <summary>
-        /// Returns the range of child node pointers for keys start from fromKey up to toKey
-        /// </summary>
-        /// <param name="fromKey"></param>
-        /// <param name="toKey"></param>
-        /// <returns></returns>
         public IEnumerable<ulong> Scan(byte[] fromKey, byte[] toKey)
         {
-            for(int i = 0; i < _keyCount; i++)
+            int i, pointerOffset, keyOffset;
+            for (i = 0, pointerOffset = PointerOffset(0), keyOffset = KeyOffset(0);
+                 i < KeyCount;
+                 i++, pointerOffset += 8, keyOffset += _config.KeySize)
             {
-                if (fromKey.Compare(_keys[i]) < 0)
+                if (fromKey.Compare(0, _page.Data, keyOffset, _config.KeySize) < 0)
                 {
-                    yield return _childPointers[i];
-                    if (toKey.Compare(_keys[i]) < 0)
+                    yield return GetPointer(i);
+                    if (toKey.Compare(0, _page.Data, keyOffset, _config.KeySize) < 0)
                     {
                         yield break;
                     }
                 }
-                if (toKey.Compare(_keys[i]) < 0)
+                if (toKey.Compare(0, _page.Data, keyOffset, _config.KeySize) < 0)
                 {
-                    yield return _childPointers[i];
+                    yield return GetPointer(i);
                     yield break;
                 }
             }
-            yield return _childPointers[_keyCount];
+            yield return GetPointer(KeyCount);
         }
 
         public IEnumerable<ulong> Scan()
         {
-            return _childPointers.Take(_keyCount + 1);
+            for (int i = 0; i <= KeyCount; i++)
+            {
+                yield return GetPointer(i);
+            }
         }
+
+        public ulong GetChildPointer(int ix)
+        {
+            if (ix > KeyCount) throw new ArgumentOutOfRangeException("ix");
+            return GetPointer(ix);
+        }
+
+        private int KeyOffset(int keyIx)
+        {
+            return BPlusTreeConfiguration.InternalNodeHeaderSize + (keyIx*_config.KeySize);
+        }
+
+        private int PointerOffset(int pointerIx)
+        {
+            return _config.InternalNodeChildStartOffset + (pointerIx*8);
+        }
+
+        private byte[] GetKey(int keyIx)
+        {
+            byte[] buff = new byte[_config.KeySize];
+            GetKey(keyIx, buff);
+            return buff;
+        }
+
+        private void GetKey(int keyIx, byte[] buff)
+        {
+            Array.Copy(_page.Data, KeyOffset(keyIx), buff, 0, _config.KeySize);
+        }
+
+        private ulong GetPointer(int pointerIx)
+        {
+            byte[] buff = new byte[8];
+            GetPointer(pointerIx, buff);
+            return BitConverter.ToUInt64(buff, 0);
+        }
+
+        private void GetPointer(int pointerIx, byte[] buff)
+        {
+            Array.Copy(_page.Data, PointerOffset(pointerIx), buff, 0, 8);
+        }
+
+        private int Search(byte[] key)
+        {
+            // TODO: replace with a binary search algorithm
+            for (int i = 0, keyOffset = KeyOffset(0);
+                 i < KeyCount;
+                 i++, keyOffset += _config.KeySize)
+            {
+                var cmp = key.Compare(0, _page.Data, keyOffset, _config.KeySize);
+                if (cmp == 0) return i;
+                if (cmp < 0) return ~i;
+            }
+            return ~KeyCount;
+        }
+
+        private int Search(ulong pointer)
+        {
+            // Note: this has to be a linear search as pointer values are in no particular order
+            int i, pointerOffset;
+            byte[] p = BitConverter.GetBytes(pointer);
+            for (i = 0, pointerOffset = PointerOffset(0); i < KeyCount + 1; i++, pointerOffset+=8)
+            {
+                var cmp = _page.Data.Compare(pointerOffset, p, 0, 8);
+                if ( cmp == 0)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        private void RightShiftFrom(int ix, int numPlaces)
+        {
+            int i, keyOffset, pointerOffset;
+            int keyShift = numPlaces * _config.KeySize;
+            int pointerShift = numPlaces*8;
+            int lastPointerOffset = PointerOffset(KeyCount);
+            _page.SetData(_page.Data, lastPointerOffset, lastPointerOffset+pointerShift, 8);
+            for (i = KeyCount - 1,
+                 keyOffset = KeyOffset(KeyCount - 1),
+                 pointerOffset = PointerOffset(KeyCount - 1);
+                 i >= ix;
+                 i--, keyOffset -= _config.KeySize, pointerOffset -= 8)
+            {
+                _page.SetData(_page.Data, keyOffset, keyOffset + keyShift, _config.KeySize);
+                _page.SetData(_page.Data, pointerOffset, pointerOffset + pointerShift, 8);
+            }
+        }
+
+        private void RightShift(int numPlaces)
+        {
+            RightShiftFrom(0, numPlaces);
+        }
+
+        private void LeftShift(int numPlaces)
+        {
+            LeftShiftFrom(0, numPlaces);
+        }
+
+        private void LeftShiftFrom(int ix, int numPlaces)
+        {
+            _page.SetData(_page.Data, KeyOffset(ix + numPlaces),
+                          KeyOffset(ix), (KeyCount - ix - numPlaces)*_config.KeySize);
+            _page.SetData(_page.Data, PointerOffset(ix + numPlaces),
+                          PointerOffset(ix), (KeyCount - ix - numPlaces + 1)*8);
+            KeyCount -= numPlaces;
+        }
+
+        private void EnsureWriteable(ulong txnId)
+        {
+            if (!_config.PageStore.IsWriteable(_page))
+            {
+                _page = _config.PageStore.GetWriteablePage(txnId, _page);
+            }
+        }
+
+        private void AssertWriteable(IPage page)
+        {
+            if (!_config.PageStore.IsWriteable(page))
+            {
+                throw new InvalidOperationException(Strings.INode_Attempt_to_write_to_a_fixed_page);
+            }
+        }
+
+
     }
 }

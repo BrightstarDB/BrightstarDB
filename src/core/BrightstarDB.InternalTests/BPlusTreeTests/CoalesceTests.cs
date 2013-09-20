@@ -15,7 +15,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             ulong srcRootId, coalescedRootId;
             using(var store = TestUtils.CreateEmptyPageStore(storeName))
             {
-                var tree = new BPlusTree(store);
+                var tree = new BPlusTree(0, store);
                 srcRootId = tree.Save(0, null);
                 store.Commit(0, null);
             }
@@ -43,11 +43,11 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         {
             const string storeName = "Coalesce.RootLeafNode.data";
             ulong srcRootId, targetRootId;
-            var config = new BPlusTreeConfiguration(8, 64, 4096);
             var txnId = 0ul;
             using(var store = TestUtils.CreateEmptyPageStore(storeName))
             {
-                var sourceTree = new BPlusTree(store);
+                var sourceTree = new BPlusTree(0, store);
+                var config = sourceTree.Configuration;
                 for (int i = 0; i < config.LeafLoadFactor; i++)
                 {
                     sourceTree.Insert(txnId, (ulong)i, BitConverter.GetBytes((ulong)i));
@@ -60,6 +60,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             using(var store = TestUtils.OpenPageStore(storeName, false))
             {
                 var sourceTree = new BPlusTree(store, srcRootId);
+                var config = sourceTree.Configuration;
                 var builder = new BPlusTreeBuilder(store, config);
                 targetRootId = builder.Build(1, sourceTree.Scan(null));
                 
@@ -77,6 +78,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             using(var store = TestUtils.OpenPageStore(storeName, true))
             {
                 var targetTree = new BPlusTree(store, targetRootId);
+                var config = targetTree.Configuration;
                 targetTree.DumpStructure();
                 byte[] valueBuff = new byte[64];
                 for (int i = 0; i < config.LeafLoadFactor; i++)
@@ -92,11 +94,11 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         {
             const string storeName = "Coalesce.LeafLoadPlusOne.data";
             ulong srcRootId, targetRootId;
-            var config = new BPlusTreeConfiguration(8, 64, 4096);
             var txnId = 0ul;
             using (var store = TestUtils.CreateEmptyPageStore(storeName))
             {
-                var sourceTree = new BPlusTree(store);
+                var sourceTree = new BPlusTree(0, store);
+                var config = sourceTree.Configuration;
                 for (int i = 0; i < config.LeafLoadFactor + 1; i++)
                 {
                     sourceTree.Insert(txnId, (ulong)i, BitConverter.GetBytes((ulong)i));
@@ -106,10 +108,10 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 store.Commit(txnId, null);
             }
 
-            txnId = 1;
             using (var store = TestUtils.OpenPageStore(storeName, false))
             {
                 var sourceTree = new BPlusTree(store, srcRootId);
+                var config = sourceTree.Configuration;
                 var builder = new BPlusTreeBuilder(store, config);
                 targetRootId = builder.Build(1, sourceTree.Scan(null));
                 var targetTree = new BPlusTree(store, targetRootId);
@@ -126,6 +128,8 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             using (var store = TestUtils.OpenPageStore(storeName, true))
             {
                 var targetTree = new BPlusTree(store, targetRootId);
+                var config = targetTree.Configuration;
+
                 targetTree.DumpStructure();
                 byte[] valueBuff = new byte[64];
                 for (int i = 0; i < config.LeafLoadFactor + 1; i++)
@@ -134,11 +138,11 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                     Assert.AreEqual((ulong)i, BitConverter.ToUInt64(valueBuff, 0));
                 }
 
-                var root = targetTree.GetNode(targetTree.RootId, null) as InternalNode;
+                var root = targetTree.GetNode(targetTree.RootId, null) as IInternalNode;
                 Assert.IsNotNull(root);
                 Assert.AreEqual(1, root.KeyCount);
-                var leftChild = targetTree.GetNode(root.ChildPointers[0], null) as LeafNode;
-                var rightChild = targetTree.GetNode(root.ChildPointers[1], null) as LeafNode;
+                var leftChild = targetTree.GetNode(root.GetChildPointer(0), null) as ILeafNode;
+                var rightChild = targetTree.GetNode(root.GetChildPointer(1), null) as ILeafNode;
                 Assert.IsNotNull(leftChild);
                 Assert.IsNotNull(rightChild);
 

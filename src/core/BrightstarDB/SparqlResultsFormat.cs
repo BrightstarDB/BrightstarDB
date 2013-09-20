@@ -98,9 +98,16 @@ namespace BrightstarDB
         public static SparqlResultsFormat GetResultsFormat(string resultsMediaTypeOrExtension)
         {
             var parts = resultsMediaTypeOrExtension.Split(';').Select(p => p.Trim()).ToList();
+#if PORTABLE
+            var encodingName =
+                parts.Where(p => p.ToLowerInvariant().StartsWith("charset="))
+                     .Select(p => p.Substring(8))
+                     .FirstOrDefault();
+#else
             var encodingName =
                 parts.Where(p => p.StartsWith("charset=", StringComparison.InvariantCultureIgnoreCase)).Select(
                     p => p.Substring(8)).FirstOrDefault();
+#endif
             var encoding = encodingName == null ? Encoding.UTF8 : Encoding.GetEncoding(encodingName);
             var mediaType = parts[0];
             foreach(var format in AllFormats)
@@ -117,7 +124,7 @@ namespace BrightstarDB
         /// <returns></returns>
         public override string ToString()
         {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             return MediaTypes[0] + "; charset=" + Encoding.WebName;
 #else
             return MediaTypes[0] + "; charset=" + Encoding.HeaderName;

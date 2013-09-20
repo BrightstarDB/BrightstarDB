@@ -135,21 +135,29 @@
     <Compile Include="Client\EmbeddedBrightstarService.cs" />
     <Compile Include="Client\IBrightStarService.cs" />
     <Compile Include="Client\ICommitPointInfo.cs" />
+    <Compile Include="Client\ICommitPointStats.cs" />
     <Compile Include="Client\IJobInfo.cs" />
+    <Compile Include="Client\IStoreStatistics.cs" />
     <Compile Include="Client\ITransactionInfo.cs" />
     <Compile Include="Client\JobInfoWrapper.cs" />
     <Compile Include="Client\NamedPipeDataObjectContext.cs" />
     <Compile Include="Client\NamedPipeDataObjectStore.cs" />
     <Compile Include="Client\NetTcpDataObjectContext.cs" />
     <Compile Include="Client\NetTcpDataObjectStore.cs" />
+    <Compile Include="Client\RefreshMode.cs" />
     <Compile Include="Client\ReplyMessageInspector.cs" />
     <Compile Include="Client\RestClientHelper.cs" />
     <Compile Include="Client\RestDataObjectContext.cs" />
+    <Compile Include="Client\RestDataObjectStore.cs" />
     <Compile Include="Client\RestJobInfo.cs" />
     <Compile Include="Client\SignatureType.cs" />
+    <Compile Include="Client\StoreStatisticsWrapper.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
+    <Compile Include="Server\SnapshotJob.cs" />
+    <Compile Include="Server\StatsMonitor.cs" />
+    <Compile Include="Server\UpdateStatsJob.cs" />
     <Compile Include="SparqlResultsFormat.cs" />
     <Compile Include="Client\TransactionInfoWrapper.cs" />
     <Compile Include="Client\TransactionPreconditionsFailedException.cs" />
@@ -203,7 +211,6 @@
     <Compile Include="EntityFramework\Query\VariableBindingType.cs" />
     <Compile Include="EntityFramework\ReflectionMappingException.cs" />
     <Compile Include="EntityFramework\ReflectionMappingProvider.cs" />
-    <Compile Include="EntityFramework\RefreshMode.cs" />
     <Compile Include="EntityFramework\RelativeOrAbsoluteIdentifierAttribute.cs" />
     <Compile Include="EntityFramework\ServiceProvider.cs" />
     <Compile Include="EntityFramework\Strings1.Designer.cs">
@@ -293,13 +300,13 @@
     <Compile Include="Storage\BPlusTreeStore\BPlusTreeStoreManager.cs" />
     <Compile Include="Storage\BPlusTreeStore\DuplicateKeyException.cs" />
     <Compile Include="Storage\BPlusTreeStore\GraphIndex\IPageStoreGraphIndex.cs" />
+    <Compile Include="Storage\BPlusTreeStore\IInternalNode.cs" />
+    <Compile Include="Storage\BPlusTreeStore\ILeafNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\INode.cs" />
     <Compile Include="Storage\BPlusTreeStore\INodeCache.cs" />
-    <Compile Include="Storage\BPlusTreeStore\InternalNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\IPageStoreObject.cs" />
     <Compile Include="Storage\BPlusTreeStore\IPageStorePrefixManager.cs" />
     <Compile Include="Storage\BPlusTreeStore\IResourceTable.cs" />
-    <Compile Include="Storage\BPlusTreeStore\LeafNode.cs" />
     <Compile Include="Storage\BPlusTreeStore\NodeCache.cs" />
     <Compile Include="Storage\BPlusTreeStore\NodeFullException.cs" />
     <Compile Include="Storage\BPlusTreeStore\PrefixManager.cs" />
@@ -309,7 +316,12 @@
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\IPageStoreResourceIndex.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LongLiteralResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LongUriResource.cs" />
+    <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LruResourceCache.cs" />
+    <Compile Include="Storage\BPlusTreeStore\ResourceIndex\LruResourceIdCache.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceTable.cs" />
+    <Compile Include="Storage\BPlusTreeStore\InternalNode.cs" />
+    <Compile Include="Storage\BPlusTreeStore\LeafNode.cs" />
+    <Compile Include="Storage\Statistics\PersistentStatisticsLog.cs" />
     <Compile Include="Storage\IPrefixManager.cs" />
     <Compile Include="Storage\BPlusTreeStore\Store.cs" />
     <Compile Include="Storage\BTreeStore\AbstractStoreManager.cs" />
@@ -346,6 +358,7 @@
     <Compile Include="Storage\InvalidWriteOffsetException.cs" />
     <Compile Include="Storage\IPersistenceManager.cs" />
     <Compile Include="Storage\IStore.cs" />
+    <Compile Include="Storage\IStoreStatisticsLog.cs" />
     <Compile Include="Storage\ITransactionInfo.cs" />
     <Compile Include="Storage\ITransactionLog.cs" />
     <Compile Include="Storage\MasterFile.cs" />
@@ -354,9 +367,11 @@
     <Compile Include="Storage\Persistence\BackgroundPageWriter.cs" />
     <Compile Include="Storage\Persistence\BinaryFilePage.cs" />
     <Compile Include="Storage\Persistence\BinaryFilePageStore.cs" />
+    <Compile Include="Storage\Persistence\BinaryPageAdapter.cs" />
     <Compile Include="Storage\Persistence\BlockProviderStream.cs" />
     <Compile Include="Storage\Persistence\CachingBlockProvider.cs" />
     <Compile Include="Storage\Persistence\CircularBufferPageCache.cs" />
+    <Compile Include="Storage\Persistence\EvictionEventArgs.cs" />
     <Compile Include="Storage\Persistence\FilePage.cs" />
     <Compile Include="Storage\Persistence\FilePersistenceManager.cs" />
     <Compile Include="Storage\Persistence\IBlockInfo.cs" />
@@ -373,6 +388,7 @@
     <Compile Include="Storage\BPlusTreeStore\RelatedResourceIndex\PredicateRelatedResourceIndex.cs" />
     <Compile Include="Storage\BPlusTreeStore\RelatedResourceIndex\RelatedResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\RelatedResourceIndex\RelatedResourceIndex.cs" />
+    <Compile Include="Storage\Persistence\LruPageCache.cs" />
     <Compile Include="Storage\Persistence\PageCache.cs" />
     <Compile Include="Storage\Persistence\ReadWriteStoreModifiedException.cs" />
     <Compile Include="Storage\ResourceIdCache.cs" />
@@ -389,10 +405,13 @@
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\ShortLiteralResource.cs" />
     <Compile Include="Storage\BPlusTreeStore\ResourceIndex\ShortUriResource.cs" />
     <Compile Include="Storage\SerializationUtils.cs" />
+    <Compile Include="Storage\Statistics\StoreStatisticsHeaderRecord.cs" />
+    <Compile Include="Storage\Statistics\StoreStatisticsRecord.cs" />
     <Compile Include="Storage\StoreConfiguration.cs" />
     <Compile Include="Storage\StoreConstants.cs" />
     <Compile Include="Storage\StoreManagerException.cs" />
     <Compile Include="Storage\StoreManagerFactory.cs" />
+    <Compile Include="Storage\Statistics\StoreStatistics.cs" />
     <Compile Include="Storage\StoreType.cs" />
     <Compile Include="Storage\TransactionInfoEnumerator.cs" />
     <Compile Include="Storage\TransactionLog\PersistentTransactionLog.cs" />
@@ -413,6 +432,7 @@
     <Compile Include="Utils\CircularBufferIndex.cs" />
     <Compile Include="Storage\StoreExtensions.cs" />
     <Compile Include="Utils\IEnumeratorExtensions.cs" />
+    <Compile Include="Utils\LruCache.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

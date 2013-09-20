@@ -61,7 +61,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             using (profiler.Step("ResourceTable.GetResource"))
             {
                 var currentPage = _pageStore.Retrieve(pageId, profiler);
-                int resourceLength = BitConverter.ToInt32(currentPage, segment*_segmentSize);
+                int resourceLength = BitConverter.ToInt32(currentPage.Data, segment*_segmentSize);
                 int totalLength = resourceLength + 4;
                 int segmentsToLoad = totalLength/_segmentSize;
                 if (totalLength%_segmentSize > 0) segmentsToLoad++;
@@ -71,11 +71,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 {
                     if (segmentIndex == _pointerSegment)
                     {
-                        ulong nextPageId = BitConverter.ToUInt64(currentPage, _pageStore.PageSize - 8);
+                        ulong nextPageId = BitConverter.ToUInt64(currentPage.Data, _pageStore.PageSize - 8);
                         currentPage = _pageStore.Retrieve(nextPageId, profiler);
                         segmentIndex = 0;
                     }
-                    Array.Copy(currentPage, segmentIndex*_segmentSize, buffer, i*_segmentSize, _segmentSize);
+                    Array.Copy(currentPage.Data, segmentIndex*_segmentSize, buffer, i*_segmentSize, _segmentSize);
                     segmentIndex++;
                 }
                 return Encoding.UTF8.GetString(buffer, 4, resourceLength);
@@ -131,12 +131,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         private void StartNewPage(ulong transactionId, BrightstarProfiler profiler)
         {
-            ulong nextPage = _pageStore.Create();
+            IPage nextPage = _pageStore.Create(transactionId);
             if (_currentPage > 0)
             {
-                _pageStore.Write(transactionId, _currentPage, BitConverter.GetBytes(nextPage), 0, _pageStore.PageSize-8, 8, profiler);
+                _pageStore.Write(transactionId, _currentPage, BitConverter.GetBytes(nextPage.Id), 0, _pageStore.PageSize-8, 8, profiler);
             }
-            _currentPage = nextPage;
+            _currentPage = nextPage.Id;
             _nextSegment = 0;
         }
 
@@ -148,9 +148,29 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
-            _pageStore.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
+        private bool _disposed;
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!_disposed)
+                {
+                    _pageStore.Close();
+                    _disposed = true;
+                }
+            }
+        }
         #endregion
+
+        ~ResourceTable()
+        {
+            Dispose(false);
+        }
+
     }
 }

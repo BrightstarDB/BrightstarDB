@@ -423,6 +423,13 @@ namespace BrightstarDB.Polaris.ViewModel
                     x => new CommitPointViewModel(x));
         }
 
+        public StatisticsViewModel GetStatistics(Store store)
+        {
+            var client = BrightstarService.GetClient(ConnectionString);
+            var stats = client.GetStatistics(store.Location);
+            return stats == null ? null : new StatisticsViewModel(stats);
+        }
+
         public Connection Clone()
         {
             var ret = new Connection(this.Name, this.ConnectionString.ToString());

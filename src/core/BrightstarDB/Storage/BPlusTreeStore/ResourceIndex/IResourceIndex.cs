@@ -1,8 +1,9 @@
-﻿using BrightstarDB.Profiling;
+﻿using System;
+using BrightstarDB.Profiling;
 
 namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
 {
-    internal interface IResourceIndex
+    internal interface IResourceIndex : IDisposable
     {
         /// <summary>
         /// Ensures that the specified resource is in the resource index and returns its resource ID

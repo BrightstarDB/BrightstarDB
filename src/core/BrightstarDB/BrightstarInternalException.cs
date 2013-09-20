@@ -6,7 +6,7 @@ namespace BrightstarDB
     /// Class of exception that indicates an internal processing error within the Brightstar engine.
     /// </summary>
     /// <remarks>This exception type is reserved for exceptions relating to Brightstar internal processing.</remarks>
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
     [Serializable]
 #endif
     public class BrightstarInternalException : BrightstarException

@@ -5,7 +5,7 @@ namespace BrightstarDB.Client
     /// <summary>
     /// Object used to cache SPARQL query results.
     /// </summary>
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
     [Serializable]
 #endif
     internal class CachedQueryResult

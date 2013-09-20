@@ -43,7 +43,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
 
         private static void RunTest(Action<IPageStore, string, PersistenceType > testAction, string baseFileName)
         {
-            testAction(TestUtils.CreateEmptyPageStore(baseFileName + "_append"), baseFileName + "_append", PersistenceType.AppendOnly);
+            //testAction(TestUtils.CreateEmptyPageStore(baseFileName + "_append"), baseFileName + "_append", PersistenceType.AppendOnly);
             testAction(TestUtils.CreateEmptyPageStore(baseFileName + "_rewrite", PersistenceType.Rewrite), baseFileName + "_rewrite", PersistenceType.Rewrite);
         }
 
@@ -54,7 +54,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
 
         private void BuildAndScan(IPageStore pageStore, string pageStoreName, PersistenceType persistenceType, int keyCount)
         {
-            var config = new BPlusTreeConfiguration(8, 64, pageStore.PageSize);
+            var config = new BPlusTreeConfiguration(pageStore, 8, 64, pageStore.PageSize);
             var builder = new BPlusTreeBuilder(pageStore, config);
             var treeRoot = builder.Build(1, _testOrderedValues.Take(keyCount));
             var treeBeforeSave = new BPlusTree(pageStore, treeRoot);

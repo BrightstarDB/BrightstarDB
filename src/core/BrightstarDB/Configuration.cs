@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.Configuration;
 using BrightstarDB.Caching;
 using BrightstarDB.Storage;
 
+#if !PORTABLE
+using System.Configuration;
+#endif
+
 #if SILVERLIGHT
 using System.IO.IsolatedStorage;
-#else
-
 #endif
 
 namespace BrightstarDB
@@ -38,19 +39,28 @@ namespace BrightstarDB
         private const string NetNamedPipeName = "BrightstarDB.NetNamedPipeName";
         private const string PersistenceTypeName = "BrightstarDB.PersistenceType";
         private const string ClusterNodePortName = "BrightstarDB.ClusterNodePort";
+        private const string ResourceCacheLimitName = "BrightstarDB.ResourceCacheLimit";
+        private const string StatsUpdateTransactionCountName = "BrightstarDB.StatsUpdate.TransactionCount";
+        private const string StatsUpdateTimeSpanName = "BrightstarDB.StatsUpdate.TimeSpan";
 
         private const string PersistenceTypeAppendOnly = "appendonly";
         private const string PersistenceTypeRewrite = "rewrite";
         private const PersistenceType DefaultPersistenceType = PersistenceType.AppendOnly;
 
-        private const int DefaultQueryCacheDiskSpace = 2048;  // in MB
+        private const int DefaultQueryCacheDiskSpace = 2048; // in MB
         private const long MegabytesToBytes = 1024*1024;
+
+        private const int DefaultHttpPort = 8090;
+        private const int DefaultTcpPort = 8095;
+
 #if WINDOWS_PHONE
         private const int DefaultPageCacheSize = 4; // in MB
+        private const int DefaultResourceCacheLimit = 10000; // number of entries
 #else
         private const int DefaultPageCacheSize = 2048; // in MB
         private const int DefaultQueryCacheMemory = 256; // in MB
-#endif   
+        private const int DefaultResourceCacheLimit = 1000000; // number of entries
+#endif
 
         static Configuration()
         {
@@ -64,58 +74,34 @@ namespace BrightstarDB
             LogLevel = "Error";
             TransactionFlushTripleCount = 1000;
             QueryCache = new NullCache();
-
-
+#elif PORTABLE
+            StoreLocation = "brightstar";
+            LogLevel = "Error";
+            TransactionFlushTripleCount = 1000;
+            PageCacheSize = DefaultPageCacheSize;
+            ResourceCacheLimit = DefaultResourceCacheLimit;
+            EnableOptimisticLocking = false;
+            EnableQueryCache = false;
+            PersistenceType = DefaultPersistenceType;
+            QueryCache = new NullCache();
 #else
             var appSettings = ConfigurationManager.AppSettings;
             StoreLocation = appSettings.Get(StoreLocationPropertyName);
             LogLevel = appSettings.Get(LogLevelPropertyName);
 
-            var httpPortValue = appSettings.Get(HttpPortName);
-            if (!string.IsNullOrEmpty(httpPortValue))
-            {
-                int port;
-                if (!int.TryParse(httpPortValue, out port))
-                {
-                    port = 8090;
-                }
-                HttPort = port;
-            } else
-            {
-                HttPort = 8090;
-            }
+            // Port Numbers
+            HttPort = GetApplicationSetting(HttpPortName, DefaultHttpPort);
+            TcpPort = GetApplicationSetting(TcpPortName, DefaultTcpPort);
 
-            var tcpPortValue = appSettings.Get(TcpPortName);
-            if (!string.IsNullOrEmpty(tcpPortValue))
-            {
-                int port;
-                if (!int.TryParse(tcpPortValue, out port))
-                {
-                    port = 8095;
-                }
-                TcpPort = port;
-            } else
-            {
-                TcpPort = 8095;
-            }
-
+            // Named Pipe Name
             var namedPipeValue = appSettings.Get(NetNamedPipeName);
             NamedPipeName = !string.IsNullOrEmpty(namedPipeValue) ? namedPipeValue : "brightstar";
-            
-            var transactionFlushTripleCountString = appSettings.Get(TxnFlushTriggerPropertyName);            
-            TransactionFlushTripleCount = 10000;
-            if (!string.IsNullOrEmpty(transactionFlushTripleCountString))
-            {                
-                int val;
-                if (int.TryParse(transactionFlushTripleCountString, out val))
-                {
-                    if (val > 0)
-                    {
-                        TransactionFlushTripleCount = val;                        
-                    }
-                } 
-            }
 
+            // Transaction Flushing
+            TransactionFlushTripleCount = GetApplicationSetting(TxnFlushTriggerPropertyName, 10000);
+
+            // Read Store cache
+            // TODO : Remove this if it is no longer in use.
             var readStoreObjectCacheSizeString = appSettings.Get(ReadStoreObjectCacheSizeName);
             ReadStoreObjectCacheSize = 10000;
             if (!string.IsNullOrEmpty(readStoreObjectCacheSizeString))
@@ -130,43 +116,25 @@ namespace BrightstarDB
                 }
             }
 
+            // ResourceCacheLimit
+            ResourceCacheLimit = GetApplicationSetting(ResourceCacheLimitName, DefaultResourceCacheLimit);
+
+            // Connection String
             ConnectionString = appSettings.Get(ConnectionStringPropertyName);
 
+            // Query Caching
             var enableQueryCacheString = appSettings.Get(EnableQueryCacheName);
             EnableQueryCache = true;
             if (!string.IsNullOrEmpty(enableQueryCacheString))
             {
                 EnableQueryCache = bool.Parse(enableQueryCacheString);
             }
-
-            var queryCacheMemoryString = appSettings.Get(QueryCacheMemoryName);
-            int queryCacheMemory;
-            if (!String.IsNullOrEmpty(queryCacheMemoryString) &&
-                (Int32.TryParse(queryCacheMemoryString, out queryCacheMemory)))
-            {
-                QueryCacheMemory = queryCacheMemory;
-            }
-            else
-            {
-                QueryCacheMemory = DefaultQueryCacheMemory;
-            }
-
-            var queryCacheDiskSpaceString = appSettings.Get(QueryCacheDiskSpaceName);
-            int queryCacheDiskSpace;
-            if (!String.IsNullOrEmpty(queryCacheDiskSpaceString) &&
-                (Int32.TryParse(queryCacheDiskSpaceString, out queryCacheDiskSpace)))
-            {
-                QueryCacheDiskSpace = queryCacheDiskSpace;
-            }
-            else
-            {
-                QueryCacheDiskSpace = DefaultQueryCacheDiskSpace;
-            }
-
+            QueryCacheMemory = GetApplicationSetting(QueryCacheMemoryName, DefaultQueryCacheMemory);
+            QueryCacheDiskSpace = GetApplicationSetting(QueryCacheDiskSpaceName, DefaultQueryCacheDiskSpace);
             QueryCacheDirectory = appSettings.Get(QueryCacheDirectoryName);
-
             QueryCache = GetQueryCache();
 
+            // Persistence Type
             var persistenceTypeSetting = appSettings.Get(PersistenceTypeName);
             if (!String.IsNullOrEmpty(persistenceTypeSetting))
             {
@@ -188,7 +156,12 @@ namespace BrightstarDB
                 PersistenceType = DefaultPersistenceType;
             }
 
+            // StatsUpdate properties
+            StatsUpdateTransactionCount = GetApplicationSetting(StatsUpdateTransactionCountName, 0);
+            StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
+
 #endif
+#if !PORTABLE
             var pageCacheSizeSetting = GetApplicationSetting(PageCacheSizeName);
             int pageCacheSize;
             if (!String.IsNullOrEmpty(pageCacheSizeSetting) && Int32.TryParse(pageCacheSizeSetting, out pageCacheSize))
@@ -202,13 +175,16 @@ namespace BrightstarDB
 
             var clusterNodePortSetting = GetApplicationSetting(ClusterNodePortName);
             int clusterNodePort;
-            if (!String.IsNullOrEmpty(clusterNodePortSetting) && Int32.TryParse(clusterNodePortSetting, out clusterNodePort))
+            if (!String.IsNullOrEmpty(clusterNodePortSetting) &&
+                Int32.TryParse(clusterNodePortSetting, out clusterNodePort))
             {
                 ClusterNodePort = clusterNodePort;
-            } else
+            }
+            else
             {
                 ClusterNodePort = 10001;
             }
+#endif
         }
 
         public static string StoreLocation { get; set; }
@@ -228,6 +204,11 @@ namespace BrightstarDB
         /// Size of the page cache in MB
         /// </summary>
         public static int PageCacheSize { get; set; }
+
+        /// <summary>
+        /// The size of resource cache (in number of entries) for each store opened.
+        /// </summary>
+        public static int ResourceCacheLimit { get; set; }
 
         public static bool EnableOptimisticLocking { get; set; }
 
@@ -254,6 +235,30 @@ namespace BrightstarDB
         public static int ClusterNodePort { get; set; }
 
         public static PersistenceType PersistenceType { get; set; }
+
+        /// <summary>
+        /// Get or set the maximum number of transactions to allow between
+        /// updates of store stats
+        /// </summary>
+        /// <remarks>If this property is set to 0, then only the <see cref="StatsUpdateTimespan"/>
+        /// property will be used to determine when to update stats. If both this property 
+        /// and <see cref="StatsUpdateTimespan"/> are set to 0, then store stats will never
+        /// be updated.</remarks>
+        public static int StatsUpdateTransactionCount { get; set; }
+
+        /// <summary>
+        /// Get or set the maximum number of seconds to wait between 
+        /// updates of store stats.
+        /// </summary>
+        /// <remarks>
+        /// <para>If this property is set to 0 then only the <see cref="StatsUpdateTransactionCount"/>
+        /// property will be used to determine when to update stats. If both this property
+        /// and <see cref="StatsUpdateTransactionCount"/> are set to 0, then store stats will never 
+        /// be updated.</para>
+        /// </remarks>
+        public static int StatsUpdateTimespan { get; set; }
+
+#if !PORTABLE
         private static ICache GetQueryCache()
         {
             if (EnableQueryCache == false)
@@ -271,8 +276,9 @@ namespace BrightstarDB
                 {
                     Directory.CreateDirectory(cacheDir);
                 }
-                ICache directoryCache = new DirectoryCache(cacheDir, MegabytesToBytes * QueryCacheDiskSpace, new LruCacheEvictionPolicy()),
-                    memoryCache = new MemoryCache(MegabytesToBytes * QueryCacheMemory, new LruCacheEvictionPolicy());
+                ICache directoryCache = new DirectoryCache(cacheDir, MegabytesToBytes*QueryCacheDiskSpace,
+                                                           new LruCacheEvictionPolicy()),
+                       memoryCache = new MemoryCache(MegabytesToBytes*QueryCacheMemory, new LruCacheEvictionPolicy());
                 return new TwoLevelCache(memoryCache, directoryCache);
             }
             else
@@ -281,7 +287,9 @@ namespace BrightstarDB
                 return memoryCache;
             }
         }
+#endif
 
+#if !PORTABLE
         private static string GetApplicationSetting(string key)
         {
 #if WINDOWS_PHONE
@@ -295,5 +303,18 @@ namespace BrightstarDB
             return ConfigurationManager.AppSettings.Get(key);
 #endif
         }
+
+        private static int GetApplicationSetting(string key, int defaultValue)
+        {
+            var setting = GetApplicationSetting(key);
+            int intValue;
+            if (!String.IsNullOrEmpty(setting) && Int32.TryParse(setting, out intValue))
+            {
+                return intValue;
+            }
+            return defaultValue;
+        }
+#endif
+
     }
 }

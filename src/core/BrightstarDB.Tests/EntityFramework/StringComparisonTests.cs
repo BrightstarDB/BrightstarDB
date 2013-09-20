@@ -8,10 +8,10 @@ namespace BrightstarDB.Tests.EntityFramework
     [TestFixture]
     public class StringComparisonTests
     {
-        private static MyEntityContext _context;
+        private MyEntityContext _context;
 
         [TestFixtureSetUp]
-        public static void SetUp(TestContext context)
+        public void SetUp()
         {
             _context = new MyEntityContext("type=embedded;storesDirectory=" + Configuration.StoreLocation + ";storeName=EFStringComparisonTests_" + DateTime.Now.Ticks);
             var np = new Company {Name = "NetworkedPlanet"};
@@ -119,6 +119,11 @@ namespace BrightstarDB.Tests.EntityFramework
             results = _context.Companies.Where(c => c.Name.Length<10).ToList();
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("Apple", results[0].Name);
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
         }
     }
 }

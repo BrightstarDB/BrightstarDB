@@ -11,12 +11,13 @@ namespace BrightstarDB.Tests.EntityFramework
     [TestFixture]
     public class PropertyChangeNotificationTests
     {
-        private MyEntityContext _context;
-        private string _storeName;
-        private ICompany _company;
-        private IMarket _ftse, _nyse;
+        private readonly MyEntityContext _context;
+        private readonly string _storeName;
+        private readonly ICompany _company;
+        private readonly IMarket _ftse;
+        private readonly IMarket _nyse;
         private string _lastPropertyChanged;
-        private IFoafPerson _person;
+        private readonly IFoafPerson _person;
         private NotifyCollectionChangedEventArgs _lastCollectionChangeEvent;
 
         public PropertyChangeNotificationTests()
@@ -34,6 +35,7 @@ namespace BrightstarDB.Tests.EntityFramework
             _context.SaveChanges();
         }
 
+       
         private void HandleCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             _lastCollectionChangeEvent = e;
@@ -160,6 +162,11 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(NotifyCollectionChangedAction.Remove, _lastCollectionChangeEvent.Action);
             Assert.AreEqual(friend, _lastCollectionChangeEvent.OldItems[0]);
 
+        }
+
+        public void Dispose()
+        {
+            _context.Dispose();
         }
     }
 }

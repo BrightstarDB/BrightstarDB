@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
 using NUnit.Framework;
@@ -18,8 +19,7 @@ namespace BrightstarDB.InternalTests
         {
             var pm = new FilePersistenceManager();
             var dirName = "TestCreateNewMaster1";
-            if (pm.DirectoryExists(dirName)) pm.DeleteDirectory(dirName);
-            pm.CreateDirectory(dirName);
+            EnsureEmptyDirectory(pm, dirName);
             var storeConfig = new StoreConfiguration {PersistenceType = PersistenceType.AppendOnly};
             var storeSetId = Guid.NewGuid();
             var mf = MasterFile.Create(pm, dirName, storeConfig, storeSetId);
@@ -31,8 +31,7 @@ namespace BrightstarDB.InternalTests
             Assert.AreEqual(PersistenceType.AppendOnly, mf.PersistenceType);
 
             dirName = "TestCreateNewMaster2";
-            if (pm.DirectoryExists(dirName)) pm.DeleteDirectory(dirName);
-            pm.CreateDirectory(dirName);
+            EnsureEmptyDirectory(pm, dirName);
             storeConfig.PersistenceType = PersistenceType.Rewrite;
             storeSetId = Guid.NewGuid();
             mf = MasterFile.Create(pm, dirName, storeConfig, storeSetId);
@@ -52,8 +51,8 @@ namespace BrightstarDB.InternalTests
         {
             var pm = new FilePersistenceManager();
             const string dirName = "TestAppendCommitPoint";
-            if (pm.DirectoryExists(dirName)) pm.DeleteDirectory(dirName);
-            pm.CreateDirectory(dirName);
+            EnsureEmptyDirectory(pm, dirName);
+
             var storeConfig = new StoreConfiguration {PersistenceType = PersistenceType.AppendOnly};
             var storeSetId = Guid.NewGuid();
             var mf = MasterFile.Create(pm, dirName, storeConfig, storeSetId);
@@ -92,8 +91,7 @@ namespace BrightstarDB.InternalTests
         {
             var pm = new FilePersistenceManager();
             const string dirName = "TestCorruptCommitPoint";
-            if (pm.DirectoryExists(dirName)) pm.DeleteDirectory(dirName);
-            pm.CreateDirectory(dirName);
+            EnsureEmptyDirectory(pm, dirName);
             var storeConfig = new StoreConfiguration { PersistenceType = PersistenceType.AppendOnly };
             var storeSetId = Guid.NewGuid();
             var mf = MasterFile.Create(pm, dirName, storeConfig, storeSetId);
@@ -141,6 +139,16 @@ namespace BrightstarDB.InternalTests
             Assert.AreEqual(commit1JobId, lastCommit.JobId);
             Assert.AreEqual(commit1Time.Ticks, lastCommit.CommitTime.Ticks);
 
+        }
+
+        private void EnsureEmptyDirectory(IPersistenceManager pm, string dirName)
+        {
+            if (pm.DirectoryExists(dirName))
+            {
+                pm.DeleteDirectory(dirName);
+            }
+            Thread.Sleep(10);
+            pm.CreateDirectory(dirName);
         }
 
     }

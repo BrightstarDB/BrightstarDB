@@ -1,4 +1,5 @@
-﻿using BrightstarDB.Storage.Persistence;
+﻿#if !PORTABLE
+using BrightstarDB.Storage.Persistence;
 
 namespace BrightstarDB.Storage.BTreeStore
 {
@@ -9,3 +10,4 @@ namespace BrightstarDB.Storage.BTreeStore
         }
     }
 }
+#endif

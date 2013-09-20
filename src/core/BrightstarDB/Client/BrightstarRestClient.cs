@@ -471,6 +471,55 @@ namespace BrightstarDB.Client
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Retrieves the most recent statistics for the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for.</param>
+        /// <returns>A <see cref="IStoreStatistics"/> instance containing the most recent statistics for the named store, or NULL if
+        /// there are no statistics availabe for the store.</returns>
+        public IStoreStatistics GetStatistics(string storeName)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Retrieves a range of statistics records for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for</param>
+        /// <param name="latest">The latest date to retrieve statistics for</param>
+        /// <param name="earlierst">The earliest date to retrieve statisitcs for</param>
+        /// <param name="skip">The offset into the date-filters list to return from</param>
+        /// <param name="take">The number of results to return</param>
+        /// <returns>An enumeration over the specified subset of statistics records for the store.</returns>
+        /// <exception cref="ArgumentException">Raised if <paramref name="skip"/> is less than 0 or <paramref name="take"/> is greater than 100.</exception>
+        public IEnumerable<IStoreStatistics> GetStatistics(string storeName, DateTime latest, DateTime earlierst, int skip, int take)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Queues a job to update the statistics for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store whose statistics are to be updated</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
+        public IJobInfo UpdateStatistics(string storeName)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Queues a job to create a snapshot of a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to take a snapshot of</param>
+        /// <param name="targetStoreName">The name of the store to be created to receive the snapshot</param>
+        /// <param name="persistenceType">The type of persistence to use for the target store</param>
+        /// <param name="sourceCommitPoint">OPTIONAL: the commit point in the source store to take a snapshot from</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
+        public IJobInfo CreateSnapshot(string storeName, string targetStoreName, PersistenceType persistenceType, ICommitPointInfo sourceCommitPoint = null)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
 

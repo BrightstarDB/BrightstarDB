@@ -57,6 +57,7 @@
     <Compile Include="JobInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StoreApplicationFault.cs" />
+    <Compile Include="StoreStatistics.cs" />
     <Compile Include="TransactionInfo.cs" />
   </ItemGroup>
   <ItemGroup>

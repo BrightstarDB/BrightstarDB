@@ -14,11 +14,35 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with re-linq; if not, see http://www.gnu.org/licenses.
 // 
+
+using System;
 using System.Linq.Expressions;
+using Remotion.Linq.Parsing;
 using Remotion.Linq.Utilities;
 
 namespace Remotion.Linq.Clauses.Expressions
 {
+#if PORTABLE
+    public class SubQueryExpression : ExtensionExpression
+    {
+        public const ExpressionType ExpressionType = (ExpressionType)100002;
+
+        public SubQueryExpression(QueryModel queryModel) 
+            : base(queryModel.GetOutputDataInfo().DataType, ExpressionType)
+        {
+            ArgumentUtility.CheckNotNull("queryModel", queryModel);
+            QueryModel = queryModel;
+        }
+
+        public QueryModel QueryModel { get; private set; }
+
+        protected internal override Expression VisitChildren(ExpressionTreeVisitor visitor)
+        {
+            ArgumentUtility.CheckNotNull("visitor", visitor);
+            return visitor.VisitExpression(this);
+        }
+    }
+#else
   /// <summary>
   /// Represents an <see cref="Expression"/> that holds a subquery. The subquery is held by <see cref="QueryModel"/> in its parsed form.
   /// </summary>
@@ -35,4 +59,5 @@ namespace Remotion.Linq.Clauses.Expressions
 
     public QueryModel QueryModel { get; private set; }
   }
+#endif
 }

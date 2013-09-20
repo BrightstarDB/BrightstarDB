@@ -7,11 +7,12 @@ namespace BrightstarDB.Tests.EntityFramework
     [TestFixture]
     public class DataTypeTests
     {
-        private readonly MyEntityContext _myEntityContext;
+        private MyEntityContext _myEntityContext;
 
         private readonly string _connectionString = "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=" + Guid.NewGuid();
 
-        public DataTypeTests()
+        [TestFixtureSetUp]
+        public void SetUp()
         {
             _myEntityContext = new MyEntityContext(_connectionString);
         }
@@ -37,7 +38,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            var checkEntity = newContext.Entities.Where(e => e.Id.Equals(entityId)).FirstOrDefault();
+            var checkEntity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
 
             Assert.IsNotNull(checkEntity);
             Assert.IsNotNull(checkEntity.SomeDateTime);
@@ -107,7 +108,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            var checkEntity = newContext.Entities.Where(e => e.Id.Equals(entityId)).FirstOrDefault();
+            var checkEntity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
 
             Assert.IsNotNull(checkEntity);
             Assert.IsNotNull(checkEntity.CollectionOfDateTimes);
@@ -152,8 +153,8 @@ namespace BrightstarDB.Tests.EntityFramework
         public void TestSetByte()
         {
             var entity = _myEntityContext.Entities.Create();
-            entity.SomeByte = (Byte) 255;
-            entity.AnotherByte = (byte) 128;
+            entity.SomeByte = 255;
+            entity.AnotherByte = 128;
             entity.NullableByte = null;
             entity.AnotherNullableByte = null;
             _myEntityContext.SaveChanges();
@@ -161,7 +162,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.Where(e => e.Id.Equals(entityId)).FirstOrDefault();
+            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeByte);
             Assert.IsNotNull(entity.AnotherByte);
@@ -186,7 +187,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.Where(e => e.Id.Equals(entityId)).FirstOrDefault();
+            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeChar);
             Assert.IsNotNull(entity.AnotherChar);
@@ -212,7 +213,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.Where(e => e.Id.Equals(entityId)).FirstOrDefault();
+            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeSByte);
             Assert.IsNotNull(entity.AnotherSByte);
@@ -236,7 +237,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.Where(e => e.Id.Equals(entityId)).FirstOrDefault();
+            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeShort);
             Assert.IsNotNull(entity.AnotherShort);
@@ -259,7 +260,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.Where(e => e.Id.Equals(entityId)).FirstOrDefault();
+            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeUInt);
             Assert.IsNotNull(entity.AnotherUInt);
@@ -282,7 +283,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.Where(e => e.Id.Equals(entityId)).FirstOrDefault();
+            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeULong);
             Assert.IsNotNull(entity.AnotherULong);
@@ -305,7 +306,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.Where(e => e.Id.Equals(entityId)).FirstOrDefault();
+            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeUShort);
             Assert.IsNotNull(entity.AnotherUShort);
@@ -332,8 +333,8 @@ namespace BrightstarDB.Tests.EntityFramework
             var entity2Id = entity2.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity1 = newContext.Entities.Where(e => e.Id.Equals(entity1Id)).FirstOrDefault();
-            entity2 = newContext.Entities.Where(e => e.Id.Equals(entity2Id)).FirstOrDefault();
+            entity1 = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entity1Id));
+            entity2 = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entity2Id));
             Assert.IsNotNull(entity1);
             Assert.IsNotNull(entity2);
             Assert.AreEqual(TestEnumeration.Second, entity1.SomeEnumeration);

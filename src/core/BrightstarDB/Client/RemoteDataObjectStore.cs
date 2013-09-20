@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Xml.Linq;
 using BrightstarDB.Model;
@@ -14,15 +15,32 @@ namespace BrightstarDB.Client
     /// </summary>
     internal abstract class RemoteDataObjectStore : DataObjectStoreBase
     {
-        private const string DataObjectQueryTemplate = @"select ?p ?o where {{ <{0}> ?p ?o }}";
+        private readonly string _dataObjectQueryTemplate;
         private readonly string _storeName;
         private readonly bool _optimisticLockingEnabled;
 
-        protected RemoteDataObjectStore(string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled)
-            : base(namespaceMappings)
+        protected RemoteDataObjectStore(string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
+            : base(namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             _storeName = storeName;
             _optimisticLockingEnabled = optimisticLockingEnabled;
+
+            // Initialize the SPARQL query template
+            var sb = new StringBuilder();
+            sb.Append("SELECT ?p ?o ?g");
+            if (DataSetGraphUris != null)
+            {
+                foreach (var dsGraph in DataSetGraphUris)
+                {
+                    sb.AppendFormat(" FROM NAMED <{0}>", dsGraph);
+                }
+            }
+            sb.AppendFormat(" FROM NAMED <{0}>", UpdateGraphUri);
+            sb.AppendFormat(" FROM NAMED <{0}>", VersionGraphUri);
+            sb.Append(" WHERE {{ GRAPH ?g {{ <{0}> ?p ?o }} }}");
+            _dataObjectQueryTemplate = sb.ToString();
+
             ResetTransactionData();
         }
 
@@ -57,7 +75,7 @@ namespace BrightstarDB.Client
 
         public override SparqlResult ExecuteSparql(string sparqlExpression)
         {
-            return new SparqlResult(Client.ExecuteQuery(_storeName, sparqlExpression));
+            return new SparqlResult(Client.ExecuteQuery(_storeName, sparqlExpression, DataSetGraphUris));
         }
 
         /// <summary>
@@ -68,7 +86,12 @@ namespace BrightstarDB.Client
             if (_optimisticLockingEnabled)
             {
                 // get subject entity and see if there is a version triple
-                var subjects = AddTriples.Select(x => x.Subject).Distinct().Union(DeletePatterns.Select(x => x.Subject).Distinct()).ToList();
+                var subjects =
+                    AddTriples.Select(x => x.Subject)
+                              .Distinct()
+                              .Union(DeletePatterns.Select(x => x.Subject).Distinct())
+                              .Except(new[] {Constants.WildcardUri})
+                              .ToList();
                 foreach (var subject in subjects)
                 {
                     var entity = LookupDataObject(subject);
@@ -85,7 +108,16 @@ namespace BrightstarDB.Client
                         // inc version
                         intVersion++;
                         entity.SetProperty(Constants.VersionPredicateUri, intVersion);
-                        Preconditions.Add(new Triple { Graph = Constants.DefaultGraphUri, DataType = RdfDatatypes.Integer, IsLiteral = true, LangCode = null, Object = version.ToString(), Predicate = Constants.VersionPredicateUri, Subject = subject });
+                        Preconditions.Add(new Triple
+                            {
+                                Subject = subject,
+                                Predicate = Constants.VersionPredicateUri,
+                                Object = version.ToString(),
+                                IsLiteral = true,
+                                DataType = RdfDatatypes.Integer,
+                                LangCode = null, 
+                                Graph = VersionGraphUri
+                            });
                     }
                 }
             }
@@ -152,7 +184,7 @@ namespace BrightstarDB.Client
 
         private IEnumerable<Triple> GetTriplesForDataObject(string identity)
         {
-            Stream sparqlResultStream = Client.ExecuteQuery(_storeName, string.Format(DataObjectQueryTemplate, identity));
+            Stream sparqlResultStream = Client.ExecuteQuery(_storeName, string.Format(_dataObjectQueryTemplate, identity), DataSetGraphUris);
             XDocument data = XDocument.Load(sparqlResultStream);
 
             foreach (var sparqlResultRow in data.SparqlResultRows())
@@ -161,7 +193,7 @@ namespace BrightstarDB.Client
                 var triple = new Triple
                 {
                     Subject = identity,
-                    Graph = Constants.DefaultGraphUri,
+                    Graph = sparqlResultRow.GetColumnValue("g").ToString(),
                     Predicate = sparqlResultRow.GetColumnValue("p").ToString()
                 };
 
@@ -170,16 +202,25 @@ namespace BrightstarDB.Client
                     var dt = sparqlResultRow.GetLiteralDatatype("o");
                     var langCode = sparqlResultRow.GetLiteralLanguageCode("o");
                     triple.DataType = dt ?? RdfDatatypes.String;
-                    if (langCode != null) {triple.LangCode = langCode;}
+                    if (langCode != null)
+                    {
+                        triple.LangCode = langCode;
+                    }
                     triple.Object = sparqlResultRow.GetColumnValue("o").ToString().Trim();
                     triple.IsLiteral = true;
-                } else
+                }
+                else
                 {
-                    triple.Object = sparqlResultRow.GetColumnValue("o").ToString().Trim();                    
+                    triple.Object = sparqlResultRow.GetColumnValue("o").ToString().Trim();
                 }
 
                 yield return triple;
             }
+        }
+
+        protected override void Cleanup()
+        {
+            // Nothing to cleanup
         }
     }
 }

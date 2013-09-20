@@ -5,6 +5,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Model;
 using BrightstarDB.Profiling;
 using BrightstarDB.Query;
+using BrightstarDB.Storage.Persistence;
 
 namespace BrightstarDB.Storage
 {
@@ -104,6 +105,14 @@ namespace BrightstarDB.Storage
         void Consolidate(Guid jobId);
 
         /// <summary>
+        /// Copies all the indexes from this store to the specified target page store
+        /// </summary>
+        /// <param name="pageStore">The page store to copy to</param>
+        /// <param name="txnId">The transaction Id to use in the target page store for the write</param>
+        /// <returns>The ID of the root store page created in the target page store</returns>
+        ulong CopyTo(IPageStore pageStore, ulong txnId);
+
+        /// <summary>
         /// Clear out any existing data in the target graph, then copy all triples from the source graph to the target graph
         /// </summary>
         /// <param name="srcGraphUri"></param>
@@ -126,5 +135,20 @@ namespace BrightstarDB.Storage
         void DeleteGraph(string graphUri);
         void DeleteGraphs(IEnumerable<string> graphUris);
         void Close();
+
+        /// <summary>
+        /// Returns an enumeration over the unique predicate URIs in the store
+        /// </summary>
+        /// <param name="profiler"></param>
+        /// <returns></returns>
+        IEnumerable<string> GetPredicates(BrightstarProfiler profiler = null);
+
+        /// <summary>
+        /// Counts the total number of triples with the specified predicate in the store.
+        /// </summary>
+        /// <param name="predicateUri">The predicate URI to count triples for</param>
+        /// <param name="profiler"></param>
+        /// <returns>The number of triples matching the specified predicate</returns>
+        ulong GetTripleCount(string predicateUri, BrightstarProfiler profiler = null);
     }
 }

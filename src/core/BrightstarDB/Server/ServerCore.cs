@@ -6,11 +6,14 @@ using System.Text;
 using System.Xml.Linq;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
-using BrightstarDB.Model;
 using BrightstarDB.Storage;
 using System.Threading;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 using TransactionType = BrightstarDB.Storage.TransactionType;
+using Triple = BrightstarDB.Model.Triple;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Server
 {
@@ -71,7 +74,7 @@ namespace BrightstarDB.Server
         {
             Logging.LogInfo("Create Store");
             var sid = Guid.NewGuid().ToString();
-            _storeManager.CreateStore(_baseLocation + "\\" + sid, true);
+            _storeManager.CreateStore(Path.Combine(_baseLocation, sid), true);
             Logging.LogInfo("Store id is {0}", sid);
             return sid;
         }
@@ -79,7 +82,7 @@ namespace BrightstarDB.Server
         public string CreateStore(string storeName, PersistenceType persistenceType)
         {
             Logging.LogInfo("Create Store");
-            var store = _storeManager.CreateStore(_baseLocation + "\\" + storeName, persistenceType, true);
+            var store = _storeManager.CreateStore(Path.Combine(_baseLocation, storeName), persistenceType, true);
             store.Close();
             Logging.LogInfo("Store id is {0}", storeName);
             return storeName;
@@ -88,9 +91,19 @@ namespace BrightstarDB.Server
         public bool DoesStoreExist(string storeName)
         {
             Logging.LogInfo("check store exists store {0}", storeName);
-            return _storeManager.DoesStoreExist(_baseLocation + "\\" + storeName);
+            return _storeManager.DoesStoreExist(Path.Combine(_baseLocation, storeName));
         }
 
+#if PORTABLE
+        public void DeleteStore(string storeName)
+        {
+            Logging.LogInfo("Delete store {0}", storeName);
+            var storeWorker = GetStoreWorker(storeName);
+            // remove store worker from collection
+            RemoveStoreWorker(storeName);
+            storeWorker.Shutdown(false, () => _storeManager.DeleteStore(_baseLocation + "\\" + storeName));            
+        }
+#else
         public void DeleteStore(string storeName, bool waitForCompletion = true)
         {
             Logging.LogInfo("Delete store {0}", storeName);
@@ -99,13 +112,15 @@ namespace BrightstarDB.Server
             RemoveStoreWorker(storeName);
             storeWorker.Shutdown(false, () => _storeManager.DeleteStore(_baseLocation + "\\" + storeName));
 
-            if (waitForCompletion) {
+            if (waitForCompletion) 
+            {
                 while (DoesStoreExist(storeName))
                 {
                     Thread.Sleep(10);
                 }
             }
         }
+#endif
 
         private void RemoveStoreWorker(string storeName)
         {
@@ -170,7 +185,11 @@ namespace BrightstarDB.Server
             }
             catch (Exception)
             {
+#if PORTABLE
+                System.CloseExtensions.Close(responseStream);
+#else
                 responseStream.Close();
+#endif
                 throw;
             }
         }
@@ -230,7 +249,11 @@ namespace BrightstarDB.Server
             }
             catch(Exception)
             {
+#if PORTABLE
+                System.CloseExtensions.Close(responseStream);
+#else
                 responseStream.Close();
+#endif
                 throw;
             }
         }
@@ -434,6 +457,25 @@ namespace BrightstarDB.Server
                     return sparqlUpdateJob;
             }
             return null;
+        }
+
+        public IEnumerable<Storage.Statistics.StoreStatistics> GetStatistics(string store)
+        {
+            var storeWorker = GetStoreWorker(store);
+            return storeWorker.StoreStatistics.GetStatistics();
+        }
+
+        public Guid UpdateStatistics(string storeName)
+        {
+            var storeWorker = GetStoreWorker(storeName);
+            return storeWorker.UpdateStatistics();
+        }
+
+        public Guid CreateSnapshot(string sourceStoreName, string targetStoreName, PersistenceType persistenceType, ulong sourceCommitPointId)
+        {
+
+            var storeWorker = GetStoreWorker(sourceStoreName);
+            return storeWorker.QueueSnapshotJob(targetStoreName, persistenceType, sourceCommitPointId);
         }
     }
 }

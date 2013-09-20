@@ -18,13 +18,20 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
         /// <summary>
         /// Creates a new empty resource index in the specified page store
         /// </summary>
+        /// <param name="txnId"></param>
         /// <param name="pageStore"></param>
         /// <param name="resourceTable"></param>
-        public ResourceIndex(IPageStore pageStore, IResourceTable resourceTable)  : base(pageStore)
+        public ResourceIndex(ulong txnId, IPageStore pageStore, IResourceTable resourceTable)  : base(txnId, pageStore)
         {
-            _resourceCache = new ConcurrentResourceCache();
-            _resourceIdCache = new ConcurrentResourceIdCache();
+            //_resourceCache = new ConcurrentResourceCache();
+            //_resourceIdCache = new ConcurrentResourceIdCache();
+            _resourceCache = new LruResourceCache();
+            _resourceIdCache = new LruResourceIdCache();
             _resourceStore = new ResourceStore(resourceTable);
+#if DEBUG_BTREE
+            Configuration.DebugId = "ResIx";
+            Logging.LogDebug("Created new {0} BTree with root page {1}", Configuration.DebugId, RootId);
+#endif
         }
 
         /// <summary>
@@ -35,9 +42,15 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
         /// <param name="rootNodeId">The ID of the page that contains the root node of the resource index</param>
         public ResourceIndex(IPageStore pageStore, IResourceTable resourceTable, ulong rootNodeId) : base(pageStore, rootNodeId)
         {
-            _resourceCache = new ConcurrentResourceCache();
-            _resourceIdCache = new ConcurrentResourceIdCache();
+            //_resourceCache = new ConcurrentResourceCache();
+            //_resourceIdCache = new ConcurrentResourceIdCache();
+            _resourceCache= new LruResourceCache();
+            _resourceIdCache = new LruResourceIdCache();
             _resourceStore = new ResourceStore(resourceTable);
+#if DEBUG_BTREE
+            Configuration.DebugId = "ResIx";
+            Logging.LogDebug("Opened new {0} BTree with root page {1}", Configuration.DebugId, rootNodeId);
+#endif
         }
 
         #region Implementation of IResourceIndex
@@ -168,6 +181,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
                     _resourceCache.Add(resourceId, resource);
                     return resource;
                 }
+#if DEBUG
+                if (resourceId > 0)
+                {
+                    // Repeat the search for debug purposes
+                    Search(resourceId, buff, profiler);
+                }
+#endif
                 return null;
             }
         }
@@ -213,6 +233,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
             return sb.ToString();
         }
 
+        //private static ulong _targetResourceId = 15806097072303636481;
 
         private ulong AssertResourceInBTree(ulong txnId, string resourceValue, bool isLiteral, ulong dataTypeId, ulong langCodeId, uint hashCode, BrightstarProfiler profiler)
         {
@@ -270,6 +291,33 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
             return (uint)resourceId & uint.MaxValue;
         }
 
-        #endregion  
+        #endregion
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!_disposed)
+                {
+                    _resourceCache.Dispose();
+                    _resourceIdCache.Dispose();
+                    _resourceStore.Dispose();
+                    _disposed = true;
+                }
+            }
+        }
+
+        ~ResourceIndex()
+        {
+            Dispose(false);
+        }
+
     }
 }

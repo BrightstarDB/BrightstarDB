@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
 using Polenter.Serialization;
 #else
 using System.Runtime.Serialization.Formatters.Binary;
@@ -102,7 +102,11 @@ namespace BrightstarDB.Caching
                 {
                     (o as IBinarySerializable).Save(ms);
                     ms.Close();
+#if PORTABLE
+                    buff = ms.ToArray();
+#else
                     buff = ms.GetBuffer();
+#endif
                 }
             }
             else
@@ -240,7 +244,7 @@ namespace BrightstarDB.Caching
         {
             try
             {
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                 var settings = new SharpSerializerBinarySettings(BinarySerializationMode.Burst);
                 var ms = new MemoryStream(buff);
                 var ser = new SharpSerializer(settings);
@@ -277,13 +281,17 @@ namespace BrightstarDB.Caching
         {
             try
             {
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
             var settings = new SharpSerializerBinarySettings(BinarySerializationMode.Burst);
             var ser = new SharpSerializer(settings);
             var ms = new MemoryStream();
             ser.Serialize(o, ms);
             ms.Close();
+#if SILVERLIGHT
             return ms.GetBuffer();
+#else
+            return ms.ToArray();
+#endif
 #else
                 var ms = new MemoryStream();
                 var bf = new BinaryFormatter();

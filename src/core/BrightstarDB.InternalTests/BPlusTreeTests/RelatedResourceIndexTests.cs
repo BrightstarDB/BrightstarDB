@@ -13,7 +13,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             ulong relatedResourceIndexRoot;
             using(var pageStore = TestUtils.CreateEmptyPageStore("TestInsertRelatedResource.dat"))
             {
-                var relatedResourceIndex = new RelatedResourceIndex(pageStore);
+                var relatedResourceIndex = new RelatedResourceIndex(0, pageStore);
                 relatedResourceIndex.AddRelatedResource(0, 1ul, 2ul, 3ul, 4);
                 var relatedResourceIds = relatedResourceIndex.EnumerateRelatedResources(1ul, 2ul, 4, null).ToList();
                 Assert.AreEqual(1, relatedResourceIds.Count);
@@ -36,9 +36,9 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         public void TestEnumerateMultipleRelatedResources()
         {
             ulong relatedResourceIndexRoot;
-            using (var pageStore = TestUtils.CreateEmptyPageStore("TestInsertRelatedResource.dat"))
+            using (var pageStore = TestUtils.CreateEmptyPageStore("TestMultipleRelatedResources.dat"))
             {
-                var relatedResourceIndex = new RelatedResourceIndex(pageStore);
+                var relatedResourceIndex = new RelatedResourceIndex(0, pageStore);
                 relatedResourceIndex.AddRelatedResource(0, 1ul, 2ul, 3ul, 4);
                 relatedResourceIndex.AddRelatedResource(0, 1ul, 2ul, 5ul, 4);
                 relatedResourceIndex.AddRelatedResource(0, 1ul, 2ul, 6ul, 4);
@@ -61,7 +61,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 pageStore.Commit(0ul, null);
             }
 
-            using (var pageStore = TestUtils.OpenPageStore("TestInsertRelatedResource.dat", true))
+            using (var pageStore = TestUtils.OpenPageStore("TestMultipleRelatedResources.dat", true))
             {
                 var relatedResourceIndex = new RelatedResourceIndex(pageStore, relatedResourceIndexRoot, null);
                 var relatedResourceIds = relatedResourceIndex.EnumerateRelatedResources(1, 2, 4).ToList();
@@ -86,7 +86,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             ulong relatedResourceIndexRoot;
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestDeleteRelatedResource.dat"))
             {
-                var relatedResourceIndex = new RelatedResourceIndex(pageStore);
+                var relatedResourceIndex = new RelatedResourceIndex(0, pageStore);
                 relatedResourceIndex.AddRelatedResource(0, 1ul, 2ul, 3ul, 4);
                 relatedResourceIndex.AddRelatedResource(0, 1ul, 2ul, 5ul, 4);
                 relatedResourceIndex.AddRelatedResource(0, 1ul, 2ul, 6ul, 4);

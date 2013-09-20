@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using BrightstarDB.Client;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -15,7 +16,7 @@ namespace BrightstarDB.EntityFramework
         private readonly bool _isAttached;
         private readonly BrightstarEntityObject _beo;
         private readonly string _propertyTypeUri;
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
         private readonly List<T> _items;
 #else
         private readonly HashSet<T> _items;
@@ -27,7 +28,7 @@ namespace BrightstarDB.EntityFramework
         /// <param name="initialValues"></param>
         internal LiteralsCollection(IEnumerable<T> initialValues)
         {
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
             _items = new List<T>(initialValues);
 #else
             _items = new HashSet<T>(initialValues);
@@ -53,11 +54,7 @@ namespace BrightstarDB.EntityFramework
         /// <filterpriority>1</filterpriority>
         public IEnumerator<T> GetEnumerator()
         {
-            if (_isAttached)
-            {
-                return _beo.DataObject.GetPropertyValues(_propertyTypeUri).OfType<T>().GetEnumerator();
-            }
-            return _items.GetEnumerator();
+            return GetPropertyValues().GetEnumerator();
         }
 
         /// <summary>
@@ -91,7 +88,7 @@ namespace BrightstarDB.EntityFramework
             {
                 _items.Add(item);
             }
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, 0));
 #else
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
@@ -126,7 +123,7 @@ namespace BrightstarDB.EntityFramework
         {
             if (_isAttached)
             {
-                return _beo.DataObject.GetPropertyValues(_propertyTypeUri).OfType<T>().Any(x => x.Equals(item));
+                return GetPropertyValues().Any(x => x.Equals(item));
             }
             return _items.Contains(item);
         }
@@ -142,14 +139,7 @@ namespace BrightstarDB.EntityFramework
         /// </exception>
         public void CopyTo(T[] array, int arrayIndex)
         {
-            if (_isAttached)
-            {
-                _beo.DataObject.GetPropertyValues(_propertyTypeUri).OfType<T>().ToList().CopyTo(array, arrayIndex);
-            }
-            else
-            {
-                _items.CopyTo(array, arrayIndex);
-            }
+            GetPropertyValues().ToList().CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -163,10 +153,10 @@ namespace BrightstarDB.EntityFramework
         {
             if (_isAttached)
             {
-                if (_beo.DataObject.GetPropertyValues(_propertyTypeUri).OfType<T>().Any(x => x.Equals(item)))
+                if (GetPropertyValues().Any(x => x.Equals(item)))
                 {
                     _beo.DataObject.RemoveProperty(_propertyTypeUri, item);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
                     OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, 0));
 #else
                     OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
@@ -178,7 +168,7 @@ namespace BrightstarDB.EntityFramework
             bool removed = _items.Remove(item);
             if (removed)
             {
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, 0));
 #else
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
@@ -197,7 +187,7 @@ namespace BrightstarDB.EntityFramework
         {
             get
             {
-                return _isAttached ? _beo.DataObject.GetPropertyValues(_propertyTypeUri).OfType<T>().Count() : _items.Count;
+                return GetPropertyValues().Count();
             }
         }
 
@@ -224,11 +214,25 @@ namespace BrightstarDB.EntityFramework
             if (items == null) throw new ArgumentNullException("items");
             var addItems = items.ToList();
             foreach(var item in addItems) Add(item);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, addItems, 0));
 #else
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, addItems));
 #endif
+        }
+
+        private IEnumerable<T> GetPropertyValues()
+        {
+            if (!_isAttached) return _items;
+            if (typeof (T) == typeof (Uri))
+            {
+                return
+                    _beo.DataObject.GetPropertyValues(_propertyTypeUri)
+                        .OfType<IDataObject>()
+                        .Select(dataObject => new Uri(dataObject.Identity))
+                        .Cast<T>();
+            }
+            return _beo.DataObject.GetPropertyValues(_propertyTypeUri).OfType<T>();
         }
 
         #region Implementation of INotifyCollectionChanged

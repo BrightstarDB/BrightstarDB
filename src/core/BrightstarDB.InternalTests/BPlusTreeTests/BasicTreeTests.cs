@@ -16,17 +16,15 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
     [TestFixture]
     public class BasicTreeTests
     {
-        private readonly BPlusTreeConfiguration _config = new BPlusTreeConfiguration(8, 64, 4096);
-
         [Test]
         public void TestInsertNoSplit()
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestInsertNoSplit.data"))
             {
-                var tree = new BPlusTree(pageStore);
+                var tree = new BPlusTree(1, pageStore);
                 tree.Insert(0, 5ul, TestUtils.StringToByteArray("five"));
                 tree.Insert(0, 3ul, TestUtils.StringToByteArray("three"));
-                var valueBuffer = new byte[_config.ValueSize];
+                var valueBuffer = new byte[tree.Configuration.ValueSize];
                 Assert.IsTrue(tree.Search(5ul, valueBuffer, null), "Expected search for key 5 to return true");
                 TestUtils.AssertBuffersEqual(TestUtils.StringToByteArray("five"), valueBuffer);
                 Assert.IsTrue(tree.Search(3ul, valueBuffer, null), "Expected search for key 3 to return true");
@@ -34,7 +32,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 Assert.IsFalse(tree.Search(2ul, valueBuffer, null), "Expected search for key 2 to return false");
                 tree.Save(0, null);
                 var root = tree.RootId;
-                pageStore.Commit((ulong) DateTime.Now.Ticks, null);
+                pageStore.Commit(1, null);
 
                 tree = new BPlusTree(pageStore, root);
                 Assert.IsTrue(tree.Search(5ul, valueBuffer, null), "Expected search for key 5 to return true");
@@ -49,21 +47,22 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         public void TestInsertSingleRootSplit()
         {
             ulong rootId;
-            var buff = new byte[_config.ValueSize];
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestInsertSingleRootSplit.data"))
             {
-                var tree = new BPlusTree(pageStore);
                 var txnId = 0ul;
-                for (int i = 0; i < _config.LeafLoadFactor; i++)
+                var tree = new BPlusTree(txnId, pageStore);
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
+                for (int i = 0; i < config.LeafLoadFactor; i++)
                 {
                     tree.Insert(txnId, (ulong) i, BitConverter.GetBytes((ulong) i));
                 }
 
-                tree.Insert(txnId, (ulong) _config.LeafLoadFactor, BitConverter.GetBytes((ulong) _config.LeafLoadFactor));
+                tree.Insert(txnId, (ulong) config.LeafLoadFactor, BitConverter.GetBytes((ulong) config.LeafLoadFactor));
                 Assert.IsTrue(tree.Search(14, buff, null));
 
                 // Check we can find all the values inserted so far
-                for (int i = 0; i <= _config.LeafLoadFactor; i++)
+                for (int i = 0; i <= config.LeafLoadFactor; i++)
                 {
                     Assert.IsTrue(tree.Search((ulong) i, buff, null));
                 }
@@ -75,7 +74,9 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             using (var pageStore = TestUtils.OpenPageStore("TestInsertSingleRootSplit.data", true))
             {
                 var tree = new BPlusTree(pageStore, rootId);
-                for (int i = 0; i <= _config.LeafLoadFactor; i++)
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
+                for (int i = 0; i <= config.LeafLoadFactor; i++)
                 {
                     Assert.IsTrue(tree.Search((ulong) i, buff, null), "Could not find entry for key {0}", i);
                     var value = BitConverter.ToUInt64(buff, 0);
@@ -88,16 +89,18 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         public void TestSplitRootNode()
         {
             ulong treeRootId;
-            var buff = new byte[_config.ValueSize];
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestSplitRootNode.data"))
             {
-                var tree = new BPlusTree(pageStore);
                 var txnId = 0ul;
-                for (int i = 0; i < _config.InternalBranchFactor; i++)
+                var tree = new BPlusTree(txnId, pageStore);
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
+
+                for (int i = 0; i < config.InternalBranchFactor; i++)
                 {
-                    for (int j = 0; j < _config.LeafLoadFactor; j++)
+                    for (int j = 0; j < config.LeafLoadFactor; j++)
                     {
-                        var nodeKey = (ulong) ((i*_config.LeafLoadFactor) + j);
+                        var nodeKey = (ulong) ((i*config.LeafLoadFactor) + j);
                         tree.Insert(txnId, nodeKey, BitConverter.GetBytes(nodeKey));
                     }
                 }
@@ -108,12 +111,15 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             }
             using (var pageStore = TestUtils.OpenPageStore("TestSplitRootNode.data",true))
             {
-                var tree = new BPlusTree(pageStore, treeRootId);
-                for (int i = 0; i < _config.InternalBranchFactor; i++)
+                var tree = new BPlusTree(pageStore, treeRootId); 
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
+
+                for (int i = 0; i < config.InternalBranchFactor; i++)
                 {
-                    for (int j = 0; j < _config.LeafLoadFactor; j++)
+                    for (int j = 0; j < config.LeafLoadFactor; j++)
                     {
-                        var nodeKey = (ulong) ((i*_config.LeafLoadFactor) + j);
+                        var nodeKey = (ulong) ((i*config.LeafLoadFactor) + j);
                         Assert.IsTrue(tree.Search(nodeKey, buff, null), "Could not find entry for key {0}", nodeKey);
                         var value = BitConverter.ToUInt64(buff, 0);
                         Assert.AreEqual(nodeKey, value);
@@ -128,17 +134,21 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestInsertInReverseOrder.data"))
             {
-                var tree = new BPlusTree(pageStore);
                 var txnId = 0ul;
+                var tree = new BPlusTree(txnId, pageStore);
+                var config = tree.Configuration;
+
                 for (int i = 100000; i > 0; i--)
                 {
                     tree.Insert(txnId, (ulong) i, BitConverter.GetBytes(i));
                 }
+                Console.WriteLine("Tree after 100,000 inserts:");
+                tree.DumpStructure();
 
-                var buff = new byte[_config.ValueSize];
+                var buff = new byte[config.ValueSize];
                 for (int i = 100000; i > 0; i--)
                 {
-                    Assert.IsTrue(tree.Search((ulong) i, buff, null));
+                    Assert.IsTrue(tree.Search((ulong) i, buff, null), "Cannot find entry for key {0}", i);
                     TestUtils.AssertBuffersEqual(BitConverter.GetBytes(i), buff);
                 }
             }
@@ -150,8 +160,8 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             ulong treeRootId;
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestInsertInRandomOrder.data"))
             {
-                var tree = new BPlusTree(pageStore);
                 var txnId = 0ul;
+                var tree = new BPlusTree(txnId, pageStore);
                 foreach (var insertValue in TestUtils.MakeRandomInsertList(100000))
                 {
                     tree.Insert(txnId, (ulong) insertValue, BitConverter.GetBytes(insertValue));
@@ -162,7 +172,8 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             using (var pageStore = TestUtils.OpenPageStore("TestInsertInRandomOrder.data", true))
             {
                 var tree = new BPlusTree(pageStore, treeRootId);
-                var buff = new byte[_config.ValueSize];
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
                 for (int i = 0; i < 100000; i++)
                 {
                     Assert.IsTrue(tree.Search((ulong) i, buff, null), "Could not find key {0} in tree", i);
@@ -178,9 +189,10 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestDeleteFromLeafRoot.data"))
             {
-                var tree = new BPlusTree(pageStore);
                 var txnId = 0ul;
-                var buff = new byte[_config.ValueSize];
+                var tree = new BPlusTree(txnId, pageStore);
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
                 tree.Insert(txnId, 1ul, TestUtils.StringToByteArray("one"));
                 tree.Insert(txnId, 2ul, TestUtils.StringToByteArray("two"));
                 tree.Insert(txnId, 3ul, TestUtils.StringToByteArray("three"));
@@ -199,22 +211,23 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestBorrowLeft.data"))
             {
-                var tree = new BPlusTree(pageStore);
-                var buff = new byte[_config.ValueSize];
                 var txnId = 0ul;
-                for (int j = _config.LeafLoadFactor; j >= 0; j--)
+                var tree = new BPlusTree(txnId, pageStore);
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
+                for (int j = config.LeafLoadFactor; j >= 0; j--)
                 {
                     tree.Insert(txnId, (ulong) j, BitConverter.GetBytes((ulong) j));
                 }
 
-                tree.Delete(txnId, (ulong) (_config.LeafLoadFactor - 1), null);
-                tree.Delete(txnId, (ulong) (_config.LeafLoadFactor - 2), null);
+                tree.Delete(txnId, (ulong) (config.LeafLoadFactor - 1), null);
+                tree.Delete(txnId, (ulong) (config.LeafLoadFactor - 2), null);
                     // This should force a borrow from the left node
 
-                for (int i = 0; i <= _config.LeafLoadFactor; i++)
+                for (int i = 0; i <= config.LeafLoadFactor; i++)
                 {
                     Assert.IsTrue(
-                        i == (_config.LeafLoadFactor - 1) ^ i == (_config.LeafLoadFactor - 2) ^
+                        i == (config.LeafLoadFactor - 1) ^ i == (config.LeafLoadFactor - 2) ^
                         tree.Search((ulong) i, buff, null),
                         "Could not find entry for key {0}", i);
                 }
@@ -226,18 +239,24 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestBorrowRight.data"))
             {
-                var tree = new BPlusTree(pageStore);
-                var buff = new byte[_config.ValueSize];
                 var txnId = 0ul;
-                for (int i = 0; i <= _config.LeafLoadFactor; i++)
+                var tree = new BPlusTree(txnId, pageStore);
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
+                for (int i = 0; i <= config.LeafLoadFactor; i++)
                 {
                     tree.Insert(txnId, (ulong) i, BitConverter.GetBytes((ulong) i));
                 }
+                //Console.WriteLine("Before deletes:");
+                //tree.DumpStructure();
                 tree.Delete(txnId, 13ul, null);
                 tree.Delete(txnId, 12ul, null); // Should force a borrow frrom the right node
-                for (int i = 0; i <= _config.LeafLoadFactor; i++)
+                //Console.WriteLine("After Deletes");
+                //tree.DumpStructure();
+                for (int i = 0; i <= config.LeafLoadFactor; i++)
                 {
-                    Assert.IsTrue(i == 12 ^ i == 13 ^ tree.Search((ulong) i, buff, null));
+                    Assert.IsTrue(i == 12 ^ i == 13 ^ tree.Search((ulong) i, buff, null),
+                        "Could not find entry for key {0}", i);
                 }
             }
         }
@@ -247,17 +266,18 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestMergeLeft.data"))
             {
-                var tree = new BPlusTree(pageStore);
-                var testBytes = new byte[] {1, 2, 3, 4};
-                var buff = new byte[_config.ValueSize];
                 var txnId = 0ul;
-                for (int i = 0; i < _config.LeafLoadFactor*_config.InternalBranchFactor; i++)
+                var tree = new BPlusTree(txnId, pageStore);
+                var testBytes = new byte[] {1, 2, 3, 4};
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
+                for (int i = 0; i < config.LeafLoadFactor*config.InternalBranchFactor; i++)
                 {
                     tree.Insert(txnId, (ulong) i, testBytes);
                 }
 
-                ulong delFrom = (ulong) (_config.LeafLoadFactor*_config.InternalBranchFactor) - 1;
-                ulong delRange = ((ulong) _config.LeafLoadFactor/2) + 2;
+                ulong delFrom = (ulong) (config.LeafLoadFactor*config.InternalBranchFactor) - 1;
+                ulong delRange = ((ulong) config.LeafLoadFactor/2) + 2;
                 for (ulong i = 0; i < delRange; i++)
                 {
                     tree.Delete(txnId, delFrom - i, null); // Should be enough to force a left merge
@@ -276,11 +296,12 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
         {
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestMergeRight.data"))
             {
-                var tree = new BPlusTree(pageStore);
-                var testBytes = new byte[] {1, 2, 3, 4};
-                var buff = new byte[_config.ValueSize];
                 var txnId = 0ul;
-                for (int i = 0; i < _config.LeafLoadFactor*_config.InternalBranchFactor; i++)
+                var tree = new BPlusTree(txnId, pageStore);
+                var testBytes = new byte[] {1, 2, 3, 4};
+                var config = tree.Configuration;
+                var buff = new byte[config.ValueSize];
+                for (int i = 0; i < config.LeafLoadFactor*config.InternalBranchFactor; i++)
                 {
                     try
                     {
@@ -290,32 +311,48 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                     {
                         Assert.Fail("Insert failed for key {0} with exception {1}", i, ex);
                     }
+
+                    
                 }
 
                 var rootNode = tree.GetNode(tree.RootId, null);
-                var childId = (rootNode as InternalNode).GetChildNodeId(rootNode.RightmostKey);
-                var child = tree.GetNode(childId, null) as InternalNode;
+                var childId = (rootNode as IInternalNode).GetChildNodeId(rootNode.RightmostKey);
+                var child = tree.GetNode(childId, null) as IInternalNode;
                 var childLeftmostKey = BitConverter.ToUInt64(child.LeftmostKey, 0);
                 var grandchild =
-                    tree.GetNode(child.GetChildNodeId(BitConverter.GetBytes(childLeftmostKey - 1)), null) as LeafNode;
+                    tree.GetNode(child.GetChildNodeId(BitConverter.GetBytes(childLeftmostKey - 1)), null) as ILeafNode;
                 var deleteFrom = BitConverter.ToUInt64(grandchild.LeftmostKey, 0);
 
-                var findChildId = (rootNode as InternalNode).GetChildNodeId(BitConverter.GetBytes(deleteFrom));
+                var findChildId = (rootNode as IInternalNode).GetChildNodeId(BitConverter.GetBytes(deleteFrom));
                 Assert.AreEqual(child.PageId, findChildId, "Incorrect node id returned for key {0}", deleteFrom);
+
+                tree.DumpStructure();
 
                 for (ulong i = 0; i < 4; i++)
                 {
                     var deleteKey = deleteFrom + i;
                     tree.Delete(txnId, deleteKey, null); // Should be enough to force a right merge
+                    //Console.WriteLine("\n\nDeleted {0}\n", deleteKey);
+                    //tree.DumpStructure();
+                    Assert.IsTrue(tree.Search(10395ul, buff, null));
                 }
 
-                for (ulong i = 0; i < (ulong) (_config.LeafLoadFactor*_config.InternalBranchFactor); i++)
+                for (ulong i = 0; i < (ulong) (config.LeafLoadFactor*config.InternalBranchFactor); i++)
                 {
-                    Assert.IsTrue(tree.Search(i, buff, null) ^ (i - deleteFrom >= 0 && i - deleteFrom < 4),
-                                  "Could not find key {0}. deleteFrom={1}", i, deleteFrom);
+                    try
+                    {
+                        Assert.IsTrue(tree.Search(i, buff, null) ^ (i - deleteFrom >= 0 && i - deleteFrom < 4),
+                                      "Could not find key {0}. deleteFrom={1}", i, deleteFrom);
+                    }
+                    catch (AssertionException)
+                    {
+                        Console.WriteLine("\nFailed tree structure:\n");
+                        tree.DumpStructure();
+                        throw;
+                    }
                 }
 
-                deleteFrom = (ulong) (_config.LeafLoadFactor*_config.InternalBranchFactor) - 5;
+                deleteFrom = (ulong) (config.LeafLoadFactor*config.InternalBranchFactor) - 5;
                 for (ulong i = 0; i < 4; i++)
                 {
                     var deleteKey = deleteFrom + i;
@@ -333,7 +370,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             var txnId = 0ul;
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestValuelessBTree.data"))
             {
-                var tree = new BPlusTree(pageStore, 16, 0);
+                var tree = new BPlusTree(0, pageStore, 16, 0);
                 for(int i = 0; i < 1000; i++)
                 {
                     var g = Guid.NewGuid();
@@ -343,11 +380,13 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 tree.Save(0, null);
                 treeRoot = tree.RootId;
                 pageStore.Commit(0ul, null);
+                //tree.DumpStructure();
             }
 
             using (var pageStore = TestUtils.OpenPageStore("TestValuelessBTree.data", false))
             {
                 var tree = new BPlusTree(pageStore, treeRoot, 16, 0);
+                tree.DumpStructure();
                 var buff = new byte[0];
                 foreach(var g in insertedValues)
                 {
@@ -368,7 +407,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             inserted.Add(0); // Not using enumerable initializer because its not supported in the mobile build
             using (var pageStore = TestUtils.CreateEmptyPageStore("TestBatchedInserts.data"))
             {
-                var tree = new BPlusTree(pageStore);
+                var tree = new BPlusTree(txnId, pageStore);
                 for (int i = 1; i <= 10000; i++)
                 {
                     while (inserted.Contains(key))
@@ -382,9 +421,9 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                     {
                         tree.Save((ulong)i / 250, null);
                         pageStore.Commit((ulong)i / 250, null);
+                        //Console.WriteLine("Dump tree @ commit after {0}", i);
+                        //tree.DumpStructure();
                         Assert.AreEqual(i, tree.Scan(0, ulong.MaxValue, null).Count());
-                        Console.WriteLine("Dump tree @ commit after {0}", i);
-                        tree.DumpStructure();
                     }
                 }
             }
@@ -398,7 +437,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             const int keyCount = 20000;
             using(var pageStore = TestUtils.CreateEmptyPageStore("TestInsertAndDeleteAllEntries.data"))
             {
-                var tree = new BPlusTree(pageStore);
+                var tree = new BPlusTree(0, pageStore);
                 for(int i = 0; i < keyCount; i++)
                 {
                     tree.Insert(0, (ulong)i, value);
@@ -419,10 +458,12 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             using (var pageStore = TestUtils.OpenPageStore("TestInsertAndDeleteAllEntries.data", false))
             {
                 var tree = new BPlusTree(pageStore, rootPageId);
+                Assert.IsTrue(tree.Search(3457ul, value, null), "Could not find entry 3457 before deletes");
                 for (int i = 0; i < keyCount; i += 2)
                 {
                     tree.Delete(1ul, (ulong)i, null);
                     Assert.IsFalse(tree.Search((ulong)i, value, null), "Still found entry for key {0} after delete", i);
+                    Assert.IsTrue(tree.Search(3457ul, value, null), "Could not find entry 3457 after delete of {0}",i);
                 }
                 rootPageId = tree.Save(1, null);
                 pageStore.Commit(1, null);
@@ -468,7 +509,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             const int keyCount = 20000;
             using (var pageStore = TestUtils.CreateEmptyPageStore(pageStoreName))
             {
-                var tree = new BPlusTree(pageStore);
+                var tree = new BPlusTree(0, pageStore);
                 for (int i = 0; i < keyCount; i++)
                 {
                     tree.Insert(0, (ulong) i, value);
@@ -482,7 +523,15 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 var tree = new BPlusTree(pageStore, rootPageId);
                 for (int i = keyCount - 1; i >= 0; i--)
                 {
-                    tree.Delete(1, (ulong) i, null);
+                    try
+                    {
+                        tree.Delete(1, (ulong) i, null);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Delete threw exception on key {0}", i);
+                        throw;
+                    }
                 }
                 rootPageId = tree.Save(1, null);
                 pageStore.Commit(0, null);
@@ -504,7 +553,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             const int keyCount = 20000;
             using (var pageStore = TestUtils.CreateEmptyPageStore(pageStoreName))
             {
-                var tree = new BPlusTree(pageStore);
+                var tree = new BPlusTree(0, pageStore);
                 for (int i = 0; i < keyCount; i++)
                 {
                     tree.Insert(0, (ulong)i, value);

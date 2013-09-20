@@ -1,7 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#else
+using System.Collections.Concurrent;
+#endif
 
 namespace BrightstarDB.Caching
 {
@@ -13,7 +17,7 @@ namespace BrightstarDB.Caching
         private readonly ConcurrentDictionary<string, TimestampedCacheEntry> _normalPriorityEntries;
         private readonly ConcurrentDictionary<string, TimestampedCacheEntry> _highPriorityEntries;
         private bool _running;
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
         private readonly ManualResetEvent _evictionCompleted = new ManualResetEvent(false);
 #else
         private readonly ManualResetEventSlim _evictionCompleted = new ManualResetEventSlim();
@@ -38,7 +42,7 @@ namespace BrightstarDB.Caching
             {
                 if (_running)
                 {
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                     _evictionCompleted.WaitOne();
 #else
                     _evictionCompleted.Wait();

@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using BrightstarDB.Storage.Persistence;
+using BrightstarDB.Storage.Statistics;
 using BrightstarDB.Storage.TransactionLog;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.BTreeStore
 {
@@ -245,15 +249,15 @@ namespace BrightstarDB.Storage.BTreeStore
                         }
                         catch (Exception ex)
                         {
-#if !WINDOWS_PHONE
+#if WINDOWS_PHONE || PORTABLE
+                            Logging.LogError(BrightstarEventId.ObjectWriteError,
+                 "Error writing object {0} with Id {1} and type {2}. Cause: {3}.",
+                 obj, obj.ObjectId, obj.GetType().FullName, ex);
+#else
                             Logging.LogError(BrightstarEventId.ObjectWriteError,
                                              "Error writing object {0} with Id {1} and type {2}. Cause: {3}. Call stack: {4}",
                                              obj, obj.ObjectId, obj.GetType().FullName, ex,
                                              Environment.StackTrace);
-#else
-                            Logging.LogError(BrightstarEventId.ObjectWriteError,
-                 "Error writing object {0} with Id {1} and type {2}. Cause: {3}.",
-                 obj, obj.ObjectId, obj.GetType().FullName, ex);
 #endif
                             throw;
                         }
@@ -326,6 +330,17 @@ namespace BrightstarDB.Storage.BTreeStore
         public virtual ITransactionLog GetTransactionLog(string storeLocation)
         {
             return new PersistentTransactionLog(_persistenceManager, storeLocation);
+        }
+
+        public virtual IStoreStatisticsLog GetStatisticsLog(string storeLocation)
+        {
+            return new PersistentStatisticsLog(_persistenceManager, storeLocation);
+        }
+
+        public void CreateSnapshot(string srcStoreLocation, string destStoreLocation, PersistenceType storePersistenceType,
+                                   ulong commitPointId = StoreConstants.NullUlong)
+        {
+            throw new NotImplementedException();
         }
 
         public MasterFile GetMasterFile(string storeLocation)

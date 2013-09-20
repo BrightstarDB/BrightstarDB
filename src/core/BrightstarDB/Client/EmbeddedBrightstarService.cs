@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+#if !PORTABLE
 using System.Threading.Tasks;
+#endif
 using BrightstarDB.Storage;
 using BrightstarDB.Server;
 #if !SILVERLIGHT
@@ -193,6 +195,9 @@ namespace BrightstarDB.Client
                 var t = new Thread(ExecuteQuery);
                 t.Start(new QueryParams(storeName, queryExpression, ifNotModifiedSince, resultsFormat, pStream));
                 t.Join();
+#elif PORTABLE
+                _serverCore.Query(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince, resultsFormat,
+                                  pStream);
 #else
                 var t = new Task(() => _serverCore.Query(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince, resultsFormat, pStream));
                 t.Start();
@@ -264,6 +269,9 @@ namespace BrightstarDB.Client
                 var t = new Thread(ExecuteQuery);
                 t.Start(new QueryParams(commitPoint, queryExpression, resultsFormat, pStream));
                 t.Join();
+#elif PORTABLE
+                _serverCore.Query(commitPoint.StoreName, commitPoint.Id, queryExpression, defaultGraphUris,
+                                  resultsFormat, pStream);
 #else
                 var t =
                     new Task(() => _serverCore.Query(commitPoint.StoreName, commitPoint.Id, queryExpression, defaultGraphUris, resultsFormat, pStream));
@@ -277,6 +285,7 @@ namespace BrightstarDB.Client
                 pStream.Seek(0, SeekOrigin.Begin);
                 return pStream;
             }
+#if !PORTABLE
             catch (AggregateException aggregateException)
             {
                 Logging.LogError(BrightstarEventId.ServerCoreException,
@@ -295,6 +304,7 @@ namespace BrightstarDB.Client
                         "Error querying store {0}@{1} with expression {2}. Multiple errors occurred: {3}",
                         commitPoint.StoreName, commitPoint.Id, queryExpression, messages));
             }
+#endif
             catch (Exception ex)
             {
                 Logging.LogError(BrightstarEventId.ServerCoreException,
@@ -306,6 +316,32 @@ namespace BrightstarDB.Client
             }
         }
 
+#if PORTABLE
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="preconditions">NTriples that must be in the store in order for the transaction to execute</param>
+        /// <param name="deletePatterns">The delete patterns that will be removed from the store</param>
+        /// <param name="insertData">The NTriples data that will be inserted into the store.</param>
+        /// <param name="defaultGraphUri">The URI of the default graph to apply the transaction to.</param>
+        /// <returns>Job Info</returns>
+        public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
+                                           string insertData, string defaultGraphUri)
+        {
+            try
+            {
+                var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData,
+                                                           defaultGraphUri);
+                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error Queing Transaction {0} {1} {2}", storeName, deletePatterns, insertData);
+                throw new BrightstarClientException("Error queing transaction in store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+#else
         /// <summary>
         /// Execute an update transaction.
         /// </summary>
@@ -351,7 +387,23 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException("Error queing transaction in store " + storeName + ". " + ex.Message, ex);
             }
         }
+#endif
 
+#if PORTABLE
+        public IJobInfo ExecuteUpdate(string storeName, string updateExpression)
+        {
+            try
+            {
+                var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
+                return new JobInfoWrapper(new JobInfo { JobId = jobId.ToString(), JobPending = true });
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error queing SPARQL update {0} {1}", storeName, updateExpression);
+                throw new BrightstarClientException("Error queing SPARQL update in store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+#else
         /// <summary>
         /// Execute a SPARQL Update expression against a store
         /// </summary>
@@ -392,6 +444,7 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException("Error queing SPARQL update in store " + storeName + ". " + ex.Message, ex);
             }
         }
+#endif
 
 #if SILVERLIGHT
         
@@ -615,6 +668,125 @@ namespace BrightstarDB.Client
             }
         }
 
+        /// <summary>
+        /// Retrieves the most recent statistics for the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for.</param>
+        /// <returns>A <see cref="IStoreStatistics"/> instance containing the most recent statistics for the named store, or NULL if
+        /// there are no statistics availabe for the store.</returns>
+        public IStoreStatistics GetStatistics(string storeName)
+        {
+            try
+            {
+                return _serverCore.GetStatistics(storeName).Select(
+                    s =>
+                    new StoreStatisticsWrapper(new StoreStatistics
+                        {
+                            CommitId = s.CommitNumber,
+                            CommitTimestamp = s.CommitTime,
+                            TotalTripleCount = s.TripleCount,
+                            PredicateTripleCounts = s.PredicateTripleCounts
+                        })
+                    ).FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting statistics for store {0}", storeName);
+                throw new BrightstarClientException("Error getting statistics for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a range of statistics records for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve statistics for</param>
+        /// <param name="latest">The latest date to retrieve statistics for</param>
+        /// <param name="earlierst">The earliest date to retrieve statisitcs for</param>
+        /// <param name="skip">The offset into the date-filters list to return from</param>
+        /// <param name="take">The number of results to return</param>
+        /// <returns>An enumeration over the specified subset of statistics records for the store.</returns>
+        /// <exception cref="ArgumentException">Raised if <paramref name="skip"/> is less than 0 or <paramref name="take"/> is greater than 100.</exception>
+        public IEnumerable<IStoreStatistics> GetStatistics(string storeName, DateTime latest, DateTime earlierst,
+                                                           int skip, int take)
+        {
+            if (skip <0) throw new ArgumentOutOfRangeException("skip", Strings.BrightstarServiceClient_SkipMustNotBeNegative);
+            if (take > 100) throw new ArgumentOutOfRangeException("take", Strings.BrightstarServiceClient_GetStatistics_TakeTooLarge);
+            try
+            {
+                // ReSharper disable RedundantEnumerableCastCall
+                // not redundant for SILVERLIGHT build
+                return _serverCore.GetStatistics(storeName)
+                                  .Where(s => s.CommitTime <= latest && s.CommitTime >= earlierst)
+                                  .Skip(skip)
+                                  .Take(take)
+                                  .Select(s => new StoreStatisticsWrapper(new StoreStatistics
+                                      {
+                                          CommitId = s.CommitNumber,
+                                          CommitTimestamp = s.CommitTime,
+                                          TotalTripleCount = s.TripleCount,
+                                          PredicateTripleCounts = s.PredicateTripleCounts
+                                      })).Cast<IStoreStatistics>();
+                // ReSharper restore RedundantEnumerableCastCall
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting statistics for store {0}",
+                                 storeName);
+                throw new BrightstarClientException(
+                    "Error getting statistics for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// Queues a job to update the statistics for a store
+        /// </summary>
+        /// <param name="storeName">The name of the store whose statistics are to be updated</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
+        public IJobInfo UpdateStatistics(string storeName)
+        {
+            try
+            {
+                var jobId = _serverCore.UpdateStatistics(storeName);
+                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error queuing statistics update job for store {0}", storeName);
+                throw new BrightstarClientException(
+                    "Error queuing statistics update job for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// Queues a job to create a snapshot of a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to take a snapshot of</param>
+        /// <param name="targetStoreName">The name of the store to be created to receive the snapshot</param>
+        /// <param name="persistenceType">The type of persistence to use for the target store</param>
+        /// <param name="sourceCommitPoint">OPTIONAL: the commit point in the source store to take a snapshot from</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
+        public IJobInfo CreateSnapshot(string storeName, string targetStoreName,
+                                       PersistenceType persistenceType,
+                                       ICommitPointInfo sourceCommitPoint = null)
+        {
+            try
+            {
+                var jobId = _serverCore.CreateSnapshot(storeName, targetStoreName,
+                                                       persistenceType,
+                                                       sourceCommitPoint == null
+                                                           ? StoreConstants.NullUlong
+                                                           : sourceCommitPoint.Id);
+                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error queuing snapshot job for store {0}",
+                                 storeName);
+                throw new BrightstarClientException(
+                    "Error queuing snapshot job for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
 
         /// <summary>
         /// Returns the commit point that was in effect at a given date/time
@@ -688,7 +860,7 @@ namespace BrightstarDB.Client
                                              JobId = t.JobId,
                                              StartTime = t.TransactionStartTime,
                                              StoreName = storeName,
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                                              Status = (BrightstarTransactionStatus)((int)t.TransactionStatus),
                                              TransactionType = (BrightstarTransactionType)((int)t.TransactionType)
 #else

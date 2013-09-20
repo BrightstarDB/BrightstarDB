@@ -126,8 +126,18 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     if (values.ContainsKey(mapping.Item2))
                     {
+#if PORTABLE
+                        var memberInfo =
+                            Constructor.DeclaringType.GetMember(mapping.Item1.Name, BindingFlags.Public).FirstOrDefault();
+                        if (memberInfo != null)
+                        {
+                            var methodInfo = memberInfo as MethodInfo;
+                            methodInfo.Invoke(ret, new []{values[mapping.Item2]});
+                        }
+#else
                         Constructor.DeclaringType.InvokeMember(mapping.Item1.Name, BindingFlags.Public, null, ret,
                                                                new object[] {values[mapping.Item2]});
+#endif
                     }
                 }
             }

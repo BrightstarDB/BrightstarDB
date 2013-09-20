@@ -8,6 +8,11 @@ using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Rdf;
+using BrightstarDB.Storage.Persistence;
+
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.EntityFramework
 {
@@ -24,7 +29,7 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="mappings">The context type and property mappings</param>
         /// <param name="store">The Brightstar store that manages the data</param>
-        public BrightstarEntityContext(EntityMappingStore mappings, IDataObjectStore store) :base(mappings)
+        protected BrightstarEntityContext(EntityMappingStore mappings, IDataObjectStore store) :base(mappings)
         {
             _store = store;
             _trackedObjects = new Dictionary<string, List<BrightstarEntityObject>>();
@@ -36,11 +41,19 @@ namespace BrightstarDB.EntityFramework
         /// <param name="mappings">The context type and property mappings</param>
         ///<param name="connectionString">The connection string that will be used to connect to an existing BrightstarDB store</param>
         ///<param name="enableOptimisticLocking">Optional parameter to override the optimistic locking configuration specified in the connection string</param>
-        public BrightstarEntityContext(EntityMappingStore mappings, string connectionString, bool? enableOptimisticLocking = null) : base(mappings)
+        /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// not defined, the default graph in the store will be updated.</param>
+        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
+        /// If not defined, all graphs in the store will be queried.</param>
+        /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
+        /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+        protected BrightstarEntityContext(EntityMappingStore mappings, string connectionString, bool? enableOptimisticLocking = null,
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null ) : base(mappings)
         {
             var cstr = new ConnectionString(connectionString);
             AssertStoreFromConnectionString(cstr);
-            _store = OpenStore(cstr, enableOptimisticLocking);
+            _store = OpenStore(cstr, enableOptimisticLocking,
+                updateGraphUri, datasetGraphUris, versionGraphUri);
             _trackedObjects = new Dictionary<string, List<BrightstarEntityObject>>();
         }
 
@@ -72,16 +85,24 @@ namespace BrightstarDB.EntityFramework
         /// Creates a new domain context and connects to the store specified in the configuration connectionString.
         /// </summary>
         /// <param name="mappings">The context type and property mappings</param>
-        public BrightstarEntityContext(EntityMappingStore mappings)
+        /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// not defined, the default graph in the store will be updated.</param>
+        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
+        /// If not defined, all graphs in the store will be queried.</param>
+        /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
+        /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+        protected BrightstarEntityContext(EntityMappingStore mappings,
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
             : base(mappings)
         {
             var cstr = new ConnectionString(Configuration.ConnectionString);
             AssertStoreFromConnectionString(cstr);
-            _store = OpenStore(cstr);
+            _store = OpenStore(cstr, updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri);
             _trackedObjects = new Dictionary<string, List<BrightstarEntityObject>>();
         }
 
-        private static IDataObjectStore OpenStore(ConnectionString connectionString, bool? enableOptimisticLocking = null)
+        private static IDataObjectStore OpenStore(ConnectionString connectionString, bool? enableOptimisticLocking = null,
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
         {
             IDataObjectContext context;
             switch (connectionString.Type)
@@ -91,7 +112,7 @@ namespace BrightstarDB.EntityFramework
                     context = new EmbeddedDataObjectContext(connectionString);
                     break;
 #endif
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !PORTABLE
 #if !REST_CLIENT
                 case ConnectionType.Http:
                     context = new HttpDataObjectContext(connectionString);
@@ -116,7 +137,10 @@ namespace BrightstarDB.EntityFramework
                                      optimisticLockingEnabled:
                                          enableOptimisticLocking.HasValue
                                              ? enableOptimisticLocking.Value
-                                             : connectionString.OptimisticLocking);
+                                             : connectionString.OptimisticLocking,
+                                     updateGraph: updateGraphUri,
+                                     defaultDataSet: datasetGraphUris,
+                                     versionTrackingGraph: versionGraphUri);
         }
 
         internal IDataObject GetDataObject(Uri identity, bool loadNow)
@@ -439,6 +463,7 @@ namespace BrightstarDB.EntityFramework
             }
             var identity = bsObject.DataObject.Identity;
             _trackedObjects.Remove(identity);
+            RemoveReferences(bsObject);
             bsObject.DataObject.Delete();
             bsObject.DataObject = null;
         }
@@ -451,6 +476,14 @@ namespace BrightstarDB.EntityFramework
         public override string GetDatatype(Type systemType)
         {
             return RdfDatatypes.GetRdfDatatype(systemType);
+        }
+
+        /// <summary>
+        /// This method is invoked when the entity context is being disposed.
+        /// </summary>
+        protected override void Cleanup()
+        {
+            _store.Dispose();
         }
 
         #endregion
@@ -664,6 +697,24 @@ namespace BrightstarDB.EntityFramework
                     {
                         destObject.UpdateProperty(destProperty.Name, null);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes any reference to <paramref name="toRemove"/> from locally 
+        /// tracked objects in this context.
+        /// </summary>
+        /// <param name="toRemove">The entity object that is to be removed</param>
+        /// <remarks>This method is used when <paramref name="toRemove"/> has been locally deleted
+        /// in the context.</remarks>
+        private void RemoveReferences(BrightstarEntityObject toRemove)
+        {
+            foreach (var trackedList in _trackedObjects.Values)
+            {
+                foreach (var tracked in trackedList)
+                {
+                    tracked.RemoveReferences(toRemove);
                 }
             }
         }

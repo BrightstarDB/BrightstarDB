@@ -23,67 +23,54 @@ For more information about the RDF layer of BrightstarDB, please read the :ref:`
 Creating a Data Object Context
 ==============================
 
-
-The following example shows how to create a new context using a connection string::
+The ``IDataObjectContext`` interface provides the methods for accessing BrightstarDB stores through the
+Data Object Layer. You can use this interface to list the available stores, to open existing stores
+and to create or delete stores. The following example shows how to create a new context using a 
+connection string::
 
   var context = BrightstarService.GetDataObjectContext("Type=http;endpoint=http://localhost:8090/brightstar;");
 
-For more information about connection strings, please read the :ref:`"Connection Strings" 
-topic <Connection_Strings>`
+The connection string defines the type of service you are connecting to. For more information about connection strings, 
+please read the :ref:`"Connection Strings" topic <Connection_Strings>`
 
+Using the IDataObjectContext
+============================
 
-Creating a Store
-================
+Once you have an ``IDataObjectContext``, a new store can be creating using the ``CreateStore`` method::
 
-A new store can be creating using the following code::
+  IDataObjectStore myStore = context.CreateStore("MyStore");
+  
+``CreateStore`` also accepts a number of optional parameters which are described in later sections.
 
-  string storeName = "Store_" + Guid.NewGuid();
-  context.CreateStore(storeName);
+Deleting a store is also straight forward - you just pass in the name of the store to be deleted::
 
+  context.DeleteStore("MyStore");
 
-Deleting a Store
-================
+To check if a store with a particular name already exists, use the ``DoesStoreExist()`` method::
 
-Deleting a store is also straight forward::
+  // Create MyStore if it doesn't already exist
+  if (!context.DoesStoreExist("MyStore")) {
+    context.CreateStore("MyStore");
+  }
+  
+To open an existing store, use the ``OpenStore()`` method. This method will throw an exception
+if the named store does not exist, so it is a good idea to test for this first::
 
-  context.DeleteStore(storeName);
+  IDataObjectStore myStore;
+  if (context.DoesStoreExist("MyStore")) {
+    myStore = context.OpenStore("MyStore");
+  }
 
+Working With Data Objects
+=========================
 
-Creating data objects
-=====================
-
-
-Data Objects can be created using the following code::
+Data Objects can be created using the ``MakeDataObject()`` method on the IDataObjectStore::
 
   var fred = store.MakeDataObject("http://example.org/people/fred");
 
 The objects can be created by passing in a well formed URI as the identity, if no identity is 
-given then one is automatically generated for it. 
-
-
-Adding information to data objects
-==================================
-
-To add information about this object we can add properties to it.
-
-To set the value of a single property, use the following code::
-
-  var fullname = store.MakeDataObject("http://example.org/schemas/person/fullName");
-  fred.SetProperty(fullname, "Fred Evans");
-
-Calling ``SetProperty()`` a second time will overwrite the previous value of the property.
-
-To add multiple properties of the same type use the code below::
-
-  var skill = store.MakeDataObject("http://example.org/schemas/person/skill");
-  fred.AddProperty(skill, csharp);
-  fred.AddProperty(skill, html);
-  fred.AddProperty(skill, css);
-
-Retrieving Data Objects
-=======================
-
-A data object can be retrieved from the store using the following code::
+given then one is automatically generated for it and can be accessed via its ``Identity`` property. 
+A data object can be retrieved from the store using its URI identifier::
 
   var fred = store.GetDataObject("http://example.org/people/fred");
 
@@ -96,21 +83,76 @@ will be automatically added to BrightstarDB.
   ``GetDataObject()`` will never return a null object. The data object consists of all the 
   information that is held in BrightstarDB for a particular identity.
 
-We can check the RDF data that an object has at any time by using the following code:::
+To set the value of a single property, use the ``SetProperty()`` method. The method
+requires an IDataObject instance that defines the type of the property being added,
+so this needs to be created first.::
+
+  var name = store.MakeDataObject("http://xmlns.com/foaf/0.1/name");
+  fred.SetProperty(name, "Fred Evans");
+  
+There is also a short-hand version that takes care of creating the IDataObject for the type,
+so the following is equivalent to the previous two-line example::
+
+  fred.SetProperty("http://xmlns.com/foaf/0.1/name", "Fred Evans");
+
+Calling ``SetProperty()`` a second time will overwrite the previous value of the property::
+
+  fred.SetProperty("http://xmlns.com/foaf/0.1/name", "Fred Q. Evans");
+
+If you want to add multiple properties of the same type use the ``AddProperty()`` method instead of ``SetProperty()``::
+
+  var mbox = store.MakeDataObject("http://xmlns.com/foaf/0.1/mbox");
+  fred.AddProperty(mbox, "fred@example.com");
+  fred.AddProperty(mbox, "fred.evans@example.com");
+  
+A property value can either be a literal primitive type (supported C# primitive types are
+string, bool, DateTime, Date, double, int, float, long, byte, decimal, short,
+ubyte, ushort, uint, ulong, char and byte[]), or another IDataObject instance::
+
+  var alice = store.MakeDataObject("http://example.org/people/alice");
+  var knows = store.MakeDataObject("http://xmlns.com/foaf/0.1/knows");
+  fred.AddProperty(knows, alice);
+
+There is also a short-hand function for setting the RDF type property for a data object::
+
+  var person = store.MakeDataObject("http://xmlns.com/foaf/0.1/Person");
+  fred.SetType(person);
+
+A property can be removed from a data object using the ``RemoveProperty()`` method::
+
+  fred.RemoveProperty(mbox, "fred@example.com");
+  
+``RemoveProperty()`` will only remove a property that matches exactly by type and value (and language 
+code if specified). Alternatively to remove all properties of a given type, use the 
+``RemovePropertiesOfType()`` method::
+
+  fred.RemovePropertiesOfType(mbox);
+
+All of these methods for adding/remove properties and setting a type return the data object itself,
+allowing the calls to be chained::
+
+  fred.SetType(person)
+      .SetProperty(name, "Fred Q. Evans")
+      .AddProperty(mbox, "fred@example.org")
+      .AddProperty(knows, alice);
+	  
+Adding and removing properties and changing the type simply adds and removes triples from the set of 
+locally managed triples for the data object. You can access the RDF data that an object has at any time 
+by using the following code::
 
   var triples = ((DataObject)fred).Triples;
 
-
-Deleting Data Objects
-=====================
-
-A data object can be deleted using the following code::
+A data object can be deleted using the ``Delete()`` method on the data object itself::
 
   var fred = store.GetDataObject("http://example.org/people/fred");
   fred.Delete();
 
-This removes all triples describing that data object from the store.
+This will remove all triples describing that data object from the store when changes are saved.
 
+Updates such as new properties, new objects and deletions are all tracked by the IDataObjectStore locally
+and are only applied to the BrightstarDB store when you call the ``SaveChanges()`` method on the store.
+``SaveChanges()`` saves your changes in a single transaction, so either all updates will be applied
+to the store or the transaction will fail and none of the updates will be applied.
 
 Namespace Mappings
 ==================
@@ -145,14 +187,10 @@ Querying data using SPARQL
 BrightstarDB supports `SPARQL 1.1`_ for querying the data in the store. These queries can be 
 executed via the Data Object store using the ``ExecuteSparql()`` method. 
 
-
-
 The SparqlResult returned has the results of the SPARQL query in the ResultDocument property 
 which is an XML document formatted according to the `SPARQL XML Query Results Format`_. The
 BrightstarDB libraries provide some helpful extension methods for accessing the contents of
-a SPARQL XML results document
-
-::
+a SPARQL XML results document::
 
   var query = "SELECT ?skill WHERE { " +
               "<http://example.org/people/fred> <http://example.org/schemas/person/skill> ?skill " +
@@ -163,8 +201,6 @@ a SPARQL XML results document
       var val = sparqlResultRow.GetColumnValue("skill");
       Console.WriteLine("Skill is " + val);
   }
-
-
 
 Binding SPARQL Results To Data Objects
 ======================================
@@ -180,409 +216,99 @@ the results to a data object, and passes back the enumeration of these instances
       Console.WriteLine("Skill is " + s.Identity);
   }
 
-
-.. _Data_Object_Layer_Sample_Program:
-
-
-Sample Program
-==============
-
-.. _SPARQL 1.1: http://www.w3.org/TR/sparql11-query/
-
-.. note::
-
-  The source code for this example can be found in 
-  [INSTALLDIR]\\Samples\\DataObjectLayer\\DataObjectLayerSamples.sln
-
-The sample project is a simple console application that runs through some of the basic usage 
-for BrightstarDB's Data Object Layer.
-
-
-Creating the context
---------------------
-
-A context is created using a connection string that specifies usage of the HTTP server::
-
-  var context = BrightstarService.GetDataObjectContext(
-                       @"Type=http;endpoint=http://localhost:8090/brightstar;");
-
-                       
-Creating the store
-------------------
-
-A store is created with a unique name::
-
-  string storeName = "DataObjectLayerSample_" + Guid.NewGuid();
-  var store = context.CreateStore(storeName);
-
-Namespace Mappings
-------------------
-
-In order to use simpler identities when we are creating and retrieving data objects, we set up 
-a dictionary of namespace mappings to use when we connect to the store::
-
-  _namespaceMappings = new Dictionary<string, string>()
-      {
-          {"people", "http://example.org/people/"},
-          {"skills", "http://example.org/skills/"},
-          {"schema", "http://example.org/schema/"}
-  };
-
-  store = context.OpenStore(storeName, _namespaceMappings);
-
-
-Optimistic Locking
-------------------
-
-To enable support for optimistic locking, we must pass a boolean flag to the ``OpenStore()`` or 
-``CreateStore()`` method::
-
-  store = context.OpenStore(storeName, _namespaceMappings, true); // Open store with optimistic locking enabled
-
-
-Skills
-------
-
-We create a data object to use as the type of data object for skills, and then create a number 
-of skill data objects::
-
-  var skillType = store.MakeDataObject("schema:skill");
-
-  var csharp = store.MakeDataObject("skills:csharp");
-  csharp.SetType(skillType);
-  var html = store.MakeDataObject("skills:html");
-  html.SetType(skillType);
-  var css = store.MakeDataObject("skills:css");
-  css.SetType(skillType);
-  var javascript = store.MakeDataObject("skills:javascript");
-  javascript.SetType(skillType);
-
-
-People
-------
-
-We follow the same process to create some people data objects::
-
-  var personType = store.MakeDataObject("schema:person");
-
-  var fred = store.MakeDataObject("people:fred");
-  fred.SetType(personType);
-  var william = store.MakeDataObject("people:william");
-  william.SetType(personType);
-
-
-Properties
-----------
-
-We create 2 data objects to use as the types for some properties that the people data objects 
-will hold::
-
-  var fullname = store.MakeDataObject("schema:person/fullName");
-  var skill = store.MakeDataObject("schema:person/skill");
-
-We then set the single name property on the people, and add skills
-
-.. note::
-
-  For multiple properties we must use the ``AddProperty()`` method rather than ``SetProperty()`` which 
-  would overwrite any previous value
-
-::
-
-  fred.SetProperty(fullname, "Fred Evans");
-  fred.AddProperty(skill, csharp);
-  fred.AddProperty(skill, html);
-  fred.AddProperty(skill, css);
-
-  william.SetProperty(fullname, "William Turner");
-  william.AddProperty(skill, html);
-  william.AddProperty(skill, css);
-  william.AddProperty(skill, javascript);
-
-The data type of literal properties are set automatically when a property value is added or set::
-
-  var employeeNumber = store.MakeDataObject("schema:person/employeeNumber");
-  var dateOfBirth = store.MakeDataObject("schema:person/dateOfBirth");
-  var salary = store.MakeDataObject("schema:person/salary");
-
-  fred = store.GetDataObject("people:fred");
-  fred.SetProperty(employeeNumber, 123);
-  fred.SetProperty(dateOfBirth, DateTime.Now.AddYears(-30));
-  fred.SetProperty(salary, 18000.00);
-
-
-Save Changes
-------------
-
-Now that we have created the objects we require, we save the changes to the BrightstarDB store::
-
-  store.SaveChanges();
-
-  
-Querying the data
------------------
-
-In this sample, we use a SPARQL query to return all of the skills of the data object for 'fred'. 
-We can then loop through the ResultDocument of the SparqlResult returned to see the identities 
-of each of those skills.
-
-::
-
-  const string getPersonSkillsQuery = 
-        "SELECT ?skill WHERE { " +
-        "  <http://example.org/people/fred> <http://example.org/schemas/person/skill> ?skill " +
-        "}";
-  var sparqlResult = store.ExecuteSparql(getPersonSkillsQuery);
-
-
-Binding Data Objects With SPARQL
---------------------------------
-
-The Data Object Store has a very useful method called ``BindDataObjectsWithSparql()``, which takes 
-a SPARQL query that is written to return the URI identities of data object. The method then 
-returns the data objects for each of the URIs contained in the results.
-
-In the sample we pass in a query to return URIs of any objects with the skill type::
-
-  const string skillsQuery = "SELECT ?skill WHERE {?skill a <http://example.org/schemas/skill>}";
-  var allSkills = store.BindDataObjectsWithSparql(skillsQuery).ToList();
-
-
-Deleting Objects
-----------------
-
-To delete data objects we simply call the Delete() method of that object and save the changes 
-to the store::
-
-  foreach (var s in allSkills)
-  {
-      s.Delete();
-  }
-  store.SaveChanges();
-
-
-.. _Optimistic_Locking_in_DOL:
-
+.. _optimistic_locking_in_dol:
 
 Optimistic Locking in the Data Object Layer
 ===========================================
 
-
 The Data Object Layer provides a basic level of optimistic locking support using the 
 conditional update support provided by the RDF Client API and a special version property that 
-gets assigned to data objects. To enable optimistic locking support it is necessary to enable 
-locking when the ``IDataObjectStore`` instance is retrieved from the context by either the 
-``OpenStore()`` or ``CreateStore()`` method (see :ref:`Sample Program <Data_Object_Layer_Sample_Program>` 
-for an example).
+gets assigned to data objects. Optimistic locking is enabled in one of two ways. The
+first option is to enable optimistic locking in the connection string used to create the 
+``IDataObjectContext``::
 
+    var context = BrightstarService.GetDataObjectContext(
+                      "type=http;endpoint=http://localhost:8090/brightstar;optimisticLocking=true");
+
+The other option is to enable optimistic locking in the ``OpenStore()`` or ``CreateStore()`` method used to 
+retrieve the IDataObjectStore instance from the IDataObjectContext::
+ 
+    var store = context.OpenStore("MyStore", optimisticLockingEnabled:true);
+
+.. note::
+  The optimisticLockingEnabled parameter of ``OpenStore()`` and ``CreateStore()`` is optional.
+  If it is omitted, then the setting in the connection string for the IDataObjectContext is used.
+  If it is specified, it always overrides the setting in the connection string.
+  
 With optimistic locking enabled, the Data Object Layer checks for the presence of a special 
 version property on every object it retrieves (the property predicate URI is 
 ``http://www.brightstardb.com/.well-known/model/version``). If this property is present, its value 
 defines the current version number of the property. If the property is not present, the object 
-is recorded as being currently unversioned. On save, the DataObjectLayer uses the current 
+is recorded as being currently unversioned. On save, the Data Object Layer uses the current 
 version number of all versioned data objects as the set of preconditions for the update, if 
 any of these objects have had their version number property modified on the server, the 
 precondition will fail and the update will not be applied. Also as part of the save, the 
-DataObjectLayer updates the version number of all versioned data objects and creates a new 
+Data Object Layer updates the version number of all versioned data objects and creates a new 
 version number for all unversioned data objects.
 
 When an concurrent modification is detected, this is notified to your code by a 
-``BrightstarClientException`` being raised. In your code you should catch this exception and 
-handle the error, typically either by abandoning updates (and notifying the user) or 
-re-retrieving the modified objects and attempting the update again.
-
-
-.. _Dynamic_API:
-
-************
- Dynamic API
-************
-
-The Dynamic API is a thin layer on top of the data object layer. It is designed to further 
-ease the use of .NET with RDF data and to provide a model for persisting data in systems that 
-make use of the .NET dynamic keyword. The .NET dynamic keyword and dynamic runtime allow 
-properties of objects to be set at runtime without any prior class definition.
-
-The following example shows how dynamics work in general. Both 'Name' and 'Type' are resolved 
-at runtime. In this case they are simply stored as properties in the ExpandoObject. 
-
-::
-
-  dynamic d = new ExpandoObject();
-  d.Name = "Brightstar";
-  d.Type = "Product";
-
-Dynamic Context
-===============
-
-A dynamic context can be used to create dynamic objects whose state is persisted as RDF in 
-BrightstarDB. To use the dynamic context a normal DataObjectContext must be created first. 
-From the context a store can be created or opened. The store provides methods to create and 
-fetch dynamic objects. 
-
-::
-
-  var dataObjectContext = BrightstarService.GetDataObjectContext();
-  // create a dynamic context
-  var dynaContext = new BrightstarDynamicContext(dataObjectContext);
-  // create a new store
-  var storeId = "DynamicSample" + Guid.NewGuid().ToString();
-  var dynaStore = dynaContext.CreateStore(storeId);
-
-Dynamic Object
-==============
-
-The dynamic object is a wrapper around the ``IDataObject``. When a dynamic property is set this is 
-translated into an update to the ``IDataObject`` and in turn into RDF. By default the name of the 
-property is appended to  the default namespace. By using namespace mappings any RDF vocabulary 
-can be mapped. To use a namespace mapping, you must access / update a property whose name is
-the namespace prefix followed by ``__`` (two underscore characters) followed by the suffix part
-of the URI. For example ``object.foaf__name``. 
-
-If the value of the property is set to be a list of values then multiple triples are created, one for each value.
-
-::
-
-  dynamic brightstar = dynaStore.MakeNewObject();
-  brightstar.name = "BrightstarDB";
-
-  // setting a list of values creates multiple properties on the object.
-  brightstar.rdfs__label = new[] { "BrightstarDB", "NoSQL Database" };
-
-  dynamic product = dynaStore.MakeNewObject();
-  // objects are connected together in the same way
-  brightstar.rdfs__type = product;
-
-
-Saving Changes
-==============
-
-The data updated in a context is persisted when ``SaveChanges()`` is called on the store object.::
-
-  dynaStore.SaveChanges();
-
-
-Loading Data
-============
-
-After opening a store dynamic objects can be loaded via the ``GetDataObject()`` method or the 
-``BindObjectsWithSparql()`` method.
-
-::
-
-  dynaStore = dynaContext.OpenStore(storeId);
-
-  // Retrieve a single object by its identifier
-  var object = dynaStore.GetDataObject(aUri);
-
-  // Use a SPARQL query that returns a single variable to return a collection of dynamic objects
-  var objects = dynaStore.BindObjectsWithSparql("select distinct ?dy where { ?dy ?p ?o }");
-
-
-.. _Sample_Program:
-
-Sample Program
-==============
-
-.. note::
-
-  The source code for this example can be found in [INSTALLDIR]\\Samples\\Dynamic\\Dynamic.sln
-
-::
-
-  using System;
-  using System.Collections.Generic;
-  using System.Linq;
-  using System.Text;
-  using BrightstarDB.Dynamic;
-  using BrightstarDB.Client;
-
-
-  namespace DynamicSamples
-  {
-      public class Program
-      {
-          /// <summary>
-          /// Assumes BrightstarDB is running as a service and exposing the 
-          /// default endpoint at http://localhost:8090/brightstar 
-          /// </summary>
-          /// <param name="args"></param>
-          static void Main(string[] args)
-          {
-              // gets a new BrightstarDB DataObjectContext
-              var dataObjectContext = BrightstarService.GetDataObjectContext();
-
-
-              // create a dynamic context
-              var dynaContext = new BrightstarDynamicContext(dataObjectContext);
-
-
-              // open a new store
-              var storeId = "DynamicSample" + Guid.NewGuid().ToString();
-              var dynaStore = dynaContext.CreateStore(storeId);
-
-
-              // create some dynamic objects. 
-              dynamic brightstar = dynaStore.MakeNewObject();
-              dynamic product = dynaStore.MakeNewObject();
-
-
-              // set some properties
-              brightstar.name = "BrightstarDB";
-              product.rdfs__label = "Product";
-              var id = brightstar.Identity;
-
-
-              // use namespace mapping (RDF and RDFS are defined by default)
-              // Assigning a list creates repeated RDF properties.
-              brightstar.rdfs__label = new[] { "BrightstarDB", "NoSQL Database" };
-
-
-              // objects are connected together in the same way
-              brightstar.rdfs__type = product;
-
-
-              dynaStore.SaveChanges();
-
-
-              // open store and read some data
-              dynaStore = dynaContext.OpenStore(storeId);
-              brightstar = dynaStore.GetDataObject(brightstar.Identity);
-
-
-              // property values are ALWAYS collections.
-              var name = brightstar.name.FirstOrDefault();
-              Console.WriteLine("Name = " + name);
-
-
-              // property can also be accessed by index
-              var nameByIndex = brightstar.name[0];
-              Console.WriteLine("Name = " + nameByIndex);
-
-
-              // they can be enumerated without a cast
-              foreach (var l in brightstar.rdfs__label)
-              {
-                  Console.WriteLine("Label = " + l);
-              }
-
-
-              // object relationships are navigated in the same way
-              var p = brightstar.rdfs__type.FirstOrDefault();
-              Console.WriteLine(p.rdfs__label.FirstOrDefault());
-
-
-              // dynamic objects can also be loaded via sparql
-              dynaStore = dynaContext.OpenStore(storeId);
-              var objects = dynaStore.BindObjectsWithSparql(
-                                  "select distinct ?dy where { ?dy ?p ?o }");
-              foreach (var obj in objects)
-              {
-                  Console.WriteLine(obj.rdfs__label[0]);
-              }
-              
-              Console.ReadLine();
-          }
-      }
-  }
-
+``TransactionPreconditionsFailedException`` being raised. In your code you should catch this exception and 
+handle the error. The ``IDataObjectStore`` interface provides a ``Refresh()`` method that implements
+two common approaches to handling this status. The ``Refresh()`` method takes two parameters:
+a data object instance and a ``RefreshMode`` parameter that specifies how the object
+is to be updated. ``RefreshMode.StoreWins`` overwrites any local modifications made
+to the object with the updated values held on the server. ``RefreshMode.ClientWins``
+works the other way around, keeping the local changes and updating the version number
+for the locally tracked object so that the next time ``SaveChanges()`` is attempted
+the local changes will overwrite those held on the server. To find which objects
+need refreshing, the ``IDataObjectStore`` provides the ``TrackedObjects`` property
+that returns an enumerator over all the objects currently tracked by the store. Each
+IDataObject instance provides an ``IsModified`` property that is set to true if
+the store has some local changes for that object.
+
+
+Graph Targeting in the Data Object API
+======================================
+
+You can use the Data Object API to update a specific named graph in the BrightstarDB store.
+Each time you open a store you can specify the following optional parameters:
+
+  * ``updateGraph`` : The identifier of the graph that new statements will be added to. Defaults to the BrightstarDB default graph (``http://www.brightstardb.com/.well-known/model/defaultgraph``)
+  * ``defaultDataSet`` : The identifier of the graphs that statements will be retrieved from. Defaults to all graphs in the store.
+  * ``versionGraph`` : The identifier of the graph that contains version information for optimistic locking. Defaults to the same graph as ``updateGraph``.
+  
+These are passed as additional optional parameters to the ``IDataObjectContext.OpenStore()`` method.
+
+To create a store that reads properties from the default graph and adds properties to a specific graph (e.g. for recording the results of inferences), use the following::
+
+    // Set storeName, prefixes and inferredGraphUri here
+    var store = context.OpenStore(storeName, prefixes, updateGraph:inferredGraphUri,
+                                  defaultDataSet: new[] {Constants.DefaultGraphUri},
+								  versionGraph:Constants.DefaultGraphUri);
+
+	..note::
+	Note that you need to be careful when using optimistic locking to ensure that you are consistent about which graph manages
+	the version information. We recommend that you either use the BrightstarDB default graph (as shown in the example above)
+	or use another named graph seperate from the graphs that store the rest of the data (and define a constant for that
+	graph URI).
+	
+To create a store that reads only the inferred properties use code like this::
+
+    // Set storeName, prefixes and inferredGraphUri here
+    var store = context.OpenStore(storeName, prefixes, updateGraph:inferredGraphUri,
+                                  defaultDataSet: new[] {inferredGraphUri},
+								  versionGraph:Constants.DefaultGraphUri);
+
+When creating a new store using the ``IDataObjectContext.CreateStore()`` method the ``updateGraph`` and ``versionGraph`` options can be specified, but
+the ``defaultDataSet`` parameter is not available as a new store will not have any graphs. In this case the store returned will read from and write to
+the graph specified by the ``updateGraph`` parameter.
+
+Graph Targeting and Deletions
+-----------------------------
+
+The ``RemoveProperty()`` and ``SetProperty()`` methods can both cause triples to be deleted from the store. In this case the triples
+are removed from both the graph specified by ``updateGraph`` and all the graphs specified in the ``defaultDataSet`` (or all 
+graphs in the store if the ``defaultDataSet`` is not specified or is set to null).
+
+Similarly if you call the ``Delete`` method on a DataObject, the triples that have the DataObject as subject or object will 
+be deleted from the ``updateGraph`` and all graphs in the ``defaultDataSet``.

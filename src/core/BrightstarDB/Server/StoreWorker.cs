@@ -1,9 +1,14 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using BrightstarDB.Model;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#else
+using System.Collections.Concurrent;
+#endif
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
 #if !SILVERLIGHT
@@ -37,6 +42,9 @@ namespace BrightstarDB.Server
         // store name
         private readonly string _storeName;
 
+        // store directory location
+        private readonly string _baseLocation;
+
         // store location
         private readonly string _storeLocation;
 
@@ -45,12 +53,16 @@ namespace BrightstarDB.Server
 
         private readonly ITransactionLog _transactionLog;
 
+        private readonly IStoreStatisticsLog _storeStatisticsLog;
+
+        private StatsMonitor _statsMonitor;
+
         // todo: might need to make this persistent or clear it out now and again.
         private readonly ConcurrentDictionary<string, JobExecutionStatus> _jobExecutionStatus;
 
         private bool _shutdownRequested;
         private bool _completeRemainingJobs;
-        private Thread _jobProcessingThread;
+        private readonly ManualResetEvent _shutdownCompleted;
 
         /// <summary>
         /// Event fired after a successful job execution but before the job status is updated to completed
@@ -69,14 +81,18 @@ namespace BrightstarDB.Server
         /// <param name="storeName">Name of store</param>
         public StoreWorker(string baseLocation, string storeName)
         {
+            _baseLocation = baseLocation;
             _storeName = storeName;
             _storeLocation = Path.Combine(baseLocation, storeName);
             Logging.LogInfo("StoreWorker created with location {0}", _storeLocation);
             _jobs = new ConcurrentQueue<Job>();
-            // _jobStatus = new ConcurrentDictionary<string, JobStatus>();
             _jobExecutionStatus = new ConcurrentDictionary<string, JobExecutionStatus>();
             _storeManager = StoreManagerFactory.GetStoreManager();
             _transactionLog = _storeManager.GetTransactionLog(_storeLocation);
+            _storeStatisticsLog = _storeManager.GetStatisticsLog(_storeLocation);
+            _statsMonitor = new StatsMonitor();
+            InitializeStatsMonitor();
+            _shutdownCompleted = new ManualResetEvent(false);
         }
 
         /// <summary>
@@ -84,8 +100,7 @@ namespace BrightstarDB.Server
         /// </summary>
         public void Start()
         {
-            _jobProcessingThread = new Thread(ProcessJobs);
-            _jobProcessingThread.Start();
+            ThreadPool.QueueUserWorkItem(ProcessJobs);
         }
 
         public ITransactionLog TransactionLog
@@ -93,7 +108,12 @@ namespace BrightstarDB.Server
             get { return _transactionLog; }
         }
 
-        private void ProcessJobs()
+        public IStoreStatisticsLog StoreStatistics
+        {
+            get { return _storeStatisticsLog; }
+        }
+
+        private void ProcessJobs(object state)
         {
             Logging.LogInfo("Process Jobs Started");
 
@@ -122,7 +142,7 @@ namespace BrightstarDB.Server
                                 var st = DateTime.UtcNow;
                                 job.Run();
                                 var et = DateTime.UtcNow;
-#if SILVERLIGHT
+#if SILVERLIGHT || PORTABLE
                                 Logging.LogInfo("Job completed in {0}", et.Subtract(st).TotalMilliseconds);
 #else
                                 Logging.LogInfo("Job completed in {0} : Current memory usage : {1}",et.Subtract(st).TotalMilliseconds, System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 );
@@ -150,7 +170,7 @@ namespace BrightstarDB.Server
                             }
                         }
                     }
-                    Thread.Sleep(1);
+                    _shutdownCompleted.WaitOne(1);
                 }
                 catch (Exception ex)
                 {
@@ -197,10 +217,16 @@ namespace BrightstarDB.Server
         {
             lock(_readStoreLock)
             {
-                if (_readStore != null)
-                {
-                    _readStore.Close();
-                }
+                // KA: Don't close the read store at this point
+                // as export jobs or queries may still be using it
+                // instead the store should dispose of any resources
+                // when it is garbage collected.
+                // This fixes an issue found in ClientTests.TestExportWhileWriting
+                //if (_readStore != null)
+                //{
+                //    _readStore.Close();
+                //}
+
                 _readStore = null;
             }
         }
@@ -246,11 +272,22 @@ namespace BrightstarDB.Server
             }
         }
 
-        public void QueueJob(Job job)
+        public void QueueJob(Job job, bool incrementTransactionCount = true)
         {
             Logging.LogDebug("Queueing Job Id {0}", job.JobId);
-            _jobExecutionStatus.TryAdd(job.JobId.ToString(), new JobExecutionStatus { JobId = job.JobId, JobStatus = JobStatus.Pending });
-            _jobs.Enqueue(job);
+            bool queuedJob = false;
+            while (!queuedJob)
+            {
+                if (
+                    _jobExecutionStatus.TryAdd(job.JobId.ToString(),
+                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending}))
+                {
+                    _jobs.Enqueue(job);
+                    queuedJob = true;
+                    Logging.LogDebug("Queued Job Id {0}", job.JobId);
+                    _statsMonitor.OnJobScheduled(incrementTransactionCount);
+                }
+            }
         }
 
         /// <summary>
@@ -264,34 +301,25 @@ namespace BrightstarDB.Server
         /// <returns></returns>
         public Guid ProcessTransaction(string preconditions, string deletePatterns, string insertData, string defaultGraphUri, string format)
         {
-            Logging.LogInfo("ProcessTransaction");           
+            Logging.LogDebug("ProcessTransaction");
             var jobId = Guid.NewGuid();
             var job = new UpdateTransaction(jobId, this, preconditions, deletePatterns, insertData, defaultGraphUri);
-            Logging.LogDebug("Queueing Job Id {0}", jobId);
-            _jobs.Enqueue(job);
-            _jobExecutionStatus.TryAdd(jobId.ToString(), new JobExecutionStatus { JobId = jobId, JobStatus = JobStatus.Pending });
+            QueueJob(job);
             return jobId;
         }
 
         public Guid Import(string contentFileName, string graphUri)
         {
+            Logging.LogDebug("Import {0}, {1}", contentFileName, graphUri);
             var jobId = Guid.NewGuid();
-            bool queuedJob = false;
-            while (!queuedJob)
-            {
-                if (_jobExecutionStatus.TryAdd(jobId.ToString(),
-                                               new JobExecutionStatus {JobId = jobId, JobStatus = JobStatus.Pending}))
-                {
-                    _jobs.Enqueue(new ImportJob(jobId, this, contentFileName, graphUri));
-                    queuedJob = true;
-                    Logging.LogInfo("Queued import job {0}", jobId);
-                }
-            }
+            var job = new ImportJob(jobId, this, contentFileName, graphUri);
+            QueueJob(job);
             return jobId;
         }
 
         public Guid Export(string fileName, string graphUri)
         {
+            Logging.LogDebug("Export {0}, {1}", fileName, graphUri);
             var jobId = Guid.NewGuid();
             var exportJob = new ExportJob(jobId, this, fileName, graphUri);
             _jobExecutionStatus.TryAdd(jobId.ToString(),
@@ -320,6 +348,28 @@ namespace BrightstarDB.Server
             return jobId;
         }
 
+        public Guid UpdateStatistics()
+        {
+            Logging.LogDebug("UpdateStatistics");
+            var jobId = Guid.NewGuid();
+            var job = new UpdateStatsJob(jobId, this);
+            QueueJob(job);
+            return jobId;
+        }
+
+        public Guid QueueSnapshotJob(string destinationStoreName, PersistenceType persistenceType, ulong commitPointId = StoreConstants.NullUlong)
+        {
+            Logging.LogDebug("QueueSnapshotJob {0}, {1}", destinationStoreName, commitPointId);
+            var jobId = Guid.NewGuid();
+            var snapshotJob = new SnapshotJob(jobId, this, destinationStoreName, persistenceType, commitPointId);
+            QueueJob(snapshotJob, false);
+            return jobId;
+        }
+
+        internal void CreateSnapshot(string destinationStoreName, PersistenceType persistenceType, ulong commitPointId)
+        {
+            _storeManager.CreateSnapshot(_storeLocation, Path.Combine(_baseLocation, destinationStoreName), persistenceType, commitPointId);
+        }
 
         public IEnumerable<Triple> GetResourceStatements(string resourceUri)
         {
@@ -338,16 +388,23 @@ namespace BrightstarDB.Server
 
         private void ReleaseResources()
         {
-            // close file handles
-            if (_readStore != null)
+            lock (this)
             {
-                _readStore.Close();
-            }
+                // close read and write stores
+                if (_readStore != null)
+                {
+                    _readStore.Close();
+                    _readStore.Dispose();
+                    _readStore = null;
+                }
 
-            if (_writeStore != null)
-            {
-                _writeStore.Close();
-            }            
+                if (_writeStore != null)
+                {
+                    _writeStore.Close();
+                    _writeStore.Dispose();
+                    _writeStore = null;
+                }
+            }
         }
 
         public void Shutdown(bool completeJobs, ShutdownContinuation c = null)
@@ -355,6 +412,7 @@ namespace BrightstarDB.Server
             _shutdownContinuation = c;
             _shutdownRequested = true;
             _completeRemainingJobs = completeJobs;
+            ReleaseResources();
         }
 
         public void Consolidate(Guid jobId)
@@ -368,5 +426,19 @@ namespace BrightstarDB.Server
             _readStore = null;    
         }
 
+        private void InitializeStatsMonitor()
+        {
+            if (Configuration.StatsUpdateTimespan > 0 || Configuration.StatsUpdateTransactionCount > 0)
+            {
+                var lastStats = _storeStatisticsLog.GetStatistics().FirstOrDefault();
+                CommitPoint lastCommitPoint;
+                using (var readStore = _storeManager.OpenStore(_storeLocation, true))
+                {
+                    lastCommitPoint = readStore.GetCommitPoints().FirstOrDefault();
+                }
+                _statsMonitor.Initialize(lastStats, lastCommitPoint == null ? 0 : lastCommitPoint.CommitNumber,
+                                         () => UpdateStatistics());
+            }
+        }
     }
 }

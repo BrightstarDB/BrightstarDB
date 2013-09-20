@@ -19,6 +19,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Utilities;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace Remotion.Linq.EagerFetching
 {

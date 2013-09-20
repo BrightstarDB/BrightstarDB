@@ -179,4 +179,11 @@
   <data name="BrightstarServiceClient_QueryDefaultGraphUriMustNotBeNull" xml:space="preserve">
     <value>Default graph URI must not be NULL.</value>
   </data>
+  <data name="INode_Attempt_to_write_to_a_fixed_page" xml:space="preserve">
+    <value>Attempt to write to a fixed page.</value>
+    <comment>Default string for the InvalidOperationException raised by an INode when an attempt is made to write to a backing page that is not marked as writeable.</comment>
+  </data>
+  <data name="BrightstarServiceClient_GetStatistics_TakeTooLarge" xml:space="preserve">
+    <value>Requested number of statistics records exceeds the maximum value of 100.</value>
+  </data>
 </root>

@@ -6,6 +6,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <NoDocs Condition=" '$(NoDocs)' == '' ">False</NoDocs>
+	<Prerelease></Prerelease>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <BuildNumberFile Condition=" '$(BuildNumberFile)' == '' ">..\buildnumber.txt</BuildNumberFile>
     <OutputPath>packages</OutputPath>
@@ -106,7 +107,7 @@
 			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe"/>
 	  <ServiceExe Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.config"
 			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe.config"/>
-      <Docs Include="..\doc\build\BrightstarDB_API.chm"/>
+      <Docs Include="..\doc\build\api\BrightstarDB_API.chm"/>
       <VisualStudio Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.vsi"/>
       <Root Include="PackageFiles\README.txt;PackageFiles\EULA.rtf;PackageFiles\NOTICE.txt"/>
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.zip"/>
@@ -241,6 +242,19 @@
     <Zip Files="@(InstallerFiles)" ZipFileName="$(OutputPath)\BrightstarDB-$(BuildNumber).zip" WorkingDirectory="BrightstarDB\bin\$(Configuration)"/>
   </Target>
 
+  <!-- ============================================================ -->
+  <!-- Portable Class Library                                       -->
+  <!-- ============================================================ -->
+
+  <Target Name="Portable" DependsOnTargets="Version">
+	<MSBuild Projects="..\src\portable\portable.sln"
+	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+  </Target>
+  
+  <!-- ============================================================ -->
+  <!-- Core Build Targets                                           -->
+  <!-- ============================================================ -->
+
   <Target Name="Rebuild">
     <CallTarget Targets="Clean"/>
     <CallTarget Targets="Build"/>
@@ -259,59 +273,96 @@
     <MakeDir Directories="$(TempDir)"/>
   </Target>
 
-  <Target Name="Clean" DependsOnTargets="CleanInstallerTmp;CleanOutput">
+  <Target Name="CleanPortable">
+	<MSBuild Projects="..\src\portable\portable.sln"
+	         Targets="Clean"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+  </Target>
+  <Target Name="Clean" DependsOnTargets="CleanInstallerTmp;CleanOutput;CleanPortable">
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
 	     Targets="Clean"
 	     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
   </Target>
 
-  <Target Name="NuGet" DependsOnTargets="Version">
+  <!-- ============================================================ -->
+  <!-- NuGet Package Building                                       -->
+  <!-- ============================================================ -->
+  
+  <Target Name="NuGet" DependsOnTargets="Version;Prepare;Portable">
     <RemoveDir Directories="$(OutputPath)\nuget" />
+	<MakeDir Directories="$(OutputPath)\nuget" />
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDBLibs" />
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDB" />
+	<MakeDir Directories="$(OutputPath)\nuget\BrightstarDB.Platform" />
     <ItemGroup>
         <Readme Include="nuget\README.txt" />
         <ReleaseNotes Include="nuget\ReleaseNotes.txt"/>
         <NuspecTemplate Include="nuget\BrightstarDB.nuspec.template"/>
         <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
+		<PlatformNuspecTemplate Include="nuget\BrightstarDB.Platform.nuspec.template"/>
         <Net40Libs Include="InstallerTmp\SDK\Net40\*.dll" />
         <WP71Libs Include="InstallerTmp\SDK\WP71\*.dll" />
 		<WP8Libs Include="InstallerTmp\SDK\WP71\*.dll" Exclude="InstallerTmp\SDK\WP71\System.Threading.Tasks.dll" />
         <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
+		<PortableLibs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\*.dll" />
+		<PortableDesktop Include="..\src\portable\BrightstarDB.Portable.Desktop\bin\$(Configuration)\BrightstarDB.Portable.Desktop.dll" />
+		<PortablePhone Include="..\src\portable\BrightstarDB.Portable.Phone\bin\$(Configuration)\BrightstarDB.Portable.Phone.dll"/>
+		<PortableSilverlight Include="..\src\portable\BrightstarDB.Portable.Silverlight\bin\$(Configuration)\BrightstarDB.Portable.Silverlight.dll"/>
+		<PortableStore Include="..\src\portable\BrightstarDB.Portable.Store\bin\$(Configuration)\BrightstarDB.Portable.Store.dll" />
     </ItemGroup>
     
     <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
     <Copy SourceFiles="@(LibsNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec')" />
+	<Copy SourceFiles="@(PlatformNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec')" />
 
     <ReadLinesFromFile File="@(ReleaseNotes)">
       <Output TaskParameter="Lines" PropertyName="ReleaseNotesText" />
     </ReadLinesFromFile>
     <Message Text="Release Notes: $(ReleaseNotesText)"/>
-    <FileUpdate Files="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec;$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec"
-   Regex="\$releaseNotes\$"
-   ReplacementText="$([System.IO.File]::ReadAllText('nuget\ReleaseNotes.txt'))" />
+    <FileUpdate Files="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec;$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec;$(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec"
+                Regex="\$releaseNotes\$"
+                ReplacementText="$([System.IO.File]::ReadAllText('nuget\ReleaseNotes.txt'))" />
         
-    
+    <PropertyGroup>
+	    <PackageBuildNumber Condition="'$(Prerelease)' == ''">$(BuildNumber)</PackageBuildNumber>
+		<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(BuildNumber)-$(Prerelease)</PackageBuildNumber>
+	</PropertyGroup>
+
+    <FileUpdate Files="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec;$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec;$(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec"
+                Regex="\$version\$"
+                ReplacementText="$(PackageBuildNumber)" />
+    	
     <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec"
              Query="package/metadata/version"
-             Value="$(BuildNumber)" />
+             Value="$(PackageBuildNumber)" />
     <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec"
              Query="package/metadata/version"
-             Value="$(BuildNumber)" />
+             Value="$(PackageBuildNumber)" />
+	<XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDB.Platform\BrightstardB.Platform.nuspec"
+			 Query="package/metadata/version"
+			 Value="$(PackageBuildNumber)" />
 
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
     <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\wp71"/>
 	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\windowsphone8" />
+	<Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+wp80+win8" />
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs" />
     
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\net40"/>
     <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\wp71"/>
 	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\windowsphone8" />
+	<Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\portable-net45+wp80+win8" />
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB" />
     <Copy SourceFiles="@(TextTemplates)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\content" />
     
+	<Copy SourceFiles="@(PortableDesktop)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\net45" />
+	<Copy SourceFiles="@(PortablePhone)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\wp80" />
+	<Copy SourceFiles="@(PortableSilverlight)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl5" />
+	<Copy SourceFiles="@(PortableStore)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\win8" />
+	
     <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" />
     <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec" />
+	<Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec" />
   </Target>
   
 </Project>

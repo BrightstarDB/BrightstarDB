@@ -14,6 +14,8 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,7 +44,9 @@
       <HintPath>..\..\lib\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="Remotion.Linq, Version=1.13.102.1, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Remotion.Linq.dll</HintPath>
@@ -80,6 +84,7 @@
     <Compile Include="EntityFrameworkAssemblyAttributes.cs" />
     <Compile Include="EntityFramework\ContextCallbackTests.cs" />
     <Compile Include="EntityFramework\EmbeddedOptimisticLockingTests.cs" />
+    <Compile Include="EntityFramework\EntityFrameworkGraphTargetingTests.cs" />
     <Compile Include="EntityFramework\HttpOptimisticLockingTests.cs" />
     <Compile Include="EntityFramework\IArticle.cs" />
     <Compile Include="EntityFramework\EFClientTests.cs" />
@@ -105,9 +110,10 @@
     <Compile Include="EntityFramework\IPerson.cs" />
     <Compile Include="EntityFramework\ISkill.cs" />
     <Compile Include="EntityFramework\MyEntityContext.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>MyEntityContext.tt</DependentUpon>
+      <SubType>Code</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="EntityFramework\OptimisticLockingTestsBase.cs" />
     <Compile Include="EntityFramework\PropertyChangeNotificationTests.cs" />
@@ -115,6 +121,7 @@
     <Compile Include="EntityFramework\SimpleContextTests.cs" />
     <Compile Include="EntityFramework\InterfaceInheritanceTests.cs" />
     <Compile Include="EntityFramework\StringComparisonTests.cs" />
+    <Compile Include="TestHelper.cs" />
     <Compile Include="GraphTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteScalingTests.cs" />
@@ -143,6 +150,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MyEntityContext.cs</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
@@ -161,4 +169,5 @@
   <Target Name="BeforeBuild">
     <Copy SourceFiles="..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="EntityFramework\MyEntityContext.tt" />
   </Target>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
 </Project>

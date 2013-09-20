@@ -54,8 +54,8 @@ Add the following code to that file::
   public interface IActor
   {
     string Name { get; set; }
-    DateTime DateOfBirth { get; set; }  
-    ICollection<IFilm> Films { get; set; }
+    DateTime DateOfBirth { get; set; }  
+    ICollection<IFilm> Films { get; set; }
   }
 
 Then add another Brightstar Entity Definition named IFilm.cs and include the following code::
@@ -63,9 +63,10 @@ Then add another Brightstar Entity Definition named IFilm.cs and include the fol
   [Entity]
   public interface IFilm
   {
-  string Name { get; }
-  [InverseProperty("Films")]
-  ICollection<IActor> Actors { get; }
+    string Name { get; set; }
+	
+    [InverseProperty("Films")]
+    ICollection<IActor> Actors { get; }
   }
 
 

@@ -82,12 +82,23 @@ namespace BrightstarDB.Tests.EntityFramework
     	}
     
     	/// <summary>
-    	/// Initialize a new entity context using the specified Brightstar
-    	/// connection string
+    	/// Initialize a new entity context using the specified Brightstar connection string
     	/// </summary>
     	/// <param name="connectionString">The connection to be used to connect to an existing BrightstarDB store</param>
     	/// <param name="enableOptimisticLocking">OPTIONAL: If set to true optmistic locking will be applied to all entity updates</param>
-    	public MyEntityContext(string connectionString, bool? enableOptimisticLocking=null) : base(TypeMappings, connectionString, enableOptimisticLocking)
+        /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// not defined, the default graph in the store will be updated.</param>
+        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
+        /// If not defined, all graphs in the store will be queried.</param>
+        /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
+        /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+    	public MyEntityContext(
+    	    string connectionString, 
+    		bool? enableOptimisticLocking=null,
+    		string updateGraphUri = null,
+    		IEnumerable<string> datasetGraphUris = null,
+    		string versionGraphUri = null
+        ) : base(TypeMappings, connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -97,6 +108,26 @@ namespace BrightstarDB.Tests.EntityFramework
     	/// connection string retrieved from the configuration.
     	/// </summary>
     	public MyEntityContext() : base(TypeMappings)
+    	{
+    		InitializeContext();
+    	}
+    	
+    	/// <summary>
+    	/// Initialize a new entity context using the specified Brightstar
+    	/// connection string retrieved from the configuration and the
+    	//  specified target graphs
+    	/// </summary>
+        /// <param name="updateGraphUri">The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// set to null, the default graph in the store will be updated.</param>
+        /// <param name="datasetGraphUris">The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
+        /// If set to null, all graphs in the store will be queried.</param>
+        /// <param name="versionGraphUri">The URI identifier of the graph that contains version number statements for entities. 
+        /// If set to null, the value of <paramref name="updateGraphUri"/> will be used.</param>
+    	public MyEntityContext(
+    		string updateGraphUri,
+    		IEnumerable<string> datasetGraphUris,
+    		string versionGraphUri
+    	) : base(TypeMappings, updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -781,6 +812,12 @@ namespace BrightstarDB.Tests.EntityFramework
             		get { return GetRelatedProperty<System.Nullable<System.DateTime>>("BirthDate"); }
             		set { SetRelatedProperty("BirthDate", value); }
     	}
+    
+    	public System.Uri Homepage
+    	{
+            		get { return GetRelatedProperty<System.Uri>("Homepage"); }
+            		set { SetRelatedProperty("Homepage", value); }
+    	}
     	#endregion
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IFoafAgent
     	public System.Collections.Generic.ICollection<System.String> MboxSums
@@ -963,6 +1000,11 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
             get { return GetRelatedObject<BrightstarDB.Tests.EntityFramework.IJobRole>("JobRole"); }
             set { SetRelatedObject<BrightstarDB.Tests.EntityFramework.IJobRole>("JobRole", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.Uri> Websites
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.Uri>("Websites"); }
+    		set { SetRelatedLiteralPropertiesCollection<System.Uri>("Websites", value); }
     	}
     	#endregion
     }

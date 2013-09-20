@@ -819,6 +819,14 @@ fieldset > input {
     color: red;
 }
 
+table {
+    margin-bottom: 1em;
+}
+
+td, th {
+    padding: 3px 6px;
+}
+
 #licenseTable {
     width: 100%;
 }

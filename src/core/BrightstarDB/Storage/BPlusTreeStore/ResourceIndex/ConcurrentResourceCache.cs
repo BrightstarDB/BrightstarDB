@@ -1,11 +1,15 @@
 ﻿using System;
+#if !PORTABLE
 using System.Collections.Concurrent;
+#else
+using BrightstarDB.Portable.Compatibility;
+#endif
 
 namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
 {
     internal class ConcurrentResourceCache : IResourceCache
     {
-        private readonly ConcurrentDictionary<ulong, WeakReference> _cache = new ConcurrentDictionary<ulong, WeakReference>();
+        private ConcurrentDictionary<ulong, WeakReference> _cache = new ConcurrentDictionary<ulong, WeakReference>();
 
         #region Implementation of IResourceCache
 
@@ -37,5 +41,30 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
         }
 
         #endregion
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private bool _disposed;
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (!_disposed)
+                {
+                    _cache.Clear();
+                    _cache = null;
+                    _disposed = true;
+                }
+            }
+        }
+
+        ~ConcurrentResourceCache()
+        {
+            Dispose(false);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE // Portable version of BrightstarDB does not contain BrightstarDB.Dynamic
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
@@ -319,3 +320,4 @@ namespace BrightstarDB.Tests
         }
     }
 }
+#endif

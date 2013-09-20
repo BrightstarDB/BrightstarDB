@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using BrightstarDB.Client;
 
 namespace BulkImport
@@ -64,13 +66,14 @@ namespace BulkImport
                     logWriter.Write("Creating new store with name '{0}'", parsedArgs.StoreName);
                     client.CreateStore(parsedArgs.StoreName);
                 }
+
                 var timer = new Stopwatch();
                 foreach (var file in importDirectory.EnumerateFiles(parsedArgs.FilePattern))
                 {
                     string finalMessage;
                     timer.Reset();
                     timer.Start();
-                    var importSuccessful = RunImportJob(client, parsedArgs.StoreName, file.Name, out finalMessage);
+                    var importSuccessful = RunImportJob(client, parsedArgs.StoreName, file.Name, parsedArgs.LogProgress, out finalMessage);
                     timer.Stop();
                     if (importSuccessful)
                     {
@@ -85,26 +88,52 @@ namespace BulkImport
                         logWriter.WriteLine("Import of file '{0}' failed. Last message was: {1}", file.FullName, finalMessage);
                     }
                 }
+                
             }
 
             BrightstarService.Shutdown();
 
         }
 
-        static bool RunImportJob(IBrightstarService client, string storeName, string fileName, out string finalMessage )
+        static bool RunImportJob(IBrightstarService client, string storeName, string fileName, bool logProgress, out string finalMessage )
         {
             var importJobInfo = client.StartImport(storeName, fileName);
+            var lastMessage = String.Empty;
             while(!(importJobInfo.JobCompletedOk || importJobInfo.JobCompletedWithErrors))
             {
-                System.Threading.Thread.Sleep(1000);
+                Thread.Sleep(1000);
                 importJobInfo = client.GetJobInfo(storeName, importJobInfo.JobId);
+                if (logProgress && !String.IsNullOrEmpty(importJobInfo.StatusMessage) &&
+                    !importJobInfo.StatusMessage.Equals(lastMessage))
+                {
+                    ClearCurrentConsoleLine();
+                    Console.WriteLine(importJobInfo.StatusMessage);
+                    Console.SetCursorPosition(0, Console.CursorTop - 1);
+                    lastMessage = importJobInfo.StatusMessage;
+                }
             }
             finalMessage = importJobInfo.StatusMessage;
             if (importJobInfo.ExceptionInfo != null)
             {
                 finalMessage += " Exception Detail:" + importJobInfo.ExceptionInfo;
             }
+            if (logProgress && !String.IsNullOrEmpty(finalMessage))
+            {
+                ClearCurrentConsoleLine();
+                Console.WriteLine(finalMessage);
+            }
             return importJobInfo.JobCompletedOk;
+        }
+
+        /// <summary>
+        /// Overwrites the current console line with spaces
+        /// </summary>
+        static void ClearCurrentConsoleLine()
+        {
+            int currentLineCursor = Console.CursorTop;
+            Console.SetCursorPosition(0, currentLineCursor);
+            Console.WriteLine(new string(' ', Console.WindowWidth));
+            Console.SetCursorPosition(0, currentLineCursor);
         }
 
         static IBrightstarService TryGetClient(string connectionString)

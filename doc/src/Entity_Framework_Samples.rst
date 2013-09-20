@@ -413,30 +413,8 @@ define your data model, you should re-run the text template to regenerate the co
 
 We now have the basic data model for our application completed and have generated the code for 
 creating persistent entities that match our data model and storing them in BrightstarDB. In 
-the next step we will see how to use this data model and context in creating screens in our 
+the next section we will see how to use this data model and context in creating screens in our 
 MVC application.
-
-Running the application
-^^^^^^^^^^^^^^^^^^^^^^^
-
-Hit F5 to start up the application in Debug mode. This opens a browser window that by default 
-starts in the Index action of the HomeController. As we have not yet added any dinners yet, 
-the list is empty, but we can click on **Create New** to go to the Create view to add some 
-dinners.
-
-.. image:: Images/mvc8.png
-
-Note that the custom attributes entered in the entity interface have been picked up by MVC. If 
-you attempt to submit this form without filling in Title, Address or Host you will see the 
-form validation errors on the page.
-
-After entering some data we can see them in the list on the index page:
-
-.. image:: Images/mvc9.png
-
-We can also easily view the details of a dinner, edit the details or delete the dinner by 
-using the links next to each item on the list.
-
 
 .. _Creating_MVC_Controllers_And_V:
 

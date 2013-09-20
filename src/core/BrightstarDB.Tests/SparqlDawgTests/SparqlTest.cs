@@ -11,6 +11,10 @@ using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 using SparqlResult = VDS.RDF.Query.SparqlResult;
+#if PORTABLE
+using Console=VDS.RDF.Console;
+using Path = BrightstarDB.Portable.Compatibility.Path;
+#endif
 
 namespace BrightstarDB.Tests.SparqlDawgTests
 {
@@ -44,7 +48,11 @@ namespace BrightstarDB.Tests.SparqlDawgTests
         {
             var g = new Graph();
             var importId = Guid.NewGuid();
+#if PORTABLE
+            StreamLoader.Load(g, dataPath, new FileStream(dataPath, FileMode.Open));
+#else
             FileLoader.Load(g, dataPath);
+#endif
             _bnodeMappings = new Dictionary<string, string>();
             var sw = new StringWriter();
             var ntWriter = new NQuadsWriter(sw, Constants.DefaultGraphUri);
@@ -200,7 +208,11 @@ namespace BrightstarDB.Tests.SparqlDawgTests
         protected void ExecuteUpdate(string requestPath)
         {
             var updateExpression = File.ReadAllText(requestPath);
+#if PORTABLE
+            var result = _service.ExecuteUpdate(_storeName, updateExpression);
+#else
             var result = _service.ExecuteUpdate(_storeName, updateExpression, true);
+#endif
             Assert.IsTrue(result.JobCompletedOk, "SPARQL Update failed for update from file path {0} : {1} : {2}", requestPath, result.StatusMessage, result.ExceptionInfo);
         }
 
@@ -216,7 +228,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                 resultsReader.Load(actualResultSet, tr);
             }
             var expectedResultSet = new SparqlResultSet();
-            resultsReader.Load(expectedResultSet, expectedResultsPath);
+            resultsReader.Load(expectedResultSet, new StreamReader(expectedResultsPath));
             var bnodeMap = new Dictionary<string, string>();
             CompareSparqlResults(actualResultSet, expectedResultSet, reduced, bnodeMap);
         }
@@ -224,7 +236,11 @@ namespace BrightstarDB.Tests.SparqlDawgTests
         private void CompareResultGraphs(string results, string expectedResultsPath, bool reduced)
         {
             var expectedResultGraph = new Graph();
+#if PORTABLE
+            StreamLoader.Load(expectedResultGraph, expectedResultsPath, new FileStream(expectedResultsPath, FileMode.Open));
+#else
             FileLoader.Load(expectedResultGraph, expectedResultsPath);
+#endif
             var resultSet = expectedResultGraph.GetUriNode(new Uri("http://www.w3.org/2001/sw/DataAccess/tests/result-set#ResultSet"));
             if (resultSet != null)
             {
@@ -236,7 +252,11 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                 {
                     xmlParser.Load(actualResultSet, tr);
                 }
+#if PORTABLE
+                rdfParser.Load(expectedResultSet, new StreamReader(expectedResultsPath));
+#else
                 rdfParser.Load(expectedResultSet, expectedResultsPath);
+#endif
                 var bnodeMap = new Dictionary<string, string>();
                 CompareSparqlResults(actualResultSet, expectedResultSet, reduced, bnodeMap);
             }
