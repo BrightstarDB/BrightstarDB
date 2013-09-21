@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -124,8 +124,8 @@
     <Compile Include="Client\BrightstarClientException.cs" />
     <Compile Include="Client\BrightstarRestClient.cs" />
     <Compile Include="Client\BrightstarService.cs" />
-    <Compile Include="Client\BrightStarServiceClient.cs" />
-    <Compile Include="Client\BrightStarServiceClientExtensions.cs" />
+    <Compile Include="Client\BrightstarServiceClient.cs" />
+    <Compile Include="Client\BrightstarServiceClientExtensions.cs" />
     <Compile Include="Client\BrightstarTransactionType.cs" />
     <Compile Include="Client\BrightstarWcfClusterClient.cs" />
     <Compile Include="Client\BrightstarWcfServiceClient.cs" />
@@ -252,7 +252,7 @@
     <Compile Include="Query\Functions\BitAndFunc.cs" />
     <Compile Include="Query\BrightstarBlankNode.cs" />
     <Compile Include="Query\BrightstarLiteralNode.cs" />
-    <Compile Include="Query\BrightStarQueryProcessor.cs" />
+    <Compile Include="Query\BrightstarQueryProcessor.cs" />
     <Compile Include="Query\BrightstarSparqlResultSet.cs" />
     <Compile Include="Query\BrightstarSparqlResultsType.cs" />
     <Compile Include="Query\BrightstarUriNode.cs" />
