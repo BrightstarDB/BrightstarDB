@@ -202,7 +202,7 @@ namespace BrightstarDB.Rdf
             if (systemType == null || systemType == typeof(BrightstarDB.Rdf.PlainLiteral)) return PlainLiteral;
             RdfDatatype ret;
             if (SystemTypeToRdfType.TryGetValue(systemType, out ret)) return ret.DatatypeUri;
-            throw new ArgumentException(String.Format("The type {0} is not mapped to any known RDF datatype", systemType.FullName), "systemType");
+            throw new ArgumentException(System.String.Format("The type {0} is not mapped to any known RDF datatype", systemType.FullName), "systemType");
         }
 
         ///<summary>
@@ -213,10 +213,10 @@ namespace BrightstarDB.Rdf
         ///<exception cref="ArgumentException">Thrown if <paramref name="value"/> is not of a type that can be mapped to an RDF datatype by this class</exception>
         public static string GetLiteralString(object value)
         {
-            if (value == null) return String.Empty;
+            if (value == null) return System.String.Empty;
             RdfDatatype ret;
             if (SystemTypeToRdfType.TryGetValue(value.GetType(), out ret)) return ret.FormatLiteral(value);
-            throw new ArgumentException(String.Format("The type {0} is not mapped to any known RDF datatype", value.GetType().FullName), "value");
+            throw new ArgumentException(System.String.Format("The type {0} is not mapped to any known RDF datatype", value.GetType().FullName), "value");
         }
 
         /// <summary>
@@ -247,7 +247,7 @@ namespace BrightstarDB.Rdf
             {
                 return datatype.ParseLiteral(literalString, literalLanguageTag);
             }
-            throw new ArgumentException(String.Format("The datatype URI {0} is not mapped to any known RDF datatype", literalDatatype), "literalDatatype");
+            throw new ArgumentException(System.String.Format("The datatype URI {0} is not mapped to any known RDF datatype", literalDatatype), "literalDatatype");
         }
 
         /// <summary>
