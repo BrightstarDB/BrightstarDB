@@ -31,6 +31,7 @@ namespace BrightstarDB.EntityFramework.Tests
             mappingStore.AddImplMapping<ContextObjects.IMarket,ContextObjects.Market>();
             mappingStore.AddImplMapping<ContextObjects.IPerson,ContextObjects.Person>();
             mappingStore.AddImplMapping<IRsvp,Rsvp>();
+            mappingStore.AddImplMapping<IConcept, Concept>();
         }
 
         #region Overrides of LdoContext
@@ -126,6 +127,7 @@ namespace BrightstarDB.EntityFramework.Tests
         public IQueryable<ContextObjects.IMarket> Markets { get { return new MockLdoSet<ContextObjects.IMarket>(this); } }
         public IQueryable<ContextObjects.ICompany> Companies { get { return new MockLdoSet<ContextObjects.ICompany>(this); } }
         public IQueryable<ContextObjects.IPerson> People { get { return new MockLdoSet<ContextObjects.IPerson>(this); } }
+        public IQueryable<IConcept> Concepts { get { return new MockLdoSet<IConcept>(this); } }
 
         /// <summary>
         /// The XML namespace for W3C XML Schema

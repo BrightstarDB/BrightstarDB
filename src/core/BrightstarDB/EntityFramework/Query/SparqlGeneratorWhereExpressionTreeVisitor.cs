@@ -750,6 +750,7 @@ namespace BrightstarDB.EntityFramework.Query
                 var itemVarName = SparqlQueryBuilder.SafeSparqlVarName(expression.QueryModel.MainFromClause.ItemName);
 
                 var mappedFromExpression = VisitExpression(expression.QueryModel.MainFromClause.FromExpression);
+                QueryBuilder.AddQuerySourceMapping(expression.QueryModel.MainFromClause, mappedFromExpression);
                 if (mappedFromExpression is SelectVariableNameExpression)
                 {
                     QueryBuilder.RenameVariable((mappedFromExpression as SelectVariableNameExpression).Name,
@@ -777,7 +778,42 @@ namespace BrightstarDB.EntityFramework.Query
                 QueryBuilder.EndExists();
                 return expression;
             }
+            else if (expression.QueryModel.ResultOperators.Count == 0)
+            {
+                var itemVarName = SparqlQueryBuilder.SafeSparqlVarName(expression.QueryModel.MainFromClause.ItemName);
+                var mappedFromExpression = VisitExpression(expression.QueryModel.MainFromClause.FromExpression);
+                QueryBuilder.AddQuerySourceMapping(expression.QueryModel.MainFromClause, mappedFromExpression);
+                if (mappedFromExpression is SelectVariableNameExpression)
+                {
+                    // Rename the variable in the SPARQL so that it matches the LINQ variable
+                    QueryBuilder.RenameVariable((mappedFromExpression as SelectVariableNameExpression).Name, itemVarName);
+                    (mappedFromExpression as SelectVariableNameExpression).Name = itemVarName;
+                }
+                foreach (var bodyClause in expression.QueryModel.BodyClauses)
+                {
+                    if (bodyClause is WhereClause)
+                    {
+                        var whereClause = bodyClause as WhereClause;
+                        VisitExpression(whereClause.Predicate);
+                    }
+                    else
+                    {
+                        CreateUnhandledItemException(bodyClause, "VisitSubQueryExpression");
+                    }
+                }
+                return mappedFromExpression;
+            }
             return base.VisitSubQueryExpression(expression);
+        }
+
+        protected override Expression VisitQuerySourceReferenceExpression(QuerySourceReferenceExpression expression)
+        {
+            Expression mappedExpression;
+            if (QueryBuilder.TryGetQuerySourceMapping(expression.ReferencedQuerySource, out mappedExpression))
+            {
+                return mappedExpression;
+            }
+            return base.VisitQuerySourceReferenceExpression(expression);
         }
 
         #region Overrides of ThrowingExpressionTreeVisitor

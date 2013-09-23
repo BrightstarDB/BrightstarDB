@@ -86,8 +86,9 @@ namespace BrightstarDB.Client
             if (binding.Elements(SparqlResultsNamespace + "literal").FirstOrDefault() != null)
             {
                 var datatype = GetBindingDataType(binding) ?? Constants.DefaultDatatypeUri;
+                var language = GetBindingLanguageCode(binding) ?? String.Empty;
                 object parsedValue;
-                if (RdfDatatypes.TryParseLiteralString(binding.Value, datatype, out parsedValue)) return parsedValue;
+                if (RdfDatatypes.TryParseLiteralString(binding.Value, datatype, language, out parsedValue)) return parsedValue;
                 return binding.Value;
             }
             return new Uri(binding.Value);
@@ -135,12 +136,20 @@ namespace BrightstarDB.Client
             return attribute.Value;            
         }
 
+        private static string GetBindingLanguageCode(XElement binding)
+        {
+            var literal = binding.Elements(SparqlResultsNamespace + "literal").FirstOrDefault();
+            if (literal == null) return String.Empty;
+            var lang = literal.Attribute(XNamespace.Xml + "lang");
+            return lang == null ? String.Empty : lang.Value;
+        }
+
         /// <summary>
         /// Gets the language code for the specified literal column
         /// </summary>
         /// <param name="row">The XElement that represents the sparql resul row</param>
         /// <param name="name">The name of the sparql result parameter</param>
-        /// <returns>Language code of null if the named column doesnt exist, or there is no langusge code attribute</returns>
+        /// <returns>Language code or null if the named column doesnt exist, or there is no langusge code attribute</returns>
         public static string GetLiteralLanguageCode(this XElement row, string name)
         {
             var binding =
@@ -148,13 +157,19 @@ namespace BrightstarDB.Client
                     e => (e.Attribute("name") != null && e.Attribute("name").Value.Equals(name))).FirstOrDefault();
             if (binding == null) return null;
 
-            var literal = binding.Elements(SparqlResultsNamespace + "literal").FirstOrDefault();
-            if (literal == null) return null;
+            return GetBindingLanguageCode(binding);
+        }
 
-            var attribute = literal.Attribute("lang");
-            if (attribute == null) return null;
-
-            return attribute.Value;            
+        /// <summary>
+        /// Gets the language code for the specified literal column
+        /// </summary>
+        /// <param name="row">The XElement that represents a result row</param>
+        /// <param name="columnIndex">The zero-based index of the column value to return</param>
+        /// <returns>The language code of the result or null if no language value is specified or the column does not exist</returns>
+        public static string GetLiteralLanguageCode(this XElement row, int columnIndex)
+        {
+            var binding = row.Elements(SparqlResultsNamespace + "binding").ElementAtOrDefault(columnIndex);
+            return GetBindingLanguageCode(binding);
         }
     }
 }

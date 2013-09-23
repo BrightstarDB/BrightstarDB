@@ -91,7 +91,7 @@ namespace BrightstarDB.EntityFramework.Query
         /// <param name="parameters">The SPARLQ result binding values</param>
         /// <param name="converter">A function that given a string value from the SPARQL binding and a target type is capable of returning a new instance of the target type bound to the string value</param>
         /// <returns>The generated member instance</returns>
-        public object ApplyMemberInitExpression<T>(Dictionary<string, object> parameters, Func<string, Type, object> converter )
+        public object ApplyMemberInitExpression<T>(Dictionary<string, object> parameters, Func<string, string, Type, object> converter )
         {
             var exprBuilder = new SparqlGeneratorSelectExpressionBuilder(parameters, converter);
             var expressionBody = exprBuilder.VisitExpression(_memberInitExpression);
