@@ -94,13 +94,17 @@ namespace BrightstarDB.EntityFramework.Query
 
         public string AddFromPart(IQuerySource querySource)
         {
-            var typeUri = _context.MapTypeToUri(querySource.ItemType);
             var itemVarName = IntroduceNamedVariable(querySource.ItemName);
-            AddTripleConstraint(
-                GraphNode.Variable, 
-                itemVarName,
-                GraphNode.Raw, "a",
-                GraphNode.Iri, typeUri);
+            if (!Rdf.RdfDatatypes.IsKnownType(querySource.ItemType))
+            {
+                // Target value is not a literal so we expect a mapping to a known entity type
+                var typeUri = _context.MapTypeToUri(querySource.ItemType);
+                AddTripleConstraint(
+                    GraphNode.Variable,
+                    itemVarName,
+                    GraphNode.Raw, "a",
+                    GraphNode.Iri, typeUri);
+            }
             AddQuerySourceMapping(querySource, new SelectVariableNameExpression(itemVarName, VariableBindingType.Resource, querySource.ItemType));
             if (querySource is MainFromClause)
             {
@@ -339,7 +343,7 @@ namespace BrightstarDB.EntityFramework.Query
                     // selected variables cannot be replaced
                     continue;
                 }
-                string matchPattern = @"([\s+|\.|\{|\(])\?(" + Regex.Escape(varName) + @")([\s+|,])";
+                string matchPattern = @"([\s+|\.|\{|\(])\?(" + Regex.Escape(varName) + @")([\s+|,|=|]|\.|\))";
                 query = Regex.Replace(query, matchPattern, m =>
                                                                {
                                                                    return m.Groups[1] + _variableValueMapping[varName] +

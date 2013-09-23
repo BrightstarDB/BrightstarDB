@@ -153,6 +153,7 @@
     <Compile Include="Client\SignatureType.cs" />
     <Compile Include="Client\StoreStatisticsWrapper.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
+    <Compile Include="Rdf\PlainLiteral.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
     <Compile Include="Server\SnapshotJob.cs" />

@@ -17,6 +17,7 @@ using BrightstarDB.EntityFramework;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using BrightstarDB.Rdf;
 
 namespace BrightstarDB.Tests.EntityFramework 
 {
@@ -35,6 +36,8 @@ namespace BrightstarDB.Tests.EntityFramework
     		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IBaseEntity, BrightstarDB.Tests.EntityFramework.BaseEntity>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ICompany));
     		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.ICompany, BrightstarDB.Tests.EntityFramework.Company>();
+    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IConcept));
+    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IConcept, BrightstarDB.Tests.EntityFramework.Concept>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IDBPediaPerson));
     		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IDBPediaPerson, BrightstarDB.Tests.EntityFramework.DBPediaPerson>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IDepartment));
@@ -138,6 +141,7 @@ namespace BrightstarDB.Tests.EntityFramework
     		Articles = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IArticle>(this);
     		BaseEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IBaseEntity>(this);
     		Companies = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ICompany>(this);
+    		Concepts = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IConcept>(this);
     		DBPediaPersons = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IDBPediaPerson>(this);
     		Departments = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IDepartment>(this);
     		DerivedEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IDerivedEntity>(this);
@@ -173,6 +177,11 @@ namespace BrightstarDB.Tests.EntityFramework
     	}
     	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.ICompany> Companies
+    	{
+    		get; private set;
+    	}
+    	
+    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IConcept> Concepts
     	{
     		get; private set;
     	}
@@ -393,6 +402,23 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
             		get { return GetRelatedProperty<System.Int32>("HeadCount"); }
             		set { SetRelatedProperty("HeadCount", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
+    public partial class Concept : BrightstarEntityObject, IConcept 
+    {
+    	public Concept(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Concept() : base() { }
+    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.IConcept
+    	public System.Collections.Generic.ICollection<PlainLiteral> PrefLabel
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<PlainLiteral>("PrefLabel"); }
+    		set { SetRelatedLiteralPropertiesCollection<PlainLiteral>("PrefLabel", value); }
     	}
     	#endregion
     }

@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="ConstructorTests.cs" />
     <Compile Include="ContextObjects\Company.cs" />
+    <Compile Include="ContextObjects\Concept.cs" />
     <Compile Include="ContextObjects\Dinner.cs" />
     <Compile Include="ContextObjects\DinnerType.cs" />
     <Compile Include="ContextObjects\Market.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="MockContext.cs" />
     <Compile Include="MockLdoSet.cs" />
     <Compile Include="NumericComparatorsTests.cs" />
+    <Compile Include="PlainLiteralQueryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringFunctionTests.cs" />
   </ItemGroup>

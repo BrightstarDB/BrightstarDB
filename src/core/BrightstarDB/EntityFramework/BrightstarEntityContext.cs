@@ -303,7 +303,8 @@ namespace BrightstarDB.EntityFramework
                     {
                         var argInfo = anonymousConstructorArgs[i];
                         var colValue = row.GetColumnValue(argInfo.VariableName);
-                        args[i] = colValue == null ? argInfo.DefaultValue : argInfo.ValueConverter(colValue.ToString());
+                        var colLang = row.GetLiteralLanguageCode(argInfo.VariableName);
+                        args[i] = colValue == null ? argInfo.DefaultValue : argInfo.ValueConverter(colValue.ToString(), colLang);
                     }
                     yield return (T)Activator.CreateInstance(typeof(T), args);
                 }                
@@ -334,12 +335,20 @@ namespace BrightstarDB.EntityFramework
                 }
                 foreach(var row in resultDoc.SparqlResultRows())
                 {
-                    yield return (T)converter(row.GetColumnValue(0).ToString());
+                    var value = row.GetColumnValue(0);
+                    if (value.GetType() == typeof (T))
+                    {
+                        yield return (T) value;
+                    }
+                    else
+                    {
+                        yield return (T) converter(row.GetColumnValue(0).ToString(), row.GetLiteralLanguageCode(0));
+                    }
                 }
             }
         }
 
-        private object ConvertString(string s, Type t)
+        private object ConvertString(string value, string lang, Type t)
         {
             var converter = GetStringConverter(t);
             if (converter == null)
@@ -347,7 +356,7 @@ namespace BrightstarDB.EntityFramework
                 throw new EntityFrameworkException("No SPARQL results conversion found from string to type '{0}'",
                                                    t.FullName);
             }
-            return converter(s);
+            return converter(value, lang);
         }
 
         /// <summary>
@@ -376,32 +385,34 @@ namespace BrightstarDB.EntityFramework
         {
             public string PropertyName;
             public string VariableName;
-            public Converter<String, object> ValueConverter;
+            public Func<string, string, object> ValueConverter;
             public object DefaultValue;
         }
 
-        private Converter<String, object> GetStringConverter(Type targetType)
+        
+        private Func<string, string, object> GetStringConverter(Type targetType)
         {
             if (typeof(BrightstarEntityObject).IsAssignableFrom(GetImplType(targetType)))
             {
-                return x => BindSingleBrightstarObject(targetType, x);
+                return (s,l) => BindSingleBrightstarObject(targetType, s);
             }
-            if (targetType == typeof(string)) return (x => x);
-            if (targetType == typeof(bool)) return x => Convert.ToBoolean(x);
-            if (targetType == typeof(int)) return x => Convert.ToInt32(x);
-            if (targetType == typeof(short)) return x => Convert.ToInt16(x);
-            if (targetType == typeof(long)) return x => Convert.ToInt64(x);
-            if (targetType == typeof(DateTime)) return x => Convert.ToDateTime(x);
-            if (targetType == typeof(Byte)) return x => Convert.ToByte(x);
-            if (targetType == typeof(Decimal)) return x => Convert.ToDecimal(x);
-            if (targetType == typeof(Double)) return x => Convert.ToDouble(x);
-            if (targetType == typeof(SByte)) return x => Convert.ToSByte(x);
-            if (targetType == typeof(Single)) return x => Convert.ToSingle(x);
-            if (targetType == typeof(UInt16)) return x => Convert.ToUInt16(x);
-            if (targetType == typeof(UInt32)) return x => Convert.ToUInt32(x);
-            if (targetType == typeof(UInt64)) return x => Convert.ToUInt64(x);
+            if (targetType == typeof (PlainLiteral)) return (s, l) => new PlainLiteral(s, l);
+            if (targetType == typeof(string)) return (x,l) => x;
+            if (targetType == typeof(bool)) return (x, l) => Convert.ToBoolean(x);
+            if (targetType == typeof(int)) return (x, l) => Convert.ToInt32(x);
+            if (targetType == typeof(short)) return (x, l) => Convert.ToInt16(x);
+            if (targetType == typeof(long)) return (x, l) => Convert.ToInt64(x);
+            if (targetType == typeof(DateTime)) return (x, l) => Convert.ToDateTime(x);
+            if (targetType == typeof(Byte)) return (x, l) => Convert.ToByte(x);
+            if (targetType == typeof(Decimal)) return (x, l) => Convert.ToDecimal(x);
+            if (targetType == typeof(Double)) return (x, l) => Convert.ToDouble(x);
+            if (targetType == typeof(SByte)) return (x, l) => Convert.ToSByte(x);
+            if (targetType == typeof(Single)) return (x, l) => Convert.ToSingle(x);
+            if (targetType == typeof(UInt16)) return (x, l) => Convert.ToUInt16(x);
+            if (targetType == typeof(UInt32)) return (x, l) => Convert.ToUInt32(x);
+            if (targetType == typeof(UInt64)) return (x, l) => Convert.ToUInt64(x);
             var stringConstructor = targetType.GetConstructor(new Type[] {typeof (string)});
-            if (stringConstructor != null) return x => stringConstructor.Invoke(new object[]{x});
+            if (stringConstructor != null) return (x, l) => stringConstructor.Invoke(new object[] { x });
             return null;
         }
 

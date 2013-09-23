@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BrightstarDB.EntityFramework;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 
@@ -205,7 +206,7 @@ namespace BrightstarDB.Client
                 if (value == null) throw new ArgumentNullException("value");
                 string dataType = RdfDatatypes.GetRdfDatatype(value.GetType());
                 string litString = RdfDatatypes.GetLiteralString(value);
-                AddLiteralProperty(type, litString, dataType, lang);
+                AddLiteralProperty(type, litString, dataType, lang ?? RdfDatatypes.GetLiteralLanguageTag(value));
             }
             return this;
         }
@@ -452,7 +453,7 @@ namespace BrightstarDB.Client
             if (triple.IsLiteral)
             {
                 object retValue;
-                if (RdfDatatypes.TryParseLiteralString(triple.Object, triple.DataType, out retValue))
+                if (RdfDatatypes.TryParseLiteralString(triple.Object, triple.DataType, triple.LangCode, out retValue))
                 {
                     return retValue;
                 }

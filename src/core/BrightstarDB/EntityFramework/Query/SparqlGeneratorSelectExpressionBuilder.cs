@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using BrightstarDB.Rdf;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Parsing;
 
@@ -13,8 +14,8 @@ namespace BrightstarDB.EntityFramework.Query
     internal class SparqlGeneratorSelectExpressionBuilder : ExpressionTreeVisitor
     {
         private readonly Dictionary<string, object> _values;
-        private readonly Func<string, Type, object> _converter; 
-        public SparqlGeneratorSelectExpressionBuilder(Dictionary<string, object> values, Func<string, Type, object> converter)
+        private readonly Func<string, string, Type, object> _converter; 
+        public SparqlGeneratorSelectExpressionBuilder(Dictionary<string, object> values, Func<string, string, Type, object> converter)
         {
             _values = values;
             _converter = converter;
@@ -38,7 +39,7 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     return Expression.Constant(v, siv.Type);
                 }
-                var converted = _converter(v, siv.Type);
+                var converted = _converter(v, RdfDatatypes.GetLiteralLanguageTag(_values[siv.Name]), siv.Type);
                 return Expression.Constant(converted, siv.Type);
             }
             if (expression is SelectVariableNameExpression)
@@ -49,7 +50,7 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     return Expression.Constant(v, svn.Type);
                 }
-                var converted = _converter(v.ToString(), svn.Type);
+                var converted = _converter(v.ToString(), RdfDatatypes.GetLiteralLanguageTag(v), svn.Type);
                 return Expression.Constant(converted, svn.Type);
             }
             return expression;
@@ -61,7 +62,7 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 // Extracting a value from a resource that should be in the _values dictionary
                 var svn = expression.Expression as SelectVariableNameExpression;
-                var parent = _converter(_values[svn.Name].ToString(), svn.Type);
+                var parent = _converter(_values[svn.Name].ToString(), RdfDatatypes.GetLiteralLanguageTag(_values[svn.Name]), svn.Type);
                 if (expression.Member is PropertyInfo)
                 {
                     var property = expression.Member as PropertyInfo;
