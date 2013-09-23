@@ -8,7 +8,34 @@
 .. _System.Collections.Specialized.INotifyCollectionChanged: http://msdn.microsoft.com/en-us/library/system.collections.specialized.inotifycollectionchanged%28v=vs.100%29.aspx
 
 
-This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are marked with FIX
+This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require 
+either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
+marked with FIX
+
+****************************
+ Development
+****************************
+
+The following are changes that are contained in the develop branch of the BrightstarDB repository but which have not yet been included in an official binary release.
+These changes will appear in the 1.5 release.
+
+  - **BREAKING**: RDF literal values without an explicit datatype are now exposed through the Data Objects and Entity Framework APIs as instances of the type ``BrightstarDB.Rdf.PlainLiteral``
+    rather than as ``System.String``. This change has been made to better enable the APIs to deal with RDF literals with language tags. This update allows both dynamic objects and
+    Entity Framework interfaces to have properties typed as ``BrightstarDB.Rdf.PlainLiteral`` (or an ``ICollection<BrightstarDB.Rdf.PlainLiteral>``). The LINQ to SPARQL implementation
+    has also been updated to support this type. However, this change may be **BREAKING** for some uses of the API. In particular when using either the dynamic objects API or
+    the SPARQL results set ``XElement`` extension methods, the object returned for an RDF plain literal result will now be a ``BrightstarDB.Rdf.PlainLiteral`` instance rather
+    than a string. The fix for this breaking change is to call ``.ToString()`` on the ``PlainLiteral`` instance. e.g::
+        
+            // This comparison will always return false as the object returned by 
+            // GetColumnValue is a BrightstarDB.Rdf.PlainLiteral
+            bool isFoo = resultRow.GetColumnValue("o").Equals("foo");
+            
+            // To fix this breaking change insert .ToString() like this:
+            bool isActuallyFoo = resultRow.GetColumn("o").ToString().Equals("foo");
+            
+            // Or for a more explicit comparison
+            bool isLiteralFoo = resultRow.GetColumn("o").Equals(new PlainLiteral("foo"));
+        
 
 ****************************
  BrightstarDB 1.4 Release
