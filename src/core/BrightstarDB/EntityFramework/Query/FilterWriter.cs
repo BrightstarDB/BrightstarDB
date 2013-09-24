@@ -623,12 +623,9 @@ namespace BrightstarDB.EntityFramework.Query
 #if WINDOWS_PHONE || PORTABLE
                 if (mappedExpression is SelectVariableNameExpression)
                 {
-                    VisitSelectVariableNameExpression(mappedExpression as SelectVariableNameExpression);
+                    return VisitSelectVariableNameExpression(mappedExpression as SelectVariableNameExpression);
                 }
-                else
-                {
-                    VisitExpression(mappedExpression);
-                }
+                return VisitExpression(mappedExpression);
 #else
                 return VisitExpression(mappedExpression);
 #endif
