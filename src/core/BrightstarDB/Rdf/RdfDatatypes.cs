@@ -138,7 +138,7 @@ namespace BrightstarDB.Rdf
         private static readonly RdfDatatype RdfUnsignedShort = new RdfDatatype(UnsignedShort, (o => ((ushort)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToUInt16(s));
         private static readonly RdfDatatype RdfUnsignedByte = new RdfDatatype(UnsignedByte, (o => ((byte)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToByte(s));
 #if PORTABLE
-        private static readonly RdfDatatype RdfChar = new RdfDatatype(Char, o=>((char)o).ToString(), s=>s.ToCharArray().FirstOrDefault());
+        private static readonly RdfDatatype RdfChar = new RdfDatatype(Char, o=>((char)o).ToString(), (s,l)=>s.ToCharArray().FirstOrDefault());
 #else
         private static readonly RdfDatatype RdfChar = new RdfDatatype(Char, o => ((char)o).ToString(CultureInfo.InvariantCulture), (s,l) => s.FirstOrDefault());
 #endif

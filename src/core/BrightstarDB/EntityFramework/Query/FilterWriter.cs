@@ -620,19 +620,37 @@ namespace BrightstarDB.EntityFramework.Query
             Expression mappedExpression;
             if (QueryBuilder.TryGetQuerySourceMapping(expression.ReferencedQuerySource, out mappedExpression))
             {
+#if WINDOWS_PHONE || PORTABLE
+                if (mappedExpression is SelectVariableNameExpression)
+                {
+                    VisitSelectVariableNameExpression(mappedExpression as SelectVariableNameExpression);
+                }
+                else
+                {
+                    VisitExpression(mappedExpression);
+                }
+#else
                 return VisitExpression(mappedExpression);
+#endif
             }
             return base.VisitQuerySourceReferenceExpression(expression);
         }
 
+#if !WINDOWS_PHONE && !PORTABLE
         protected override Expression VisitExtensionExpression(Remotion.Linq.Clauses.Expressions.ExtensionExpression expression)
         {
             if (expression is SelectVariableNameExpression)
             {
-                _filterExpressionBuilder.AppendFormat("?{0}", (expression as SelectVariableNameExpression).Name);
-                return expression;
+                return VisitSelectVariableNameExpression(expression as SelectVariableNameExpression);
             }
             return base.VisitExtensionExpression(expression);
+        }
+#endif
+
+        protected Expression VisitSelectVariableNameExpression(SelectVariableNameExpression expression)
+        {
+            _filterExpressionBuilder.AppendFormat("?{0}", expression.Name);
+            return expression;
         }
 
         protected override Expression VisitBinaryExpression(BinaryExpression expression)
