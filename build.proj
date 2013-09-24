@@ -1,0 +1,39 @@
+<Project ToolsVersion="4.0" DefaultTargets="BuildAndTest" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <NoDocs Condition=" '$(NoDocs)' == '' ">False</NoDocs>
+    </PropertyGroup>
+    
+    <Target Name="Test" Condition=" '$(Configuration)' == 'Debug'">
+    </Target>
+    
+    <Target Name="BuildCore">
+        <MSBuild Projects="src\core\BrightstarDB.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean;Build"/>
+    </Target>
+    
+    <Target Name="BuildMobile">
+        <MSBuild Projects="src\mobile\mobile.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean;Build"/>
+    </Target>
+    
+    <Target Name="BuildPortable">
+        <MSBuild Projects="src\portable\portable.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean;Build"/>
+    </Target>
+
+    <Target Name="BuildTools">
+        <MSBuild Projects="src\tools\Polaris\Polaris.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean;Build"/>        
+    </Target>
+    
+    <Target Name="Build" DependsOnTargets="BuildCore;BuildMobile;BuildPortable;BuildTools">
+    </Target>
+
+    <Target Name="BuildAndTest" DependsOnTargets="Build;Test">
+    </Target>
+</Project>
