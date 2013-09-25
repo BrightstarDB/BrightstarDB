@@ -125,9 +125,11 @@ namespace BrightstarDB.EntityFramework
                     context = new NamedPipeDataObjectContext(connectionString);
                     break;
 #endif
+#if REST_CLIENT
                 case ConnectionType.Rest:
                     context = new RestDataObjectContext(connectionString);
                     break;
+#endif
 #endif
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
