@@ -1,9 +1,9 @@
 #!/bin/bash
 
 CONFIGURATION=Debug
-LIB_DIR=build
-MONO_DIR=build
+MONO_DIR=mono
 CURRENT_DIR=`pwd`
+LIB_DIR="$CURRENT_DIR"/build
 export MSBuildExtensionsPath="$CURRENT_DIR"/xbuild
 
 echo $MSBuildExtensionsPath
@@ -20,6 +20,8 @@ function buildComponent {
 }
 
 buildComponent core BrightstarDB
-#buildComponent core BrightstarDB.Service
-#buildComponent core BrightstarDB.ServerRunner
+
+# TODO : Add build of REST service and tests here when ready.
+
+
 
