@@ -4,7 +4,7 @@ CONFIGURATION=Debug
 LIB_DIR=build
 MONO_DIR=build
 CURRENT_DIR=`pwd`
-MSBuildExtensionsPath="$CURRENT_DIR"/xbuild
+export MSBuildExtensionsPath="$CURRENT_DIR"/xbuild
 
 echo $MSBuildExtensionsPath
 cd ..
