@@ -32,7 +32,7 @@ namespace BrightstarDB.Client
         }
 
 
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
 
 #if !REST_CLIENT
         /// <summary>
@@ -154,7 +154,7 @@ namespace BrightstarDB.Client
                 case ConnectionType.Embedded:
                     return new EmbeddedBrightstarService(connectionString.StoresDirectory);
 #endif
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
 #if !REST_CLIENT
                 case ConnectionType.Http:
                     return GetHttpClient(new Uri(connectionString.ServiceEndpoint), GetConfiguredCache());
@@ -212,7 +212,7 @@ namespace BrightstarDB.Client
 #if !REST_CLIENT
                 case ConnectionType.Embedded:
                     return new EmbeddedDataObjectContext(connectionString);
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
                 case ConnectionType.Http:
                     return new HttpDataObjectContext(connectionString);
                 case ConnectionType.Tcp:

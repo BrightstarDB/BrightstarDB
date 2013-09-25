@@ -1,4 +1,4 @@
-﻿#if !REST_CLIENT
+﻿#if !REST_CLIENT && !__MonoCS__
 using System;
 using System.Collections.Generic;
 using BrightstarDB.Storage;
