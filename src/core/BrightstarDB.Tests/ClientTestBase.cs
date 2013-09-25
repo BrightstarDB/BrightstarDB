@@ -15,7 +15,6 @@ namespace BrightstarDB.Tests
     {
         private static ServiceHost _serviceHost;
         private static bool _closed;
-        private static bool _started;
         private static readonly object HostLock = new object();
 
         protected static void StartService()
