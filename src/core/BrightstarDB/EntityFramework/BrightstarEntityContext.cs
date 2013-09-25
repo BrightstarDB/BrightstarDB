@@ -112,7 +112,7 @@ namespace BrightstarDB.EntityFramework
                     context = new EmbeddedDataObjectContext(connectionString);
                     break;
 #endif
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
 #if !REST_CLIENT
                 case ConnectionType.Http:
                     context = new HttpDataObjectContext(connectionString);
@@ -125,9 +125,11 @@ namespace BrightstarDB.EntityFramework
                     context = new NamedPipeDataObjectContext(connectionString);
                     break;
 #endif
+#if REST_CLIENT
                 case ConnectionType.Rest:
                     context = new RestDataObjectContext(connectionString);
                     break;
+#endif
 #endif
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +

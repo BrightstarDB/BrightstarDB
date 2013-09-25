@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if REST_CLIENT
+using System;
 using System.Collections.Generic;
 using BrightstarDB.Storage;
 
@@ -125,3 +126,4 @@ namespace BrightstarDB.Client
         #endregion
     }
 }
+#endif
