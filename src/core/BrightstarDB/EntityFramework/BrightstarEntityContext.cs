@@ -112,7 +112,7 @@ namespace BrightstarDB.EntityFramework
                     context = new EmbeddedDataObjectContext(connectionString);
                     break;
 #endif
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
 #if !REST_CLIENT
                 case ConnectionType.Http:
                     context = new HttpDataObjectContext(connectionString);

@@ -614,7 +614,7 @@ namespace BrightstarDB.EntityFramework.Query
         public void WriteRegexFilter(Expression expression, string s, string flags =null)
         {
             _filterExpressionBuilder.Append("(regex(");
-            var expr = VisitExpression(expression);
+            VisitExpression(expression);
             _filterExpressionBuilder.Append(", ");
             _filterExpressionBuilder.Append(MakeSparqlConstant(s));
             if (flags != null)
