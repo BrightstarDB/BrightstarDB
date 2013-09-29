@@ -408,6 +408,11 @@ namespace BrightstarDB.Server
             return jobId;
         }
 
+        public CommitPoint GetCommitPoint(string storeName, ulong commitOffset)
+        {
+            return GetCommitPoints(storeName).FirstOrDefault(x => x.LocationOffset.Equals(commitOffset));
+        }
+
         public CommitPoint GetCommitPoint(string storeName, DateTime timestamp)
         {
             var utcTimestamp = timestamp.ToUniversalTime();

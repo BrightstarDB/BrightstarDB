@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -273,7 +273,7 @@
     <Compile Include="Rdf\StoreTripleSink.cs" />
     <Compile Include="Rdf\TripleSinkException.cs" />
     <Compile Include="Server\BrightstarClientDataException.cs" />
-    <Compile Include="BrightstarStoreNotModifiedException.cs" />
+    <Compile Include="Client\BrightstarStoreNotModifiedException.cs" />
     <Compile Include="Server\ConnectionStream.cs" />
     <Compile Include="Server\ConsolidateJob.cs" />
     <Compile Include="Server\ConsumerStream.cs" />

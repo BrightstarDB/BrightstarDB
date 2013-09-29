@@ -494,6 +494,17 @@ namespace BrightstarDB.Client
         }
 
         /// <summary>
+        /// Returns the specified commit point of a BrighstarDB store
+        /// </summary>
+        /// <param name="storeName">The name of the store to open</param>
+        /// <param name="commitId">The identifier of the commit point to be returned</param>
+        /// <returns>The specified commit point or NULL if no matching commit point was found</returns>
+        public ICommitPointInfo GetCommitPoint(string storeName, ulong commitId)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Get a list of commit points that lie within a specified date/time range
         /// </summary>
         /// <param name="storeName"></param>
@@ -657,6 +668,11 @@ namespace BrightstarDB.Client
             {
                 throw new BrightstarClientException(fault);
             }
+        }
+
+        public ITransactionInfo GetTransaction(string storeName, Guid jobId)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>

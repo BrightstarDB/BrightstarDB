@@ -13,7 +13,7 @@ namespace BrightstarDB.Client
     /// </summary>
     [Serializable]
 #endif
-    public sealed class BrightstarClientException : BrightstarException
+    public class BrightstarClientException : BrightstarException
     {
         private const string DefaultServiceErrorMessage = "Error executing client call.";
 

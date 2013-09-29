@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A6A05324-BA02-4C82-9199-AD19BC442C60}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BrightstarDB.Server.Modules</RootNamespace>
+    <AssemblyName>BrightstarDB.Server.Modules</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Nancy">
+      <HintPath>..\packages\Nancy.0.20.0\lib\net40\Nancy.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CommitPointsModule.cs" />
+    <Compile Include="InvalidCommitPointException.cs" />
+    <Compile Include="JobsModule.cs" />
+    <Compile Include="Model\CommitPointResponseObject.cs" />
+    <Compile Include="Model\CreateStoreRequestObject.cs" />
+    <Compile Include="Model\JobRequestObject.cs" />
+    <Compile Include="Model\JobResponseObject.cs" />
+    <Compile Include="Model\SparqlResquestObject.cs" />
+    <Compile Include="Model\SparqlUpdateRequestObject.cs" />
+    <Compile Include="Model\StatisticsRequestObject.cs" />
+    <Compile Include="Model\StatisticsResponseObject.cs" />
+    <Compile Include="Model\StoreResponseObject.cs" />
+    <Compile Include="Model\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Model\TransactionResponseObject.cs" />
+    <Compile Include="Model\TransactionsRequestObject.cs" />
+    <Compile Include="NegotiatorExtensions.cs" />
+    <Compile Include="SparqlQueryProcessingModel.cs" />
+    <Compile Include="SparqlQueryResponse.cs" />
+    <Compile Include="SparqlModule.cs" />
+    <Compile Include="SparqlProcessor.cs" />
+    <Compile Include="SparqlUpdateModule.cs" />
+    <Compile Include="StatisticsModule.cs" />
+    <Compile Include="StoreModule.cs" />
+    <Compile Include="StoresModule.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransactionsModule.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\BrightstarDB\BrightstarDB.csproj">
+      <Project>{121A81F3-EB1C-4228-81FB-0D7505A438FB}</Project>
+      <Name>BrightstarDB</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Model\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

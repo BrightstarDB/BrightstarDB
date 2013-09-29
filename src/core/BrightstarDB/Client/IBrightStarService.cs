@@ -203,6 +203,14 @@ namespace BrightstarDB.Client
         IEnumerable<ICommitPointInfo> GetCommitPoints(string storeName, int skip, int take);
 
         /// <summary>
+        /// Returns the specified commit point of a BrighstarDB store
+        /// </summary>
+        /// <param name="storeName">The name of the store to open</param>
+        /// <param name="commitId">The identifier of the commit point to be returned</param>
+        /// <returns>The specified commit point or NULL if no matching commit point was found</returns>
+        ICommitPointInfo GetCommitPoint(string storeName, ulong commitId);
+
+        /// <summary>
         /// Returns the commit point that was in effect at a given date/time
         /// </summary>
         /// <param name="storeName">The name of the store to search</param>
@@ -228,6 +236,14 @@ namespace BrightstarDB.Client
         /// <param name="take">How many transactions to return.</param>
         /// <returns>An enumeration over the transactions executed against the store</returns>
         IEnumerable<ITransactionInfo> GetTransactions(string storeName, int skip, int take);
+
+        /// <summary>
+        /// Returns the transaction record creaed by the execution of a specific job against the store
+        /// </summary>
+        /// <param name="storeName">The name of the store where the job was executed</param>
+        /// <param name="jobId">The ID of the job that was executed</param>
+        /// <returns>The transaction information for the execution of the job or NULL if no matching transaction record was found</returns>
+        ITransactionInfo GetTransaction(string storeName, Guid jobId);
 
         /// <summary>
         /// Executes a previous transaction

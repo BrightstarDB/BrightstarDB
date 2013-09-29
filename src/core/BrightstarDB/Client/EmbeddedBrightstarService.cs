@@ -787,6 +787,35 @@ namespace BrightstarDB.Client
             }
         }
 
+        /// <summary>
+        /// Returns the specified commit point of a BrighstarDB store
+        /// </summary>
+        /// <param name="storeName">The name of the store to open</param>
+        /// <param name="commitId">The identifier of the commit point to be returned</param>
+        /// <returns>The specified commit point or NULL if no matching commit point was found</returns>
+        public ICommitPointInfo GetCommitPoint(string storeName, ulong commitId)
+        {
+            try
+            {
+                var commitPoint = _serverCore.GetCommitPoint(storeName, commitId);
+                if (commitPoint == null) return null;
+                return new CommitPointInfoWrapper(new CommitPointInfo
+                    {
+                        StoreName = storeName,
+                        Id = commitPoint.LocationOffset,
+                        CommitTime = commitPoint.CommitTime,
+                        JobId = commitPoint.JobId
+                    });
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException,
+                                 "Error getting commit point {0} for store {1}", commitId, storeName);
+                throw new BrightstarClientException(
+                    String.Format("Error getting commit point {0} for store {1}. {2}", commitId, storeName,
+                                  ex.Message), ex);
+            }
+        }
 
         /// <summary>
         /// Returns the commit point that was in effect at a given date/time
@@ -853,30 +882,44 @@ namespace BrightstarDB.Client
             try
             {
                 return _serverCore.GetTransactions(storeName).Skip(skip).Take(take)
-                    .Select(t => new TransactionInfoWrapper(
-                                     new TransactionInfo
-                                         {
-                                             Id = t.DataStartPosition,
-                                             JobId = t.JobId,
-                                             StartTime = t.TransactionStartTime,
-                                             StoreName = storeName,
-#if SILVERLIGHT || PORTABLE
-                                             Status = (BrightstarTransactionStatus)((int)t.TransactionStatus),
-                                             TransactionType = (BrightstarTransactionType)((int)t.TransactionType)
-#else
-                                             Status = (TransactionStatus)((int)t.TransactionStatus),
-                                             TransactionType = (TransactionType)((int)t.TransactionType)
-#endif
-// ReSharper disable RedundantEnumerableCastCall
-// Cast is not redundant for SILVERLIGHT builds
-                                         })).Cast<ITransactionInfo>();
-// ReSharper restore RedundantEnumerableCastCall
+                                  .Select(t => MakeTransactionInfoWrapper(storeName, t));
             }
             catch (Exception ex)
             {
                 Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting transactions for store {0}", storeName);
                 throw new BrightstarClientException("Error getting transactions for store " + storeName + ". " + ex.Message, ex);
             }
+        }
+
+        private static TransactionInfoWrapper MakeTransactionInfoWrapper(string storeName, Storage.ITransactionInfo t)
+        {
+            return new TransactionInfoWrapper(
+                new TransactionInfo
+                    {
+                        Id = t.DataStartPosition,
+                        JobId = t.JobId,
+                        StartTime = t.TransactionStartTime,
+                        StoreName = storeName,
+#if SILVERLIGHT || PORTABLE
+                                             Status = (BrightstarTransactionStatus)((int)t.TransactionStatus),
+                                             TransactionType = (BrightstarTransactionType)((int)t.TransactionType)
+#else
+                        Status = (TransactionStatus) ((int) t.TransactionStatus),
+                        TransactionType = (TransactionType) ((int) t.TransactionType)
+#endif
+                    });
+        }
+
+        /// <summary>
+        /// Returns the transaction record creaed by the execution of a specific job against the store
+        /// </summary>
+        /// <param name="storeName">The name of the store where the job was executed</param>
+        /// <param name="jobId">The ID of the job that was executed</param>
+        /// <returns>The transaction information for the execution of the job or NULL if no matching transaction record was found</returns>
+        public ITransactionInfo GetTransaction(string storeName, Guid jobId)
+        {
+            var txnMatch = _serverCore.GetTransactions(storeName).FirstOrDefault(t => t.JobId.Equals(jobId));
+            return txnMatch == null ? null : MakeTransactionInfoWrapper(storeName, txnMatch);
         }
 
         /// <summary>

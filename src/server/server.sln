@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.Modules", "BrightstarDB.Server.Modules\BrightstarDB.Server.Modules.csproj", "{A6A05324-BA02-4C82-9199-AD19BC442C60}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB", "..\core\BrightstarDB\BrightstarDB.csproj", "{121A81F3-EB1C-4228-81FB-0D7505A438FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.Modules.Tests", "BrightstarDB.Server.Modules.Tests\BrightstarDB.Server.Modules.Tests.csproj", "{523BB67E-CEB7-4144-AACB-AB5937F8872E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		CloudDebug|Any CPU = CloudDebug|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Staging|Any CPU = Staging|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A6A05324-BA02-4C82-9199-AD19BC442C60}.CloudDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6A05324-BA02-4C82-9199-AD19BC442C60}.CloudDebug|Any CPU.Build.0 = Debug|Any CPU
+		{A6A05324-BA02-4C82-9199-AD19BC442C60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6A05324-BA02-4C82-9199-AD19BC442C60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6A05324-BA02-4C82-9199-AD19BC442C60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6A05324-BA02-4C82-9199-AD19BC442C60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6A05324-BA02-4C82-9199-AD19BC442C60}.Staging|Any CPU.ActiveCfg = Release|Any CPU
+		{A6A05324-BA02-4C82-9199-AD19BC442C60}.Staging|Any CPU.Build.0 = Release|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.CloudDebug|Any CPU.ActiveCfg = CloudDebug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.CloudDebug|Any CPU.Build.0 = CloudDebug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.CloudDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.CloudDebug|Any CPU.Build.0 = Debug|Any CPU
+		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.Staging|Any CPU.ActiveCfg = Release|Any CPU
+		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.Staging|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
