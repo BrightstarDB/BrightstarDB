@@ -14,8 +14,10 @@ namespace BrightstarDB.Server.Modules
 {
     public class StoresModule : NancyModule
     {
-        public StoresModule(IBrightstarService brightstarService)
+        public StoresModule(IBrightstarService brightstarService, ISystemPermissionsProvider systemPermissionsProvider)
         {
+            this.RequiresBrightstarSystemPermission(systemPermissionsProvider, get:SystemPermissions.ListStores, post:SystemPermissions.CreateStore);
+
             Get["/"] = parameters =>
                 {
                     var stores = brightstarService.ListStores();

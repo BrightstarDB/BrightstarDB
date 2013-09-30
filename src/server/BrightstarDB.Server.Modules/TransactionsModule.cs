@@ -11,8 +11,10 @@ namespace BrightstarDB.Server.Modules
     {
         private const int DefaultPageSize = 10;
 
-        public TransactionsModule(IBrightstarService brightstarService)
+        public TransactionsModule(IBrightstarService brightstarService, IStorePermissionsProvider storePermissionsProvider)
         {
+            this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.ViewHistory);
+
             Get["/{storeName}/transactions"] = parameters =>
                 {
                     var transactionsRequest = this.Bind<TransactionsRequestObject>();

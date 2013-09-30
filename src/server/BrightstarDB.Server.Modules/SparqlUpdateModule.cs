@@ -11,8 +11,10 @@ namespace BrightstarDB.Server.Modules
     {
         private static readonly MediaRange SparqlRequest = MediaRange.FromString("application/sparql-update");
 
-        public SparqlUpdateModule(IBrightstarService brightstarService)
+        public SparqlUpdateModule(IBrightstarService brightstarService, IStorePermissionsProvider permissionsProvider)
         {
+            this.RequiresBrightstarStorePermission(permissionsProvider, post:StorePermissions.SparqlUpdate);
+
             Post["/{storeName}/update"] = parameters =>
                 {
                     var requestObject = this.Bind<SparqlUpdateRequestObject>();

@@ -13,6 +13,7 @@ namespace BrightstarDB.Server.Modules.Tests
     [TestFixture]
     public class JobsUrlSpec
     {
+        #region Consolidate Job
         [Test]
         public void TestPostConsolidateJob()
         {
@@ -38,6 +39,14 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Verify();
         }
 
+        [Test]
+        public void TestPostConsolidateJobRequiresAdminPermissions()
+        {
+            AssertPermissionRequired(JobRequestObject.CreateConsolidateJob(), StorePermissions.Admin);
+        }
+        #endregion
+
+        #region Export Job
         [Test]
         public void TestPostExportJob()
         {
@@ -85,6 +94,16 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         [Test]
+        public void TestPostExportJobRequiresExportPermissions()
+        {
+            AssertPermissionRequired(JobRequestObject.CreateExportJob("export.nt"), StorePermissions.Export);
+            AssertPermissionRequired(JobRequestObject.CreateExportJob("export.nt", "http://some/graph/uri"),
+                                     StorePermissions.Export);
+        }
+        #endregion
+
+        #region
+        [Test]
         public void TestPostImportJob()
         {
             var brightstar = new Mock<IBrightstarService>();
@@ -131,6 +150,16 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         [Test]
+        public void TestPostImportJobRequiresUpdatePermissions()
+        {
+            AssertPermissionRequired(JobRequestObject.CreateImportJob("import.nt"), StorePermissions.TransactionUpdate);
+            AssertPermissionRequired(JobRequestObject.CreateImportJob("import.nt", "http://some/graph/uri"), StorePermissions.TransactionUpdate);
+        }
+
+        #endregion
+
+        #region SPARQL Update
+        [Test]
         public void TestPostSparqlUpdateJob()
         {
             // Setup
@@ -166,6 +195,15 @@ namespace BrightstarDB.Server.Modules.Tests
             TestBadPost("/foo/jobs", "{ JobType: \"SparqlUpdate\", JobParameters: { UpdateExpression: \"\" } }");
         }
 
+        [Test]
+        public void TestPostSparqlUpdateJobRequiresSparqlUpdatePermissions()
+        {
+            AssertPermissionRequired(JobRequestObject.CreateSparqlUpdateJob("update expression"), StorePermissions.SparqlUpdate);
+        }
+
+        #endregion
+
+        #region Update Transaction
         [Test]
         public void TestPostTransactionJob()
         {
@@ -254,13 +292,30 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         [Test]
+        public void TestPostTransactionRequiresTransactionalUpdatePermission()
+        {
+            AssertPermissionRequired(JobRequestObject.CreateTransactionJob("pre", "del", "ins"), StorePermissions.TransactionUpdate);
+            AssertPermissionRequired(JobRequestObject.CreateTransactionJob("pre", "del", "ins", "http://some/graph/uri"), StorePermissions.TransactionUpdate);
+        }
+
+        #endregion
+
+        #region Stats Update
+        [Test]
         public void TestPostUpdateStatsJob()
         {
             TestValidPost("/foo/jobs", JobRequestObject.CreateUpdateStatsJob(),
                           (b, m) => b.Setup(s => s.UpdateStatistics("foo")).Returns(m.Object).Verifiable());
         }
 
-        
+        [Test]
+        public void TestPostUpdateStatsJobRequiresAdminPermissions()
+        {
+            AssertPermissionRequired(JobRequestObject.CreateUpdateStatsJob(), StorePermissions.Admin);
+        }
+        #endregion
+
+        #region Re-execute Transaction
         [Test]
         public void TestPostRepeatTransactionJob()
         {
@@ -277,6 +332,14 @@ namespace BrightstarDB.Server.Modules.Tests
                               });
         }
 
+        [Test]
+        public void TestPostRepeatTransactionJobRequiresAdminPermissions()
+        {
+            AssertPermissionRequired(JobRequestObject.CreateRepeatTransactionJob(Guid.Empty), StorePermissions.Admin);
+        }
+        #endregion
+
+        #region Snapshot Job
         [Test]
         public void TestPostSnapshotJob()
         {
@@ -299,6 +362,35 @@ namespace BrightstarDB.Server.Modules.Tests
                            .Returns(m.Object)
                            .Verifiable());
             
+        }
+
+        [Test]
+        public void TestPostSnapshotJobRequiresAdminPermissions()
+        {
+            AssertPermissionRequired(JobRequestObject.CreateSnapshotJob("bar", "AppendOnly", 123), StorePermissions.Admin);
+            AssertPermissionRequired(JobRequestObject.CreateSnapshotJob("bletch", "Rewrite"), StorePermissions.Admin);
+        }
+        #endregion
+
+        private void AssertPermissionRequired(JobRequestObject jobRequest, StorePermissions witheldPermission)
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var permissionsService = new Mock<IStorePermissionsProvider>();
+            permissionsService.Setup(s => s.GetStorePermissions(null, "foo"))
+                              .Returns(StorePermissions.All ^ witheldPermission)
+                              .Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissionsService.Object));
+
+            // Execute
+            var response = app.Post("/foo/jobs", with =>
+            {
+                with.Accept(MediaRange.FromString("application/json"));
+                with.JsonBody(jobRequest);
+            });
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            permissionsService.Verify();
         }
 
         private static void TestBadPost(string toUrl, string jsonString)

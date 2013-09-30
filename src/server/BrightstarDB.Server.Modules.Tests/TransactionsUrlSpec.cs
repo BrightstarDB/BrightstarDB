@@ -117,6 +117,39 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(transaction, Has.Property("Status").EqualTo("CompletedOk"));
         }
 
+        [Test]
+        public void TestGetTransactionsRequiresViewHistoryPermissions()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var permissions = new Mock<IStorePermissionsProvider>();
+            permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.ViewHistory)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
+
+            // Execute
+            var response = app.Get("/foo/transactions", with => with.Accept(Json));
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            permissions.Verify();
+        }
+
+        [Test]
+        public void TestGetTransactionsByJobRequiresViewHistoryPermissions()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var permissions = new Mock<IStorePermissionsProvider>();
+            permissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.ViewHistory)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
+
+            // Execute
+            var response = app.Get("/foo/transactions/byjob/6100E798-EDB4-457B-AE33-640EF64BFA18", with => with.Accept(Json));
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            permissions.Verify();
+            
+        }
+
         private static IEnumerable<ITransactionInfo> MockTransactionInfo(int count)
         {
             var ret = new List<ITransactionInfo>();

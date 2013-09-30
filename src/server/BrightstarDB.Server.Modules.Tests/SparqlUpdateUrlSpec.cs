@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BrightstarDB.Client;
+﻿using BrightstarDB.Client;
 using Moq;
 using NUnit.Framework;
 using Nancy;
@@ -74,6 +69,21 @@ namespace BrightstarDB.Server.Modules.Tests
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
             brightstar.Verify();
+        }
+
+        [Test]
+        public void TestRequiresSparqlUpdatePermissions()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var permissions = new Mock<IStorePermissionsProvider>();
+            permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.SparqlUpdate)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
+
+            var response = app.Post("/foo/update", with => with.FormValue("update", "update expression"));
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            permissions.Verify();
+
         }
     }
 }

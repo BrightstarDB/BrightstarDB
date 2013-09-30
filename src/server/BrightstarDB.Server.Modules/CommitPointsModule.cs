@@ -15,8 +15,10 @@ namespace BrightstarDB.Server.Modules
     {
         private const int DefaultPageSize = 10;
 
-        public CommitPointsModule(IBrightstarService brightstarService)
+        public CommitPointsModule(IBrightstarService brightstarService, IStorePermissionsProvider permissionsProvider)
         {
+            this.RequiresBrightstarStorePermission(permissionsProvider, get:StorePermissions.ViewHistory, post:StorePermissions.Admin);
+
             Get["/{storeName}/commits"] = parameters =>
                 {
                     int skip = Request.Query["skip"].TryParse<int>(0);

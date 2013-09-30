@@ -6,8 +6,10 @@ namespace BrightstarDB.Server.Modules
 {
     public class StoreModule:NancyModule
     {
-        public StoreModule(IBrightstarService brightstarService)
+        public StoreModule(IBrightstarService brightstarService, IStorePermissionsProvider storePermissionsProvider)
         {
+            this.RequiresBrightstarStorePermission(storePermissionsProvider, StorePermissions.Query);
+
             Get["/{storeName}"] = parameters =>
                 {
 

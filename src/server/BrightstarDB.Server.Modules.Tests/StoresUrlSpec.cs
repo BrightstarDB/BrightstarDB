@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Storage;
@@ -11,7 +8,6 @@ using NUnit.Framework;
 using Nancy;
 using Nancy.Responses.Negotiation;
 using Nancy.Testing;
-using Nancy.Testing.Fakes;
 using Moq;
 
 namespace BrightstarDB.Server.Modules.Tests
@@ -19,20 +15,35 @@ namespace BrightstarDB.Server.Modules.Tests
     [TestFixture]
     public class StoresUrlSpec
     {
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-            FakeRootPathProvider.RootPath = Path.GetDirectoryName(typeof(StoresUrlSpec).Assembly.Location);
-        }
-
+        
         [Test]
         public void TestGetReturnsOk()
         {
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
-            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object));
+            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
+                                          new PassAllStorePermissionsProvider(true),
+                                          new PassAllSystemPermissionsProvider(SystemPermissions.ListStores)));
+
             var response = app.Get("/", c=>c.Accept(MediaRange.FromString("application/json")));
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test]
+        public void TestGetRequiresListStoresPermissions()
+        {
+            // Setup
+            var brightstar = new Mock<IBrightstarService>();
+            var systemPermissions = new Mock<ISystemPermissionsProvider>();
+            systemPermissions.Setup(s=>s.HasPermissions(null, SystemPermissions.ListStores)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(true), systemPermissions.Object));
+
+            // Execute
+            var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            systemPermissions.Verify();
         }
 
         [Test]
@@ -41,7 +52,10 @@ namespace BrightstarDB.Server.Modules.Tests
             // Setup
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.ListStores()).Returns(new string[] {"store1", "store2", "store3"});
-            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object));
+            var app =
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
+                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllSystemPermissionsProvider(SystemPermissions.ListStores)));
 
             // Execute
             var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
@@ -65,7 +79,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.DoesStoreExist("foo")).Returns(false);
             mockBrightstar.Setup(s => s.CreateStore("foo", PersistenceType.AppendOnly)).Verifiable("Expected CreateStore to be called");
-            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object));
+            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new PassAllStorePermissionsProvider(true), new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
 
             // Execute
             var response = app.Post("/", with =>
@@ -92,7 +106,10 @@ namespace BrightstarDB.Server.Modules.Tests
             // Setup
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true);
-            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object));
+            var app =
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
+                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
             
             // Execute
             var response = app.Post("/", with =>
@@ -110,7 +127,10 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             // Setup
             var mockBrightstar = new Mock<IBrightstarService>();
-            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object));
+            var app =
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
+                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
 
             // Execute
             var response = app.Post("/", with =>
@@ -129,7 +149,10 @@ namespace BrightstarDB.Server.Modules.Tests
             // Setup
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.CreateStore("/invalid/store_name")).Throws<ArgumentException>();
-            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object));
+            var app =
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
+                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
 
             // Execute
             var response = app.Post("/", with =>
@@ -149,7 +172,10 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.DoesStoreExist("foo")).Returns(false);
             mockBrightstar.Setup(s => s.CreateStore("foo")).Verifiable();
-            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object));
+            var app =
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
+                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
 
             // Execute
             var response = app.Post("/", with =>
@@ -167,6 +193,27 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(responseContent, Is.Not.Null);
             Assert.That(responseContent, Has.Property("Name").EqualTo("foo"));
             Assert.That(responseContent, Has.Property("Jobs").EqualTo("foo/jobs"));            
+        }
+
+        [Test]
+        public void TestPostRequiresCreateStorePermission()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var systemPermissions = new Mock<ISystemPermissionsProvider>();
+            systemPermissions.Setup(s=>s.HasPermissions(null, SystemPermissions.CreateStore)).Returns(false).Verifiable();
+            var app =
+                new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(true),
+                                                      systemPermissions.Object));
+            // Execute
+            var response = app.Post("/", with =>
+            {
+                with.Accept(MediaRange.FromString("application/json"));
+                with.JsonBody(new CreateStoreRequestObject("foo"));
+                with.AjaxRequest();
+            });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            systemPermissions.Verify();
         }
     }
 }

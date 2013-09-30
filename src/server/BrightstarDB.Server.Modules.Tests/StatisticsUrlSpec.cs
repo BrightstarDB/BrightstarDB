@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using Moq;
@@ -11,11 +10,29 @@ using Nancy.Testing;
 
 namespace BrightstarDB.Server.Modules.Tests
 {
-    [TestFixture]
-    public class StatisticsUrlSpec
+    public class StatisticsUrlSpecBase
     {
-        private static readonly MediaRange Json = MediaRange.FromString("application/json");
+        protected static readonly MediaRange Json = MediaRange.FromString("application/json");
+        protected IEnumerable<IStoreStatistics> MockStatistics(int count)
+        {
+            var ret = new List<IStoreStatistics>();
+            for (var i = 0; i < count; i++)
+            {
+                var mock = new Mock<IStoreStatistics>();
+                mock.Setup(s => s.CommitId).Returns((ulong) (count - i)*10);
+                mock.Setup(s => s.CommitTimestamp).Returns(DateTime.UtcNow.AddHours((count - i)*-1));
+                mock.Setup(s => s.TotalTripleCount).Returns((ulong)(count - i)*1000);
+                mock.Setup(s => s.PredicateTripleCounts)
+                    .Returns(new Dictionary<string, ulong> {{"http://some/predicate", (ulong) (count - i)*1000}});
+                ret.Add(mock.Object);
+            }
+            return ret;
+        }
+    }
 
+    [TestFixture]
+    public class StatisticsUrlSpec : StatisticsUrlSpecBase
+    {
         [Test]
         public void TestGetStatisticsWithoutOptions()
         {
@@ -155,38 +172,20 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         [Test]
-        public void TestGetLatestStatistics()
+        public void TestGetStatisticsRequiresViewHistoryPermissions()
         {
-            // Setup
             var brightstar = new Mock<IBrightstarService>();
-            brightstar.Setup(s=>s.GetStatistics("foo")).Returns(MockStatistics(1).First()).Verifiable();
-            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+            var permissions = new Mock<IStorePermissionsProvider>();
+            permissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Query)).Returns(true); // to ensure that we are explicitly NOT using Read permissions
+            permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.ViewHistory)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 
             // Execute
-            var response = app.Get("/foo/statistics/latest", with => with.Accept(Json));
+            var response = app.Get("/foo/statistics", with => with.Accept(Json));
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var result = response.Body.DeserializeJson<StatisticsResponseObject>();
-            Console.WriteLine(response.Headers["Link"]);
-            Assert.That(result, Is.Not.Null);
-            brightstar.Verify();
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
         }
-
-        private IEnumerable<IStoreStatistics> MockStatistics(int count)
-        {
-            var ret = new List<IStoreStatistics>();
-            for (var i = 0; i < count; i++)
-            {
-                var mock = new Mock<IStoreStatistics>();
-                mock.Setup(s => s.CommitId).Returns((ulong) (count - i)*10);
-                mock.Setup(s => s.CommitTimestamp).Returns(DateTime.UtcNow.AddHours((count - i)*-1));
-                mock.Setup(s => s.TotalTripleCount).Returns((ulong)(count - i)*1000);
-                mock.Setup(s => s.PredicateTripleCounts)
-                    .Returns(new Dictionary<string, ulong> {{"http://some/predicate", (ulong) (count - i)*1000}});
-                ret.Add(mock.Object);
-            }
-            return ret;
-        } 
     }
+
 }

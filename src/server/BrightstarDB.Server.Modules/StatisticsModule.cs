@@ -14,8 +14,9 @@ namespace BrightstarDB.Server.Modules
     {
         private const int DefaultPageSize = 10;
 
-        public StatisticsModule(IBrightstarService brightstarService)
+        public StatisticsModule(IBrightstarService brightstarService, IStorePermissionsProvider storePermissionsProvider)
         {
+            this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.ViewHistory);
             Get["/{storeName}/statistics"] = parameters =>
                 {
                     var request = this.Bind<StatisticsRequestObject>();
@@ -32,23 +33,6 @@ namespace BrightstarDB.Server.Modules
 
                     return Negotiate.WithPagedList(stats.Select(MakeResponseModel), request.Skip, DefaultPageSize,
                                                    DefaultPageSize, resourceUri);
-                };
-
-            Get["/{storeName}/statistics/latest"] = parameters =>
-                {
-                    var latest = brightstarService.GetStatistics(parameters["storeName"]);
-                    return MakeResponseModel(latest);
-                };
-        }
-
-        private static StatisticsResponseObject MakeResponseModel(IStoreStatistics stats)
-        {
-            return new StatisticsResponseObject
-                {
-                    CommitId = stats.CommitId,
-                    CommitTimestamp = stats.CommitTimestamp,
-                    PredicateTripleCounts = new Dictionary<string, ulong>(stats.PredicateTripleCounts),
-                    TotalTripleCount = stats.TotalTripleCount
                 };
         }
 
@@ -68,6 +52,17 @@ namespace BrightstarDB.Server.Modules
                 return String.Format("?earliest={0}", requestObject.Earliest.Value.ToString("s"));
             }
             return String.Empty;
+        }
+
+        private static StatisticsResponseObject MakeResponseModel(IStoreStatistics stats)
+        {
+            return new StatisticsResponseObject
+            {
+                CommitId = stats.CommitId,
+                CommitTimestamp = stats.CommitTimestamp,
+                PredicateTripleCounts = stats.PredicateTripleCounts == null ? new Dictionary<string, ulong>() : new Dictionary<string, ulong>(stats.PredicateTripleCounts),
+                TotalTripleCount = stats.TotalTripleCount
+            };
         }
     }
 }

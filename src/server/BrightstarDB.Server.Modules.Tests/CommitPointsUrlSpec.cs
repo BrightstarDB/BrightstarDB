@@ -17,17 +17,38 @@ namespace BrightstarDB.Server.Modules.Tests
         private static readonly MediaRange Json = MediaRange.FromString("application/json");
 
         [Test]
+        [Description("Retrieving commit points requires ViewHistory privileges")]
+        public void TestViewHistoryPermissionRequired()
+        {
+            var commitPoints = MockCommitPoints("foo", 1);
+            var brightstarService = SetupBrightstarService(commitPoints);
+            var permissionsService = new Mock<IStorePermissionsProvider>();
+            permissionsService.Setup(x=>x.HasStorePermission(null, "foo", StorePermissions.ViewHistory)).Returns(false).Verifiable();
+            var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object, permissionsService.Object));
+
+            // Execute
+            var response = browser.Get("/foo/commits", with => with.Accept(Json));
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            permissionsService.Verify();
+        }
+
+        private static Mock<IBrightstarService> SetupBrightstarService(IEnumerable<ICommitPointInfo> commitPoints)
+        {
+            var brightstarService = new Mock<IBrightstarService>();
+            brightstarService.Setup(s=>s.GetCommitPoints("foo", It.IsAny<int>(), It.IsAny<int>()))
+                .Returns((string storeName, int skip, int take)=> commitPoints.Skip(skip).Take(take))
+                .Verifiable();
+            return brightstarService;
+        }
+
+        [Test]
         [Description("Test retrieving the first page of commit point info")]
         public void TestGetCommitPoints()
         {
             var commitPoints = MockCommitPoints("foo", 10);
-            var brightstarService = new Mock<IBrightstarService>();
-            brightstarService.Setup(s => s.GetCommitPoints("foo", It.IsAny<int>(), It.IsAny<int>()))
-                             .Returns((string storeName, int skip, int take) =>
-                                 {
-                                     return commitPoints.Skip(skip).Take(take);
-                                 })
-                             .Verifiable();
+            var brightstarService = SetupBrightstarService(commitPoints);
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object));
 
             // Execute
@@ -53,10 +74,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestCommitPointResultHasNextPageLink()
         {
             var commitPoints = MockCommitPoints("foo", 11);
-            var brightstarService = new Mock<IBrightstarService>();
-            brightstarService.Setup(s => s.GetCommitPoints("foo", It.IsAny<int>(), It.IsAny<int>()))
-                             .Returns((string storeName, int skip, int take) => commitPoints.Skip(skip).Take(take))
-                             .Verifiable();
+            var brightstarService = SetupBrightstarService(commitPoints);
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object));
 
             // Execute
@@ -78,10 +96,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestCommitPointResultHasPreviousAndFirstPageLink()
         {
             var commitPoints = MockCommitPoints("foo", 21);
-            var brightstarService = new Mock<IBrightstarService>();
-            brightstarService.Setup(s => s.GetCommitPoints("foo", It.IsAny<int>(), It.IsAny<int>()))
-                             .Returns((string storeName, int skip, int take) => commitPoints.Skip(skip).Take(take))
-                             .Verifiable();
+            var brightstarService = SetupBrightstarService(commitPoints);
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object));
 
             // Execute
@@ -107,10 +122,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestFinalPageOfCommitPointResultsHasNoNextPageLink()
         {
             var commitPoints = MockCommitPoints("foo", 21);
-            var brightstarService = new Mock<IBrightstarService>();
-            brightstarService.Setup(s => s.GetCommitPoints("foo", It.IsAny<int>(), It.IsAny<int>()))
-                             .Returns((string storeName, int skip, int take) => commitPoints.Skip(skip).Take(take))
-                             .Verifiable();
+            var brightstarService = SetupBrightstarService(commitPoints);
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object));
 
             // Execute
@@ -182,6 +194,24 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstarService.Verify();
         }
 
+        [Test]
+        public void TestPostCommitRequiresAdministratorPrivileges()
+        {
+            var brightstarService = new Mock<IBrightstarService>();
+            var permissionsService = new Mock<IStorePermissionsProvider>();
+            permissionsService.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Admin)).Returns(false);
+
+            var app = new Browser(new FakeNancyBootstrapper(brightstarService.Object, permissionsService.Object));
+
+            var response = app.Post("/foo/commits", with =>
+            {
+                with.JsonBody(new CommitPointResponseObject { Id = 123, StoreName = "foo" });
+                with.Accept(Json);
+            });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+            permissionsService.Verify();
+        }
 
         [Test]
         public void TestPostCommitPointToRevert()
@@ -202,6 +232,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstarService.Verify();
         }
 
+        
         [Test]
         public void TestCannotRevertIfCommitPointNotFound()
         {

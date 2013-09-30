@@ -254,7 +254,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Get("/foo/commits/123/sparql", with =>
+            var response = app.Post("/foo/commits/123/sparql", with =>
             {
                 with.FormValue("query", "query");
                 with.Accept(SparqlXml);
@@ -263,6 +263,44 @@ namespace BrightstarDB.Server.Modules.Tests
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
             brightstar.Verify();
+        }
+
+        [Test]
+        public void TestGetRequiresQueryPermissions()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var permissions = new Mock<IStorePermissionsProvider>();
+            permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.Query)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
+
+            // Execute
+            var response = app.Get("/foo/sparql", with =>
+            {
+                with.Query("query", "query");
+                with.Accept(SparqlXml);
+            });
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        }
+
+        [Test]
+        public void TestPostRequiresQueryPermissions()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var permissions = new Mock<IStorePermissionsProvider>();
+            permissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Query)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
+
+            // Execute
+            var response = app.Post("/foo/sparql", with =>
+            {
+                with.FormValue("query", "query");
+                with.Accept(SparqlXml);
+            });
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
         }
 
         #region Helper Methods

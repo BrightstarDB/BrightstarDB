@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BrightstarDB.Client;
+﻿using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using Moq;
 using NUnit.Framework;
@@ -82,5 +77,36 @@ namespace BrightstarDB.Server.Modules.Tests
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
+
+        [Test]
+        public void TestGetRequiresReadPermissions()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var storePermissions = new Mock<IStorePermissionsProvider>();
+            storePermissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.Query)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, storePermissions.Object));
+
+            // Execute
+            var response = app.Get("/foo");
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        }
+
+        [Test]
+        public void TestHeadRequiresReadPermissions()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var storePermissions = new Mock<IStorePermissionsProvider>();
+            storePermissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Query)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, storePermissions.Object));
+
+            // Execute
+            var response = app.Head("/foo");
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        }
+
     }
 }
