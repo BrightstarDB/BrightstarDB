@@ -16,7 +16,7 @@ namespace BrightstarDB.Server.Modules
 
         public SparqlModule(IBrightstarService brightstarService, IStorePermissionsProvider permissionsProvider)
         {
-            this.RequiresBrightstarStorePermission(permissionsProvider, get:StorePermissions.Query, post:StorePermissions.Query);
+            this.RequiresBrightstarStorePermission(permissionsProvider, get:StorePermissions.Read, post:StorePermissions.Read);
             _brightstar = brightstarService;
 
             Get["/{storeName}/sparql"] = parameters =>

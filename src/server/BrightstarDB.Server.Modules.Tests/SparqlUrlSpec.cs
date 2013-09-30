@@ -266,11 +266,11 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         [Test]
-        public void TestGetRequiresQueryPermissions()
+        public void TestGetRequiresReadPermissions()
         {
             var brightstar = new Mock<IBrightstarService>();
             var permissions = new Mock<IStorePermissionsProvider>();
-            permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.Query)).Returns(false).Verifiable();
+            permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.Read)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 
             // Execute
@@ -285,11 +285,11 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         [Test]
-        public void TestPostRequiresQueryPermissions()
+        public void TestPostRequiresReadPermissions()
         {
             var brightstar = new Mock<IBrightstarService>();
             var permissions = new Mock<IStorePermissionsProvider>();
-            permissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Query)).Returns(false).Verifiable();
+            permissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Read)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 
             // Execute

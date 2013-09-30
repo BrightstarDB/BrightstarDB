@@ -8,7 +8,7 @@ namespace BrightstarDB.Server.Modules
     {
         public StoreModule(IBrightstarService brightstarService, IStorePermissionsProvider storePermissionsProvider)
         {
-            this.RequiresBrightstarStorePermission(storePermissionsProvider, StorePermissions.Query);
+            this.RequiresBrightstarStorePermission(storePermissionsProvider, StorePermissions.Read);
 
             Get["/{storeName}"] = parameters =>
                 {

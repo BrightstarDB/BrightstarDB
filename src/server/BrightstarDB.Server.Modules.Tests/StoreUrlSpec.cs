@@ -83,7 +83,7 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             var brightstar = new Mock<IBrightstarService>();
             var storePermissions = new Mock<IStorePermissionsProvider>();
-            storePermissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.Query)).Returns(false).Verifiable();
+            storePermissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.Read)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, storePermissions.Object));
 
             // Execute
@@ -98,7 +98,7 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             var brightstar = new Mock<IBrightstarService>();
             var storePermissions = new Mock<IStorePermissionsProvider>();
-            storePermissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Query)).Returns(false).Verifiable();
+            storePermissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Read)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, storePermissions.Object));
 
             // Execute

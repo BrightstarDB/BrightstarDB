@@ -9,7 +9,7 @@ namespace BrightstarDB.Server.Modules
     {
         public LatestStatisticsModule(IBrightstarService brightstarService, IStorePermissionsProvider storePermissionsProvider)
         {
-            this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.Query);
+            this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.Read);
             Get["/{storeName}/statistics/latest"] = parameters =>
                 {
                     var latest = brightstarService.GetStatistics(parameters["storeName"]);
