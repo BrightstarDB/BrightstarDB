@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
@@ -14,7 +15,7 @@ namespace BrightstarDB.Server.Modules
     {
         private readonly IBrightstarService _brightstar;
 
-        public SparqlModule(IBrightstarService brightstarService, IStorePermissionsProvider permissionsProvider)
+        public SparqlModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider permissionsProvider)
         {
             this.RequiresBrightstarStorePermission(permissionsProvider, get:StorePermissions.Read, post:StorePermissions.Read);
             _brightstar = brightstarService;

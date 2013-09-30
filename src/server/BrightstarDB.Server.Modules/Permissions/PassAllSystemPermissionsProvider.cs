@@ -1,8 +1,8 @@
 ﻿using Nancy.Security;
 
-namespace BrightstarDB.Server.Modules
+namespace BrightstarDB.Server.Modules.Permissions
 {
-    public class PassAllSystemPermissionsProvider : ISystemPermissionsProvider
+    public class PassAllSystemPermissionsProvider : AbstractSystemPermissionsProvider
     {
         private readonly SystemPermissions _anonymousPermissions;
 
@@ -11,15 +11,11 @@ namespace BrightstarDB.Server.Modules
             _anonymousPermissions = anonymousUserPermissions;
         }
 
-        public SystemPermissions GetPermissionsForUser(IUserIdentity user)
+        public override SystemPermissions GetPermissionsForUser(IUserIdentity user)
         {
             if (user == null) return _anonymousPermissions;
             return SystemPermissions.All;
         }
 
-        public bool HasPermissions(IUserIdentity user, SystemPermissions requestedPermissions)
-        {
-            return (GetPermissionsForUser(user) & requestedPermissions) == requestedPermissions;
-        }
     }
 }

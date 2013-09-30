@@ -1,8 +1,8 @@
 ﻿using Nancy.Security;
 
-namespace BrightstarDB.Server.Modules
+namespace BrightstarDB.Server.Modules.Permissions
 {
-    public class PassAllStorePermissionsProvider : IStorePermissionsProvider
+    public class PassAllStorePermissionsProvider : AbstractStorePermissionsProvider
     {
         private readonly bool _allowAnonymousAccess;
 
@@ -11,13 +11,13 @@ namespace BrightstarDB.Server.Modules
             _allowAnonymousAccess = allowAnonymousAccess;
         }
 
-        public bool HasStorePermission(IUserIdentity userIdentity, string storeName, StorePermissions permissionRequested)
+        public override bool HasStorePermission(IUserIdentity userIdentity, string storeName, StorePermissions permissionRequested)
         {
             if (userIdentity == null) return _allowAnonymousAccess;
             return true;
         }
 
-        public StorePermissions GetStorePermissions(IUserIdentity currentUser, string storeName)
+        public override StorePermissions GetStorePermissions(IUserIdentity currentUser, string storeName)
         {
             if (currentUser == null && !_allowAnonymousAccess) return StorePermissions.None;
             return StorePermissions.All;

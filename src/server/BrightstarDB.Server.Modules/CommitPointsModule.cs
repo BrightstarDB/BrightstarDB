@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
@@ -15,7 +16,7 @@ namespace BrightstarDB.Server.Modules
     {
         private const int DefaultPageSize = 10;
 
-        public CommitPointsModule(IBrightstarService brightstarService, IStorePermissionsProvider permissionsProvider)
+        public CommitPointsModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider permissionsProvider)
         {
             this.RequiresBrightstarStorePermission(permissionsProvider, get:StorePermissions.ViewHistory, post:StorePermissions.Admin);
 

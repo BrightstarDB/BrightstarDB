@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;
 using NUnit.Framework;
 using Nancy;
@@ -34,7 +35,7 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             // Setup
             var brightstar = new Mock<IBrightstarService>();
-            var systemPermissions = new Mock<ISystemPermissionsProvider>();
+            var systemPermissions = new Mock<AbstractSystemPermissionsProvider>();
             systemPermissions.Setup(s=>s.HasPermissions(null, SystemPermissions.ListStores)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(true), systemPermissions.Object));
 
@@ -199,7 +200,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestPostRequiresCreateStorePermission()
         {
             var brightstar = new Mock<IBrightstarService>();
-            var systemPermissions = new Mock<ISystemPermissionsProvider>();
+            var systemPermissions = new Mock<AbstractSystemPermissionsProvider>();
             systemPermissions.Setup(s=>s.HasPermissions(null, SystemPermissions.CreateStore)).Returns(false).Verifiable();
             var app =
                 new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(true),

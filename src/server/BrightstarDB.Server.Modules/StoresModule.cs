@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;
 using Nancy;
 using Nancy.ModelBinding;
@@ -14,7 +15,7 @@ namespace BrightstarDB.Server.Modules
 {
     public class StoresModule : NancyModule
     {
-        public StoresModule(IBrightstarService brightstarService, ISystemPermissionsProvider systemPermissionsProvider)
+        public StoresModule(IBrightstarService brightstarService, AbstractSystemPermissionsProvider systemPermissionsProvider)
         {
             this.RequiresBrightstarSystemPermission(systemPermissionsProvider, get:SystemPermissions.ListStores, post:SystemPermissions.CreateStore);
 

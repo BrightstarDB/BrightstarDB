@@ -1,6 +1,7 @@
 ﻿using System;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;
 using Nancy;
 using Nancy.ModelBinding;
@@ -10,7 +11,7 @@ namespace BrightstarDB.Server.Modules
 {
     public class JobsModule : NancyModule
     {
-        public JobsModule(IBrightstarService brightstarService, IStorePermissionsProvider permissionsProvider)
+        public JobsModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider permissionsProvider)
         {
             this.RequiresBrightstarStorePermissionData(permissionsProvider);
 

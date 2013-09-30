@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Moq;
 using NUnit.Framework;
 using Nancy;
@@ -22,7 +23,7 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             var commitPoints = MockCommitPoints("foo", 1);
             var brightstarService = SetupBrightstarService(commitPoints);
-            var permissionsService = new Mock<IStorePermissionsProvider>();
+            var permissionsService = new Mock<AbstractStorePermissionsProvider>();
             permissionsService.Setup(x=>x.HasStorePermission(null, "foo", StorePermissions.ViewHistory)).Returns(false).Verifiable();
             var browser = new Browser(new FakeNancyBootstrapper(brightstarService.Object, permissionsService.Object));
 
@@ -198,7 +199,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestPostCommitRequiresAdministratorPrivileges()
         {
             var brightstarService = new Mock<IBrightstarService>();
-            var permissionsService = new Mock<IStorePermissionsProvider>();
+            var permissionsService = new Mock<AbstractStorePermissionsProvider>();
             permissionsService.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Admin)).Returns(false);
 
             var app = new Browser(new FakeNancyBootstrapper(brightstarService.Object, permissionsService.Object));

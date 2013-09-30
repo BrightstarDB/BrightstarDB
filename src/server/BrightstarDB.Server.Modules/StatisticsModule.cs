@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.ModelBinding;
 
@@ -14,7 +15,7 @@ namespace BrightstarDB.Server.Modules
     {
         private const int DefaultPageSize = 10;
 
-        public StatisticsModule(IBrightstarService brightstarService, IStorePermissionsProvider storePermissionsProvider)
+        public StatisticsModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider storePermissionsProvider)
         {
             this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.ViewHistory);
             Get["/{storeName}/statistics"] = parameters =>

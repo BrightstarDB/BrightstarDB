@@ -2,6 +2,7 @@
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Moq;
 using NUnit.Framework;
 using Nancy;
@@ -35,7 +36,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestGetLatestStatisticsRequiresQueryPermisions()
         {
             var brightstar = new Mock<IBrightstarService>();
-            var permissions = new Mock<IStorePermissionsProvider>();
+            var permissions = new Mock<AbstractStorePermissionsProvider>();
             permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.Read)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 

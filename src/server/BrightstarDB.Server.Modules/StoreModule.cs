@@ -1,12 +1,13 @@
 ﻿using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 
 namespace BrightstarDB.Server.Modules
 {
     public class StoreModule:NancyModule
     {
-        public StoreModule(IBrightstarService brightstarService, IStorePermissionsProvider storePermissionsProvider)
+        public StoreModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider storePermissionsProvider)
         {
             this.RequiresBrightstarStorePermission(storePermissionsProvider, StorePermissions.Read);
 

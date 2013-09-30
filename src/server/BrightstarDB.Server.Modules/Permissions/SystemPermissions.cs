@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BrightstarDB.Server.Modules
+namespace BrightstarDB.Server.Modules.Permissions
 {
     [Flags]
     public enum SystemPermissions

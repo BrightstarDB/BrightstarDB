@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 
 namespace BrightstarDB.Server.Modules
 {
     public class LatestStatisticsModule : NancyModule
     {
-        public LatestStatisticsModule(IBrightstarService brightstarService, IStorePermissionsProvider storePermissionsProvider)
+        public LatestStatisticsModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider storePermissionsProvider)
         {
             this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.Read);
             Get["/{storeName}/statistics/latest"] = parameters =>

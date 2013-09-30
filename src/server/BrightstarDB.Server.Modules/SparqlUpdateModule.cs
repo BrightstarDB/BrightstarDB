@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
@@ -11,7 +12,7 @@ namespace BrightstarDB.Server.Modules
     {
         private static readonly MediaRange SparqlRequest = MediaRange.FromString("application/sparql-update");
 
-        public SparqlUpdateModule(IBrightstarService brightstarService, IStorePermissionsProvider permissionsProvider)
+        public SparqlUpdateModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider permissionsProvider)
         {
             this.RequiresBrightstarStorePermission(permissionsProvider, post:StorePermissions.SparqlUpdate);
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Moq;
 using NUnit.Framework;
 using Nancy;
@@ -175,7 +176,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestGetStatisticsRequiresViewHistoryPermissions()
         {
             var brightstar = new Mock<IBrightstarService>();
-            var permissions = new Mock<IStorePermissionsProvider>();
+            var permissions = new Mock<AbstractStorePermissionsProvider>();
             permissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Read)).Returns(true); // to ensure that we are explicitly NOT using Read permissions
             permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.ViewHistory)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));

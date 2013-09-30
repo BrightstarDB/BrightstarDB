@@ -1,4 +1,5 @@
 ﻿using BrightstarDB.Client;
+using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 
 namespace BrightstarDB.Server.Modules.Tests
@@ -6,8 +7,8 @@ namespace BrightstarDB.Server.Modules.Tests
     public class FakeNancyBootstrapper : DefaultNancyBootstrapper
     {
         private readonly IBrightstarService _brightstarService;
-        private readonly IStorePermissionsProvider _storePermissionsProvider;
-        private readonly ISystemPermissionsProvider _systemPermissionsProvider;
+        private readonly AbstractStorePermissionsProvider _storePermissionsProvider;
+        private readonly AbstractSystemPermissionsProvider _systemPermissionsProvider;
 
         public FakeNancyBootstrapper(IBrightstarService brightstarService) : this(
             brightstarService, new PassAllStorePermissionsProvider(true))
@@ -15,15 +16,15 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         public FakeNancyBootstrapper(IBrightstarService brightstarService,
-                                     IStorePermissionsProvider storePermissionsProvider)
+                                     AbstractStorePermissionsProvider storePermissionsProvider)
             : this(brightstarService, storePermissionsProvider, new PassAllSystemPermissionsProvider())
         {
             
         }
 
         public FakeNancyBootstrapper(IBrightstarService brightstarService,
-                                     IStorePermissionsProvider storePermissionsProvider,
-            ISystemPermissionsProvider systemPermissionsProvider)
+                                     AbstractStorePermissionsProvider storePermissionsProvider,
+            AbstractSystemPermissionsProvider systemPermissionsProvider)
         {
             _brightstarService = brightstarService;
             _storePermissionsProvider = storePermissionsProvider;
@@ -34,7 +35,7 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             base.ConfigureApplicationContainer(container);
             container.Register<IBrightstarService>(_brightstarService);
-            container.Register<IStorePermissionsProvider>(_storePermissionsProvider);
+            container.Register<AbstractStorePermissionsProvider>(_storePermissionsProvider);
             container.Register(_systemPermissionsProvider);
         }
     }

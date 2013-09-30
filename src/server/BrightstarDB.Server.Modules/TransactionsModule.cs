@@ -2,6 +2,7 @@
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.ModelBinding;
 
@@ -11,7 +12,7 @@ namespace BrightstarDB.Server.Modules
     {
         private const int DefaultPageSize = 10;
 
-        public TransactionsModule(IBrightstarService brightstarService, IStorePermissionsProvider storePermissionsProvider)
+        public TransactionsModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider storePermissionsProvider)
         {
             this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.ViewHistory);
 

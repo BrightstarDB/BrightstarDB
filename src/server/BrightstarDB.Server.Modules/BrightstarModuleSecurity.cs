@@ -1,11 +1,12 @@
-﻿using Nancy;
+﻿using BrightstarDB.Server.Modules.Permissions;
+using Nancy;
 
 namespace BrightstarDB.Server.Modules
 {
     public static class BrightstarModuleSecurity
     {
         public static void RequiresBrightstarStorePermission(this NancyModule module,
-            IStorePermissionsProvider permissionsProvider, StorePermissions get = StorePermissions.None, StorePermissions post = StorePermissions.None, StorePermissions delete = StorePermissions.None)
+            AbstractStorePermissionsProvider permissionsProvider, StorePermissions get = StorePermissions.None, StorePermissions post = StorePermissions.None, StorePermissions delete = StorePermissions.None)
         {
             module.Before.AddItemToEndOfPipeline(ctx => RequiresAuthorization(ctx, permissionsProvider, get, post, delete));
         }
@@ -15,13 +16,13 @@ namespace BrightstarDB.Server.Modules
         /// with the store permissions during the Before module pipeline.
         /// </summary>
         /// <param name="module">The module requesting permission data</param>
-        public static void RequiresBrightstarStorePermissionData(this NancyModule module, IStorePermissionsProvider permissionsProvider)
+        public static void RequiresBrightstarStorePermissionData(this NancyModule module, AbstractStorePermissionsProvider permissionsProvider)
         {
             module.Before.AddItemToEndOfPipeline(ctx=>RequiresPermissionData(ctx,permissionsProvider));
         }
 
         public static void RequiresBrightstarSystemPermission(this NancyModule module,
-                                                              ISystemPermissionsProvider permissionsProvider,
+                                                              AbstractSystemPermissionsProvider permissionsProvider,
                                                               SystemPermissions get = SystemPermissions.None,
                                                               SystemPermissions post = SystemPermissions.None)
         {
@@ -29,7 +30,7 @@ namespace BrightstarDB.Server.Modules
         }
 
         private static Response RequiresPermissionData(NancyContext context,
-                                                       IStorePermissionsProvider permissionsProvider)
+                                                       AbstractStorePermissionsProvider permissionsProvider)
         {
             var storeName = context.Parameters["storeName"];
             context.ViewBag["BrightstarStorePermissions"] = permissionsProvider.GetStorePermissions(context.CurrentUser,
@@ -37,7 +38,7 @@ namespace BrightstarDB.Server.Modules
             return null;
         }
 
-        private static Response RequiresAuthorization(NancyContext context, IStorePermissionsProvider permissionsProvider, StorePermissions get, StorePermissions post, StorePermissions delete)
+        private static Response RequiresAuthorization(NancyContext context, AbstractStorePermissionsProvider permissionsProvider, StorePermissions get, StorePermissions post, StorePermissions delete)
         {
             var permissionRequired = StorePermissions.None;
             
@@ -68,7 +69,7 @@ namespace BrightstarDB.Server.Modules
         }
 
         private static Response RequiresAuthorization(NancyContext context,
-                                                      ISystemPermissionsProvider permissionsProvider,
+                                                      AbstractSystemPermissionsProvider permissionsProvider,
                                                       SystemPermissions get, SystemPermissions post)
         {
             var permissionsRequired = SystemPermissions.None;

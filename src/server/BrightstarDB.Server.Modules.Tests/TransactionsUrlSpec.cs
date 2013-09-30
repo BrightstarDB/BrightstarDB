@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using Moq;
 using NUnit.Framework;
 using Nancy;
@@ -121,7 +122,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestGetTransactionsRequiresViewHistoryPermissions()
         {
             var brightstar = new Mock<IBrightstarService>();
-            var permissions = new Mock<IStorePermissionsProvider>();
+            var permissions = new Mock<AbstractStorePermissionsProvider>();
             permissions.Setup(s=>s.HasStorePermission(null, "foo", StorePermissions.ViewHistory)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 
@@ -137,7 +138,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestGetTransactionsByJobRequiresViewHistoryPermissions()
         {
             var brightstar = new Mock<IBrightstarService>();
-            var permissions = new Mock<IStorePermissionsProvider>();
+            var permissions = new Mock<AbstractStorePermissionsProvider>();
             permissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.ViewHistory)).Returns(false).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, permissions.Object));
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;
 using Moq;
 using NUnit.Framework;
@@ -375,7 +376,7 @@ namespace BrightstarDB.Server.Modules.Tests
         private void AssertPermissionRequired(JobRequestObject jobRequest, StorePermissions witheldPermission)
         {
             var brightstar = new Mock<IBrightstarService>();
-            var permissionsService = new Mock<IStorePermissionsProvider>();
+            var permissionsService = new Mock<AbstractStorePermissionsProvider>();
             permissionsService.Setup(s => s.GetStorePermissions(null, "foo"))
                               .Returns(StorePermissions.All ^ witheldPermission)
                               .Verifiable();
