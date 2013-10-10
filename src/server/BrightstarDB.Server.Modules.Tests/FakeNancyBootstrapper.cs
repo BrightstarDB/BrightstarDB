@@ -11,7 +11,7 @@ namespace BrightstarDB.Server.Modules.Tests
         private readonly AbstractSystemPermissionsProvider _systemPermissionsProvider;
 
         public FakeNancyBootstrapper(IBrightstarService brightstarService) : this(
-            brightstarService, new PassAllStorePermissionsProvider(true))
+            brightstarService, new PassAllStorePermissionsProvider(StorePermissions.All))
         {
         }
 

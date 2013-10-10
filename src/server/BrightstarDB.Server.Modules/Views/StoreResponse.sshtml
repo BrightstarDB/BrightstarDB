@@ -1,0 +1,24 @@
+﻿@Master['Layout']
+
+@Section['Content']
+
+	<nav class="breadcrumb">
+		<ul>
+			<li><a href="@Path['~/']">Home</a></li>
+			<li>Store: @Model.Name</li>
+		</ul>
+	</nav>
+
+	<h1>Store: @Model.Name</h1>
+
+	Currently available store operations are:
+	<ul>
+		<li><a href="@Model.SparqlQuery">SPARQL Query</a></li>
+		<li><a href="@Model.SparqlUpdate">SPARQL Update</a></li>
+		<li><a href="@Model.Jobs">Jobs</a></li>
+		<li><a href="@Model.Statistics">Statistics</a></li>
+		<li><a href="@Model.Commits">Commit History</a></li>
+		<li><a href="@Model.Transactions">Transaction History</a></li>
+	</ul>
+
+@EndSection

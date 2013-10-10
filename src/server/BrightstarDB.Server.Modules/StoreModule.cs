@@ -20,7 +20,7 @@ namespace BrightstarDB.Server.Modules
                         {
                             return HttpStatusCode.OK;
                         }
-                        return new StoreResponseObject(parameters["storeName"]);
+                        return new StoreResponseModel(parameters["storeName"]);
                     }
                     return HttpStatusCode.NotFound;
                 };

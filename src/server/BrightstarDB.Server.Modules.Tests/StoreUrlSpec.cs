@@ -25,7 +25,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var storeInfo = response.Body.DeserializeJson<StoreResponseObject>();
+            var storeInfo = response.Body.DeserializeJson<StoreResponseModel>();
             Assert.That(storeInfo, Is.Not.Null);
             Assert.That(storeInfo, Has.Property("Name").EqualTo("foo"));
             Assert.That(storeInfo, Has.Property("Jobs").EqualTo("foo/jobs"));

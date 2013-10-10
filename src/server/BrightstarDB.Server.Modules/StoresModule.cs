@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
@@ -22,13 +18,11 @@ namespace BrightstarDB.Server.Modules
             Get["/"] = parameters =>
                 {
                     var stores = brightstarService.ListStores();
-                    return stores.Select(s=>new StoreResponseObject(s));
+                    return new StoresResponseObject {Stores = stores.Select(s => new StoreResponseModel(s)).ToList()};
                 };
 
             Post["/"] = parameters =>
                 {
-                    var rdr = new StreamReader(this.Request.Body);
-                    var body = rdr.ReadToEnd();
                     var request = this.Bind<CreateStoreRequestObject>();
                     if (request == null || String.IsNullOrEmpty(request.StoreName))
                     {
@@ -58,7 +52,7 @@ namespace BrightstarDB.Server.Modules
                     {
                         return HttpStatusCode.BadRequest;   
                     }
-                    return new StoreResponseObject(request.StoreName);
+                    return new StoreResponseModel(request.StoreName);
                 };
         }
     }

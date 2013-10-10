@@ -4,22 +4,22 @@ namespace BrightstarDB.Server.Modules.Permissions
 {
     public class PassAllStorePermissionsProvider : AbstractStorePermissionsProvider
     {
-        private readonly bool _allowAnonymousAccess;
+        private readonly StorePermissions _anonymousPermissions;
 
-        public PassAllStorePermissionsProvider(bool allowAnonymousAccess)
+        public PassAllStorePermissionsProvider(StorePermissions anonymousPermissions = StorePermissions.None)
         {
-            _allowAnonymousAccess = allowAnonymousAccess;
+            _anonymousPermissions = anonymousPermissions;
         }
 
         public override bool HasStorePermission(IUserIdentity userIdentity, string storeName, StorePermissions permissionRequested)
         {
-            if (userIdentity == null) return _allowAnonymousAccess;
+            if (userIdentity == null) return (_anonymousPermissions & permissionRequested) == permissionRequested;
             return true;
         }
 
         public override StorePermissions GetStorePermissions(IUserIdentity currentUser, string storeName)
         {
-            if (currentUser == null && !_allowAnonymousAccess) return StorePermissions.None;
+            if (currentUser == null) return _anonymousPermissions;
             return StorePermissions.All;
         }
     }

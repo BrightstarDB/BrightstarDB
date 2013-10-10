@@ -1,0 +1,35 @@
+@Master['Layout']
+
+@Section['Content']
+
+	<nav class="breadcrumb">
+		<ul>
+			<li>Home</li>
+		</ul>
+	</nav>
+
+	<h1>Store List</h1>
+	<table class="items">
+		<thead>
+			<tr>
+				<td>Store Name</td>
+				<td>Actions</td>
+			</tr>
+		</thead>
+		<tbody>
+			@Each.Stores
+				<tr>
+					<td><a href="@Current.Name">@Current.Name</a></td>
+					<td>
+						<ul class="horizontal">
+							<li><a href="@Current.Commits">Commit History</a></li>
+							<li><a href="@Current.Jobs">Jobs</a></li>
+							<li><a href="@Current.Transactions">Transactions</a></li>
+							<li><a href="@Current.Statistics">Statistics</a></li>
+						</ul>
+					</td>
+				</tr>
+			@EndEach
+		</tbody>
+	</table>
+@EndSection

@@ -2,7 +2,7 @@
 
 namespace BrightstarDB.Server.Modules.Model
 {
-    public class StoreResponseObject
+    public class StoreResponseModel
     {
         /// <summary>
         /// Get or set the store name
@@ -29,9 +29,19 @@ namespace BrightstarDB.Server.Modules.Model
         /// </summary>
         public string Statistics { get; set; }
 
-        public StoreResponseObject(){}
+        /// <summary>
+        /// Get or set the relative path to the SPARQL query endpoint
+        /// </summary>
+        public string SparqlQuery { get; set; }
 
-        public StoreResponseObject(string storeName)
+        /// <summary>
+        /// Get or set the relative pat to the SPARQL update endpoint
+        /// </summary>
+        public string SparqlUpdate { get; set; }
+
+        public StoreResponseModel(){}
+
+        public StoreResponseModel(string storeName)
         {
             if (storeName == null) throw new ArgumentNullException("storeName");
             if (String.IsNullOrWhiteSpace(storeName)) throw new ArgumentException("storeName");
@@ -40,6 +50,8 @@ namespace BrightstarDB.Server.Modules.Model
             Jobs = String.Format("{0}/jobs", storeName);
             Transactions = String.Format("{0}/transactions", storeName);
             Statistics = String.Format("{0}/statistics", storeName);
+            SparqlQuery = String.Format("{0}/sparql", storeName);
+            SparqlUpdate = String.Format("{0}/update", storeName);
         }
     }
 }

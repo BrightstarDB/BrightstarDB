@@ -14,15 +14,15 @@ namespace BrightstarDB.Server.Modules.Tests
         [TestCase(null, ExpectedException = typeof(ArgumentNullException))]
         [TestCase("", ExpectedException = typeof(ArgumentException))]
         [TestCase(" ", ExpectedException = typeof(ArgumentException))]
-        public StoreResponseObject TestConstructorThrowsOnInvalidInput(string storeName)
+        public StoreResponseModel TestConstructorThrowsOnInvalidInput(string storeName)
         {
-            return new StoreResponseObject(storeName);
+            return new StoreResponseModel(storeName);
         }
 
         [Test]
         public void TestConstructorSetsAllFields()
         {
-            var o = new StoreResponseObject("storeName");
+            var o = new StoreResponseModel("storeName");
             Assert.That(o, Is.Not.Null);
             Assert.That(o, Has.Property("Name").EqualTo("storeName"));
             Assert.That(o, Has.Property("Commits").EqualTo("storeName/commits"));

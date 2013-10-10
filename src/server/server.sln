@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB", "..\core\Bri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.Modules.Tests", "BrightstarDB.Server.Modules.Tests\BrightstarDB.Server.Modules.Tests.csproj", "{523BB67E-CEB7-4144-AACB-AB5937F8872E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.Runner", "BrightstarDB.Server.Runner\BrightstarDB.Server.Runner.csproj", "{3911AEEA-5B8D-4129-9916-3A827E649CB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CloudDebug|Any CPU = CloudDebug|Any CPU
@@ -39,6 +41,14 @@ Global
 		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.Staging|Any CPU.ActiveCfg = Release|Any CPU
 		{523BB67E-CEB7-4144-AACB-AB5937F8872E}.Staging|Any CPU.Build.0 = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.CloudDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.CloudDebug|Any CPU.Build.0 = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Staging|Any CPU.ActiveCfg = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Staging|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

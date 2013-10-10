@@ -23,11 +23,24 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
             var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                          new PassAllStorePermissionsProvider(true),
+                                          new PassAllStorePermissionsProvider(StorePermissions.All),
                                           new PassAllSystemPermissionsProvider(SystemPermissions.ListStores)));
 
             var response = app.Get("/", c=>c.Accept(MediaRange.FromString("application/json")));
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test]
+        public void TestGetHtmlReturnsOk()
+        {
+            var mockBrightstar = new Mock<IBrightstarService>();
+            mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
+            var app =
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new PassAllStorePermissionsProvider(StorePermissions.All),
+                                                      new PassAllSystemPermissionsProvider(SystemPermissions.ListStores)));
+            var response = app.Get("/");
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Body.AsString(), Contains.Substring("Hello Stores"));
         }
 
         [Test]
@@ -37,7 +50,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var systemPermissions = new Mock<AbstractSystemPermissionsProvider>();
             systemPermissions.Setup(s=>s.HasPermissions(null, SystemPermissions.ListStores)).Returns(false).Verifiable();
-            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(true), systemPermissions.Object));
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(StorePermissions.All), systemPermissions.Object));
 
             // Execute
             var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
@@ -55,7 +68,7 @@ namespace BrightstarDB.Server.Modules.Tests
             mockBrightstar.Setup(s => s.ListStores()).Returns(new string[] {"store1", "store2", "store3"});
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
                                                       new PassAllSystemPermissionsProvider(SystemPermissions.ListStores)));
 
             // Execute
@@ -65,7 +78,7 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.ContentType, Contains.Substring("application/json"));
             Assert.That(response.Body, Is.Not.Null);
-            var responseContent = response.Body.DeserializeJson <List<StoreResponseObject>>();
+            var responseContent = response.Body.DeserializeJson <List<StoreResponseModel>>();
             Assert.That(responseContent, Is.Not.Null);
             Assert.That(responseContent.Count, Is.EqualTo(3));
             Assert.That(responseContent.Any(s=>s.Name.Equals("store1") && s.Jobs.Equals("store1/jobs")));
@@ -80,7 +93,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.DoesStoreExist("foo")).Returns(false);
             mockBrightstar.Setup(s => s.CreateStore("foo", PersistenceType.AppendOnly)).Verifiable("Expected CreateStore to be called");
-            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new PassAllStorePermissionsProvider(true), new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
+            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new PassAllStorePermissionsProvider(StorePermissions.All), new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
 
             // Execute
             var response = app.Post("/", with =>
@@ -95,7 +108,7 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.ContentType, Contains.Substring("application/json"));
             Assert.That(response.Body, Is.Not.Null);
-            var responseContent = response.Body.DeserializeJson<StoreResponseObject>();
+            var responseContent = response.Body.DeserializeJson<StoreResponseModel>();
             Assert.That(responseContent, Is.Not.Null);
             Assert.That(responseContent, Has.Property("Name").EqualTo("foo"));
             Assert.That(responseContent, Has.Property("Jobs").EqualTo("foo/jobs"));
@@ -109,7 +122,7 @@ namespace BrightstarDB.Server.Modules.Tests
             mockBrightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true);
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
                                                       new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
             
             // Execute
@@ -130,7 +143,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockBrightstar = new Mock<IBrightstarService>();
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
                                                       new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
 
             // Execute
@@ -152,7 +165,7 @@ namespace BrightstarDB.Server.Modules.Tests
             mockBrightstar.Setup(s => s.CreateStore("/invalid/store_name")).Throws<ArgumentException>();
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
                                                       new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
 
             // Execute
@@ -175,7 +188,7 @@ namespace BrightstarDB.Server.Modules.Tests
             mockBrightstar.Setup(s => s.CreateStore("foo")).Verifiable();
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(true),
+                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
                                                       new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
 
             // Execute
@@ -190,7 +203,7 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.ContentType, Contains.Substring("application/json"));
             Assert.That(response.Body, Is.Not.Null);
-            var responseContent = response.Body.DeserializeJson<StoreResponseObject>();
+            var responseContent = response.Body.DeserializeJson<StoreResponseModel>();
             Assert.That(responseContent, Is.Not.Null);
             Assert.That(responseContent, Has.Property("Name").EqualTo("foo"));
             Assert.That(responseContent, Has.Property("Jobs").EqualTo("foo/jobs"));            
@@ -203,7 +216,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var systemPermissions = new Mock<AbstractSystemPermissionsProvider>();
             systemPermissions.Setup(s=>s.HasPermissions(null, SystemPermissions.CreateStore)).Returns(false).Verifiable();
             var app =
-                new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(true),
+                new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(StorePermissions.All),
                                                       systemPermissions.Object));
             // Execute
             var response = app.Post("/", with =>
