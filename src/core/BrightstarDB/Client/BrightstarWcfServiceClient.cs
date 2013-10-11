@@ -450,180 +450,91 @@ namespace BrightstarDB.Client
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ListStores", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ListStoresResponse")]
         string[] ListStores();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ListStores", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ListStoresResponse")]
-        System.Threading.Tasks.Task<string[]> ListStoresAsync();
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/CreateStore", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/CreateStoreResponse")]
         void CreateStore(string storeName);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/CreateStore", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/CreateStoreResponse")]
-        System.Threading.Tasks.Task CreateStoreAsync(string storeName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/CreateStoreWithPersis" +
             "tenceType", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/CreateStoreWithPersis" +
             "tenceTypeResponse")]
         void CreateStoreWithPersistenceType(string storeName, BrightstarDB.Storage.PersistenceType persistenceType);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/CreateStoreWithPersis" +
-            "tenceType", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/CreateStoreWithPersis" +
-            "tenceTypeResponse")]
-        System.Threading.Tasks.Task CreateStoreWithPersistenceTypeAsync(string storeName, BrightstarDB.Storage.PersistenceType persistenceType);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/DeleteStore", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/DeleteStoreResponse")]
         void DeleteStore(string storeName);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/DeleteStore", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/DeleteStoreResponse")]
-        System.Threading.Tasks.Task DeleteStoreAsync(string storeName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/DoesStoreExist", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/DoesStoreExistRespons" +
             "e")]
         bool DoesStoreExist(string storeName);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/DoesStoreExist", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/DoesStoreExistRespons" +
-            "e")]
-        System.Threading.Tasks.Task<bool> DoesStoreExistAsync(string storeName);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQuery", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryResponse")]
         System.IO.Stream ExecuteQuery(string storeName, string queryExpression, string[] defaultGraphUris, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQuery", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryResponse")]
-        System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryAsync(string storeName, string queryExpression, string[] defaultGraphUris, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryOnCommitP" +
             "oint", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryOnCommitP" +
             "ointResponse")]
         System.IO.Stream ExecuteQueryOnCommitPoint(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string[] defaultGraphUris, string resultsMediaType);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryOnCommitP" +
-            "oint", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteQueryOnCommitP" +
-            "ointResponse")]
-        System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryOnCommitPointAsync(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string[] defaultGraphUris, string resultsMediaType);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteTransaction", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteTransactionRes" +
             "ponse")]
         BrightstarDB.Client.JobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteTransaction", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteTransactionRes" +
-            "ponse")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> ExecuteTransactionAsync(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetJobInfo", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetJobInfoResponse")]
         BrightstarDB.Client.JobInfo GetJobInfo(string storeName, string jobId);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetJobInfo", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetJobInfoResponse")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> GetJobInfoAsync(string storeName, string jobId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/StartImport", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/StartImportResponse")]
         BrightstarDB.Client.JobInfo StartImport(string store, string fileName, string graphUri);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/StartImport", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/StartImportResponse")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> StartImportAsync(string store, string fileName, string graphUri);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/StartExport", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/StartExportResponse")]
         BrightstarDB.Client.JobInfo StartExport(string store, string fileName, string graphUri);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/StartExport", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/StartExportResponse")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> StartExportAsync(string store, string fileName, string graphUri);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteUpdate", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteUpdateResponse" +
             "")]
         BrightstarDB.Client.JobInfo ExecuteUpdate(string store, string updateExpression);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteUpdate", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ExecuteUpdateResponse" +
-            "")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> ExecuteUpdateAsync(string store, string updateExpression);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ConsolidateStore", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ConsolidateStoreRespo" +
             "nse")]
         BrightstarDB.Client.JobInfo ConsolidateStore(string store);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ConsolidateStore", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ConsolidateStoreRespo" +
-            "nse")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> ConsolidateStoreAsync(string store);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPoints", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPointsRespon" +
             "se")]
         BrightstarDB.Client.CommitPointInfo[] GetCommitPoints(string storeName, int skip, int take);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPoints", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPointsRespon" +
-            "se")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.CommitPointInfo[]> GetCommitPointsAsync(string storeName, int skip, int take);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPointsInDate" +
             "Range", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPointsInDate" +
             "RangeResponse")]
         BrightstarDB.Client.CommitPointInfo[] GetCommitPointsInDateRange(string storeName, System.DateTime latest, System.DateTime earliest, int skip, int take);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPointsInDate" +
-            "Range", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPointsInDate" +
-            "RangeResponse")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.CommitPointInfo[]> GetCommitPointsInDateRangeAsync(string storeName, System.DateTime latest, System.DateTime earliest, int skip, int take);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPoint", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPointRespons" +
             "e")]
         BrightstarDB.Client.CommitPointInfo GetCommitPoint(string storeName, System.DateTime timestamp);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPoint", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetCommitPointRespons" +
-            "e")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.CommitPointInfo> GetCommitPointAsync(string storeName, System.DateTime timestamp);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/RevertToCommitPoint", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/RevertToCommitPointRe" +
             "sponse")]
         void RevertToCommitPoint(string storeName, BrightstarDB.Client.CommitPointInfo commitPoint);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/RevertToCommitPoint", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/RevertToCommitPointRe" +
-            "sponse")]
-        System.Threading.Tasks.Task RevertToCommitPointAsync(string storeName, BrightstarDB.Client.CommitPointInfo commitPoint);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetTransactions", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetTransactionsRespon" +
             "se")]
         BrightstarDB.Client.TransactionInfo[] GetTransactions(string storeName, int skip, int take);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetTransactions", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetTransactionsRespon" +
-            "se")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.TransactionInfo[]> GetTransactionsAsync(string storeName, int skip, int take);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ReExecuteTransaction", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ReExecuteTransactionR" +
             "esponse")]
         BrightstarDB.Client.JobInfo ReExecuteTransaction(string storeName, BrightstarDB.Client.TransactionInfo transactionInfo);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/ReExecuteTransaction", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/ReExecuteTransactionR" +
-            "esponse")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> ReExecuteTransactionAsync(string storeName, BrightstarDB.Client.TransactionInfo transactionInfo);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetStatistics", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetStatisticsResponse" +
             "")]
         BrightstarDB.Client.StoreStatistics GetStatistics(string storeName);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetStatistics", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetStatisticsResponse" +
-            "")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.StoreStatistics> GetStatisticsAsync(string storeName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetStatisticsInDateRa" +
             "nge", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetStatisticsInDateRa" +
             "ngeResponse")]
         BrightstarDB.Client.StoreStatistics[] GetStatisticsInDateRange(string storeName, System.DateTime latest, System.DateTime earlierst, int skip, int take);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/GetStatisticsInDateRa" +
-            "nge", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/GetStatisticsInDateRa" +
-            "ngeResponse")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.StoreStatistics[]> GetStatisticsInDateRangeAsync(string storeName, System.DateTime latest, System.DateTime earlierst, int skip, int take);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/UpdateStatistics", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/UpdateStatisticsRespo" +
             "nse")]
         BrightstarDB.Client.JobInfo UpdateStatistics(string storeName);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/UpdateStatistics", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/UpdateStatisticsRespo" +
-            "nse")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> UpdateStatisticsAsync(string storeName);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/CreateSnapshot", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/CreateSnapshotRespons" +
             "e")]
         BrightstarDB.Client.JobInfo CreateSnapshot(string sourceStoreName, string targetStoreName, BrightstarDB.Storage.PersistenceType storePersistenceType, BrightstarDB.Client.CommitPointInfo sourceCommitPoint);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://brightstardb.com/services/core/IBrightstarWcfService/CreateSnapshot", ReplyAction="http://brightstardb.com/services/core/IBrightstarWcfService/CreateSnapshotRespons" +
-            "e")]
-        System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> CreateSnapshotAsync(string sourceStoreName, string targetStoreName, BrightstarDB.Storage.PersistenceType storePersistenceType, BrightstarDB.Client.CommitPointInfo sourceCommitPoint);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -665,19 +576,9 @@ namespace BrightstarDB.Client
             return base.Channel.ListStores();
         }
         
-        public System.Threading.Tasks.Task<string[]> ListStoresAsync()
-        {
-            return base.Channel.ListStoresAsync();
-        }
-        
         public void CreateStore(string storeName)
         {
             base.Channel.CreateStore(storeName);
-        }
-        
-        public System.Threading.Tasks.Task CreateStoreAsync(string storeName)
-        {
-            return base.Channel.CreateStoreAsync(storeName);
         }
         
         public void CreateStoreWithPersistenceType(string storeName, BrightstarDB.Storage.PersistenceType persistenceType)
@@ -685,19 +586,9 @@ namespace BrightstarDB.Client
             base.Channel.CreateStoreWithPersistenceType(storeName, persistenceType);
         }
         
-        public System.Threading.Tasks.Task CreateStoreWithPersistenceTypeAsync(string storeName, BrightstarDB.Storage.PersistenceType persistenceType)
-        {
-            return base.Channel.CreateStoreWithPersistenceTypeAsync(storeName, persistenceType);
-        }
-        
         public void DeleteStore(string storeName)
         {
             base.Channel.DeleteStore(storeName);
-        }
-        
-        public System.Threading.Tasks.Task DeleteStoreAsync(string storeName)
-        {
-            return base.Channel.DeleteStoreAsync(storeName);
         }
         
         public bool DoesStoreExist(string storeName)
@@ -705,19 +596,9 @@ namespace BrightstarDB.Client
             return base.Channel.DoesStoreExist(storeName);
         }
         
-        public System.Threading.Tasks.Task<bool> DoesStoreExistAsync(string storeName)
-        {
-            return base.Channel.DoesStoreExistAsync(storeName);
-        }
-        
         public System.IO.Stream ExecuteQuery(string storeName, string queryExpression, string[] defaultGraphUris, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType)
         {
             return base.Channel.ExecuteQuery(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince, resultsMediaType);
-        }
-        
-        public System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryAsync(string storeName, string queryExpression, string[] defaultGraphUris, System.Nullable<System.DateTime> ifNotModifiedSince, string resultsMediaType)
-        {
-            return base.Channel.ExecuteQueryAsync(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince, resultsMediaType);
         }
         
         public System.IO.Stream ExecuteQueryOnCommitPoint(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string[] defaultGraphUris, string resultsMediaType)
@@ -725,19 +606,9 @@ namespace BrightstarDB.Client
             return base.Channel.ExecuteQueryOnCommitPoint(commitPoint, queryExpression, defaultGraphUris, resultsMediaType);
         }
         
-        public System.Threading.Tasks.Task<System.IO.Stream> ExecuteQueryOnCommitPointAsync(BrightstarDB.Client.CommitPointInfo commitPoint, string queryExpression, string[] defaultGraphUris, string resultsMediaType)
-        {
-            return base.Channel.ExecuteQueryOnCommitPointAsync(commitPoint, queryExpression, defaultGraphUris, resultsMediaType);
-        }
-        
         public BrightstarDB.Client.JobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri)
         {
             return base.Channel.ExecuteTransaction(storeName, preconditions, deletePatterns, insertData, defaultGraphUri);
-        }
-        
-        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> ExecuteTransactionAsync(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri)
-        {
-            return base.Channel.ExecuteTransactionAsync(storeName, preconditions, deletePatterns, insertData, defaultGraphUri);
         }
         
         public BrightstarDB.Client.JobInfo GetJobInfo(string storeName, string jobId)
@@ -745,19 +616,9 @@ namespace BrightstarDB.Client
             return base.Channel.GetJobInfo(storeName, jobId);
         }
         
-        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> GetJobInfoAsync(string storeName, string jobId)
-        {
-            return base.Channel.GetJobInfoAsync(storeName, jobId);
-        }
-        
         public BrightstarDB.Client.JobInfo StartImport(string store, string fileName, string graphUri)
         {
             return base.Channel.StartImport(store, fileName, graphUri);
-        }
-        
-        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> StartImportAsync(string store, string fileName, string graphUri)
-        {
-            return base.Channel.StartImportAsync(store, fileName, graphUri);
         }
         
         public BrightstarDB.Client.JobInfo StartExport(string store, string fileName, string graphUri)
@@ -765,19 +626,9 @@ namespace BrightstarDB.Client
             return base.Channel.StartExport(store, fileName, graphUri);
         }
         
-        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> StartExportAsync(string store, string fileName, string graphUri)
-        {
-            return base.Channel.StartExportAsync(store, fileName, graphUri);
-        }
-        
         public BrightstarDB.Client.JobInfo ExecuteUpdate(string store, string updateExpression)
         {
             return base.Channel.ExecuteUpdate(store, updateExpression);
-        }
-        
-        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> ExecuteUpdateAsync(string store, string updateExpression)
-        {
-            return base.Channel.ExecuteUpdateAsync(store, updateExpression);
         }
         
         public BrightstarDB.Client.JobInfo ConsolidateStore(string store)
@@ -785,19 +636,9 @@ namespace BrightstarDB.Client
             return base.Channel.ConsolidateStore(store);
         }
         
-        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> ConsolidateStoreAsync(string store)
-        {
-            return base.Channel.ConsolidateStoreAsync(store);
-        }
-        
         public BrightstarDB.Client.CommitPointInfo[] GetCommitPoints(string storeName, int skip, int take)
         {
             return base.Channel.GetCommitPoints(storeName, skip, take);
-        }
-        
-        public System.Threading.Tasks.Task<BrightstarDB.Client.CommitPointInfo[]> GetCommitPointsAsync(string storeName, int skip, int take)
-        {
-            return base.Channel.GetCommitPointsAsync(storeName, skip, take);
         }
         
         public BrightstarDB.Client.CommitPointInfo[] GetCommitPointsInDateRange(string storeName, System.DateTime latest, System.DateTime earliest, int skip, int take)
@@ -805,19 +646,9 @@ namespace BrightstarDB.Client
             return base.Channel.GetCommitPointsInDateRange(storeName, latest, earliest, skip, take);
         }
         
-        public System.Threading.Tasks.Task<BrightstarDB.Client.CommitPointInfo[]> GetCommitPointsInDateRangeAsync(string storeName, System.DateTime latest, System.DateTime earliest, int skip, int take)
-        {
-            return base.Channel.GetCommitPointsInDateRangeAsync(storeName, latest, earliest, skip, take);
-        }
-        
         public BrightstarDB.Client.CommitPointInfo GetCommitPoint(string storeName, System.DateTime timestamp)
         {
             return base.Channel.GetCommitPoint(storeName, timestamp);
-        }
-        
-        public System.Threading.Tasks.Task<BrightstarDB.Client.CommitPointInfo> GetCommitPointAsync(string storeName, System.DateTime timestamp)
-        {
-            return base.Channel.GetCommitPointAsync(storeName, timestamp);
         }
         
         public void RevertToCommitPoint(string storeName, BrightstarDB.Client.CommitPointInfo commitPoint)
@@ -825,19 +656,9 @@ namespace BrightstarDB.Client
             base.Channel.RevertToCommitPoint(storeName, commitPoint);
         }
         
-        public System.Threading.Tasks.Task RevertToCommitPointAsync(string storeName, BrightstarDB.Client.CommitPointInfo commitPoint)
-        {
-            return base.Channel.RevertToCommitPointAsync(storeName, commitPoint);
-        }
-        
         public BrightstarDB.Client.TransactionInfo[] GetTransactions(string storeName, int skip, int take)
         {
             return base.Channel.GetTransactions(storeName, skip, take);
-        }
-        
-        public System.Threading.Tasks.Task<BrightstarDB.Client.TransactionInfo[]> GetTransactionsAsync(string storeName, int skip, int take)
-        {
-            return base.Channel.GetTransactionsAsync(storeName, skip, take);
         }
         
         public BrightstarDB.Client.JobInfo ReExecuteTransaction(string storeName, BrightstarDB.Client.TransactionInfo transactionInfo)
@@ -845,19 +666,9 @@ namespace BrightstarDB.Client
             return base.Channel.ReExecuteTransaction(storeName, transactionInfo);
         }
         
-        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> ReExecuteTransactionAsync(string storeName, BrightstarDB.Client.TransactionInfo transactionInfo)
-        {
-            return base.Channel.ReExecuteTransactionAsync(storeName, transactionInfo);
-        }
-        
         public BrightstarDB.Client.StoreStatistics GetStatistics(string storeName)
         {
             return base.Channel.GetStatistics(storeName);
-        }
-        
-        public System.Threading.Tasks.Task<BrightstarDB.Client.StoreStatistics> GetStatisticsAsync(string storeName)
-        {
-            return base.Channel.GetStatisticsAsync(storeName);
         }
         
         public BrightstarDB.Client.StoreStatistics[] GetStatisticsInDateRange(string storeName, System.DateTime latest, System.DateTime earlierst, int skip, int take)
@@ -865,29 +676,14 @@ namespace BrightstarDB.Client
             return base.Channel.GetStatisticsInDateRange(storeName, latest, earlierst, skip, take);
         }
         
-        public System.Threading.Tasks.Task<BrightstarDB.Client.StoreStatistics[]> GetStatisticsInDateRangeAsync(string storeName, System.DateTime latest, System.DateTime earlierst, int skip, int take)
-        {
-            return base.Channel.GetStatisticsInDateRangeAsync(storeName, latest, earlierst, skip, take);
-        }
-        
         public BrightstarDB.Client.JobInfo UpdateStatistics(string storeName)
         {
             return base.Channel.UpdateStatistics(storeName);
         }
         
-        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> UpdateStatisticsAsync(string storeName)
-        {
-            return base.Channel.UpdateStatisticsAsync(storeName);
-        }
-        
         public BrightstarDB.Client.JobInfo CreateSnapshot(string sourceStoreName, string targetStoreName, BrightstarDB.Storage.PersistenceType storePersistenceType, BrightstarDB.Client.CommitPointInfo sourceCommitPoint)
         {
             return base.Channel.CreateSnapshot(sourceStoreName, targetStoreName, storePersistenceType, sourceCommitPoint);
-        }
-        
-        public System.Threading.Tasks.Task<BrightstarDB.Client.JobInfo> CreateSnapshotAsync(string sourceStoreName, string targetStoreName, BrightstarDB.Storage.PersistenceType storePersistenceType, BrightstarDB.Client.CommitPointInfo sourceCommitPoint)
-        {
-            return base.Channel.CreateSnapshotAsync(sourceStoreName, targetStoreName, storePersistenceType, sourceCommitPoint);
         }
     }
 }
