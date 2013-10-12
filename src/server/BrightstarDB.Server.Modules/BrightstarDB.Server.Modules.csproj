@@ -113,7 +113,6 @@
     <Content Include="Views\_Layout.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\BrightstarDB\BrightstarDB.csproj">
