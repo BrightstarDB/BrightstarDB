@@ -2,8 +2,8 @@
 
 @Section['Content']
 
-	<nav class="breadcrumb">
-		<ul>
+	<nav>
+		<ul class="horizontal breadcrumb">
 			<li>Home</li>
 		</ul>
 	</nav>
@@ -19,9 +19,9 @@
 		<tbody>
 			@Each.Stores
 				<tr>
-					<td><a href="@Current.Name">@Current.Name</a></td>
+					<td><a href="@Path['~/']@Current.Name">@Current.Name</a></td>
 					<td>
-						<ul class="horizontal">
+						<ul class="horizontal links">
 							<li><a href="@Current.Commits">Commit History</a></li>
 							<li><a href="@Current.Jobs">Jobs</a></li>
 							<li><a href="@Current.Transactions">Transactions</a></li>
@@ -32,4 +32,25 @@
 			@EndEach
 		</tbody>
 	</table>
+
+	<div class="actions right">
+		<form method="POST">
+			<fieldset>
+				<legend>Create New Store</legend>
+				<div class="form-field">
+					<label class="form-label" for="storeName">Store Name:</label>
+					<input class="form-input" type="text" name="StoreName" id="storeName" />
+				</div>
+				<div class="form-field">
+					<label class="form-label" for="persistenceType">Persistence Type:</label>
+					<select name="PersistenceType" id="persistenceType">
+						<option value="1">Append-Only</option>
+						<option value="2">Rewrite</option>
+					</select>
+				</div>
+				<button type="submit">Create Store</button>
+			</fieldset>
+		</form>
+	</div>
+
 @EndSection

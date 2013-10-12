@@ -2,7 +2,7 @@
 
 namespace BrightstarDB.Server.Modules.Model
 {
-    public class StoresResponseObject
+    public class StoresResponseModel
     {
         public List<StoreResponseModel> Stores { get; set; }
     }

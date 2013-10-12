@@ -43,27 +43,21 @@ namespace BrightstarDB.Server.Modules
             {
                 first = resourceUri;
                 var prevPage = skip - defaultPageSize;
-                if (prevPage <= 0)
-                {
-                    prev = resourceUri;
-                }
-                else
-                {
-                    prev = String.Format("{0}{1}skip={2}", resourceUri, queryParamsSeparator, prevPage);
-                }
+                prev = prevPage <= 0 ? resourceUri : String.Format("{0}{1}skip={2}", resourceUri, queryParamsSeparator, prevPage);
             }
             if (fullList.Count > take)
             {
                 next = String.Format("{0}{1}skip={2}", resourceUri, queryParamsSeparator, skip + take);
             }
-            if (links.Count > 0)
-            {
-                return negotiate.WithModel(returnList).WithHeader("Link", String.Join(",", links));
-            }
 
             if (first != null) links.Add(MakeLink(first, "first"));
             if (prev != null) links.Add(MakeLink(prev, "prev"));
             if (next != null) links.Add(MakeLink(next, "next"));
+
+            if (links.Count > 0)
+            {
+                return negotiate.WithModel(returnList).WithHeader("Link", String.Join(",", links));
+            }
 
 
             var pagedView = "Paged" + typeof (T).Name;

@@ -12,6 +12,10 @@ namespace BrightstarDB.Server.Modules
         private readonly SparqlRequestObject _sparqlRequest;
         private readonly ulong _commitId;
 
+        public string StoreName { get { return _storeName; } }
+        public ulong CommitId { get { return _commitId; } }
+        public SparqlRequestObject SparqlRequest { get { return _sparqlRequest; } }
+
         public SparqlQueryProcessingModel(string storeName, IBrightstarService service, SparqlRequestObject sparqlRequest)
         {
             _storeName = storeName;
@@ -39,5 +43,7 @@ namespace BrightstarDB.Server.Modules
 
             return _service.ExecuteQuery(_storeName, _sparqlRequest.Query, _sparqlRequest.DefaultGraphUri, ifNotModifiedSince, format);
         }
+
+
     }
 }

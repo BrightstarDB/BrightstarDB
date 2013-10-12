@@ -109,5 +109,50 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
         }
 
+        [Test]
+        public void TestDeleteReturnsOk()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            brightstar.Setup(s=>s.DoesStoreExist("foo")).Returns(true).Verifiable();
+            brightstar.Setup(s=>s.DeleteStore("foo")).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+
+            var response = app.Delete("/foo", c=>c.Accept(MediaRange.FromString("application/json")));
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            brightstar.Verify();
+        }
+
+        [Test]
+        public void TestDeleteHtmlResponse()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            brightstar.Setup(s=>s.DoesStoreExist("foo")).Returns(true).Verifiable();
+            brightstar.Setup(s => s.DeleteStore("foo")).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+
+            var response = app.Delete("/foo", c => c.Accept(MediaRange.FromString("text/html")));
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Body.AsString(), Contains.Substring("Store 'foo' deleted successfully."));
+            brightstar.Verify();
+            
+        }
+
+        [Test]
+        public void TestDeleteRequiresStoreAdminPermission()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var storePermissions = new Mock<AbstractStorePermissionsProvider>();
+
+            storePermissions.Setup(s => s.HasStorePermission(null, "foo", StorePermissions.Admin)).Returns(false).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, storePermissions.Object));
+
+            // Execute
+            var response = app.Delete("/foo");
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        }
     }
 }

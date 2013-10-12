@@ -33,8 +33,14 @@
     <Reference Include="Nancy">
       <HintPath>..\packages\Nancy.0.20.0\lib\net40\Nancy.dll</HintPath>
     </Reference>
+    <Reference Include="Nancy.ViewEngines.Razor">
+      <HintPath>..\packages\Nancy.Viewengines.Razor.0.20.0\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web.Razor.Unofficial">
+      <HintPath>..\packages\System.Web.Razor.Unofficial.2.0.2\lib\net40\System.Web.Razor.Unofficial.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,7 +51,8 @@
     <Compile Include="BrightstarBootstrapper.cs" />
     <Compile Include="BrightstarModuleSecurity.cs" />
     <Compile Include="Model\PagedResultModel.cs" />
-    <Compile Include="Model\StoresResponseObject.cs" />
+    <Compile Include="Model\StoreDeletedModel.cs" />
+    <Compile Include="Model\StoresResponseModel.cs" />
     <Compile Include="Permissions\CombiningStorePermissionsProvider.cs" />
     <Compile Include="CommitPointsModule.cs" />
     <Compile Include="Permissions\FallbackStorePermissionsProvider.cs" />
@@ -58,7 +65,7 @@
     <Compile Include="Model\CreateStoreRequestObject.cs" />
     <Compile Include="Model\JobRequestObject.cs" />
     <Compile Include="Model\JobResponseObject.cs" />
-    <Compile Include="Model\SparqlResquestObject.cs" />
+    <Compile Include="Model\SparqlRequestObject.cs" />
     <Compile Include="Model\SparqlUpdateRequestObject.cs" />
     <Compile Include="Model\StatisticsRequestObject.cs" />
     <Compile Include="Model\StatisticsResponseObject.cs" />
@@ -77,6 +84,7 @@
     <Compile Include="SparqlQueryResponse.cs" />
     <Compile Include="SparqlModule.cs" />
     <Compile Include="SparqlProcessor.cs" />
+    <Compile Include="Model\SparqlResultModel.cs" />
     <Compile Include="SparqlUpdateModule.cs" />
     <Compile Include="StatisticsModule.cs" />
     <Compile Include="StoreModule.cs" />
@@ -85,18 +93,27 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Permissions\SystemPermissions.cs" />
     <Compile Include="TransactionsModule.cs" />
-    <None Include="Views\Layout.sshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Views\StoreResponse.sshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Views\StoresResponseObject.sshtml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Content Include="Views\StoreDeleted.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\StoreResponse.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
+    <Content Include="Views\SparqlResult.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Views\SparqlResult.sshtml" />
+    <Content Include="Views\StoresResponse.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\_Layout.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\BrightstarDB\BrightstarDB.csproj">
@@ -110,7 +127,19 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\core.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+if $(ConfigurationName) == Debug (
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.20.0\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll" "$(ProjectDir)bin\Debug"
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.20.0\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\Debug"
+)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <title>BrightstarDB</title>
+	<link rel="stylesheet" href="@Path['~/assets/core.css']"/>
 </head>
 <body>
 @Section['Content'];

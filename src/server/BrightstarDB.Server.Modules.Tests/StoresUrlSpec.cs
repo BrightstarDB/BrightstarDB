@@ -40,7 +40,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                                       new PassAllSystemPermissionsProvider(SystemPermissions.ListStores)));
             var response = app.Get("/");
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Body.AsString(), Contains.Substring("Hello Stores"));
+            Assert.That(response.Body.AsString(), Contains.Substring("<table class=\"items\">"));
         }
 
         [Test]
@@ -78,12 +78,13 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.ContentType, Contains.Substring("application/json"));
             Assert.That(response.Body, Is.Not.Null);
-            var responseContent = response.Body.DeserializeJson <List<StoreResponseModel>>();
+            var responseContent = response.Body.DeserializeJson <StoresResponseModel>();
             Assert.That(responseContent, Is.Not.Null);
-            Assert.That(responseContent.Count, Is.EqualTo(3));
-            Assert.That(responseContent.Any(s=>s.Name.Equals("store1") && s.Jobs.Equals("store1/jobs")));
-            Assert.That(responseContent.Any(s => s.Name.Equals("store2") && s.Jobs.Equals("store2/jobs")));
-            Assert.That(responseContent.Any(s => s.Name.Equals("store3") && s.Jobs.Equals("store3/jobs")));
+            Assert.That(responseContent.Stores, Is.Not.Null);
+            Assert.That(responseContent.Stores.Count, Is.EqualTo(3));
+            Assert.That(responseContent.Stores.Any(s => s.Name.Equals("store1") && s.Jobs.Equals("store1/jobs")));
+            Assert.That(responseContent.Stores.Any(s => s.Name.Equals("store2") && s.Jobs.Equals("store2/jobs")));
+            Assert.That(responseContent.Stores.Any(s => s.Name.Equals("store3") && s.Jobs.Equals("store3/jobs")));
         }
 
         [Test]

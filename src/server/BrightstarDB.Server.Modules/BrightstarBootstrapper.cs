@@ -1,6 +1,8 @@
 ﻿using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
+using Nancy.Conventions;
+using Nancy.ViewEngines.Razor;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -57,6 +59,14 @@ namespace BrightstarDB.Server.Modules
             container.Register(_brightstarService);
             container.Register(_storePermissionsProvider);
             container.Register(_systemPermissionsProvider);
+            container.Register<RazorViewEngine>();
+        }
+
+        protected override void ConfigureConventions(NancyConventions nancyConventions)
+        {
+            base.ConfigureConventions(nancyConventions);
+            nancyConventions.StaticContentsConventions.Add(
+                StaticContentConventionBuilder.AddDirectory("assets"));
         }
     }
 }

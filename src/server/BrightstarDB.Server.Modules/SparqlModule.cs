@@ -88,7 +88,17 @@ namespace BrightstarDB.Server.Modules
 
         private Negotiator ProcessQuery(string storeName, SparqlRequestObject requestObject)
         {
-            return Negotiate.WithModel(new SparqlQueryProcessingModel(storeName, _brightstar, requestObject));
+            SparqlResultsFormat requestedFormat =
+                String.IsNullOrEmpty(requestObject.Format)
+                    ? SparqlResultsFormat.Xml
+                    : (
+                          SparqlResultsFormat.GetResultsFormat(requestObject.Format) ??
+                          SparqlResultsFormat.Xml);
+            var model = new SparqlResultModel(storeName, _brightstar, requestObject, requestedFormat);
+            
+            return Negotiate
+                .WithMediaRangeModel(MediaRange.FromString("text/html"), model).WithView("SparqlResult")
+                .WithModel(new SparqlQueryProcessingModel(storeName, _brightstar, requestObject));
         }
     }
 }

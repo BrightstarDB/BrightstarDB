@@ -6,5 +6,6 @@
         public string CommitId { get; set; }
         public string[] DefaultGraphUri { get; set; }
         public string[] NamedGraphUri { get; set; }
+        public string Format { get; set; }
     }
 }

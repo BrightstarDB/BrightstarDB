@@ -18,7 +18,7 @@ namespace BrightstarDB.Server.Modules
             Get["/"] = parameters =>
                 {
                     var stores = brightstarService.ListStores();
-                    return new StoresResponseObject {Stores = stores.Select(s => new StoreResponseModel(s)).ToList()};
+                    return new StoresResponseModel {Stores = stores.Select(s => new StoreResponseModel(s)).ToList()};
                 };
 
             Post["/"] = parameters =>
