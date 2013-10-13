@@ -5,7 +5,7 @@ namespace BrightstarDB.Server.Modules.Model
     /// <summary>
     /// C# representation of the JSON object returned to represent a Job status
     /// </summary>
-    public class JobResponseObject
+    public class JobResponseModel
     {
         /// <summary>
         /// Get / set the ID of the job
@@ -32,15 +32,15 @@ namespace BrightstarDB.Server.Modules.Model
         /// </summary>
         public DateTime Ended { get; set; }
         
+        /// <summary>
+        /// Get or set the name of the store where this job runs
+        /// </summary>
+        public string StoreName { get; set; }
 
         public bool JobPending { get { return JobStatus.Equals("Pending", StringComparison.InvariantCultureIgnoreCase); } }
         public bool JobStarted { get { return JobStatus.Equals("Started", StringComparison.InvariantCultureIgnoreCase); } }
         public bool JobCompletedOk { get { return JobStatus.Equals("CompletedOk", StringComparison.InvariantCultureIgnoreCase); } }
         public bool JobCompletedWithErrors { get { return JobStatus.Equals("TransactionError", StringComparison.InvariantCultureIgnoreCase) || JobStatus.Equals("Unknown", StringComparison.InvariantCultureIgnoreCase); } }
         public bool InvalidJob { get { return JobStatus.Equals("NotRegistered", StringComparison.InvariantCultureIgnoreCase); } }
-
-
-        public JobResponseObject(){}
-
     }
 }

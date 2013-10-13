@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
@@ -11,9 +12,39 @@ namespace BrightstarDB.Server.Modules
 {
     public class JobsModule : NancyModule
     {
+        private const int DefaultPageSize = 10;
         public JobsModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider permissionsProvider)
         {
             this.RequiresBrightstarStorePermissionData(permissionsProvider);
+
+            Get["/{storeName}/jobs"] = parameters =>
+                {
+                    var jobsRequestObject = this.Bind<JobsRequestModel>();
+                    if (jobsRequestObject == null || jobsRequestObject.StoreName == null)
+                    {
+                        return HttpStatusCode.BadRequest;
+                    }
+                    var jobs = brightstarService.GetJobInfo(jobsRequestObject.StoreName, jobsRequestObject.Skip,
+                                                            DefaultPageSize + 1);
+                    return Negotiate.WithPagedList(jobsRequestObject,
+                                                   jobs.Select(j=>MakeResponseObject(j, jobsRequestObject.StoreName)),
+                                                   jobsRequestObject.Skip, DefaultPageSize, DefaultPageSize,
+                                                   "jobs");
+                };
+
+            Get["/{storeName}/jobs/{jobId}"] = parameters =>
+                {
+                    var request = this.Bind<JobRequestModel>();
+                    if (request == null ||
+                        request.StoreName == null ||
+                        request.JobId == null)
+                    {
+                        return HttpStatusCode.BadRequest;
+                    }
+                    var job = brightstarService.GetJobInfo(request.StoreName, request.JobId);
+                    if (job == null) return HttpStatusCode.NotFound;
+                    return MakeResponseObject(job, request.StoreName);
+                };
 
             Post["/{storeName}/jobs"] = parameters =>
                 {
@@ -164,7 +195,7 @@ namespace BrightstarDB.Server.Modules
                                 return HttpStatusCode.BadRequest;
                         }
 
-                        var response = new JsonResponse<JobResponseObject>(new JobResponseObject
+                        var response = new JsonResponse<JobResponseModel>(new JobResponseModel
                             {
                                 JobId = queuedJobInfo.JobId,
                                 StatusMessage = queuedJobInfo.StatusMessage,
@@ -179,6 +210,18 @@ namespace BrightstarDB.Server.Modules
                         return HttpStatusCode.Unauthorized;
                     }
 
+                };
+        }
+
+        private static JobResponseModel MakeResponseObject(IJobInfo arg, string storeName)
+        {
+            return new JobResponseModel
+                {
+                    JobId = arg.JobId,
+                    JobStatus = GetJobStatusString(arg),
+                    StatusMessage = arg.StatusMessage,
+                    StoreName = storeName
+                    // TODO: Extend IJobInfo with date/time stamp properties
                 };
         }
 

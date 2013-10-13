@@ -14,7 +14,7 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestBooleanFlagsFromJobStatus()
         {
-            var status = new JobResponseObject {JobStatus = "Pending"};
+            var status = new JobResponseModel {JobStatus = "Pending"};
             Assert.That(status.JobPending);
             Assert.That(!(status.JobCompletedOk || status.JobCompletedWithErrors || status.JobStarted || status.InvalidJob));
 

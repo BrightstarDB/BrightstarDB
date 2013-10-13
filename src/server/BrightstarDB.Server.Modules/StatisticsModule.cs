@@ -32,7 +32,7 @@ namespace BrightstarDB.Server.Modules
                         request.StoreName, request.Latest.Value, request.Earliest.Value,
                         request.Skip, DefaultPageSize + 1);
 
-                    return Negotiate.WithPagedList(stats.Select(MakeResponseModel), request.Skip, DefaultPageSize,
+                    return Negotiate.WithPagedList(request, stats.Select(MakeResponseModel), request.Skip, DefaultPageSize,
                                                    DefaultPageSize, resourceUri);
                 };
         }

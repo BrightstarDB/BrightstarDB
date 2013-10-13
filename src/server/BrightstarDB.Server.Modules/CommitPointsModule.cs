@@ -28,6 +28,8 @@ namespace BrightstarDB.Server.Modules
                     DateTime earliest = Request.Query["earliest"].TryParse<DateTime>();
                     DateTime latest = Request.Query["latest"].TryParse<DateTime>();
 
+                    var request = this.Bind<CommitPointsRequestModel>();
+
                     if (timestamp != default(DateTime))
                     {
                         // Request for a single commit point
@@ -38,15 +40,15 @@ namespace BrightstarDB.Server.Modules
                         IEnumerable<ICommitPointInfo> results =
                             brightstarService.GetCommitPoints(parameters["storeName"], latest, earliest, skip, take + 1);
                         var resourceUri = String.Format("commits?latest={0}&earliest={1}", latest.ToString("s"), earliest.ToString("s"));
-                        return Negotiate.WithPagedList(results.Select(MakeResponseObject), skip, take, DefaultPageSize, resourceUri);
+                        return Negotiate.WithPagedList(request, results.Select(MakeResponseObject), skip, take, DefaultPageSize, resourceUri);
                     }
                     IEnumerable<ICommitPointInfo> commitPointInfos = brightstarService.GetCommitPoints(parameters["storeName"], skip, take + 1);
-                    return Negotiate.WithPagedList(commitPointInfos.Select(MakeResponseObject), skip, take, DefaultPageSize, "commits");
+                    return Negotiate.WithPagedList(request, commitPointInfos.Select(MakeResponseObject), skip, take, DefaultPageSize, "commits");
                 };
 
             Post["/{storeName}/commits"] = parameters =>
                 {
-                    var commitPoint = this.Bind<CommitPointResponseObject>();
+                    var commitPoint = this.Bind<CommitPointResponseModel>();
                     if (commitPoint == null ||
                         String.IsNullOrEmpty(commitPoint.StoreName) ||
                         !commitPoint.StoreName.Equals(parameters["storeName"]))
@@ -62,9 +64,9 @@ namespace BrightstarDB.Server.Modules
                 };
         }
 
-        private static CommitPointResponseObject MakeResponseObject(ICommitPointInfo commitPointInfo)
+        private static CommitPointResponseModel MakeResponseObject(ICommitPointInfo commitPointInfo)
         {
-            return new CommitPointResponseObject
+            return new CommitPointResponseModel
                 {
                     Id = commitPointInfo.Id,
                     CommitTime = commitPointInfo.CommitTime,

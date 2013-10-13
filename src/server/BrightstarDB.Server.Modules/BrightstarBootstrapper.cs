@@ -11,6 +11,7 @@ namespace BrightstarDB.Server.Modules
         private readonly IBrightstarService _brightstarService;
         private readonly AbstractStorePermissionsProvider _storePermissionsProvider;
         private readonly AbstractSystemPermissionsProvider _systemPermissionsProvider;
+        private readonly IRootPathProvider _rootPathProvider;
 
         /// <summary>
         /// Creates a new bootstrapper that denies all anonymous access to the specified Brightstar service
@@ -21,7 +22,8 @@ namespace BrightstarDB.Server.Modules
             : this(
                 brightstarService, 
             new PassAllStorePermissionsProvider(),
-            new PassAllSystemPermissionsProvider())
+            new PassAllSystemPermissionsProvider(),
+            null)
         {
         }
 
@@ -33,7 +35,7 @@ namespace BrightstarDB.Server.Modules
         /// <param name="storePermissionsProvider"></param>
         public BrightstarBootstrapper(IBrightstarService brightstarService,
                                       AbstractStorePermissionsProvider storePermissionsProvider)
-            : this(brightstarService, storePermissionsProvider, new PassAllSystemPermissionsProvider())
+            : this(brightstarService, storePermissionsProvider, new PassAllSystemPermissionsProvider(), null)
         {
 
         }
@@ -46,11 +48,13 @@ namespace BrightstarDB.Server.Modules
         /// <param name="systemPermissionsProvider"></param>
         public BrightstarBootstrapper(IBrightstarService brightstarService,
                                       AbstractStorePermissionsProvider storePermissionsProvider,
-                                      AbstractSystemPermissionsProvider systemPermissionsProvider)
+                                      AbstractSystemPermissionsProvider systemPermissionsProvider,
+            string rootPath = null)
         {
             _brightstarService = brightstarService;
             _storePermissionsProvider = storePermissionsProvider;
             _systemPermissionsProvider = systemPermissionsProvider;
+            _rootPathProvider = new FixedRootPathProvider(rootPath);
         }
 
         protected override void ConfigureApplicationContainer(Nancy.TinyIoc.TinyIoCContainer container)
@@ -68,5 +72,15 @@ namespace BrightstarDB.Server.Modules
             nancyConventions.StaticContentsConventions.Add(
                 StaticContentConventionBuilder.AddDirectory("assets"));
         }
+
+        protected override IRootPathProvider RootPathProvider
+        {
+            get
+            {
+                if (_rootPathProvider == null) return base.RootPathProvider;
+                return _rootPathProvider;
+            }
+        }
+
     }
 }

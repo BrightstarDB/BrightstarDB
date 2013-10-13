@@ -325,6 +325,12 @@ namespace BrightstarDB.Server
             return storeWorker.Import(contentFileName, graphUri);
         }
 
+        internal IEnumerable<JobExecutionStatus> GetJobs(string storeName)
+        {
+            var storeWorker = GetStoreWorker(storeName);
+            return storeWorker.GetJobs();
+        }
+
         public JobExecutionStatus GetJobStatus(string storeId, string jobId)
         {
             var storeWorker = GetStoreWorker(storeId);
@@ -482,5 +488,6 @@ namespace BrightstarDB.Server
             var storeWorker = GetStoreWorker(sourceStoreName);
             return storeWorker.QueueSnapshotJob(targetStoreName, persistenceType, sourceCommitPointId);
         }
+
     }
 }

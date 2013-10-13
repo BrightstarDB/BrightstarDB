@@ -57,7 +57,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var responseList = response.Body.DeserializeJson<List<CommitPointResponseObject>>();
+            var responseList = response.Body.DeserializeJson<List<CommitPointResponseModel>>();
             Assert.That(responseList.Count, Is.EqualTo(10));
             brightstarService.Verify();
         }
@@ -83,7 +83,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var responseList = response.Body.DeserializeJson<List<CommitPointResponseObject>>();
+            var responseList = response.Body.DeserializeJson<List<CommitPointResponseModel>>();
             Assert.That(responseList.Count, Is.EqualTo(10));
             Assert.That(response.Headers.ContainsKey("Link"));
             Assert.That(response.Headers["Link"], Is.Not.Null.And.Matches(new LinkExistsConstraint("next", "commits?skip=10")));
@@ -109,7 +109,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var responseList = response.Body.DeserializeJson<List<CommitPointResponseObject>>();
+            var responseList = response.Body.DeserializeJson<List<CommitPointResponseModel>>();
             Assert.That(responseList.Count, Is.EqualTo(10));
             Assert.That(response.Headers.ContainsKey("Link"));
             Assert.That(response.Headers["Link"], Is.Not.Null.And.Matches(new LinkExistsConstraint("next", "commits?skip=20")));
@@ -135,7 +135,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var responseList = response.Body.DeserializeJson<List<CommitPointResponseObject>>();
+            var responseList = response.Body.DeserializeJson<List<CommitPointResponseModel>>();
             Assert.That(responseList.Count, Is.EqualTo(1));
             Assert.That(response.Headers.ContainsKey("Link"));
             Assert.That(response.Headers["Link"],
@@ -160,7 +160,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 });
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var responseObject = response.Body.DeserializeJson<CommitPointResponseObject>();
+            var responseObject = response.Body.DeserializeJson<CommitPointResponseModel>();
             Assert.That(responseObject.Id, Is.EqualTo(10UL));
             brightstarService.Verify();
         }
@@ -187,7 +187,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var responseList = response.Body.DeserializeJson<List<CommitPointResponseObject>>();
+            var responseList = response.Body.DeserializeJson<List<CommitPointResponseModel>>();
             Assert.That(responseList.Count, Is.EqualTo(10));
             Assert.That(response.Headers.ContainsKey("Link"));
             Assert.That(response.Headers["Link"],
@@ -206,7 +206,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             var response = app.Post("/foo/commits", with =>
             {
-                with.JsonBody(new CommitPointResponseObject { Id = 123, StoreName = "foo" });
+                with.JsonBody(new CommitPointResponseModel { Id = 123, StoreName = "foo" });
                 with.Accept(Json);
             });
 
@@ -225,7 +225,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             var response = browser.Post("/foo/commits", with =>
                 {
-                    with.JsonBody(new CommitPointResponseObject {Id = 123, StoreName = "foo"});
+                    with.JsonBody(new CommitPointResponseModel {Id = 123, StoreName = "foo"});
                     with.Accept(Json);
                 });
 
@@ -242,7 +242,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             var response = browser.Post("/foo/commits", with =>
             {
-                with.JsonBody(new CommitPointResponseObject { Id = 123, StoreName = "foo" });
+                with.JsonBody(new CommitPointResponseModel { Id = 123, StoreName = "foo" });
                 with.Accept(Json);
             });
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));

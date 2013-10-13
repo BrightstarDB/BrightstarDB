@@ -194,6 +194,11 @@ namespace BrightstarDB.Server
             }
         }
 
+        public IEnumerable<JobExecutionStatus> GetJobs()
+        {
+            return _jobExecutionStatus.Values.OrderBy(x => x.Started);
+        }
+
         public JobExecutionStatus GetJobStatus(string jobId)
         {
             JobExecutionStatus status;
@@ -440,5 +445,6 @@ namespace BrightstarDB.Server
                                          () => UpdateStatistics());
             }
         }
+
     }
 }

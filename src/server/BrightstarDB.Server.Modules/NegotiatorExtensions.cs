@@ -29,7 +29,7 @@ namespace BrightstarDB.Server.Modules
         /// first or prev link is generated if the request is for the first page. No next link is generated if the page includes
         /// the final item in the list.</para>
         /// </remarks>
-        public static Negotiator WithPagedList<T>(this Negotiator negotiator, IEnumerable<T> items, int skip, int take, int defaultPageSize, string resourceUri)
+        public static Negotiator WithPagedList<T>(this Negotiator negotiator, dynamic requestObject, IEnumerable<T> items, int skip, int take, int defaultPageSize, string resourceUri)
         {
             var links = new List<string>();
             var queryParamsSeparator = resourceUri.Contains("?") ? "&" : "?";
@@ -66,7 +66,7 @@ namespace BrightstarDB.Server.Modules
                 pagedView = pagedView.Substring(0, pagedView.Length - 5);
             }
             return negotiate.WithMediaRangeModel(MediaRange.FromString("text/html"),
-                                          new PagedResultModel<T>(first, prev, next, returnList))
+                new PagedResultModel<T>(first, prev, next, returnList, requestObject))
                                           .WithView(pagedView)
                      .WithMediaRangeModel("application/json", returnList);
         }

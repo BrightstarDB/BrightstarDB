@@ -22,7 +22,8 @@ namespace BrightstarDB.Server.Modules
                     var transactions = brightstarService.GetTransactions(transactionsRequest.StoreName,
                                                                                  transactionsRequest.Skip,
                                                                                  DefaultPageSize + 1);
-                    return Negotiate.WithPagedList(transactions.Select(MakeResponseObject),
+                    return Negotiate.WithPagedList(transactionsRequest,
+                                                   transactions.Select(MakeResponseObject),
                                                    transactionsRequest.Skip, DefaultPageSize, DefaultPageSize,
                                                    "transactions");
                 };
@@ -39,9 +40,9 @@ namespace BrightstarDB.Server.Modules
                 };
         }
 
-        private static TransactionResponseObject MakeResponseObject(ITransactionInfo transactionInfo)
+        private static TransactionResponseModel MakeResponseObject(ITransactionInfo transactionInfo)
         {
-            return new TransactionResponseObject
+            return new TransactionResponseModel
                 {
                     Id = transactionInfo.Id,
                     JobId = transactionInfo.JobId,

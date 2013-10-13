@@ -39,5 +39,8 @@ namespace BrightstarDB.Server.Runner
             DefaultValue = SystemPermissions.None)]
         public SystemPermissions AnonymousSystemPermissions = SystemPermissions.None;
 
+        [Argument(ArgumentType.AtMostOnce, HelpText = "The full path to the directory containing the Views and assets folder for the server",
+            ShortName = "r")]
+        public string RootPath;
     }
 }

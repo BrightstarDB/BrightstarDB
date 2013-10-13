@@ -29,7 +29,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var response = browser.Get("/foo/transactions", with => with.Accept(Json));
             
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var transactionList = response.Body.DeserializeJson<List<TransactionResponseObject>>();
+            var transactionList = response.Body.DeserializeJson<List<TransactionResponseModel>>();
             Assert.That(transactionList, Is.Not.Null);
             Assert.That(transactionList.Count, Is.EqualTo(10));
             brightstarService.Verify();
@@ -51,7 +51,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 });
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var transactionList = response.Body.DeserializeJson<List<TransactionResponseObject>>();
+            var transactionList = response.Body.DeserializeJson<List<TransactionResponseModel>>();
             Assert.That(transactionList, Is.Not.Null);
             Assert.That(transactionList.Count, Is.EqualTo(10));
             Assert.That(response.Headers["Link"], Is.Not.Null);
@@ -79,7 +79,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var response = browser.Get("/foo/transactions/byjob/6100E798-EDB4-457B-AE33-640EF64BFA18", with => with.Accept(Json));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var transaction = response.Body.DeserializeJson<TransactionResponseObject>();
+            var transaction = response.Body.DeserializeJson<TransactionResponseModel>();
             Assert.That(transaction, Is.Not.Null);
             Assert.That(transaction.JobId, Is.EqualTo(Guid.Parse("6100E798-EDB4-457B-AE33-640EF64BFA18")));
             brightstarService.Verify();
@@ -106,7 +106,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             brightstarService.Verify();
-            var transactionList = response.Body.DeserializeJson<List<TransactionResponseObject>>();
+            var transactionList = response.Body.DeserializeJson<List<TransactionResponseModel>>();
             Assert.That(transactionList, Is.Not.Null);
             Assert.That(transactionList.Count, Is.EqualTo(1));
             var transaction = transactionList[0];

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BrightstarDB.Server.Modules.Model
 {
-    public class CommitPointResponseObject
+    public class CommitPointResponseModel
     {
         public ulong Id { get; set; }
         public string StoreName { get; set; }

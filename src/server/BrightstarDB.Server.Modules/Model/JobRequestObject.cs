@@ -10,6 +10,11 @@ namespace BrightstarDB.Server.Modules.Model
     public class JobRequestObject
     {
         /// <summary>
+        /// Get or set the name of the store that the job is to be executed against.
+        /// </summary>
+        public string StoreName { get; set; }
+
+        /// <summary>
         /// Get or set the string identifier for the type of job to be created
         /// </summary>
         public string JobType { get; set; }

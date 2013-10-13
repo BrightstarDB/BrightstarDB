@@ -19,7 +19,8 @@ namespace BrightstarDB.Server.Runner
                                                   new PassAllStorePermissionsProvider(
                                                       serviceArgs.AnonymousStorePermissions),
                                                   new PassAllSystemPermissionsProvider(
-                                                      serviceArgs.AnonymousSystemPermissions));
+                                                      serviceArgs.AnonymousSystemPermissions),
+                                                      serviceArgs.RootPath);
             }
             catch (Exception ex)
             {

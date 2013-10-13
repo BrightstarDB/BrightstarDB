@@ -364,6 +364,11 @@ namespace BrightstarDB.Client
             }
         }
 
+        public IEnumerable<IJobInfo> GetJobInfo(string storeName, int skip, int take)
+        {
+            throw new NotImplementedException();
+        }
+
         /*
         /// <summary>
         /// Returns all the triples in the named store

@@ -266,6 +266,19 @@ namespace BrightstarDB.Client
         }
 
         /// <summary>
+        /// Gets information about jobs recently executed against a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve job information from</param>
+        /// <param name="skip">The number of records to skip</param>
+        /// <param name="take">The number of records to take</param>
+        /// <returns>The subset of job information requested by the skip and take parameters</returns>
+        /// <remarks>Job information is returned in reverse order of the order in which they will be / were executed (most recent first).</remarks>
+        public IEnumerable<IJobInfo> GetJobInfo(string storeName, int skip, int take)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Gets the information about a job. Including status and any messages.
         /// </summary>
         /// <param name="storeName">Name of the store where the job is running</param>

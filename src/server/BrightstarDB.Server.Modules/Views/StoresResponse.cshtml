@@ -4,18 +4,29 @@
     ViewBag.Title = "BrightstarDB: Stores";
 }
 
-<table class="items">
-    <thead>
-        <tr>
-            <td>Store</td>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var s in Model.Stores)
-    {
-        <tr>
-            <td><a href="~/@s.Name">@s.Name</a></td>
-        </tr>
-    }
+<nav>
+    <ul class="breadcrumb horizontal">
+        <li><a href="#">Home</a></li>
+    </ul>
+</nav>
+
+<section>
+    <h1>@ViewBag.Title</h1>
+    <p>Stores available on this BrightstarDB server.</p>
+
+    <table class="items">
+        <thead>
+            <tr>
+                <td>Store</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.Stores)
+            {
+                <tr>
+                    <td><a href="~/@s.Name">@s.Name</a></td>
+                </tr>
+            }
         </tbody>
-</table>
+    </table>
+</section>

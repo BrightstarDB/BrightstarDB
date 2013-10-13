@@ -444,6 +444,40 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException("Error queing SPARQL update in store " + storeName + ". " + ex.Message, ex);
             }
         }
+
+        /// <summary>
+        /// Gets information about jobs recently executed against a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve job information from</param>
+        /// <param name="skip">The number of records to skip</param>
+        /// <param name="take">The number of records to take</param>
+        /// <returns>The subset of job information requested by the skip and take parameters</returns>
+        /// <remarks>Job information is returned in reverse order of the order in which they will be / were executed (most recent first).</remarks>
+        public IEnumerable<IJobInfo> GetJobInfo(string storeName, int skip, int take)
+        {
+            try
+            {
+                var jobs = _serverCore.GetJobs(storeName).Skip(skip).Take(take);
+                return jobs.Select(jobStatus => new JobInfoWrapper(
+                                                    new JobInfo
+                                                        {
+                                                            JobId = jobStatus.JobId.ToString(),
+                                                            StatusMessage = jobStatus.Information,
+                                                            ExceptionInfo = jobStatus.ExceptionDetail,
+                                                            JobPending = (jobStatus.JobStatus == JobStatus.Pending),
+                                                            JobCompletedOk =
+                                                                (jobStatus.JobStatus == JobStatus.CompletedOk),
+                                                            JobCompletedWithErrors =
+                                                                (jobStatus.JobStatus == JobStatus.TransactionError),
+                                                            JobStarted = (jobStatus.JobStatus == JobStatus.Started)
+                                                        }));
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting job listing for store {0}", storeName);
+                throw new BrightstarClientException("Error getting job listing for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
 #endif
 
 #if SILVERLIGHT

@@ -1,19 +1,80 @@
-﻿.breadcrumb {
-    width: 100%;
-    background: #c0c0c0;
-    padding: 1em;
-}
-
-ul.horizontal {
+﻿ul.horizontal {
     list-style: none;
+    padding-left: 0px;
 }
 
 ul.horizontal li {
     display: inline-block;
 }
 
-ul.breadcrumb li:after {
-    content: " > ";
+ul.breadcrumb li a {
+    display: block;
+    float: left;
+    height: 30px;
+    background: #ededed;
+    text-align: center;
+    padding: 10px 20px 0 35px;
+    position: relative;
+    margin: 0 5px 0 0;
+    text-decoration: none;
+    color: #666;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+}
+
+/* Chops out the chevron shape at the left of the breadcrumb box */
+ul.breadcrumb li a:before {
+    content: "";
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 20px solid #fff;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* Creates a triangle at the right of the breadcrumb box */
+ul.breadcrumb li a:after {
+    content: "";
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 20px solid #ededed;
+    position: absolute;
+    right: -20px;
+    top: 0;
+    z-index: 1;
+}
+
+/* Rounded left corners for first item */
+ul.breadcrumb li:first-child a {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    padding-left: 15px;
+}
+
+/* Remove chevron from first item */
+ul.breadcrumb li:first-child a:before {
+    display: none;
+}
+
+/* Rounded right corners for last item */
+ul.breadcrumb li:last-child a {
+    padding-right: 20px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+/* Remove triangle from last item*/
+ul.breadcrumb li:last-child a:after {
+    display: none;
+}
+ 
+ul.breadcrumb li a:hover {
+    background: #e0e0e0;
+}
+
+ul.breadcrumb li a:hover:after {
+    border-left-color: #e0e0e0;
 }
 
 ul.links li:after {
@@ -98,7 +159,7 @@ table td {
 	background: -webkit-gradient(linear, left top, left bottom, from(#fbfbfb), to(#fafafa));
 	background: -moz-linear-gradient(top,  #fbfbfb,  #fafafa);
 }
-table tr.even td {
+table tr:nth-child(even) td {
 	background: #f6f6f6;
 	background: -webkit-gradient(linear, left top, left bottom, from(#f8f8f8), to(#f6f6f6));
 	background: -moz-linear-gradient(top,  #f8f8f8,  #f6f6f6);
@@ -124,4 +185,14 @@ table tr:hover td {
 
 .right {
     float: right;
+}
+
+.form-label {
+    display: inline-block;
+    vertical-align: top;
+    width: 15em;
+}
+
+input.long {
+    width: 30em;
 }

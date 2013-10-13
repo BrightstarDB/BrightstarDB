@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
@@ -14,6 +15,8 @@ namespace BrightstarDB.Server.Modules.Tests
     [TestFixture]
     public class JobsUrlSpec
     {
+        private static readonly MediaRange Json = MediaRange.FromString("application/json");
+
         #region Consolidate Job
         [Test]
         public void TestPostConsolidateJob()
@@ -372,6 +375,77 @@ namespace BrightstarDB.Server.Modules.Tests
             AssertPermissionRequired(JobRequestObject.CreateSnapshotJob("bletch", "Rewrite"), StorePermissions.Admin);
         }
         #endregion
+
+        #region List Jobs
+        [Test]
+        public void TestListJobs()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            brightstar.Setup(s => s.GetJobInfo("foo", 0, 11)).Returns(MockJobInfo(11)).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+
+            var response = app.Get("/foo/jobs", with => with.Accept(Json));
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            var jobs = response.Body.DeserializeJson<List<JobResponseModel>>();
+            Assert.That(jobs, Is.Not.Null);
+            Assert.That(jobs.Count, Is.EqualTo(10));
+            brightstar.Verify();
+        }
+
+        private static IEnumerable<IJobInfo> MockJobInfo(int num)
+        {
+            for (int i = 0; i < num; i++)
+            {
+                var mock = new Mock<IJobInfo>();
+                mock.Setup(j => j.JobId).Returns(Guid.NewGuid().ToString);
+                mock.Setup(j => j.StatusMessage).Returns("Mock job #" + i);
+                mock.Setup(j => j.JobCompletedOk).Returns(true);
+                yield return mock.Object;
+            }
+        }
+
+        #endregion
+
+        [Test]
+        public void TestGetJob()
+        {
+            var mockJob = new Mock<IJobInfo>();
+            mockJob.Setup(j => j.JobId).Returns("EDBB1735-426B-4A57-B8E2-91C581D54075");
+            mockJob.Setup(j => j.StatusMessage).Returns("Mock Job");
+            mockJob.Setup(j => j.JobCompletedOk).Returns(true);
+            var brightstar = new Mock<IBrightstarService>();
+            brightstar.Setup(s => s.GetJobInfo("foo", "EDBB1735-426B-4A57-B8E2-91C581D54075")).Returns(
+                mockJob.Object).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+
+            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075", with => with.Accept(Json));
+            
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            var job = response.Body.DeserializeJson<JobResponseModel>();
+            Assert.That(job, Is.Not.Null);
+            Assert.That(job.JobId, Is.EqualTo("EDBB1735-426B-4A57-B8E2-91C581D54075"));
+            Assert.That(job.StatusMessage, Is.EqualTo("Mock Job"));
+            Assert.That(job.JobCompletedOk, Is.EqualTo(true));
+            Assert.That(job.JobCompletedWithErrors, Is.EqualTo(false));
+            brightstar.Verify();
+        }
+
+        [Test]
+        public void TestGetJobWithInvalidJobIdReturnsNotFound()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            brightstar.Setup(s => s.GetJobInfo("foo", "EDBB1735-426B-4A57-B8E2-91C581D54075"))
+                      .Returns(()=>null)
+                      .Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+
+            var response = app.Get("/foo/jobs/EDBB1735-426B-4A57-B8E2-91C581D54075");
+
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        }
 
         private void AssertPermissionRequired(JobRequestObject jobRequest, StorePermissions witheldPermission)
         {

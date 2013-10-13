@@ -50,6 +50,11 @@
   <ItemGroup>
     <Compile Include="BrightstarBootstrapper.cs" />
     <Compile Include="BrightstarModuleSecurity.cs" />
+    <Compile Include="FixedRootPathProvider.cs" />
+    <Compile Include="Model\CommitPointsRequestModel.cs" />
+    <Compile Include="Model\IPagedResultModel.cs" />
+    <Compile Include="Model\JobRequestModel.cs" />
+    <Compile Include="Model\JobsRequestModel.cs" />
     <Compile Include="Model\PagedResultModel.cs" />
     <Compile Include="Model\StoreDeletedModel.cs" />
     <Compile Include="Model\StoresResponseModel.cs" />
@@ -61,10 +66,10 @@
     <Compile Include="Permissions\AbstractSystemPermissionsProvider.cs" />
     <Compile Include="JobsModule.cs" />
     <Compile Include="LatestStatisticsModule.cs" />
-    <Compile Include="Model\CommitPointResponseObject.cs" />
+    <Compile Include="Model\CommitPointResponseModel.cs" />
     <Compile Include="Model\CreateStoreRequestObject.cs" />
     <Compile Include="Model\JobRequestObject.cs" />
-    <Compile Include="Model\JobResponseObject.cs" />
+    <Compile Include="Model\JobResponseModel.cs" />
     <Compile Include="Model\SparqlRequestObject.cs" />
     <Compile Include="Model\SparqlUpdateRequestObject.cs" />
     <Compile Include="Model\StatisticsRequestObject.cs" />
@@ -75,7 +80,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
-    <Compile Include="Model\TransactionResponseObject.cs" />
+    <Compile Include="Model\TransactionResponseModel.cs" />
     <Compile Include="Model\TransactionsRequestObject.cs" />
     <Compile Include="NegotiatorExtensions.cs" />
     <Compile Include="Permissions\PassAllStorePermissionsProvider.cs" />
@@ -93,6 +98,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Permissions\SystemPermissions.cs" />
     <Compile Include="TransactionsModule.cs" />
+    <Content Include="assets\jquery-1.10.2.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\sample.html" />
     <Content Include="Views\StoreDeleted.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -106,11 +115,25 @@
     <Content Include="Views\SparqlResult.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Views\SparqlResult.sshtml" />
     <Content Include="Views\StoresResponse.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\_Layout.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\PagedTransactionResponse.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\PagedCommitPointResponse.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\ListPaging.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\PagedJobResponse.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\JobResponse.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -1,0 +1,18 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Server.Modules.Model.IPagedResultModel>
+
+<nav>
+        <ul class="links">
+            @if (!string.IsNullOrEmpty(Model.FirstPageLink))
+            {
+                <li><a href="@Model.FirstPageLink" title="First page of results">&lt;&lt;</a></li>
+            }
+            @if (!string.IsNullOrEmpty(Model.PreviousPageLink))
+            {
+                <li><a href="@Model.PreviousPageLink" title="Previous page of results">&lt;</a></li>
+            }
+            @if (!string.IsNullOrEmpty(Model.NextPageLink))
+            {
+                <li><a href="@Model.NextPageLink" title="Next page of results">&gt;</a></li>
+            }
+        </ul>
+    </nav>

@@ -1,0 +1,38 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Server.Modules.Model.JobResponseModel>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "BrightstarDB: Job Information";
+}
+
+<nav>
+    <ul class="horizontal breadcrumb">
+        <li><a href="~/">Home</a></li>
+        <li><a href="~/@Model.StoreName">Store: @Model.StoreName</a></li>
+        <li><a href="~/@Model.StoreName/jobs">Jobs</a></li>
+        <li><a href="#">@Model.JobId</a></li>
+    </ul>
+</nav>
+
+<fieldset>
+    <legend>Job Info</legend>
+    <div class="field">
+        <span class="label">Job ID</span>
+        <span class="value">@Model.JobId</span>
+    </div>
+    <div class="field">
+        <span class="label">Status</span>
+        <span class="value">@Model.JobStatus</span>
+    </div>
+    <div class="field">
+        <span class="label">Started At</span>
+        <span class="value">@Model.Started</span>
+    </div>
+    <div class="field">
+        <span class="label">Ended At</span>
+        <span class="value">@Model.Ended</span>
+    </div>
+    <div class="field">
+        <span class="label">Message</span>
+        <span class="value">@Model.StatusMessage</span>
+    </div>
+</fieldset>
