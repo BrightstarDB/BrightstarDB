@@ -187,6 +187,11 @@ table tr:hover td {
     float: right;
 }
 
+.left {
+    float: left;
+    margin-right: 20px;
+}
+
 .form-label {
     display: inline-block;
     vertical-align: top;

@@ -3,6 +3,7 @@ using BrightstarDB.Server.Modules.Permissions;
 using Moq;
 using NUnit.Framework;
 using Nancy;
+using Nancy.Responses.Negotiation;
 using Nancy.Testing;
 
 namespace BrightstarDB.Server.Modules.Tests
@@ -68,7 +69,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var response = app.Post("/foo/update", with => with.FormValue("update", "update expression"));
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
             brightstar.Verify();
         }
 
@@ -85,6 +86,18 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
             permissions.Verify();
 
+        }
+
+        [Test]
+        public void TestGetReturnsHtmlForm()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+
+            var response = app.Get("/foo/update", with=>with.Accept(MediaRange.FromString("text/html")));
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Body.AsString(), Contains.Substring("<h1>SPARQL Update</h1>"));
         }
     }
 }

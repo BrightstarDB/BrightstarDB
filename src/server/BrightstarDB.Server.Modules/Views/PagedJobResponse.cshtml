@@ -14,7 +14,7 @@
     </ul>
 </nav>
 
-<table>
+<table id="jobsTable">
     <thead>
         <tr>
             <th>Job ID</th>
@@ -40,12 +40,12 @@
 
 @Html.Partial("ListPaging.cshtml", Model as BrightstarDB.Server.Modules.Model.IPagedResultModel)
 
-<form method="POST">
+<form method="POST" id="newJobForm">
     <fieldset>
         <legend>Post New Job</legend>
         <div>
             <label class="form-label" for="jobType">Job Type</label>
-            <select id="jobType">
+            <select id="jobType" name="JobType">
                 <option value="Consolidate">Consolidate Store</option>
                 <option value="Export">Export RDF</option>
                 <option value="Import">Import RDF</option>
@@ -94,7 +94,7 @@
                 <option value="Rewrite">Rewrite</option>
             </select>
         </div>
-        <button type="submit">Create Job</button>
+        <button type="submit" id="createJobButton">Create Job</button>
     </fieldset>
 </form>
 
@@ -115,4 +115,24 @@
             break;
         }
     });
+    $('#createJobButton').click(function (event) {
+        event.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "@Url.Content("~/"+Model.RequestProperties.StoreName+"/jobs")",
+            data: $('#newJobForm').serialize(),
+            dataType: 'json'
+        }).done(function(data) {
+            $('<tr></tr>').prependTo($('#jobsTable tbody'))
+                .append('<td>' + data.JobId + '</td>')
+                .append('<td>' + data.JobStatus + '</td>')
+                .append('<td></td>')
+                .append('<td></td>')
+                .append('<td>Job Queued</td>');
+        }).fail(function (jqXHR, textStatus) {
+            alert("Request failed: " + textStatus);
+            alert("Job creation failed. Please check the validity of all job arguments");
+        });
+    });
+    
 </script>

@@ -53,6 +53,7 @@
     <Compile Include="BrightstarBootstrapper.cs" />
     <Compile Include="BrightstarModuleSecurity.cs" />
     <Compile Include="FixedRootPathProvider.cs" />
+    <Compile Include="JobInfoExtensions.cs" />
     <Compile Include="Model\CommitPointsRequestModel.cs" />
     <Compile Include="Model\IPagedResultModel.cs" />
     <Compile Include="Model\JobRequestModel.cs" />
@@ -75,7 +76,7 @@
     <Compile Include="Model\SparqlRequestObject.cs" />
     <Compile Include="Model\SparqlUpdateRequestObject.cs" />
     <Compile Include="Model\StatisticsRequestObject.cs" />
-    <Compile Include="Model\StatisticsResponseObject.cs" />
+    <Compile Include="Model\StatisticsResponseModel.cs" />
     <Compile Include="Model\StoreResponseModel.cs" />
     <Compile Include="Model\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -136,6 +137,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Views\JobResponse.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\PagedStatisticsResponse.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\SparqlUpdate.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -14,6 +14,11 @@
         /// Type for a triple update transaction
         /// </summary>
         UpdateTransaction = 1,
+
+        /// <summary>
+        /// Type for a SPARQL update transaction
+        /// </summary>
+        SparqlUpdateTransaction = 2
     }
 
     /// <summary>

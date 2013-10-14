@@ -27,7 +27,7 @@ namespace BrightstarDB.Server.Modules
                     var jobs = brightstarService.GetJobInfo(jobsRequestObject.StoreName, jobsRequestObject.Skip,
                                                             DefaultPageSize + 1);
                     return Negotiate.WithPagedList(jobsRequestObject,
-                                                   jobs.Select(j=>MakeResponseObject(j, jobsRequestObject.StoreName)),
+                                                   jobs.Select(j=>j.MakeResponseObject(jobsRequestObject.StoreName)),
                                                    jobsRequestObject.Skip, DefaultPageSize, DefaultPageSize,
                                                    "jobs");
                 };
@@ -43,7 +43,7 @@ namespace BrightstarDB.Server.Modules
                     }
                     var job = brightstarService.GetJobInfo(request.StoreName, request.JobId);
                     if (job == null) return HttpStatusCode.NotFound;
-                    return MakeResponseObject(job, request.StoreName);
+                    return job.MakeResponseObject(request.StoreName);
                 };
 
             Post["/{storeName}/jobs"] = parameters =>
@@ -199,7 +199,7 @@ namespace BrightstarDB.Server.Modules
                             {
                                 JobId = queuedJobInfo.JobId,
                                 StatusMessage = queuedJobInfo.StatusMessage,
-                                JobStatus = GetJobStatusString(queuedJobInfo)
+                                JobStatus = queuedJobInfo.GetJobStatusString()
                             }, new DefaultJsonSerializer())
                             .WithHeader("Content-Location", queuedJobInfo.JobId)
                             .WithStatusCode(HttpStatusCode.OK);
@@ -213,17 +213,7 @@ namespace BrightstarDB.Server.Modules
                 };
         }
 
-        private static JobResponseModel MakeResponseObject(IJobInfo arg, string storeName)
-        {
-            return new JobResponseModel
-                {
-                    JobId = arg.JobId,
-                    JobStatus = GetJobStatusString(arg),
-                    StatusMessage = arg.StatusMessage,
-                    StoreName = storeName
-                    // TODO: Extend IJobInfo with date/time stamp properties
-                };
-        }
+        
 
         private void AssertPermission(StorePermissions permissionRequired)
         {
@@ -238,13 +228,6 @@ namespace BrightstarDB.Server.Modules
             throw new UnauthorizedAccessException();
         }
 
-        private static string GetJobStatusString(IJobInfo jobInfo)
-        {
-            if (jobInfo.JobPending) return "Pending";
-            if (jobInfo.JobStarted) return "Started";
-            if (jobInfo.JobCompletedOk) return "CompletedOk";
-            if (jobInfo.JobCompletedWithErrors) return "TransactionError";
-            return "Unknown";
-        }
+        
     }
 }

@@ -50,7 +50,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Headers["Link"], new LinkExistsConstraint("next", "statistics?skip=10"));
-            var results = response.Body.DeserializeJson<List<StatisticsResponseObject>>();
+            var results = response.Body.DeserializeJson<List<StatisticsResponseModel>>();
             Assert.That(results, Is.Not.Null);
             Assert.That(results.Count, Is.EqualTo(10));
             brightstar.Verify();
@@ -83,7 +83,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Headers["Link"], new LinkExistsConstraint("next", String.Format("statistics?latest={0}&earliest={1}&skip=10", now.ToString("s"), lastWeek.ToString("s"))));
-            var results = response.Body.DeserializeJson<List<StatisticsResponseObject>>();
+            var results = response.Body.DeserializeJson<List<StatisticsResponseModel>>();
             Assert.That(results, Is.Not.Null);
             Assert.That(results.Count, Is.EqualTo(10));
             brightstar.Verify();
@@ -111,7 +111,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Headers["Link"], new LinkExistsConstraint("next", String.Format("statistics?earliest={0}&skip=10", lastWeek.ToString("s"))));
-            var results = response.Body.DeserializeJson<List<StatisticsResponseObject>>();
+            var results = response.Body.DeserializeJson<List<StatisticsResponseModel>>();
             Assert.That(results, Is.Not.Null);
             Assert.That(results.Count, Is.EqualTo(10));
             brightstar.Verify();
@@ -138,7 +138,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Headers["Link"], new LinkExistsConstraint("next", String.Format("statistics?latest={0}&skip=10", now.ToString("s"))));
-            var results = response.Body.DeserializeJson<List<StatisticsResponseObject>>();
+            var results = response.Body.DeserializeJson<List<StatisticsResponseModel>>();
             Assert.That(results, Is.Not.Null);
             Assert.That(results.Count, Is.EqualTo(10));
             brightstar.Verify();
@@ -166,7 +166,7 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.Headers["Link"], new LinkExistsConstraint("next", "statistics?skip=20"));
             Assert.That(response.Headers["Link"], new LinkExistsConstraint("prev", "statistics"));
             Assert.That(response.Headers["Link"], new LinkExistsConstraint("first", "statistics"));
-            var results = response.Body.DeserializeJson<List<StatisticsResponseObject>>();
+            var results = response.Body.DeserializeJson<List<StatisticsResponseModel>>();
             Assert.That(results, Is.Not.Null);
             Assert.That(results.Count, Is.EqualTo(10));
             brightstar.Verify();

@@ -38,5 +38,13 @@ namespace BrightstarDB.Server.Modules.Tests
             container.Register<AbstractStorePermissionsProvider>(_storePermissionsProvider);
             container.Register(_systemPermissionsProvider);
         }
+
+        protected override IRootPathProvider RootPathProvider
+        {
+            get
+            {
+                return new DefaultRootPathProvider();
+            }
+        }
     }
 }

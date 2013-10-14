@@ -7,6 +7,7 @@ namespace BrightstarDB.Server.Modules
     {
         private readonly string _rootPath;
 
+        public FixedRootPathProvider() : this(null) { }
         public FixedRootPathProvider(string rootPath)
         {
             _rootPath = rootPath == null ? null : Path.GetFullPath(rootPath);

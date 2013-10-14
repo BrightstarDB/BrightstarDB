@@ -14,7 +14,16 @@ namespace BrightstarDB.Server.Modules
 
         public SparqlUpdateModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider permissionsProvider)
         {
-            this.RequiresBrightstarStorePermission(permissionsProvider, post:StorePermissions.SparqlUpdate);
+            this.RequiresBrightstarStorePermission(permissionsProvider, get:StorePermissions.SparqlUpdate, post:StorePermissions.SparqlUpdate);
+
+            Get["/{storeName}/update"] = parameters =>
+                {
+                    var requestObject = this.Bind<SparqlUpdateRequestObject>();
+                    return
+                        Negotiate.WithAllowedMediaRange(MediaRange.FromString("text/html"))
+                                 .WithModel(requestObject)
+                                 .WithView("SparqlUpdate");
+                };
 
             Post["/{storeName}/update"] = parameters =>
                 {
@@ -30,13 +39,16 @@ namespace BrightstarDB.Server.Modules
                     if (!parameters["storeName"].HasValue) return HttpStatusCode.BadRequest;
                     if (string.IsNullOrWhiteSpace(requestObject.Update)) return HttpStatusCode.BadRequest;
 
-                    var jobInfo = brightstarService.ExecuteUpdate(parameters["storeName"], requestObject.Update, true);
+                    IJobInfo jobInfo = brightstarService.ExecuteUpdate(parameters["storeName"], requestObject.Update, true);
                     if (jobInfo.JobCompletedOk)
                     {
-                        return HttpStatusCode.OK;
+                        return jobInfo.MakeResponseObject(requestObject.StoreName);
                     }
-                    return HttpStatusCode.InternalServerError;
+                    return
+                        Negotiate.WithStatusCode(HttpStatusCode.BadRequest)
+                                 .WithModel(jobInfo.MakeResponseObject(requestObject.StoreName));
                 };
         }
+
     }
 }

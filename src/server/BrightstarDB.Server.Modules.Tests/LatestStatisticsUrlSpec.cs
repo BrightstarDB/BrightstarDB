@@ -26,7 +26,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            var result = response.Body.DeserializeJson<StatisticsResponseObject>();
+            var result = response.Body.DeserializeJson<StatisticsResponseModel>();
             Console.WriteLine(response.Headers["Link"]);
             Assert.That(result, Is.Not.Null);
             brightstar.Verify();

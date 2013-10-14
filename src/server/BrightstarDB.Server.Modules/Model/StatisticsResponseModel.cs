@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BrightstarDB.Server.Modules.Model
 {
-    public class StatisticsResponseObject
+    public class StatisticsResponseModel
     {
         public ulong CommitId { get; set; }
         public DateTime CommitTimestamp { get; set; }

@@ -18,9 +18,9 @@ namespace BrightstarDB.Server.Modules
                 };
         }
 
-        private static StatisticsResponseObject MakeResponseModel(IStoreStatistics stats)
+        private static StatisticsResponseModel MakeResponseModel(IStoreStatistics stats)
         {
-            return new StatisticsResponseObject
+            return new StatisticsResponseModel
                 {
                     CommitId = stats.CommitId,
                     CommitTimestamp = stats.CommitTimestamp,
