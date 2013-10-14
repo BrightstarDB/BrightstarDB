@@ -20,6 +20,9 @@ function buildComponent {
 }
 
 buildComponent core BrightstarDB
+buildComponent server BrightstarDB.Server.Modules
+buildComponent server BrightstarDB.Server.Runner
+buildComponent server BrightstarDB.Server.Modules.Tests
 
 # TODO : Add build of REST service and tests here when ready.
 
