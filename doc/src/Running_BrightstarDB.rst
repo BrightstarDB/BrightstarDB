@@ -9,6 +9,30 @@ The WCF service can be hosted either in a Windows Service which can be configure
 to automatically start when the host machine starts; or it can be run as a command-line
 application. 
 
+***********************************
+ Namespace Reservation
+***********************************
+
+The BrightstarDB server requires permission from the Windows system to start listening
+for connections on an HTTP port. This permission must be granted to the user that 
+the service runs as. When the BrightstarDB server is run as a service, this will be the 
+service user. When the BrightstarDB server is run from a command line, it will be the
+user who starts the command line shell.
+
+To grant users the permission to listen for connections on a particular endpoint 
+you must run the ``http add urlacl`` command in command prompt with elevated 
+(Administrator) permissions.
+
+If you use the default port and path for the BrightstarDB service, the following
+command will grant all users the required permissions to start the service::
+
+    netsh http add urlacl url=http://+:8090/brightstar/ user=Everyone
+
+note:
+    The BrightstarDB installer will automatically make the required reservation
+    for running the BrightstarDB server as a Windows service using the default
+    port (8090) and path (/brightstar/)
+
 *********************************************
  Running BrightstarDB as a Windows Service
 *********************************************
@@ -39,6 +63,7 @@ Note that either no parameters are passed or all four parameters are required::
 
   - <pipe name> specifies the name of the named pipe that the named pipe interface to the BrightstarDB service will use to listen for connections. This overrides the BrightstarDB.NetNamedPipeName configuration option.
 
+    
 ***********************************
  BrightstarDB Configuration Options
 ***********************************
