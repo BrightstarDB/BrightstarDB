@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using BrightstarDB.Dto;
 using BrightstarDB.Profiling;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
@@ -71,7 +72,7 @@ namespace BrightstarDB.Server
             catch (RdfParserException parserException)
             {
                 ErrorMessage = parserException.Message;
-                ExceptionDetail = new ExceptionDetail(parserException);
+                ExceptionDetail = new ExceptionDetailObject(parserException);
                 Logging.LogInfo("Parser error processing import job on file " + _contentFileName + ". " + parserException.Message);
                 throw;
             }

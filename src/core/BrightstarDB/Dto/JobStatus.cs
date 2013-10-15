@@ -1,4 +1,4 @@
-﻿namespace BrightstarDB.Server
+﻿namespace BrightstarDB.Dto
 {
     internal enum JobStatus
     {

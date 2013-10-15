@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Rdf;
 
 namespace BrightstarDB.Server
@@ -159,6 +160,6 @@ namespace BrightstarDB.Server
             }
         }
 
-        public override Storage.TransactionType TransactionType { get { return Storage.TransactionType.UpdateTransaction; } }
+        public override TransactionType TransactionType { get { return TransactionType.UpdateTransaction; } }
     }
 }

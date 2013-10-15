@@ -258,7 +258,7 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store to be updated</param>
         /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
         /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         public IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true)
         {
             // TODO: Implement update with SPARQL protocol

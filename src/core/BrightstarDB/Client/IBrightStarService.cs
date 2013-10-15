@@ -145,7 +145,7 @@ namespace BrightstarDB.Client
         /// <param name="insertData">The NTriples or NQuads data that will be inserted into the store.</param>
         /// <param name="defaultGraphUri">The URI of the default graph that the transaction will be applied to</param>
         /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         /// <remarks>If <paramref name="preconditions"/>, <paramref name="deletePatterns"/> or <paramref name="insertData"/> contain
         /// quads, the graph URI specified by the quad will override the value provided by <paramref name="defaultGraphUri"/>. </remarks>
         IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri = Constants.DefaultGraphUri, bool waitForCompletion = true);
@@ -156,7 +156,7 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store to be updated</param>
         /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
         /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true);
 #endif
 
@@ -175,7 +175,7 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="storeName">Name of the store where the job is running</param>
         /// <param name="jobId">The Id of the job</param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         IJobInfo GetJobInfo(string storeName, string jobId);
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace BrightstarDB.Client
         /// <param name="store">The store to perform the import to</param>
         /// <param name="fileName">The name of the file in brighhtstar\import folder to import.</param>
         /// <param name="graphUri">The URI of the default graph to import the data into. Defaults to <see cref="Constants.DefaultGraphUri"/></param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         IJobInfo StartImport(string store, string fileName, string graphUri = Constants.DefaultGraphUri);
 
         /// <summary>

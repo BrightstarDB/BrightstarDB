@@ -94,7 +94,6 @@
     <Compile Include="OptimiserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryTests.cs" />
-    <Compile Include="RemoteProxyTests.cs" />
     <Compile Include="BPlusTreeTests\ResourceTableTests.cs" />
     <Compile Include="ScalingTests.cs" />
     <Compile Include="SparqlTestSuite\ManifestEvaluation.cs" />
@@ -103,13 +102,8 @@
     <Compile Include="StoreTestsBase.cs" />
     <Compile Include="StoreWorkerTests.cs" />
     <Compile Include="StreamTests.cs" />
-    <Compile Include="ClientCacheTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BrightstarDB.Service\BrightstarDB.Service.csproj">
-      <Project>{9BBB50DF-AE78-4BFC-8AFA-FF829E86DF8A}</Project>
-      <Name>BrightstarDB.Service</Name>
-    </ProjectReference>
     <ProjectReference Include="..\BrightstarDB.Tests\BrightstarDB.Tests.csproj">
       <Project>{4EB8BF43-94B1-4264-B2C9-9EE1BAB7F094}</Project>
       <Name>BrightstarDB.Tests</Name>

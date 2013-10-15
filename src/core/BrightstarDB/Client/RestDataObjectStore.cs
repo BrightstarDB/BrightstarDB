@@ -1,5 +1,4 @@
-﻿#if REST_CLIENT
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace BrightstarDB.Client
 {
@@ -36,4 +35,3 @@ namespace BrightstarDB.Client
         }
     }
 }
-#endif

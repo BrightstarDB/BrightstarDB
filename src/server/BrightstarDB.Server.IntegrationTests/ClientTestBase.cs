@@ -1,15 +1,12 @@
 ﻿#if !PORTABLE
 using System;
 using System.Diagnostics;
-using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 #if !SDK_TESTS
-using BrightstarDB.Service;
 #endif
-using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.Server.IntegrationTests
 {
     public class ClientTestBase
     {

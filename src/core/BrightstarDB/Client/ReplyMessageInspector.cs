@@ -1,5 +1,4 @@
-﻿#if !REST_CLIENT
-using System;
+﻿using System;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
@@ -119,4 +118,3 @@ namespace BrightstarDB.Client
         #endregion
     }
 }
-#endif

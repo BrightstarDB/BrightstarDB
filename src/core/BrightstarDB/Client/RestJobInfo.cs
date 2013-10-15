@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ServiceModel;
 using System.Web.Script.Serialization;
+using BrightstarDB.Dto;
 
 namespace BrightstarDB.Client
 {
@@ -80,7 +81,7 @@ namespace BrightstarDB.Client
         /// Exception information
         /// </summary>
         [ScriptIgnore]
-        public ExceptionDetail ExceptionInfo
+        public ExceptionDetailObject ExceptionInfo
         {
             get { return null; }
         }

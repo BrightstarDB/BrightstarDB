@@ -1,5 +1,4 @@
-﻿#if !REST_CLIENT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using BrightstarDB.Profiling;
 using BrightstarDB.Storage;
@@ -99,4 +98,3 @@ namespace BrightstarDB.Rdf
         }
     }
 }
-#endif

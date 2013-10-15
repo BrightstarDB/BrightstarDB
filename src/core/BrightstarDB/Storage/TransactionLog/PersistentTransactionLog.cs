@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using BrightstarDB.Dto;
+
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif

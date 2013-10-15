@@ -6,20 +6,38 @@ using System.Text;
 using System.Threading;
 using System.Xml.Linq;
 using BrightstarDB.Client;
-using BrightstarDB.EntityFramework;
 using BrightstarDB.Storage;
-using BrightstarDB.Tests;
 using NUnit.Framework;
 
-namespace BrightstarDB.InternalTests
+namespace BrightstarDB.Server.IntegrationTests
 {
     [TestFixture]
-    public class DataObjectTests
+    public class DataObjectTests : ClientTestBase
     {
-        private IDataObjectContext GetContext()
+        [TestFixtureSetUp]
+        public void SetUp()
         {
-            return BrightstarService.GetDataObjectContext(
-                "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=DataObjectTests" + Guid.NewGuid());
+            StartService();
+        }
+
+        [TestFixtureTearDown]
+        public void TearDown()
+        {
+            CloseService();
+        }
+
+        private IDataObjectContext GetContext(string type)
+        {
+            switch(type)
+            {
+                case "http":
+                    return BrightstarService.GetDataObjectContext(
+                        "Type=http;endpoint=http://localhost:8090/brightstar;StoreName=DataObjectTests" + Guid.NewGuid());
+                case "embedded":
+                    return BrightstarService.GetDataObjectContext(
+                        "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=DataObjectTests" + Guid.NewGuid());
+            }
+            return null;
         }
 
         [Test]
@@ -31,6 +49,15 @@ namespace BrightstarDB.InternalTests
             Assert.IsNotNull(context);
         }
 
+        [Test]
+        public void TestGetHttpDataContextByConnectionString()
+        {
+            var connectionString = "Type=http;endpoint=http://localhost:8090/brightstar;StoreName=DataObjectTests" + Guid.NewGuid();
+            var cs = new ConnectionString(connectionString);
+            var context = BrightstarService.GetDataObjectContext(cs);
+            Assert.IsNotNull(context);
+            Assert.AreEqual(typeof(HttpDataObjectContext), context.GetType());
+        }
        
         [Test]
         public void TestGetEmbeddedDataContextByConnectionString()
@@ -40,6 +67,31 @@ namespace BrightstarDB.InternalTests
             var context = BrightstarService.GetDataObjectContext(cs);
             Assert.IsNotNull(context);
             Assert.AreEqual(typeof(EmbeddedDataObjectContext), context.GetType());
+        }
+
+        [Test]
+        public void TestGetHttpDataContextCreateStore()
+        {
+            var connectionString = "Type=http;endpoint=http://localhost:8090/brightstar;StoreName=DataObjectTests" + Guid.NewGuid();
+            var cs = new ConnectionString(connectionString);
+            var context = BrightstarService.GetDataObjectContext(cs);
+            Assert.IsNotNull(context);
+            var store = context.CreateStore(cs.StoreName);
+            Assert.IsNotNull(store);
+        }
+
+        [Test]
+        [ExpectedException(typeof(BrightstarClientException))]
+        public void TestGetHttpDataContextDeleteStore()
+        {
+            var context = GetContext("http");
+            Assert.IsNotNull(context);
+            var storeId = "todelete_" + Guid.NewGuid().ToString();
+            var store = context.CreateStore(storeId);
+            Assert.IsNotNull(store);
+            context.DeleteStore(storeId);
+            Thread.Sleep(1000); // Slight delay to allow time for the shutdown to be processed
+            context.OpenStore(storeId);
         }
 
         [Test]
@@ -53,6 +105,18 @@ namespace BrightstarDB.InternalTests
             Assert.IsNotNull(store, "store is null");
         }
 
+        [Test]
+        public void TestGetHttpDataContextOpenStore()
+        {
+            var connectionString = "Type=http;endpoint=http://localhost:8090/brightstar;StoreName=DataObjectTests" + Guid.NewGuid();
+            var cs = new ConnectionString(connectionString);
+            var context = BrightstarService.GetDataObjectContext(cs);
+            Assert.IsNotNull(context);
+            var store = context.CreateStore(cs.StoreName);
+            Assert.IsNotNull(store);
+            store = context.OpenStore(cs.StoreName);
+            Assert.IsNotNull(store);
+        }
         [Test]
         public void TestGetEmbeddedDataContextOpenStore()
         {
@@ -100,9 +164,21 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
+        public void TestOpenDataObjectStoreWithNamespaceMappingsHttp()
+        {
+            var context = GetContext("http");
+            Assert.IsNotNull(context);
+            var storeName = Guid.NewGuid().ToString();
+            var store = context.CreateStore(storeName);
+            Assert.IsNotNull(store);
+            store = context.OpenStore(storeName, new Dictionary<string, string> { { "people", "http://www.networkedplanet.com/people/" } });
+            Assert.IsNotNull(store);
+        }
+
+        [Test]
         public void TestOpenDataObjectStoreWithNamespaceMappingsEmbedded()
         {
-            var context = GetContext();
+            var context = GetContext("embedded");
             Assert.IsNotNull(context);
             var storeName = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeName);
@@ -123,9 +199,20 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
+        public void TestCreateDataObjectWithUriHttp()
+        {
+            var context = GetContext("http");
+            Assert.IsNotNull(context);
+            var store = context.CreateStore(Guid.NewGuid().ToString());
+            Assert.IsNotNull(store);
+            var p1 = store.MakeDataObject("http://www.networkedplanet.com/people/gra");
+            Assert.IsNotNull(p1);
+        }
+
+        [Test]
         public void TestCreateDataObjectWithUriEmbedded()
         {
-            var context = GetContext();
+            var context = GetContext("embedded");
             Assert.IsNotNull(context);
             var store = context.CreateStore(Guid.NewGuid().ToString());
             Assert.IsNotNull(store);
@@ -145,9 +232,20 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
+        public void TestCreateDataObjectWithStringHttp()
+        {
+            var context = GetContext("http");
+            Assert.IsNotNull(context);
+            var store = context.CreateStore(Guid.NewGuid().ToString());
+            Assert.IsNotNull(store);
+            var p1 = store.MakeDataObject("http://www.networkedplanet.com/people/gra");
+            Assert.IsNotNull(p1);
+        }
+
+        [Test]
         public void TestCreateDataObjectWithStringEmbedded()
         {
-            var context = GetContext();
+            var context = GetContext("embedded");
             Assert.IsNotNull(context);
             var store = context.CreateStore(Guid.NewGuid().ToString());
             Assert.IsNotNull(store);
@@ -200,7 +298,7 @@ namespace BrightstarDB.InternalTests
         [Test]
         public void TestRetrieveNonExistantDataObject()
         {
-            var context = GetContext();
+            var context = GetContext("http");
             var storeId = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeId);
             var p1 = store.GetDataObject("http://some.random.uri/thing");

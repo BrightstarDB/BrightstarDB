@@ -60,13 +60,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BrightstarDB\Client\CommitPointInfo.cs" />
-    <Compile Include="BrightstarDB\Client\JobInfo.cs" />
-    <Compile Include="BrightstarDB\Client\StoreStatistics.cs" />
-    <Compile Include="BrightstarDB\Client\TransactionInfo.cs" />
-    <Compile Include="BrightstarDB\Client\TransactionStatus.cs" />
-    <Compile Include="BrightstarDB\Client\TransactionType.cs" />
-    <Compile Include="BrightstarDB\ExceptionDetail.cs" />
     <Compile Include="BrightstarDB\MobileInternals.cs" />
     <Compile Include="BrightstarDB\SmartAssembly.Attributes.cs" />
     <Compile Include="MD5.cs" />

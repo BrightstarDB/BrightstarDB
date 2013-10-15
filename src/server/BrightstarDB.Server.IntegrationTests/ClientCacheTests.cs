@@ -5,10 +5,9 @@ using System.Linq;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
 using BrightstarDB.Storage;
-using BrightstarDB.Tests;
 using NUnit.Framework;
 
-namespace BrightstarDB.InternalTests
+namespace BrightstarDB.Server.IntegrationTests
 {
     [TestFixture]
     public class ClientCacheTests : ClientTestBase

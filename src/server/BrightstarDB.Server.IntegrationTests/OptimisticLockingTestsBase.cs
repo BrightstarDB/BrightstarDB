@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using BrightstarDB.Client;
 using NUnit.Framework;
 
-namespace BrightstarDB.Tests.EntityFramework
+namespace BrightstarDB.Server.IntegrationTests
 {
     public abstract class OptimisticLockingTestsBase
     {

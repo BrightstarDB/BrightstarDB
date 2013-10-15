@@ -1,4 +1,4 @@
-﻿namespace BrightstarDB.Storage
+﻿namespace BrightstarDB.Dto
 {
     /// <summary>
     /// An enumeration over the types of transactions that are processed by a BrightstarDB server

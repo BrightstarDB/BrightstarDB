@@ -1,5 +1,4 @@
-﻿#if !REST_CLIENT
-using System;
+﻿using System;
 using System.IO;
 
 #if !SILVERLIGHT && !PORTABLE
@@ -194,4 +193,3 @@ namespace BrightstarDB.Rdf
         #endregion
     }
 }
-#endif

@@ -1,12 +1,6 @@
 ﻿using BrightstarDB.Caching;
-#if !REST_CLIENT
 using BrightstarDB.Server;
-#endif
 using System;
-#if !SILVERLIGHT && !PORTABLE
-using System.Xml;
-using System.ServiceModel;
-#endif
 
 
 namespace BrightstarDB.Client
@@ -26,77 +20,10 @@ namespace BrightstarDB.Client
         /// running job is allowed to conclude and all other queued jobs are lost.</param>
         public static void Shutdown(bool allowJobsToConclude=true)
         {
-#if !REST_CLIENT
             ServerCoreManager.Shutdown(allowJobsToConclude);                    
-#endif
         }
-
-
 #if !SILVERLIGHT && !PORTABLE && !__MonoCS__
 
-#if !REST_CLIENT
-        /// <summary>
-        /// Initialises and returns a new HTTP service client. This client should be used when the client is on a separate machine from the service and
-        /// firewall or other constrains prohibit the use of the TcpNet client.
-        /// </summary>
-        /// <param name="endpointUri">The uri where the HTTP endpoint is running. By default this is http://{machinename}:8090/brightstar</param>
-        /// <param name="queryCache">OPTIONAL : the cache to use for query results</param>
-        /// <returns>A new brightstar service client. It is important to call dispose on the client after use.</returns>
-        internal static IBrightstarService GetHttpClient(Uri endpointUri, ICache queryCache = null)
-        {
-            var binding = new BasicHttpContextBinding
-            {
-                MaxReceivedMessageSize = Int32.MaxValue,
-                SendTimeout = TimeSpan.FromMinutes(30),
-                TransferMode = TransferMode.StreamedResponse,
-                ReaderQuotas = XmlDictionaryReaderQuotas.Max
-            };
-            var endpointAddress = new EndpointAddress(endpointUri);
-            var client = new BrightstarServiceClient(new BrightstarWcfServiceClient(binding, endpointAddress), queryCache);
-            return client;
-        }
-
-        /// <summary>
-        /// Initialises and returns a new NetTcp service client. This client should be used when the client is on a separate machine from the service.
-        /// </summary>
-        /// <param name="endpointUri">The uri where the NetTcp endpoint is running. By default this is net.tcp://{machinename}:8095/brightstar</param>
-        /// <param name="queryCache">OPTIONAL : the cache to use for query results</param>
-        /// <returns>A new brightstar service client. It is important to call dispose on the client after use.</returns>
-        internal static IBrightstarService GetNetTcpClient(Uri endpointUri, ICache queryCache = null)
-        {
-            var binding = new NetTcpContextBinding
-            {
-                MaxReceivedMessageSize = Int32.MaxValue,
-                SendTimeout = TimeSpan.FromMinutes(30),
-                TransferMode = TransferMode.StreamedResponse,
-                ReaderQuotas = XmlDictionaryReaderQuotas.Max
-            };
-            var endpointAddress = new EndpointAddress(endpointUri);
-            var client = new BrightstarServiceClient(new BrightstarWcfServiceClient(binding, endpointAddress), queryCache);
-            return client;
-        }
-
-                /// <summary>
-        /// Initialises and returns a new NamedPipe service client. This client should be used when the client is on the same machine as the server.
-        /// </summary>
-        /// <param name="endpointUri">The uri where the Named Pipe endpoint is running. By default this is net.pipe://{machinename}/brightstar</param>
-        /// <param name="queryCache">OPTIONAL : the cache to use for query results</param>
-        /// <returns>A new brightstar service client. It is important to call dispose on the client after use.</returns>
-        internal static IBrightstarService GetNamedPipeClient(Uri endpointUri, ICache queryCache = null)
-        {
-            var binding = new NetNamedPipeBinding
-            {
-                MaxReceivedMessageSize = Int32.MaxValue,
-                SendTimeout = TimeSpan.FromMinutes(30),
-                TransferMode = TransferMode.StreamedResponse,
-                ReaderQuotas = XmlDictionaryReaderQuotas.Max
-            };
-
-            var endpointAddress = new EndpointAddress(endpointUri);
-            var client = new BrightstarServiceClient(new BrightstarWcfServiceClient(binding, endpointAddress), queryCache);
-            return client;
-        }
-#endif
         internal  static  IBrightstarService GetRestClient(ConnectionString connectionString)
         {
             var accountId = connectionString.Account;
@@ -105,7 +32,7 @@ namespace BrightstarDB.Client
         }
 
 #endif
-#if !REST_CLIENT
+
         ///<summary>
         /// Returns a client for the embededd stores in the specified location
         ///</summary>
@@ -115,7 +42,7 @@ namespace BrightstarDB.Client
         {
             return new EmbeddedBrightstarService(baseLocation);
         }
-#endif
+
         ///<summary>
         /// Gets a client based on the connection string specified in the configuration.
         ///</summary>
@@ -150,19 +77,9 @@ namespace BrightstarDB.Client
         {
             switch (connectionString.Type)
             {
-#if !REST_CLIENT
                 case ConnectionType.Embedded:
                     return new EmbeddedBrightstarService(connectionString.StoresDirectory);
-#endif
 #if !SILVERLIGHT && !PORTABLE && !__MonoCS__
-#if !REST_CLIENT
-                case ConnectionType.Http:
-                    return GetHttpClient(new Uri(connectionString.ServiceEndpoint), GetConfiguredCache());
-                case ConnectionType.Tcp:
-                    return GetNetTcpClient(new Uri(connectionString.ServiceEndpoint), GetConfiguredCache());
-                case ConnectionType.NamedPipe:
-                    return GetNamedPipeClient(new Uri(connectionString.ServiceEndpoint), GetConfiguredCache());
-#endif
                 case ConnectionType.Rest:
                     return GetRestClient(connectionString);
 #endif
@@ -209,18 +126,8 @@ namespace BrightstarDB.Client
         {
             switch (connectionString.Type)
             {
-#if !REST_CLIENT
                 case ConnectionType.Embedded:
                     return new EmbeddedDataObjectContext(connectionString);
-#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
-                case ConnectionType.Http:
-                    return new HttpDataObjectContext(connectionString);
-                case ConnectionType.Tcp:
-                    return new NetTcpDataObjectContext(connectionString);
-                case ConnectionType.NamedPipe:
-                    return new NamedPipeDataObjectContext(connectionString);
-#endif
-#endif
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value);

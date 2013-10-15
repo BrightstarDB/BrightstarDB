@@ -1,9 +1,9 @@
-﻿#if !REST_CLIENT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using BrightstarDB.Dto;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Server;
@@ -187,4 +187,3 @@ namespace BrightstarDB.Client
 
     }
 }
-#endif

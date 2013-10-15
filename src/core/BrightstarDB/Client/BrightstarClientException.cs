@@ -1,4 +1,5 @@
 ﻿using System;
+using BrightstarDB.Dto;
 using BrightstarDB.Rdf;
 #if !SILVERLIGHT
 using System.ServiceModel;
@@ -20,24 +21,16 @@ namespace BrightstarDB.Client
         /// <summary>
         /// Gets the detailed description of the exception that caused this client exception to be raised.
         /// </summary>
-        public new ExceptionDetail InnerException { get; private set; }
+        public new ExceptionDetailObject InnerException { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
         public string InnerExceptionType { get; private set; }
 
-#if !SILVERLIGHT
-        internal BrightstarClientException(FaultException<ExceptionDetail> fault) 
-            : base(fault.Detail!=null && fault.Detail.Message != null ? fault.Detail.Message : DefaultServiceErrorMessage)
-        {
-            InnerException = fault.Detail == null ? null : fault.Detail.InnerException;
-        }
-#endif
-
         internal BrightstarClientException(string message) : base(message){}
 
-        internal BrightstarClientException(string message, ExceptionDetail detail) : base(message)
+        internal BrightstarClientException(string message, ExceptionDetailObject detail) : base(message)
         {
             InnerException = detail;
             InnerExceptionType = detail.Type;
@@ -47,12 +40,12 @@ namespace BrightstarDB.Client
             parserException.HaveLineNumber ?String.Format( "{0} Line {1}: {2}", message, parserException.LineNumber, parserException.Message):
             String.Format("{0} {1}", message, parserException.Message), parserException)
         {
-            InnerException = new ExceptionDetail(parserException);
+            InnerException = new ExceptionDetailObject(parserException);
         }
 
         internal BrightstarClientException(string message, Exception inner) : base(message, inner)
         {
-            InnerException = new ExceptionDetail(inner);
+            InnerException = new ExceptionDetailObject(inner);
         }
     }
 }

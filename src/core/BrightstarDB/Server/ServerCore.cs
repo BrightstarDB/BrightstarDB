@@ -9,7 +9,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Storage;
 using System.Threading;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
-using TransactionType = BrightstarDB.Storage.TransactionType;
+using TransactionType = BrightstarDB.Dto.TransactionType;
 using Triple = BrightstarDB.Model.Triple;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;

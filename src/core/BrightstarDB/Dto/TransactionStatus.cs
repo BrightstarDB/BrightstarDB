@@ -1,4 +1,4 @@
-﻿namespace BrightstarDB.Storage
+﻿namespace BrightstarDB.Dto
 {
     /// <summary>
     /// An enumeration over the status codes for completed transactions

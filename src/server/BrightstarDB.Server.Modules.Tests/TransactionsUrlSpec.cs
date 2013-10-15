@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using Moq;
@@ -93,8 +94,8 @@ namespace BrightstarDB.Server.Modules.Tests
             mockTransaction.Setup(t => t.JobId).Returns(Guid.Parse("{6100E798-EDB4-457B-AE33-640EF64BFA18}"));
             mockTransaction.Setup(t => t.StoreName).Returns("foo");
             mockTransaction.Setup(t => t.StartTime).Returns(new DateTime(2013, 09, 29, 11, 38, 00, DateTimeKind.Utc));
-            mockTransaction.Setup(t => t.TransactionType).Returns(BrightstarTransactionType.ImportJob);
-            mockTransaction.Setup(t => t.Status).Returns(BrightstarTransactionStatus.CompletedOk);
+            mockTransaction.Setup(t => t.TransactionType).Returns(TransactionType.ImportJob);
+            mockTransaction.Setup(t => t.Status).Returns(TransactionStatus.CompletedOk);
             var brightstarService = new Mock<IBrightstarService>();
             brightstarService.Setup(s => s.GetTransactions("foo", 0, 11))
                              .Returns(new List<ITransactionInfo> {mockTransaction.Object});

@@ -1,5 +1,4 @@
-﻿#if !REST_CLIENT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using BrightstarDB.Server;
 using BrightstarDB.Storage;
@@ -132,4 +131,3 @@ namespace BrightstarDB.Client
 
     }
 }
-#endif
