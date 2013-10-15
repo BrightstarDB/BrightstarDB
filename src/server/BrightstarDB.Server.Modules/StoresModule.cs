@@ -18,7 +18,11 @@ namespace BrightstarDB.Server.Modules
             Get["/"] = parameters =>
                 {
                     var stores = brightstarService.ListStores();
-                    return new StoresResponseModel {Stores = stores.Select(s => new StoreResponseModel(s)).ToList()};
+                    return
+                        Negotiate.WithModel(new StoresResponseModel
+                            {
+                                Stores = stores.Select(s => new StoreResponseModel(s)).ToList()
+                            });
                 };
 
             Post["/"] = parameters =>
@@ -52,7 +56,9 @@ namespace BrightstarDB.Server.Modules
                     {
                         return HttpStatusCode.BadRequest;   
                     }
-                    return new StoreResponseModel(request.StoreName);
+                    return
+                        Negotiate.WithModel(new StoreResponseModel(request.StoreName))
+                                 .WithStatusCode(HttpStatusCode.Created);
                 };
         }
     }

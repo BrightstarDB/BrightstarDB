@@ -1,6 +1,7 @@
 ﻿#if !PORTABLE
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 using BrightstarDB.Client;
 using NUnit.Framework;
 
-namespace BrightstarDB.Tests
+namespace BrightstarDB.Server.IntegrationTests
 {
     [TestFixture]
     [Ignore]
@@ -21,7 +22,9 @@ namespace BrightstarDB.Tests
         public void SetUp()
         {
             StartService();
-            var importDir = Path.Combine(Configuration.StoreLocation, "import");
+            var appSettings = ConfigurationManager.AppSettings;
+            var storeLocation = appSettings.Get("BrightstarDB.StoreLocation");
+            var importDir = Path.Combine(storeLocation, "import");
             if (!Directory.Exists(importDir))
             {
                 Directory.CreateDirectory(importDir);
@@ -44,7 +47,7 @@ namespace BrightstarDB.Tests
             sp.ConnectionLimit = 64;
 
             var st = DateTime.UtcNow;
-            IDataObjectContext context = new HttpDataObjectContext(new ConnectionString("type=http;endpoint=http://localhost:8090/brightstar"));
+            IDataObjectContext context = new RestDataObjectContext(new ConnectionString("type=rest;endpoint=http://localhost:8090/brightstar"));
             Assert.IsNotNull(context);
 
             var storeId = Guid.NewGuid().ToString();

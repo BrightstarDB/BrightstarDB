@@ -7,7 +7,11 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Web.Script.Serialization;
+using BrightstarDB.Caching;
+using BrightstarDB.Client.RestSecurity;
+using BrightstarDB.Dto;
 using BrightstarDB.Storage;
+using Remotion.Linq.Utilities;
 
 namespace BrightstarDB.Client
 {
@@ -16,18 +20,21 @@ namespace BrightstarDB.Client
     /// </summary>
     public class BrightstarRestClient : IBrightstarService
     {
-        private Uri _serviceEndpoint;
-        private string _accountId;
-        private string _authKey;
+        private readonly Uri _serviceEndpoint;
+        private readonly IRequestAuthenticator _requestAuthenticator;
         private const string JsonContentType = "application/json";
-        //private const string XmlContentType = "application/xml";
         private const string UrlEncodedFormContentType = "application/x-www-form-urlencoded";
+
+        internal BrightstarRestClient(string serviceEndpoint, IRequestAuthenticator requestAuthenticator, ICache clientCache)
+        {
+            _serviceEndpoint = serviceEndpoint.EndsWith("/") ? new Uri(serviceEndpoint) : new Uri(serviceEndpoint + "/");
+            _requestAuthenticator = requestAuthenticator;
+        }
 
         internal BrightstarRestClient(string serviceEndpoint, string accountId, string authenticationKey)
         {
             _serviceEndpoint = serviceEndpoint.EndsWith("/") ? new Uri(serviceEndpoint) : new Uri(serviceEndpoint + "/");
-            _accountId = accountId;
-            _authKey = authenticationKey;
+            _requestAuthenticator = new SharedSecretAuthenticator(accountId, authenticationKey);
         }
 
         #region Implementation of IBrightstarService
@@ -46,7 +53,8 @@ namespace BrightstarDB.Client
         public IEnumerable<string> ListStores()
         {
             var response = AuthenticatedGet("");
-            return Deserialize<string[]>(response);
+            var storesResponse = Deserialize<StoresResponseModel>(response);
+            return storesResponse.Stores.Select(s=>s.Name);
         }
 
         /// <summary>
@@ -55,17 +63,7 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store to be created</param>
         public void CreateStore(string storeName)
         {
-            var response = AuthenticatedPost("",
-                                             new List<Tuple<string, string>>
-                                                 {
-                                                     new Tuple<string, string>("storeName", storeName)
-                                                 });
-            if (response.StatusCode != HttpStatusCode.Created)
-            {
-                throw new BrightstarClientException(
-                    String.Format("Store not created. Server response was: {0} - {1}", response.StatusCode,
-                                  response.StatusDescription));
-            }
+            CreateStore(new CreateStoreRequestObject(storeName));
         }
 
         /// <summary>
@@ -75,9 +73,30 @@ namespace BrightstarDB.Client
         /// <param name="persistenceType"></param>
         public void CreateStore(string storeName, PersistenceType persistenceType)
         {
-            throw new NotImplementedException();
+            CreateStore(new CreateStoreRequestObject(storeName, persistenceType));
         }
 
+        private void CreateStore(CreateStoreRequestObject storeRequestObject)
+        {
+            ValidateStoreName(storeRequestObject.StoreName);
+            var response = AuthenticatedPost("", storeRequestObject);
+            if (response.StatusCode != HttpStatusCode.Created)
+            {
+                throw new BrightstarClientException(
+                    String.Format("Store not created. Server response was: {0} - {1}", response.StatusCode,
+                                  response.StatusDescription));
+            }
+        }
+
+        private void ValidateStoreName(string storeName)
+        {
+            if (storeName == null) throw new ArgumentNullException("storeName", Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
+            if (String.IsNullOrEmpty(storeName)) throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString, "storeName");
+            if (!System.Text.RegularExpressions.Regex.IsMatch(storeName, Constants.StoreNameRegex))
+            {
+                throw new ArgumentException(Strings.BrightstarServiceClient_InvalidStoreName, "storeName");
+            }
+        }
         /// <summary>
         /// Delete the named store
         /// </summary>
@@ -562,9 +581,10 @@ namespace BrightstarDB.Client
         {
             var uri = new Uri(_serviceEndpoint, relativePath);
             var getRequest = WebRequest.Create(uri.ToString()) as HttpWebRequest;
-            getRequest.ContentType = JsonContentType;
+            getRequest.Accept = JsonContentType;
             getRequest.Date = DateTime.UtcNow;
-            SignRequest(getRequest);
+            _requestAuthenticator.Authenticate(getRequest);
+
             var ret = getRequest.GetResponse() as HttpWebResponse;
             if (ret != null)
             {
@@ -579,8 +599,60 @@ namespace BrightstarDB.Client
             var headRequest = WebRequest.Create(uri.ToString()) as HttpWebRequest;
             headRequest.Method = "HEAD";
             headRequest.Date = DateTime.UtcNow;
-            SignRequest(headRequest);
+            _requestAuthenticator.Authenticate(headRequest);
             return headRequest.GetResponse() as HttpWebResponse;
+        }
+
+        private HttpWebResponse AuthenticatedPost<T>(string relativePath, T postDto)
+        {
+            var uri = new Uri(_serviceEndpoint, relativePath);
+            var postRequest = WebRequest.Create(uri) as HttpWebRequest;
+            postRequest.Method = "POST";
+            postRequest.Date = DateTime.UtcNow;
+            postRequest.ContentType = JsonContentType;
+            postRequest.Accept = JsonContentType;
+            var serializer = new Newtonsoft.Json.JsonSerializer();
+            var contentBuilder = new StringBuilder();
+            using (var contentWriter = new StringWriter(contentBuilder))
+            {
+                serializer.Serialize(contentWriter, postDto);
+            }
+            var content = contentBuilder.ToString().TrimEnd('&');
+            using (var writer = new StreamWriter(postRequest.GetRequestStream()))
+            {
+                writer.Write(content);
+            }
+            var md5 = System.Security.Cryptography.MD5.Create();
+            var contentBytes = Encoding.UTF8.GetBytes(content);
+            var hashCode = Convert.ToBase64String(md5.ComputeHash(contentBytes));
+            postRequest.Headers[HttpRequestHeader.ContentMd5] = hashCode;
+            //postRequest.ContentLength = contentBytes.Length;
+
+            _requestAuthenticator.Authenticate(postRequest);
+            try
+            {
+                var ret = postRequest.GetResponse() as HttpWebResponse;
+                if (ret != null)
+                {
+                    LastResponseTimestamp = DateTime.Now;
+                }
+                return ret;
+            }
+            catch (WebException wex)
+            {
+                string responseContent;
+                if (wex.Response != null)
+                {
+                    using (var rdr = new StreamReader(wex.Response.GetResponseStream()))
+                    {
+                        responseContent = rdr.ReadToEnd();
+                        Logging.LogWarning(BrightstarEventId.TransportError,
+                            "HTTP POST to {0} failed. Server response was: {1}",
+                            relativePath, responseContent);
+                    }
+                }
+                throw;
+            }
         }
 
         private HttpWebResponse AuthenticatedPost(string relativePath, IEnumerable<Tuple<string, string>> postBodyParameters)
@@ -608,7 +680,7 @@ namespace BrightstarDB.Client
             postRequest.Headers[HttpRequestHeader.ContentMd5] = hashCode;
             //postRequest.ContentLength = contentBytes.Length;
 
-            SignRequest(postRequest);
+            _requestAuthenticator.Authenticate(postRequest);
             try
             {
                 var ret = postRequest.GetResponse() as HttpWebResponse;
@@ -680,20 +752,11 @@ namespace BrightstarDB.Client
         {
             var uri = new Uri(_serviceEndpoint, relativePath);
             var deleteRequest = WebRequest.Create(uri) as HttpWebRequest;
-            SignRequest(deleteRequest);
+            _requestAuthenticator.Authenticate(deleteRequest);
             deleteRequest.Method = "DELETE";
             var response = deleteRequest.GetResponse() as HttpWebResponse;
             if (response != null) LastResponseTimestamp = DateTime.Now;
             return response;
-        }
-        /// <summary>
-        /// Adds the required authentication and timestamp headers to the request
-        /// </summary>
-        /// <param name="request"></param>
-        private void SignRequest(HttpWebRequest request)
-        {
-           request.Headers.Add(HttpRequestHeader.Authorization,
-               "SharedKey " + _accountId + ":" + RestClientHelper.GenerateSignature(request, SignatureType.SharedKey,  _authKey));
         }
 
         

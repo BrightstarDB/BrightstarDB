@@ -15,10 +15,15 @@ namespace BrightstarDB.Server.IntegrationTests
     [TestFixture]
     public class ClientTests : ClientTestBase
     {
-
+        private readonly string _storeLocation;
+        public ClientTests()
+        {
+            var appSettings = System.Configuration.ConfigurationManager.AppSettings;
+            _storeLocation = appSettings.Get("BrightstarDB.StoreLocation");
+        }
         private static IBrightstarService GetClient()
         {
-            return BrightstarService.GetClient("type=http;endpoint=http://localhost:8090/brightstar");
+            return BrightstarService.GetClient("type=rest;endpoint=http://localhost:8090/brightstar");
         }
 
         [TestFixtureSetUp]
@@ -592,7 +597,7 @@ namespace BrightstarDB.Server.IntegrationTests
         [Test]
         public void TestSpecialCharsInIdentities()
         {
-            var importDir = Path.Combine(Configuration.StoreLocation, "import");
+            var importDir = Path.Combine(_storeLocation, "import");
             if (!Directory.Exists(importDir))
             {
                 Directory.CreateDirectory(importDir);
@@ -620,7 +625,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
             Assert.IsTrue(jobInfo.JobCompletedOk, "Import job failed");
 
-            IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
+            IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + _storeLocation + "\\"));
             var store = context.OpenStore(storeName);
 
             var test = store.BindDataObjectsWithSparql("SELECT ?p WHERE {?p a <http://xmlns.com/foaf/0.1/Person>} LIMIT 30").ToList();

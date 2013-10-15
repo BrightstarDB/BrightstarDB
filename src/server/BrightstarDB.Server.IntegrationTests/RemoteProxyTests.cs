@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
-using BrightstarDB.Tests;
 using NUnit.Framework;
 
-namespace BrightstarDB.InternalTests
+namespace BrightstarDB.Server.IntegrationTests
 {
     [TestFixture]
     public class RemoteProxyTests : ClientTestBase
@@ -29,7 +28,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestCreateDataObjectContext()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
         }
 
@@ -37,7 +36,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestCreateDataObjectStore()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
             var store = context.CreateStore(Guid.NewGuid().ToString());
             Assert.IsNotNull(store);
@@ -47,7 +46,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestOpenDataObjectStore()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
             var storeName = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeName);
@@ -60,7 +59,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestOpenDataObjectStoreWithNamespaceMappings()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
             var storeName = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeName);
@@ -73,7 +72,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestCreateDataObjectWithUri()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
             var store = context.CreateStore(Guid.NewGuid().ToString());
             Assert.IsNotNull(store);
@@ -85,7 +84,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestCreateDataObjectWithString()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
             var store = context.CreateStore(Guid.NewGuid().ToString());
             Assert.IsNotNull(store);
@@ -97,7 +96,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestCreateDataObject()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
             var store = context.CreateStore(Guid.NewGuid().ToString());
             Assert.IsNotNull(store);
@@ -109,7 +108,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestCreateDataObjectWithCurie()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
             var storeName = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeName);
@@ -126,7 +125,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestSaveAndFetchDataObject()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
             var store = context.CreateStore(Guid.NewGuid().ToString());
             Assert.IsNotNull(store);
@@ -146,7 +145,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestSavedDataObjectPropertyIsSameAfterSave()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             Assert.IsNotNull(context);
             var store = context.CreateStore(Guid.NewGuid().ToString());
             Assert.IsNotNull(store);
@@ -170,7 +169,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestLocalStateAfterSetProperty()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var store = context.CreateStore(Guid.NewGuid().ToString());
 
             var p1 = store.MakeDataObject();
@@ -187,7 +186,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestSetSamePropertyResultsInOnlyOneProperty()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var store = context.CreateStore(Guid.NewGuid().ToString());
 
             var p1 = store.MakeDataObject();
@@ -200,15 +199,13 @@ namespace BrightstarDB.InternalTests
 
             Assert.AreEqual(propValue, "kal");
 
-            Assert.AreEqual(1, ((DataObject)p1).Triples.Count());
-            Assert.AreEqual(1, ((RemoteDataObjectStore)store).AddTriples.Count());
         }
 
         [Test]
         [Category("RemoteProxyTests")]
         public void TestRemoveProperty()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var store = context.CreateStore(Guid.NewGuid().ToString());
 
             var p1 = store.MakeDataObject();
@@ -221,8 +218,7 @@ namespace BrightstarDB.InternalTests
 
             p1.RemovePropertiesOfType(ageType);
 
-            Assert.AreEqual(0, ((DataObject)p1).Triples.Count());
-            Assert.AreEqual(0, ((RemoteDataObjectStore)store).AddTriples.Count());
+            Assert.That(p1.GetPropertyValue(ageType), Is.Null);
         }
 
 
@@ -230,7 +226,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestRemovePropertyPersisted()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var store = context.CreateStore(Guid.NewGuid().ToString());
 
             var p1 = store.MakeDataObject();
@@ -243,21 +239,19 @@ namespace BrightstarDB.InternalTests
 
             p1.RemovePropertiesOfType(ageType);
 
-            Assert.AreEqual(0, ((DataObject)p1).Triples.Count());
-            Assert.AreEqual(0, ((RemoteDataObjectStore)store).AddTriples.Count());
+            Assert.That(p1.GetPropertyValue(ageType), Is.Null);
 
             store.SaveChanges();
 
             var p2 = store.GetDataObject(p1.Identity);
-            Assert.AreEqual(0, ((DataObject)p2).Triples.Count());
-
+            Assert.That(p2.GetPropertyValue(ageType), Is.Null);
         }
 
         [Test]
         [Category("RemoteProxyTests")]
         public void TestAddAndRemovePropertyPersisted()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var store = context.CreateStore(Guid.NewGuid().ToString());
 
             var p1 = store.MakeDataObject();
@@ -271,19 +265,18 @@ namespace BrightstarDB.InternalTests
             store.SaveChanges();
 
             var p2 = store.GetDataObject(p1.Identity);
-            Assert.AreEqual(1, ((DataObject)p2).Triples.Count());
+            Assert.That(p2.GetPropertyValue(ageType), Is.EqualTo("kal"));
 
             p2.RemovePropertiesOfType(ageType);
 
-            Assert.AreEqual(0, ((DataObject)p2).Triples.Count());
-            Assert.AreEqual(0, ((RemoteDataObjectStore)store).AddTriples.Count());
+            Assert.That(p2.GetPropertyValue(ageType), Is.Null);
         }
 
         [Test]
         [Category("RemoteProxyTests")]
         public void TestSetSamePropertyResultsInOnlyOnePropertyAfterSave()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var storeId = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeId);
 
@@ -298,7 +291,9 @@ namespace BrightstarDB.InternalTests
             store = context.OpenStore(storeId);
 
             var p2 = store.GetDataObject(p1.Identity);
-            Assert.AreEqual(1, ((DataObject)p2).Triples.Count());
+            var values = p2.GetPropertyValues(ageType);
+            Assert.That(values.Count(), Is.EqualTo(1));
+            Assert.That(values.First(), Is.EqualTo("kal"));
         }
 
         [Test]
@@ -306,7 +301,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestDataObjectFluids()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var storeId = Guid.NewGuid().ToString();
             context.CreateStore(storeId);
             var store = context.OpenStore(storeId, new Dictionary<string, string>() { { "ont", "http://www.networkedplanet.com/types/" }, 
@@ -337,7 +332,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestAddProperty()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var store = context.CreateStore(Guid.NewGuid().ToString());
 
             var p1 = store.MakeDataObject();
@@ -349,14 +344,17 @@ namespace BrightstarDB.InternalTests
             store.SaveChanges();
 
             var p2 = store.GetDataObject(p1.Identity);
-            Assert.AreEqual(2, ((DataObject)p2).Triples.Count());
+            var values = p2.GetPropertyValues(ageType).ToList();
+            Assert.That(values.Count(), Is.EqualTo(2));
+            Assert.That(values, Contains.Item("graham"));
+            Assert.That(values, Contains.Item("kal"));
         }
 
         [Test]
         [Category("RemoteProxyTests")]
         public void TestGetProperty()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var store = context.CreateStore(Guid.NewGuid().ToString());
 
             var p1 = store.MakeDataObject();
@@ -368,14 +366,17 @@ namespace BrightstarDB.InternalTests
             store.SaveChanges();
 
             var p2 = store.GetDataObject(p1.Identity);
-            Assert.AreEqual(2, ((DataObject)p2).Triples.Count());
+            var values = p2.GetPropertyValues(ageType).ToList();
+            Assert.That(values.Count, Is.EqualTo(2));
+            Assert.That(values, Contains.Item("graham"));
+            Assert.That(values, Contains.Item("kal"));
         }
 
         [Test]
         [Category("RemoteProxyTests")]
         public void TestSetPropertyDataObject()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var store = context.CreateStore(Guid.NewGuid().ToString());
 
             var p1 = store.MakeDataObject();
@@ -388,14 +389,17 @@ namespace BrightstarDB.InternalTests
             store.SaveChanges();
 
             var p3 = store.GetDataObject(p1.Identity);
-            Assert.AreEqual(1, ((DataObject)p3).Triples.Count());
+            var v = p3.GetPropertyValue(classificationType) as IDataObject;
+            Assert.That(v, Is.Not.Null);
+            Assert.That(v.Identity, Is.EqualTo(p2.Identity));
+
         }
 
         [Test]
         [Category("RemoteProxyTests")]
         public void TestGetProperties()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var storeId = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeId);
 
@@ -410,7 +414,6 @@ namespace BrightstarDB.InternalTests
             store = context.OpenStore(storeId);
 
             var p2 = store.GetDataObject(p1.Identity);
-            Assert.AreEqual(2, ((DataObject)p2).Triples.Count());
 
             var propValues = p2.GetPropertyValues("http://www.np.com/label").Cast<string>();
             Assert.IsNotNull(propValues);
@@ -421,7 +424,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestRemoveSpecificValueProperty()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var storeId = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeId);
 
@@ -436,7 +439,6 @@ namespace BrightstarDB.InternalTests
             store = context.OpenStore(storeId);
 
             var p2 = store.GetDataObject(p1.Identity);
-            Assert.AreEqual(2, ((DataObject)p2).Triples.Count());
 
             var propValues = p2.GetPropertyValues("http://www.np.com/label").Cast<string>();
             Assert.IsNotNull(propValues);
@@ -446,12 +448,9 @@ namespace BrightstarDB.InternalTests
             p2.RemoveProperty(ageType, "kal");
             store.SaveChanges();
 
-            Assert.AreEqual(1, ((DataObject)p2).Triples.Count());
             store = context.OpenStore(storeId);
 
             var p3 = store.GetDataObject(p1.Identity);
-            Assert.AreEqual(1, ((DataObject)p3).Triples.Count());
-
             var label = p3.GetPropertyValue(ageType);
             Assert.IsNotNull(label);
             Assert.AreEqual("graham", label);
@@ -462,7 +461,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestGetRelatedProxies()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var storeId = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeId, new Dictionary<string, string>() { { "ont", "http://www.networkedplanet.com/types/" }, 
                                                                                { "rdfs", "http://www.w3.org/2000/01/rdf-schema#" },
@@ -491,7 +490,7 @@ namespace BrightstarDB.InternalTests
         [Category("RemoteProxyTests")]
         public void TestGetRelatedProxiesWithSafeCurie()
         {
-            IDataObjectContext context = new HttpDataObjectContext(_connectionString);
+            IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var storeId = Guid.NewGuid().ToString();
             var store = context.CreateStore(storeId, new Dictionary<string, string> { { "ont", "http://www.networkedplanet.com/types/" }, 
                                                                                { "rdfs", "http://www.w3.org/2000/01/rdf-schema#" },
@@ -520,7 +519,7 @@ namespace BrightstarDB.InternalTests
         public void TestPreconditionsFailedException()
         {
             IDataObjectContext context =
-                new HttpDataObjectContext(
+                new RestDataObjectContext(
                     new ConnectionString("type=http;optimisticLocking=true;endpoint=http://localhost:8090/brightstar"));
             var storeName = Guid.NewGuid().ToString();
             var store1 = context.CreateStore(storeName);

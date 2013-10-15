@@ -106,7 +106,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             mockBrightstar.Verify();
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
             Assert.That(response.ContentType, Contains.Substring("application/json"));
             Assert.That(response.Body, Is.Not.Null);
             var responseContent = response.Body.DeserializeJson<StoreResponseModel>();
@@ -201,7 +201,7 @@ namespace BrightstarDB.Server.Modules.Tests
             });
 
             mockBrightstar.Verify();
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
             Assert.That(response.ContentType, Contains.Substring("application/json"));
             Assert.That(response.Body, Is.Not.Null);
             var responseContent = response.Body.DeserializeJson<StoreResponseModel>();

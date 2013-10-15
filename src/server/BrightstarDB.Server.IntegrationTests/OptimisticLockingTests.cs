@@ -1,15 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using BrightstarDB.Client;
+using BrightstarDB.Server.IntegrationTests.Context;
 using NUnit.Framework;
 
 namespace BrightstarDB.Server.IntegrationTests
 {
-    public abstract class OptimisticLockingTestsBase
+    [TestFixture]
+    public class OptimisticLockingTests : ClientTestBase
     {
-        protected abstract MyEntityContext NewContext();
+        private readonly string _storeName = "HttpOptimisticLockingTests_" + DateTime.Now.Ticks;
+
+        [TestFixtureSetUp]
+        public void SetUp()
+        {
+            StartService();
+        }
+
+        [TestFixtureTearDown]
+        public void TearDown()
+        {
+            CloseService();
+        }
+
+        protected MyEntityContext NewContext()
+        {
+            return new MyEntityContext(
+                String.Format("type=http;endpoint=http://localhost:8090/brightstar;storeName={0};optimisticLocking=true", _storeName));
+        }
+
+
 
         #region Test Single Object Refresh
-        protected virtual void TestSimplePropertyRefreshWithClientWins()
+        [Test]
+        public void TestSimplePropertyRefreshWithClientWins()
         {
             using (var context1 = NewContext())
             {
@@ -47,6 +72,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
+        [Test]
         public void TestSimplePropertyRefreshWithStoreWins()
         {
             using (var context1 = NewContext())
@@ -86,6 +112,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
+        [Test]
         public void TestRelatedObjectRefreshWithClientWins()
         {
             using (var context1 = NewContext())
@@ -132,6 +159,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
+        [Test]
         public void TestRelatedObjectRefreshWithStoreWins()
         {
             using (var context1 = NewContext())
@@ -180,6 +208,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
+        [Test]
         public void TestLiteralCollectionRefreshWithClientWins()
         {
             using (var context1 = NewContext())
@@ -221,6 +250,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
+        [Test]
         public void TestLiteralCollectionRefreshWithStoreWins()
         {
             using (var context1 = NewContext())
@@ -265,6 +295,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
+        [Test]
         public void TestObjectCollectionRefreshWithClientWins()
         {
             using (var context1 = NewContext())
@@ -320,6 +351,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
+        [Test]
         public void TestObjectCollectionRefreshWithStoreWins()
         {
             using (var context1 = NewContext())
@@ -381,6 +413,7 @@ namespace BrightstarDB.Server.IntegrationTests
         #endregion
 
         #region Multiple Object Refresh
+        [Test]
         public void MultiLiteralPropertyRefreshClientWins()
         {
             using (var context1 = NewContext())
@@ -427,6 +460,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
+        [Test]
         public void MultiLiteralPropertyRefreshStoreWins()
         {
             using (var context1 = NewContext())
@@ -475,6 +509,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
+        [Test]
         public void MultiLiteralPropertyRefreshMixedModes()
         {
             using (var context1 = NewContext())
@@ -523,7 +558,7 @@ namespace BrightstarDB.Server.IntegrationTests
         #endregion
 
         #region CRUD
-
+        [Test]
         public void TestCreateAndDeleteInSameContext()
         {
             using (var context = NewContext())

@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
-using BrightstarDB.Storage;
+using BrightstarDB.Client.RestSecurity;
 using NUnit.Framework;
 
 namespace BrightstarDB.Server.IntegrationTests
@@ -14,7 +12,7 @@ namespace BrightstarDB.Server.IntegrationTests
     {
         private static IBrightstarService GetClient(ICache queryCache = null)
         {
-            return BrightstarService.GetHttpClient(new Uri("http://localhost:8090/brightstar"), queryCache);
+            return BrightstarService.GetRestClient("http://localhost:8090/brightstar/", new PassthroughRequestAuthenticator(), queryCache);
         }
 
         [TestFixtureSetUp]
@@ -50,8 +48,7 @@ namespace BrightstarDB.Server.IntegrationTests
             Assert.AreEqual("This is a test", result);
 
             client.ExecuteTransaction(storeName, null, null,
-                                      "<http://example.org/s> <http://example.org/p> <http://example.org/o> .",
-                                      Constants.DefaultGraphUri, true);
+                                      "<http://example.org/s> <http://example.org/p> <http://example.org/o> .");
             resultStream = client.ExecuteQuery(storeName, query);
             using (var resultReader = new StreamReader(resultStream))
             {
@@ -64,22 +61,6 @@ namespace BrightstarDB.Server.IntegrationTests
             var cacheResult = testCache.Lookup<CachedQueryResult>(cacheKey);
             Assert.AreEqual(result, cacheResult.Result);
         }
-
-        private void CheckTriples(string storeName, int startId, int endId)
-        {
-            var store = StoreManagerFactory.GetStoreManager().OpenStore("C:\\brightstar\\" + storeName, true);
-            List<int> missingIds = new List<int>();
-            for (int i = startId; i < endId; i++)
-            {
-                var matchCount = store.Match("http://www.example.org/resource/" + i, null, null, graphs: null).Count();
-                if (matchCount == 0) missingIds.Add(i);
-            }
-            if (missingIds.Count > 0)
-            {
-                Assert.Fail("Could match the following IDs: " + String.Join(", ", missingIds));
-            }
-        }
-
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BrightstarDB.Caching;
+using BrightstarDB.Client.RestSecurity;
 using BrightstarDB.Server;
 using System;
 
@@ -28,7 +29,11 @@ namespace BrightstarDB.Client
         {
             var accountId = connectionString.Account;
             var key = connectionString.Key;
-            return new BrightstarRestClient(connectionString.ServiceEndpoint, accountId, key);
+            if (accountId != null && key != null)
+            {
+                return new BrightstarRestClient(connectionString.ServiceEndpoint, accountId, key);
+            }
+            return new BrightstarRestClient(connectionString.ServiceEndpoint, new PassthroughRequestAuthenticator(), null);
         }
 
 #endif
@@ -134,5 +139,17 @@ namespace BrightstarDB.Client
             }
         }
 
+        /// <summary>
+        /// Returns a new REST service client instance
+        /// </summary>
+        /// <param name="restEndpoint">The URI of the BrightstarDB REST endpoint to connect to</param>
+        /// <param name="requestAuthenticator">The service to use to apply authentication information to outgoing requests</param>
+        /// <param name="queryCache">A cache instance for the client to use for caching SPARQL query responses</param>
+        /// <returns>A new <see cref="IBrightstarService"/> instance</returns>
+        public static IBrightstarService GetRestClient(string restEndpoint, IRequestAuthenticator requestAuthenticator = null, ICache queryCache = null)
+        {
+            if (requestAuthenticator == null) requestAuthenticator = new PassthroughRequestAuthenticator();
+            return new BrightstarRestClient(restEndpoint, requestAuthenticator, queryCache);
+        }
     }
 }
