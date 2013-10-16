@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+#if !PORTABLE
 using System.Web.Script.Serialization;
+#endif
+#if PORTABLE
+using VDS.RDF;
+#endif
 using BrightstarDB.Caching;
 using BrightstarDB.Client.RestSecurity;
 using BrightstarDB.Dto;
 using BrightstarDB.Storage;
-using Remotion.Linq.Utilities;
 
 namespace BrightstarDB.Client
 {
@@ -20,10 +26,43 @@ namespace BrightstarDB.Client
     /// </summary>
     public class BrightstarRestClient : IBrightstarService
     {
-        private readonly Uri _serviceEndpoint;
-        private readonly IRequestAuthenticator _requestAuthenticator;
         private const string JsonContentType = "application/json";
         private const string UrlEncodedFormContentType = "application/x-www-form-urlencoded";
+        private const int DefaultPollInterval = 500;
+        private const int DefaultPollTimeout = 0;
+
+        private readonly Uri _serviceEndpoint;
+        private readonly IRequestAuthenticator _requestAuthenticator;
+        private int _pollInterval = DefaultPollInterval;
+        private int _pollTimeout = DefaultPollTimeout;
+
+        /// <summary>
+        /// Get or set the amount of time (in milliseconds)
+        /// to wait between poll requests on a job
+        /// </summary>
+        public int PollInterval
+        {
+            get { return _pollInterval; }
+            set { if (value <= 0) throw new ArgumentException("Poll interval must be greater than 0");
+                _pollInterval = value;
+            }
+        }
+
+        /// <summary>
+        /// Get or set the amount of time (in milliseconds)
+        /// to wait for the completion of a job.
+        /// </summary>
+        /// <remarks>A value of 0 indicates that the client
+        /// should wait indefinitely for completion.</remarks>
+        public int PollTimeout
+        {
+            get { return _pollTimeout; }
+            set
+            {
+                if (value < 0) throw new ArgumentException("Poll timeout must be greater than or equal to 0");
+                _pollTimeout = value;
+            }
+        }
 
         internal BrightstarRestClient(string serviceEndpoint, IRequestAuthenticator requestAuthenticator, ICache clientCache)
         {
@@ -54,9 +93,10 @@ namespace BrightstarDB.Client
         {
             var response = AuthenticatedGet("");
             var storesResponse = Deserialize<StoresResponseModel>(response);
-            return storesResponse.Stores.Select(s=>s.Name);
+            return storesResponse.Stores;
         }
 
+        
         /// <summary>
         /// Create a new store
         /// </summary>
@@ -78,23 +118,45 @@ namespace BrightstarDB.Client
 
         private void CreateStore(CreateStoreRequestObject storeRequestObject)
         {
-            ValidateStoreName(storeRequestObject.StoreName);
-            var response = AuthenticatedPost("", storeRequestObject);
-            if (response.StatusCode != HttpStatusCode.Created)
+            try
             {
-                throw new BrightstarClientException(
-                    String.Format("Store not created. Server response was: {0} - {1}", response.StatusCode,
-                                  response.StatusDescription));
+                ValidateStoreName(storeRequestObject.StoreName);
+                var response = AuthenticatedPost("", storeRequestObject);
+                if (response.StatusCode != HttpStatusCode.Created)
+                {
+                    throw new BrightstarClientException(
+                        String.Format("Store not created. Server response was: {0} - {1}", response.StatusCode,
+                                      response.StatusDescription));
+                }
+            }
+            catch (BrightstarClientException ex)
+            {
+                if (InnerExceptionHasStatusCode(ex, HttpStatusCode.Conflict))
+                {
+                    throw new BrightstarClientException(Strings.BrightstarServiceClient_StoreNameConflict);
+                }
+                throw;
+            }
+            catch (WebException wex)
+            {
+                if (wex.Response is HttpWebResponse)
+                {
+                    var httpWebResponse = wex.Response as HttpWebResponse;
+                    if (httpWebResponse.StatusCode == HttpStatusCode.Conflict)
+                    {
+                        throw new BrightstarClientException(Strings.BrightstarServiceClient_StoreNameConflict);
+                    }
+                }
             }
         }
 
-        private void ValidateStoreName(string storeName)
+        private void ValidateStoreName(string storeName, string argName = "storeName")
         {
-            if (storeName == null) throw new ArgumentNullException("storeName", Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
-            if (String.IsNullOrEmpty(storeName)) throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString, "storeName");
+            if (storeName == null) throw new ArgumentNullException(argName, Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
+            if (String.IsNullOrEmpty(storeName)) throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString, argName);
             if (!System.Text.RegularExpressions.Regex.IsMatch(storeName, Constants.StoreNameRegex))
             {
-                throw new ArgumentException(Strings.BrightstarServiceClient_InvalidStoreName, "storeName");
+                throw new ArgumentException(Strings.BrightstarServiceClient_InvalidStoreName, argName);
             }
         }
         /// <summary>
@@ -103,6 +165,7 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store to be deleted</param>
         public void DeleteStore(string storeName)
         {
+            ValidateStoreName(storeName);
             var response = AuthenticatedDelete(storeName);
             if (response.StatusCode != HttpStatusCode.OK)
             {
@@ -119,19 +182,29 @@ namespace BrightstarDB.Client
         /// <returns>True if store exists, false otherwise</returns>
         public bool DoesStoreExist(string storeName)
         {
+            ValidateStoreName(storeName);
             try
             {
                 AuthenticatedHead(storeName);
                 return true;
             }
-            catch (WebException wex)
+            catch (BrightstarClientException ex)
             {
-                if (wex.Status == WebExceptionStatus.ProtocolError &&
-                    (wex.Response as HttpWebResponse).StatusCode == HttpStatusCode.NotFound)
+                if (InnerExceptionHasStatusCode(ex, HttpStatusCode.NotFound))
                 {
                     return false;
                 }
                 throw;
+            }
+            catch (WebException wex)
+            {
+                var response = wex.Response as HttpWebResponse;
+                if (response != null && response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return false;
+                }
+                LogWebException("HEAD", storeName, wex);
+                throw new BrightstarClientException("Could not verify existence of store.", wex);
             }
         }
 
@@ -166,7 +239,7 @@ namespace BrightstarDB.Client
                                    DateTime? ifNotModifiedSince = new DateTime?(),
                                    SparqlResultsFormat resultsFormat = null)
         {
-            return ExecuteQuery(storeName, queryExpression, new string[] {defaultGraphUri}, ifNotModifiedSince,
+            return ExecuteQuery(storeName, queryExpression, new[] {defaultGraphUri}, ifNotModifiedSince,
                                 resultsFormat);
         }
 
@@ -177,34 +250,63 @@ namespace BrightstarDB.Client
         /// <param name="queryExpression">SPARQL query string</param>
         /// <param name="defaultGraphUris">An enumeration over the URIs of the graphs that will be taken together as the default graph for the query</param>
         /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
-        /// a BrightstarClientException will be raised with the message "Store not modified".</param>
+        /// a <see cref="BrightstarStoreNotModifiedException"/> will be raised.</param>
         /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
         /// <returns>A stream containing XML SPARQL result XML</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="storeName"/> or <paramref name="queryExpression"/> is NULL</exception>
+        /// <exception cref="ArgumentException">If <paramref name="storeName"/> or <paramref name="queryExpression"/> is an empty string</exception>
+        /// <exception cref="BrightstarStoreNotModifiedException">Raised if the <paramref name="ifNotModifiedSince"/> parameter has 
+        /// a value and the store has not been modified since the specified time.</exception>
         public Stream ExecuteQuery(string storeName, string queryExpression,
             IEnumerable<string> defaultGraphUris,
             DateTime? ifNotModifiedSince = new DateTime?(),
             SparqlResultsFormat resultsFormat = null)
         {
+            // Parameter validation
+            ValidateStoreName(storeName);
+            if (queryExpression == null) throw new ArgumentNullException("queryExpression", Strings.StringParameterMustBeNonEmpty);
+            if(String.IsNullOrEmpty(queryExpression)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "queryExpression");
             if (resultsFormat == null) resultsFormat = SparqlResultsFormat.Xml;
-            // TODO: Add media type to request header
+
             if (ifNotModifiedSince.HasValue)
             {
+                // Check if store has been modified
                 var headResponse = AuthenticatedHead(storeName);
-                if (headResponse.LastModified <= ifNotModifiedSince.Value)
+                var lastModified = GetLastModified(headResponse);
+                if (lastModified.HasValue && lastModified <= ifNotModifiedSince.Value)
                 {
-                    throw new BrightstarClientException("Store not modified");
+                    throw new BrightstarStoreNotModifiedException();
                 }
             }
+
+            // Construct query request as a form POST
             var parameters = new List<Tuple<string, string>> {new Tuple<string, string>("query", queryExpression)};
             if (defaultGraphUris != null)
             {
                 parameters.AddRange(defaultGraphUris.Select(g => new Tuple<string, string>("default-graph-uri", g)));
             }
-            
-            var queryResponse = AuthenticatedPost(storeName, parameters);
+
+            // Execute
+            var queryResponse = AuthenticatedFormPost(storeName + "/sparql", parameters, resultsFormat.MediaTypes[0]);
+
+            // Return raw response stream
             return queryResponse.GetResponseStream();
         }
 
+        private static DateTime? GetLastModified(HttpWebResponse r)
+        {
+#if PORTABLE
+            var headerVal = r.Headers["Last-Modified"];
+            DateTime lastModified;
+            if (!String.IsNullOrEmpty(headerVal) && DateTime.TryParse(headerVal, out lastModified))
+            {
+                return lastModified;
+            }
+            return null;
+#else
+            return r.LastModified;
+#endif
+        }
         /// <summary>
         /// Query a specific commit point of a store
         /// </summary>
@@ -240,11 +342,50 @@ namespace BrightstarDB.Client
         /// <param name="defaultGraphUris"></param>
         /// <param name="resultsFormat"> </param>
         /// <returns>A stream containing XML SPARQL results</returns>
-        public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression, IEnumerable<string> defaultGraphUris, SparqlResultsFormat resultsFormat)
+        public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression,
+                                   IEnumerable<string> defaultGraphUris, SparqlResultsFormat resultsFormat)
         {
-            throw new NotImplementedException();
+            if (commitPoint == null) throw new ArgumentNullException("commitPoint");
+            ValidateStoreName(commitPoint.StoreName, "commitPoint.StoreName");
+            if (queryExpression == null) throw new ArgumentNullException();
+            if (resultsFormat == null) resultsFormat = SparqlResultsFormat.Xml;
+
+            if (String.IsNullOrWhiteSpace(queryExpression))
+                throw new ArgumentException(Strings.BrightstarServiceClient_QueryMustNotBeEmptyString, "queryExpression");
+            var queryUri = commitPoint.StoreName + "/commits/" + commitPoint.Id + "/sparql";
+            var postParameters = new List<Tuple<string, string>> {new Tuple<string, string>("query", queryExpression)};
+            if (defaultGraphUris != null)
+            {
+                postParameters.AddRange(
+                    defaultGraphUris.Select(graphUri => new Tuple<string, string>("default-graph-uri", graphUri)));
+            }
+            var queryResponse = AuthenticatedFormPost(queryUri, postParameters, resultsFormat.MediaTypes[0]);
+            return queryResponse.GetResponseStream();
         }
 
+#if PORTABLE
+                /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="preconditions">NTriples that must be in the store in order for the transaction to execute</param>
+        /// <param name="deletePatterns">The delete patterns that will be removed from the store</param>
+        /// <param name="insertData">The NTriples data that will be inserted into the store.</param>
+        /// <param name="defaultGraphUri">The URI of the default graph to be updated by the transaction.</param>
+        /// <returns>Job Info</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="storeName"/> is NULL</exception>
+        /// <exception cref="ArgumentException">If <paramref name="storeName"/> is an empty string or not a valid store name</exception>
+        public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
+                                           string insertData, string defaultGraphUri)
+        {
+            ValidateStoreName(storeName);
+            var transactionJob = JobRequestObject.CreateTransactionJob(preconditions, deletePatterns, insertData,
+                                                                       defaultGraphUri);
+            var jobUri = CreateJob(storeName, transactionJob);
+            var jobInfoResponse = AuthenticatedGet(jobUri);
+            return Deserialize<JobResponseModel>(jobInfoResponse);
+        }
+#else
         /// <summary>
         /// Execute an update transaction.
         /// </summary>
@@ -255,22 +396,44 @@ namespace BrightstarDB.Client
         /// <param name="defaultGraphUri">The URI of the default graph to be updated by the transaction.</param>
         /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
         /// <returns>Job Info</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="storeName"/> is NULL</exception>
+        /// <exception cref="ArgumentException">If <paramref name="storeName"/> is an empty string or not a valid store name</exception>
         public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
                                            string insertData, string defaultGraphUri, bool waitForCompletion = true)
         {
-            string jobData = "GRAPH " + defaultGraphUri + "\n" + String.Join("\n.\n", preconditions, deletePatterns, insertData);
-            var jobUri = CreateJob(storeName, "Transaction", jobData);
+            ValidateStoreName(storeName);
+            var transactionJob = JobRequestObject.CreateTransactionJob(preconditions, deletePatterns, insertData,
+                                                                       defaultGraphUri);
+            var jobUri = CreateJob(storeName, transactionJob);
             if (waitForCompletion)
             {
-                return PollJob(jobUri, 500, 0);
+                return PollJob(jobUri);
             }
-            else
-            {
-                var jobInfoResponse = AuthenticatedGet(jobUri);
-                return Deserialize<RestJobInfo>(jobInfoResponse);
-            }
+            var jobInfoResponse = AuthenticatedGet(jobUri);
+            return Deserialize<JobResponseModel>(jobInfoResponse);
         }
+#endif
 
+#if PORTABLE
+        /// <summary>
+        /// Execute a SPARQL Update expression against a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to be updated</param>
+        /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
+        /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
+        public IJobInfo ExecuteUpdate(string storeName, string updateExpression)
+        {
+            ValidateStoreName(storeName);
+            if (String.IsNullOrWhiteSpace(updateExpression))
+                throw new ArgumentException(Strings.BrightstarServiceClient_UpdateExpressionMustNotBeEmptyString,
+                                            "updateExpression");
+            var job = JobRequestObject.CreateSparqlUpdateJob(updateExpression);
+            var jobUri = CreateJob(storeName, job);
+            var jobResponse = AuthenticatedGet(jobUri);
+            return Deserialize<JobResponseModel>(jobResponse);        
+        }
+#else
         /// <summary>
         /// Execute a SPARQL Update expression against a store
         /// </summary>
@@ -280,9 +443,20 @@ namespace BrightstarDB.Client
         /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         public IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true)
         {
-            // TODO: Implement update with SPARQL protocol
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            if (String.IsNullOrWhiteSpace(updateExpression))
+                throw new ArgumentException(Strings.BrightstarServiceClient_UpdateExpressionMustNotBeEmptyString,
+                                            "updateExpression");
+            var job = JobRequestObject.CreateSparqlUpdateJob(updateExpression);
+            var jobUri = CreateJob(storeName, job);
+            if (waitForCompletion)
+            {
+                return PollJob(jobUri);
+            }
+            var jobResponse = AuthenticatedGet(jobUri);
+            return Deserialize<JobResponseModel>(jobResponse);
         }
+#endif
 
         /// <summary>
         /// Gets information about jobs recently executed against a store
@@ -294,7 +468,14 @@ namespace BrightstarDB.Client
         /// <remarks>Job information is returned in reverse order of the order in which they will be / were executed (most recent first).</remarks>
         public IEnumerable<IJobInfo> GetJobInfo(string storeName, int skip, int take)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative);
+            if (take <= 0) throw new ArgumentException(Strings.BrightstarServiceClient_TakeMustBeGreaterThanZero);
+            if (take > 100) throw new ArgumentException(Strings.BrightstarServiceClient_GetJobInfo_TakeToLarge);
+
+            var queryUri = String.Format("{0}/jobs?skip={1}&take={2}", storeName, skip, take);
+            var response = AuthenticatedGet(queryUri);
+            return Deserialize<List<JobResponseModel>>(response);
         }
 
         /// <summary>
@@ -305,23 +486,9 @@ namespace BrightstarDB.Client
         /// <returns>A JobInfo instance</returns>
         public IJobInfo GetJobInfo(string storeName, string jobId)
         {
+            ValidateStoreName(storeName);
             var jobInfoResponse = AuthenticatedGet(storeName + "/jobs/" + jobId);
-            return Deserialize<RestJobInfo>(jobInfoResponse);
-        }
-
-        /// <summary>
-        /// Starts an import job.
-        /// </summary>
-        /// <param name="store">The store to perform the import to</param>
-        /// <param name="fileName">The URI of the data to import.</param>
-        /// <returns>A JobInfo instance</returns>
-        /// <remarks>This method starts a job on the server to import data from an NTriples format
-        /// RDF data source. 
-        /// For control over Azure blob storage credentials and compression, use the overloaded version of this method</remarks>
-        public IJobInfo StartImport(string store, string fileName)
-        {
-            var importSource = new BlobImportSource {BlobUri = fileName};
-            return StartImport(store, importSource);
+            return Deserialize<JobResponseModel>(jobInfoResponse);
         }
 
         /// <summary>
@@ -333,40 +500,11 @@ namespace BrightstarDB.Client
         /// <returns>A <see cref="IJobInfo"/> instance to use for monitoring the progress of the job</returns>
         public IJobInfo StartImport(string store, string fileName, string graphUri)
         {
-            var importSource = new BlobImportSource { BlobUri = fileName, Graph = graphUri};
-            return StartImport(store, importSource);
-        }
-
-        private IJobInfo StartImport(string store, BlobImportSource importSource)
-        {
-        var jobUri = CreateJob(store, "Import", importSource.ToJsonString());
+            ValidateStoreName(store);
+            var job = JobRequestObject.CreateImportJob(fileName, graphUri);
+            var jobUri = CreateJob(store, job);
             var jobInfoResponse = AuthenticatedGet(jobUri);
-            return Deserialize<RestJobInfo>(jobInfoResponse);
-        }
-
-        /// <summary>
-        /// Starts an import job with the option to read from a compressed data source
-        /// </summary>
-        /// <param name="store">The store to import into</param>
-        /// <param name="sourceUri">The URI of the data to be imported</param>
-        /// <param name="useGZip">Flag indicating if the source data is compressed</param>
-        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        public IJobInfo StartImport(string store, string sourceUri, bool useGZip )
-        {
-            return StartImport(store, new BlobImportSource {BlobUri = sourceUri, IsGZiped = useGZip});
-        }
-
-        /// <summary>
-        /// Starts an import job reading data from Azure blob storage
-        /// </summary>
-        /// <param name="store">The store to import into</param>
-        /// <param name="blobStoreConnectionString">The connection string to the Azure blob storage</param>
-        /// <param name="blobAddress">The URI of the data to be imported</param>
-        /// <param name="useGZip">Flag indicating if the source data is compressed</param>
-        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        public IJobInfo StartImport(string store, string blobStoreConnectionString, string blobAddress, bool useGZip)
-        {
-            return StartImport(store, new BlobImportSource { ConnectionString = blobStoreConnectionString, BlobUri = blobAddress, IsGZiped = useGZip });
+            return Deserialize<JobResponseModel>(jobInfoResponse);
         }
 
         /// <summary>
@@ -378,45 +516,11 @@ namespace BrightstarDB.Client
         /// <returns>A JobInfo instance</returns>
         public IJobInfo StartExport(string store, string fileName, string graphUri)
         {
-            return StartExport(store, new BlobImportSource {BlobUri = fileName, Graph = graphUri});
-        }
-
-        /// <summary>
-        /// Starts an export job with the option to compress the exported data
-        /// </summary>
-        /// <param name="store">The store to export data from</param>
-        /// <param name="targetUri">The URI to write the data to</param>
-        /// <param name="useGZip">Flag indicating if the exported data should be compressed as it is exported</param>
-        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        public IJobInfo StartExport(string store, string targetUri, bool useGZip)
-        {
-            return StartExport(store, new BlobImportSource {BlobUri = targetUri, IsGZiped = useGZip});
-        }
-
-        /// <summary>
-        /// Starts an export job to write to an Azure blob
-        /// </summary>
-        /// <param name="store">The store to export data from</param>
-        /// <param name="blobStoreConnectionString">The connection string to the Azure blob storage</param>
-        /// <param name="blobAddress">The URI of the blob to write to</param>
-        /// <param name="useGZip">Flag indicating if the exported data should be compressed as it is exported</param>
-        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        public IJobInfo StartExport(string store, string blobStoreConnectionString, string blobAddress, bool useGZip)
-        {
-            return StartExport(store,
-                               new BlobImportSource
-                                   {
-                                       ConnectionString = blobStoreConnectionString,
-                                       BlobUri = blobAddress,
-                                       IsGZiped = useGZip
-                                   });
-        }
-
-        private IJobInfo StartExport(string store, BlobImportSource exportSource)
-        {
-            var jobUri = CreateJob(store, "Export", exportSource.ToJsonString());
+            ValidateStoreName(store);
+            var job = JobRequestObject.CreateExportJob(fileName, graphUri);
+            var jobUri = CreateJob(store, job);
             var jobInfoResponse = AuthenticatedGet(jobUri);
-            return Deserialize<RestJobInfo>(jobInfoResponse);
+            return Deserialize<JobResponseModel>(jobInfoResponse);
         }
 
         /// <summary>
@@ -426,7 +530,11 @@ namespace BrightstarDB.Client
         /// <returns>A JobInfo instance</returns>
         public IJobInfo ConsolidateStore(string store)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(store);
+            var job = JobRequestObject.CreateConsolidateJob();
+            var jobUri = CreateJob(store, job);
+            var jobInfoResponse = AuthenticatedGet(jobUri);
+            return Deserialize<JobResponseModel>(jobInfoResponse);
         }
 
         /// <summary>
@@ -438,7 +546,15 @@ namespace BrightstarDB.Client
         /// <returns>An enumeration over the store commit points</returns>
         public IEnumerable<ICommitPointInfo> GetCommitPoints(string storeName, int skip, int take)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            if (take > 100) throw new ArgumentException(Strings.BrightstarServiceClient_GetCommitPoints_TakeToLarge, "take");
+            if (take < 1) throw new ArgumentException(Strings.BrightstarServiceClient_TakeMustBeGreaterThanZero, "take");
+            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative, "skip");
+            var commitPointsResponse =
+                AuthenticatedGet(storeName + String.Format("/commits?skip={0}&take={1}", skip, take));
+            var results = Deserialize<List<CommitPointResponseModel>>(commitPointsResponse);
+            if (results != null) return results.Cast<ICommitPointInfo>();
+            throw new BrightstarClientException(Strings.BrightstarServiceClient_UnexpectedResponseContent);
         }
 
         /// <summary>
@@ -449,7 +565,35 @@ namespace BrightstarDB.Client
         /// <returns>The specified commit point or NULL if no matching commit point was found</returns>
         public ICommitPointInfo GetCommitPoint(string storeName, ulong commitId)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            try
+            {
+                var commitPointResponse = AuthenticatedGet(storeName + "/commits/" + commitId);
+                var result = Deserialize<CommitPointResponseModel>(commitPointResponse);
+                return result;
+            }
+            catch (BrightstarClientException clientException)
+            {
+                if (InnerExceptionHasStatusCode(clientException, HttpStatusCode.NotFound))
+                {
+                    return null;
+                }
+                throw;
+            }
+        }
+
+        private static bool InnerExceptionHasStatusCode(BrightstarClientException clientException, HttpStatusCode expectedCode)
+        {
+            var webException = clientException.InnerException as WebException;
+            if (webException != null)
+            {
+                var httpResponse = webException.Response as HttpWebResponse;
+                if (httpResponse != null && httpResponse.StatusCode == expectedCode)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -463,7 +607,21 @@ namespace BrightstarDB.Client
         /// </returns>
         public ICommitPointInfo GetCommitPoint(string storeName, DateTime timestamp)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            var requestUri = storeName + "/commits?timestamp=" + timestamp.ToString("u");
+            try
+            {
+                var response = AuthenticatedGet(requestUri);
+                return Deserialize<CommitPointInfoObject>(response);
+            }
+            catch (BrightstarClientException ex)
+            {
+                if (InnerExceptionHasStatusCode(ex, HttpStatusCode.NotFound))
+                {
+                    return null;
+                }
+                throw;
+            }
         }
 
         /// <summary>
@@ -473,7 +631,22 @@ namespace BrightstarDB.Client
         /// <param name="commitPoint">The commit point to revert to</param>
         public void RevertToCommitPoint(string storeName, ICommitPointInfo commitPoint)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            if (commitPoint == null) throw new ArgumentNullException("commitPoint");
+            if (commitPoint.StoreName != storeName)
+            {
+                throw new ArgumentException(Strings.BrightstarServiceClient_InvalidCommitPointInfoObject, "commitPoint");
+            }
+
+            var postUri = storeName + "/commits";
+            var postCommit = new CommitPointInfoObject
+                {
+                    Id = commitPoint.Id,
+                    StoreName = commitPoint.StoreName,
+                    CommitTime = commitPoint.CommitTime,
+                    JobId = commitPoint.JobId
+                };
+            AuthenticatedPost(postUri, postCommit);
         }
 
         /// <summary>
@@ -485,7 +658,14 @@ namespace BrightstarDB.Client
         /// <returns>An enumeration over the transactions executed against the store</returns>
         public IEnumerable<ITransactionInfo> GetTransactions(string storeName, int skip, int take)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative, "skip");
+            if (take <= 0) throw new ArgumentException(Strings.BrightstarServiceClient_TakeMustBeGreaterThanZero, "take");
+            if (take > 100) throw new ArgumentException(Strings.BrightstarServiceClient_GetTransactions_TakeTooLarge, "take");
+
+            var queryUri = String.Format("{0}/transactions?skip={1}&take={2}", storeName, skip, take);
+            var response = AuthenticatedGet(queryUri);
+            return Deserialize<List<TransactionInfoObject>>(response);
         }
 
         /// <summary>
@@ -496,7 +676,22 @@ namespace BrightstarDB.Client
         /// <returns>The transaction information for the execution of the job or NULL if no matching transaction record was found</returns>
         public ITransactionInfo GetTransaction(string storeName, Guid jobId)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+
+            var queryUri = String.Format("{0}/transactions/byjob/{1}", storeName, jobId);
+            try
+            {
+                var response = AuthenticatedGet(queryUri);
+                return Deserialize<TransactionInfoObject>(response);
+            }
+            catch (BrightstarClientException ex)
+            {
+                if (InnerExceptionHasStatusCode(ex, HttpStatusCode.NotFound))
+                {
+                    return null;
+                }
+                throw;
+            }
         }
 
         /// <summary>
@@ -506,7 +701,14 @@ namespace BrightstarDB.Client
         /// <param name="transactionInfo">The transaction to be applied</param>
         public IJobInfo ReExecuteTransaction(string storeName, ITransactionInfo transactionInfo)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            if (transactionInfo == null) throw new ArgumentNullException("transactionInfo");
+            if (transactionInfo.StoreName != storeName) throw new ArgumentException(Strings.BrightstarServiceClient_InvalidTransactionInfoObject, "transactionInfo");
+
+            var job = JobRequestObject.CreateRepeatTransactionJob(transactionInfo.JobId);
+            var jobUri = CreateJob(storeName, job);
+            var jobResponse = AuthenticatedGet(jobUri);
+            return Deserialize<JobResponseModel>(jobResponse);
         }
 
         /// <summary>
@@ -522,7 +724,22 @@ namespace BrightstarDB.Client
         public IEnumerable<ICommitPointInfo> GetCommitPoints(string storeName, DateTime latest, DateTime earliest,
                                                              int skip, int take)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            if (take > 100)
+                throw new ArgumentException(Strings.BrightstarServiceClient_GetCommitPoints_TakeToLarge, "take");
+            if (take < 1)
+                throw new ArgumentException(Strings.BrightstarServiceClient_TakeMustBeGreaterThanZero, "take");
+            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative, "skip");
+            if (latest < earliest)
+            {
+                throw new ArgumentException(Strings.BrightstarServiceClient_InvalidDateRange, "latest");
+            }
+            var queryUri = String.Format(CultureInfo.InvariantCulture,
+                                         "{0}/commits?latest={1}&earliest={2}&skip={3}&take={4}",
+                                         storeName, latest.ToString("u"), earliest.ToString("u"),
+                                         skip, take);
+            var response = AuthenticatedGet(queryUri);
+            return Deserialize<List<CommitPointResponseModel>>(response);
         }
 
         /// <summary>
@@ -533,7 +750,21 @@ namespace BrightstarDB.Client
         /// there are no statistics availabe for the store.</returns>
         public IStoreStatistics GetStatistics(string storeName)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            try
+            {
+                var response = AuthenticatedGet(storeName + "/statistics/latest");
+                return Deserialize<StoreStatisticsObject>(response);
+            }
+            catch (BrightstarClientException ex)
+            {
+                if (InnerExceptionHasStatusCode(ex, HttpStatusCode.NotFound))
+                {
+                    // Store has no statistics yet
+                    return null;
+                }
+                throw;
+            }
         }
 
         /// <summary>
@@ -548,7 +779,13 @@ namespace BrightstarDB.Client
         /// <exception cref="ArgumentException">Raised if <paramref name="skip"/> is less than 0 or <paramref name="take"/> is greater than 100.</exception>
         public IEnumerable<IStoreStatistics> GetStatistics(string storeName, DateTime latest, DateTime earlierst, int skip, int take)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative);
+            if (take > 100) throw new ArgumentException(Strings.BrightstarServiceClient_GetStatistics_TakeTooLarge);
+            var uri = String.Format("{0}/statistics?latest={1}&earlies={2}&skip={3}&take={4}",
+                                    storeName, latest.ToString("u"), earlierst.ToString("u"), skip, take);
+            var response = AuthenticatedGet(uri);
+            return Deserialize<List<StoreStatisticsObject>>(response);
         }
 
         /// <summary>
@@ -558,7 +795,12 @@ namespace BrightstarDB.Client
         /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
         public IJobInfo UpdateStatistics(string storeName)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            var job = JobRequestObject.CreateUpdateStatsJob();
+            var jobUri = CreateJob(storeName, job);
+            var response = AuthenticatedGet(jobUri);
+            var jobInfo = Deserialize<JobResponseModel>(response);
+            return jobInfo;
         }
 
         /// <summary>
@@ -571,7 +813,16 @@ namespace BrightstarDB.Client
         /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
         public IJobInfo CreateSnapshot(string storeName, string targetStoreName, PersistenceType persistenceType, ICommitPointInfo sourceCommitPoint = null)
         {
-            throw new NotImplementedException();
+            ValidateStoreName(storeName);
+            ValidateStoreName(targetStoreName, "targetStoreName");
+            var job = sourceCommitPoint == null
+                          ? JobRequestObject.CreateSnapshotJob(targetStoreName, persistenceType.ToString())
+                          : JobRequestObject.CreateSnapshotJob(targetStoreName, persistenceType.ToString(),
+                                                               sourceCommitPoint.Id);
+            var jobUri = CreateJob(storeName, job);
+            var jobResponse = AuthenticatedGet(jobUri);
+            var jobStatus = Deserialize<JobResponseModel>(jobResponse);
+            return jobStatus;
         }
 
         #endregion
@@ -581,34 +832,64 @@ namespace BrightstarDB.Client
         {
             var uri = new Uri(_serviceEndpoint, relativePath);
             var getRequest = WebRequest.Create(uri.ToString()) as HttpWebRequest;
+            if (getRequest == null) throw new ArgumentException(Strings.NotAnHttpRequest);
             getRequest.Accept = JsonContentType;
-            getRequest.Date = DateTime.UtcNow;
+            SetDateHeader(getRequest);
             _requestAuthenticator.Authenticate(getRequest);
 
-            var ret = getRequest.GetResponse() as HttpWebResponse;
-            if (ret != null)
+            try
             {
-                LastResponseTimestamp = DateTime.Now;
+                var ret = getRequest.GetResponse() as HttpWebResponse;
+                if (ret != null)
+                {
+                    LastResponseTimestamp = DateTime.Now;
+                }
+                return ret;
             }
-            return ret;
+            catch (WebException wex)
+            {
+                LogWebException("GET", relativePath, wex);
+                throw new BrightstarClientException("HTTP Transport Error", wex);
+            }
+        }
+
+        private void SetDateHeader(HttpWebRequest httpWebRequest)
+        {
+            // NOTE: Currently there doesn't seem to be anyway of setting this
+            // property in PCL - trying to set the httpWebRequest.Headers
+            // directly results in a runtime error
+#if !PORTABLE
+            httpWebRequest.Date = DateTime.UtcNow;
+#endif
         }
 
         private HttpWebResponse AuthenticatedHead(string relativePath)
         {
             var uri = new Uri(_serviceEndpoint, relativePath);
             var headRequest = WebRequest.Create(uri.ToString()) as HttpWebRequest;
+            if (headRequest == null) throw new ArgumentException(Strings.NotAnHttpRequest);
             headRequest.Method = "HEAD";
-            headRequest.Date = DateTime.UtcNow;
+            headRequest.Accept = JsonContentType;
+            SetDateHeader(headRequest);
             _requestAuthenticator.Authenticate(headRequest);
-            return headRequest.GetResponse() as HttpWebResponse;
+            try
+            {
+                return headRequest.GetResponse() as HttpWebResponse;
+            }
+            catch (WebException wex)
+            {
+                LogWebException("HEAD", relativePath, wex);
+                throw new BrightstarClientException("HTTP Transport Error", wex);
+            }
         }
 
         private HttpWebResponse AuthenticatedPost<T>(string relativePath, T postDto)
         {
             var uri = new Uri(_serviceEndpoint, relativePath);
             var postRequest = WebRequest.Create(uri) as HttpWebRequest;
+            if (postRequest == null) throw new ArgumentException(Strings.NotAnHttpRequest);
             postRequest.Method = "POST";
-            postRequest.Date = DateTime.UtcNow;
+            SetDateHeader(postRequest);
             postRequest.ContentType = JsonContentType;
             postRequest.Accept = JsonContentType;
             var serializer = new Newtonsoft.Json.JsonSerializer();
@@ -622,11 +903,16 @@ namespace BrightstarDB.Client
             {
                 writer.Write(content);
             }
+#if PORTABLE
+            var md5 = MD5.Create();
+            var contentBytes = Encoding.UTF8.GetBytes(content);
+            var hashCode = Convert.ToBase64String(md5.ComputeHash(contentBytes));
+#else
             var md5 = System.Security.Cryptography.MD5.Create();
             var contentBytes = Encoding.UTF8.GetBytes(content);
             var hashCode = Convert.ToBase64String(md5.ComputeHash(contentBytes));
+#endif
             postRequest.Headers[HttpRequestHeader.ContentMd5] = hashCode;
-            //postRequest.ContentLength = contentBytes.Length;
 
             _requestAuthenticator.Authenticate(postRequest);
             try
@@ -640,27 +926,19 @@ namespace BrightstarDB.Client
             }
             catch (WebException wex)
             {
-                string responseContent;
-                if (wex.Response != null)
-                {
-                    using (var rdr = new StreamReader(wex.Response.GetResponseStream()))
-                    {
-                        responseContent = rdr.ReadToEnd();
-                        Logging.LogWarning(BrightstarEventId.TransportError,
-                            "HTTP POST to {0} failed. Server response was: {1}",
-                            relativePath, responseContent);
-                    }
-                }
-                throw;
+                LogWebException("POST", relativePath, wex);
+                throw new BrightstarClientException("HTTP Transport Error", wex);
             }
         }
 
-        private HttpWebResponse AuthenticatedPost(string relativePath, IEnumerable<Tuple<string, string>> postBodyParameters)
+        private HttpWebResponse AuthenticatedFormPost(string relativePath, IEnumerable<Tuple<string, string>> postBodyParameters, string acceptType)
         {
             var uri = new Uri(_serviceEndpoint, relativePath);
             var postRequest = WebRequest.Create(uri) as HttpWebRequest;
+            if (postRequest == null) throw new ArgumentException(Strings.NotAnHttpRequest);
             postRequest.Method = "POST";
-            postRequest.Date = DateTime.UtcNow;
+            SetDateHeader(postRequest);
+            postRequest.Accept = acceptType;
             postRequest.ContentType = UrlEncodedFormContentType;
             var contentBuilder = new StringBuilder();
             foreach (var bodyParam in postBodyParameters)
@@ -674,9 +952,15 @@ namespace BrightstarDB.Client
             {
                 writer.Write(content);
             }
+#if PORTABLE
+            var md5 = MD5.Create();
+            var contentBytes = Encoding.UTF8.GetBytes(content);
+            var hashCode = Convert.ToBase64String(md5.ComputeHash(contentBytes));
+#else
             var md5 = System.Security.Cryptography.MD5.Create();
             var contentBytes = Encoding.UTF8.GetBytes(content);
             var hashCode = Convert.ToBase64String(md5.ComputeHash(contentBytes));
+#endif
             postRequest.Headers[HttpRequestHeader.ContentMd5] = hashCode;
             //postRequest.ContentLength = contentBytes.Length;
 
@@ -692,19 +976,63 @@ namespace BrightstarDB.Client
             }
             catch (WebException wex)
             {
-                string responseContent;
-                if (wex.Response != null)
-                {
-                    using (var rdr = new StreamReader(wex.Response.GetResponseStream()))
-                    {
-                        responseContent = rdr.ReadToEnd();
-                        Logging.LogWarning(BrightstarEventId.TransportError,
-                            "HTTP POST to {0} failed. Server response was: {1}",
-                            relativePath, responseContent);
-                    }
-                }
-                throw;
+                LogWebException("POST", relativePath, wex);
+                throw new BrightstarClientException("HTTP Transport error", wex);
             }
+        }
+
+        private HttpWebResponse AuthenticatedDelete(string relativePath)
+        {
+            var uri = new Uri(_serviceEndpoint, relativePath);
+            var deleteRequest = WebRequest.Create(uri) as HttpWebRequest;
+            if (deleteRequest == null) throw new ArgumentException("Request does not use HTTP(S)");
+            deleteRequest.Method = "DELETE";
+            deleteRequest.Accept = JsonContentType;
+            _requestAuthenticator.Authenticate(deleteRequest);
+            try
+            {
+                var response = deleteRequest.GetResponse() as HttpWebResponse;
+                if (response != null) LastResponseTimestamp = DateTime.Now;
+                return response;
+            }
+            catch (WebException wex)
+            {
+                LogWebException("DELETE", relativePath, wex);
+                throw new BrightstarClientException("HTTP Transport error", wex);
+            }
+        }
+
+        private static void LogWebException(string httpMethod, string requestUri, WebException wex)
+        {
+            if (wex.Response != null)
+            {
+                if (wex.Response is HttpWebResponse)
+                {
+                    var httpResponse = wex.Response as HttpWebResponse;
+                    var responseStream = wex.Response.GetResponseStream();
+                    if (responseStream != null)
+                    {
+                        using (var rdr = new StreamReader(responseStream))
+                        {
+                            var responseContent = rdr.ReadToEnd();
+                            Logging.LogWarning(BrightstarEventId.TransportError,
+                                               "HTTP {0} to {1} failed. Server response was: {2} - {3} : {4}",
+                                               httpMethod, requestUri, httpResponse.StatusCode,
+                                               httpResponse.StatusDescription,
+                                               responseContent);
+                            return;
+                        }
+                    }
+                    Logging.LogWarning(BrightstarEventId.TransportError,
+                                       "HTTP {0} to {1} failed. Server response was: {2} - {3}",
+                                       httpMethod, requestUri, httpResponse.StatusCode,
+                                       httpResponse.StatusDescription);
+                    return;
+                }
+            }
+            Logging.LogWarning(BrightstarEventId.TransportError,
+                               "HTTP {0} to {1} failed. Could not process server response.",
+                               httpMethod, requestUri);
         }
 
         private static readonly byte[] Mark = new byte[] { (byte)'-', (byte)'_', (byte)'.', (byte)'~' };
@@ -731,59 +1059,52 @@ namespace BrightstarDB.Client
             return escapeBuilder.ToString();
         }
 
-        private string CreateJob(string storeName, string jobType, string jobData)
+        private string CreateJob(string storeName, JobRequestObject jobRequest)
         {
-            var postBodyParameters = new List<Tuple<string, string>>
-                                         {
-                                             new Tuple<string, string>("jobType", jobType),
-                                             new Tuple<string, string>("jobData", jobData)
-                                         };
-            var response = AuthenticatedPost(storeName + "/jobs", postBodyParameters);
+            var response = AuthenticatedPost(storeName + "/jobs", jobRequest);
             if (response.StatusCode == HttpStatusCode.Created)
             {
+#if PORTABLE
+                return response.Headers["Location"];
+#else
                 return response.Headers[HttpResponseHeader.Location];
+#endif
             }
             throw new BrightstarClientException(
                 String.Format("Creation of job failed. Server returned status : {0} - {1}", response.StatusCode,
                               response.StatusDescription));
         }
 
-        private HttpWebResponse AuthenticatedDelete(string relativePath)
-        {
-            var uri = new Uri(_serviceEndpoint, relativePath);
-            var deleteRequest = WebRequest.Create(uri) as HttpWebRequest;
-            _requestAuthenticator.Authenticate(deleteRequest);
-            deleteRequest.Method = "DELETE";
-            var response = deleteRequest.GetResponse() as HttpWebResponse;
-            if (response != null) LastResponseTimestamp = DateTime.Now;
-            return response;
-        }
-
-        
-        private T Deserialize<T>(HttpWebResponse response)
+        private static T Deserialize<T>(HttpWebResponse response)
         {
             string jsonString;
-            using (var rdr = new StreamReader(response.GetResponseStream()))
+            if (response == null) throw new ArgumentNullException("response");
+            var responseStream = response.GetResponseStream();
+            if (responseStream == null) throw new BrightstarClientException("No body found in response. Expected a " + typeof(T).Name);
+            using (var rdr = new StreamReader(responseStream))
             {
                 jsonString = rdr.ReadToEnd();
             }
-            var ser = new JavaScriptSerializer();
-            return ser.Deserialize<T>(jsonString);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(jsonString);
+            //var ser = new JavaScriptSerializer();
+            //return ser.Deserialize<T>(jsonString);
         }
 
-        private IJobInfo PollJob(string jobUri, int pollInterval, int pollTimeout)
+#if !PORTABLE
+        private IJobInfo PollJob(string jobUri)
         {
             var timer = new Stopwatch();
             timer.Start();
             while (true)
             {
                 var jobInfoRepsonse = AuthenticatedGet(jobUri);
-                var jobInfo = Deserialize<RestJobInfo>(jobInfoRepsonse);
+                var jobInfo = Deserialize<JobResponseModel>(jobInfoRepsonse);
                 if (jobInfo.JobCompletedOk || jobInfo.JobCompletedWithErrors) return jobInfo;
-                if (pollTimeout > 0 && timer.ElapsedMilliseconds > pollTimeout) break;
-                Thread.Sleep(pollInterval);
+                if (PollTimeout > 0 && timer.ElapsedMilliseconds > PollTimeout) break;
+                Thread.Sleep(PollInterval);
             }
             throw new TimeoutException("Poll timeout exceeded");
         }
+#endif
     }
 }

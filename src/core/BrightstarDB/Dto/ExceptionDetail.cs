@@ -20,7 +20,7 @@ namespace BrightstarDB.Dto
             Type = exception.GetType().ToString();
             Message = exception.Message;
             StackTrace = exception.StackTrace;
-#if !WINDOWS_PHONE
+#if !WINDOWS_PHONE && !PORTABLE
             HelpLink = exception.HelpLink;
 #endif
             if (exception.InnerException != null)

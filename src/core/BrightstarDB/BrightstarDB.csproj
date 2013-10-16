@@ -26,6 +26,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\BrightstarDB.XML</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CloudDebug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -52,6 +54,7 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -72,6 +75,7 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="dotNetRDF, Version=0.5.1.24230, Culture=neutral, PublicKeyToken=8b91af99db2769f2, processorArchitecture=MSIL">
@@ -146,9 +150,12 @@
     <Compile Include="Client\RestSecurity\SharedSecretAuthenticator.cs" />
     <Compile Include="Client\SignatureType.cs" />
     <Compile Include="Dto\CommitPointInfoObject.cs" />
+    <Compile Include="Dto\CommitPointResponseModel.cs" />
     <Compile Include="Dto\CreateStoreRequestObject.cs" />
     <Compile Include="Dto\ExceptionDetail.cs" />
     <Compile Include="Dto\JobInfoObject.cs" />
+    <Compile Include="Dto\JobRequestObject.cs" />
+    <Compile Include="Dto\JobResponseModel.cs" />
     <Compile Include="Dto\JobStatus.cs" />
     <Compile Include="Dto\StoreResponseModel.cs" />
     <Compile Include="Dto\StoresResponseModel.cs" />

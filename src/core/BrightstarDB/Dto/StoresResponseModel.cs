@@ -10,6 +10,6 @@ namespace BrightstarDB.Dto
         /// <summary>
         /// The store list
         /// </summary>
-        public List<StoreResponseModel> Stores { get; set; }
+        public List<string> Stores { get; set; }
     }
 }

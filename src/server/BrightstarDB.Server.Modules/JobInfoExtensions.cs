@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BrightstarDB.Client;
-using BrightstarDB.Server.Modules.Model;
+﻿using BrightstarDB.Client;
+using BrightstarDB.Dto;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -19,6 +14,7 @@ namespace BrightstarDB.Server.Modules
                 StatusMessage = arg.StatusMessage,
                 StoreName = storeName
                 // TODO: Extend IJobInfo with date/time stamp properties
+                // TODO: Extend with job exception info
             };
         }
 

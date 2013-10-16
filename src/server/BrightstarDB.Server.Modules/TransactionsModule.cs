@@ -19,12 +19,13 @@ namespace BrightstarDB.Server.Modules
             Get["/{storeName}/transactions"] = parameters =>
                 {
                     var transactionsRequest = this.Bind<TransactionsRequestObject>();
+                    if (transactionsRequest.Take <= 0) transactionsRequest.Take = DefaultPageSize;
                     var transactions = brightstarService.GetTransactions(transactionsRequest.StoreName,
                                                                                  transactionsRequest.Skip,
-                                                                                 DefaultPageSize + 1);
+                                                                                 transactionsRequest.Take + 1);
                     return Negotiate.WithPagedList(transactionsRequest,
                                                    transactions.Select(MakeResponseObject),
-                                                   transactionsRequest.Skip, DefaultPageSize, DefaultPageSize,
+                                                   transactionsRequest.Skip, transactionsRequest.Take, DefaultPageSize,
                                                    "transactions");
                 };
 

@@ -9,14 +9,18 @@ using System.ComponentModel.DataAnnotations;
 namespace BrightstarDB.Server.IntegrationTests.Context
 {
     [Entity("http://xmlns.com/foaf/0.1/Person")]
+#if !PORTABLE
     [ClassAttribute("[DisplayName(\"Person\")]")]
+#endif
     public interface IFoafPerson : IFoafAgent
     {
         [Identifier("http://www.networkedplanet.com/people/")]
         string Id { get; }
 
         [PropertyType("http://xmlns.com/foaf/0.1/nick")]
+#if !PORTABLE
         [DisplayName("Also Known As")]
+#endif
         string Nickname { get; set; }
 
 #if !PORTABLE

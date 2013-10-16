@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BrightstarDB.Server.Modules.Model;
+﻿using BrightstarDB.Dto;
 using NUnit.Framework;
 
 namespace BrightstarDB.Server.Modules.Tests

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
-using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;
 using NUnit.Framework;
@@ -10,6 +10,8 @@ using Nancy;
 using Nancy.Responses.Negotiation;
 using Nancy.Testing;
 using Moq;
+using CreateStoreRequestObject = BrightstarDB.Server.Modules.Model.CreateStoreRequestObject;
+using StoreResponseModel = BrightstarDB.Server.Modules.Model.StoreResponseModel;
 
 namespace BrightstarDB.Server.Modules.Tests
 {
@@ -82,9 +84,9 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(responseContent, Is.Not.Null);
             Assert.That(responseContent.Stores, Is.Not.Null);
             Assert.That(responseContent.Stores.Count, Is.EqualTo(3));
-            Assert.That(responseContent.Stores.Any(s => s.Name.Equals("store1") && s.Jobs.Equals("store1/jobs")));
-            Assert.That(responseContent.Stores.Any(s => s.Name.Equals("store2") && s.Jobs.Equals("store2/jobs")));
-            Assert.That(responseContent.Stores.Any(s => s.Name.Equals("store3") && s.Jobs.Equals("store3/jobs")));
+            Assert.That(responseContent.Stores.Any(s => s.Equals("store1") ));
+            Assert.That(responseContent.Stores.Any(s => s.Equals("store2") ));
+            Assert.That(responseContent.Stores.Any(s => s.Equals("store3") ));
         }
 
         [Test]

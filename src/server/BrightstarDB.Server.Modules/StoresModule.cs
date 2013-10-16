@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
 using BrightstarDB.Client;
-using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;
 using Nancy;
 using Nancy.ModelBinding;
+using CreateStoreRequestObject = BrightstarDB.Server.Modules.Model.CreateStoreRequestObject;
+using StoreResponseModel = BrightstarDB.Server.Modules.Model.StoreResponseModel;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -21,7 +23,7 @@ namespace BrightstarDB.Server.Modules
                     return
                         Negotiate.WithModel(new StoresResponseModel
                             {
-                                Stores = stores.Select(s => new StoreResponseModel(s)).ToList()
+                                Stores = stores.ToList()
                             });
                 };
 

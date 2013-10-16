@@ -1,4 +1,5 @@
-﻿using BrightstarDB.Client;
+﻿using System;
+using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.Conventions;
@@ -71,6 +72,7 @@ namespace BrightstarDB.Server.Modules
             base.ConfigureConventions(nancyConventions);
             nancyConventions.StaticContentsConventions.Add(
                 StaticContentConventionBuilder.AddDirectory("assets"));
+            Nancy.Json.JsonSettings.MaxJsonLength = Int32.MaxValue;
         }
 
         protected override IRootPathProvider RootPathProvider

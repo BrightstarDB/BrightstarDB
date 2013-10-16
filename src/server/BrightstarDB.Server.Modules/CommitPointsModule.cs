@@ -33,7 +33,8 @@ namespace BrightstarDB.Server.Modules
                     if (timestamp != default(DateTime))
                     {
                         // Request for a single commit point
-                        return MakeResponseObject(brightstarService.GetCommitPoint(parameters["storeName"], timestamp));
+                        var commitPoint = brightstarService.GetCommitPoint(parameters["storeName"], timestamp);
+                        return commitPoint == null ? HttpStatusCode.NotFound : MakeResponseObject(commitPoint);
                     }
                     if (earliest != default(DateTime) && latest != default(DateTime))
                     {

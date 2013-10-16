@@ -147,6 +147,7 @@ namespace BrightstarDB.Server
                 writer.Write(_preconditions);
                 writer.Write(_deletePatterns);
                 writer.Write(_insertData);
+                writer.Write(_defaultGraphUri);
             }
         }
 
@@ -157,6 +158,7 @@ namespace BrightstarDB.Server
                 _preconditions = reader.ReadString();
                 _deletePatterns = reader.ReadString();
                 _insertData = reader.ReadString();
+                _defaultGraphUri = reader.ReadString();
             }
         }
 

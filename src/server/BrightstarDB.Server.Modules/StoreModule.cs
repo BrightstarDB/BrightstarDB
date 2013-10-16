@@ -1,4 +1,7 @@
-﻿using BrightstarDB.Client;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
@@ -19,7 +22,19 @@ namespace BrightstarDB.Server.Modules
                     {
                         if (Request.Method.ToUpperInvariant() == "HEAD")
                         {
-                            return HttpStatusCode.OK;
+                            try
+                            {
+                                var storeName = parameters["storeName"];
+                                IEnumerable<ICommitPointInfo> commitPoints = brightstarService.GetCommitPoints(storeName, 0, 1);
+                                ICommitPointInfo commit = commitPoints.FirstOrDefault();
+                                return
+                                    Negotiate.WithHeader("Last-Modified", commit.CommitTime.ToString("r"))
+                                             .WithStatusCode(HttpStatusCode.OK);
+                            }
+                            catch (Exception ex)
+                            {
+                                ex = ex;
+                            }
                         }
                         return new StoreResponseModel(parameters["storeName"]);
                     }

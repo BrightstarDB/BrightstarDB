@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
@@ -156,9 +157,16 @@ namespace BrightstarDB.Client
         private void PostTransaction(string preconditions, string patternsToDelete, string triplesToAdd, string defaultGraphUri)
         {
             var jobInfo = Client.ExecuteTransaction(_storeName, preconditions, patternsToDelete, triplesToAdd, defaultGraphUri);
+            
             while (!(jobInfo.JobCompletedOk || jobInfo.JobCompletedWithErrors))
             {
+#if PORTABLE
+                // Very rudimentary synchronous wait
+                var ev = new ManualResetEvent(false);
+                ev.WaitOne(200);
+#else
                 Thread.Sleep(20);
+#endif
                 jobInfo = Client.GetJobInfo(_storeName, jobInfo.JobId);
             }
 

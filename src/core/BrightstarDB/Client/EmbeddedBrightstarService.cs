@@ -207,9 +207,9 @@ namespace BrightstarDB.Client
                 pStream.Seek(0, SeekOrigin.Begin);
                 return pStream;
             }
-            catch (BrightstarStoreNotModifiedException ex)
+            catch (BrightstarStoreNotModifiedException)
             {
-                throw new BrightstarClientException("Store not modified", new ExceptionDetailObject(ex));
+                throw;
             }
             catch (Exception ex)
             {
@@ -329,7 +329,7 @@ namespace BrightstarDB.Client
             {
                 var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData,
                                                            defaultGraphUri);
-                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+                return new JobInfoObject {JobId = jobId.ToString(), JobStatus = JobStatus.Pending};
             }
             catch (Exception ex)
             {
@@ -388,7 +388,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
-                return new JobInfoWrapper(new JobInfo { JobId = jobId.ToString(), JobPending = true });
+                return new JobInfoObject { JobId = jobId.ToString(), JobStatus = JobStatus.Pending };
             }
             catch (Exception ex)
             {
@@ -435,7 +435,7 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException("Error queing SPARQL update in store " + storeName + ". " + ex.Message, ex);
             }
         }
-
+#endif
         /// <summary>
         /// Gets information about jobs recently executed against a store
         /// </summary>
@@ -463,7 +463,7 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException("Error getting job listing for store " + storeName + ". " + ex.Message, ex);
             }
         }
-#endif
+
 
 #if SILVERLIGHT
         

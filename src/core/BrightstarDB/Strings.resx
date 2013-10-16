@@ -186,4 +186,31 @@
   <data name="BrightstarServiceClient_GetStatistics_TakeTooLarge" xml:space="preserve">
     <value>Requested number of statistics records exceeds the maximum value of 100.</value>
   </data>
+  <data name="BrightstarServiceClient_StoreNameConflict" xml:space="preserve">
+    <value>Store name conflicts with the name of an existing store.</value>
+  </data>
+  <data name="StringParameterMustBeNonEmpty" xml:space="preserve">
+    <value>Parameter must be a non-empty, non-null string.</value>
+  </data>
+  <data name="NotAnHttpRequest" xml:space="preserve">
+    <value>Request does not use HTTP(S)</value>
+  </data>
+  <data name="BrightstarServiceClient_TakeMustBeGreaterThanZero" xml:space="preserve">
+    <value>Requestd page size must be greater than zero.</value>
+  </data>
+  <data name="BrightstarServiceClient_UnexpectedResponseContent" xml:space="preserve">
+    <value>The server provided unexpected content in response to the service request.</value>
+  </data>
+  <data name="BrightstarServiceClient_GetJobInfo_TakeToLarge" xml:space="preserve">
+    <value>The requested number of job records exceeds the maximum of 100.</value>
+  </data>
+  <data name="BrightstarServiceClient_GetTransactions_TakeTooLarge" xml:space="preserve">
+    <value>The requested number of transaction records exceeds the maximum of 100.</value>
+  </data>
+  <data name="BrightstarServiceClient_InvalidDateRange" xml:space="preserve">
+    <value>Invalid date range. Ensure that the latest date is later than or the same as the earliest date.</value>
+  </data>
+  <data name="BrightstarServiceClient_UpdateExpressionMustNotBeEmptyString" xml:space="preserve">
+    <value>The SPARQL Update expression must not be null or an empty string.</value>
+  </data>
 </root>

@@ -14,6 +14,7 @@ namespace BrightstarDB.Server.Modules
             Get["/{storeName}/statistics/latest"] = parameters =>
                 {
                     var latest = brightstarService.GetStatistics(parameters["storeName"]);
+                    if (latest == null) return HttpStatusCode.NotFound;
                     return MakeResponseModel(latest);
                 };
         }

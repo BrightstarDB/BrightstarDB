@@ -24,7 +24,10 @@ namespace BrightstarDB.Client
         /// </summary>
         protected override IBrightstarService Client
         {
-            get { return BrightstarService.GetRestClient(_connectionString); }
+            get
+            {
+                return BrightstarService.GetRestClient(_connectionString);
+            }
         }
 
         #endregion

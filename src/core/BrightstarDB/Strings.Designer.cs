@@ -97,11 +97,29 @@ namespace BrightstarDB {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The requested number of job records exceeds the maximum of 100..
+        /// </summary>
+        internal static string BrightstarServiceClient_GetJobInfo_TakeToLarge {
+            get {
+                return ResourceManager.GetString("BrightstarServiceClient_GetJobInfo_TakeToLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Requested number of statistics records exceeds the maximum value of 100..
         /// </summary>
         internal static string BrightstarServiceClient_GetStatistics_TakeTooLarge {
             get {
                 return ResourceManager.GetString("BrightstarServiceClient_GetStatistics_TakeTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested number of transaction records exceeds the maximum of 100..
+        /// </summary>
+        internal static string BrightstarServiceClient_GetTransactions_TakeTooLarge {
+            get {
+                return ResourceManager.GetString("BrightstarServiceClient_GetTransactions_TakeTooLarge", resourceCulture);
             }
         }
         
@@ -129,6 +147,15 @@ namespace BrightstarDB {
         internal static string BrightstarServiceClient_InvalidCommitPointInfoObject {
             get {
                 return ResourceManager.GetString("BrightstarServiceClient_InvalidCommitPointInfoObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid date range. Ensure that the latest date is later than or the same as the earliest date..
+        /// </summary>
+        internal static string BrightstarServiceClient_InvalidDateRange {
+            get {
+                return ResourceManager.GetString("BrightstarServiceClient_InvalidDateRange", resourceCulture);
             }
         }
         
@@ -214,6 +241,15 @@ namespace BrightstarDB {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Store name conflicts with the name of an existing store..
+        /// </summary>
+        internal static string BrightstarServiceClient_StoreNameConflict {
+            get {
+                return ResourceManager.GetString("BrightstarServiceClient_StoreNameConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Store name must not be an empty string..
         /// </summary>
         internal static string BrightstarServiceClient_StoreNameMustNotBeEmptyString {
@@ -228,6 +264,33 @@ namespace BrightstarDB {
         internal static string BrightstarServiceClient_StoreNameMustNotBeNull {
             get {
                 return ResourceManager.GetString("BrightstarServiceClient_StoreNameMustNotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Requestd page size must be greater than zero..
+        /// </summary>
+        internal static string BrightstarServiceClient_TakeMustBeGreaterThanZero {
+            get {
+                return ResourceManager.GetString("BrightstarServiceClient_TakeMustBeGreaterThanZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The server provided unexpected content in response to the service request..
+        /// </summary>
+        internal static string BrightstarServiceClient_UnexpectedResponseContent {
+            get {
+                return ResourceManager.GetString("BrightstarServiceClient_UnexpectedResponseContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The SPARQL Update expression must not be null or an empty string..
+        /// </summary>
+        internal static string BrightstarServiceClient_UpdateExpressionMustNotBeEmptyString {
+            get {
+                return ResourceManager.GetString("BrightstarServiceClient_UpdateExpressionMustNotBeEmptyString", resourceCulture);
             }
         }
         
@@ -255,6 +318,24 @@ namespace BrightstarDB {
         internal static string InvalidEntityType {
             get {
                 return ResourceManager.GetString("InvalidEntityType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request does not use HTTP(S).
+        /// </summary>
+        internal static string NotAnHttpRequest {
+            get {
+                return ResourceManager.GetString("NotAnHttpRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter must be a non-empty, non-null string..
+        /// </summary>
+        internal static string StringParameterMustBeNonEmpty {
+            get {
+                return ResourceManager.GetString("StringParameterMustBeNonEmpty", resourceCulture);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;
@@ -24,11 +25,12 @@ namespace BrightstarDB.Server.Modules
                     {
                         return HttpStatusCode.BadRequest;
                     }
+                    if (jobsRequestObject.Take <= 0) jobsRequestObject.Take = DefaultPageSize;
                     var jobs = brightstarService.GetJobInfo(jobsRequestObject.StoreName, jobsRequestObject.Skip,
-                                                            DefaultPageSize + 1);
+                                                            jobsRequestObject.Take + 1);
                     return Negotiate.WithPagedList(jobsRequestObject,
                                                    jobs.Select(j=>j.MakeResponseObject(jobsRequestObject.StoreName)),
-                                                   jobsRequestObject.Skip, DefaultPageSize, DefaultPageSize,
+                                                   jobsRequestObject.Skip, jobsRequestObject.Take, DefaultPageSize,
                                                    "jobs");
                 };
 
@@ -195,15 +197,15 @@ namespace BrightstarDB.Server.Modules
                                 return HttpStatusCode.BadRequest;
                         }
 
-                        var response = new JsonResponse<JobResponseModel>(new JobResponseModel
+                        var jobUri = (string) storeName + "/jobs/" + queuedJobInfo.JobId;
+                        return Negotiate.WithMediaRangeModel("text/html", new JobResponseModel
                             {
                                 JobId = queuedJobInfo.JobId,
                                 StatusMessage = queuedJobInfo.StatusMessage,
                                 JobStatus = queuedJobInfo.GetJobStatusString()
-                            }, new DefaultJsonSerializer())
-                            .WithHeader("Content-Location", queuedJobInfo.JobId)
-                            .WithStatusCode(HttpStatusCode.OK);
-                        return response;
+                            })
+                            .WithHeader("Location", jobUri)
+                            .WithStatusCode(HttpStatusCode.Created);
                     }
                     catch (UnauthorizedAccessException)
                     {

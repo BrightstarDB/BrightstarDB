@@ -405,10 +405,12 @@ namespace BrightstarDB.Server
                 case TransactionType.UpdateTransaction:
                     var updateJob = new UpdateTransaction(jobId, storeWorker);
                     updateJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(dataStartPosition));
+                    storeWorker.QueueJob(updateJob);
                     break;
                 case TransactionType.SparqlUpdateTransaction:
                     var sparqlUpdateJob = new SparqlUpdateJob(jobId, storeWorker, null);
                     sparqlUpdateJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(dataStartPosition));
+                    storeWorker.QueueJob(sparqlUpdateJob);
                     break;
             }
             return jobId;

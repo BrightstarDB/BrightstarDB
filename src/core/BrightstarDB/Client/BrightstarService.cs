@@ -23,20 +23,6 @@ namespace BrightstarDB.Client
         {
             ServerCoreManager.Shutdown(allowJobsToConclude);                    
         }
-#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
-
-        internal  static  IBrightstarService GetRestClient(ConnectionString connectionString)
-        {
-            var accountId = connectionString.Account;
-            var key = connectionString.Key;
-            if (accountId != null && key != null)
-            {
-                return new BrightstarRestClient(connectionString.ServiceEndpoint, accountId, key);
-            }
-            return new BrightstarRestClient(connectionString.ServiceEndpoint, new PassthroughRequestAuthenticator(), null);
-        }
-
-#endif
 
         ///<summary>
         /// Returns a client for the embededd stores in the specified location
@@ -84,10 +70,8 @@ namespace BrightstarDB.Client
             {
                 case ConnectionType.Embedded:
                     return new EmbeddedBrightstarService(connectionString.StoresDirectory);
-#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
                 case ConnectionType.Rest:
                     return GetRestClient(connectionString);
-#endif
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value);
@@ -150,6 +134,28 @@ namespace BrightstarDB.Client
         {
             if (requestAuthenticator == null) requestAuthenticator = new PassthroughRequestAuthenticator();
             return new BrightstarRestClient(restEndpoint, requestAuthenticator, queryCache);
+        }
+
+        /// <summary>
+        /// Returns a new REST service client instance constructed from a BrightstarDB connection string
+        /// </summary>
+        /// <param name="connectionString">The connection string providing the parameters for the REST service connection</param>
+        /// <returns>A new <see cref="IBrightstarService"/>instance</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="connectionString"/> parameter is NULL</exception>
+        /// <exception cref="BrightstarClientException">The <paramref name="connectionString"/> parameter is invalid for some other reason</exception>
+        public static IBrightstarService GetRestClient(ConnectionString connectionString)
+        {
+            if (connectionString == null) throw new ArgumentNullException("connectionString");
+            if (String.IsNullOrEmpty(connectionString.ServiceEndpoint))
+                throw new BrightstarClientException(
+                    "Connection string does not contain the required 'endpoint' attribute");
+            string endpoint = connectionString.ServiceEndpoint;
+            IRequestAuthenticator requestAuthenticator = new PassthroughRequestAuthenticator();
+            if (connectionString.Account != null && connectionString.Key != null)
+            {
+                requestAuthenticator = new SharedSecretAuthenticator(connectionString.Account, connectionString.Key);
+            }
+            return new BrightstarRestClient(endpoint, requestAuthenticator, null);
         }
     }
 }
