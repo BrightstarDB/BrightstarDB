@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
@@ -13,6 +14,16 @@ namespace BrightstarDB.Server.Modules
         private readonly AbstractStorePermissionsProvider _storePermissionsProvider;
         private readonly AbstractSystemPermissionsProvider _systemPermissionsProvider;
         private readonly IRootPathProvider _rootPathProvider;
+
+        public BrightstarBootstrapper()
+        {
+            var config = ConfigurationManager.GetSection("brightstarService") as BrightstarServiceConfiguration;
+            if (config == null) throw new ConfigurationErrorsException(Strings.NoServiceConfiguration);
+
+            _brightstarService = BrightstarService.GetClient(config.ConnectionString);
+            _storePermissionsProvider = config.StorePermissionsProvider;
+            _systemPermissionsProvider = config.SystemPermissionsProvider;
+        }
 
         /// <summary>
         /// Creates a new bootstrapper that denies all anonymous access to the specified Brightstar service

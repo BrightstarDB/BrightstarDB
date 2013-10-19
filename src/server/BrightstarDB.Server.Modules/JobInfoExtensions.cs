@@ -12,9 +12,10 @@ namespace BrightstarDB.Server.Modules
                 JobId = arg.JobId,
                 JobStatus = GetJobStatusString(arg),
                 StatusMessage = arg.StatusMessage,
-                StoreName = storeName
+                StoreName = storeName,
+                ExceptionInfo = arg.ExceptionInfo
+               
                 // TODO: Extend IJobInfo with date/time stamp properties
-                // TODO: Extend with job exception info
             };
         }
 

@@ -29,16 +29,6 @@ namespace BrightstarDB.Server.Runner
         //    HelpText = "Require connections to use HTTPS")] 
         //public bool RequireHttps;
 
-        [Argument(ArgumentType.AtMostOnce, ShortName = "anonstore",
-            HelpText = "The default store permissions to grant to an anonymous user.",
-            DefaultValue = StorePermissions.None)]
-        public StorePermissions AnonymousStorePermissions = StorePermissions.None;
-
-        [Argument(ArgumentType.AtMostOnce, ShortName = "anonsys",
-            HelpText = "The default system permissions to grant to an anonymous user.",
-            DefaultValue = SystemPermissions.None)]
-        public SystemPermissions AnonymousSystemPermissions = SystemPermissions.None;
-
         [Argument(ArgumentType.AtMostOnce, HelpText = "The full path to the directory containing the Views and assets folder for the server",
             ShortName = "r")]
         public string RootPath;

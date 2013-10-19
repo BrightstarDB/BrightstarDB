@@ -27,7 +27,7 @@ namespace BrightstarDB.Server.IntegrationTests
         protected MyEntityContext NewContext()
         {
             return new MyEntityContext(
-                String.Format("type=http;endpoint=http://localhost:8090/brightstar;storeName={0};optimisticLocking=true", _storeName));
+                String.Format("type=rest;endpoint=http://localhost:8090/brightstar;storeName={0};optimisticLocking=true", _storeName));
         }
 
 

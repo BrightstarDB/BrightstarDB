@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{AE8BC6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.IntegrationTests", "BrightstarDB.Server.IntegrationTests\BrightstarDB.Server.IntegrationTests.csproj", "{DF96239F-5240-475C-BD33-52F0EE2536C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.AspNet", "BrightstarDB.Server.AspNet\BrightstarDB.Server.AspNet.csproj", "{8F2B30D0-9109-4955-AE23-C287A0DF7998}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CloudDebug|Any CPU = CloudDebug|Any CPU
@@ -88,6 +90,18 @@ Global
 		{DF96239F-5240-475C-BD33-52F0EE2536C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DF96239F-5240-475C-BD33-52F0EE2536C2}.Staging|Any CPU.ActiveCfg = Release|Any CPU
 		{DF96239F-5240-475C-BD33-52F0EE2536C2}.Staging|Any CPU.Build.0 = Release|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.CloudDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.CloudDebug|Any CPU.Build.0 = Debug|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.MonoDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.MonoDebug|Any CPU.Build.0 = Debug|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.MonoRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.MonoRelease|Any CPU.Build.0 = Release|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.Staging|Any CPU.ActiveCfg = Release|Any CPU
+		{8F2B30D0-9109-4955-AE23-C287A0DF7998}.Staging|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

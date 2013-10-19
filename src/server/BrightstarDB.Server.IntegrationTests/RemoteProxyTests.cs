@@ -9,7 +9,7 @@ namespace BrightstarDB.Server.IntegrationTests
     [TestFixture]
     public class RemoteProxyTests : ClientTestBase
     {
-        private readonly ConnectionString _connectionString = new ConnectionString("type=http;endpoint=http://localhost:8090/brightstar");
+        private readonly ConnectionString _connectionString = new ConnectionString("type=rest;endpoint=http://localhost:8090/brightstar");
 
         [TestFixtureSetUp]
         public void SetUp()
@@ -520,7 +520,7 @@ namespace BrightstarDB.Server.IntegrationTests
         {
             IDataObjectContext context =
                 new RestDataObjectContext(
-                    new ConnectionString("type=http;optimisticLocking=true;endpoint=http://localhost:8090/brightstar"));
+                    new ConnectionString("type=rest;optimisticLocking=true;endpoint=http://localhost:8090/brightstar"));
             var storeName = Guid.NewGuid().ToString();
             var store1 = context.CreateStore(storeName);
             var store1Alice = store1.MakeDataObject("http://example.org/alice");

@@ -16,7 +16,7 @@ namespace BrightstarDB.Dto
         /// <summary>
         /// Exception information
         /// </summary>
-        public ExceptionDetailObject ExceptionInfo { get; private set; }
+        public ExceptionDetailObject ExceptionInfo { get; set; }
 
         /// <summary>
         /// Get or set the string identifier for the current job status

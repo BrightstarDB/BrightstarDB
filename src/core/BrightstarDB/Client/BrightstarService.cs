@@ -117,9 +117,11 @@ namespace BrightstarDB.Client
             {
                 case ConnectionType.Embedded:
                     return new EmbeddedDataObjectContext(connectionString);
+                case ConnectionType.Rest:
+                    return new RestDataObjectContext(connectionString);
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
-                                                        connectionString.Value);
+                                                        connectionString.Value + ". Cause: unrecognised connection string type: " + connectionString.Type);
             }
         }
 

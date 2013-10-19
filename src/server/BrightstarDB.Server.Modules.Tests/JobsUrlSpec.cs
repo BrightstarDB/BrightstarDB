@@ -39,8 +39,8 @@ namespace BrightstarDB.Server.Modules.Tests
                 });
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers["Content-Location"], Is.EqualTo("1234"));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/1234"));
             brightstar.Verify();
         }
 
@@ -70,8 +70,8 @@ namespace BrightstarDB.Server.Modules.Tests
                 });
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers["Content-Location"], Is.EqualTo("2345"));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/2345"));
             brightstar.Verify();
         }
 
@@ -93,8 +93,8 @@ namespace BrightstarDB.Server.Modules.Tests
             });
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers["Content-Location"], Is.EqualTo("2345"));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/2345"));
             brightstar.Verify();
         }
 
@@ -126,8 +126,8 @@ namespace BrightstarDB.Server.Modules.Tests
                 });
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers["Content-Location"], Is.EqualTo("3456"));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/3456"));
             brightstar.Verify();
         }
 
@@ -149,8 +149,8 @@ namespace BrightstarDB.Server.Modules.Tests
             });
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers["Content-Location"], Is.EqualTo("3456"));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/3456"));
             brightstar.Verify();
         }
 
@@ -183,8 +183,8 @@ namespace BrightstarDB.Server.Modules.Tests
             });
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers["Content-Location"], Is.EqualTo("4567"));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/4567"));
             brightstar.Verify();
         }
 
@@ -234,8 +234,8 @@ namespace BrightstarDB.Server.Modules.Tests
                 });
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers["Content-Location"], Is.EqualTo("5678"));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/5678"));
             brightstar.Verify();
         }
 
@@ -264,8 +264,8 @@ namespace BrightstarDB.Server.Modules.Tests
             });
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers["Content-Location"], Is.EqualTo("5678"));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/5678"));
             brightstar.Verify();            
         }
 
@@ -501,8 +501,8 @@ namespace BrightstarDB.Server.Modules.Tests
                 });
 
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers["Content-Location"], Is.EqualTo("ABCD"));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/ABCD"));
             brightstar.Verify();
         }
 
@@ -523,7 +523,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 });
             
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
             brightstar.Verify();
         }
     }

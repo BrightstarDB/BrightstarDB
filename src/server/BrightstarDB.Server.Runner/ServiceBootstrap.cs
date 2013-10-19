@@ -12,15 +12,19 @@ namespace BrightstarDB.Server.Runner
         {
             try
             {
-                var service = serviceArgs.ConnectionString == null
-                                  ? BrightstarService.GetClient()
-                                  : BrightstarService.GetClient(serviceArgs.ConnectionString);
+                var configuration =
+                    System.Configuration.ConfigurationManager.GetSection("brightstarService") as
+                    BrightstarServiceConfiguration ?? new BrightstarServiceConfiguration();
+
+                // Connection string specified on the command line overrides the one in the app config file.
+                if (serviceArgs.ConnectionString != null) configuration.ConnectionString = serviceArgs.ConnectionString;
+
+                var service = BrightstarService.GetClient(configuration.ConnectionString);
+
                 return new BrightstarBootstrapper(service,
-                                                  new PassAllStorePermissionsProvider(
-                                                      serviceArgs.AnonymousStorePermissions),
-                                                  new PassAllSystemPermissionsProvider(
-                                                      serviceArgs.AnonymousSystemPermissions),
-                                                      serviceArgs.RootPath);
+                                                  configuration.StorePermissionsProvider,
+                                                  configuration.SystemPermissionsProvider,
+                                                  serviceArgs.RootPath);
             }
             catch (Exception ex)
             {

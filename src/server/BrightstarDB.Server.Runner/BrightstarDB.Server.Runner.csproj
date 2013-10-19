@@ -48,6 +48,7 @@
       <HintPath>..\packages\Nancy.Hosting.Self.0.20.0\lib\net40\Nancy.Hosting.Self.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
@@ -59,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrightstarServiceConfigurationSection.cs" />
     <Compile Include="ServiceBootstrap.cs" />
     <Compile Include="CommandLineArguments.cs" />
     <Compile Include="ProjectInstaller.cs">

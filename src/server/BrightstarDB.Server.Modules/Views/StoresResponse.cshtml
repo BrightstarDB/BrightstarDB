@@ -1,4 +1,4 @@
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Server.Modules.Model.StoresResponseModel>
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Dto.StoresResponseModel>
 @{
     Layout = "_Layout";
     ViewBag.Title = "BrightstarDB: Stores";
@@ -24,7 +24,7 @@
             @foreach (var s in Model.Stores)
             {
                 <tr>
-                    <td><a href="~/@s.Name">@s.Name</a></td>
+                    <td><a href="~/@s">@s</a></td>
                 </tr>
             }
         </tbody>

@@ -10,6 +10,14 @@ namespace BrightstarDB.Dto
     public class ExceptionDetailObject
     {
         /// <summary>
+        /// 
+        /// </summary>
+        [Obsolete("Provided only for serialization purposes")]
+        public ExceptionDetailObject()
+        {
+            
+        }
+        /// <summary>
         /// Creates a new instance of the <see cref="ExceptionDetailObject"/> class from the exception.
         /// </summary>
         /// <param name="exception">The exception to be serialized as an <see cref="ExceptionDetailObject"/></param>

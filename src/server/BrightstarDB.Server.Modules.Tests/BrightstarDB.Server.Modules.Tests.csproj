@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommitPointsUrlSpec.cs" />
+    <Compile Include="ConfigurationSectionHandlerSpec.cs" />
     <Compile Include="CreateStoreRequestObjectSpec.cs" />
     <Compile Include="FakeNancyBootstrapper.cs" />
     <Compile Include="JobRequestObjectSpec.cs" />

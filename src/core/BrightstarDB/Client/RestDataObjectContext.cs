@@ -98,6 +98,8 @@ namespace BrightstarDB.Client
         {
             Client.CreateStore(storeName,
                                persistenceType.HasValue ? persistenceType.Value : Configuration.PersistenceType);
+            if (String.IsNullOrEmpty(updateGraph)) updateGraph = Constants.DefaultGraphUri;
+            if (String.IsNullOrEmpty(versionTrackingGraph)) versionTrackingGraph = updateGraph;
             return new RestDataObjectStore(
                 _connectionString, storeName, namespaceMappings,
                 optimisticLockingEnabled.HasValue ? optimisticLockingEnabled.Value : _optimisticLockingEnabled,

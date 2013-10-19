@@ -147,7 +147,7 @@ namespace BrightstarDB.Client
             }
             preconditionsData.Close();
 
-            PostTransaction(preconditionsData.ToString(), deleteData.ToString(), addData.ToString(), Constants.DefaultGraphUri);
+            PostTransaction(preconditionsData.ToString(), deleteData.ToString(), addData.ToString(), UpdateGraphUri);
 
             // reset changes
             ResetTransactionData();
