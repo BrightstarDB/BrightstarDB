@@ -3,7 +3,7 @@
                 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Connection Properties" Width="401" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:converters="clr-namespace:BrightstarDB.Polaris.Converters" d:DesignHeight="324" SizeToContent="Height" >
+        xmlns:converters="clr-namespace:BrightstarDB.Polaris.Converters" d:DesignHeight="230" SizeToContent="Height" >
     <Window.Resources>
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="Margin" Value="5"/>
@@ -20,9 +20,6 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -52,23 +49,11 @@
                     Click="HandleDirectorySelectorClicked"/>
         </Grid>
         
-        <TextBlock Grid.Row="3">Server Name</TextBlock>
-        <TextBox Name="ServerNameText" Grid.Row="3" Grid.Column="1" Text="{Binding ServerName, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False">
+        <TextBlock Grid.Row="3">Server Address</TextBlock>
+        <TextBox Name="ServerEndpointText" Grid.Row="3" Grid.Column="1" Text="{Binding ServerEndpoint, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False">
         </TextBox>
         
-        <TextBlock Grid.Row="4">Port Number</TextBlock>
-        <TextBox Name="ServerPortText" Grid.Row="4" Grid.Column="1" Text="{Binding ServerPort, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False">
-        </TextBox>
-
-        <TextBlock Grid.Row="5">Server Path</TextBlock>
-        <TextBox Name="ServerPathText" Grid.Row="5" Grid.Column="1" Text="{Binding ServerPath, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False">
-        </TextBox>
-        
-        <TextBlock Grid.Row="6">Pipe Name</TextBlock>
-        <TextBox Name="PipeNameText" Grid.Row="6" Grid.Column="1" Text="{Binding PipeName, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False">
-        </TextBox>
-
-        <Grid Name="ValidationErrors" Grid.Row="7" Grid.ColumnSpan="2" Visibility="{Binding IsValid, Converter={StaticResource VisibilityConverter}, ConverterParameter=ShowIfFalse}"
+        <Grid Name="ValidationErrors" Grid.Row="4" Grid.ColumnSpan="2" Visibility="{Binding IsValid, Converter={StaticResource VisibilityConverter}, ConverterParameter=ShowIfFalse}"
               Background="#45FF0000">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -79,7 +64,7 @@
             <ListBox Grid.Row="1" ItemsSource="{Binding ValidationMessages}" BorderThickness="0" Background="Transparent" Margin="10,0,10,5"/>
         </Grid>
 
-        <Grid Grid.Row="8" Grid.ColumnSpan="2" >
+        <Grid Grid.Row="5" Grid.ColumnSpan="2" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
