@@ -22,20 +22,20 @@ namespace BrightstarDB
         /// <summary>
         /// Parses the provided connection string
         /// </summary>
-        /// <param name="value">The connection string to be parsed</param>
-        public ConnectionString(string value)
+        /// <param name="connectionString">The connection string to be parsed</param>
+        public ConnectionString(string connectionString)
         {    
-            if (value == null)
+            if (connectionString == null)
             {
-                throw new ArgumentNullException("Connection string must not be NULL.");
+                throw new ArgumentNullException("connectionString", Strings.BrightstarConnectionString_MustMotBeNull);
             }
-            if(String.Empty.Equals(value))
+            if(String.Empty.Equals(connectionString))
             {
-                throw new ArgumentException("Connection string must not be an empty string.");
+                throw new ArgumentException(Strings.BrightstarConnectionString_MustNotBeEmpty, "connectionString");
             }
             _values = new Dictionary<string, string>();
-            ParseValues(value);
-            _rawValue = value;
+            ParseValues(connectionString);
+            _rawValue = connectionString;
         }
 
         internal string Value { get { return _rawValue; } }
@@ -71,20 +71,9 @@ namespace BrightstarDB
                 Type = ConnectionType.Embedded;
                 AssertStoresDirectory();
             }
-            else if (type.Equals("http"))
+            else if (type.Equals("http") || type.Equals("tcp") || type.Equals("namedpipe"))
             {
-                Type = ConnectionType.Http;
-                AssertEndpoint();
-            }
-            else if (type.Equals("tcp"))
-            {
-                Type = ConnectionType.Tcp;
-                AssertEndpoint();
-            }
-            else if (type.Equals("namedpipe"))
-            {
-                Type = ConnectionType.NamedPipe;
-                AssertEndpoint();
+                throw new FormatException(String.Format(Strings.BrightstarConnectionString_ObsoleteType, type));
             }
             else if (type.Equals("rest"))
             {
@@ -171,18 +160,6 @@ namespace BrightstarDB
             if (Type == ConnectionType.Embedded)
             {
                 return String.Format("type=embedded;storesDirectory={0}", StoresDirectory);
-            }
-            if (Type == ConnectionType.Http )
-            {
-                return "type=http;endpoint=" + ServiceEndpoint;
-            }
-            if (Type == ConnectionType.Tcp)
-            {
-                return "type=tcp;endpoint=" + ServiceEndpoint;
-            }
-            if (Type == ConnectionType.NamedPipe)
-            {
-                return "type=namedpipe;endpoint=" + ServiceEndpoint;
             }
             if (Type == ConnectionType.Rest)
             {

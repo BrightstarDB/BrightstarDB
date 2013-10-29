@@ -213,4 +213,13 @@
   <data name="BrightstarServiceClient_UpdateExpressionMustNotBeEmptyString" xml:space="preserve">
     <value>The SPARQL Update expression must not be null or an empty string.</value>
   </data>
+  <data name="BrightstarConnectionString_MustMotBeNull" xml:space="preserve">
+    <value>Connection string must not be NULL.</value>
+  </data>
+  <data name="BrightstarConnectionString_MustNotBeEmpty" xml:space="preserve">
+    <value>Connection string must not be an empty string.</value>
+  </data>
+  <data name="BrightstarConnectionString_ObsoleteType" xml:space="preserve">
+    <value>The connection type '{0}' is unsupported from BrightstarDB 1.5 onwards.</value>
+  </data>
 </root>

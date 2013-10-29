@@ -61,6 +61,33 @@ namespace BrightstarDB {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection string must not be NULL..
+        /// </summary>
+        internal static string BrightstarConnectionString_MustMotBeNull {
+            get {
+                return ResourceManager.GetString("BrightstarConnectionString_MustMotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection string must not be an empty string..
+        /// </summary>
+        internal static string BrightstarConnectionString_MustNotBeEmpty {
+            get {
+                return ResourceManager.GetString("BrightstarConnectionString_MustNotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The connection type &apos;{0}&apos; is unsupported from BrightstarDB 1.5 onwards..
+        /// </summary>
+        internal static string BrightstarConnectionString_ObsoleteType {
+            get {
+                return ResourceManager.GetString("BrightstarConnectionString_ObsoleteType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Commit point must not be NULL..
         /// </summary>
         internal static string BrightstarServiceClient_CommitPointMustNotBeNull {
