@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.Responses.Negotiation;
+using StoreResponseModel = BrightstarDB.Server.Modules.Model.StoreResponseModel;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -29,7 +31,8 @@ namespace BrightstarDB.Server.Modules
                                 ICommitPointInfo commit = commitPoints.FirstOrDefault();
                                 return
                                     Negotiate.WithHeader("Last-Modified", commit.CommitTime.ToString("r"))
-                                             .WithStatusCode(HttpStatusCode.OK);
+                                             .WithStatusCode(HttpStatusCode.OK)
+                                             .WithModel(new StoreResponseModel(parameters["storeName"]));
                             }
                             catch (Exception ex)
                             {

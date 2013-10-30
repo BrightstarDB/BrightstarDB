@@ -40,6 +40,7 @@ namespace BrightstarDB.Server.IntegrationTests
                                                      BrightstarService.GetClient(),
                                                      new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All)),
+                                                     new HostConfiguration{AllowChunkedEncoding = false},
                                                  new Uri("http://localhost:8090/brightstar/"));
                     _serviceHost.Start();
                 }

@@ -18,7 +18,9 @@ namespace BrightstarDB.Server.Runner
             var serviceArgs = new ServiceArgs();
             CommandLine.Parser.ParseArguments(args, serviceArgs); // TODO: parser error reporting should not go to console
             var bootstrapper = ServiceBootstrap.GetBootstrapper(serviceArgs);
-            _nancyHost = new NancyHost(bootstrapper, serviceArgs.BaseUris.Select(x=>new Uri(x)).ToArray());
+            _nancyHost = new NancyHost(bootstrapper, 
+                new HostConfiguration{AllowChunkedEncoding = false},
+                serviceArgs.BaseUris.Select(x=>new Uri(x)).ToArray());
             _nancyHost.Start();
         }
 
