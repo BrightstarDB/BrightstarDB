@@ -1,4 +1,4 @@
-.. BrightstarDB Security:
+.. _BrightstarDB Security:
 
 ######################
 BrightstarDB Security
@@ -13,14 +13,16 @@ with different schemes of user authentication and authorization.
 Access Control
 *****************
 
-.. note:
+.. note::
 
-Access controls for BrightstarDB services is a work in progress. Previous releases had
-no form of access control and there is much work to complete to reach the desired state.
-Rather than wait until everything is all completed, this release provides the framework
-for access controls and future releases will build on that framework to deliver incremental
-increases in functionality. Comments and suggestions for improvements in this area
-are most welcome.
+    Access controls for BrightstarDB services is a work in progress. Previous releases had
+    no form of access control and there is much work to complete to reach the desired state.
+    Rather than wait until everything is all completed, this release provides the framework
+    for access controls and future releases will build on that framework to deliver incremental
+    increases in functionality. Comments and suggestions for improvements in this area
+    are most welcome.
+
+.. _Store Permissions:
 
 Store Permissions
 =================
@@ -57,6 +59,8 @@ can be any combination of the following:
         
     All
         A combination of all of the above permissions
+
+.. _System Permissions:
         
 System Permissions
 ==================
@@ -84,6 +88,7 @@ delete stores. The system permissions for a user can be any combination of the f
     All
         A combination of all the above permissions.
 
+.. Authentication:
 
 *********************
 Authentication
@@ -118,13 +123,15 @@ signature on the request using the same key. If the signature is valid, the
 identity for the request is set to the identity associated with the account ID.
 If the signature is not valid, the request is rejected without further processing.
 
-.. note:
+.. note::
+
     Currently this form of authentication is not yet implemented on the server.
     It is planned to add support for this in a future release and to provide
     a simple service for managing account/secret pairs in a BrightstarDB
     store so that it is easy to integrate key generation and management into
     an existing site.
 
+.. _Authorization:
 
 *********************
 Authorization
@@ -161,7 +168,8 @@ Possible means of determining the permissions for a user include:
         BrightstarDB store. These permissions can be updated through the BrightstarDB 
         Admin API.
         
-.. note:
+.. note::
+
     Currently only support for Fixed Permission Levels is implemented. Support for the other forms
     of authentication will be added in forthcoming releases.
         

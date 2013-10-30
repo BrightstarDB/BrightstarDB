@@ -51,16 +51,16 @@ The configuration for this service can be found in BrightstarService.exe.config 
 *****************************************
 
 Running the service as an application rather than a Windows service can be done by running 
-the `BrightstarService.exe` located in the `[INSTALLDIR]\Service` folder. The configuration 
+the `BrightstarService.exe` located in the `[INSTALLDIR]\\Service` folder. The configuration 
 from the `BrightstarService.exe.config` file is used by the service when it starts up. However, 
 some properties can also be overridden using command line parameters passed to the service. 
-The format of the command-line is as follows:
+The format of the command-line is as follows::
 
   BrightstarService.exe [options]
 
-Where options are:
+Where ``options`` are:
 
-    /c, /ConnectionString
+    ``/c``, ``/ConnectionString``
         Provides the connection string used by the service to access the BrightstarDB stores.
         Typically this connection string should be an **embedded** connection string, but it 
         is not a requirement. If this option is specified on the command-line it overrides
@@ -68,18 +68,31 @@ Where options are:
         specified on the command-line then a value MUST be provided in the the application
         configuration file.
         
-    /r, /RootPath
+    ``/r``, ``/RootPath``
         Specifies the full file path to the directory containing the `Views` and `assets` folder
         for the service. The default path used is the path to the directory containing the
         BrightstarService.exe file itself. This should only need to be overridden in development
         environments where it can be used to serve views/assets directly from the source folders
         rather than from the bin directory.
         
-    /u, /ServiceUri
+    ``/u``, ``/ServiceUri``
         Specifies the base URI path that the service will listen on for connections. This 
         parameter can be repeated multiple times to create a service that will listen on
         multiple endpoints. The default value is "http://localhost:8090/brightstar/"
 
+***********************************
+ Running BrightstarDB In IIS
+***********************************
+
+    BrightstarDB can be hosted as a .NET 4.0 web application in IIS. If you have installed
+    BrightstarDB from the installer, you will find a pre-built version of the web application
+    in the `INSTALLDIR\\webapp` directory.
+    
+    You will need to ensure that the application pool that the web application runs under
+    has the necessary privileges to access the directory where the BrightstarDB stores
+    are kept. It is strongly advised that this directory should be outside the directory
+    structure used for the IIS website itself.
+    
 ***********************************
  BrightstarDB Service Configuration 
 ***********************************
@@ -115,14 +128,16 @@ handler is invoked. The section itself consists of the following elements and at
         This is the root element for the configuration. It supports a number of attributes (documented below)
         and contains one or zero `storePermissions` elements and one or zero `systemPermissions` elements.
         
-    `brightstarService\@connectionString`
+    `brightstarService/@connectionString`
         This attribute specifies the connection string that the BrightstarDB service will use to connect
         to the stores it serves. The attribute value must be a valid BrightstarDB connection string. 
-        Typically the connection type will be embedded, but this is not required.
+        Typically the connection type will be embedded, but this is not required. See the section
+        :ref:`Connection_Strings` for more information about the format of BrightstarDB connection
+        strings.
         
     `storePermissions`
         This element is the root element for configuring the way that the BrightstarDB service manages
-        store access permissions. See `Configuring Store Permissions`_ for more details.
+        store access permissions. See :ref:`Configuring Store Permissions` for more details.
         
     `systemPermissions`
         This element is the root element for configuring the way that the BrightstarDB service manages
@@ -134,37 +149,10 @@ Configuring Store Permissions
 =============================
 
 When a user attempts to read or write data in a BrightstarDB store, the Store Permissions for that user
-are checked to ensure that the user has the required privileges. 
-
-The possible permissions are:
-
-    None
-        The user has no permissions on the store and can perform no operations on it at all
-    
-    Read
-        The user has permission to perform SPARQL queries on the store
-        
-    Export
-        The user can run an export job to retrieve a dump of the RDF contained in the store
-        
-    ViewHistory
-        The user can view the commit and transaction history of the store
-        
-    SparqlUpdate
-        The user can post updates to the store using the SPARQL update protocol
-        
-    TransactionUpdate
-        The user can post updates to the store using the BrightstarDB transactional update protocol
-        
-    Admin
-        The user can re-execute previous transactions; revert the store to a previous transaction;
-        and delete the store
-        
-    WithGrant
-        The user can grant permissions on this store to other users
-        
-    All
-        A combination of all of the above permissions
+are checked to ensure that the user has the required privileges. Store Permissions for a user are 
+provided by a Store Permissions Provider, and a user may have different permissions for each store
+on the BrightstarDB server. For more information about Store Permissions and providers
+please refer to the :ref:`Store Permissions` section of the :ref:`BrightstarDB Security` documentation.
 
 The permissions that a user has are provided to the BrightstarDB service by one or more configured 
 *Store Permission Providers*. The following providers are available "out of the box":
@@ -192,32 +180,15 @@ The permissions that a user has are provided to the BrightstarDB service by one 
         where ``[child providers]`` is exactly two XML elements one for each of the child permission
         providers.
         
-.. Configuring System Permissions:
+.. _Configuring System Permissions:
 
 Configuring System Permissions
 ==============================
 
-System Permissions control the access of users to list, create and manage BrightstarDB stores. The
-possible permissions are:
-
-    None
-        The user has no system permissions. This level denies even the listing of the stores
-        currently available on the server.
-        
-    ListStores
-        The user can list the stores available on the server. Note that the listing is not
-        currently filtered by store access permissions, so the user will see all stores
-        regardless of whether or not they have any permission to access the stores.
-        
-    CreateStore
-        The user can create new stores on the server.
-        
-    Admin
-        The user can delete stores from the server regardless of whether they have permissions
-        to administer the individual stores themselves.
-        
-    All
-        A combination of all the above permissions.
+System Permissions control the access of users to list, create and manage BrightstarDB stores. 
+There is one set of System Permissions for a user on the BrightstarDB server. For more information
+about System Permissions please refer to the :ref:`System Permissions` section of the 
+:ref:`BrightstarDB Security` documentation.
         
 The permissions that a user has are provided to the BrightstarDB service by one or more configured 
 *System Permission Providers*. The following providers are available "out of the box":
@@ -251,31 +222,27 @@ Additional Configuration Options
 A number of other aspects of BrightstarDB service operations can be configured by adding values to the
 ``appSettings`` section of the application configuration file. These are:        
 
-  - BrightstarDB.StoreLocation - specifies the path to the directory where stores are persisted. For Windows Phone 7.1 this path is fixed as the directory "brightstar" in the isolated storage for the application, so this setting has no effect.
+  - ``BrightstarDB.LogLevel`` - configures the level of detail that is logged by the BrightstarDB application. The valid options are ERROR, INFO, WARN, DEBUG, and ALL.  For more information about logging and configuring where logs are written please refer to the section :ref:`Logging <Logging>`. For Windows Phone 7.1 this setting is fixed as ERROR and cannot be overridden.
 
-  - BrightstarDB.LogLevel - configures the level of detail that is logged by the BrightstarDB application. The valid options are ERROR, INFO, WARN, DEBUG, and ALL.  For more information about logging and configuring where logs are written please refer to the section :ref:`Logging <Logging>`. For Windows Phone 7.1 this setting is fixed as ERROR and cannot be overridden.
+  - ``BrightstarDB.TxnFlushTripleCount`` - specifies a batch size for importing large sets of triples. At the end of each batch BrightstarDB will perform housekeeping tasks to try to ensure a lower memory footprint. The default value is 10,000 on .NET 4.0. For applications that run on larger, more capable hardware (with available memory of 4GB or more) the value can usually be increased to 50,000 or even 100,000 - but it is worth testing the configured value before committing to it in deployment. For Windows Phone 7.1 this value is fixed as 1,000 and cannot be overridden.
 
-  - BrightstarDB.TxnFlushTripleCount - specifies a batch size for importing large sets of triples. At the end of each batch BrightstarDB will perform housekeeping tasks to try to ensure a lower memory footprint. The default value is 10,000 on .NET 4.0. For applications that run on larger, more capable hardware (with available memory of 4GB or more) the value can usually be increased to 50,000 or even 100,000 - but it is worth testing the configured value before committing to it in deployment. For Windows Phone 7.1 this value is fixed as 1,000 and cannot be overridden.
+  - ``BrightstarDB.PageCacheSize`` - specifies the amount of memory in MB to be used by the BrightstarDB store page cache. This setting applies only to applications that open a BrightstarDB store as the cache is used to cache pages of data from the data.bs and resources.bs data files. The default value is 2048 on .NET 4.0 and 4 on Windows Phone 7.1. Note that this memory is not all allocated on startup so actual memory usage by the application may initially be lower than this value.
 
-  - BrightstarDB.ConnectionString - specifies the default connection string to use when creating a BrightstarDB client. This setting can be used by applications that want to enable the user to choose the store that they connect to as a runtime configuration option.
-
-  - BrightstarDB.PageCacheSize - specifies the amount of memory in MB to be used by the BrightstarDB store page cache. This setting applies only to applications that open a BrightstarDB store as the cache is used to cache pages of data from the data.bs and resources.bs data files. The default value is 2048 on .NET 4.0 and 4 on Windows Phone 7.1. Note that this memory is not all allocated on startup so actual memory usage by the application may initially be lower than this value.
-
-  - BrightstarDB.ResourceCacheLimit - specifies the number of resource entries to keep cached for each open store. Default values are 1,000,000 on .NET 4.0 and 10,000 on Windows Phone.
+  - ``BrightstarDB.ResourceCacheLimit`` - specifies the number of resource entries to keep cached for each open store. Default values are 1,000,000 on .NET 4.0 and 10,000 on Windows Phone.
   
-  - BrightstarDB.EnableQueryCache - specifies whether or not the application should cache the results of SPARQL queries. Allowed values are "true" or "false" and the setting defaults to "true". Query caching is only available on .NET 4.0 so this setting has no effect on Windows Phone 7.1
+  - ``BrightstarDB.EnableQueryCache`` - specifies whether or not the application should cache the results of SPARQL queries. Allowed values are "true" or "false" and the setting defaults to "true". Query caching is only available on .NET 4.0 so this setting has no effect on Windows Phone 7.1
 
-  - BrightstarDB.QueryCacheDirectory - specifies the folder location where cached results are stored.
+  - ``BrightstarDB.QueryCacheDirectory`` - specifies the folder location where cached results are stored.
 
-  - BrightstarDB.QueryCacheMemory - specifies the amount of memory in MB to be used by the SPARQL query cache. The default value is 256.
+  - ``BrightstarDB.QueryCacheMemory`` - specifies the amount of memory in MB to be used by the SPARQL query cache. The default value is 256.
 
-  - BrightstarDB.QueryCacheDisk - specifies the amount of disk space (in MB) to be used by the SPARQL query cache. The default value is 2048. The disk space used will be in a subdirectory under the location specified by the BrightstarDB.StoreLocation configuration property.
+  - ``BrightstarDB.QueryCacheDisk`` - specifies the amount of disk space (in MB) to be used by the SPARQL query cache. The default value is 2048. The disk space used will be in a subdirectory under the location specified by the BrightstarDB.StoreLocation configuration property.
 
-  - BrightstarDB.PersistenceType - specifies the default type of persistence used for the main BrighstarDB index files. Allowed values are "appendonly" or "rewrite" (values are case-insensitive). For more information about the store persistence types please refer to the section :ref:`Store Persistence Types <Store_Persistence_Types>`.
+  - ``BrightstarDB.PersistenceType`` - specifies the default type of persistence used for the main BrighstarDB index files. Allowed values are "appendonly" or "rewrite" (values are case-insensitive). For more information about the store persistence types please refer to the section :ref:`Store Persistence Types <Store_Persistence_Types>`.
 
-  - BrightstarDB.StatsUpdate.Timespan - specifies the minimum number of seconds that must pass between automatic update of store statistics.
+  - ``BrightstarDB.StatsUpdate.Timespan`` - specifies the minimum number of seconds that must pass between automatic update of store statistics.
   
-  - BrightstarDB.StatsUpdate.TransactionCount - specifies the minimum number of transactions that must occur between automatic update of store statistics.
+  - ``BrightstarDB.StatsUpdate.TransactionCount`` - specifies the minimum number of transactions that must occur between automatic update of store statistics.
 
 Example Server Configuration
 ============================
@@ -335,19 +302,16 @@ The sample below shows all the BrightstarDB options with usage comments. ::
  Configuring Caching
 *********************
 
-
 BrightstarDB provides facilities for caching the results of SPARQL queries both in memory and to disk.
 Caching complex SPARQL queries or queries that potentially return large numbers of results can provide
 a significant performance improvement. Caching is controlled through a combination of settings in the 
 application configuration file (the web.config for web apps, or the .exe.config for other executables).
-
 
 **AppSetting Key**  **Default Value**  **Description**  
 BrightstarDB.EnableQueryCache  false  Boolean value ("true" or "false") that specifies if the system should cache the result of SPARQL queries.  
 BrightstarDB.QueryCacheMemory  256  The size in MB of the in-memory query cache.  
 BrightstarDB.QueryCacheDirectory  <undefined>  The path to the directory to be used for the disk cache. If left undefined, then the behaviour depends on whether the BrightstarDB.StoreLocation setting is provided. If it is, then a disk cache will be created in the _bscache subdirectory of the StoreLocation, otherwise disk caching will be disabled.  
 BrightstarDB.QueryCacheDiskSpace  2048  The size in MB of the disk cache.  
-
 
 Example Caching Configurations
 ==============================
@@ -363,7 +327,6 @@ is specified in the configuration file::
       <add key="BrightstarDB.StoreLocation" value="d:\brightstar\" />
     </appSettings>
   </configuration>
-
 
 
 To cache in some other location (e.g. a fast disk dedicated to caching)::
@@ -386,7 +349,6 @@ To cache in some other location (e.g. a fast disk dedicated to caching)::
       <add key="BrightstarDB.QueryCacheDiskSpace" value="204800" /> 
     </appSettings>
   </configuration>
-
 
 
 This sample has no disk cache because there is no valid location for the cache to be created::
