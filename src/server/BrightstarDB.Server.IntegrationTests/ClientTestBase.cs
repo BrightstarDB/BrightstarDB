@@ -38,8 +38,8 @@ namespace BrightstarDB.Server.IntegrationTests
                 {
                     _serviceHost = new NancyHost(new BrightstarBootstrapper(
                                                      BrightstarService.GetClient(),
-                                                     new PassAllStorePermissionsProvider(StorePermissions.All),
-                                                     new PassAllSystemPermissionsProvider(SystemPermissions.All)),
+                                                     new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                     new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All)),
                                                  new Uri("http://localhost:8090/brightstar/"));
                     _serviceHost.Start();
                 }

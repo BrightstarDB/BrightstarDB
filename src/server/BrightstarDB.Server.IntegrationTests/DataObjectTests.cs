@@ -240,6 +240,8 @@ namespace BrightstarDB.Server.IntegrationTests
             updateDataObject = store3.GetDataObject("resource:Alice");
             Assert.IsNotNull(updateDataObject);
             Assert.IsNotNull(updateDataObject.GetPropertyValue("foaf:mbox_sha1"));
+            Assert.IsNotNull(updateDataObject.GetPropertyValue("foaf:name"));
+            Assert.IsNotNull(updateDataObject.GetPropertyValue("foaf:mbox"));
             Assert.AreEqual("ABCD1234", updateDataObject.GetPropertyValue("foaf:mbox_sha1").ToString());
             Assert.AreEqual("Alice Test", updateDataObject.GetPropertyValue("foaf:name").ToString());
             Assert.AreEqual("alice@example.org", updateDataObject.GetPropertyValue("foaf:mbox").ToString());

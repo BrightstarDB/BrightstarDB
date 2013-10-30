@@ -89,8 +89,6 @@
     <Compile Include="Model\TransactionResponseModel.cs" />
     <Compile Include="NegotiatorExtensions.cs" />
     <Compile Include="Permissions\FallbackSystemPermissionsProvider.cs" />
-    <Compile Include="Permissions\PassAllStorePermissionsProvider.cs" />
-    <Compile Include="Permissions\PassAllSystemPermissionsProvider.cs" />
     <Compile Include="SparqlQueryProcessingModel.cs" />
     <Compile Include="SparqlQueryResponse.cs" />
     <Compile Include="SparqlModule.cs" />

@@ -33,9 +33,8 @@ namespace BrightstarDB.Server.Modules
         public BrightstarBootstrapper(IBrightstarService brightstarService)
             : this(
                 brightstarService, 
-            new PassAllStorePermissionsProvider(),
-            new PassAllSystemPermissionsProvider(),
-            null)
+            new FallbackStorePermissionsProvider(StorePermissions.All),
+            new FallbackSystemPermissionsProvider(SystemPermissions.All))
         {
         }
 
@@ -47,7 +46,7 @@ namespace BrightstarDB.Server.Modules
         /// <param name="storePermissionsProvider"></param>
         public BrightstarBootstrapper(IBrightstarService brightstarService,
                                       AbstractStorePermissionsProvider storePermissionsProvider)
-            : this(brightstarService, storePermissionsProvider, new PassAllSystemPermissionsProvider(), null)
+            : this(brightstarService, storePermissionsProvider, new FallbackSystemPermissionsProvider(SystemPermissions.All))
         {
 
         }
@@ -55,9 +54,10 @@ namespace BrightstarDB.Server.Modules
         /// <summary>
         /// Creates a new bootstrapper with store and system access goverened by the specified providers.
         /// </summary>
-        /// <param name="brightstarService"></param>
-        /// <param name="storePermissionsProvider"></param>
-        /// <param name="systemPermissionsProvider"></param>
+        /// <param name="brightstarService">The connection to the BrightstarDB stores</param>
+        /// <param name="storePermissionsProvider">The store permissions provider to be used by the service</param>
+        /// <param name="systemPermissionsProvider">The system permissions provider to be used by the service</param>
+        /// <param name="rootPath">The path to the directory containing the service Views and assets folder</param>
         public BrightstarBootstrapper(IBrightstarService brightstarService,
                                       AbstractStorePermissionsProvider storePermissionsProvider,
                                       AbstractSystemPermissionsProvider systemPermissionsProvider,

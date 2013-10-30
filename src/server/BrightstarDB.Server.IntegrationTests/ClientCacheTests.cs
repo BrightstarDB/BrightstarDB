@@ -49,6 +49,7 @@ namespace BrightstarDB.Server.IntegrationTests
 
             client.ExecuteTransaction(storeName, null, null,
                                       "<http://example.org/s> <http://example.org/p> <http://example.org/o> .");
+
             resultStream = client.ExecuteQuery(storeName, query);
             using (var resultReader = new StreamReader(resultStream))
             {

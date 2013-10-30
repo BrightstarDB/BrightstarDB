@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Dto;
@@ -25,8 +24,8 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
             var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                          new PassAllStorePermissionsProvider(StorePermissions.All),
-                                          new PassAllSystemPermissionsProvider(SystemPermissions.ListStores)));
+                                          new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                          new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
 
             var response = app.Get("/", c=>c.Accept(MediaRange.FromString("application/json")));
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -38,8 +37,8 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
             var app =
-                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new PassAllStorePermissionsProvider(StorePermissions.All),
-                                                      new PassAllSystemPermissionsProvider(SystemPermissions.ListStores)));
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
             var response = app.Get("/");
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Body.AsString(), Contains.Substring("<table class=\"items\">"));
@@ -52,7 +51,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var systemPermissions = new Mock<AbstractSystemPermissionsProvider>();
             systemPermissions.Setup(s=>s.HasPermissions(null, SystemPermissions.ListStores)).Returns(false).Verifiable();
-            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(StorePermissions.All), systemPermissions.Object));
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All), systemPermissions.Object));
 
             // Execute
             var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
@@ -67,11 +66,11 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             // Setup
             var mockBrightstar = new Mock<IBrightstarService>();
-            mockBrightstar.Setup(s => s.ListStores()).Returns(new string[] {"store1", "store2", "store3"});
+            mockBrightstar.Setup(s => s.ListStores()).Returns(new[] {"store1", "store2", "store3"});
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
-                                                      new PassAllSystemPermissionsProvider(SystemPermissions.ListStores)));
+                                                      new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
 
             // Execute
             var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
@@ -96,7 +95,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockBrightstar = new Mock<IBrightstarService>();
             mockBrightstar.Setup(s => s.DoesStoreExist("foo")).Returns(false);
             mockBrightstar.Setup(s => s.CreateStore("foo", PersistenceType.AppendOnly)).Verifiable("Expected CreateStore to be called");
-            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new PassAllStorePermissionsProvider(StorePermissions.All), new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
+            var app = new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All), new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.CreateStore)));
 
             // Execute
             var response = app.Post("/", with =>
@@ -125,8 +124,8 @@ namespace BrightstarDB.Server.Modules.Tests
             mockBrightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true);
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
-                                                      new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
+                                                      new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.CreateStore)));
             
             // Execute
             var response = app.Post("/", with =>
@@ -146,8 +145,8 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockBrightstar = new Mock<IBrightstarService>();
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
-                                                      new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
+                                                      new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.CreateStore)));
 
             // Execute
             var response = app.Post("/", with =>
@@ -168,8 +167,8 @@ namespace BrightstarDB.Server.Modules.Tests
             mockBrightstar.Setup(s => s.CreateStore("/invalid/store_name")).Throws<ArgumentException>();
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
-                                                      new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
+                                                      new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.CreateStore)));
 
             // Execute
             var response = app.Post("/", with =>
@@ -191,8 +190,8 @@ namespace BrightstarDB.Server.Modules.Tests
             mockBrightstar.Setup(s => s.CreateStore("foo")).Verifiable();
             var app =
                 new Browser(new FakeNancyBootstrapper(mockBrightstar.Object,
-                                                      new PassAllStorePermissionsProvider(StorePermissions.All),
-                                                      new PassAllSystemPermissionsProvider(SystemPermissions.CreateStore)));
+                                                      new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.CreateStore)));
 
             // Execute
             var response = app.Post("/", with =>
@@ -219,7 +218,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var systemPermissions = new Mock<AbstractSystemPermissionsProvider>();
             systemPermissions.Setup(s=>s.HasPermissions(null, SystemPermissions.CreateStore)).Returns(false).Verifiable();
             var app =
-                new Browser(new FakeNancyBootstrapper(brightstar.Object, new PassAllStorePermissionsProvider(StorePermissions.All),
+                new Browser(new FakeNancyBootstrapper(brightstar.Object, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
                                                       systemPermissions.Object));
             // Execute
             var response = app.Post("/", with =>

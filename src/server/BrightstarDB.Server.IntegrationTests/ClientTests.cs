@@ -1168,8 +1168,11 @@ WHERE { ?s ?p 'foo' }";
             updatedCommitPoints = client.GetCommitPoints(storeName, 0, 1).ToList();
             Assert.That(updatedCommitPoints, Has.Count.EqualTo(1));
 
-            updatedCommitPoints = client.GetCommitPoints(storeName, DateTime.UtcNow,
-                                                         DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(10)), 0, 10)
+            updatedCommitPoints = client.GetCommitPoints(
+                storeName,
+                // Need to allow for resolution of the date/time format
+                DateTime.UtcNow.Add(TimeSpan.FromSeconds(1.0)),
+                DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(10)), 0, 10)
                                         .ToList();
             Assert.That(updatedCommitPoints, Has.Count.EqualTo(2));
         }

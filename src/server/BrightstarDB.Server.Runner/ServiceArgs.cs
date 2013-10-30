@@ -12,7 +12,7 @@ namespace BrightstarDB.Server.Runner
         }
 
         [Argument(ArgumentType.MultipleUnique,
-            LongName = "Service URI",
+            LongName = "ServiceUri",
             ShortName = "u",
             HelpText =
                 "The base URI that the service will listen on for connections. Can be repeated multiple times to listen on multiple endpoints."

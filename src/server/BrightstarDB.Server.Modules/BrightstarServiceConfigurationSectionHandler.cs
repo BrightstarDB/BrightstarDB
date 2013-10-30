@@ -57,13 +57,12 @@ namespace BrightstarDB.Server.Modules
                         ProcessSystemPermissions(childProviderElements[1]));
 
                 case "fallback":
-                    var permissions = GetSystemPermissionsAttributeValue(providerElement, "permissions");
-                    return new FallbackSystemPermissionsProvider(permissions);
+                    var authenticatedPermissions = GetSystemPermissionsAttributeValue(providerElement, "authenticated");
+                    SystemPermissions anonymousPermissions;
+                    return TryGetSystemPermissionsAttributeValue(providerElement, "anonymous", out anonymousPermissions)
+                               ? new FallbackSystemPermissionsProvider(authenticatedPermissions, anonymousPermissions)
+                               : new FallbackSystemPermissionsProvider(authenticatedPermissions);
                     
-                case "passAll":
-                    var anonPermissions = GetSystemPermissionsAttributeValue(providerElement, "anonPermissions");
-                    return new PassAllSystemPermissionsProvider(anonPermissions);
-
                 default:
                     throw new ConfigurationErrorsException(
                         String.Format(
@@ -95,11 +94,11 @@ namespace BrightstarDB.Server.Modules
                         ProcessStorePermissionsProvider(childProviderElements[0]),
                         ProcessStorePermissionsProvider(childProviderElements[1]));
                 case "fallback":
-                    var permissions = GetStorePermissionsAttributeValue(providerElement, "permissions");
-                    return new FallbackStorePermissionsProvider(permissions);
-                case "passAll":
-                    var anonPermissions = GetStorePermissionsAttributeValue(providerElement, "anonPermissions");
-                    return new PassAllStorePermissionsProvider(anonPermissions);
+                    var authPermissions = GetStorePermissionsAttributeValue(providerElement, "authenticated");
+                    StorePermissions anonPermissions;
+                    return TryGetStorePermissionsAttributeValue(providerElement, "anonymous", out anonPermissions)
+                               ? new FallbackStorePermissionsProvider(authPermissions, anonPermissions)
+                               : new FallbackStorePermissionsProvider(authPermissions);
                 default:
                     throw new ConfigurationErrorsException(
                         "Unexecpted configuration element inside 'storePermissions' element. Cannot process element '" +
@@ -123,6 +122,20 @@ namespace BrightstarDB.Server.Modules
             return ret;
         }
 
+        private static bool TryGetStorePermissionsAttributeValue(XmlElement providerElement, string attrName, out StorePermissions storePermissions)
+        {
+            try
+            {
+                storePermissions = GetStorePermissionsAttributeValue(providerElement, attrName);
+                return true;
+            }
+            catch (ConfigurationErrorsException)
+            {
+                storePermissions = StorePermissions.None;
+                return false;
+            }
+        }
+
         private static SystemPermissions GetSystemPermissionsAttributeValue(XmlElement providerElement, string attrName)
         {
             var szAttrValue = providerElement.GetAttribute(attrName);
@@ -137,6 +150,21 @@ namespace BrightstarDB.Server.Modules
                     szAttrValue, attrName, providerElement.Name));
             }
             return ret;
+        }
+
+        private static bool TryGetSystemPermissionsAttributeValue(XmlElement providerElement, string attrName,
+                                                                  out SystemPermissions systemPermissions)
+        {
+            try
+            {
+                systemPermissions = GetSystemPermissionsAttributeValue(providerElement, attrName);
+                return true;
+            }
+            catch (ConfigurationErrorsException)
+            {
+                systemPermissions = SystemPermissions.None;
+                return false;
+            }
         }
 
     }

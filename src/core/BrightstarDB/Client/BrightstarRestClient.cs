@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 #if !PORTABLE
 using System.Web.Script.Serialization;
 #endif
@@ -35,6 +34,8 @@ namespace BrightstarDB.Client
         private readonly IRequestAuthenticator _requestAuthenticator;
         private int _pollInterval = DefaultPollInterval;
         private int _pollTimeout = DefaultPollTimeout;
+
+        private ICache _clientCache;
 
         /// <summary>
         /// Get or set the amount of time (in milliseconds)
@@ -68,12 +69,14 @@ namespace BrightstarDB.Client
         {
             _serviceEndpoint = serviceEndpoint.EndsWith("/") ? new Uri(serviceEndpoint) : new Uri(serviceEndpoint + "/");
             _requestAuthenticator = requestAuthenticator;
+            _clientCache = clientCache;
         }
 
         internal BrightstarRestClient(string serviceEndpoint, string accountId, string authenticationKey)
         {
             _serviceEndpoint = serviceEndpoint.EndsWith("/") ? new Uri(serviceEndpoint) : new Uri(serviceEndpoint + "/");
             _requestAuthenticator = new SharedSecretAuthenticator(accountId, authenticationKey);
+            _clientCache = new NullCache();
         }
 
         #region Implementation of IBrightstarService
@@ -150,7 +153,7 @@ namespace BrightstarDB.Client
             }
         }
 
-        private void ValidateStoreName(string storeName, string argName = "storeName")
+        private static void ValidateStoreName(string storeName, string argName = "storeName")
         {
             if (storeName == null) throw new ArgumentNullException(argName, Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
             if (String.IsNullOrEmpty(storeName)) throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString, argName);
@@ -159,6 +162,7 @@ namespace BrightstarDB.Client
                 throw new ArgumentException(Strings.BrightstarServiceClient_InvalidStoreName, argName);
             }
         }
+
         /// <summary>
         /// Delete the named store
         /// </summary>
@@ -268,6 +272,25 @@ namespace BrightstarDB.Client
             if(String.IsNullOrEmpty(queryExpression)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "queryExpression");
             if (resultsFormat == null) resultsFormat = SparqlResultsFormat.Xml;
 
+            string cacheKey = null;
+            var graphs = defaultGraphUris == null ? null : defaultGraphUris.ToArray();
+            CachedQueryResult cachedResult = null;
+
+            if (ifNotModifiedSince == null && _clientCache != null)
+            {
+                // See if we have a cached result
+                cacheKey = storeName + "_" + queryExpression.GetHashCode();
+                if (graphs != null)
+                {
+                    cacheKey = cacheKey + "_" + String.Join(",", graphs).GetHashCode();
+                }
+                cachedResult = _clientCache.Lookup<CachedQueryResult>(cacheKey);
+                if (cachedResult != null)
+                {
+                    ifNotModifiedSince = cachedResult.Timestamp;
+                }
+            }
+
             if (ifNotModifiedSince.HasValue)
             {
                 // Check if store has been modified
@@ -275,6 +298,14 @@ namespace BrightstarDB.Client
                 var lastModified = GetLastModified(headResponse);
                 if (lastModified.HasValue && lastModified <= ifNotModifiedSince.Value)
                 {
+                    if (cachedResult != null)
+                    {
+                        // Cached result is still valid
+                        return new MemoryStream(
+                            resultsFormat == null 
+                            ? Encoding.UTF8.GetBytes(cachedResult.Result)
+                            : resultsFormat.Encoding.GetBytes(cachedResult.Result));
+                    }
                     throw new BrightstarStoreNotModifiedException();
                 }
             }
@@ -288,9 +319,25 @@ namespace BrightstarDB.Client
 
             // Execute
             var queryResponse = AuthenticatedFormPost(storeName + "/sparql", parameters, resultsFormat.MediaTypes[0]);
+            var responseStream = queryResponse.GetResponseStream();
 
-            // Return raw response stream
-            return queryResponse.GetResponseStream();
+            // Cache result and return
+            if (_clientCache != null && cacheKey != null && LastResponseTimestamp.HasValue && responseStream != null)
+            {
+
+                using (var streamReader = new StreamReader(responseStream))
+                {
+                    var resultString = streamReader.ReadToEnd();
+                    cachedResult = new CachedQueryResult(LastResponseTimestamp.Value, resultString);
+                    _clientCache.Insert(cacheKey, cachedResult, CachePriority.Normal);
+                    return new MemoryStream(streamReader.CurrentEncoding.GetBytes(cachedResult.Result));
+                }
+            }
+            else
+            {
+                return responseStream;
+            }
+
         }
 
         private static DateTime? GetLastModified(HttpWebResponse r)

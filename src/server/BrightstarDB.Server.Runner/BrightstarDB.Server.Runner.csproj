@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BrightstarDB.Server.Runner</RootNamespace>
-    <AssemblyName>BrightstarDB.Server.Runner</AssemblyName>
+    <AssemblyName>BrightstarService</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -60,7 +60,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BrightstarServiceConfigurationSection.cs" />
     <Compile Include="ServiceBootstrap.cs" />
     <Compile Include="CommandLineArguments.cs" />
     <Compile Include="ProjectInstaller.cs">
