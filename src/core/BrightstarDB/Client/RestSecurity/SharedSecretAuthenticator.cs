@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿#if !WINDOWS_PHONE
+using System.Net;
 
 namespace BrightstarDB.Client.RestSecurity
 {
@@ -28,7 +29,7 @@ namespace BrightstarDB.Client.RestSecurity
         /// <param name="request">The request to be updated with authentication information</param>
         public void Authenticate(HttpWebRequest request)
         {
-#if PORTABLE
+#if PORTABLE || WINDOWS_PHONE
             request.Headers[HttpRequestHeader.Authorization] =
                 "SharedKey " + _accountId + ":" +
                 RestClientHelper.GenerateSignature(request, SignatureType.SharedKey, _authKey);
@@ -39,3 +40,4 @@ namespace BrightstarDB.Client.RestSecurity
         }
     }
 }
+#endif

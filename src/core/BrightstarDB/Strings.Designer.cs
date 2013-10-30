@@ -322,6 +322,24 @@ namespace BrightstarDB {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The argument provided was not of or assignable to the expected type &apos;{0}&apos;.
+        /// </summary>
+        internal static string EntityFramework_InvalidEntityType {
+            get {
+                return ResourceManager.GetString("EntityFramework_InvalidEntityType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property &apos;{0}&apos; of type &apos;{1}&apos; cannot be used as an identity property. An identity property must be a read-only System.String property. If this property is intended to be the identity property for the entity, please change it to a read-only System.String property. If it is not intended to be the identity property for the entity, please add the [ResourceAddress] attribute to the property which is intended to be the identity property for the entity..
+        /// </summary>
+        internal static string EntityFramework_InvalidPropertyMessage {
+            get {
+                return ResourceManager.GetString("EntityFramework_InvalidPropertyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempt to write to a fixed page..
         /// </summary>
         internal static string INode_Attempt_to_write_to_a_fixed_page {

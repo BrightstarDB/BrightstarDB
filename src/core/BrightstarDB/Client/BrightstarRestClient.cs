@@ -7,10 +7,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-#if !PORTABLE
+#if !PORTABLE && !WINDOWS_PHONE
 using System.Web.Script.Serialization;
 #endif
-#if PORTABLE
+#if PORTABLE || WINDOWS_PHONE
 using VDS.RDF;
 #endif
 using BrightstarDB.Caching;
@@ -342,7 +342,7 @@ namespace BrightstarDB.Client
 
         private static DateTime? GetLastModified(HttpWebResponse r)
         {
-#if PORTABLE
+#if PORTABLE || WINDOWS_PHONE
             var headerVal = r.Headers["Last-Modified"];
             DateTime lastModified;
             if (!String.IsNullOrEmpty(headerVal) && DateTime.TryParse(headerVal, out lastModified))
@@ -522,7 +522,11 @@ namespace BrightstarDB.Client
 
             var queryUri = String.Format("{0}/jobs?skip={1}&take={2}", storeName, skip, take);
             var response = AuthenticatedGet(queryUri);
+#if WINDOWS_PHONE
+            return Deserialize<List<JobResponseModel>>(response).Cast<IJobInfo>();
+#else
             return Deserialize<List<JobResponseModel>>(response);
+#endif
         }
 
         /// <summary>
@@ -712,7 +716,11 @@ namespace BrightstarDB.Client
 
             var queryUri = String.Format("{0}/transactions?skip={1}&take={2}", storeName, skip, take);
             var response = AuthenticatedGet(queryUri);
+#if WINDOWS_PHONE
+            return Deserialize<List<TransactionInfoObject>>(response).Cast<ITransactionInfo>();
+#else
             return Deserialize<List<TransactionInfoObject>>(response);
+#endif
         }
 
         /// <summary>
@@ -786,7 +794,11 @@ namespace BrightstarDB.Client
                                          storeName, latest.ToString("u"), earliest.ToString("u"),
                                          skip, take);
             var response = AuthenticatedGet(queryUri);
+#if WINDOWS_PHONE
+            return Deserialize<List<CommitPointResponseModel>>(response).Cast<ICommitPointInfo>();
+#else
             return Deserialize<List<CommitPointResponseModel>>(response);
+#endif
         }
 
         /// <summary>
@@ -801,7 +813,11 @@ namespace BrightstarDB.Client
             try
             {
                 var response = AuthenticatedGet(storeName + "/statistics/latest");
+#if WINDOWS_PHONE
+                return Deserialize<StoreStatisticsObject>(response) as IStoreStatistics;
+#else
                 return Deserialize<StoreStatisticsObject>(response);
+#endif
             }
             catch (BrightstarClientException ex)
             {
@@ -832,7 +848,11 @@ namespace BrightstarDB.Client
             var uri = String.Format("{0}/statistics?latest={1}&earlies={2}&skip={3}&take={4}",
                                     storeName, latest.ToString("u"), earlierst.ToString("u"), skip, take);
             var response = AuthenticatedGet(uri);
+#if WINDOWS_PHONE
+            return Deserialize<List<StoreStatisticsObject>>(response).Cast<IStoreStatistics>();
+#else
             return Deserialize<List<StoreStatisticsObject>>(response);
+#endif
         }
 
         /// <summary>
@@ -1111,7 +1131,7 @@ namespace BrightstarDB.Client
             var response = AuthenticatedPost(storeName + "/jobs", jobRequest);
             if (response.StatusCode == HttpStatusCode.Created)
             {
-#if PORTABLE
+#if PORTABLE || WINDOWS_PHONE
                 return response.Headers["Location"];
 #else
                 return response.Headers[HttpResponseHeader.Location];

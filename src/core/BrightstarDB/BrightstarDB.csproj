@@ -124,7 +124,6 @@
     <Compile Include="Caching\MemoryCache.cs" />
     <Compile Include="Caching\NullCache.cs" />
     <Compile Include="Caching\TwoLevelCache.cs" />
-    <Compile Include="Client\BlobImportSource.cs" />
     <Compile Include="Client\BrightstarClientException.cs" />
     <Compile Include="Client\BrightstarRestClient.cs" />
     <Compile Include="Client\BrightstarService.cs" />
@@ -139,11 +138,9 @@
     <Compile Include="Client\IStoreStatistics.cs" />
     <Compile Include="Client\ITransactionInfo.cs" />
     <Compile Include="Client\RefreshMode.cs" />
-    <Compile Include="Client\ReplyMessageInspector.cs" />
     <Compile Include="Client\RestClientHelper.cs" />
     <Compile Include="Client\RestDataObjectContext.cs" />
     <Compile Include="Client\RestDataObjectStore.cs" />
-    <Compile Include="Client\RestJobInfo.cs" />
     <Compile Include="Client\RestSecurity\CredentialsRequestAuthenticator.cs" />
     <Compile Include="Client\RestSecurity\IRequestAuthenticator.cs" />
     <Compile Include="Client\RestSecurity\PassthroughRequestAuthenticator.cs" />
@@ -224,11 +221,6 @@
     <Compile Include="EntityFramework\ReflectionMappingProvider.cs" />
     <Compile Include="EntityFramework\RelativeOrAbsoluteIdentifierAttribute.cs" />
     <Compile Include="EntityFramework\ServiceProvider.cs" />
-    <Compile Include="EntityFramework\Strings1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Strings.resx</DependentUpon>
-    </Compile>
     <Compile Include="EntityFramework\TypeExtensions.cs" />
     <Compile Include="EntityFramework\TypeIdentifierPrefixAttribute.cs" />
     <Compile Include="EntityFramework\UnattachedEntityCollection.cs" />
@@ -442,11 +434,6 @@
     <Compile Include="Utils\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="EntityFramework\Strings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Desginer</SubType>
-      <LastGenOutput>Strings1.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Include="Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>

@@ -70,8 +70,10 @@ namespace BrightstarDB.Client
             {
                 case ConnectionType.Embedded:
                     return new EmbeddedBrightstarService(connectionString.StoresDirectory);
+#if !WINDOWS_PHONE
                 case ConnectionType.Rest:
                     return GetRestClient(connectionString);
+#endif
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value);
@@ -117,14 +119,17 @@ namespace BrightstarDB.Client
             {
                 case ConnectionType.Embedded:
                     return new EmbeddedDataObjectContext(connectionString);
+#if !WINDOWS_PHONE
                 case ConnectionType.Rest:
                     return new RestDataObjectContext(connectionString);
+#endif
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value + ". Cause: unrecognised connection string type: " + connectionString.Type);
             }
         }
 
+#if !WINDOWS_PHONE
         /// <summary>
         /// Returns a new REST service client instance
         /// </summary>
@@ -159,5 +164,6 @@ namespace BrightstarDB.Client
             }
             return new BrightstarRestClient(endpoint, requestAuthenticator, null);
         }
+#endif
     }
 }

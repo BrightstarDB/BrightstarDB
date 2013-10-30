@@ -35,14 +35,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Strings.Designer.cs">
-      <Link>BrightstarDB\EntityFramework\Strings.Designer.cs</Link>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Strings.resx</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\Strings1.Designer.cs">
-      <Link>BrightstarDB\Strings1.Designer.cs</Link>
+    <Compile Include="..\..\core\BrightstarDB\Strings.Designer.cs">
+      <Link>BrightstarDB\Strings.Designer.cs</Link>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
@@ -69,15 +63,8 @@
       <Link>BrightstarDB\Strings.resx</Link>
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
-      <LastGenOutput>Strings1.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>BrightstarDB</CustomToolNamespace>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\core\BrightstarDB\EntityFramework\Strings.resx">
-      <Link>BrightstarDB\EntityFramework\Strings.resx</Link>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>BrightstarDB.EntityFramework</CustomToolNamespace>
+      <CustomToolNamespace>BrightstarDB</CustomToolNamespace>
     </EmbeddedResource>
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Tuple.cs" />
     <Compile Include="Adaptation\PlatformAdapter.cs" />
