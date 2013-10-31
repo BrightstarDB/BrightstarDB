@@ -6,25 +6,32 @@ CURRENT_DIR=`pwd`
 LIB_DIR="$CURRENT_DIR"/build
 export MSBuildExtensionsPath="$CURRENT_DIR"/xbuild
 
-echo $MSBuildExtensionsPath
-cd ..
-
-if [ ! -d "$LIB_DIR" ]
+if [ -d "$LIB_DIR" ]
 then
-	mkdir "$LIB_DIR"
+    rm -rf "$LIB_DIR"
 fi
+mkdir "$LIB_DIR"
+mkdir "$LIB_DIR"/service
 
 function buildComponent {
-	xbuild /p:Configuration="$CONFIGURATION" src/"$1"/"$2"/"$2".csproj
-	cp src/"$1"/"$2"/bin/"$CONFIGURATION"/"$2".dll "$LIB_DIR"
+	xbuild /p:Configuration="$CONFIGURATION" ../src/"$1"/"$2"/"$2".csproj
+	cp ../src/"$1"/"$2"/bin/"$CONFIGURATION"/"$2".dll "$LIB_DIR"
 }
 
+function build {
+    xbuild /p:Configuration="$CONFIGURATION" ../src/"$1"/"$2"/"$2".csproj
+}
+
+# Build core components
 buildComponent core BrightstarDB
-buildComponent server BrightstarDB.Server.Modules
-buildComponent server BrightstarDB.Server.Runner
-buildComponent server BrightstarDB.Server.Modules.Tests
+buildComponent core BrightstarDB.Server.Modules
+build core BrightstarDB.Server.Runner
+cp -r ../src/core/BrightstarDB.Server.Runner/bin/"$CONFIGURATION"/* "$LIB_DIR"/service
 
-# TODO : Add build of REST service and tests here when ready.
-
-
+# Build Tests
+#build core BrightstarDB.Tests
+#build core BrightstarDB.EntityFramework.Tests
+#build core BrightstardB.InternalTests
+#build core BrightstarDB.Server.Modules.Tests
+#build core BrightstarDB.Server.IntegrationTests
 
