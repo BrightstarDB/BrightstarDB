@@ -13,6 +13,15 @@
     <AssemblyTitle></AssemblyTitle>
   </PropertyGroup>
 
+  <!-- BrightstarDB Version Number. Now hardcoded to avoid problems
+       with the MSBuild Community Tasks Version task under monodevelop  -->
+  <PropertyGroup>
+    <Major>1</Major>
+    <Minor>5</Minor>
+    <Build>0</Build>
+    <Revision>0</Revision>
+  </PropertyGroup>
+  
   <ItemGroup>
 	<PropertyFiles Include="**\AssemblyInfo.cs"/>
   </ItemGroup>
@@ -27,13 +36,6 @@
 			<Output ItemName="AssemblyInfoFileItem" TaskParameter="Include"/>
 		</CreateItem>
 			
-		<Version VersionFile="$(BuildNumberFile)">
-		  <Output TaskParameter="Major" PropertyName="Major"/>
-		  <Output TaskParameter="Minor" PropertyName="Minor"/>
-		  <Output TaskParameter="Build" PropertyName="Build" />
-		  <Output TaskParameter="Revision" PropertyName="Revision"/>
-		</Version>
-		
 		<MakeDir Directories="%(AssemblyInfoFileItem.RootDir)%(AssemblyInfoFileItem.Directory)" />
 		<AssemblyInfo
 				Condition="( '$(Configuration)' == 'Release' ) Or (!Exists('$(AssemblyInfoFile)'))"
