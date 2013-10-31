@@ -9,8 +9,7 @@ namespace BrightstarDB.Client
     ///</summary>
     public class RestDataObjectContext:IDataObjectContext
     {
-        private ConnectionString _connectionString;
-        private readonly string _endpointUri;
+        private readonly ConnectionString _connectionString;
         private readonly bool _optimisticLockingEnabled;
 
         /// <summary>
@@ -25,7 +24,6 @@ namespace BrightstarDB.Client
                 throw new ArgumentException("Invalid connection type", "connectionString");
             }
             _connectionString = connectionString;
-            _endpointUri = connectionString.ServiceEndpoint;
             _optimisticLockingEnabled = connectionString.OptimisticLocking;
         }
 
