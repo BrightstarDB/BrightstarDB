@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Text;
 
 namespace BrightstarDB.Rdf
 {
@@ -167,9 +167,9 @@ namespace BrightstarDB.Rdf
             line = line.Substring(firstSpace).Trim();
 
             // object value
-            if (line.StartsWith("<"))
+            if (line.StartsWith("<", StringComparison.OrdinalIgnoreCase))
             {
-                int lastAngle = line.IndexOf(">");
+                int lastAngle = line.IndexOf(">", StringComparison.OrdinalIgnoreCase);
                 string objectUri = line.Substring(1, lastAngle - 1);
 
                 line = line.Substring(lastAngle + 1);
@@ -192,11 +192,12 @@ namespace BrightstarDB.Rdf
             else if (line.StartsWith("\""))
             {
                 // get string in quotes
-                int lastQuote = line.LastIndexOf("\"");
+                int lastQuote = line.LastIndexOf("\"", StringComparison.OrdinalIgnoreCase);
 
                 string literalValue = line.Substring(1, lastQuote - 1);
 
-                literalValue = UnEscapeLiteralValue(literalValue);
+                //literalValue = UnEscapeLiteralValue(literalValue);
+                literalValue = UnescapeLiteral(literalValue);
 
                 // check for lang code or data type
                 line = line.Substring(lastQuote + 1).Trim();
@@ -204,8 +205,8 @@ namespace BrightstarDB.Rdf
                 if (line.StartsWith("@"))
                 {
                     // langcode
-                    int index = line.IndexOf(" ");
-                    if (index < 0) index = line.IndexOf("\t");
+                    int index = line.IndexOf(" ", StringComparison.OrdinalIgnoreCase);
+                    if (index < 0) index = line.IndexOf("\t", StringComparison.OrdinalIgnoreCase);
                     string langCode = line.Substring(1, index - 1).Trim();
 
                     line = line.Substring(index + 1);
@@ -254,11 +255,11 @@ namespace BrightstarDB.Rdf
                     }
                 }
             }
-            else if (line.StartsWith("_:"))
+            else if (line.StartsWith("_:", StringComparison.OrdinalIgnoreCase))
             {
-                int end = line.IndexOf(" ");
-                if (end < 0) end = line.IndexOf("\t");
-                if (end < 0) end = line.IndexOf(".");
+                int end = line.IndexOf(" ", StringComparison.OrdinalIgnoreCase);
+                if (end < 0) end = line.IndexOf("\t", StringComparison.OrdinalIgnoreCase);
+                if (end < 0) end = line.IndexOf(".", StringComparison.OrdinalIgnoreCase);
 
                 string bnodeId = line.Substring(2, end - 2).Trim();
 
@@ -290,65 +291,130 @@ namespace BrightstarDB.Rdf
         /// <returns></returns>
         private string CheckContextForGraphUri(string line)
         {
-            if (line.Trim().StartsWith("<"))
+            if (line.Trim().StartsWith("<", StringComparison.OrdinalIgnoreCase))
             {
-                var startPos = line.IndexOf("<");
-                var length = line.IndexOf(">") - startPos;
+                var startPos = line.IndexOf("<", StringComparison.OrdinalIgnoreCase);
+                var length = line.IndexOf(">", StringComparison.OrdinalIgnoreCase) - startPos;
                 return line.Substring(startPos + 1, length - 1);
             }
 
             return _graphUri;
         }
 
-        private string UnEscapeLiteralValue(string value)
+        private static string UnescapeLiteral(string value)
         {
-            // special escapes
-            string res = value.Replace("\\\\", "\\");
-            res = res.Replace("\\\"", "\"");
-            res = res.Replace("\\\'", "\'");
-            res = res.Replace("\\n", "\n");
-            res = res.Replace("\\t", "\t");
-            res = res.Replace("\\r", "\r");
-
-            // unicode processing
-            int loc = res.IndexOf("\\u");
-            while (loc >= 0)
+            var ret = new StringBuilder();
+            bool inEscape = false;
+            bool inUtf16 = false;
+            bool inUtf32 = false;
+            var utf16Buff = new char[4];
+            var utf32Buff = new char[8];
+            int unicodeCharIx = 0;
+            foreach (var c in value)
             {
-                string unicodeValues = res.Substring(loc + 2, 4);
-                // check all are hex digits
-                foreach (char c in unicodeValues)
+                if (inEscape)
+                {
+                    switch (c)
+                    {
+                        case '\\':
+                            ret.Append(c);
+                            break;
+                        case 't':
+                            ret.Append('\t');
+                            break;
+                        case 'b':
+                            ret.Append('\b');
+                            break;
+                        case 'n':
+                            ret.Append('\n');
+                            break;
+                        case 'r':
+                            ret.Append('\r');
+                            break;
+                        case 'f':
+                            ret.Append('\f');
+                            break;
+                        case '"':
+                            ret.Append('"');
+                            break;
+                        case '\'':
+                            ret.Append('\'');
+                            break;
+                        case 'u':
+                            inUtf16 = true;
+                            unicodeCharIx = 0;
+                            break;
+                        case 'U':
+                            inUtf32 = true;
+                            unicodeCharIx = 0;
+                            break;
+                        case '~':
+                        case '.':
+                        case '-':
+                        case '!':
+                        case '$':
+                        case '&':
+                        case '(':
+                        case ')':
+                        case '*':
+                        case '+':
+                        case ',':
+                        case ';':
+                        case '=':
+                        case '/':
+                        case '?':
+                        case '#':
+                        case '@':
+                        case '%':
+                        case '_':
+                            ret.Append(c);
+                            break;
+                        default:
+                            throw new FormatException("Unrecognized escape sequence \\" + c + " in literal \"" + value + "\"");
+                    }
+                    inEscape = false;
+                }
+                else if (inUtf16)
                 {
                     if (!IsHexDigit(c))
                     {
                         throw new FormatException("Unexpected non hex digit in unicode escaped string: " + c);
                     }
+                    utf16Buff[unicodeCharIx++] = c;
+                    if (unicodeCharIx == 4)
+                    {
+                        ret.Append(ConvertToUtf16Char(new string(utf16Buff)));
+                        unicodeCharIx = 0;
+                        inUtf16 = false;
+                    }
                 }
-                char replacementChar = ConvertToUtf16Char(unicodeValues);
-                res = res.Replace("\\u" + unicodeValues, new string(replacementChar, 1));
-                loc = res.IndexOf("\\u");
-            }
-
-            loc = res.IndexOf("\\U");
-            while(loc >= 0)
-            {
-                string unicodeValues = value.Substring(loc + 2, 8);
-#if PORTABLE
-                if (!unicodeValues.ToCharArray().All(IsHexDigit))
+                else if (inUtf32)
                 {
-                    throw new FormatException("Unexpected non-hex digit in unicode escaped string: \\U" + unicodeValues);
+                    if (!IsHexDigit(c))
+                    {
+                        throw new FormatException("Unexpected non hex digit in unicode escaped string: " + c);
+                    }
+                    utf32Buff[unicodeCharIx++] = c;
+                    if (unicodeCharIx == 4)
+                    {
+                        ret.Append(ConvertToUtf32Char(new string(utf32Buff)));
+                        unicodeCharIx = 0;
+                        inUtf32 = false;
+                    }
                 }
-#else
-                if (!unicodeValues.All(IsHexDigit))
+                else
                 {
-                    throw new FormatException("Unexpected non-hex digit in unicode escaped string: \\U" + unicodeValues);
+                    if (c == '\\')
+                    {
+                        inEscape = true;
+                    }
+                    else
+                    {
+                        ret.Append(c);
+                    }
                 }
-#endif
-                string replacementChar = ConvertToUtf32Char(unicodeValues);
-                res = res.Replace("\\U" + unicodeValues, replacementChar);
-                loc = res.IndexOf("\\U");
             }
-
-            return res;
+            return ret.ToString();
         }
 
         private static bool IsHexDigit(char c)
