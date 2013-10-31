@@ -67,6 +67,9 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\core.css" />
+    <Content Include="assets\jquery-1.10.2.min.js" />
+    <Content Include="Views\sample.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +78,20 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Views\JobResponse.cshtml" />
+    <Content Include="Views\Layout.sshtml" />
+    <Content Include="Views\ListPaging.cshtml" />
+    <Content Include="Views\PagedCommitPointResponse.cshtml" />
+    <Content Include="Views\PagedJobResponse.cshtml" />
+    <Content Include="Views\PagedStatisticsResponse.cshtml" />
+    <Content Include="Views\PagedTransactionResponse.cshtml" />
+    <Content Include="Views\SparqlResult.cshtml" />
+    <Content Include="Views\SparqlUpdate.cshtml" />
+    <Content Include="Views\StoreDeleted.cshtml" />
+    <Content Include="Views\StoreResponse.cshtml" />
+    <Content Include="Views\StoresResponse.cshtml" />
+    <Content Include="Views\StoresResponseObject.sshtml" />
+    <Content Include="Views\_Layout.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
