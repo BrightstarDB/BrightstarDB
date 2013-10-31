@@ -1,0 +1,74 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Server.Modules.Model.PagedResultModel<BrightstarDB.Server.Modules.Model.StatisticsResponseModel>>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "BrightstarDB: Store Statistics List";
+}
+@section Head {
+    <script src="~/assets/jquery-1.10.2.min.js" type="text/javascript"></script>
+}
+<nav>
+    <ul class="horizontal breadcrumb">
+        <li><a href="~/">Home</a></li>
+        <li><a href="~/@Model.RequestProperties.StoreName">@Model.RequestProperties.StoreName</a></li>
+        <li><a href="~/@Model.RequestProperties.StoreName/statistics">Statistics</a></li>
+    </ul>
+</nav>
+
+<section>
+    <h1>Store Statistics: @Model.RequestProperties.StoreName</h1>
+    <noscript>
+        <p>To see detailed statistics you need to enable Javascript.</p>
+    </noscript>
+    <p>Click on a row to show the detailed statistics.</p>
+    <div class="left">
+        <table id="statistics" style="margin-top:0">
+            <thead>
+                <tr>
+                    <th>Statistics Timestamp</th>
+                    <th>Total Triple Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr id="job-@item.CommitId">
+                        <td>@item.CommitTimestamp</td>
+                        <td>@item.TotalTripleCount</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    @Html.Partial("ListPaging", Model)
+    </div>
+        <aside>
+        @foreach (var item in Model.Items)
+        {
+            <table id="detail-job-@item.CommitId" style="display: none">
+                <thead>
+                    <tr>
+                        <th>Predicate</th>
+                        <th>Triple Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var entry in item.PredicateTripleCounts)
+                    {
+                        <tr>
+                            <td>@entry.Key</td>
+                            <td>@entry.Value</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </aside>
+
+</section>
+
+<script type="text/javascript">
+    $('#statistics tr').click(function (event) {
+        var id = $(this).attr('id');
+        $('aside table').hide();
+        $('#detail-' + id).show();
+    });
+</script>

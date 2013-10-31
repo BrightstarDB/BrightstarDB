@@ -1,8 +1,5 @@
 ﻿using System;
-
-#if !SILVERLIGHT
-using System.ServiceModel;
-#endif
+using BrightstarDB.Dto;
 
 namespace BrightstarDB.Server
 {
@@ -11,7 +8,7 @@ namespace BrightstarDB.Server
         public Guid JobId { get; set; }
         public JobStatus JobStatus { get; set; }
         public string Information { get; set; }
-        public ExceptionDetail ExceptionDetail { get; set; }
+        public ExceptionDetailObject ExceptionDetail { get; set; }
         public DateTime Started { get; set; }
         public DateTime Ended { get; set; }
     }

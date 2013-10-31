@@ -8,8 +8,8 @@ BrightstarDB Documentation
     Getting Started <Getting_Started>
     Concepts <Concepts>
     Why BrightstarDB? <Why_BrightstarDB_>
-    Supported RDF Syntaxes <Supported_RDF_Syntaxes>
     Developing With BrightstarDB <Developing_With_BrightstarDB>
+    BrightstarDB Security <Security>
     Running BrightstarDB <Running_BrightstarDB>
     SPARQL Endpoint <SPARQL_Endpoint>
     Polaris Management Tool <Using_Polaris>

@@ -1,0 +1,32 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Dto.StoresResponseModel>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "BrightstarDB: Stores";
+}
+
+<nav>
+    <ul class="breadcrumb horizontal">
+        <li><a href="#">Home</a></li>
+    </ul>
+</nav>
+
+<section>
+    <h1>@ViewBag.Title</h1>
+    <p>Stores available on this BrightstarDB server.</p>
+
+    <table class="items">
+        <thead>
+            <tr>
+                <td>Store</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.Stores)
+            {
+                <tr>
+                    <td><a href="~/@s">@s</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>

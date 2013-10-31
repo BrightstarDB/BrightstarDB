@@ -6,9 +6,6 @@ using NUnit.Framework;
 namespace BrightstarDB.Tests.EntityFramework
 {
     public abstract class OptimisticLockingTestsBase
-#if !PORTABLE
-        : ClientTestBase
-#endif
     {
         protected abstract MyEntityContext NewContext();
 

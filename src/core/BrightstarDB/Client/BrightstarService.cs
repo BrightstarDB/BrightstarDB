@@ -1,12 +1,7 @@
 ﻿using BrightstarDB.Caching;
-#if !REST_CLIENT
+using BrightstarDB.Client.RestSecurity;
 using BrightstarDB.Server;
-#endif
 using System;
-#if !SILVERLIGHT && !PORTABLE
-using System.Xml;
-using System.ServiceModel;
-#endif
 
 
 namespace BrightstarDB.Client
@@ -26,86 +21,9 @@ namespace BrightstarDB.Client
         /// running job is allowed to conclude and all other queued jobs are lost.</param>
         public static void Shutdown(bool allowJobsToConclude=true)
         {
-#if !REST_CLIENT
             ServerCoreManager.Shutdown(allowJobsToConclude);                    
-#endif
         }
 
-
-#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
-
-#if !REST_CLIENT
-        /// <summary>
-        /// Initialises and returns a new HTTP service client. This client should be used when the client is on a separate machine from the service and
-        /// firewall or other constrains prohibit the use of the TcpNet client.
-        /// </summary>
-        /// <param name="endpointUri">The uri where the HTTP endpoint is running. By default this is http://{machinename}:8090/brightstar</param>
-        /// <param name="queryCache">OPTIONAL : the cache to use for query results</param>
-        /// <returns>A new brightstar service client. It is important to call dispose on the client after use.</returns>
-        internal static IBrightstarService GetHttpClient(Uri endpointUri, ICache queryCache = null)
-        {
-            var binding = new BasicHttpContextBinding
-            {
-                MaxReceivedMessageSize = Int32.MaxValue,
-                SendTimeout = TimeSpan.FromMinutes(30),
-                TransferMode = TransferMode.StreamedResponse,
-                ReaderQuotas = XmlDictionaryReaderQuotas.Max
-            };
-            var endpointAddress = new EndpointAddress(endpointUri);
-            var client = new BrightstarServiceClient(new BrightstarWcfServiceClient(binding, endpointAddress), queryCache);
-            return client;
-        }
-
-        /// <summary>
-        /// Initialises and returns a new NetTcp service client. This client should be used when the client is on a separate machine from the service.
-        /// </summary>
-        /// <param name="endpointUri">The uri where the NetTcp endpoint is running. By default this is net.tcp://{machinename}:8095/brightstar</param>
-        /// <param name="queryCache">OPTIONAL : the cache to use for query results</param>
-        /// <returns>A new brightstar service client. It is important to call dispose on the client after use.</returns>
-        internal static IBrightstarService GetNetTcpClient(Uri endpointUri, ICache queryCache = null)
-        {
-            var binding = new NetTcpContextBinding
-            {
-                MaxReceivedMessageSize = Int32.MaxValue,
-                SendTimeout = TimeSpan.FromMinutes(30),
-                TransferMode = TransferMode.StreamedResponse,
-                ReaderQuotas = XmlDictionaryReaderQuotas.Max
-            };
-            var endpointAddress = new EndpointAddress(endpointUri);
-            var client = new BrightstarServiceClient(new BrightstarWcfServiceClient(binding, endpointAddress), queryCache);
-            return client;
-        }
-
-                /// <summary>
-        /// Initialises and returns a new NamedPipe service client. This client should be used when the client is on the same machine as the server.
-        /// </summary>
-        /// <param name="endpointUri">The uri where the Named Pipe endpoint is running. By default this is net.pipe://{machinename}/brightstar</param>
-        /// <param name="queryCache">OPTIONAL : the cache to use for query results</param>
-        /// <returns>A new brightstar service client. It is important to call dispose on the client after use.</returns>
-        internal static IBrightstarService GetNamedPipeClient(Uri endpointUri, ICache queryCache = null)
-        {
-            var binding = new NetNamedPipeBinding
-            {
-                MaxReceivedMessageSize = Int32.MaxValue,
-                SendTimeout = TimeSpan.FromMinutes(30),
-                TransferMode = TransferMode.StreamedResponse,
-                ReaderQuotas = XmlDictionaryReaderQuotas.Max
-            };
-
-            var endpointAddress = new EndpointAddress(endpointUri);
-            var client = new BrightstarServiceClient(new BrightstarWcfServiceClient(binding, endpointAddress), queryCache);
-            return client;
-        }
-#endif
-        internal  static  IBrightstarService GetRestClient(ConnectionString connectionString)
-        {
-            var accountId = connectionString.Account;
-            var key = connectionString.Key;
-            return new BrightstarRestClient(connectionString.ServiceEndpoint, accountId, key);
-        }
-
-#endif
-#if !REST_CLIENT
         ///<summary>
         /// Returns a client for the embededd stores in the specified location
         ///</summary>
@@ -115,7 +33,7 @@ namespace BrightstarDB.Client
         {
             return new EmbeddedBrightstarService(baseLocation);
         }
-#endif
+
         ///<summary>
         /// Gets a client based on the connection string specified in the configuration.
         ///</summary>
@@ -150,19 +68,9 @@ namespace BrightstarDB.Client
         {
             switch (connectionString.Type)
             {
-#if !REST_CLIENT
                 case ConnectionType.Embedded:
                     return new EmbeddedBrightstarService(connectionString.StoresDirectory);
-#endif
-#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
-#if !REST_CLIENT
-                case ConnectionType.Http:
-                    return GetHttpClient(new Uri(connectionString.ServiceEndpoint), GetConfiguredCache());
-                case ConnectionType.Tcp:
-                    return GetNetTcpClient(new Uri(connectionString.ServiceEndpoint), GetConfiguredCache());
-                case ConnectionType.NamedPipe:
-                    return GetNamedPipeClient(new Uri(connectionString.ServiceEndpoint), GetConfiguredCache());
-#endif
+#if !WINDOWS_PHONE
                 case ConnectionType.Rest:
                     return GetRestClient(connectionString);
 #endif
@@ -209,23 +117,53 @@ namespace BrightstarDB.Client
         {
             switch (connectionString.Type)
             {
-#if !REST_CLIENT
                 case ConnectionType.Embedded:
                     return new EmbeddedDataObjectContext(connectionString);
-#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
-                case ConnectionType.Http:
-                    return new HttpDataObjectContext(connectionString);
-                case ConnectionType.Tcp:
-                    return new NetTcpDataObjectContext(connectionString);
-                case ConnectionType.NamedPipe:
-                    return new NamedPipeDataObjectContext(connectionString);
-#endif
+#if !WINDOWS_PHONE
+                case ConnectionType.Rest:
+                    return new RestDataObjectContext(connectionString);
 #endif
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
-                                                        connectionString.Value);
+                                                        connectionString.Value + ". Cause: unrecognised connection string type: " + connectionString.Type);
             }
         }
 
+#if !WINDOWS_PHONE
+        /// <summary>
+        /// Returns a new REST service client instance
+        /// </summary>
+        /// <param name="restEndpoint">The URI of the BrightstarDB REST endpoint to connect to</param>
+        /// <param name="requestAuthenticator">The service to use to apply authentication information to outgoing requests</param>
+        /// <param name="queryCache">A cache instance for the client to use for caching SPARQL query responses</param>
+        /// <returns>A new <see cref="IBrightstarService"/> instance</returns>
+        public static IBrightstarService GetRestClient(string restEndpoint, IRequestAuthenticator requestAuthenticator = null, ICache queryCache = null)
+        {
+            if (requestAuthenticator == null) requestAuthenticator = new PassthroughRequestAuthenticator();
+            return new BrightstarRestClient(restEndpoint, requestAuthenticator, queryCache);
+        }
+
+        /// <summary>
+        /// Returns a new REST service client instance constructed from a BrightstarDB connection string
+        /// </summary>
+        /// <param name="connectionString">The connection string providing the parameters for the REST service connection</param>
+        /// <returns>A new <see cref="IBrightstarService"/>instance</returns>
+        /// <exception cref="ArgumentNullException">The <paramref name="connectionString"/> parameter is NULL</exception>
+        /// <exception cref="BrightstarClientException">The <paramref name="connectionString"/> parameter is invalid for some other reason</exception>
+        public static IBrightstarService GetRestClient(ConnectionString connectionString)
+        {
+            if (connectionString == null) throw new ArgumentNullException("connectionString");
+            if (String.IsNullOrEmpty(connectionString.ServiceEndpoint))
+                throw new BrightstarClientException(
+                    "Connection string does not contain the required 'endpoint' attribute");
+            string endpoint = connectionString.ServiceEndpoint;
+            IRequestAuthenticator requestAuthenticator = new PassthroughRequestAuthenticator();
+            if (connectionString.Account != null && connectionString.Key != null)
+            {
+                requestAuthenticator = new SharedSecretAuthenticator(connectionString.Account, connectionString.Key);
+            }
+            return new BrightstarRestClient(endpoint, requestAuthenticator, null);
+        }
+#endif
     }
 }

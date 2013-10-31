@@ -1,5 +1,4 @@
-﻿#if REST_CLIENT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using BrightstarDB.Storage;
 
@@ -10,8 +9,7 @@ namespace BrightstarDB.Client
     ///</summary>
     public class RestDataObjectContext:IDataObjectContext
     {
-        private ConnectionString _connectionString;
-        private readonly string _endpointUri;
+        private readonly ConnectionString _connectionString;
         private readonly bool _optimisticLockingEnabled;
 
         /// <summary>
@@ -26,7 +24,6 @@ namespace BrightstarDB.Client
                 throw new ArgumentException("Invalid connection type", "connectionString");
             }
             _connectionString = connectionString;
-            _endpointUri = connectionString.ServiceEndpoint;
             _optimisticLockingEnabled = connectionString.OptimisticLocking;
         }
 
@@ -99,6 +96,8 @@ namespace BrightstarDB.Client
         {
             Client.CreateStore(storeName,
                                persistenceType.HasValue ? persistenceType.Value : Configuration.PersistenceType);
+            if (String.IsNullOrEmpty(updateGraph)) updateGraph = Constants.DefaultGraphUri;
+            if (String.IsNullOrEmpty(versionTrackingGraph)) versionTrackingGraph = updateGraph;
             return new RestDataObjectStore(
                 _connectionString, storeName, namespaceMappings,
                 optimisticLockingEnabled.HasValue ? optimisticLockingEnabled.Value : _optimisticLockingEnabled,
@@ -126,4 +125,3 @@ namespace BrightstarDB.Client
         #endregion
     }
 }
-#endif

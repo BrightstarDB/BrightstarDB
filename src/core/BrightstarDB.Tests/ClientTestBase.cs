@@ -11,7 +11,7 @@ using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    public class ClientTestBase// : IDisposable
+    public class ClientTestBase
     {
         private static ServiceHost _serviceHost;
         private static bool _closed;

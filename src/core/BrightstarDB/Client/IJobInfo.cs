@@ -1,6 +1,4 @@
-﻿#if !SILVERLIGHT
-using System.ServiceModel;
-#endif
+﻿using BrightstarDB.Dto;
 
 namespace BrightstarDB.Client
 {
@@ -42,6 +40,6 @@ namespace BrightstarDB.Client
         /// <summary>
         /// Exception information
         /// </summary>
-        ExceptionDetail ExceptionInfo { get; }
+        ExceptionDetailObject ExceptionInfo { get; }
     }
 }

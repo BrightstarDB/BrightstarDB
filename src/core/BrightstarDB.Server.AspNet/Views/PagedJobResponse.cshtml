@@ -1,0 +1,138 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Server.Modules.Model.PagedResultModel<BrightstarDB.Server.Modules.Model.JobResponseModel>>
+@{
+    Layout = "_Layout";
+    ViewBag.Title = "BrightstarDB: Store Jobs List";
+}
+@section Head {
+    <script src="~/assets/jquery-1.10.2.min.js" type="text/javascript"></script>
+}
+<nav>
+    <ul class="horizontal breadcrumb">
+        <li><a href="~/">Home</a></li>
+        <li><a href="~/@Model.RequestProperties.StoreName">@Model.RequestProperties.StoreName</a></li>
+        <li><a href="~/@Model.RequestProperties.StoreName/jobs">Jobs</a></li>
+    </ul>
+</nav>
+
+<table id="jobsTable">
+    <thead>
+        <tr>
+            <th>Job ID</th>
+            <th>Status</th>
+            <th>Started</th>
+            <th>Completed</th>
+            <th>Status Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+            <td><a href="~/@Model.RequestProperties.StoreName/jobs/@item.JobId"></a>@item.JobId</td>
+                <td>@item.JobStatus</td>
+                <td>@item.Started</td>
+                <td>@item.Ended</td>
+                <td>@item.StatusMessage</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@Html.Partial("ListPaging.cshtml", Model as BrightstarDB.Server.Modules.Model.IPagedResultModel)
+
+<form method="POST" id="newJobForm">
+    <fieldset>
+        <legend>Post New Job</legend>
+        <div>
+            <label class="form-label" for="jobType">Job Type</label>
+            <select id="jobType" name="JobType">
+                <option value="Consolidate">Consolidate Store</option>
+                <option value="Export">Export RDF</option>
+                <option value="Import">Import RDF</option>
+                <option value="Transaction">Update Transaction</option>
+                <option value="SparqlUpdate">SPARQL Update</option>
+                <option value="UpdateStats">Update Statistics</option>
+                <option value="CreateSnapshot">Create Store Snapshot</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label"for="fileName">Import/Export File Name:</label>
+            <input class="form-field long" type="text" id="fileName" name="fileName"/>
+        </div>
+        <div>
+            <label class="form-label"for="graphUri">Graph URI</label>
+            <input class="form-field long" type="text" id="graphUri" name="graphUri"/>
+        </div>
+        <div>
+            <label class="form-label"for="defaultGraphUri">Default Graph URI</label>
+            <input class="form-field long" type="text" id="defaultGraphUri" name="defaultGraphUri"/>
+        </div>
+        <div>
+            <label class="form-label"for="preconditions">Pre-conditions</label>
+            <textarea class="form-field" id="preconditions" name="preconditions" rows="5" cols="80"></textarea>
+        </div>
+        <div>
+            <label class="form-label"for="deletes">Deletes</label>
+            <textarea class="form-field" id="deletes" name="deletes" rows="5" cols="80"></textarea>
+        </div>
+        <div>
+            <label class="form-label"for="inserts">Inserts</label>
+            <textarea class="form-field" id="inserts" name="inserts" rows="5" cols="80"></textarea>
+        </div>
+        <div>
+            <label class="form-label"for="expression">SPARQL Update Expression</label>
+            <textarea class="form-field" id="expression" name="UpdateExpression" rows="5" cols="80"></textarea>
+        </div>
+        <div>
+            <label class="form-label"for="targetStoreName">Target Store Name</label>
+            <input class="form-field long" id="targetStoreName" name="targetStoreName"/>
+        </div>
+        <div>
+            <label class="form-label"for="persistenceType">Target Store Persistence</label>
+            <select class="form-field" id="persistenceType" name="PersistenceType">
+                <option value="AppendOnly">Append Only (recommended)</option>
+                <option value="Rewrite">Rewrite</option>
+            </select>
+        </div>
+        <button type="submit" id="createJobButton">Create Job</button>
+    </fieldset>
+</form>
+
+<script type="text/javascript">
+    $('form input,textarea,select:not(#jobType)').attr('disabled', 'disabled');
+    $('#jobType').change(function () {
+        $('form input,textarea,select:not(#jobType)').attr('disabled', 'disabled');
+
+        switch ($('#jobType option:selected').val()) {
+        case 'Import':
+            $('#fileName,#defaultGraphUri').removeAttr('disabled');
+            break;
+        case 'Export':
+            $('#fileName,#graphUri').removeAttr('disabled');
+            break;
+        case 'Transaction':
+            $('#preconditions,#deletes,#inserts').removeAttr('disabled');
+            break;
+        }
+    });
+    $('#createJobButton').click(function (event) {
+        event.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "@Url.Content("~/"+Model.RequestProperties.StoreName+"/jobs")",
+            data: $('#newJobForm').serialize(),
+            dataType: 'json'
+        }).done(function(data) {
+            $('<tr></tr>').prependTo($('#jobsTable tbody'))
+                .append('<td>' + data.JobId + '</td>')
+                .append('<td>' + data.JobStatus + '</td>')
+                .append('<td></td>')
+                .append('<td></td>')
+                .append('<td>Job Queued</td>');
+        }).fail(function (jqXHR, textStatus) {
+            alert("Request failed: " + textStatus);
+            alert("Job creation failed. Please check the validity of all job arguments");
+        });
+    });
+    
+</script>

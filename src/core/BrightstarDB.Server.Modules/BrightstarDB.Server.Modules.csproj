@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A6A05324-BA02-4C82-9199-AD19BC442C60}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BrightstarDB.Server.Modules</RootNamespace>
+    <AssemblyName>BrightstarDB.Server.Modules</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Nancy, Version=0.21.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Nancy.0.21.1\lib\net40\Nancy.dll</HintPath>
+    </Reference>
+    <Reference Include="Nancy.ViewEngines.Razor, Version=0.21.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Nancy.Viewengines.Razor.0.21.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web.Razor.Unofficial, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\System.Web.Razor.Unofficial.2.0.2\lib\net40\System.Web.Razor.Unofficial.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BrightstarBootstrapper.cs" />
+    <Compile Include="BrightstarModuleSecurity.cs" />
+    <Compile Include="BrightstarServiceConfiguration.cs" />
+    <Compile Include="BrightstarServiceConfigurationSectionHandler.cs" />
+    <Compile Include="FixedRootPathProvider.cs" />
+    <Compile Include="JobInfoExtensions.cs" />
+    <Compile Include="Model\CommitPointsRequestModel.cs" />
+    <Compile Include="Model\IPagedResultModel.cs" />
+    <Compile Include="Model\JobRequestModel.cs" />
+    <Compile Include="Model\JobsRequestModel.cs" />
+    <Compile Include="Model\PagedResultModel.cs" />
+    <Compile Include="Model\StoreDeletedModel.cs" />
+    <Compile Include="Model\TransactionsRequestObject.cs" />
+    <Compile Include="Permissions\CombiningStorePermissionsProvider.cs" />
+    <Compile Include="CommitPointsModule.cs" />
+    <Compile Include="Permissions\CombiningSystemPermissionsProvider.cs" />
+    <Compile Include="Permissions\FallbackStorePermissionsProvider.cs" />
+    <Compile Include="InvalidCommitPointException.cs" />
+    <Compile Include="Permissions\AbstractStorePermissionsProvider.cs" />
+    <Compile Include="Permissions\AbstractSystemPermissionsProvider.cs" />
+    <Compile Include="JobsModule.cs" />
+    <Compile Include="LatestStatisticsModule.cs" />
+    <Compile Include="Model\CommitPointResponseModel.cs" />
+    <Compile Include="Model\CreateStoreRequestObject.cs" />
+    <Compile Include="Model\SparqlRequestObject.cs" />
+    <Compile Include="Model\SparqlUpdateRequestObject.cs" />
+    <Compile Include="Model\StatisticsRequestObject.cs" />
+    <Compile Include="Model\StatisticsResponseModel.cs" />
+    <Compile Include="Model\StoreResponseModel.cs" />
+    <Compile Include="Model\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Model\TransactionResponseModel.cs" />
+    <Compile Include="NegotiatorExtensions.cs" />
+    <Compile Include="Permissions\FallbackSystemPermissionsProvider.cs" />
+    <Compile Include="SparqlQueryProcessingModel.cs" />
+    <Compile Include="SparqlQueryResponse.cs" />
+    <Compile Include="SparqlModule.cs" />
+    <Compile Include="SparqlProcessor.cs" />
+    <Compile Include="Model\SparqlResultModel.cs" />
+    <Compile Include="SparqlUpdateModule.cs" />
+    <Compile Include="StatisticsModule.cs" />
+    <Compile Include="StoreModule.cs" />
+    <Compile Include="Permissions\StorePermissions.cs" />
+    <Compile Include="StoresModule.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Permissions\SystemPermissions.cs" />
+    <Compile Include="Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="TransactionsModule.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\BrightstarDB.Server.AspNet\Views\**\*.*">
+      <Link>Views\%(recursivedir)\%(filename)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\BrightstarDB.Server.AspNet\assets\**\*.*">
+      <Link>assets\%(recursivedir)\%(filename)</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\BrightstarDB\BrightstarDB.csproj">
+      <Project>{121A81F3-EB1C-4228-81FB-0D7505A438FB}</Project>
+      <Name>BrightstarDB</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Model\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <RazorAssemblies Include="$(SolutionDir)packages\Nancy.Viewengines.Razor.0.21.1\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll;&#xD;&#xA;      $(SolutionDir)packages\Nancy.Viewengines.Razor.0.21.1\lib\net40\Nancy.ViewEngines.Razor.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="AfterBuild" DependsOnTargets="CopyRazorAssemblies" />
+  <Target Name="CopyRazorAssemblies" Condition="'$(Configuration)' == 'Debug'">
+    <Copy SourceFiles="@(RazorAssemblies)" DestinationFolder="$(ProjectDir)\bin\Debug" />
+  </Target>
+  <!-- xcopy operation generated by nancy razor package. Replaced with CopyRazorAssemblies task above.
+  <PropertyGroup>
+    <PostBuildEvent>
+if $(ConfigurationName) == Debug (
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.21.1\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll" "$(ProjectDir)bin\"
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.21.1\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\"
+)</PostBuildEvent>
+  </PropertyGroup>
+  -->
+</Project>

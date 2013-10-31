@@ -1,5 +1,4 @@
-﻿#if REST_CLIENT
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace BrightstarDB.Client
 {
@@ -25,7 +24,10 @@ namespace BrightstarDB.Client
         /// </summary>
         protected override IBrightstarService Client
         {
-            get { return BrightstarService.GetRestClient(_connectionString); }
+            get
+            {
+                return BrightstarService.GetRestClient(_connectionString);
+            }
         }
 
         #endregion
@@ -36,4 +38,3 @@ namespace BrightstarDB.Client
         }
     }
 }
-#endif

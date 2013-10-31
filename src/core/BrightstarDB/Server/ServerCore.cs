@@ -9,7 +9,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Storage;
 using System.Threading;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
-using TransactionType = BrightstarDB.Storage.TransactionType;
+using TransactionType = BrightstarDB.Dto.TransactionType;
 using Triple = BrightstarDB.Model.Triple;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
@@ -325,6 +325,12 @@ namespace BrightstarDB.Server
             return storeWorker.Import(contentFileName, graphUri);
         }
 
+        internal IEnumerable<JobExecutionStatus> GetJobs(string storeName)
+        {
+            var storeWorker = GetStoreWorker(storeName);
+            return storeWorker.GetJobs();
+        }
+
         public JobExecutionStatus GetJobStatus(string storeId, string jobId)
         {
             var storeWorker = GetStoreWorker(storeId);
@@ -399,13 +405,20 @@ namespace BrightstarDB.Server
                 case TransactionType.UpdateTransaction:
                     var updateJob = new UpdateTransaction(jobId, storeWorker);
                     updateJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(dataStartPosition));
+                    storeWorker.QueueJob(updateJob);
                     break;
                 case TransactionType.SparqlUpdateTransaction:
                     var sparqlUpdateJob = new SparqlUpdateJob(jobId, storeWorker, null);
                     sparqlUpdateJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(dataStartPosition));
+                    storeWorker.QueueJob(sparqlUpdateJob);
                     break;
             }
             return jobId;
+        }
+
+        public CommitPoint GetCommitPoint(string storeName, ulong commitOffset)
+        {
+            return GetCommitPoints(storeName).FirstOrDefault(x => x.LocationOffset.Equals(commitOffset));
         }
 
         public CommitPoint GetCommitPoint(string storeName, DateTime timestamp)
@@ -477,5 +490,6 @@ namespace BrightstarDB.Server
             var storeWorker = GetStoreWorker(sourceStoreName);
             return storeWorker.QueueSnapshotJob(targetStoreName, persistenceType, sourceCommitPointId);
         }
+
     }
 }

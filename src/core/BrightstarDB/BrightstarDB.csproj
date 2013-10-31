@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -26,6 +26,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\BrightstarDB.XML</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CloudDebug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -52,6 +54,7 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -72,6 +75,7 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="dotNetRDF, Version=0.5.1.24230, Culture=neutral, PublicKeyToken=8b91af99db2769f2, processorArchitecture=MSIL">
@@ -120,17 +124,11 @@
     <Compile Include="Caching\MemoryCache.cs" />
     <Compile Include="Caching\NullCache.cs" />
     <Compile Include="Caching\TwoLevelCache.cs" />
-    <Compile Include="Client\BlobImportSource.cs" />
     <Compile Include="Client\BrightstarClientException.cs" />
     <Compile Include="Client\BrightstarRestClient.cs" />
     <Compile Include="Client\BrightstarService.cs" />
-    <Compile Include="Client\BrightstarServiceClient.cs" />
     <Compile Include="Client\BrightstarServiceClientExtensions.cs" />
-    <Compile Include="Client\BrightstarTransactionType.cs" />
-    <Compile Include="Client\BrightstarWcfClusterClient.cs" />
-    <Compile Include="Client\BrightstarWcfServiceClient.cs" />
     <Compile Include="Client\CachedQueryResult.cs" />
-    <Compile Include="Client\CommitPointInfoWrapper.cs" />
     <Compile Include="Client\DataObjectStoreBase.cs" />
     <Compile Include="Client\EmbeddedBrightstarService.cs" />
     <Compile Include="Client\IBrightStarService.cs" />
@@ -139,19 +137,29 @@
     <Compile Include="Client\IJobInfo.cs" />
     <Compile Include="Client\IStoreStatistics.cs" />
     <Compile Include="Client\ITransactionInfo.cs" />
-    <Compile Include="Client\JobInfoWrapper.cs" />
-    <Compile Include="Client\NamedPipeDataObjectContext.cs" />
-    <Compile Include="Client\NamedPipeDataObjectStore.cs" />
-    <Compile Include="Client\NetTcpDataObjectContext.cs" />
-    <Compile Include="Client\NetTcpDataObjectStore.cs" />
     <Compile Include="Client\RefreshMode.cs" />
-    <Compile Include="Client\ReplyMessageInspector.cs" />
     <Compile Include="Client\RestClientHelper.cs" />
     <Compile Include="Client\RestDataObjectContext.cs" />
     <Compile Include="Client\RestDataObjectStore.cs" />
-    <Compile Include="Client\RestJobInfo.cs" />
+    <Compile Include="Client\RestSecurity\CredentialsRequestAuthenticator.cs" />
+    <Compile Include="Client\RestSecurity\IRequestAuthenticator.cs" />
+    <Compile Include="Client\RestSecurity\PassthroughRequestAuthenticator.cs" />
+    <Compile Include="Client\RestSecurity\SharedSecretAuthenticator.cs" />
     <Compile Include="Client\SignatureType.cs" />
-    <Compile Include="Client\StoreStatisticsWrapper.cs" />
+    <Compile Include="Dto\CommitPointInfoObject.cs" />
+    <Compile Include="Dto\CommitPointResponseModel.cs" />
+    <Compile Include="Dto\CreateStoreRequestObject.cs" />
+    <Compile Include="Dto\ExceptionDetail.cs" />
+    <Compile Include="Dto\JobInfoObject.cs" />
+    <Compile Include="Dto\JobRequestObject.cs" />
+    <Compile Include="Dto\JobResponseModel.cs" />
+    <Compile Include="Dto\JobStatus.cs" />
+    <Compile Include="Dto\StoreResponseModel.cs" />
+    <Compile Include="Dto\StoresResponseModel.cs" />
+    <Compile Include="Dto\StoreStatisticsObject.cs" />
+    <Compile Include="Dto\TransactionInfoObject.cs" />
+    <Compile Include="Dto\TransactionStatus.cs" />
+    <Compile Include="Dto\TransactionType.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
     <Compile Include="Rdf\PlainLiteral.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
@@ -160,7 +168,6 @@
     <Compile Include="Server\StatsMonitor.cs" />
     <Compile Include="Server\UpdateStatsJob.cs" />
     <Compile Include="SparqlResultsFormat.cs" />
-    <Compile Include="Client\TransactionInfoWrapper.cs" />
     <Compile Include="Client\TransactionPreconditionsFailedException.cs" />
     <Compile Include="Client\XDocumentSparqlExtensions.cs" />
     <Compile Include="ConnectionString.cs" />
@@ -214,11 +221,6 @@
     <Compile Include="EntityFramework\ReflectionMappingProvider.cs" />
     <Compile Include="EntityFramework\RelativeOrAbsoluteIdentifierAttribute.cs" />
     <Compile Include="EntityFramework\ServiceProvider.cs" />
-    <Compile Include="EntityFramework\Strings1.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Strings.resx</DependentUpon>
-    </Compile>
     <Compile Include="EntityFramework\TypeExtensions.cs" />
     <Compile Include="EntityFramework\TypeIdentifierPrefixAttribute.cs" />
     <Compile Include="EntityFramework\UnattachedEntityCollection.cs" />
@@ -230,8 +232,6 @@
     <Compile Include="Client\DataObject.cs" />
     <Compile Include="Client\EmbeddedDataObjectContext.cs" />
     <Compile Include="Client\EmbeddedDataObjectStore.cs" />
-    <Compile Include="Client\HttpDataObjectContext.cs" />
-    <Compile Include="Client\HttpDataObjectStore.cs" />
     <Compile Include="Client\IDataObject.cs" />
     <Compile Include="Client\IDataObjectContext.cs" />
     <Compile Include="Client\IDataObjectStore.cs" />
@@ -273,7 +273,7 @@
     <Compile Include="Rdf\StoreTripleSink.cs" />
     <Compile Include="Rdf\TripleSinkException.cs" />
     <Compile Include="Server\BrightstarClientDataException.cs" />
-    <Compile Include="BrightstarStoreNotModifiedException.cs" />
+    <Compile Include="Client\BrightstarStoreNotModifiedException.cs" />
     <Compile Include="Server\ConnectionStream.cs" />
     <Compile Include="Server\ConsolidateJob.cs" />
     <Compile Include="Server\ConsumerStream.cs" />
@@ -283,7 +283,6 @@
     <Compile Include="Server\IStoreWorker.cs" />
     <Compile Include="Server\Job.cs" />
     <Compile Include="Server\JobExecutionStatus.cs" />
-    <Compile Include="Server\JobStatus.cs" />
     <Compile Include="Server\MemoryUtils.cs" />
     <Compile Include="Server\PreConditionFailedException.cs" />
     <Compile Include="Server\PreConditionSink.cs" />
@@ -417,8 +416,6 @@
     <Compile Include="Storage\TransactionInfoEnumerator.cs" />
     <Compile Include="Storage\TransactionLog\PersistentTransactionLog.cs" />
     <Compile Include="Storage\TransactionLog\TransactionInfo.cs" />
-    <Compile Include="Storage\TransactionStatus.cs" />
-    <Compile Include="Storage\TransactionType.cs" />
     <Compile Include="Storage\WeakReferenceNodeCache.cs" />
     <Compile Include="Strings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -437,11 +434,6 @@
     <Compile Include="Utils\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="EntityFramework\Strings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Desginer</SubType>
-      <LastGenOutput>Strings1.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Include="Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
