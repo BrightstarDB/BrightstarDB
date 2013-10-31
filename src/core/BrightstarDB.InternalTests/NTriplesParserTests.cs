@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
 using NUnit.Framework;
@@ -70,6 +72,26 @@ namespace BrightstarDB.InternalTests
             ntp.Parse(new FileStream(TestPaths.DataPath+"nquads.txt", FileMode.Open), new NoopParser(), Constants.DefaultGraphUri);
         }
 
+        [Test]
+        public void TestBackslashEscape()
+        {
+            const string ntriples = @"<http://example.org/s> <http://example.org/p1> ""c:\\users""
+<http://example.org/s> <http://example.org/p2> ""\\users\\tom""";
+            var parser = new NTriplesParser();
+            var sink = new LoggingTripleSink();
+            parser.Parse(new StringReader(ntriples), sink, "http://example.org/g" );
+
+            Assert.That(sink.Triples, Has.Count.EqualTo(1));
+            var triple1 = sink.Triples.FirstOrDefault(t => t.Predicate.Equals("http://example.org/p1"));
+            var triple2 = sink.Triples.FirstOrDefault(t => t.Predicate.Equals("http://example.org/p2"));
+            Assert.That(triple1, Is.Not.Null);
+            Assert.That(triple1.IsLiteral);
+            Assert.That(triple1.Object, Is.EqualTo(@"c:\users"));
+            Assert.That(triple2, Is.Not.Null);
+            Assert.That(triple2.IsLiteral);
+            Assert.That(triple2.Object, Is.EqualTo(@"\users\tom"));
+        }
+
         public class NoopParser : BaseRdfHandler , ITripleSink
         {
             protected override bool HandleTripleInternal(Triple t)
@@ -96,5 +118,31 @@ namespace BrightstarDB.InternalTests
             }
         }
 
+        internal class LoggingTripleSink : ITripleSink
+        {
+            public List<BrightstarDB.Model.Triple> Triples { get; set; }
+
+            public LoggingTripleSink()
+            {
+                Triples = new List<BrightstarDB.Model.Triple>();
+            }
+
+            public void Triple(string subject, bool subjectIsBNode, string predicate, bool predicateIsBNode, string obj, bool objIsBNode,
+                               bool objIsLiteral, string dataType, string langCode, string graphUri)
+            {
+                Triples.Add(new BrightstarDB.Model.Triple
+                    {
+                        Subject = subject,
+                        Predicate = predicate,
+                        Object = obj,
+                        DataType = dataType,
+                        Graph = graphUri,
+                        IsLiteral = objIsLiteral,
+                        LangCode = langCode
+                    });
+            }
+
+
+        }
     }
 }
