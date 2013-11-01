@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
 using BrightstarDB.Client.RestSecurity;
@@ -46,6 +47,8 @@ namespace BrightstarDB.Server.IntegrationTests
                 result = resultReader.ReadToEnd();
             }
             Assert.AreEqual("This is a test", result);
+
+            Thread.Sleep(1000); // Allow for resolution of Last-Modified header
 
             client.ExecuteTransaction(storeName, null, null,
                                       "<http://example.org/s> <http://example.org/p> <http://example.org/o> .");
