@@ -79,11 +79,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\BrightstarDB.Server.AspNet\Views\**\*.*">
-      <Link>Views\%(recursivedir)\%(filename)</Link>
+      <Link>Views\%(recursivedir)\%(filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\BrightstarDB.Server.AspNet\assets\**\*.*">
-      <Link>assets\%(recursivedir)\%(filename)</Link>
+      <Link>assets\%(recursivedir)\%(filename)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
