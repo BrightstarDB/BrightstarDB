@@ -286,10 +286,10 @@ To create a store that reads properties from the default graph and adds properti
                                   defaultDataSet: new[] {Constants.DefaultGraphUri},
 								  versionGraph:Constants.DefaultGraphUri);
 
-	..note::
+.. note::
 	Note that you need to be careful when using optimistic locking to ensure that you are consistent about which graph manages
 	the version information. We recommend that you either use the BrightstarDB default graph (as shown in the example above)
-	or use another named graph seperate from the graphs that store the rest of the data (and define a constant for that
+	or use another named graph separate from the graphs that store the rest of the data (and define a constant for that
 	graph URI).
 	
 To create a store that reads only the inferred properties use code like this::
@@ -302,6 +302,19 @@ To create a store that reads only the inferred properties use code like this::
 When creating a new store using the ``IDataObjectContext.CreateStore()`` method the ``updateGraph`` and ``versionGraph`` options can be specified, but
 the ``defaultDataSet`` parameter is not available as a new store will not have any graphs. In this case the store returned will read from and write to
 the graph specified by the ``updateGraph`` parameter.
+
+.. _default_data_set:
+
+Default Data Set
+----------------
+
+The ``defaultDataSet`` parameter can be used to list the URIs of the graphs that should
+be queried by the ``IDataObjectStore`` returned by the method. In SPARQL parlance, 
+this set of graphs is known as the *dataset*. If an update graph or
+version graph is specified then those graph URIs will also be added to the data set. 
+In the special case that ``updateGraph``, ``versionGraph`` and ``defaultDataSet``
+are all NULL (or not specified in the call to ``OpenStore``), the default data set
+will be set to cover all of the graphs in the BrightstarDB store.
 
 Graph Targeting and Deletions
 -----------------------------
