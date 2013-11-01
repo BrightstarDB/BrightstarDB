@@ -43,10 +43,15 @@ namespace BrightstarDB.EntityFramework
         ///<param name="enableOptimisticLocking">Optional parameter to override the optimistic locking configuration specified in the connection string</param>
         /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
         /// not defined, the default graph in the store will be updated.</param>
-        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
-        /// If not defined, all graphs in the store will be queried.</param>
+        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties. See
+        /// the remarks below.</param>
         /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
         /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+        /// <remarks>
+        /// <para>If <paramref name="datasetGraphUris"/> is null, then the context will query the graphs defined by 
+        /// <paramref name="updateGraphUri"/> and <paramref name="versionGraphUri"/> only. If all three parameters
+        /// are null then the context will query across all graphs in the store.</para>
+        /// </remarks>
         protected BrightstarEntityContext(EntityMappingStore mappings, string connectionString, bool? enableOptimisticLocking = null,
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null ) : base(mappings)
         {

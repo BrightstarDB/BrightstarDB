@@ -236,7 +236,7 @@ namespace BrightstarDB.Server.IntegrationTests
             store2.SaveChanges();
 
             // Check access to properties in both graphs
-            var store3 = context.OpenStore(storeName, prefixes, updateGraph: graph1);
+            var store3 = context.OpenStore(storeName, prefixes,  updateGraph: graph1, defaultDataSet:new [] {graph1, Constants.DefaultGraphUri});
             updateDataObject = store3.GetDataObject("resource:Alice");
             Assert.IsNotNull(updateDataObject);
             Assert.IsNotNull(updateDataObject.GetPropertyValue("foaf:mbox_sha1"));
@@ -255,7 +255,7 @@ namespace BrightstarDB.Server.IntegrationTests
             store4.SaveChanges();
 
             // Check that the object and properties are still accessible through the default graph
-            var store5 = context.OpenStore(storeName, prefixes, updateGraph: graph1);
+            var store5 = context.OpenStore(storeName, prefixes, updateGraph: graph1, defaultDataSet: new[] { graph1, Constants.DefaultGraphUri });
             updateDataObject = store5.GetDataObject("resource:Alice");
             Assert.IsNotNull(updateDataObject);
             Assert.IsNotNull(updateDataObject.GetPropertyValue("foaf:mbox"));
@@ -272,12 +272,12 @@ namespace BrightstarDB.Server.IntegrationTests
             var storeName = "TestVersioningGraph_" + DateTime.Now.Ticks;
             const string versionGraph = "http://example.org/graphs/versioning";
 
-            var store1 = context.CreateStore(storeName, versionTrackingGraph:versionGraph);
+            var store1 = context.CreateStore(storeName, updateGraph:Constants.DefaultGraphUri, versionTrackingGraph:versionGraph);
             var store1Alice = store1.MakeDataObject("http://example.org/alice");
             store1Alice.SetProperty("http://example.org/age", 21);
             store1.SaveChanges();
 
-            var store2 = context.OpenStore(storeName, versionTrackingGraph:versionGraph);
+            var store2 = context.OpenStore(storeName, updateGraph: Constants.DefaultGraphUri, versionTrackingGraph: versionGraph);
             var store2Alice = store2.GetDataObject("http://example.org/alice");
             store2Alice.SetProperty("http://example.org/age", 22);
             store2.SaveChanges();
