@@ -5,15 +5,17 @@ namespace BrightstarDB.Client
     internal class RestDataObjectStore : RemoteDataObjectStore
     {
         private readonly ConnectionString _connectionString;
+        private readonly string _storeName;
 
         public RestDataObjectStore(ConnectionString connectionString, string storeName,
                                    Dictionary<string, string> namespaceMappings, bool isOptimisticLockingEnabled,
                                    string updateGraphUri, IEnumerable<string> datasetGraphUris, string versionGraphUri
             )
             : base(
-                storeName, namespaceMappings, isOptimisticLockingEnabled, updateGraphUri, datasetGraphUris,
+                namespaceMappings, isOptimisticLockingEnabled, updateGraphUri, datasetGraphUris,
                 versionGraphUri)
         {
+            _storeName = storeName;
             _connectionString = connectionString;
         }
 
@@ -22,12 +24,9 @@ namespace BrightstarDB.Client
         /// <summary>
         /// This must be overidden by all subclasses to create the correct client
         /// </summary>
-        protected override IBrightstarService Client
+        protected override IUpdateableStore Client
         {
-            get
-            {
-                return BrightstarService.GetRestClient(_connectionString);
-            }
+            get { return new BrightstarRestUpdatableStore(BrightstarService.GetRestClient(_connectionString), _storeName); }
         }
 
         #endregion

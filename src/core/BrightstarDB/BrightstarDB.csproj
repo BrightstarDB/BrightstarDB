@@ -133,6 +133,7 @@
     <Compile Include="Caching\TwoLevelCache.cs" />
     <Compile Include="Client\BrightstarClientException.cs" />
     <Compile Include="Client\BrightstarRestClient.cs" />
+    <Compile Include="Client\BrightstarRestUpdatableStore.cs" />
     <Compile Include="Client\BrightstarService.cs" />
     <Compile Include="Client\BrightstarServiceClientExtensions.cs" />
     <Compile Include="Client\CachedQueryResult.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Client\IJobInfo.cs" />
     <Compile Include="Client\IStoreStatistics.cs" />
     <Compile Include="Client\ITransactionInfo.cs" />
+    <Compile Include="Client\IUpdateableStore.cs" />
     <Compile Include="Client\RefreshMode.cs" />
     <Compile Include="Client\RestClientHelper.cs" />
     <Compile Include="Client\RestDataObjectContext.cs" />
