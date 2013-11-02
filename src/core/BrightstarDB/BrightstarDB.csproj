@@ -155,6 +155,8 @@
     <Compile Include="Client\RestSecurity\PassthroughRequestAuthenticator.cs" />
     <Compile Include="Client\RestSecurity\SharedSecretAuthenticator.cs" />
     <Compile Include="Client\SignatureType.cs" />
+    <Compile Include="Client\SparqlDataObjectStore.cs" />
+    <Compile Include="Client\SparqlUpdatableStore.cs" />
     <Compile Include="Dto\CommitPointInfoObject.cs" />
     <Compile Include="Dto\CommitPointResponseModel.cs" />
     <Compile Include="Dto\CreateStoreRequestObject.cs" />

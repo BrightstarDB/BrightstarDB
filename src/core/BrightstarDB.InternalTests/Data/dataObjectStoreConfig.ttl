@@ -7,7 +7,8 @@ bst:peopleStore a dnr:TripleStore;
 
 bst:peopleGraph a dnr:Graph ;
 	dnr:type "VDS.RDF.Graph" ;
-	dnr:fromFile "people.ttl" .
+	dnr:fromFile "people.ttl" ;
+	dnr:assignUri <http://example.org/people> .
 
 bst:peopleStoreQuery a dnr:SparqlQueryProcessor;
 	dnr:type "VDS.RDF.Query.LeviathanQueryProcessor" ;

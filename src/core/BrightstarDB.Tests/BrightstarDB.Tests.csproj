@@ -84,7 +84,6 @@
     <Compile Include="CachingTests.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="ConnectionStringTests.cs" />
-    <Compile Include="DataObjectsTests\DotNetRdfStoreTests.cs" />
     <Compile Include="DataObjectsTests\LiteralPropertiesTests.cs" />
     <Compile Include="DataObjectsTests\StoreCallbackTests.cs" />
     <Compile Include="DynamicObjectTests.cs" />
@@ -149,8 +148,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Data\bsbm_370k.nt" />
-    <None Include="Data\dataObjectStoreConfig.ttl" />
-    <None Include="Data\people.ttl" />
     <None Include="Data\persondata_en_subset.nt" />
     <None Include="Data\escaping.nt" />
     <None Include="EntityFramework\MyEntityContext.tt">

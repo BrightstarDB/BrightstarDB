@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BrightstarDB.Client;
 using NUnit.Framework;
 using VDS.RDF;
 using VDS.RDF.Configuration;
+using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 using VDS.RDF.Update;
 
-namespace BrightstarDB.Tests.DataObjectsTests
+namespace BrightstarDB.InternalTests
 {
     [TestFixture]
     public class DotNetRdfStoreTests
@@ -19,15 +18,30 @@ namespace BrightstarDB.Tests.DataObjectsTests
         [TestFixtureSetUp]
         public void SetUp()
         {
-            _config = ConfigurationLoader.LoadConfiguration(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
+            _config = ConfigurationLoader.LoadConfiguration(TestConfiguration.DataLocation + "dataObjectStoreConfig.ttl");
             ConfigurationLoader.PathResolver = new LocalPathResolver();
         }
 
+        [Test]
+        public void TestPeopleStoreConfiguration()
+        {
+            var store = GetConfiguredObject<ITripleStore>("http://www.brightstardb.com/tests#peopleStore");
+            Assert.That(store, Is.Not.Null);
+            Assert.That(store.HasGraph(new Uri("http://example.org/people")));
+
+            // Check that we can retrieve some data for Alice through the query interface
+            var query =
+                GetConfiguredObject<ISparqlQueryProcessor>("http://www.brightstardb.com/tests#peopleStoreQuery");
+            var parser = new SparqlQueryParser();
+            var sparql = parser.ParseFromString("SELECT ?p ?o ?g FROM NAMED <http://example.org/people> WHERE { GRAPH ?g { <http://example.org/alice> ?p ?o } }");
+            var results = query.ProcessQuery(sparql) as SparqlResultSet;
+            Assert.That(results, Is.Not.Null);
+            Assert.That(results.Results.Count, Is.EqualTo(4));
+        }
 
         [Test]
         public void TestDataObjectRetrieval()
         {
-            ITripleStore store = GetTripleStore("http://www.brightstardb.com/tests#peopleStore");
             var query =
                 GetConfiguredObject<ISparqlQueryProcessor>("http://www.brightstardb.com/tests#peopleStoreQuery");
             var update =
@@ -38,22 +52,13 @@ namespace BrightstarDB.Tests.DataObjectsTests
                     {"foaf", "http://xmlns.com/foaf/0.1/"},
                     {"ex", "http://example.org/"}
                 };
-            //IDataObjectStore doStore = new SparqlDataObjectStore(query, update, namespaceMappings, false, null, null, null);
 
-            //var alice = doStore.GetDataObject("ex:alice");
-            //Assert.That(alice, Is.Not.Null);
-        }
+            IDataObjectStore doStore = new SparqlDataObjectStore(query, update, namespaceMappings, false, "http://example.org/people", null, null);
 
-        private ITripleStore GetTripleStore(string storeId)
-        {
-            INode tripleStoreNode = _config.CreateUriNode(new Uri(storeId));
-            Object tmp = ConfigurationLoader.LoadObject(_config, tripleStoreNode);
-            if (tmp is ITripleStore)
-            {
-                return tmp as ITripleStore;
-            }
-            Assert.Fail("Could not load ITripleStore for identifier '{0}'", storeId);
-            return null;
+            var alice = doStore.GetDataObject("ex:alice");
+            Assert.That(alice, Is.Not.Null);
+            var name = alice.GetPropertyValue("foaf:name");
+            Assert.That(name, Is.Not.Null);
         }
 
         private T GetConfiguredObject<T>(string id) where T : class
@@ -70,7 +75,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
     {
         public string ResolvePath(string path)
         {
-            return System.IO.Path.GetFullPath(Configuration.DataLocation + path);
+            return System.IO.Path.GetFullPath(TestConfiguration.DataLocation + path);
         }
     }
 }

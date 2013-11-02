@@ -24,19 +24,8 @@ namespace BrightstarDB.Client
             _optimisticLockingEnabled = optimisticLockingEnabled;
 
             // Initialize the SPARQL query template
-            var sb = new StringBuilder();
-            sb.Append("SELECT ?p ?o ?g");
-            if (DataSetGraphUris != null)
-            {
-                foreach (var dsGraph in DataSetGraphUris)
-                {
-                    sb.AppendFormat(" FROM NAMED <{0}>", dsGraph);
-                }
-            }
-            sb.AppendFormat(" FROM NAMED <{0}>", UpdateGraphUri);
-            sb.AppendFormat(" FROM NAMED <{0}>", VersionGraphUri);
-            sb.Append(" WHERE {{ GRAPH ?g {{ <{0}> ?p ?o }} }}");
-            _dataObjectQueryTemplate = sb.ToString();
+            _dataObjectQueryTemplate = GetQueryTemplate();
+
 
             ResetTransactionData();
         }
@@ -73,6 +62,23 @@ namespace BrightstarDB.Client
         public override SparqlResult ExecuteSparql(string sparqlExpression)
         {
             return new SparqlResult(Client.ExecuteQuery(sparqlExpression, DataSetGraphUris));
+        }
+
+        protected virtual string GetQueryTemplate()
+        {
+            var sb = new StringBuilder();
+            sb.Append("SELECT ?p ?o ?g");
+            if (DataSetGraphUris != null)
+            {
+                foreach (var dsGraph in DataSetGraphUris)
+                {
+                    sb.AppendFormat(" FROM NAMED <{0}>", dsGraph);
+                }
+            }
+            sb.AppendFormat(" FROM NAMED <{0}>", UpdateGraphUri);
+            sb.AppendFormat(" FROM NAMED <{0}>", VersionGraphUri);
+            sb.Append(" WHERE {{ GRAPH ?g {{ <{0}> ?p ?o }} }}");
+            return sb.ToString();
         }
 
         /// <summary>
