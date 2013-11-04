@@ -90,6 +90,7 @@
     <Compile Include="DynamicObjectTests.cs" />
     <Compile Include="EntityFrameworkAssemblyAttributes.cs" />
     <Compile Include="EntityFramework\ContextCallbackTests.cs" />
+    <Compile Include="EntityFramework\DotNetRdfContextTests.cs" />
     <Compile Include="EntityFramework\EmbeddedOptimisticLockingTests.cs" />
     <Compile Include="EntityFramework\EntityFrameworkGraphTargetingTests.cs" />
     <Compile Include="EntityFramework\IArticle.cs" />
