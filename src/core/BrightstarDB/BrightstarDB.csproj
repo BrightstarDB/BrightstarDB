@@ -138,6 +138,7 @@
     <Compile Include="Client\BrightstarServiceClientExtensions.cs" />
     <Compile Include="Client\CachedQueryResult.cs" />
     <Compile Include="Client\DataObjectStoreBase.cs" />
+    <Compile Include="Client\DotNetRdfDataObjectContext.cs" />
     <Compile Include="Client\EmbeddedBrightstarService.cs" />
     <Compile Include="Client\IBrightStarService.cs" />
     <Compile Include="Client\ICommitPointInfo.cs" />

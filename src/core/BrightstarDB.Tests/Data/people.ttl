@@ -1,12 +1,12 @@
-﻿@prefix ex: <http://example.org/> .
+﻿@prefix : <http://www.networkedplanet.com/people/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
-ex:alice a foaf:Person ;
+:alice a foaf:Person ;
 	foaf:name "Alice" ;
 	foaf:mbox "alice@example.org" ;
-	foaf:knows ex:Bob .
+	foaf:knows :bob .
 
-ex:bob a foaf:Person ;
+:bob a foaf:Person ;
 	foaf:name "Bob" ;
 	foaf:mbox "bob@example.org" ;
-	foaf:knows ex:Alice .
+	foaf:knows :alice .

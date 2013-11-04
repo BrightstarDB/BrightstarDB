@@ -123,9 +123,13 @@ namespace BrightstarDB.Client
                 case ConnectionType.Rest:
                     return new RestDataObjectContext(connectionString);
 #endif
+                case ConnectionType.DotNetRdf:
+                    return new DotNetRdfDataObjectContext(connectionString);
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
-                                                        connectionString.Value + ". Cause: unrecognised connection string type: " + connectionString.Type);
+                                                        connectionString.Value +
+                                                        ". Cause: unrecognised connection string type: " +
+                                                        connectionString.Type);
             }
         }
 

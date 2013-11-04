@@ -31,6 +31,12 @@ namespace BrightstarDB
         /// <summary>
         /// Connection type for a client connection to a Brightstar REST endpoint over HTTP or HTTPS
         /// </summary>
-        Rest
+        Rest,
+
+        /// <summary>
+        /// Connection type for a connection to a store through a DotNetRDF configuration. Used only
+        /// for Data Objects and Entity Framework connections.
+        /// </summary>
+        DotNetRdf,
     }
 }
