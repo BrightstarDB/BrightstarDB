@@ -115,6 +115,11 @@ namespace BrightstarDB.EntityFramework.Tests
             return null;
         }
 
+        public override IList<string> GetDataset()
+        {
+            return null;
+        }
+
         protected override void Cleanup()
         {
             // Nothing to clean up

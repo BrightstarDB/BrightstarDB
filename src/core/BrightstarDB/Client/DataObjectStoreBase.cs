@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using BrightstarDB.Model;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
@@ -42,6 +43,7 @@ namespace BrightstarDB.Client
 
         private readonly string _updateGraphUri;
         private readonly string[] _datasetGraphUris;
+        private readonly string _datasetClause;
         private readonly string _versionGraphUri;
 
         private const string InverseOfSparql = "SELECT ?s WHERE {{ ?s <{0}> <{1}> }}";
@@ -71,6 +73,17 @@ namespace BrightstarDB.Client
             {
                 // caller provided an empty enumeration, so default to all graphs
                 _datasetGraphUris = null;
+                _datasetClause = String.Empty;
+            }
+            if (_datasetGraphUris != null)
+            {
+                var builder = new StringBuilder();
+                builder.Append("FROM ");
+                foreach (var g in _datasetGraphUris)
+                {
+                    builder.AppendFormat("<{0}> ", g);
+                }
+                _datasetClause = builder.ToString();
             }
             _versionGraphUri = String.IsNullOrEmpty(versionGraphUri) ? _updateGraphUri : versionGraphUri;
 
@@ -262,6 +275,15 @@ namespace BrightstarDB.Client
 #endif
         }
 
+        public IList<string> GetDataset()
+        {
+            return _datasetGraphUris;
+        }
+
+        public string GetDatasetClause()
+        {
+            return _datasetClause;
+        }
         #endregion
 
         #region Implementation of IInternalDataObjectStore

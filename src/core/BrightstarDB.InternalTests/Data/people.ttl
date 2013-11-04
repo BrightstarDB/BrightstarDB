@@ -1,4 +1,4 @@
-﻿@prefix ex: <http://www.networkedplanet.com/people/> .
+﻿@prefix ex: <http://example.org/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 ex:alice a foaf:Person ;
