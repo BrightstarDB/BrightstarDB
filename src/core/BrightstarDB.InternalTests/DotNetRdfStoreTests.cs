@@ -61,6 +61,33 @@ namespace BrightstarDB.InternalTests
             Assert.That(name, Is.Not.Null);
         }
 
+        [Test]
+        public void TestDataObjectUpdate()
+        {
+            // Setup
+            var query =
+                GetConfiguredObject<ISparqlQueryProcessor>("http://www.brightstardb.com/tests#peopleStoreQuery");
+            var update =
+                GetConfiguredObject<ISparqlUpdateProcessor>("http://www.brightstardb.com/tests#peopleStoreUpdate");
+            var namespaceMappings = new Dictionary<string, string>
+                {
+                    {"foaf", "http://xmlns.com/foaf/0.1/"},
+                    {"ex", "http://example.org/"}
+                };
+            IDataObjectStore doStore = new SparqlDataObjectStore(query, update, namespaceMappings, false, "http://example.org/people", null, null);
+            var bob = doStore.GetDataObject("ex:bob");
+            
+            // Execute
+            bob.SetProperty("foaf:age", 40);
+            doStore.SaveChanges();
+
+            // Validate
+            doStore = new SparqlDataObjectStore(query, update, namespaceMappings, false, "http://example.org/people", null, null);
+            bob = doStore.GetDataObject("ex:bob");
+            Assert.That(bob, Is.Not.Null);
+            Assert.That(bob.GetPropertyValue("foaf:age"), Is.EqualTo(41));
+        }
+
         private T GetConfiguredObject<T>(string id) where T : class
         {
             INode configNode = _config.CreateUriNode(new Uri(id));
