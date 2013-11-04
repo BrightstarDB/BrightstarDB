@@ -22,7 +22,8 @@ namespace BrightstarDB.Client
             return _client.ExecuteQuery(_storeName, queryExpression, datasetGraphUris);
         }
 
-        public void ApplyTransaction(IList<Triple> preconditions, IList<Triple> deletePatterns, IList<Triple> inserts, string updateGraphUri)
+        public void ApplyTransaction(IList<Triple> preconditions, IList<Triple> deletePatterns, IList<Triple> inserts, 
+            string updateGraphUri )
         {
             var deleteData = new StringWriter();
             var dw = new BrightstarTripleSinkAdapter(new NQuadsWriter(deleteData, updateGraphUri));

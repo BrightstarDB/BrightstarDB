@@ -5,6 +5,9 @@ using VDS.RDF.Update;
 
 namespace BrightstarDB.Client
 {
+    /// <summary>
+    /// DataObjectStore that uses SPARQL and SPARQL UPDATE only
+    /// </summary>
     internal class SparqlDataObjectStore : RemoteDataObjectStore
     {
         private readonly IUpdateableStore _client;

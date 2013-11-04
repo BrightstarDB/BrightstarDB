@@ -3,12 +3,17 @@
 
 bst:peopleStore a dnr:TripleStore;
 	dnr:type "VDS.RDF.TripleStore" ;
-	dnr:usingGraph bst:peopleGraph .
+	dnr:usingGraph bst:peopleGraph ;
+	dnr:usingGraph bst:addGraph .
 
 bst:peopleGraph a dnr:Graph ;
 	dnr:type "VDS.RDF.Graph" ;
 	dnr:fromFile "people.ttl" ;
 	dnr:assignUri <http://example.org/people> .
+
+bst:addGraph a dnr:Graph ;
+	dnr:type "VDS.RDF.Graph" ;
+	dnr:assignUri <http://example.org/addGraph> .
 
 bst:peopleStoreQuery a dnr:SparqlQueryProcessor;
 	dnr:type "VDS.RDF.Query.LeviathanQueryProcessor" ;

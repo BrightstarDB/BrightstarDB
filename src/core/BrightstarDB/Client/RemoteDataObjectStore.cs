@@ -14,19 +14,16 @@ namespace BrightstarDB.Client
     /// </summary>
     internal abstract class RemoteDataObjectStore : DataObjectStoreBase
     {
-        private readonly string _dataObjectQueryTemplate;
         private readonly bool _optimisticLockingEnabled;
+        private string _queryTemplate;
+
+        private String QueryTemplate { get { return _queryTemplate ?? (_queryTemplate = GetQueryTemplate()); } }
 
         protected RemoteDataObjectStore(Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
             : base(namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             _optimisticLockingEnabled = optimisticLockingEnabled;
-
-            // Initialize the SPARQL query template
-            _dataObjectQueryTemplate = GetQueryTemplate();
-
-
             ResetTransactionData();
         }
 
@@ -148,7 +145,7 @@ namespace BrightstarDB.Client
 
         private IEnumerable<Triple> GetTriplesForDataObject(string identity)
         {
-            Stream sparqlResultStream = Client.ExecuteQuery(string.Format(_dataObjectQueryTemplate, identity), DataSetGraphUris);
+            Stream sparqlResultStream = Client.ExecuteQuery(string.Format(QueryTemplate, identity), DataSetGraphUris);
             XDocument data = XDocument.Load(sparqlResultStream);
 
             foreach (var sparqlResultRow in data.SparqlResultRows())

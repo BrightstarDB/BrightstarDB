@@ -8,7 +8,8 @@ namespace BrightstarDB.Client
     {
         Stream ExecuteQuery(string queryExpression, IList<string> datasetGraphUris);
 
-        void ApplyTransaction(IList<Triple> preconditions, IList<Triple> deletePatterns, IList<Triple> inserts, string updateGraphUri);
+        void ApplyTransaction(IList<Triple> preconditions, IList<Triple> deletePatterns, IList<Triple> inserts,
+                              string updateGraphUri);
 
         void Cleanup();
     }
