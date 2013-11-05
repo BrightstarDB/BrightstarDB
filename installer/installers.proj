@@ -85,10 +85,7 @@
     <Copy SourceFiles="@(SdkFiles)" DestinationFolder="..\samples\SDK\%(RecursiveDir)"/>
   </Target>
   
- <!--
   <Target Name="Prepare" DependsOnTargets="Version;BuildNet40;BuildWP71;BuildVisualStudio;BuildPolaris;BuildDocs">
-  -->
-  <Target Name="Prepare" >
     <ItemGroup>
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <Net40Dep Include="..\src\lib\unused_dependencies\*.dll;..\src\lib\Remotion.Linq.dll" />
