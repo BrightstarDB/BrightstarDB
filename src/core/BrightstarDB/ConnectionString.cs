@@ -15,6 +15,10 @@ namespace BrightstarDB
         private const string OptimisticLockingName = "optimisticlocking";
         private const string AccountPropertyName = "account";
         private const string KeyPropertyName = "key";
+        private const string ConfigurationName = "configuration";
+        private const string DnrStoreName = "store";
+        private const string DnrQueryName = "query";
+        private const string DnrUpdateName = "update";
 
         private readonly Dictionary<string, string> _values;
         private readonly string _rawValue; 
@@ -80,6 +84,11 @@ namespace BrightstarDB
                 Type = ConnectionType.Rest;
                 AssertEndpoint();
             }
+            else if (type.Equals("dotnetrdf"))
+            {
+                Type=ConnectionType.DotNetRdf;
+                AssertConfiguration();
+            }
             else
             {
                 throw new FormatException(String.Format(
@@ -111,6 +120,21 @@ namespace BrightstarDB
             if (String.IsNullOrEmpty(ServiceEndpoint))
             {
                 throw new FormatException("No Endpoint parameter found in the connection string.");
+            }
+        }
+
+        private void AssertConfiguration()
+        {
+            if (String.IsNullOrEmpty(Configuration))
+            {
+                throw new FormatException("No Configuration parameter found in the connection string.");
+            }
+            if (String.IsNullOrEmpty(DnrStoreName) &&
+                (String.IsNullOrEmpty(DnrQueryName) || String.IsNullOrEmpty(DnrUpdateName)))
+            {
+                throw new FormatException(
+                    String.Format("DotNetRdf connection requires either a {0} parameter or {1} and {2} parameters",
+                                  DnrStoreName, DnrQueryName, DnrUpdateName));
             }
         }
 
@@ -150,6 +174,26 @@ namespace BrightstarDB
         /// Get the shared key used for signing REST operations
         /// </summary>
         public string Key { get { return GetValueOrDefault(KeyPropertyName); } }
+
+        /// <summary>
+        /// Get the path to the DotNetRDF configuration file used to configure the underlying store
+        /// </summary>
+        public string Configuration { get { return GetValueOrDefault(ConfigurationName); } }
+
+        /// <summary>
+        /// Get the URI identifier of the store configuration node in the DotNetRDF configuration file
+        /// </summary>
+        public string DnrStore { get { return GetValueOrDefault(DnrStoreName); } }
+
+        /// <summary>
+        /// Get the URI identifier of the SPARQL query endpoint configuration node in the DotNetRDF configuration file
+        /// </summary>
+        public string DnrQuery { get { return GetValueOrDefault(DnrQueryName); } }
+
+        /// <summary>
+        /// Get the URI identifier of the SPARQL update endpoint configuration node in the DotNetRDF configuration file
+        /// </summary>
+        public string DnrUpdate { get { return GetValueOrDefault(DnrUpdateName); } }
 
         /// <summary>
         /// Returns the string representation of this connection string.

@@ -33,6 +33,11 @@ namespace BrightstarDB.EntityFramework.Query
         /// </summary>
         private readonly List<string> _namedVariables = new List<string>();
 
+        /// <summary>
+        /// List of the graph URIs that form the query dataset, or null to query the default data set
+        /// </summary>
+        private readonly IList<string> _dataset;
+ 
         public List<TripleInfo> AllTriples { get; private set; }
 
         public int Limit { get; set; }
@@ -43,6 +48,7 @@ namespace BrightstarDB.EntityFramework.Query
         public SparqlQueryBuilder(EntityContext context)
         {
             _context = context;
+            _dataset = context.GetDataset();
             _graphPatternBuilder =new StringBuilder();
             _querySourceMapping = new QuerySourceMapping();
             _variableValueMapping = new Dictionary<string, string>();
@@ -221,6 +227,14 @@ namespace BrightstarDB.EntityFramework.Query
             foreach(var ag in _aggregates)
             {
                 queryStringBuilder.AppendFormat("({0} AS ?{1}) ", ag.Item2, ag.Item1);
+            }
+            if (_dataset != null)
+            {
+                queryStringBuilder.Append("FROM ");
+                foreach (var g in _dataset)
+                {
+                    queryStringBuilder.AppendFormat("<{0}> ", g);
+                }
             }
             queryStringBuilder
                 .Append("WHERE {")

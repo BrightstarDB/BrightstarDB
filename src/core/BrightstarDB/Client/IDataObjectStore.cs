@@ -88,6 +88,19 @@ namespace BrightstarDB.Client
         /// <summary>
         /// Returns an enumeration over all data objects currently tracked by the store
         /// </summary>
-        IEnumerable<IDataObject> TrackedObjects { get; } 
+        IEnumerable<IDataObject> TrackedObjects { get; }
+
+        /// <summary>
+        /// Returns the list of graphs to query
+        /// </summary>
+        /// <returns></returns>
+        IList<string> GetDataset();
+
+        /// <summary>
+        /// Returns a Dataset clause for use in a SPARQL query
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>The string returned by this method follows the DatasetClause production of the SPARQL 1.1 grammar</remarks>
+        String GetDatasetClause();
     }
 }

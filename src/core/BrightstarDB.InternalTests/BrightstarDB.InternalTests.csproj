@@ -90,8 +90,10 @@
     <Compile Include="BrokenStoreTests.cs" />
     <Compile Include="BTreeStoreTests.cs" />
     <Compile Include="BTreeTests.cs" />
+    <Compile Include="DotNetRdfStoreTests.cs" />
     <Compile Include="StatisticsLogTests.cs" />
     <Compile Include="StatsMonitorTests.cs" />
+    <Compile Include="TestConfiguration.cs" />
     <Compile Include="TestPaths.cs" />
     <Compile Include="DataObjectTests.cs" />
     <Compile Include="GenericLruCacheTests.cs" />
@@ -125,8 +127,11 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Data\dataObjectStoreConfig.ttl" />
+    <None Include="Data\people.ttl" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

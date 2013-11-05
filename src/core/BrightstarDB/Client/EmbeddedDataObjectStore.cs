@@ -18,7 +18,7 @@ namespace BrightstarDB.Client
 
         internal EmbeddedDataObjectStore(ServerCore serverCore, string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
             string updateGraphUri, IEnumerable<string> datasetGraphUris, string versionGraphUri)
-            : base(namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
+            : base(namespaceMappings, updateGraphUri ?? Constants.DefaultGraphUri, datasetGraphUris, versionGraphUri)
         {
             _serverCore = serverCore;
             _storeName = storeName;
@@ -159,8 +159,7 @@ namespace BrightstarDB.Client
                     Preconditions.Clear();
                     throw new TransactionPreconditionsFailedException(failedTriples);
                 }
-                // todo: fix me and report inner exception
-                throw new BrightstarClientException(status.ExceptionDetail != null ? status.ExceptionDetail.Message : "The transaction encountered an error");
+                throw new BrightstarClientException(status.ExceptionDetail != null  && !String.IsNullOrEmpty(status.ExceptionDetail.Message) ? status.ExceptionDetail.Message : "The transaction encountered an error");
             }
 
             // reset changes

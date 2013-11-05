@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
@@ -23,7 +24,7 @@ namespace BrightstarDB.EntityFramework
     {
         private readonly IDataObjectStore _store;
         private readonly Dictionary<string, List<BrightstarEntityObject>> _trackedObjects;
-
+ 
         /// <summary>
         /// Creates a new domain context
         /// </summary>
@@ -75,6 +76,10 @@ namespace BrightstarDB.EntityFramework
 
         private static void AssertStoreFromConnectionString(ConnectionString connectionString)
         {
+            if (connectionString.Type == ConnectionType.DotNetRdf)
+            {
+                return;
+            }
 #if SILVERLIGHT            
             var service = new EmbeddedBrightstarService(connectionString.StoresDirectory);
 #else
@@ -120,6 +125,9 @@ namespace BrightstarDB.EntityFramework
                     context = new RestDataObjectContext(connectionString);
                     break;
 #endif
+                case ConnectionType.DotNetRdf:
+                    context = new DotNetRdfDataObjectContext(connectionString);
+                    break;
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value);
@@ -361,7 +369,9 @@ namespace BrightstarDB.EntityFramework
         /// the enumeration returns a single object, otherwise it returns no objects.</returns>
         public override IEnumerable<T> ExecuteInstanceQuery<T>(string instanceIdentifier, string typeIdentifier)
         {
-            var sparqlQuery = String.Format("ASK {{ <{0}> a <{1}>. }}", instanceIdentifier, typeIdentifier);
+            var sparqlQuery = String.Format("ASK {0} {{ <{1}> a <{2}>. }}", _store.GetDatasetClause(), instanceIdentifier, typeIdentifier);
+
+
             var sparqResult = _store.ExecuteSparql(sparqlQuery);
             var resultDoc = sparqResult.ResultDocument;
             if (resultDoc.SparqlBooleanResult())
@@ -478,6 +488,15 @@ namespace BrightstarDB.EntityFramework
         public override string GetDatatype(Type systemType)
         {
             return RdfDatatypes.GetRdfDatatype(systemType);
+        }
+
+        /// <summary>
+        /// Return the list of graphs to query or null to query the default dataset
+        /// </summary>
+        /// <returns></returns>
+        public override IList<string> GetDataset()
+        {
+            return _store.GetDataset();
         }
 
         /// <summary>

@@ -93,22 +93,25 @@ namespace BrightstarDB.Server.IntegrationTests
         {
             var context = GetContext();
             Assert.IsNotNull(context);
-            var store = context.CreateStore(Guid.NewGuid().ToString());
-            Assert.IsNotNull(store);
-            var p1 = store.MakeDataObject("http://www.networkedplanet.com/people/gra");
-            Assert.IsNotNull(p1);
+            string storeName = "TestCreateDataObject_" + DateTime.Now.Ticks;
+            using (var store = context.CreateStore(storeName))
+            {
+                Assert.IsNotNull(store);
+                var p1 = store.MakeDataObject("http://www.networkedplanet.com/people/gra");
+                p1.SetProperty("http://xmlns.com/foaf/0.1/name", "Graham Moore");
+                Assert.IsNotNull(p1);
+                store.SaveChanges();
+            }
+            using (var store = context.OpenStore(storeName))
+            {
+                var p = store.GetDataObject("http://www.networkedplanet.com/people/gra");
+                Assert.That(p, Is.Not.Null);
+                var name = p.GetPropertyValue("http://xmlns.com/foaf/0.1/name");
+                Assert.That(name, Is.Not.Null);
+                Assert.That(name, Is.EqualTo("Graham Moore"));
+            }
         }
 
-        [Test]
-        public void TestCreateDataObjectWithStringHttp()
-        {
-            var context = GetContext();
-            Assert.IsNotNull(context);
-            var store = context.CreateStore(Guid.NewGuid().ToString());
-            Assert.IsNotNull(store);
-            var p1 = store.MakeDataObject("http://www.networkedplanet.com/people/gra");
-            Assert.IsNotNull(p1);
-        }
 
         [Test]
         public void TestRetrieveNonExistantDataObject()

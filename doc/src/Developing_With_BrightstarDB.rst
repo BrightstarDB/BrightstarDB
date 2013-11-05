@@ -44,4 +44,5 @@ moment to read about Running the BrightstarDB Samples first.
     Admin API <Admin_API>
 	Developing For Windows Phone <Developing_for_Windows_Phone>
 	Developing Portable Apps <Developing_Portable_Apps>
+    Connecting to Other Stores <Other_Stores>
     API Documentation <API_Documentation>

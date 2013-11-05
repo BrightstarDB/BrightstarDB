@@ -133,10 +133,12 @@
     <Compile Include="Caching\TwoLevelCache.cs" />
     <Compile Include="Client\BrightstarClientException.cs" />
     <Compile Include="Client\BrightstarRestClient.cs" />
+    <Compile Include="Client\BrightstarRestUpdatableStore.cs" />
     <Compile Include="Client\BrightstarService.cs" />
     <Compile Include="Client\BrightstarServiceClientExtensions.cs" />
     <Compile Include="Client\CachedQueryResult.cs" />
     <Compile Include="Client\DataObjectStoreBase.cs" />
+    <Compile Include="Client\DotNetRdfDataObjectContext.cs" />
     <Compile Include="Client\EmbeddedBrightstarService.cs" />
     <Compile Include="Client\IBrightStarService.cs" />
     <Compile Include="Client\ICommitPointInfo.cs" />
@@ -144,6 +146,7 @@
     <Compile Include="Client\IJobInfo.cs" />
     <Compile Include="Client\IStoreStatistics.cs" />
     <Compile Include="Client\ITransactionInfo.cs" />
+    <Compile Include="Client\IUpdateableStore.cs" />
     <Compile Include="Client\RefreshMode.cs" />
     <Compile Include="Client\RestClientHelper.cs" />
     <Compile Include="Client\RestDataObjectContext.cs" />
@@ -153,6 +156,8 @@
     <Compile Include="Client\RestSecurity\PassthroughRequestAuthenticator.cs" />
     <Compile Include="Client\RestSecurity\SharedSecretAuthenticator.cs" />
     <Compile Include="Client\SignatureType.cs" />
+    <Compile Include="Client\SparqlDataObjectStore.cs" />
+    <Compile Include="Client\SparqlUpdatableStore.cs" />
     <Compile Include="Dto\CommitPointInfoObject.cs" />
     <Compile Include="Dto\CommitPointResponseModel.cs" />
     <Compile Include="Dto\CreateStoreRequestObject.cs" />

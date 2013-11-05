@@ -518,39 +518,12 @@ namespace BrightstarDB.Client
             // Because this is a set, we use a wildcard to delete any existing properties with the same predicate
             if (!_isNew && !_store.DeletePatterns.Any(t=>t.Subject.Equals(triple.Subject) && t.Predicate.Equals(triple.Predicate) && t.Object.Equals(Constants.WildcardUri)))
             {
-                if (_store.DataSetGraphUris == null)
-                {
-                    // Wildcard delete from all graphs
-                    _store.DeletePatterns.Add(new Triple
-                        {
-                            Subject = triple.Subject,
-                            Predicate = triple.Predicate,
-                            Object = Constants.WildcardUri
-                        });
-                }
-                else
-                {
-                    // Targeted delete only from the dataset graphs and the update graph
-                    _store.DeletePatterns.Add(
-                        new Triple
-                        {
-                            Subject = triple.Subject,
-                            Predicate = triple.Predicate,
-                            Object = Constants.WildcardUri,
-                            Graph = _store.UpdateGraphUri
-                        });
-                    foreach (var g in _store.DataSetGraphUris)
+                AddDeleteTriples(new Triple
                     {
-                        _store.DeletePatterns.Add(
-                            new Triple
-                            {
-                                Subject = triple.Subject,
-                                Predicate = triple.Predicate,
-                                Object = Constants.WildcardUri,
-                                Graph = g
-                            });
-                    }
-                }
+                        Subject = triple.Subject,
+                        Predicate = triple.Predicate,
+                        Object = Constants.WildcardUri
+                    });
             }
 
             // add new triple to current triples

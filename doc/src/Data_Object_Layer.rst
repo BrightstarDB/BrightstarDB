@@ -9,29 +9,33 @@
 .. _SPARQL XML Query Results Format: http://www.w3.org/TR/rdf-sparql-XMLres/
 
 
-The Data Object Layer is a simple generic object wrapper for the underlying RDF data in any 
-BrightstarDB store.
+The Data Object Layer is a simple generic object wrapper for the underlying RDF data in 
+any BrightstarDB store.
 
 Data Objects are lightweight wrappers around sets of RDF triples in the underlying 
-BrightstarDB store. They allow the developer to interact with the RDF data without requiring 
-all information to be sent in N-Triple format.
+BrightstarDB store. They allow the developer to interact with the RDF data without 
+requiring all information to be sent in N-Triple format.
 
-For more information about the RDF layer of BrightstarDB, please read the :ref:`RDF Client API 
-<RDF_Client_API>` section.
+For more information about the RDF layer of BrightstarDB, please read the 
+:ref:`RDF Client API <RDF_Client_API>` section.
 
 
 Creating a Data Object Context
 ==============================
 
-The ``IDataObjectContext`` interface provides the methods for accessing BrightstarDB stores through the
-Data Object Layer. You can use this interface to list the available stores, to open existing stores
-and to create or delete stores. The following example shows how to create a new context using a 
-connection string::
+The ``IDataObjectContext`` interface provides the methods for accessing BrightstarDB 
+stores through the Data Object Layer. You can use this interface to list the available 
+stores, to open existing stores and to create or delete stores. The following example 
+shows how to create a new context using a connection string::
 
-  var context = BrightstarService.GetDataObjectContext("Type=http;endpoint=http://localhost:8090/brightstar;");
+  var context = BrightstarService.GetDataObjectContext("Type=rest;endpoint=http://localhost:8090/brightstar;");
 
-The connection string defines the type of service you are connecting to. For more information about connection strings, 
-please read the :ref:`"Connection Strings" topic <Connection_Strings>`
+The connection string defines the type of service you are connecting to. 
+For the Data Object Context, the connection can be to an embedded instance
+of BrightstarDB; a connection to a BrightstarDB server over the HTTP REST interface;
+or a connection to another store using a DotNetRDF storage connector.
+For more information about connection strings, please refer to the section
+:ref:`Connection_Strings`.
 
 Using the IDataObjectContext
 ============================
@@ -273,9 +277,17 @@ Graph Targeting in the Data Object API
 You can use the Data Object API to update a specific named graph in the BrightstarDB store.
 Each time you open a store you can specify the following optional parameters:
 
-  * ``updateGraph`` : The identifier of the graph that new statements will be added to. Defaults to the BrightstarDB default graph (``http://www.brightstardb.com/.well-known/model/defaultgraph``)
-  * ``defaultDataSet`` : The identifier of the graphs that statements will be retrieved from. Defaults to all graphs in the store.
-  * ``versionGraph`` : The identifier of the graph that contains version information for optimistic locking. Defaults to the same graph as ``updateGraph``.
+  * ``updateGraph`` : The identifier of the graph that new statements will be added to. 
+        For connections to a BrightstarDB server, this defaults to the BrightstarDB default 
+        graph (``http://www.brightstardb.com/.well-known/model/defaultgraph``)
+        For connections through the DotNetRDF connectors, the default graph will be store and
+        service dependent.
+  * ``defaultDataSet`` : The identifier of the graphs that statements will be retrieved from. 
+        For connections to a BrightstarDB server, this defaults to all graphs in the store.
+        For connections through the DotNetRDF connectors, the default data set will be 
+        store and service dependent.
+  * ``versionGraph`` : The identifier of the graph that contains version information for 
+        optimistic locking. Defaults to the same graph as ``updateGraph``.
   
 These are passed as additional optional parameters to the ``IDataObjectContext.OpenStore()`` method.
 
@@ -312,9 +324,15 @@ The ``defaultDataSet`` parameter can be used to list the URIs of the graphs that
 be queried by the ``IDataObjectStore`` returned by the method. In SPARQL parlance, 
 this set of graphs is known as the *dataset*. If an update graph or
 version graph is specified then those graph URIs will also be added to the data set. 
+
 In the special case that ``updateGraph``, ``versionGraph`` and ``defaultDataSet``
-are all NULL (or not specified in the call to ``OpenStore``), the default data set
+are all NULL (or not specified in the call to ``OpenStore``), and the connection
+being opened is a connection to a BrightstarDB store the default data set
 will be set to cover all of the graphs in the BrightstarDB store.
+
+When connecting to other stores using the DotNetRDF connectors, the default data
+set will be defined by the server unless the ``defaultDataSet`` parameter is 
+explicitly set.
 
 Graph Targeting and Deletions
 -----------------------------
