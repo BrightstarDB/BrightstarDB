@@ -38,11 +38,12 @@
   
   <Import Project="..\common.proj"/>
 
+  <PropertyGroup>
+    <BuildNumber Condition="'$(BuildNumber)' == ''">$(Major).$(Minor).$(Build).$(Revision)</BuildNumber>
+  </PropertyGroup>
+  
   <Target Name="Version">
-    <Version FileName="$(BuildNumberFile)" Major="1" Minor="0" Increment="true" Condition=" '$(BuildNumber)' == '' ">
-      <Output PropertyName="BuildNumber" TaskParameter="BuildNumber"/>
-    </Version>
-    <Error Text="The BuildNumber property must be set to a value such as 1.0.234" Condition=" '$(BuildNumber)' == '' "/>
+    <Error Text="The BuildNumber property must be set to a value such as 1.4.1.0" Condition=" '$(BuildNumber)' == '' "/>
     <Message Text="Build number set to $(BuildNumber)"/>
   </Target>
   
