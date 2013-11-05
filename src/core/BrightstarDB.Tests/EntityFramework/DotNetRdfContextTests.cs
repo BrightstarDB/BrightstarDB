@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using BrightstarDB.Client;
 using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
@@ -29,20 +30,28 @@ namespace BrightstarDB.Tests.EntityFramework
         public void TestInsertIntoDefaultGraph()
         {
             var connectionString = MakeStoreConnectionString("example", "http://www.brightstardb.com/tests#emptyStore");
-            string aliceId;
-            using (var context = new MyEntityContext(connectionString))
-            {
-                var alice = context.FoafPersons.Create();
-                aliceId = alice.Id;
-                context.SaveChanges();
-            }
+            var dataObjectContext = BrightstarService.GetDataObjectContext(connectionString);
 
-            using (var context = new MyEntityContext(connectionString))
+            string aliceId;
+            using (var store = dataObjectContext.OpenStore("example"))
             {
-                var alice = context.FoafPersons.FirstOrDefault(p => p.Id.Equals(aliceId));
-                Assert.That(alice, Is.Not.Null);
+                using (var context = new MyEntityContext(store))
+                {
+                    var alice = context.FoafPersons.Create();
+                    aliceId = alice.Id;
+                    context.SaveChanges();
+                }
+            }
+            using (var store = dataObjectContext.OpenStore("example"))
+            {
+                using (var context = new MyEntityContext(store))
+                {
+                    var alice = context.FoafPersons.FirstOrDefault(p => p.Id.Equals(aliceId));
+                    Assert.That(alice, Is.Not.Null);
+                }
             }
         }
+    
 
         private static string MakeStoreConnectionString(string storeName, string storeId)
         {

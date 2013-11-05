@@ -238,13 +238,20 @@ namespace BrightstarDB.Client
             op.AppendLine("INSERT DATA {");
             foreach (var graphGroup in inserts.GroupBy(i => i.Graph))
             {
-                op.AppendFormat("GRAPH <{0}> {{", graphGroup.Key ?? defaultGraphUri);
-                op.AppendLine();
+                var targetGraph = graphGroup.Key ?? defaultGraphUri;
+                if (targetGraph != null)
+                {
+                    op.AppendFormat("GRAPH <{0}> {{", graphGroup.Key ?? defaultGraphUri);
+                    op.AppendLine();
+                }
                 foreach (var triple in graphGroup)
                 {
                     AppendTriplePattern(triple, op);
                 }
-                op.AppendLine("}");
+                if (targetGraph != null)
+                {
+                    op.AppendLine("}");
+                }
             }
             op.AppendLine("}");
             return op.ToString();

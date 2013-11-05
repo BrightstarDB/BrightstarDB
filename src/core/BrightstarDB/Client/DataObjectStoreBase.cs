@@ -67,7 +67,9 @@ namespace BrightstarDB.Client
             _namespaceMappings = namespaceMappings ?? new Dictionary<string, string>();
             _managedProxies = new Dictionary<string, DataObject>();
 
-            _updateGraphUri = String.IsNullOrEmpty(updateGraphUri) ? Constants.DefaultGraphUri : updateGraphUri;
+            //_updateGraphUri = String.IsNullOrEmpty(updateGraphUri) ? Constants.DefaultGraphUri : updateGraphUri;
+            _updateGraphUri = updateGraphUri;
+
             _datasetGraphUris = datasetGraphUris == null ? null : datasetGraphUris.ToArray();
             if (_datasetGraphUris != null && _datasetGraphUris.Length == 0)
             {

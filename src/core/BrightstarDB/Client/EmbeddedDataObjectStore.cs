@@ -18,7 +18,7 @@ namespace BrightstarDB.Client
 
         internal EmbeddedDataObjectStore(ServerCore serverCore, string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
             string updateGraphUri, IEnumerable<string> datasetGraphUris, string versionGraphUri)
-            : base(namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
+            : base(namespaceMappings, updateGraphUri ?? Constants.DefaultGraphUri, datasetGraphUris, versionGraphUri)
         {
             _serverCore = serverCore;
             _storeName = storeName;
