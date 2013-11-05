@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:vs="http://schemas.microsoft.com/wix/VSExtension">
 	<Product Id="*" 
-           Name="BrightstarDB $(var.BuildNumber).0" 
+           Name="BrightstarDB $(var.BuildNumber)" 
            Language="1033" 
-           Version="$(var.BuildNumber).0" 
+           Version="$(var.BuildNumber)" 
            Manufacturer="BrightstarDB Project" 
            UpgradeCode="CF04085A-ACFE-4447-83E1-1A50A4133655">
     
@@ -127,12 +127,6 @@
           <Directory Id="SAMPLESDIR" Name="Samples"/>
           <Directory Id="SERVICEDIR" Name="Service"/>
           <Directory Id="SERVICEDATADIR" Name="Data"/>
-          <Directory Id="SPARQLSERVICEDIR" Name="SparqlService"/>
-          <Directory Id="SDSHAREDIR" Name="SDShare">
-            <Directory Id="SDSHAREDOCSDIR" Name="Docs"/>
-            <Directory Id="SDSHARESERVICEDIR" Name="Service"/>
-            <Directory Id="SDSHARESAMPLESDIR" Name="Samples"/>
-          </Directory>
           <Directory Id="VSDIR" Name="VisualStudio"/>
           <Directory Id="TOOLSDIR" Name="Tools"/>
           <Directory Id="LMDIR" Name="LicenseManager"/>
@@ -198,14 +192,6 @@
       <ComponentGroupRef Id="vsFilesComponentGroup"/>
 
       <ComponentGroupRef Id="samplesFilesComponentGroup"/>
-
-      <ComponentGroupRef Id="sparqlServiceFilesComponentGroup"/>
-
-      <ComponentGroupRef Id="sdshareServiceFilesComponentGroup"/>
-
-      <ComponentGroupRef Id="sdshareSamplesFilesComponentGroup"/>
-      
-      <ComponentGroupRef Id="sdshareDocFilesComponentGroup"/>
 
       <ComponentRef Id="DocsShortcuts"/>
 
