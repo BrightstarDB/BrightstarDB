@@ -25,3 +25,7 @@ bst:peopleStoreQuery a dnr:SparqlQueryProcessor;
 bst:peopleStoreUpdate a dnr:SparqlUpdateProcessor ;
 	dnr:type "VDS.RDF.Update.SimpleUpdateProcessor" ;
 	dnr:usingStore bst:peopleStore .
+
+bst:fuseki a dnr:StorageProvider ;
+	dnr:type "VDS.RDF.Storage.FusekiConnector" ;
+	dnr:server "http://localhost:3030/ds/data" .

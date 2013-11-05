@@ -67,5 +67,12 @@ namespace BrightstarDB.Tests.DataObjectsTests
             Assert.That(email, Is.Not.Null);
         }
 
+        [Test]
+        public void TestInitializeFromDnrStorageProvider()
+        {
+            var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
+            var connectionString = "type=dotNetRdf;configuration=" + configFilePath + ";storeName=example;store=http://www.brightstardb.com/tests#fuseki";
+            var doContext = BrightstarService.GetDataObjectContext(connectionString);
+        }
     }
 }
