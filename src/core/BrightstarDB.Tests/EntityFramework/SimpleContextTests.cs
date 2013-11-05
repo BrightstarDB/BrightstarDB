@@ -1389,12 +1389,13 @@ namespace BrightstarDB.Tests.EntityFramework
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var jen = context.Persons.FirstOrDefault(p => p.Id.Equals(jenId));
+                var jen = context.Persons.FirstOrDefault(p => p.Id == jenId);
 
                 context.DeleteObject(jen);
                 context.SaveChanges();
 
-                Assert.AreEqual(0, context.Persons.Count());
+                jen = context.Persons.FirstOrDefault(p => p.Id == jenId);
+                Assert.That(jen, Is.Null);
             }
         }
 
