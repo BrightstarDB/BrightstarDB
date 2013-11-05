@@ -109,4 +109,19 @@ connection string::
 
     type=dotnetrdf;configuration=c:\path\to\dotNetRdf.config.ttl;query=http://example.org/configuration#sparqlQuery;update=http://example.org/configuration#sparqlUpdate;
     
+Connecting to a Fuseki Server
+=============================
+
+DotNetRDF configuration file (dotNetRdf.config.ttl)::
+
+    @prefix dnr: <http://www.dotnetrdf.org/configuration#>
+    @prefix : <http://example.org/configuration#>
+    
+    :fuseki a dnr:StorageProvider ;
+        dnr:type "VDS.RDF.Storage.FusekiConnector" ;
+        dnr:server "http://fuseki.example.org/dataset/data" .
+        
+connection string::
+    type=dotnetrdf;configuration=c:\path\to\dotNetRdf.config.ttl;store=http://example.org/configuration#fuseki
+
 **TBD: More examples**
