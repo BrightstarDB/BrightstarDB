@@ -6,12 +6,17 @@ using VDS.RDF.Configuration;
 using VDS.RDF.Query;
 using VDS.RDF.Storage;
 using VDS.RDF.Update;
+#if PORTABLE
+using BrightstarDB.Portable.Adaptation;
+#else
+using System.IO;
+#endif
 
 namespace BrightstarDB.Client
 {
     internal class DotNetRdfDataObjectContext : IDataObjectContext
     {
-        private string _configuredStoreName;
+        private readonly string _configuredStoreName;
         private readonly IGraph _configuration;
         readonly ISparqlUpdateProcessor _updateProcessor;
         readonly ISparqlQueryProcessor _queryProcessor;
@@ -89,11 +94,24 @@ namespace BrightstarDB.Client
             }
         }
 
+
+#if PORTABLE
+        private static IGraph LoadConfiguration(string configurationPath)
+        {
+            var pm = PlatformAdapter.Resolve<IPersistenceManager>();
+            ConfigurationLoader.PathResolver = new DotNetRdfConfigurationPathResolver(configurationPath);
+            using (var stream = pm.GetInputStream(configurationPath))
+            {
+                return ConfigurationLoader.LoadConfiguration(configurationPath, new Uri(configurationPath), stream);
+            }
+        }
+#else
         private static IGraph LoadConfiguration(string configurationPath)
         {
             ConfigurationLoader.PathResolver = new DotNetRdfConfigurationPathResolver(configurationPath);
             return ConfigurationLoader.LoadConfiguration(configurationPath);
         }
+#endif
 
         private object GetConfigurationObject(string id)
         {
@@ -142,11 +160,15 @@ namespace BrightstarDB.Client
 
         public DotNetRdfConfigurationPathResolver(string configurationPath)
         {
-            _configurationPath = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(configurationPath));
+#if PORTABLE
+            _configurationPath = Path.GetDirectoryName(configurationPath);
+#else
+            _configurationPath = Path.GetDirectoryName(Path.GetFullPath(configurationPath));
+#endif
         }
         public string ResolvePath(string path)
         {
-            return System.IO.Path.Combine(_configurationPath, path);
+            return Path.Combine(_configurationPath, path);
         }
     }
 }

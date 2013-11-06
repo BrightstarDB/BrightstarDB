@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\..\server\BrightstarDB.Server.IntegrationTests\**\*.cs" Exclude="..\..\..\server\BrightstarDB.Server.IntegrationTests\ClientTestBase.cs;..\..\..\server\BrightstarDB.Server.IntegrationTests\Context\MyEntityContext.cs;..\..\..\server\BrightstarDB.Server.IntegrationTests\bin\**\*.*;..\..\..\server\BrightstarDB.Server.IntegrationTests\Properties\**\*.*;..\..\..\server\BrightstarDB.Server.IntegrationTests\obj\**\*.*">
+    <Compile Include="..\..\..\core\BrightstarDB.Server.IntegrationTests\**\*.cs" Exclude="..\..\..\core\BrightstarDB.Server.IntegrationTests\ClientTestBase.cs;..\..\..\core\BrightstarDB.Server.IntegrationTests\Context\MyEntityContext.cs;..\..\..\core\BrightstarDB.Server.IntegrationTests\bin\**\*.*;..\..\..\core\BrightstarDB.Server.IntegrationTests\Properties\**\*.*;..\..\..\core\BrightstarDB.Server.IntegrationTests\obj\**\*.*">
       <Link>Server\IntegrationTests\%(recursivedir)\%(filename)</Link>
     </Compile>
     <Compile Include="Server\IntegrationTests\ClientTestBase.cs" />
