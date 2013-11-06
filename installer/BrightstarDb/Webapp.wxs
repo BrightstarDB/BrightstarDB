@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="WEBAPPDIR">
+            <Directory Id="dir716D516AC2675D702113BB7C3E319861" Name="assets" />
+            <Directory Id="dirADF8E9661D6A9B4234F81C58EB8F6513" Name="bin" />
+            <Directory Id="dir61B199D127A0B5F37C4F9AA6F4211CE6" Name="views" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="webappFilesComponentGroup">
+            <Component Id="cmp8759CD355D583CE2BE443BE1878F6F08" Directory="WEBAPPDIR" Guid="{E3D8E124-1EB1-4F4A-8E9B-76B4C111C600}">
+                <File Id="filD448DE875DDA7D22B56E2777614E4F69" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\Web.config" />
+            </Component>
+            <Component Id="cmpD14E9DDE19A55D5ECA700854A7CFF3C7" Directory="dir716D516AC2675D702113BB7C3E319861" Guid="{F173DFCB-C1BB-4177-858C-33424425650D}">
+                <File Id="fil2B788D26606E764CEBBB858F25E77A18" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\assets\core.css" />
+            </Component>
+            <Component Id="cmp3D0F6ECFAB5D6A8FB4ED625F9A467073" Directory="dir716D516AC2675D702113BB7C3E319861" Guid="{FFB07665-1065-44B5-83C0-99B9C15FD1B7}">
+                <File Id="filF3C994A4CF70818B04128D19DF79594A" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\assets\jquery-1.10.2.min.js" />
+            </Component>
+            <Component Id="cmp48E388D96B51A6A69CBF366A505F8168" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{8AC5FF0E-F3F8-4091-A305-8C9D08BD9E8F}">
+                <File Id="filCAFD70697D3E8E5C7207C162941D12D0" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\BrightstarDB.dll" />
+            </Component>
+            <Component Id="cmpE332B07599D4697AFE917434236F5EBB" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{92BD9E7F-ECC4-4E67-AA6B-928CDCF30DDE}">
+                <File Id="filDE9A42B5DC8591309730AC9BB8226E9A" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\BrightstarDB.Server.AspNet.dll" />
+            </Component>
+            <Component Id="cmp72CE536602C8652A9D99D1090F454D20" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{2A559F7F-EA52-4E8A-AC8E-551F135183AC}">
+                <File Id="fil649A658B89BFCFE27567D0D600542894" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\BrightstarDB.Server.Modules.dll" />
+            </Component>
+            <Component Id="cmp82C06E6925EA2FD1D36A6A63E26D59E7" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{13A04881-1299-4EF7-8766-14D4C2523001}">
+                <File Id="fil894C3D5602047FF7C6B0029B5A72842C" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\dotNetRDF.dll" />
+            </Component>
+            <Component Id="cmp9D7F08CB3DF39546357B5AC55373CAA6" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{B3632307-C6E3-4358-BF3D-71A0BDF73494}">
+                <File Id="filE2FDEA3DB734FB177E68689F1D4BF72D" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\HtmlAgilityPack.dll" />
+            </Component>
+            <Component Id="cmp06B45639EB7095491684F27C28D79942" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{E4124156-7980-4516-9CA0-9254D003082A}">
+                <File Id="fil349EC5E54D001B493D307EC1D5A06EFE" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\Nancy.dll" />
+            </Component>
+            <Component Id="cmpC310AA9DDFE48F34DBBB7382591D1CEC" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{28FCD8EE-28F2-4F3B-A277-BF4292A924E6}">
+                <File Id="fil110ACED05D536B3D8330CF933966E247" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\Nancy.Hosting.Aspnet.dll" />
+            </Component>
+            <Component Id="cmp7A1294105017460406900178B5939A40" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{38BE5306-AEFB-42E0-ABE9-033213174CD3}">
+                <File Id="filB150B359780615E7450E3DA28ACF576C" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\Nancy.ViewEngines.Razor.dll" />
+            </Component>
+            <Component Id="cmp9868AC76565C02C4AA7B56713BB8BDF8" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{7DEA5252-FD80-464A-86FA-A538778CFAB9}">
+                <File Id="filAC1512DAC8EE15DFC2D08378F6A2E1EA" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\Newtonsoft.Json.dll" />
+            </Component>
+            <Component Id="cmp34EBB1A266B61ECF0D9CB9C03B4FC29F" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{ECC7ACCE-5DDE-45B0-B394-53FE5D3D1BE3}">
+                <File Id="fil24C2E987068DF019EE6CE3A1CB5C588C" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\Remotion.Linq.dll" />
+            </Component>
+            <Component Id="cmpDC741B2FE752ED772CDC735914EC9DD3" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{3E291A84-D857-4063-A5D6-71B5735EEBEC}">
+                <File Id="fil9D581200A77AE5D7BB689C4FC2AED3EF" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\System.Web.Razor.Unofficial.dll" />
+            </Component>
+            <Component Id="cmpD80A791CBBAC16BCDDC71564579C2947" Directory="dirADF8E9661D6A9B4234F81C58EB8F6513" Guid="{05642231-DAB3-4C4F-B504-EEF988E5DE91}">
+                <File Id="fil5D6A03E62DA9C541F9387DE21AA2311B" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\bin\VDS.Common.dll" />
+            </Component>
+            <Component Id="cmp75428021DFF25E2F7EB94B699B601C9F" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{FD3409C0-88D1-4CF8-9E36-350984BC9497}">
+                <File Id="fil0D6CC16CB2B2B9197A1ED5487963BE2E" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\JobResponse.cshtml" />
+            </Component>
+            <Component Id="cmp4D9B010CEF4A2078B7BD484E2B56ECBE" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{7DC181C9-6435-425D-AE45-25B4030B7A4A}">
+                <File Id="filC2DCB1F82BB70AB71BD6FAFDCFE3C71C" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\Layout.sshtml" />
+            </Component>
+            <Component Id="cmpBD0081D1C82ABA7BC50AE7D86BDD46D3" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{611B198A-811B-4B38-8DDE-A25D6C473C94}">
+                <File Id="fil84E70F407C281DB5DDA4F4DFEDC0715A" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\ListPaging.cshtml" />
+            </Component>
+            <Component Id="cmpD78F15BF1A13355817C791A7DA4AC489" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{BEA5353E-EEEC-4BD0-B5CB-0686A78F6E41}">
+                <File Id="filC7C9054EC9D11FB8551AB8D4FE95AF02" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\PagedCommitPointResponse.cshtml" />
+            </Component>
+            <Component Id="cmpAD6650D4943208D8BBF2F0AEB8530C3F" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{C40436C1-0004-49B1-8B3C-4FFC004D2C8E}">
+                <File Id="fil83D787347C3FC432EAEB86BD46052058" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\PagedJobResponse.cshtml" />
+            </Component>
+            <Component Id="cmpF487A159A1729E80F681B2C6CE773FA4" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{191631F9-CA41-4A73-8D24-C8556E40CA5B}">
+                <File Id="fil1687352B6669948DE02EE6A9F3F74874" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\PagedStatisticsResponse.cshtml" />
+            </Component>
+            <Component Id="cmp13F95D34A21E6F497935005F6C1FC610" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{2C09C1C0-2263-45DB-B4CF-B528379018E8}">
+                <File Id="filCD210AC3F770D4AF4C07C8EB02317D24" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\PagedTransactionResponse.cshtml" />
+            </Component>
+            <Component Id="cmpD516EE24DA133EC5E2D1CCAD3FD3A6C8" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{9ECE1876-DFA2-430B-916D-9776D46E8A92}">
+                <File Id="fil03CFB448B3EAFBD5B337B1673EB9CC69" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\sample.html" />
+            </Component>
+            <Component Id="cmp0AA490E6400CECE6176113FF29D86A65" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{2AF683C1-2D58-48F0-B155-9F3338C5A066}">
+                <File Id="fil246B9F9804BDAF6E555468267330F979" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\SparqlResult.cshtml" />
+            </Component>
+            <Component Id="cmpEBA5F9E7A47897CFAF4E4D6C2CCF2B1C" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{2C4F31CC-3F94-4DE9-888F-233F367F0EE5}">
+                <File Id="fil8C498551E67BC5BE551E92B585D46D06" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\SparqlUpdate.cshtml" />
+            </Component>
+            <Component Id="cmp575A221607F8B7999E699E84FE78C9CC" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{16DA76F6-3D9E-4B10-B396-FB2A54BC86D7}">
+                <File Id="fil6D7065F973878A4A1CF2BA1099745640" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\StoreDeleted.cshtml" />
+            </Component>
+            <Component Id="cmp6E57E5FFEFD2ADF2166CB1452270607C" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{4DAB6921-DAE3-4F06-9ED9-839A02BDEF44}">
+                <File Id="fil44304D3A5808AFA6A98C2F6117ED79F4" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\StoreResponse.cshtml" />
+            </Component>
+            <Component Id="cmp9030050F0622E4B0D89042C89917AE31" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{D5BFD73B-C1B9-4CB6-BE3B-726D851BE79D}">
+                <File Id="fil469C655168D8C4861797261CB741850A" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\StoresResponse.cshtml" />
+            </Component>
+            <Component Id="cmpBA7DF4F01FF4CEBA29A1AF7FC2580B8E" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{4EAD7B02-6765-453D-B6AD-52E1BB00C4A4}">
+                <File Id="filECB50816EB3F0BE5846F25DFE5871D43" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\StoresResponseObject.sshtml" />
+            </Component>
+            <Component Id="cmp9A523B3434494F44FD1124137CD2EEDF" Directory="dir61B199D127A0B5F37C4F9AA6F4211CE6" Guid="{4DF31E20-4A5A-4C05-902D-F8D82C9A0C24}">
+                <File Id="filC52EEE06DA47562186FA54A122A4D476" KeyPath="yes" Source="$(var.SourceFiles.Webapp)\views\_Layout.cshtml" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

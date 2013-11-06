@@ -12,7 +12,7 @@
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <Name>BrightstarDB</Name>
-    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dSourceFiles.Service=..\InstallerTmp\Service -dSourceFiles.Tools=..\InstallerTmp\Tools -dSourceFiles.Samples=..\InstallerTmp\Samples -dSourceFiles.SparqlService=..\InstallerTmp\SparqlService  -dSourceFiles.SDShareService=..\InstallerTmp\SDShare\Service -dSourceFiles.SDShareSamples=..\InstallerTmp\SDShare\Samples -dSourceFiles.SDShareDocs=..\InstallerTmp\SDShare\Docs -dSourceFiles.SDShareRoot=..\InstallerTmp\SDShare\Root -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
+    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dSourceFiles.Service=..\InstallerTmp\Service -dSourceFiles.Tools=..\InstallerTmp\Tools -dSourceFiles.Samples=..\InstallerTmp\Samples -dSourceFiles.SparqlService=..\InstallerTmp\SparqlService  -dSourceFiles.Webapp=..\InstallerTmp\Webapp -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
     <SuppressIces>ICE30</SuppressIces>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -39,6 +39,7 @@
     <Compile Include="Samples.wxs" />
     <Compile Include="SdkFiles.wxs" />
     <Compile Include="ServiceFiles.wxs" />
+    <Compile Include="Webapp.wxs" />
     <Compile Include="Tools.wxs" />
     <Compile Include="UI.wxs" />
     <Compile Include="Urls.wxs" />
@@ -65,6 +66,7 @@
     <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="ServiceFiles.wxs" Directory="..\InstallerTmp\Service" ComponentGroupName="serviceFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SERVICEDIR" PreprocessorVariable="var.SourceFiles.Service" />
     <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="Tools.wxs" Directory="..\InstallerTmp\Tools" ComponentGroupName="toolsFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="TOOLSDIR" PreprocessorVariable="var.SourceFiles.Tools" />
     <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="Samples.wxs" Directory="..\InstallerTmp\Samples" ComponentGroupName="samplesFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="SAMPLESDIR" PreprocessorVariable="var.SourceFiles.Samples" />
+    <HeatDirectory ToolPath="$(WixToolPath)" OutputFile="Webapp.wxs" Directory="..\InstallerTmp\Webapp" ComponentGroupName="webappFilesComponentGroup" GenerateGuidsNow="true" SuppressCom="true" SuppressRegistry="true" SuppressRootDirectory="true" DirectoryRefId="WEBAPPDIR" PreprocessorVariable="var.SourceFiles.Webapp" />
   </Target>
   <ItemGroup>
     <BootstrapperFile Include=".NETFramework,Version=v4.0">

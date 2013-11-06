@@ -141,6 +141,7 @@
           <Directory Id="VSDIR" Name="VisualStudio"/>
           <Directory Id="TOOLSDIR" Name="Tools"/>
           <Directory Id="LMDIR" Name="LicenseManager"/>
+          <Directory Id="WEBAPPDIR" Name="Webapp" />
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
@@ -196,6 +197,9 @@
 
       <ComponentGroupRef Id="samplesFilesComponentGroup"/>
 
+      <ComponentGroupRef Id="webappFilesComponentGroup" />
+        
+      
       <ComponentRef Id="DocsShortcuts"/>
 
       <Component Guid="{844DEDDC-DB9E-421E-8D58-D0932399193E}" Directory="INSTALLLOCATION"  Win64="$(var.Win64)">
@@ -213,6 +217,13 @@
         <File Id="brightstarServiceExeConfig" Source="..\InstallerTmp\ServiceExe\BrightstarService.exe.config" Vital="yes"/>
         <util:XmlFile Id="SetDataDirectory"
                 File="[SERVICEDIR]\BrightstarService.exe.config"
+                Action="setValue"
+                ElementPath="/configuration/brightstarService"
+                Name="connectionString"
+                Value="Type=embedded;StoresDirectory=[SERVICEDATADIR]"
+                Permanent="yes"/>
+        <util:XmlFile Id="SetWebappDataDirectory"
+                      File="[WEBAPPDIR]\Web.config"
                 Action="setValue"
                 ElementPath="/configuration/brightstarService"
                 Name="connectionString"

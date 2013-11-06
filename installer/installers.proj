@@ -107,6 +107,11 @@
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityDefinition.zip"/>
       <Polaris Include="..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\*.dll;
 			..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\Polaris.exe"/>
+      <AspNetServerBin Include="..\src\core\BrightstarDB.Server.AspNet\bin\*.dll"/>
+      <AspNetServerAssets Include="..\src\core\BrightstarDB.Server.AspNet\assets\**\*.*" />
+      <AspNetServerViews  Include="..\src\core\BrightstarDB.Server.AspNet\views\**\*.*" />
+      <AspNetServerConfig Include="..\src\core\BrightstarDB.Server.AspNet\Web.config" />
+      
       <Samples Include="..\samples\Samples\**\*.*"
                Exclude="..\samples\**\.svn\**\*.*;
 			..\samples\**\bin\**\*.*;
@@ -134,6 +139,10 @@
     <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\ItemTemplates"/>
     <Copy SourceFiles="@(Polaris)" DestinationFolder="InstallerTmp\Tools\Polaris"/>
     <Copy SourceFiles="@(Samples)" DestinationFiles="@(Samples->'InstallerTmp\Samples\%(recursivedir)%(filename)%(extension)')"/>
+    <Copy SourceFiles="@(AspNetServerBin)" DestinationFolder="InstallerTmp\Webapp\bin" />
+    <Copy SourceFiles="@(AspNetServerAssets)" DestinationFolder="InstallerTmp\Webapp\assets" />
+    <Copy SourceFiles="@(AspNetServerViews)"  DestinationFolder="InstallerTmp\Webapp\views" />
+    <Copy SourceFiles="@(AspNetServerConfig)" DestinationFolder="InstallerTmp\Webapp" />
   </Target>
 
   <Target Name="PrepareSdk" DependsOnTargets="Version;BuildNet40;BuildWP71">
