@@ -136,7 +136,8 @@ namespace BrightstarDB.Storage
 
         public IEnumerable<string> ListSubDirectories(string dirName)
         {
-            return _isolatedStorage.GetDirectoryNames();
+            if(!_isolatedStorage.DirectoryExists(dirName)) throw new FileNotFoundException("Cannot find directory '{0}'", dirName);
+            return _isolatedStorage.GetDirectoryNames(dirName+"\\*");
         }
 
         public void RenameFile(string storeConsolidateFile, string storeDataFile)
