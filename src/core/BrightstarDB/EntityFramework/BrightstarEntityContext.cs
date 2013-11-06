@@ -120,7 +120,7 @@ namespace BrightstarDB.EntityFramework
                 case ConnectionType.Embedded:
                     context = new EmbeddedDataObjectContext(connectionString);
                     break;
-#if !SILVERLIGHT && !PORTABLE && !__MonoCS__
+#if !SILVERLIGHT && !__MonoCS__
                 case ConnectionType.Rest:
                     context = new RestDataObjectContext(connectionString);
                     break;
