@@ -742,6 +742,7 @@ WHERE { ?s ?p 'foo' }";
             return triples.ToString();
         }
 
+#if !PORTABLE // Won't work on portable as requires direct access to server import directory
         [Test]
         public void TestSpecialCharsInIdentities()
         {
@@ -762,7 +763,7 @@ WHERE { ?s ?p 'foo' }";
                 testSource.CopyTo(importDir + Path.DirectorySeparatorChar + "persondata_en_subset.nt");
             }
 
-            var bc = BrightstarService.GetClient("type=http;endpoint=http://localhost:8090/brightstar");
+            var bc = BrightstarService.GetClient("type=rest;endpoint=http://localhost:8090/brightstar");
             var storeName = Guid.NewGuid().ToString();
             bc.CreateStore(storeName);
             var jobInfo = bc.StartImport(storeName, "persondata_en_subset.nt", null);
@@ -789,6 +790,7 @@ WHERE { ?s ?p 'foo' }";
 
             }
         }
+#endif
 
         [Test]
         public void TestConsolidateEmptyStore()
