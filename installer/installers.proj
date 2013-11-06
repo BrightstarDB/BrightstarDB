@@ -150,13 +150,21 @@
   </Target>
   
   <Target Name="BuildInstaller" DependsOnTargets="CleanInstallerTmp;Prepare">
+    <CallTarget Targets="_BuildInstaller" />
+  </Target>
+  
+  <Target Name="_BuildInstaller">
     <!-- Invoke the WIX project to build the installer -->
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
              Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
+    <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
+             Properties="Configuration=$(Configuration);Platform=x64;BuildNumber=$(BuildNumber)"/>
+    <MSBuild Projects="BrightstarDBBootstrapper\BrightstarDBBootstrapper.wixproj"
+             Properties="BuildNumber=$(BuildNumber)" />
     <ItemGroup>
-      <InstallerFiles Include="BrightstarDB\bin\$(Configuration)\setup.exe;BrightstarDB\bin\$(Configuration)\*.msi"/>
+      <InstallerFiles Include="BrightstarDBBootstrapper\bin\$(Configuration)\*.exe"/>
     </ItemGroup>
-    <Zip Files="@(InstallerFiles)" ZipFileName="$(OutputPath)\BrightstarDB-$(BuildNumber).zip" WorkingDirectory="BrightstarDB\bin\$(Configuration)"/>
+    <Copy SourceFiles="@(InstallerFiles)" DestinationFolder="$(OutputPath)"/>
   </Target>
 
   <!-- ============================================================ -->

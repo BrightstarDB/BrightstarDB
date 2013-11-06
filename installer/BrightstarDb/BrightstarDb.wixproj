@@ -19,11 +19,19 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
-    <CompilerAdditionalOptions>-dSourceFiles.Sdk=..\InstallerTmp\SDK -dSourceFiles.Docs=..\InstallerTmp\Docs -dSourceFiles.VisualStudio=..\InstallerTmp\VisualStudio -dSourceFiles.Service=..\InstallerTmp\Service -dSourceFiles.Tools=..\InstallerTmp\Tools -dSourceFiles.Samples=..\InstallerTmp\Samples  -dSourceFiles.SparqlService=..\InstallerTmp\SparqlService -dSourceFiles.SDShareService=..\InstallerTmp\SDShare\Service -dSourceFiles.SDShareSamples=..\InstallerTmp\SDShare\Samples -dSourceFiles.SDShareDocs=..\InstallerTmp\SDShare\Docs -dSourceFiles.SDShareRoot=..\InstallerTmp\SDShare\Root -dBuildNumber=$(BuildNumber)</CompilerAdditionalOptions>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DocFiles.wxs" />
@@ -32,6 +40,7 @@
     <Compile Include="SdkFiles.wxs" />
     <Compile Include="ServiceFiles.wxs" />
     <Compile Include="Tools.wxs" />
+    <Compile Include="UI.wxs" />
     <Compile Include="Urls.wxs" />
     <Compile Include="VisualStudioFiles.wxs" />
   </ItemGroup>
@@ -86,6 +95,9 @@
     <GetFrameworkSdkPath>
       <Output TaskParameter="Path" PropertyName="WindowsSdkPath" />
     </GetFrameworkSdkPath>
+    <!--
     <GenerateBootstrapper ApplicationFile="brightstardb.msi" ApplicationRequiresElevation="true" ApplicationName="BrightstarDB" BootstrapperItems="@(BootstrapperFile)" ComponentsLocation="HomeSite" CopyComponents="true" OutputPath="$(OutputPath)" Path="$(WindowsSdkPath)\Bootstrapper" />
+    -->
+    <Copy SourceFiles="$(OutputPath)\BrightstarDB.msi" DestinationFiles="..\BrightstarDBBootstrapper\BrightstarDB$(Platform).msi" />
   </Target>
 </Project>
