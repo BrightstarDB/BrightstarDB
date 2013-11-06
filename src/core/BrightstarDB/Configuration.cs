@@ -67,12 +67,10 @@ namespace BrightstarDB
                 store.CreateDirectory("brightstar");
             }
             StoreLocation = "brightstar";
-            LogLevel = "Error";
             TransactionFlushTripleCount = 1000;
             QueryCache = new NullCache();
 #elif PORTABLE
             StoreLocation = "brightstar";
-            LogLevel = "Error";
             TransactionFlushTripleCount = 1000;
             PageCacheSize = DefaultPageCacheSize;
             ResourceCacheLimit = DefaultResourceCacheLimit;
