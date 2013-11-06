@@ -24,20 +24,14 @@ namespace BrightstarDB.Server.Modules
                     {
                         if (Request.Method.ToUpperInvariant() == "HEAD")
                         {
-                            try
-                            {
-                                var storeName = parameters["storeName"];
-                                IEnumerable<ICommitPointInfo> commitPoints = brightstarService.GetCommitPoints(storeName, 0, 1);
-                                ICommitPointInfo commit = commitPoints.FirstOrDefault();
-                                return
-                                    Negotiate.WithHeader("Last-Modified", commit.CommitTime.ToString("r"))
-                                             .WithStatusCode(HttpStatusCode.OK)
-                                             .WithModel(new StoreResponseModel(parameters["storeName"]));
-                            }
-                            catch (Exception ex)
-                            {
-                                ex = ex;
-                            }
+                            var storeName = parameters["storeName"];
+                            IEnumerable<ICommitPointInfo> commitPoints = brightstarService.GetCommitPoints(storeName, 0,
+                                                                                                           1);
+                            ICommitPointInfo commit = commitPoints.FirstOrDefault();
+                            return
+                                Negotiate.WithHeader("Last-Modified", commit.CommitTime.ToString("r"))
+                                         .WithStatusCode(HttpStatusCode.OK)
+                                         .WithModel(new StoreResponseModel(parameters["storeName"]));
                         }
                         return new StoreResponseModel(parameters["storeName"]);
                     }
