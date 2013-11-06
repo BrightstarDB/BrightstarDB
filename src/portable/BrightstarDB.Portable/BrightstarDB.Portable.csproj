@@ -8,7 +8,7 @@
     <ProjectGuid>{365E38E3-EDA2-4A3D-9740-375EC496DF79}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BrightstarDB.Portable</RootNamespace>
+    <RootNamespace>BrightstarDB</RootNamespace>
     <AssemblyName>BrightstarDB.Portable</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Profile158</TargetFrameworkProfile>
@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\core\BrightstarDB\Strings.Designer.cs">
-      <Link>BrightstarDB\Strings.Designer.cs</Link>
+      <Link>Strings.Designer.cs</Link>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
@@ -56,11 +56,11 @@
     <Compile Include="Compatibility\Converter.cs" />
     <Compile Include="Compatibility\FileMode.cs" />
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\MD5.cs" />
-    <Compile Include="..\..\core\BrightStarDB\**\*.cs" Exclude="..\..\core\BrightstarDB\Strings*.cs;..\..\core\BrightStarDB\OData\**\*.cs;..\..\core\BrightstarDB\Test\**\*.cs;..\..\core\BrightstarDB\Server\HttpServer.cs;..\..\core\BrightstarDB\Client\Http*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarServiceClient.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarServiceClientExtensions.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarWcfServiceClient.cs;..\..\core\BrightstarDB\Client\BrightstarWcfClusterClient.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\HttpDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\HttpDataObjectStore.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Storage\FileStoreManager.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Storage\FileBlockProvider.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Properties\**\*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Analysis\**\*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NetTcpDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NetTcpDataObjectStore.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NamedPipeDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NamedPipeDataObjectStore.cs; ..\..\core\BrightstarDB\Client\ReplyMessageInspector.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BlobImportSource.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\RestJobInfo.cs;..\..\core\BrightstarDB\Dynamic\**\*.cs;..\..\core\BrightstarDB\Storage\Persistence\BinaryPageStore.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\SingleVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\TwoVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\ThreeVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\AccumulatorBase.cs;..\..\core\BrightstarDB\Query\Processor\Accumulator.cs;..\..\core\BrightstarDB\Query\Processor\VirtualizingAccumulator.cs;..\..\core\BrightstarDB\EntityFramework\**\*.*;..\..\core\BrightstarDB\Storage\Persistence\FilePersistenceManager.cs;..\..\core\BrightstarDB\Storage\Persistence\IsolatedStoragePersistenceManager.cs">
-      <Link>BrightstarDB\%(recursivedir)\%(filename)</Link>
+    <Compile Include="..\..\core\BrightStarDB\**\*.cs" Exclude="..\..\core\BrightstarDB\Strings*.cs;..\..\core\BrightStarDB\OData\**\*.cs;..\..\core\BrightstarDB\Test\**\*.cs;..\..\core\BrightstarDB\Server\HttpServer.cs;..\..\core\BrightstarDB\Client\Http*.cs;..\..\core\BrightstarDB\Client\BrightstarServiceClient.cs;..\..\core\BrightstarDB\Client\BrightstarServiceClientExtensions.cs;..\..\core\BrightstarDB\Storage\FileStoreManager.cs;..\..\core\BrightstarDB\Storage\FileBlockProvider.cs;..\..\core\BrightstarDB\Properties\**\*.cs;..\..\core\BrightstarDB\Analysis\**\*.cs;..\..\core\BrightstarDB\Client\RestJobInfo.cs;..\..\core\BrightstarDB\Dynamic\**\*.cs;..\..\core\BrightstarDB\Storage\Persistence\BinaryPageStore.cs;..\..\core\BrightstarDB\Query\Processor\SingleVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\TwoVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\ThreeVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\AccumulatorBase.cs;..\..\core\BrightstarDB\Query\Processor\Accumulator.cs;..\..\core\BrightstarDB\Query\Processor\VirtualizingAccumulator.cs;..\..\core\BrightstarDB\Storage\Persistence\FilePersistenceManager.cs;..\..\core\BrightstarDB\Storage\Persistence\IsolatedStoragePersistenceManager.cs">
+      <Link>%(recursivedir)\%(filename)</Link>
     </Compile>
     <EmbeddedResource Include="..\..\core\BrightstarDB\Strings.resx">
-      <Link>BrightstarDB\Strings.resx</Link>
+      <Link>Strings.resx</Link>
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
@@ -71,159 +71,6 @@
     <Compile Include="Adaptation\ProbingAdapterResolver.cs" />
     <Compile Include="..\..\mobile\relinq\RelinqCore\**\*.cs;..\..\mobile\relinq\*.cs" Exclude="..\..\mobile\relinq\RelinqCore\Properties\**\*.cs">
       <Link>relinq\%(recursivedir)\%(filename)</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\BrightstarEntityCollection.cs">
-      <Link>BrightstarDB\EntityFramework\\BrightstarEntityCollection</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\BrightstarEntityContext.cs">
-      <Link>BrightstarDB\EntityFramework\\BrightstarEntityContext</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\BrightstarEntityObject.cs">
-      <Link>BrightstarDB\EntityFramework\\BrightstarEntityObject</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\BrightstarEntityObjectComparer.cs">
-      <Link>BrightstarDB\EntityFramework\\BrightstarEntityObjectComparer</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\BrightstarEntitySet.cs">
-      <Link>BrightstarDB\EntityFramework\\BrightstarEntitySet</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\ClassAttributeAttribute.cs">
-      <Link>BrightstarDB\EntityFramework\\ClassAttributeAttribute</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\EntityAttribute.cs">
-      <Link>BrightstarDB\EntityFramework\\EntityAttribute</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\EntityContext.cs">
-      <Link>BrightstarDB\EntityFramework\\EntityContext</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\EntityFrameworkException.cs">
-      <Link>BrightstarDB\EntityFramework\\EntityFrameworkException</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\EntityMappingStore.cs">
-      <Link>BrightstarDB\EntityFramework\\EntityMappingStore</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\IBrightstarEntityCollection.cs">
-      <Link>BrightstarDB\EntityFramework\\IBrightstarEntityCollection</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\IdentifierAttribute.cs">
-      <Link>BrightstarDB\EntityFramework\\IdentifierAttribute</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\IEntityCollection.cs">
-      <Link>BrightstarDB\EntityFramework\\IEntityCollection</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\IEntityContextObject.cs">
-      <Link>BrightstarDB\EntityFramework\\IEntityContextObject</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\IEntityObject.cs">
-      <Link>BrightstarDB\EntityFramework\\IEntityObject</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\IEntitySet.cs">
-      <Link>BrightstarDB\EntityFramework\\IEntitySet</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\InvalidIdentityPropertyException.cs">
-      <Link>BrightstarDB\EntityFramework\\InvalidIdentityPropertyException</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\InversePropertyAttribute.cs">
-      <Link>BrightstarDB\EntityFramework\\InversePropertyAttribute</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\InversePropertyTypeAttribute.cs">
-      <Link>BrightstarDB\EntityFramework\\InversePropertyTypeAttribute</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\LiteralsCollection.cs">
-      <Link>BrightstarDB\EntityFramework\\LiteralsCollection</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\MappingNotFoundException.cs">
-      <Link>BrightstarDB\EntityFramework\\MappingNotFoundException</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\NamespaceDeclarationAttribute.cs">
-      <Link>BrightstarDB\EntityFramework\\NamespaceDeclarationAttribute</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\PropertyHint.cs">
-      <Link>BrightstarDB\EntityFramework\\PropertyHint</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\PropertyMappingType.cs">
-      <Link>BrightstarDB\EntityFramework\\PropertyMappingType</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\PropertyTypeAttribute.cs">
-      <Link>BrightstarDB\EntityFramework\\PropertyTypeAttribute</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\EntityFrameworkCollectionQueryExecutor</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\EntityFrameworkCollectionQueryProvider</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\EntityFrameworkQueryable.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\EntityFrameworkQueryable</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\EntityFrameworkQueryableFactory.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\EntityFrameworkQueryableFactory</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\EntityFrameworkQueryExecutor.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\EntityFrameworkQueryExecutor</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\ExpressionTreeVisitorBase.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\ExpressionTreeVisitorBase</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\FilterWriter.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\FilterWriter</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\GraphNode.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\GraphNode</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\SelectIdentifierVariableNameExpression.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\SelectIdentifierVariableNameExpression</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\SelectVariableNameExpression.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\SelectVariableNameExpression</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\SparqlGeneratorQueryModelVisitor.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\SparqlGeneratorQueryModelVisitor</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\SparqlGeneratorSelectExpressionBuilder.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\SparqlGeneratorSelectExpressionBuilder</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\SparqlGeneratorSelectExpressionTreeVisitor.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\SparqlGeneratorSelectExpressionTreeVisitor</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\SparqlGeneratorWhereExpressionTreeVisitor.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\SparqlGeneratorWhereExpressionTreeVisitor</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\SparqlOrdering.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\SparqlOrdering</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\SparqlQueryBuilder.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\SparqlQueryBuilder</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\SparqlQueryContext.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\SparqlQueryContext</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\TripleInfo.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\TripleInfo</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\Query\VariableBindingType.cs">
-      <Link>BrightstarDB\EntityFramework\Query\\VariableBindingType</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\ReflectionMappingException.cs">
-      <Link>BrightstarDB\EntityFramework\\ReflectionMappingException</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\ReflectionMappingProvider.cs">
-      <Link>BrightstarDB\EntityFramework\\ReflectionMappingProvider</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\RelativeOrAbsoluteIdentifierAttribute.cs">
-      <Link>BrightstarDB\EntityFramework\\RelativeOrAbsoluteIdentifierAttribute</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\ServiceProvider.cs">
-      <Link>BrightstarDB\EntityFramework\\ServiceProvider</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\TypeExtensions.cs">
-      <Link>BrightstarDB\EntityFramework\\TypeExtensions</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\TypeIdentifierPrefixAttribute.cs">
-      <Link>BrightstarDB\EntityFramework\\TypeIdentifierPrefixAttribute</Link>
-    </Compile>
-    <Compile Include="..\..\core\BrightstarDB\EntityFramework\UnattachedEntityCollection.cs">
-      <Link>BrightstarDB\EntityFramework\\UnattachedEntityCollection</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
