@@ -28,6 +28,9 @@ namespace BrightstarDB.Tests.DataObjectsTests
         }
 
         [Test]
+#if PORTABLE
+        [Ignore("Configuration not supported by DotNetRDF Portable")]
+#endif
         public void TestInitializeFromDnrStoreConfiguration()
         {
             var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
@@ -48,6 +51,9 @@ namespace BrightstarDB.Tests.DataObjectsTests
         }
 
         [Test]
+#if PORTABLE
+        [Ignore("Configuration not supported by DotNetRDF Portable")]
+#endif
         public void TestInitializeFromDnrQueryAndUpdateConfiguration()
         {
             var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
@@ -68,6 +74,9 @@ namespace BrightstarDB.Tests.DataObjectsTests
         }
 
         [Test]
+#if PORTABLE
+        [Ignore("Configuration not supported by DotNetRDF Portable")]
+#endif
         public void TestInitializeFromDnrStorageProvider()
         {
             var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");

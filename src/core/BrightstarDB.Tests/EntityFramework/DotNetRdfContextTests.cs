@@ -9,6 +9,9 @@ namespace BrightstarDB.Tests.EntityFramework
     public class DotNetRdfContextTests
     {
         [Test]
+#if PORTABLE
+        [Ignore("DotNetRDF PCL does not support loading files into store configuration")]
+#endif
         public void TestInitializeWithStoreConfiguration()
         {
             var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
