@@ -13,7 +13,10 @@ using System.IO.IsolatedStorage;
 
 namespace BrightstarDB
 {
-    internal class Configuration
+    /// <summary>
+    /// Provides the global default configuration for the BrightstarDB service and client
+    /// </summary>
+    public class Configuration
     {
         private const string StoreLocationPropertyName = "BrightstarDB.StoreLocation";
         private const string LogLevelPropertyName = "BrightstarDB.LogLevel";
