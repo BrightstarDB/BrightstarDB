@@ -24,6 +24,9 @@ namespace BrightstarDB.Portable.Phone.Tests
         [TestMethod]
         public void TestCreateStore()
         {
+            Configuration.ResourceCacheLimit = 10000;
+            Configuration.PageCacheSize = 4;
+
             var client = GetEmbeddedClient();
             var storeName = "TestCreateStore_" + _runId;
             var storePath = Path.Combine(TestConfiguration.StoreLocation, storeName);
