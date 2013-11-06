@@ -211,9 +211,9 @@
         <util:XmlFile Id="SetDataDirectory"
                 File="[SERVICEDIR]\BrightstarService.exe.config"
                 Action="setValue"
-                ElementPath="/configuration/appSettings/add[\[]@key='BrightstarDB.StoreLocation'[\]]"
-                Name="value"
-                Value="[SERVICEDATADIR]"
+                ElementPath="/configuration/brightstarService"
+                Name="connectionString"
+                Value="Type=embedded;StoresDirectory=[SERVICEDATADIR]"
                 Permanent="yes"/>
       </Component>
 
