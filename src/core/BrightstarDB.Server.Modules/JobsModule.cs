@@ -198,7 +198,7 @@ namespace BrightstarDB.Server.Modules
                         }
 
                         var jobUri = (string) storeName + "/jobs/" + queuedJobInfo.JobId;
-                        return Negotiate.WithMediaRangeModel("text/html", new JobResponseModel
+                        return Negotiate.WithModel(new JobResponseModel
                             {
                                 JobId = queuedJobInfo.JobId,
                                 StatusMessage = queuedJobInfo.StatusMessage,

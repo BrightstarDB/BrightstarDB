@@ -57,15 +57,18 @@
         </div>
         <div>
             <label class="form-label"for="fileName">Import/Export File Name:</label>
-            <input class="form-field long" type="text" id="fileName" name="fileName"/>
+            <input class="form-field long" type="text" id="fileName" name="fileName" />
+            <span id="fileNameValidation" class="validation"></span>
         </div>
         <div>
             <label class="form-label"for="graphUri">Graph URI</label>
             <input class="form-field long" type="text" id="graphUri" name="graphUri"/>
+            <span id="graphUriValidation" class="validation"></span>
         </div>
         <div>
             <label class="form-label"for="defaultGraphUri">Default Graph URI</label>
             <input class="form-field long" type="text" id="defaultGraphUri" name="defaultGraphUri"/>
+            <span id="defaultGraphUriValidation" class="validation"></span>
         </div>
         <div>
             <label class="form-label"for="preconditions">Pre-conditions</label>
@@ -82,10 +85,12 @@
         <div>
             <label class="form-label"for="expression">SPARQL Update Expression</label>
             <textarea class="form-field" id="expression" name="UpdateExpression" rows="5" cols="80"></textarea>
+            <span id="expressionValidation" class="validation"></span>
         </div>
         <div>
             <label class="form-label"for="targetStoreName">Target Store Name</label>
             <input class="form-field long" id="targetStoreName" name="targetStoreName"/>
+            <span id="targetStoreNameValidation" class="validation"></span>
         </div>
         <div>
             <label class="form-label"for="persistenceType">Target Store Persistence</label>
@@ -93,6 +98,7 @@
                 <option value="AppendOnly">Append Only (recommended)</option>
                 <option value="Rewrite">Rewrite</option>
             </select>
+            <span id="persistenceTypeValidation" class="validation"></span>
         </div>
         <button type="submit" id="createJobButton">Create Job</button>
     </fieldset>
@@ -115,24 +121,78 @@
             break;
         }
     });
+    function validateNotNull(inputId, paramName, obj) {
+        var val = $('#' + inputId).val();
+        if (val) {
+            obj[paramName] = val;
+            return true;
+        } else {
+            $('#' + inputId + 'Validation').text('Value is required');
+            return false;
+        }
+    }
+
+    function validateJobParameters() {
+        
+        var params = {};
+        var isValid = true;
+        $('.validation').text('');
+        switch ($('#jobType').val()) {
+            case 'Consolidate':
+                break;
+            case 'Import':
+                isValid = validateNotNull('fileName', 'FileName', params);
+                isValid = validateNotNull('defaultGraphUri', 'DefaultGraphUri', params) && isValid;
+                break;
+            case 'Export':
+                isValid = validateNotNull('fileName', 'FileName', params);
+                isValid = validateNotNull('graphUri', 'GraphUri', params) && isValid;
+                break;
+            case 'Transaction':
+                params.Preconditions = $('#preconditions').val();
+                params.Deletes = $('#deletes').val();
+                params.Inserts = $('#inserts').val();
+                params.DefaultGraphUri = $('#defaultGraphUri');
+                break;
+            case 'SparqlUpdate':
+                isValid = validateNotNull('expression', 'UpdateExpression', params);
+                break;
+            case 'UpdateStats':
+                break;
+            case 'CreateSnapshot':
+                isValid = validateNotNull('targetStoreName', 'TargetStoreName', params);
+                isValid = validateNotNull('persistenceType', 'PersistenceType', params) && isValid;
+                break;
+        }
+        return isValid ? params : null;
+    }
+    
     $('#createJobButton').click(function (event) {
         event.preventDefault();
-        $.ajax({
-            type: "POST",
-            url: "@Url.Content("~/"+Model.RequestProperties.StoreName+"/jobs")",
-            data: $('#newJobForm').serialize(),
-            dataType: 'json'
-        }).done(function(data) {
-            $('<tr></tr>').prependTo($('#jobsTable tbody'))
-                .append('<td>' + data.JobId + '</td>')
-                .append('<td>' + data.JobStatus + '</td>')
-                .append('<td></td>')
-                .append('<td></td>')
-                .append('<td>Job Queued</td>');
-        }).fail(function (jqXHR, textStatus) {
-            alert("Request failed: " + textStatus);
-            alert("Job creation failed. Please check the validity of all job arguments");
-        });
+        var jobParameters = validateJobParameters();
+        if (jobParameters) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Content("~/"+Model.RequestProperties.StoreName+"/jobs")",
+                contentType: 'application/json',
+                data: JSON.stringify ({
+                    StoreName: '@Model.RequestProperties.StoreName',
+                    JobType: $('#jobType').val(),
+                    JobParameters: jobParameters
+                }),
+                dataType: 'json'
+            }).done(function(data) {
+                $('<tr></tr>').prependTo($('#jobsTable tbody'))
+                    .append('<td>' + data.JobId + '</td>')
+                    .append('<td>' + data.JobStatus + '</td>')
+                    .append('<td></td>')
+                    .append('<td></td>')
+                    .append('<td>Job Queued</td>');
+            }).fail(function(jqXHR, textStatus) {
+                alert("Request failed: " + textStatus);
+                alert("Job creation failed. Please check the validity of all job arguments");
+            });
+        }
     });
     
 </script>

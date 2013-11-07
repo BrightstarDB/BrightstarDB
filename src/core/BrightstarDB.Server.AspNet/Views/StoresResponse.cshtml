@@ -3,6 +3,9 @@
     Layout = "_Layout";
     ViewBag.Title = "BrightstarDB: Stores";
 }
+@section Head {
+    <script src="~/assets/jquery-1.10.2.min.js" type="text/javascript"></script>
+}
 
 <nav>
     <ul class="breadcrumb horizontal">
@@ -12,12 +15,27 @@
 
 <section>
     <h1>@ViewBag.Title</h1>
+    
+
     <p>Stores available on this BrightstarDB server.</p>
 
-    <table class="items">
+    <div class="right">
+        <form id="newStoreForm">
+            <fieldset>
+                <legend>Create New Store</legend>
+                <div>
+                    <label class="form-label" for="storeName">Store Name:</label>
+                    <input id="storeName" name="StoreName" type="text"/>
+                </div>
+                <input id="newStoreButton" type="submit" />
+            </fieldset>
+        </form>
+    </div>
+
+    <table class="items" id="storesTable">
         <thead>
             <tr>
-                <td>Store</td>
+                <th>Store</th>
             </tr>
         </thead>
         <tbody>
@@ -29,4 +47,23 @@
             }
         </tbody>
     </table>
+    
 </section>
+
+<script type="text/javascript">
+    $('#newStoreButton').click(function(event) {
+        event.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "@Url.Content("~/")",
+            data: $('#newStoreForm').serialize(),
+            dataType: 'json'
+        }).done(function(data) {
+            $('<tr></tr>')
+                .appendTo($('#storesTable tbody'))
+                .append('<td><a href="' + data.Name + '">' + data.Name + '</a></td>');
+        }).fail(function (jqXHR, textStatus) {
+            alert("Request failed: " + textStatus);
+        });
+    });
+</script>

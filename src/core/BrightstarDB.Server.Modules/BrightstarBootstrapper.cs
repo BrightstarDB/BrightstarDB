@@ -66,7 +66,8 @@ namespace BrightstarDB.Server.Modules
             _brightstarService = brightstarService;
             _storePermissionsProvider = storePermissionsProvider;
             _systemPermissionsProvider = systemPermissionsProvider;
-            _rootPathProvider = new FixedRootPathProvider(rootPath);
+            _rootPathProvider = (rootPath == null ? new DefaultRootPathProvider() : new FixedRootPathProvider(rootPath) as IRootPathProvider);
+            //_rootPathProvider = new FixedRootPathProvider(rootPath);
         }
 
         protected override void ConfigureApplicationContainer(Nancy.TinyIoc.TinyIoCContainer container)
