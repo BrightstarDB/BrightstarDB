@@ -2,7 +2,7 @@
 @{
     Layout = "_Layout";
     Model.ExecuteQueryForHtml(null);
-    ViewBag.Title = "BrightstarDB: Store Deleted";
+    ViewBag.Title = "BrightstarDB: SPARQL Query";
 }
 
 <nav>
@@ -31,9 +31,7 @@
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
     <p>One or more errors occurred. See details below.</p>
-    <div class="error">
-        @Model.ErrorMessage
-    </div>
+    <div class="error">@Model.ErrorMessage</div>
 }
 else if (Model.HasFormattedResults)
 {
@@ -62,7 +60,6 @@ else if (Model.HasFormattedResults)
 }
 else
 {
-    
     <textarea readonly="readonly">@Model.RawResults</textarea>
 }
     </fieldset>

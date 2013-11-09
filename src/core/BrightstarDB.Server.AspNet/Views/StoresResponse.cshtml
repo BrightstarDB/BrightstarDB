@@ -14,25 +14,9 @@
 </nav>
 
 <section>
-    <h1>@ViewBag.Title</h1>
-    
-
     <p>Stores available on this BrightstarDB server.</p>
 
-    <div class="right">
-        <form id="newStoreForm">
-            <fieldset>
-                <legend>Create New Store</legend>
-                <div>
-                    <label class="form-label" for="storeName">Store Name:</label>
-                    <input id="storeName" name="StoreName" type="text"/>
-                </div>
-                <input id="newStoreButton" type="submit" />
-            </fieldset>
-        </form>
-    </div>
-
-    <table class="items" id="storesTable">
+    <table class="left items" id="storesTable">
         <thead>
             <tr>
                 <th>Store</th>
@@ -47,7 +31,18 @@
             }
         </tbody>
     </table>
-    
+    <div style="width:20em;display: inline-block;margin-top: 20px">
+        <form id="newStoreForm">
+            <fieldset>
+                <legend>Create New Store</legend>
+                <div style="margin-bottom: 1ex">
+                    <label class="form-label" for="storeName">Store Name:</label><br/>
+                    <input id="storeName" name="StoreName" type="text" style="width:100%"/>
+                </div>
+                <input id="newStoreButton" type="submit" value="New Store"/>
+            </fieldset>
+        </form>
+    </div>
 </section>
 
 <script type="text/javascript">

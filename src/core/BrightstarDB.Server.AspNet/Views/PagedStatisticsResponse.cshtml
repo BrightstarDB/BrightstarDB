@@ -15,54 +15,60 @@
 </nav>
 
 <section>
-    <h1>Store Statistics: @Model.RequestProperties.StoreName</h1>
     <noscript>
         <p>To see detailed statistics you need to enable Javascript.</p>
     </noscript>
-    <p>Click on a row to show the detailed statistics.</p>
-    <div class="left">
-        <table id="statistics" style="margin-top:0">
-            <thead>
-                <tr>
-                    <th>Statistics Timestamp</th>
-                    <th>Total Triple Count</th>
-                </tr>
-            </thead>
-            <tbody>
+        @if (Model.Items.Count == 0)
+        {
+            <p>No statistics available for this store yet. Create statistics by running a <a href="jobs">Update Statistics Job</a>.</p>
+            
+        }
+        else
+        {
+            <p>Click on a row to show the detailed statistics.</p>
+            <div class="left">
+                <table id="statistics" style="margin-top: 0">
+                    <thead>
+                        <tr>
+                            <th>Statistics Timestamp</th>
+                            <th>Total Triple Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr id="job-@item.CommitId">
+                                <td>@item.CommitTimestamp</td>
+                                <td>@item.TotalTripleCount</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @Html.Partial("ListPaging", Model)
+            </div>
+            <aside>
                 @foreach (var item in Model.Items)
                 {
-                    <tr id="job-@item.CommitId">
-                        <td>@item.CommitTimestamp</td>
-                        <td>@item.TotalTripleCount</td>
-                    </tr>
+                    <table id="detail-job-@item.CommitId" style="display: none">
+                        <thead>
+                            <tr>
+                                <th>Predicate</th>
+                                <th>Triple Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var entry in item.PredicateTripleCounts)
+                            {
+                                <tr>
+                                    <td>@entry.Key</td>
+                                    <td>@entry.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 }
-            </tbody>
-        </table>
-    @Html.Partial("ListPaging", Model)
-    </div>
-        <aside>
-        @foreach (var item in Model.Items)
-        {
-            <table id="detail-job-@item.CommitId" style="display: none">
-                <thead>
-                    <tr>
-                        <th>Predicate</th>
-                        <th>Triple Count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var entry in item.PredicateTripleCounts)
-                    {
-                        <tr>
-                            <td>@entry.Key</td>
-                            <td>@entry.Value</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            </aside>
         }
-    </aside>
-
 </section>
 
 <script type="text/javascript">

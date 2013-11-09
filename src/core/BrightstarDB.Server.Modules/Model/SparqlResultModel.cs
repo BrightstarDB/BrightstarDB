@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using BrightstarDB.Client;
 
@@ -64,7 +65,7 @@ namespace BrightstarDB.Server.Modules.Model
             }
             catch (Exception ex)
             {
-                ErrorMessage = ex.Message;
+                ErrorMessage = FormatExceptionMessages(ex);
                 return;
             }
             if (ResultsFormat == SparqlResultsFormat.Xml)
@@ -94,5 +95,28 @@ namespace BrightstarDB.Server.Modules.Model
             }
         }
 
+
+        private static string FormatExceptionMessages(Exception e)
+        {
+            var messages = new StringBuilder();
+            FormatExceptionMessages(e, 0, messages);
+            return messages.ToString();
+        }
+
+        private static void FormatExceptionMessages(Exception e, int currentDepth, StringBuilder buffer)
+        {
+            buffer.Append(' ', currentDepth*4);
+            buffer.AppendLine(e.Message);
+            if (e is AggregateException)
+            {
+                foreach (var inner in (e as AggregateException).InnerExceptions)
+                {
+                    FormatExceptionMessages(inner, currentDepth + 1, buffer);
+                }
+            } else if (e.InnerException != null)
+            {
+                FormatExceptionMessages(e.InnerException, currentDepth + 1, buffer);
+            }
+        }
     }
 }

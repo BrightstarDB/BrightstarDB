@@ -11,8 +11,6 @@
 		</ul>
 	</nav>
 
-	<h1>Store: @Model.Name</h1>
-
 	Currently available store operations are:
 	<ul>
 		<li><a href="@Model.SparqlQuery">SPARQL Query</a></li>
@@ -23,7 +21,7 @@
 		<li><a href="@Model.Transactions">Transaction History</a></li>
 	</ul>
 
-	<form method="POST">
-		<input type="hidden" name="X-HTTP-Method-Override" value="DELETE" />
-		<button type="submit">Delete Store</button>
-	</form>
+<form method="POST">
+    <input type="hidden" name="X-HTTP-Method-Override" value="DELETE" />
+    <button type="submit" class="linkbutton">Delete Store</button>
+</form>
