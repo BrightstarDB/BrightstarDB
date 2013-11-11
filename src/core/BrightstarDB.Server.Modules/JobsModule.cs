@@ -202,7 +202,11 @@ namespace BrightstarDB.Server.Modules
                             {
                                 JobId = queuedJobInfo.JobId,
                                 StatusMessage = queuedJobInfo.StatusMessage,
-                                JobStatus = queuedJobInfo.GetJobStatusString()
+                                JobStatus = queuedJobInfo.GetJobStatusString(),
+                                ExceptionInfo = queuedJobInfo.ExceptionInfo,
+                                QueuedTime = queuedJobInfo.QueuedTime,
+                                StartTime = queuedJobInfo.StartTime,
+                                EndTime = queuedJobInfo.EndTime
                             })
                             .WithHeader("Location", jobUri)
                             .WithStatusCode(HttpStatusCode.Created);

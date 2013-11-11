@@ -19,7 +19,6 @@ namespace BrightstarDB.Server.Modules
 
             Get["/{storeName}"] = parameters =>
                 {
-
                     if (brightstarService.DoesStoreExist(parameters["storeName"]))
                     {
                         if (Request.Method.ToUpperInvariant() == "HEAD")

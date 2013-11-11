@@ -1,4 +1,5 @@
-﻿using BrightstarDB.Client;
+﻿using System;
+using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using Moq;
@@ -53,15 +54,20 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestHeadExistingStoreReturnsOk()
         {
             // Setup
+            var mockCommitPoint = new Mock<ICommitPointInfo>();
+            mockCommitPoint.Setup(m => m.CommitTime).Returns(DateTime.UtcNow);
             var brightstar = new Mock<IBrightstarService>();
             brightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true);
+            brightstar.Setup(s => s.GetCommitPoints("foo", 0, 1)).Returns(new ICommitPointInfo[] {mockCommitPoint.Object});
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
             var response = app.Head("/foo");
-            
+            var responseContent = response.Body.AsString();
+
             // Assert
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Response status code was: {0}\nResponse body was: {1}",
+                response.StatusCode, responseContent);
         }
 
         [Test]

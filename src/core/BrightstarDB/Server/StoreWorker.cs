@@ -197,7 +197,7 @@ namespace BrightstarDB.Server
 
         public IEnumerable<JobExecutionStatus> GetJobs()
         {
-            return _jobExecutionStatus.Values.OrderBy(x => x.Started);
+            return _jobExecutionStatus.Values.OrderByDescending(x => x.Queued);
         }
 
         public JobExecutionStatus GetJobStatus(string jobId)
@@ -286,7 +286,7 @@ namespace BrightstarDB.Server
             {
                 if (
                     _jobExecutionStatus.TryAdd(job.JobId.ToString(),
-                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending}))
+                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending, Queued = DateTime.UtcNow}))
                 {
                     _jobs.Enqueue(job);
                     queuedJob = true;
@@ -329,7 +329,7 @@ namespace BrightstarDB.Server
             var jobId = Guid.NewGuid();
             var exportJob = new ExportJob(jobId, this, fileName, graphUri);
             _jobExecutionStatus.TryAdd(jobId.ToString(),
-                                       new JobExecutionStatus {JobId = jobId, JobStatus = JobStatus.Started});
+                                       new JobExecutionStatus {JobId = jobId, JobStatus = JobStatus.Started, Queued = DateTime.UtcNow, Started = DateTime.UtcNow});
             exportJob.Run((id, ex) =>
                               {
                                   JobExecutionStatus jobExecutionStatus;

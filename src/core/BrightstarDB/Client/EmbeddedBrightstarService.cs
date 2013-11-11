@@ -355,7 +355,7 @@ namespace BrightstarDB.Client
                 if (!waitForCompletion)
                 {
                     var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData, defaultGraphUri);
-                    return new JobInfoObject { JobId = jobId.ToString(), JobStatus = JobStatus.Pending};
+                    return new JobInfoObject(jobId);
                 }
                 else
                 {
@@ -366,12 +366,7 @@ namespace BrightstarDB.Client
                         Thread.Sleep(50);
                         status = _serverCore.GetJobStatus(storeName, jobId.ToString());
                     }
-                    return new JobInfoObject
-                        {
-                            JobId = jobId.ToString(),
-                            StatusMessage = status.Information,
-                            JobStatus = status.JobStatus,
-                        };
+                    return new JobInfoObject(status);
                 }
             }
             catch (Exception ex)
@@ -411,7 +406,7 @@ namespace BrightstarDB.Client
                 if (!waitForCompletion)
                 {
                     var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
-                    return new JobInfoObject{JobId=jobId.ToString(), JobStatus = JobStatus.Pending};
+                    return new JobInfoObject(jobId);
                 } else
                 {
                     var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
@@ -421,12 +416,7 @@ namespace BrightstarDB.Client
                         Thread.Sleep(50);
                         status = _serverCore.GetJobStatus(storeName, jobId.ToString());
                     }
-                    return new JobInfoObject
-                    {
-                        JobId = jobId.ToString(),
-                        StatusMessage = status.Information,
-                        JobStatus = status.JobStatus,
-                    };
+                    return new JobInfoObject(status);
                 }
             }
             catch (Exception ex)
@@ -449,13 +439,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobs = _serverCore.GetJobs(storeName).Skip(skip).Take(take);
-                return jobs.Select(jobStatus => new JobInfoObject
-                                                        {
-                                                            JobId = jobStatus.JobId.ToString(),
-                                                            StatusMessage = jobStatus.Information,
-                                                            ExceptionInfo = jobStatus.ExceptionDetail,
-                                                            JobStatus = jobStatus.JobStatus,
-                                                        }).Cast<IJobInfo>();
+                return jobs.Select(jobStatus => new JobInfoObject(jobStatus)).Cast<IJobInfo>();
             }
             catch (Exception ex)
             {
@@ -548,14 +532,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobStatus = _serverCore.GetJobStatus(storeName, jobId);
-                return
-                    new JobInfoObject
-                        {
-                            JobId = jobId,
-                            StatusMessage = jobStatus.Information,
-                            ExceptionInfo = jobStatus.ExceptionDetail,
-                            JobStatus = jobStatus.JobStatus
-                        };
+                return new JobInfoObject(jobStatus);
             }
             catch (Exception ex)
             {
@@ -576,7 +553,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.Import(storeName, fileName, graphUri);
-                return new JobInfoObject { JobId = jobId.ToString(), JobStatus = JobStatus.Pending};
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -597,7 +574,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.Export(store, fileName, graphUri);
-                return new JobInfoObject {JobId = jobId.ToString(), JobStatus = JobStatus.Pending};
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -617,7 +594,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.Consolidate(store);
-                return new JobInfoObject { JobId = jobId.ToString(), JobStatus = JobStatus.Pending};
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -762,7 +739,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.UpdateStatistics(storeName);
-                return new JobInfoObject {JobId = jobId.ToString(), JobStatus = JobStatus.Pending};
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -791,7 +768,7 @@ namespace BrightstarDB.Client
                                                        sourceCommitPoint == null
                                                            ? StoreConstants.NullUlong
                                                            : sourceCommitPoint.Id);
-                return new JobInfoObject {JobId = jobId.ToString(), JobStatus = JobStatus.Pending};
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -949,7 +926,7 @@ namespace BrightstarDB.Client
             {
                 var jobId = _serverCore.ReExecuteTransaction(storeName, transactionInfo.Id,
                                                              transactionInfo.TransactionType);
-                return new JobInfoObject {JobId = jobId.ToString(), JobStatus = JobStatus.Pending};
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {

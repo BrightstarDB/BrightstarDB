@@ -19,6 +19,21 @@ namespace BrightstarDB.Dto
         public ExceptionDetailObject ExceptionInfo { get; set; }
 
         /// <summary>
+        /// Get or set the Date/Time when the job was queued to be processed
+        /// </summary>
+        public DateTime QueuedTime { get; set; }
+
+        /// <summary>
+        /// Get or set the Date/Time when the job started to be processed
+        /// </summary>
+        public DateTime StartTime { get; set; }
+
+        /// <summary>
+        /// Get or set the Date/Time when the job completed processing
+        /// </summary>
+        public DateTime EndTime { get; set; }
+
+        /// <summary>
         /// Get or set the string identifier for the current job status
         /// </summary>
         public string JobStatus { get; set; }
@@ -27,16 +42,6 @@ namespace BrightstarDB.Dto
         /// Get or set the informational status message for the job
         /// </summary>
         public string StatusMessage { get; set; }
-        
-        /// <summary>
-        /// Get or set the date/time when the job started processing
-        /// </summary>
-        public DateTime Started { get; set; }
-
-        /// <summary>
-        /// Get or set the date/time when the job completed processing
-        /// </summary>
-        public DateTime Ended { get; set; }
         
         /// <summary>
         /// Get or set the name of the store where this job runs

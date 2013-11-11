@@ -8,15 +8,16 @@ namespace BrightstarDB.Server.Modules
         public static JobResponseModel MakeResponseObject(this IJobInfo arg, string storeName)
         {
             return new JobResponseModel
-            {
-                JobId = arg.JobId,
-                JobStatus = GetJobStatusString(arg),
-                StatusMessage = arg.StatusMessage,
-                StoreName = storeName,
-                ExceptionInfo = arg.ExceptionInfo
-               
-                // TODO: Extend IJobInfo with date/time stamp properties
-            };
+                {
+                    JobId = arg.JobId,
+                    JobStatus = GetJobStatusString(arg),
+                    StatusMessage = arg.StatusMessage,
+                    StoreName = storeName,
+                    ExceptionInfo = arg.ExceptionInfo,
+                    QueuedTime = arg.QueuedTime,
+                    StartTime = arg.StartTime,
+                    EndTime = arg.EndTime
+                };
         }
 
         public static string GetJobStatusString(this IJobInfo jobInfo)

@@ -89,6 +89,7 @@
             <tr>
                 <th>Job ID</th>
                 <th>Status</th>
+                <th>Queued</th>
                 <th>Started</th>
                 <th>Completed</th>
                 <th>Status Message</th>
@@ -100,8 +101,9 @@
                 <tr>
                     <td><a href="~/@Model.RequestProperties.StoreName/jobs/@item.JobId"></a>@item.JobId</td>
                     <td>@item.JobStatus</td>
-                    <td>@item.Started</td>
-                    <td>@item.Ended</td>
+                    <td>@item.QueuedTime</td>
+                    <td>@item.StartTime</td>
+                    <td>@item.EndTime</td>
                     <td>@item.StatusMessage</td>
                 </tr>
             }
@@ -200,6 +202,7 @@
                     .append('<td>' + data.JobStatus + '</td>')
                     .append('<td></td>')
                     .append('<td></td>')
+                    .append('<td>/<td>')
                     .append('<td>Job Queued</td>');
             }).fail(function(jqXHR, textStatus) {
                 alert("Request failed: " + textStatus);
