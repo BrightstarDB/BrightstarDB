@@ -329,7 +329,7 @@ namespace BrightstarDB.Client
             {
                 var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData,
                                                            defaultGraphUri);
-                return new JobInfoObject {JobId = jobId.ToString(), JobStatus = JobStatus.Pending};
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -383,7 +383,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
-                return new JobInfoObject { JobId = jobId.ToString(), JobStatus = JobStatus.Pending };
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
