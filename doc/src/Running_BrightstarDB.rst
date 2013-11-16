@@ -42,9 +42,9 @@ note:
 *********************************************
 
 The installer will create a windows service called "BrightstarDB". 
-This exposes a WCF service endpoint that can be used to access the database. 
-The configuration for this service can be found in BrightstarService.exe.config in the 
-`[INSTALLDIR]\Service` folder.
+This exposes a RESTful HTTP service endpoint that can be used to access the database. 
+The configuration for this service can be found in `BrightstarService.exe.config` in the 
+`[INSTALLDIR]\\Service` folder.
 
 *****************************************
  Running BrightstarDB as an Application
