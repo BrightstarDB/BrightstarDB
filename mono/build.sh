@@ -33,7 +33,7 @@ then
 fi
 if [ ! -d "$LIB_DIR"/service/views ]
 then
-    mkdir "$LIB_DIR"/service/views ]
+    mkdir "$LIB_DIR"/service/views
 fi
 cp -r ../src/core/BrightstarDB.Server.AspNet/Views/* "$LIB_DIR"/service/views
 cp -r ../src/core/BrightstarDB.Server.AspNet/assets/* "$LIB_DIR"/service/assets
