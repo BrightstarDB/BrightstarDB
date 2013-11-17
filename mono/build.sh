@@ -26,7 +26,17 @@ function build {
 buildComponent core BrightstarDB
 buildComponent core BrightstarDB.Server.Modules
 build core BrightstarDB.Server.Runner
-cp -r ../src/core/BrightstarDB.Server.Runner/bin/"$CONFIGURATION"/* "$LIB_DIR"/service
+cp ../src/core/BrightstarDB.Server.Runner/bin/"$CONFIGURATION"/* "$LIB_DIR"/service
+if [ ! -d "$LIB_DIR"/service/assets ]
+then
+    mkdir "$LIB_DIR"/service/assets
+fi
+if [ ! -d "$LIB_DIR"/service/views ]
+then
+    mkdir "$LIB_DIR"/service/views ]
+fi
+cp -r ../src/core/BrightstarDB.Server.AspNet/Views/* "$LIB_DIR"/service/views
+cp -r ../src/core/BrightstarDB.Server.AspNet/assets/* "$LIB_DIR"/service/assets
 
 # Build Tests
 #build core BrightstarDB.Tests
