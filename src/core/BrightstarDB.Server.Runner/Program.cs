@@ -14,40 +14,58 @@ namespace BrightstarDB.Server.Runner
         /// </summary>
         static void Main(string[] args)
         {
+#if __MonoCS__
+            if (AppDomain.CurrentDomain.FriendlyName == "BrightstarDB"){
+                RunAsService();
+            } else {
+                RunAsConsoleApp(args);
+            }
+#else
             if (Environment.UserInteractive)
             {
-                // Running from the command line
-                WriteWelcomeHeader();
-                var serviceArgs = new ServiceArgs();
-                if (CommandLine.Parser.ParseArgumentsWithUsage(args, serviceArgs))
-                {
-                    try
-                    {
-                        var bootstrapper = ServiceBootstrap.GetBootstrapper(serviceArgs);
-                        var baseUris = serviceArgs.BaseUris.Select(x => x.EndsWith("/") ? new Uri(x) : new Uri(x+"/")).ToArray();
-                        var nancyHost = new NancyHost(bootstrapper, new HostConfiguration{AllowChunkedEncoding=false}, baseUris);
-                        nancyHost.Start();
-                        Console.ReadLine();
-                        nancyHost.Stop();
-                    }
-                    catch (BootstrapperException ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Unhandled exception in server: {0}", ex.Message);
-                    }
-                }
+                RunAsConsoleApp(args);
             }
             else
             {
-                // Running as a service
-                var servicesToRun = new ServiceBase[]
-                    {
-                        new Service()
-                    };
-                ServiceBase.Run(servicesToRun);
+                RunAsService();
+            }
+#endif
+        }
+
+        private static void RunAsService()
+        {
+// Running as a service
+            var servicesToRun = new ServiceBase[]
+                {
+                    new Service()
+                };
+            ServiceBase.Run(servicesToRun);
+        }
+
+        private static void RunAsConsoleApp(string[] args)
+        {
+// Running from the command line
+            WriteWelcomeHeader();
+            var serviceArgs = new ServiceArgs();
+            if (CommandLine.Parser.ParseArgumentsWithUsage(args, serviceArgs))
+            {
+                try
+                {
+                    var bootstrapper = ServiceBootstrap.GetBootstrapper(serviceArgs);
+                    var baseUris = serviceArgs.BaseUris.Select(x => x.EndsWith("/") ? new Uri(x) : new Uri(x + "/")).ToArray();
+                    var nancyHost = new NancyHost(bootstrapper, new HostConfiguration {AllowChunkedEncoding = false}, baseUris);
+                    nancyHost.Start();
+                    Console.ReadLine();
+                    nancyHost.Stop();
+                }
+                catch (BootstrapperException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Unhandled exception in server: {0}", ex.Message);
+                }
             }
         }
 
