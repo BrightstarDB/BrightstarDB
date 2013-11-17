@@ -54,6 +54,7 @@ namespace BrightstarDB.Server.Runner
                     var bootstrapper = ServiceBootstrap.GetBootstrapper(serviceArgs);
                     var baseUris = serviceArgs.BaseUris.Select(x => x.EndsWith("/") ? new Uri(x) : new Uri(x + "/")).ToArray();
                     var nancyHost = new NancyHost(bootstrapper, new HostConfiguration {AllowChunkedEncoding = false}, baseUris);
+                    Nancy.StaticConfiguration.DisableErrorTraces = !serviceArgs.ShowErrorTraces;
                     nancyHost.Start();
                     Console.ReadLine();
                     nancyHost.Stop();

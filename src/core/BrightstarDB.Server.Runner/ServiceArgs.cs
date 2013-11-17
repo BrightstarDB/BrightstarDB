@@ -32,5 +32,9 @@ namespace BrightstarDB.Server.Runner
         [Argument(ArgumentType.AtMostOnce, HelpText = "The full path to the directory containing the Views and assets folder for the server",
             ShortName = "r")]
         public string RootPath;
+
+        [Argument(ArgumentType.AtMostOnce, ShortName = "t",
+            HelpText = "Configure Nancy to display error traces in the browser")] 
+        public bool ShowErrorTraces;
     }
 }
