@@ -42,7 +42,7 @@
                     <input class="form-field long" type="text" id="graphUri" name="graphUri"/>
                     <span id="graphUriValidation" class="validation"></span>
                 </div>
-                <div class="Import">
+                <div class="Import Transaction">
                     <label class="form-label"for="defaultGraphUri">Default Graph URI</label>
                     <input class="form-field long" type="text" id="defaultGraphUri" name="defaultGraphUri"/>
                     <span id="defaultGraphUriValidation" class="validation"></span>
@@ -167,7 +167,7 @@
             params.Preconditions = $('#preconditions').val();
             params.Deletes = $('#deletes').val();
             params.Inserts = $('#inserts').val();
-            params.DefaultGraphUri = $('#defaultGraphUri');
+            params.DefaultGraphUri = $('#defaultGraphUri').val();
             break;
         case 'SparqlUpdate':
             isValid = validateNotNull('expression', 'UpdateExpression', params);
