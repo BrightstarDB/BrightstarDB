@@ -7,7 +7,7 @@ into the main documentation.
 
 Version
 -------
-1.4
+1.5
 
 We welcome feedback, comments, feature requests and bug reports sent to 
 support@brightstardb.com.
@@ -62,5 +62,3 @@ This software makes use of a number of 3rd party libraries. Please refer to the
 NOTICE.txt file for details of those libraries and their licensing terms and
 conditions.
  
---
-Copyright (c) 2013 BrightstarDB Ltd
