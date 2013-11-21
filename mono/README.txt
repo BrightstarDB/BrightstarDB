@@ -10,7 +10,7 @@ progresses.
 Pre-requisites
 --------------
 
-The build has been developed and tested using Mono 3.2.3 in Ubuntu 13.04
+The build has been developed and tested using Mono 3.2.4 in Ubuntu 13.04
 if you have a different Mono version / platform configuration your
 mileage may well vary!
 
