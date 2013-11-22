@@ -13,7 +13,6 @@ namespace BrightstarDB.Storage.Persistence
     {
         private readonly BinaryFilePageStore _store;
         private readonly BinaryFilePage _page;
-        private readonly ulong _txnId;
         private bool _isModified;
         private byte[] _data;
 
@@ -21,7 +20,6 @@ namespace BrightstarDB.Storage.Persistence
         {
             _store = store;
             _page = page;
-            _txnId = currentTransactionId;
             _isModified = isModified;
             if (_page.FirstTransactionId > currentTransactionId && _page.SecondTransactionId > currentTransactionId)
             {

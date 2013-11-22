@@ -1,13 +1,13 @@
-﻿#if REST_CLIENT
+﻿//#if REST_CLIENT
 
-namespace BrightstarDB.Rdf
-{
-    internal class InvalidTripleException : BrightstarException
-    {
-        public InvalidTripleException(string message) : base(message){}
-    }
-}
-#else
+//namespace BrightstarDB.Rdf
+//{
+//    internal class InvalidTripleException : BrightstarException
+//    {
+//        public InvalidTripleException(string message) : base(message){}
+//    }
+//}
+//#else
 using BrightstarDB.Server;
 
 namespace BrightstarDB.Rdf
@@ -20,4 +20,4 @@ namespace BrightstarDB.Rdf
         }
     }
 }
-#endif
+//#endif

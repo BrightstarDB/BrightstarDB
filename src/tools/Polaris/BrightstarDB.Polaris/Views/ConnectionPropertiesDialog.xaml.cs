@@ -53,53 +53,15 @@ namespace BrightstarDB.Polaris.Views
                 case ConnectionType.Embedded:
                     DirectoryPathText.IsEnabled = true;
                     DirectorySelectorButton.IsEnabled = true;
-                    ServerNameText.Text = string.Empty;
-                    ServerNameText.IsEnabled = false;
-                    ServerPortText.Text = string.Empty;
-                    ServerPortText.IsEnabled = false;
-                    ServerPathText.Text = string.Empty;
-                    ServerPathText.IsEnabled = false;
-                    PipeNameText.Text = string.Empty;
-                    PipeNameText.IsEnabled = false;
+                    ServerEndpointText.Text = string.Empty;
+                    ServerEndpointText.IsEnabled = false;
                     break;
-                case ConnectionType.Http:
+                case ConnectionType.Rest:
                     DirectoryPathText.Text = string.Empty;
                     DirectoryPathText.IsEnabled = false;
                     DirectorySelectorButton.IsEnabled = false;
-                    ServerNameText.Text = "localhost";
-                    ServerNameText.IsEnabled = true;
-                    ServerPortText.Text = "8090";
-                    ServerPortText.IsEnabled = true;
-                    ServerPathText.Text = "brightstar";
-                    ServerPathText.IsEnabled = true;
-                    PipeNameText.Text = string.Empty;
-                    PipeNameText.IsEnabled = false;
-                    break;
-                case ConnectionType.Tcp:
-                    DirectoryPathText.Text = string.Empty;
-                    DirectoryPathText.IsEnabled = false;
-                    DirectorySelectorButton.IsEnabled = false;
-                    ServerNameText.Text = "localhost";
-                    ServerNameText.IsEnabled = true;
-                    ServerPortText.Text = "8095";
-                    ServerPortText.IsEnabled = true;
-                    ServerPathText.Text = "brightstar";
-                    ServerPathText.IsEnabled = true;
-                    PipeNameText.Text = string.Empty;
-                    PipeNameText.IsEnabled = false;
-                    break;
-                case ConnectionType.NamedPipe:
-                    DirectoryPathText.Text = string.Empty;
-                    DirectoryPathText.IsEnabled = false;
-                    DirectorySelectorButton.IsEnabled = false;
-                    ServerNameText.Text = "localhost";
-                    ServerNameText.IsEnabled = true;
-                    ServerPortText.Text = string.Empty;
-                    ServerPortText.IsEnabled = false;
-                    ServerPathText.Text = string.Empty;
-                    ServerPathText.IsEnabled = false;
-                    PipeNameText.Text = "brightstar";
-                    PipeNameText.IsEnabled = true;
+                    ServerEndpointText.Text = "http://localhost:8090/brightstar";
+                    ServerEndpointText.IsEnabled = true;
                     break;
             }
         }

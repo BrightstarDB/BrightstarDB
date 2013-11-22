@@ -40,6 +40,8 @@ namespace BrightstarDB.Storage.BTreeStore
             _persistenceManager = persistenceManager;
         }
 
+        public StoreConfiguration Configuration { get { return _configuration; } }
+
         #region Implementation of IStoreManager
 
         public IEnumerable<string> ListStores(string baseLocation)

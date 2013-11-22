@@ -1,4 +1,6 @@
 ﻿using System;
+using BrightstarDB.Dto;
+
 #if !SILVERLIGHT
 using System.ServiceModel;
 #endif
@@ -9,7 +11,7 @@ namespace BrightstarDB.Server
     {
         private readonly Guid _jobId;
         protected StoreWorker StoreWorker;
-        protected ExceptionDetail ExceptionDetail;
+        protected ExceptionDetailObject ExceptionDetail;
 
         protected Job(Guid jobId, StoreWorker storeWorker)
         {
@@ -34,7 +36,7 @@ namespace BrightstarDB.Server
         /// </summary>
         public string ErrorMessage { get; protected set; }
 
-        public ExceptionDetail ErrorInformation
+        public ExceptionDetailObject ErrorInformation
         {
             get { return ExceptionDetail; }
         }

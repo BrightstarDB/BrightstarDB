@@ -38,20 +38,18 @@
   
   <Import Project="..\common.proj"/>
 
+  <PropertyGroup>
+    <BuildNumber Condition="'$(BuildNumber)' == ''">$(Major).$(Minor).$(Build).$(Revision)</BuildNumber>
+  </PropertyGroup>
+  
   <Target Name="Version">
-    <Version FileName="$(BuildNumberFile)" Major="1" Minor="0" Increment="true" Condition=" '$(BuildNumber)' == '' ">
-      <Output PropertyName="BuildNumber" TaskParameter="BuildNumber"/>
-    </Version>
-    <Error Text="The BuildNumber property must be set to a value such as 1.0.234" Condition=" '$(BuildNumber)' == '' "/>
+    <Error Text="The BuildNumber property must be set to a value such as 1.5.0" Condition=" '$(BuildNumber)' == '' "/>
     <Message Text="Build number set to $(BuildNumber)"/>
   </Target>
   
   <Target Name="BuildNet40">
-    <MSBuild Projects="..\src\core\BrightstarDB\BrightstarDB.csproj" 
-	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" 
-			 Targets="Clean;Build"/>
-	<MSBuild Projects="..\src\core\BrightstarDB.ServerRunner\BrightstarDB.ServerRunner.csproj" 
-	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" 
+	<MSBuild Projects="..\src\core\core.sln"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
 			 Targets="Clean;Build"/>
   </Target>
 
@@ -61,7 +59,7 @@
   </Target>
 
   <Target Name="BuildDocs" Condition=" '$(NoDocs)' == 'False' ">
-    <MSBuild Projects="..\src\core\BrightstarDB.sln"
+    <MSBuild Projects="..\src\core\core.sln"
 			 Properties="Configuration=Debug;BuildNumber=$(BuildNumber)"
 			 Targets="Clean;Build"
 			 Condition="('$(Configuration)' != 'Debug')"/>
@@ -72,12 +70,6 @@
     <MSBuild Projects="..\src\tools\EntityFrameworkGenerator\build.proj"
 		     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
 			 Targets="Build"/>
-  </Target>
-  
-  <Target Name="BuildCore">
-	<MSBuild Projects="..\src\core\BrightstarDB.sln"
-			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
-			 Targets="Clean;Build"/>
   </Target>
   
   <Target Name="BuildPolaris">
@@ -93,8 +85,7 @@
     <Copy SourceFiles="@(SdkFiles)" DestinationFolder="..\samples\SDK\%(RecursiveDir)"/>
   </Target>
   
- 
-  <Target Name="Prepare" DependsOnTargets="Version;BuildCore;BuildNet40;BuildWP71;BuildDocs;BuildVisualStudio;BuildPolaris">
+  <Target Name="Prepare" DependsOnTargets="Version;BuildNet40;BuildWP71;BuildVisualStudio;BuildPolaris;BuildDocs">
     <ItemGroup>
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <Net40Dep Include="..\src\lib\unused_dependencies\*.dll;..\src\lib\Remotion.Linq.dll" />
@@ -102,11 +93,13 @@
       <WP71Dep Include="..\src\mobile\lib\Newtonsoft.Json.dll;
 			..\src\mobile\lib\Polenter.SharpSerializer.Silverlight.dll;
 			..\src\mobile\lib\System.Threading.Tasks.dll"/>
-	  <Service Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.dll"/>
-	  <ServiceExe Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.exe"
-			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe"/>
-	  <ServiceExe Include="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.config"
-			   Exclude="..\src\core\BrightstarDB.ServerRunner\bin\$(Configuration)\*.vshost.exe.config"/>
+	  <Service Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.dll"/>
+	  <ServiceAssets Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\assets\**\*.*"/>
+	  <ServiceViews Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\views\**\*.*"/>
+	  <ServiceExe Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.exe"
+			   Exclude="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.vshost.exe"/>
+	  <ServiceExe Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.config"
+			   Exclude="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.vshost.exe.config"/>
       <Docs Include="..\doc\build\api\BrightstarDB_API.chm"/>
       <VisualStudio Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.vsi"/>
       <Root Include="PackageFiles\README.txt;PackageFiles\EULA.rtf;PackageFiles\NOTICE.txt"/>
@@ -114,6 +107,11 @@
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityDefinition.zip"/>
       <Polaris Include="..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\*.dll;
 			..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\Polaris.exe"/>
+      <AspNetServerBin Include="..\src\core\BrightstarDB.Server.AspNet\bin\*.dll"/>
+      <AspNetServerAssets Include="..\src\core\BrightstarDB.Server.AspNet\assets\**\*.*" />
+      <AspNetServerViews  Include="..\src\core\BrightstarDB.Server.AspNet\views\**\*.*" />
+      <AspNetServerConfig Include="..\src\core\BrightstarDB.Server.AspNet\Web.config" />
+      
       <Samples Include="..\samples\Samples\**\*.*"
                Exclude="..\samples\**\.svn\**\*.*;
 			..\samples\**\bin\**\*.*;
@@ -123,21 +121,10 @@
 			..\samples\**\*.user;
 			..\samples\**\OData\**\*.*;
 			..\samples\Samples\**\Debug*.*"/>
-      <SparqlService Include="..\samples\Samples\SparqlService\BrightstarDB.SparqlService\**\*.*;"
-                     Exclude="..\samples\Samples\SparqlService\**\.svn\**\*.*;
-                              ..\samples\Samples\SparqlService\**\*.csproj;
-                              ..\samples\Samples\SparqlService\**\*.csproj.user;
-                              ..\samples\Samples\SparqlService\**\obj\**\*.*;
-                              ..\samples\Samples\SparqlService\**\*.cs;
-                              ..\samples\Samples\SparqlService\**\Web.Debug.config;
-                              ..\samples\Samples\SparqlService\**\Web.Release.config;
-                              ..\samples\Samples\SparqlService\**\Packages.config;
-                              ..\samples\Samples\SamplesConfiguration.cs" />
     </ItemGroup>
-    <RemoveDir Directories="InstallerTmp\SDK"/>
-    <RemoveDir Directories="InstallerTmp"/>
-    <MakeDir Directories="InstallerTmp"/>
     
+    <MakeDir Directories="InstallerTmp"/>
+
     <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\SDK\NET40"/>
     <Copy SourceFiles="@(Net40Dep)" DestinationFolder="InstallerTmp\SDK\NET40"/>
     <Copy SourceFiles="@(WP71Sdk)" DestinationFolder="InstallerTmp\SDK\WP71"/>
@@ -146,39 +133,17 @@
     <Copy SourceFiles="@(VisualStudio)" DestinationFolder="InstallerTmp\VisualStudio"/>
     <Copy SourceFiles="@(Root)" DestinationFolder="InstallerTmp"/>
     <Copy SourceFiles="@(Service)" DestinationFolder="InstallerTmp\Service"/>
+    <Copy SourceFiles="@(ServiceAssets)" DestinationFolder="InstallerTmp\Service\assets" />
+    <Copy SourceFiles="@(ServiceViews)" DestinationFolder="InstallerTmp\Service\views" />
     <Copy SourceFiles="@(ServiceExe)" DestinationFolder="InstallerTmp\ServiceExe"/>
     <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\ItemTemplates"/>
     <Copy SourceFiles="@(Polaris)" DestinationFolder="InstallerTmp\Tools\Polaris"/>
     <Copy SourceFiles="@(Samples)" DestinationFiles="@(Samples->'InstallerTmp\Samples\%(recursivedir)%(filename)%(extension)')"/>
-    <Copy SourceFiles="@(SparqlService)" DestinationFiles="@(SparqlService->'InstallerTmp\SparqlService\%(recursivedir)%(filename)%(extension)')"/>
+    <Copy SourceFiles="@(AspNetServerBin)" DestinationFolder="InstallerTmp\Webapp\bin" />
+    <Copy SourceFiles="@(AspNetServerAssets)" DestinationFolder="InstallerTmp\Webapp\assets" />
+    <Copy SourceFiles="@(AspNetServerViews)"  DestinationFolder="InstallerTmp\Webapp\views" />
+    <Copy SourceFiles="@(AspNetServerConfig)" DestinationFolder="InstallerTmp\Webapp" />
   </Target>
-
-  <Target Name="BuildSparqlEndpoint" DependsOnTargets="SamplesSDK">
-    <MSBuild Projects="..\samples\Samples\Server\SparqlService\SparqlService.sln"
-	     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
-  </Target>
-
-  <Target Name="PrepareSparqlEndpoint" DependsOnTargets="BuildSparqlEndpoint">
-    <ItemGroup>
-      <SparqlService Include="..\samples\Samples\Server\SparqlService\BrightstarDB.SparqlService\**\*.*;"
-                     Exclude="..\samples\Samples\Server\SparqlService\**\.svn\**\*.*;
-                              ..\samples\Samples\Server\SparqlService\**\*.csproj;
-                              ..\samples\Samples\Server\SparqlService\**\*.csproj.user;
-                              ..\samples\Samples\Server\SparqlService\**\obj\**\*.*;
-                              ..\samples\Samples\Server\SparqlService\**\*.cs;
-                              ..\samples\Samples\Server\SparqlService\**\Web.Debug.config;
-                              ..\samples\Samples\Server\SparqlService\**\Web.Release.config;
-                              ..\samples\Samples\Server\SparqlService\**\Packages.config;
-			      ..\samples\Samples\Server\SparqlService\**\*.pdb;
-			      ..\samples\Samples\Server\SparqlService\**\*.xml" />
-    </ItemGroup>
-    <RemoveDir Directories="InstallerTmp\SparqlService"/>
-    <MakeDir Directories="InstallerTmp\SparqlService"/>
-    
-    <Copy SourceFiles="@(SparqlService)"
-      DestinationFiles="@(SparqlService->'InstallerTmp\SparqlService\%(recursivedir)%(filename)%(extension)')" />
-  </Target>
-
 
   <Target Name="PrepareSdk" DependsOnTargets="Version;BuildNet40;BuildWP71">
     <ItemGroup>
@@ -189,57 +154,26 @@
     <Copy SourceFiles="@(WP71Sdk)" DestinationFolder="InstallerTmp\SDK\WP71"/>
   </Target>
 
-  <!-- ================================
-       SDShare Stuff
-       ================================ -->
-  
-  <Target Name="BuildSDShareCore">
-    <MSBuild Projects="..\src\sdshare\SDShare.sln"
-             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
-             Targets="Clean;Build"/>
-  </Target>
-
-  <Target Name="BuildSDShareDocs">
-    <!-- No Docs at the mo ?-->
+  <Target Name="CleanInstallerTmp">
+    <RemoveDir Directories="InstallerTmp" />
   </Target>
   
-  <Target Name="PrepareSDShare" DependsOnTargets="BuildSDShareCore;BuildSDShareDocs">
-    <ItemGroup>
-      <SDShareService  Include="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.dll"/>
-      <SDShareServiceExe Include="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.exe"
-			            Exclude="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.vshost.exe"/>
-      <SDShareService Include="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.config"
-			         Exclude="..\src\sdshare\BrightstarDB.SdShare.Server\bin\$(Configuration)\*.vshost.exe.config"/>
-      <SDShareSampleConfig Include="..\samples\Configuration\SdShareConfig.xml"/>
-      <SDShareSampleProviderSoln Include="..\src\sdshare\BrightstarDB.SdShare.SampleProvider\*.sln" />
-      <SDShareSampleProviderSrc Include="..\src\sdshare\BrightstarDB.SdShare.SampleProvider\BrightstarDB.SdShare.SampleProvider\*.cs" />
-      <SDShareSampleProviderProject Include="..\src\sdshare\BrightstarDB.SdShare.SampleProvider\BrightstarDB.SdShare.SampleProvider\*.csproj" />
-      <SDShareSampleProviderProperties Include="..\src\sdshare\BrightstarDB.SdShare.SampleProvider\BrightstarDB.SdShare.SampleProvider\Properties\*.*;" />
-      <SDShareDocs Include="PackageFiles\SdShare\BrightstarDB SdShare Server.pdf"/>
-      <SDShareRoot Include="PackageFiles\SdShare\README.txt;PackageFiles\SdShare\NOTICE.txt"/>
-    </ItemGroup>
-    <RemoveDir Directories="InstallerTmp\SDShare"/>
-    <MakeDir Directories="InstallerTmp\SDShare"/>
-
-    <Copy SourceFiles="@(SDShareRoot)" DestinationFolder="InstallerTmp\SDShare\Root"/>
-    <Copy SourceFiles="@(SDShareDocs)" DestinationFolder="InstallerTmp\SDShare\Docs"/>
-    <Copy SourceFiles="@(SDShareService)" DestinationFolder="InstallerTmp\SDShare\Service"/>
-    <Copy SourceFiles="@(SDShareServiceExe)" DestinationFolder="InstallerTmp\SDShare\Service"/>
-    <Copy SourceFiles="@(SDShareSampleConfig)" DestinationFolder="InstallerTmp\SDShare\Service"/>
-    <Copy SourceFiles="@(SDShareSampleProviderSoln)" DestinationFolder="InstallerTmp\SDShare\Samples\SampleProvider"/>
-    <Copy SourceFiles="@(SDShareSampleProviderSrc)" DestinationFolder="InstallerTmp\SDShare\Samples\SampleProvider\BrightstarDB.SdShare.SampleProvider"/>
-    <Copy SourceFiles="@(SDShareSampleProviderProject)" DestinationFolder="InstallerTmp\SDShare\Samples\SampleProvider\BrightstarDB.SdShare.SampleProvider"/>
-    <Copy SourceFiles="@(SDShareSampleProviderProperties)" DestinationFolder="InstallerTmp\SDShare\Samples\SampleProvider\BrightstarDB.SdShare.SampleProvider\Properties"/>
+  <Target Name="BuildInstaller" DependsOnTargets="CleanInstallerTmp;Prepare">
+    <CallTarget Targets="_BuildInstaller" />
   </Target>
-
-  <Target Name="BuildInstaller" DependsOnTargets="Prepare;PrepareSparqlEndpoint;PrepareSDShare">
+  
+  <Target Name="_BuildInstaller">
     <!-- Invoke the WIX project to build the installer -->
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
              Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"/>
+    <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
+             Properties="Configuration=$(Configuration);Platform=x64;BuildNumber=$(BuildNumber)"/>
+    <MSBuild Projects="BrightstarDBBootstrapper\BrightstarDBBootstrapper.wixproj"
+             Properties="BuildNumber=$(BuildNumber)" />
     <ItemGroup>
-      <InstallerFiles Include="BrightstarDB\bin\$(Configuration)\setup.exe;BrightstarDB\bin\$(Configuration)\*.msi"/>
+      <InstallerFiles Include="BrightstarDBBootstrapper\bin\$(Configuration)\*.exe"/>
     </ItemGroup>
-    <Zip Files="@(InstallerFiles)" ZipFileName="$(OutputPath)\BrightstarDB-$(BuildNumber).zip" WorkingDirectory="BrightstarDB\bin\$(Configuration)"/>
+    <Copy SourceFiles="@(InstallerFiles)" DestinationFolder="$(OutputPath)"/>
   </Target>
 
   <!-- ============================================================ -->

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Server;
@@ -477,31 +478,31 @@ namespace BrightstarDB.InternalTests
             [Test]
             public void TestImportAndLookupPerformance()
             {
-                if (!File.Exists(BrightstarDB.Configuration.StoreLocation + "\\import\\bsbm_5m.nt"))
+                if (!File.Exists(Configuration.StoreLocation + "\\import\\bsbm_5m.nt"))
                 {
                     Assert.Inconclusive("Cannot locate required test file at {0}. Test will not run.",
-                        BrightstarDB.Configuration.StoreLocation + "\\import\\bsbm_5m.nt");
+                        Configuration.StoreLocation + "\\import\\bsbm_5m.nt");
                     return;
                 }
                 var storeId = Guid.NewGuid().ToString();
-                _storeManager.CreateStore(BrightstarDB.Configuration.StoreLocation + "\\" + storeId);
+                _storeManager.CreateStore(Configuration.StoreLocation + "\\" + storeId);
                 var timer = new Stopwatch();
-                var storeWorker = new StoreWorker(BrightstarDB.Configuration.StoreLocation, storeId);
+                var storeWorker = new StoreWorker(Configuration.StoreLocation, storeId);
                 storeWorker.Start();
                 timer.Start();
                 var jobId = storeWorker.Import("bsbm_5m.nt", Constants.DefaultGraphUri).ToString();
-                JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
+                JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId);
                 while (jobStatus.JobStatus == JobStatus.Pending || jobStatus.JobStatus == JobStatus.Started)
                 {
                     Thread.Sleep(100);
-                    jobStatus = storeWorker.GetJobStatus(jobId.ToString());
+                    jobStatus = storeWorker.GetJobStatus(jobId);
                 }
 
                 timer.Stop();
                 Console.WriteLine("Time to import 5M triples test file: " + timer.ElapsedMilliseconds);
 
-                var store = _storeManager.OpenStore(BrightstarDB.Configuration.StoreLocation + "\\" + storeId);
-                var validator = new TriplesValidator(store, BrightstarDB.Configuration.StoreLocation + "\\import\\bsbm_5m.nt" );
+                var store = _storeManager.OpenStore(Configuration.StoreLocation + "\\" + storeId);
+                var validator = new TriplesValidator(store, Configuration.StoreLocation + "\\import\\bsbm_5m.nt" );
                 timer.Reset();
                 timer.Start();
                 validator.Run();

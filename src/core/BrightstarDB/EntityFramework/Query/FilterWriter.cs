@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using BrightstarDB.Rdf;
 
 namespace BrightstarDB.EntityFramework.Query
 {
@@ -170,6 +171,19 @@ namespace BrightstarDB.EntityFramework.Query
                     }
                     else
                     {
+                        if (typeof (PlainLiteral) == (propertyInfo.DeclaringType))
+                        {
+                            if ("Language".Equals(propertyInfo.Name))
+                            {
+                                WriteFunction("LANG", expression.Expression);
+                                return expression;
+                            }
+                            if ("Value".Equals(propertyInfo.Name))
+                            {
+                                WriteFunction("STR", expression.Expression);
+                                return expression;
+                            }
+                        }
                         if (typeof (String).Equals(propertyInfo.DeclaringType))
                         {
                             if ("Length".Equals(propertyInfo.Name))
@@ -277,6 +291,16 @@ namespace BrightstarDB.EntityFramework.Query
                 if (!String.IsNullOrEmpty(dt))
                 {
                     _filterExpressionBuilder.AppendFormat("^^<{0}>", dt);
+                }
+                return expression;
+            }
+            if (expressionType == typeof (PlainLiteral))
+            {
+                var pl = expression.Value as PlainLiteral;
+                _filterExpressionBuilder.Append(MakeSparqlStringConstant(pl.Value));
+                if (!pl.Language.Equals(String.Empty))
+                {
+                    _filterExpressionBuilder.AppendFormat("@{0}", pl.Language);
                 }
                 return expression;
             }
@@ -591,6 +615,41 @@ namespace BrightstarDB.EntityFramework.Query
             return base.VisitUnaryExpression(expression);
         }
 
+        protected override Expression VisitQuerySourceReferenceExpression(Remotion.Linq.Clauses.Expressions.QuerySourceReferenceExpression expression)
+        {
+            Expression mappedExpression;
+            if (QueryBuilder.TryGetQuerySourceMapping(expression.ReferencedQuerySource, out mappedExpression))
+            {
+#if WINDOWS_PHONE || PORTABLE
+                if (mappedExpression is SelectVariableNameExpression)
+                {
+                    return VisitSelectVariableNameExpression(mappedExpression as SelectVariableNameExpression);
+                }
+                return VisitExpression(mappedExpression);
+#else
+                return VisitExpression(mappedExpression);
+#endif
+            }
+            return base.VisitQuerySourceReferenceExpression(expression);
+        }
+
+#if !WINDOWS_PHONE && !PORTABLE
+        protected override Expression VisitExtensionExpression(Remotion.Linq.Clauses.Expressions.ExtensionExpression expression)
+        {
+            if (expression is SelectVariableNameExpression)
+            {
+                return VisitSelectVariableNameExpression(expression as SelectVariableNameExpression);
+            }
+            return base.VisitExtensionExpression(expression);
+        }
+#endif
+
+        protected Expression VisitSelectVariableNameExpression(SelectVariableNameExpression expression)
+        {
+            _filterExpressionBuilder.AppendFormat("?{0}", expression.Name);
+            return expression;
+        }
+
         protected override Expression VisitBinaryExpression(BinaryExpression expression)
         {
             return _parent.VisitExpression(expression);
@@ -614,7 +673,7 @@ namespace BrightstarDB.EntityFramework.Query
         public void WriteRegexFilter(Expression expression, string s, string flags =null)
         {
             _filterExpressionBuilder.Append("(regex(");
-            var expr = VisitExpression(expression);
+            VisitExpression(expression);
             _filterExpressionBuilder.Append(", ");
             _filterExpressionBuilder.Append(MakeSparqlConstant(s));
             if (flags != null)

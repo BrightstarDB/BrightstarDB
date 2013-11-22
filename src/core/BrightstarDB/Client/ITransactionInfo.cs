@@ -1,4 +1,5 @@
 ﻿using System;
+using BrightstarDB.Dto;
 
 namespace BrightstarDB.Client
 {
@@ -20,12 +21,12 @@ namespace BrightstarDB.Client
         /// <summary>
         /// Get the type of transaction
         /// </summary>
-        BrightstarTransactionType TransactionType { get; }
+        TransactionType TransactionType { get; }
 
         /// <summary>
         /// Get the status of the transaction
         /// </summary>
-        BrightstarTransactionStatus Status { get; }
+        TransactionStatus Status { get; }
         
         /// <summary>
         /// Get the unique identifier of the job that processed this transaction

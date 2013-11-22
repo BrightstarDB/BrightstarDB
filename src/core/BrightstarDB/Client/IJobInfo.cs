@@ -1,6 +1,5 @@
-﻿#if !SILVERLIGHT
-using System.ServiceModel;
-#endif
+﻿using System;
+using BrightstarDB.Dto;
 
 namespace BrightstarDB.Client
 {
@@ -42,6 +41,21 @@ namespace BrightstarDB.Client
         /// <summary>
         /// Exception information
         /// </summary>
-        ExceptionDetail ExceptionInfo { get; }
+        ExceptionDetailObject ExceptionInfo { get; }
+
+        /// <summary>
+        /// Get the Date/Time when the job was queued to be processed
+        /// </summary>
+        DateTime QueuedTime { get; }
+
+        /// <summary>
+        /// Get the Date/Time when the job started to be processed
+        /// </summary>
+        DateTime StartTime { get; }
+
+        /// <summary>
+        /// Get the Date/Time when the job completed processing
+        /// </summary>
+        DateTime EndTime { get; }
     }
 }

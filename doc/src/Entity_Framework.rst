@@ -982,6 +982,10 @@ optional parameters in the context constructor:
   * ``defaultDataSet`` : The identifier of the graphs that statements will be retrieved from. Defaults to all graphs in the store.
   * ``versionGraph`` : The identifier of the graph that contains version information for optimistic locking. Defaults to the same graph as ``updateGraph``.
 
+Please refer to the section :ref:`default_data_set` for more information about the
+default data set and its relationship to the ``defaultDataSet``, ``updateGraph``,
+and ``versionGraph`` parameters.
+
 To create a context that reads properties from the default graph and adds properties to a specific graph (e.g. for recording the results of inferences), use the following::
 
     // Set storeName, prefixes and inferredGraphUri here
@@ -992,17 +996,20 @@ To create a context that reads properties from the default graph and adds proper
 	  new string[] { Constants.DefaultGraphUri },
 	  Constants.DefaultGraphUri);
 
-  ..note::
+.. note::
 	Note that you need to be careful when using optimistic locking to ensure that you are 
 	consistent about which graph manages the version information. We recommend that you 
 	either use the BrightstarDB default graph (as shown in the example above)
 	or use another named graph seperate from the graphs that store the rest of the data 
 	(and define a constant for that	graph URI).
 
-  ..note::
-    For LINQ queries to work, the triple that assigns the entity type must be in one of
-	the graphs in the defaultDataSet or in the graph to be updated. This makes the 
-	Entity Framework a bit more difficult to use across multiple graphs. When 
-	writing an application that will regularly deal with different named graphs
-	you may want to consider using the ref:`Data Object Layer API <Data_Object_Layer>`
-	and SPARQL queries for update operations.
+LINQ and Graph Targeting
+------------------------
+
+For LINQ queries to work, the triple that assigns the entity type must be in one of
+the graphs in the default data set or in the graph to be updated. This makes the 
+Entity Framework a bit more difficult to use across multiple graphs. When 
+writing an application that will regularly deal with different named graphs
+you may want to consider using the :ref:`Data Object Layer API <Data_Object_Layer>`
+and SPARQL or the low-level RDF API for update operations.
+    

@@ -74,16 +74,16 @@
         DestinationFiles="samples\Embedded\EntityFramework\ChangeTracking\MyEntityContext.tt" />
     <Copy
         SourceFiles="@(TTFile)"
-        DestinationFiles="Samples\Mobile\BrightstarNotes\DataModel\NotesContext.tt"/>
+        DestinationFiles="Samples\WP7\BrightstarNotes\DataModel\NotesContext.tt"/>
     <Copy
         SourceFiles="@(TTFile)"
-        DestinationFiles="Samples\Mobile\GettingStarted\DataModel\NotesContext.tt"/>
+        DestinationFiles="Samples\WP7\GettingStarted\DataModel\NotesContext.tt"/>
     <Copy
-		SourceFiles="@(TTFile)"
-		DestinationFiles="Samples\Mobile\ReferenceDataConsumer\DataModel\DiningGuideContext.tt"/>
+        SourceFiles="@(TTFile)"
+        DestinationFiles="Samples\WP8\BrightstarNotes\DataModel\NotesContext.tt"/>
     <Copy
-		SourceFiles="@(TTFile)"
-		DestinationFiles="Samples\Mobile\ReferenceDataGenerator\DataModel\DiningGuideContext.tt"/>
+        SourceFiles="@(TTFile)"
+        DestinationFiles="Samples\WP8\GettingStarted\DataModel\NotesContext.tt"/>
   </Target>
   
   <Target Name="Prepare" DependsOnTargets="CopySdkFiles;CopyTTFiles"/>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BrightstarDB.Dto;
 using BrightstarDB.Storage;
 using BrightstarDB.Update;
 using VDS.RDF;

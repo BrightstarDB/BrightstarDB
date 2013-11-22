@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Portable.Deskt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Portable.Store.Tests", "Test\BrightstarDB.Portable.Store.Tests\BrightstarDB.Portable.Store.Tests.csproj", "{49B52EA0-94EF-4A8A-8955-686A80B7CD12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Portable.Desktop.RestClientTests", "Test\BrightstarDB.Portable.Desktop.RestClientTests\BrightstarDB.Portable.Desktop.RestClientTests.csproj", "{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -182,6 +184,20 @@ Global
 		{49B52EA0-94EF-4A8A-8955-686A80B7CD12}.Release|x86.ActiveCfg = Release|x86
 		{49B52EA0-94EF-4A8A-8955-686A80B7CD12}.Release|x86.Build.0 = Release|x86
 		{49B52EA0-94EF-4A8A-8955-686A80B7CD12}.Release|x86.Deploy.0 = Release|x86
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Release|ARM.ActiveCfg = Release|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Release|x64.ActiveCfg = Release|Any CPU
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -194,5 +210,6 @@ Global
 		{74E8278A-5A85-4826-9FCB-06D544259062} = {1A9C795E-6E5A-4585-BED5-5920948E2807}
 		{1FFC7051-C241-4642-9071-64F6A87FF3D9} = {1A9C795E-6E5A-4585-BED5-5920948E2807}
 		{49B52EA0-94EF-4A8A-8955-686A80B7CD12} = {1A9C795E-6E5A-4585-BED5-5920948E2807}
+		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95} = {1A9C795E-6E5A-4585-BED5-5920948E2807}
 	EndGlobalSection
 EndGlobal

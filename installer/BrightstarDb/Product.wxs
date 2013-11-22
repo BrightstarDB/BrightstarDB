@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension" xmlns:vs="http://schemas.microsoft.com/wix/VSExtension">
+  <?if $(var.Platform) = "x64" ?>
+    <?define ProductDisplayName = "BrightstarDB 64-bit"?>
+    <?define ProductUpgradeCode = "50326462-248A-443C-BDE1-E09A94FFD3F6" ?>
+    <?define Win64 = "yes" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?else ?>
+    <?define ProductDisplayName = "BrightstarDB 32-bit"?>
+    <?define ProductUpgradeCode = "CF04085A-ACFE-4447-83E1-1A50A4133655" ?>
+    <?define Win64 = "no" ?>
+    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+  <?endif ?>
 	<Product Id="*" 
-           Name="BrightstarDB $(var.BuildNumber).0" 
+           Name="$(var.ProductDisplayName) $(var.BuildNumber)" 
            Language="1033" 
-           Version="$(var.BuildNumber).0" 
+           Version="$(var.BuildNumber)" 
            Manufacturer="BrightstarDB Project" 
-           UpgradeCode="CF04085A-ACFE-4447-83E1-1A50A4133655">
+           UpgradeCode="$(var.ProductUpgradeCode)">
     
-		<Package InstallerVersion="200" Compressed="yes"  />
+		<Package InstallerVersion="200" Compressed="yes"  Platform="$(var.Platform)" InstallScope="perMachine" />
 
 		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
@@ -62,8 +73,8 @@
     <WixVariable Id='WixUILicenseRtf' Value='..\InstallerTmp\EULA.rtf'/>
     <WixVariable Id='WixUIBannerBmp' Value='..\images\installtopbanner.bmp'/>
     <WixVariable Id='WixUIDialogBmp' Value='..\images\installerbackground1.bmp'/>
-    
-    <UIRef Id='WixUI_FeatureTree'/>
+
+    <UIRef Id='WixUI_FeatureTreeCustom'/>
     <UIRef Id='WixUI_ErrorProgressText'/>
 
     <UI>
@@ -120,22 +131,17 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="VS2010ITEMTEMPLATEDIR"/>
       <Directory Id="VS2012ITEMTEMPLATEDIR"/>
-      <Directory Id="ProgramFilesFolder">
+      <Directory Id="$(var.PlatformProgramFilesFolder)">
         <Directory Id="INSTALLLOCATION" Name="BrightstarDB">
           <Directory Id="DOCSDIR" Name="Docs"/>
           <Directory Id="SDKDIR" Name="SDK"/>
           <Directory Id="SAMPLESDIR" Name="Samples"/>
           <Directory Id="SERVICEDIR" Name="Service"/>
           <Directory Id="SERVICEDATADIR" Name="Data"/>
-          <Directory Id="SPARQLSERVICEDIR" Name="SparqlService"/>
-          <Directory Id="SDSHAREDIR" Name="SDShare">
-            <Directory Id="SDSHAREDOCSDIR" Name="Docs"/>
-            <Directory Id="SDSHARESERVICEDIR" Name="Service"/>
-            <Directory Id="SDSHARESAMPLESDIR" Name="Samples"/>
-          </Directory>
           <Directory Id="VSDIR" Name="VisualStudio"/>
           <Directory Id="TOOLSDIR" Name="Tools"/>
           <Directory Id="LMDIR" Name="LicenseManager"/>
+          <Directory Id="WEBAPPDIR" Name="Webapp" />
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
@@ -144,7 +150,7 @@
     </Directory>
 
     <DirectoryRef Id="BrightstarProgramMenuFolder">
-      <Component Id="ToolsShortcuts" Guid="{72317CF0-9E89-4792-8E92-4A341F497293}">
+      <Component Id="ToolsShortcuts" Guid="{72317CF0-9E89-4792-8E92-4A341F497293}" Win64="$(var.Win64)">
         <Shortcut  Id="PolarisStartMenuShortcut"
                    Name="Polaris"
                    Description="BrightstarDB management tool"
@@ -154,15 +160,7 @@
         <RegistryValue Root="HKCU" Key="Software\BrightstarDB" Name="toolsInstalled" Type="integer" Value="1" KeyPath="yes"/>
       </Component>
 
-      <Component Id="DocsShortcuts" Guid="{5E38F77E-40FE-424F-BF78-28B377487EDE}">
-        <!--<Shortcut Id="PDFShortcut"
-                  Name="BrightstarDB Documentation (PDF)"
-                  Target="[DOCSDIR]BrightstarDB_Documentation.pdf"
-                  WorkingDirectory="DOCSDIR"/>-->
-        <!--<Shortcut Id="CHMShortcut"
-                  Name="BrightstarDB Documentation (CHM)"
-                  Target="[DOCSDIR]BrightstarDB.chm"
-                  WorkingDirectory="DOCSDIR"/>-->
+      <Component Id="DocsShortcuts" Guid="{5E38F77E-40FE-424F-BF78-28B377487EDE}"  Win64="$(var.Win64)">
         <Shortcut Id="APICHMShortcut"
                   Name="BrightstarDB API (CHM)"
                   Target="[DOCSDIR]BrightstarDB_API.chm"
@@ -180,7 +178,7 @@
       </Component>
     </DirectoryRef>
     <DirectoryRef Id="SERVICEDIR">
-      <Component Id="serviceEventSourceComponent" Guid="{C878555D-D275-41F4-80BA-4A9508A1CCE6}">
+      <Component Id="serviceEventSourceComponent" Guid="{C878555D-D275-41F4-80BA-4A9508A1CCE6}"  Win64="$(var.Win64)">
         <CreateFolder/>
         <util:EventSource Name="BrightstarDB" Log="Application" EventMessageFile="%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\EventLogMessages.dll" />
       </Component>
@@ -199,17 +197,12 @@
 
       <ComponentGroupRef Id="samplesFilesComponentGroup"/>
 
-      <ComponentGroupRef Id="sparqlServiceFilesComponentGroup"/>
-
-      <ComponentGroupRef Id="sdshareServiceFilesComponentGroup"/>
-
-      <ComponentGroupRef Id="sdshareSamplesFilesComponentGroup"/>
+      <ComponentGroupRef Id="webappFilesComponentGroup" />
+        
       
-      <ComponentGroupRef Id="sdshareDocFilesComponentGroup"/>
-
       <ComponentRef Id="DocsShortcuts"/>
 
-      <Component Guid="{844DEDDC-DB9E-421E-8D58-D0932399193E}" Directory="INSTALLLOCATION">
+      <Component Guid="{844DEDDC-DB9E-421E-8D58-D0932399193E}" Directory="INSTALLLOCATION"  Win64="$(var.Win64)">
         <File Id="README_txt" KeyPath="yes" Source="..\InstallerTmp\README.txt"/>
         <File Id="LICENSE_txt" KeyPath="no" Source="..\InstallerTmp\EULA.rtf"/>
         <File Id="NOTICE_txt" KeyPath="no" Source="..\InstallerTmp\NOTICE.txt"/>
@@ -219,15 +212,22 @@
       
       <ComponentRef Id="serviceEventSourceComponent"/>
 
-      <Component Id="serviceExeComponent" Guid="{CE4B042C-3A47-41C1-B154-8B46162DC4CB}" Directory="SERVICEDIR">
+      <Component Id="serviceExeComponent" Guid="{CE4B042C-3A47-41C1-B154-8B46162DC4CB}" Directory="SERVICEDIR" Win64="$(var.Win64)">
         <File Id="brightstarServiceExe" Source="..\InstallerTmp\ServiceExe\BrightstarService.exe" KeyPath="yes" Vital="yes"/>
         <File Id="brightstarServiceExeConfig" Source="..\InstallerTmp\ServiceExe\BrightstarService.exe.config" Vital="yes"/>
         <util:XmlFile Id="SetDataDirectory"
                 File="[SERVICEDIR]\BrightstarService.exe.config"
                 Action="setValue"
-                ElementPath="/configuration/appSettings/add[\[]@key='BrightstarDB.StoreLocation'[\]]"
-                Name="value"
-                Value="[SERVICEDATADIR]"
+                ElementPath="/configuration/brightstarService"
+                Name="connectionString"
+                Value="Type=embedded;StoresDirectory=[SERVICEDATADIR]"
+                Permanent="yes"/>
+        <util:XmlFile Id="SetWebappDataDirectory"
+                      File="[WEBAPPDIR]\Web.config"
+                Action="setValue"
+                ElementPath="/configuration/brightstarService"
+                Name="connectionString"
+                Value="Type=embedded;StoresDirectory=[SERVICEDATADIR]"
                 Permanent="yes"/>
       </Component>
 
@@ -235,7 +235,7 @@
       <Feature Id="BrightstarServiceDataDirectory" Title="Service Data Directory" Level="1" ConfigurableDirectory="SERVICEDATADIR"
                Description="Use this feature to specify the location where BrightstarDB data files will be stored."
                 Absent="disallow" Display="expand" AllowAdvertise="no">
-        <Component Id="dataDirectoryComponent" Guid="{20BD7659-4886-451D-87C9-C4D9E055AAEA}" Directory="SERVICEDATADIR">
+        <Component Id="dataDirectoryComponent" Guid="{20BD7659-4886-451D-87C9-C4D9E055AAEA}" Directory="SERVICEDATADIR" Win64="$(var.Win64)">
           <CreateFolder Directory="SERVICEDATADIR"/>
         </Component>
       </Feature>
@@ -243,9 +243,9 @@
       <Feature Id="BrightstarWindowsService" Title="Register BrightstarDB Windows Service" Level="1"
                Description="Enable this feature to register the BrightstarDB Windows Service."
                Display="expand" AllowAdvertise="no">
-        <Component Id="serviceInstallComponent" Guid="{973A196D-6414-4036-BE51-BEC684838E7F}" Directory="SERVICEDIR">
+        <Component Id="serviceInstallComponent" Guid="{973A196D-6414-4036-BE51-BEC684838E7F}" Directory="SERVICEDIR" Win64="$(var.Win64)">
           <File Id="brightstarServiceExe2" Source="..\InstallerTmp\ServiceExe\BrightstarService.exe" KeyPath="yes"/>
-          <ServiceInstall Id="BrightstarDB_U" Name="BrightstarDB" DisplayName="BrightstarDB Service" Description="Runs the BrightstarDB WCF service" Type="ownProcess" Start="auto" ErrorControl="normal" Vital="yes"/>
+          <ServiceInstall Id="BrightstarDB_U" Name="BrightstarDB" DisplayName="BrightstarDB Service" Description="Runs the BrightstarDB service" Type="ownProcess" Start="auto" ErrorControl="normal" Vital="yes"/>
           <ServiceControl Id="StopBrightstarDB_U" Name="BrightstarDB" Stop="both" Remove="uninstall" Wait="yes" />
           <ServiceControl Id="StartBrightstarDB_U" Name="BrightstarDB" Start ="install" Wait="no"/>
         </Component>
@@ -254,7 +254,7 @@
       <Feature Id="Tools" Title="BrightstarDB Management Tools" Level="1"
                Description="Enable this feature to install Polaris, the desktop tool for managing local and remote BrightstarDB instances."
                Display="expand" AllowAdvertise="no">
-        <Component Id="toolsDirectoryComponent" Guid="{357C6610-1274-44AB-A115-515A7F9522E6}" Directory="TOOLSDIR" KeyPath="yes">
+        <Component Id="toolsDirectoryComponent" Guid="{357C6610-1274-44AB-A115-515A7F9522E6}" Directory="TOOLSDIR" KeyPath="yes" Win64="$(var.Win64)">
           <CreateFolder Directory="TOOLSDIR"/>
         </Component>
         <ComponentGroupRef Id="toolsFilesComponentGroup"/>
@@ -267,7 +267,7 @@
         <Condition Level="0">
           <![CDATA[((NOT VCSHARP2010EXPRESS_IDE) or VCSHARP2010EXPRESS_IDE = "")]]>
         </Condition>
-        <Component Id="vcseItemTemplatesComponent" Guid="{68817118-7608-4430-AA68-1E461081CB8D}" Directory="VS2010ITEMTEMPLATEDIR">
+        <Component Id="vcseItemTemplatesComponent" Guid="{68817118-7608-4430-AA68-1E461081CB8D}" Directory="VS2010ITEMTEMPLATEDIR" Win64="$(var.Win64)">
           <File Id="vcseEntityContextItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityContext.zip"  />
           <File Id="vcseEntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
         </Component>
@@ -277,7 +277,7 @@
                Description="Add item and project templates into the local Visual Studio installation."
                AllowAdvertise="no">
         <Condition Level="0">NOT VS2010_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED</Condition>
-        <Component Id="vsItemTemplatesComponent" Guid="{933FFF92-0B3F-4846-AF17-BD9BA9BACCCA}" Directory="VS2010ITEMTEMPLATEDIR">
+        <Component Id="vsItemTemplatesComponent" Guid="{933FFF92-0B3F-4846-AF17-BD9BA9BACCCA}" Directory="VS2010ITEMTEMPLATEDIR" Win64="$(var.Win64)">
           <File Id="vsEntityContextItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityContext.zip"  />
           <File Id="vsEntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
         </Component>
@@ -287,7 +287,7 @@
                Description="Add item and project templates in to the local Visual Studio 2012 installation."
                AllowAdvertise="no">
         <Condition Level="0">NOT VS2012_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED</Condition>
-        <Component Id="vs1012ItemTemplatesComponent" Guid="{8463A7C4-74B1-49A6-9885-5F2DCE499EE4}" Directory="VS2012ITEMTEMPLATEDIR">
+        <Component Id="vs1012ItemTemplatesComponent" Guid="{8463A7C4-74B1-49A6-9885-5F2DCE499EE4}" Directory="VS2012ITEMTEMPLATEDIR" Win64="$(var.Win64)">
           <File Id="vs2012EntityContextItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityContext.zip"/>
           <File Id="vs2012EntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
         </Component>

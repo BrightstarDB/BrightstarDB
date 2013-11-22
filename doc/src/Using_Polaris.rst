@@ -99,38 +99,26 @@ The fields of this dialog should be filled out as follows:
         process (such as a BrightstarDB server) could be attempting to access at 
         the same time.
 
-    - HTTP: Connect to the server using the HTTP protocol. This is the 
-      recommended protocol to use to connect to a remote server.
-
-    - TCP: Connect to the server using the TCP protocol
-
-    - Named Pipes: Connect to the server over a named pipe.
+    - REST: Connect to the server using the HTTP or HTTPS protocol. This is the 
+      option to use to connect to a remote server.
 
   - **Stores Directory:** This property is required only for the Embedded 
     connection type. Specify the full path to the directory that contains the 
     BrightstarDB server's store folders.
 
-  - **Server Name:** This property is required for all connection types other 
-    than Embedded. Specify the name of the machine that hosts the BrightstarDB 
-    server.
+  - **Server Address:** This property is required only for the Rest connection type.
+    Specify the full URL for the BrightstarDB service. For example, to connect to
+    a BrightstarDB service running on the default port (8090) on the local machine
+    you would enter ``http://localhost:8090/brightstar`` as the address.
 
-  - **Port Number:** This property is required for the HTTP and TCP 
-    connection types. For HTTP, the default port number is 8090. For TCP, the 
-    default is 8095.
-
-  - **Server Path:** This property is required for the HTTP and TCP 
-    connection types. For both connection types, the default path is 
-    'brightstar' (without the quotes).
-
-  - **Pipe Name:** This property is required only for the Named Pipes 
-    connection type. Specify the named pipe used to connect to the BrightstarDB 
-    server. The default pipe name is 'brightstar' (without the quotes).
-
-When you select the HTTP, TCP or NamedPipe connection types from the 
+When you select the Rest connection type from the 
 drop-down list, the dialog will automatically populate with the default 
 settings for making a connection to a local BrightstarDB server. You can 
 modify the server name and/or the other settings to make a connection to a 
 remote server or to a server with a non-default port setup.
+
+As you make changes in this dialog any validation error messages will be
+displayed in a red area beneath the input fields.
 
 When you click OK, Polaris will attempt to contact the server using the 
 information you have provided, if contact is established then a list of all 

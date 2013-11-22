@@ -42,9 +42,11 @@ namespace BrightstarDB.Tests.EntityFramework
             results = _context.Companies.Where(c => c.Name.StartsWith("net", StringComparison.CurrentCulture)).ToList();
             Assert.AreEqual(0, results.Count);
 
+#if !PORTABLE // InvariantCultureIgnoreCase is not supported by PCL
             results = _context.Companies.Where(c => c.Name.StartsWith("net", StringComparison.InvariantCultureIgnoreCase)).ToList();
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("NetworkedPlanet", results[0].Name);
+#endif
 
             results = _context.Companies.Where(c => c.Name.StartsWith("net", StringComparison.InvariantCulture)).ToList();
             Assert.AreEqual(0, results.Count);
@@ -81,9 +83,11 @@ namespace BrightstarDB.Tests.EntityFramework
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", StringComparison.CurrentCulture)).ToList();
             Assert.AreEqual(0, results.Count);
 
+#if !PORTABLE // InvariantCultureIgnoreCase is not supported by PCL
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", StringComparison.InvariantCultureIgnoreCase)).ToList();
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("NetworkedPlanet", results[0].Name);
+#endif
 
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", StringComparison.InvariantCulture)).ToList();
             Assert.AreEqual(0, results.Count);

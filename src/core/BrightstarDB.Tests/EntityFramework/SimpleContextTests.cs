@@ -1366,50 +1366,6 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-#if !PORTABLE
-        [Test]
-        [ExpectedException(typeof(TransactionPreconditionsFailedException))]
-        public void TestOptimisticLockingHttp()
-        {
-            var storeName = Guid.NewGuid().ToString();
-            string personId;
-            using (
-                var context =
-                    new MyEntityContext("Type=http;endpoint=http://localhost:8090/brightstar;StoreName=" + storeName,
-                                        true))
-            {
-                var person = context.Persons.Create();
-                context.SaveChanges();
-                personId = person.Id;
-            }
-
-            using (
-                var context1 =
-                    new MyEntityContext("Type=http;endpoint=http://localhost:8090/brightstar;StoreName=" + storeName,
-                                        true))
-            {
-                var person1 = context1.Persons.FirstOrDefault(p => p.Id == personId);
-                Assert.IsNotNull(person1);
-
-                using (var context2 =
-                    new MyEntityContext("Type=http;endpoint=http://localhost:8090/brightstar;StoreName=" + storeName,
-                                        true))
-                {
-                    var person2 = context2.Persons.FirstOrDefault(p => p.Id == personId);
-                    Assert.IsNotNull(person2);
-
-                    Assert.AreNotSame(person2, person1);
-
-                    person1.Name = "bob";
-                    person2.Name = "berby";
-
-                    context1.SaveChanges();
-                    context2.SaveChanges();
-                }
-            }
-        }
-#endif
-
         [Test]
         public void TestDeleteEntity()
         {
@@ -1433,12 +1389,13 @@ namespace BrightstarDB.Tests.EntityFramework
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var jen = context.Persons.FirstOrDefault(p => p.Id.Equals(jenId));
+                var jen = context.Persons.FirstOrDefault(p => p.Id == jenId);
 
                 context.DeleteObject(jen);
                 context.SaveChanges();
 
-                Assert.AreEqual(0, context.Persons.Count());
+                jen = context.Persons.FirstOrDefault(p => p.Id == jenId);
+                Assert.That(jen, Is.Null);
             }
         }
 

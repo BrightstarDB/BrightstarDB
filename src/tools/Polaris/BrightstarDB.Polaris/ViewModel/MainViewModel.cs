@@ -45,7 +45,7 @@ namespace BrightstarDB.Polaris.ViewModel
                 Configuration.ConnectionStrings.Add(new NamedConnectionString
                                                         {
                                                             Name="Remote",
-                                                            ConnectionString = "type=http;endpoint=http://invalid/url"
+                                                            ConnectionString = "type=rest;endpoint=http://invalid/url"
                                                         });
             }
             else
@@ -63,9 +63,16 @@ namespace BrightstarDB.Polaris.ViewModel
 
             foreach(var namedConnection in Configuration.ConnectionStrings)
             {
-                var connection = new Connection(namedConnection.Name, namedConnection.ConnectionString);
-                connection.TryConnect();
-                StoreSources.Add(connection);
+                try
+                {
+                    var connection = new Connection(namedConnection.Name, namedConnection.ConnectionString);
+                    connection.TryConnect();
+                    StoreSources.Add(connection);
+                }
+                catch (FormatException)
+                {
+                    // This will be thrown if the configuration contains an obsolete connection type
+                }
             }
             TabItems = new ObservableCollection<TabItemViewModel>();
             NewSparqlQueryCommand = new RelayCommand<Store>((s)=>NewSparqlQuery(s));

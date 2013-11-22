@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Xml.Linq;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
@@ -15,32 +14,16 @@ namespace BrightstarDB.Client
     /// </summary>
     internal abstract class RemoteDataObjectStore : DataObjectStoreBase
     {
-        private readonly string _dataObjectQueryTemplate;
-        private readonly string _storeName;
         private readonly bool _optimisticLockingEnabled;
+        private string _queryTemplate;
 
-        protected RemoteDataObjectStore(string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
+        private String QueryTemplate { get { return _queryTemplate ?? (_queryTemplate = GetQueryTemplate()); } }
+
+        protected RemoteDataObjectStore(Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
             : base(namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
-            _storeName = storeName;
             _optimisticLockingEnabled = optimisticLockingEnabled;
-
-            // Initialize the SPARQL query template
-            var sb = new StringBuilder();
-            sb.Append("SELECT ?p ?o ?g");
-            if (DataSetGraphUris != null)
-            {
-                foreach (var dsGraph in DataSetGraphUris)
-                {
-                    sb.AppendFormat(" FROM NAMED <{0}>", dsGraph);
-                }
-            }
-            sb.AppendFormat(" FROM NAMED <{0}>", UpdateGraphUri);
-            sb.AppendFormat(" FROM NAMED <{0}>", VersionGraphUri);
-            sb.Append(" WHERE {{ GRAPH ?g {{ <{0}> ?p ?o }} }}");
-            _dataObjectQueryTemplate = sb.ToString();
-
             ResetTransactionData();
         }
 
@@ -49,7 +32,7 @@ namespace BrightstarDB.Client
         /// <summary>
         /// This must be overidden by all subclasses to create the correct client
         /// </summary>
-        protected abstract IBrightstarService Client { get; }
+        protected abstract IUpdateableStore Client { get; }
 
         public override IDataObject GetDataObject(string identity)
         {
@@ -75,7 +58,24 @@ namespace BrightstarDB.Client
 
         public override SparqlResult ExecuteSparql(string sparqlExpression)
         {
-            return new SparqlResult(Client.ExecuteQuery(_storeName, sparqlExpression, DataSetGraphUris));
+            return new SparqlResult(Client.ExecuteQuery(sparqlExpression, DataSetGraphUris));
+        }
+
+        protected virtual string GetQueryTemplate()
+        {
+            var sb = new StringBuilder();
+            sb.Append("SELECT ?p ?o ?g");
+            if (DataSetGraphUris != null)
+            {
+                foreach (var dsGraph in DataSetGraphUris)
+                {
+                    sb.AppendFormat(" FROM NAMED <{0}>", dsGraph);
+                }
+            }
+            sb.AppendFormat(" FROM NAMED <{0}>", UpdateGraphUri);
+            sb.AppendFormat(" FROM NAMED <{0}>", VersionGraphUri);
+            sb.Append(" WHERE {{ GRAPH ?g {{ <{0}> ?p ?o }} }}");
+            return sb.ToString();
         }
 
         /// <summary>
@@ -122,57 +122,18 @@ namespace BrightstarDB.Client
                 }
             }
 
-            var deleteData = new StringWriter();
-            var dw = new BrightstarTripleSinkAdapter(new NTriplesWriter(deleteData));
-            foreach (Triple triple in DeletePatterns)
+            try
             {
-                dw.Triple(triple);
+                Client.ApplyTransaction(Preconditions, DeletePatterns, AddTriples, UpdateGraphUri);
             }
-            deleteData.Close();
-
-            var addData = new StringWriter();
-            var aw = new BrightstarTripleSinkAdapter(new NTriplesWriter(addData));
-            foreach (Triple triple in AddTriples)
+            catch (TransactionPreconditionsFailedException)
             {
-                aw.Triple(triple);
+                Preconditions.Clear();
+                throw;
             }
-            addData.Close();
-
-            var preconditionsData = new StringWriter();
-            var pw = new BrightstarTripleSinkAdapter(new NTriplesWriter(preconditionsData));
-            foreach (var triple in Preconditions)
-            {
-                pw.Triple(triple);
-            }
-            preconditionsData.Close();
-
-            PostTransaction(preconditionsData.ToString(), deleteData.ToString(), addData.ToString(), Constants.DefaultGraphUri);
 
             // reset changes
             ResetTransactionData();
-        }
-
-
-        private void PostTransaction(string preconditions, string patternsToDelete, string triplesToAdd, string defaultGraphUri)
-        {
-            var jobInfo = Client.ExecuteTransaction(_storeName, preconditions, patternsToDelete, triplesToAdd, defaultGraphUri);
-            while (!(jobInfo.JobCompletedOk || jobInfo.JobCompletedWithErrors))
-            {
-                Thread.Sleep(20);
-                jobInfo = Client.GetJobInfo(_storeName, jobInfo.JobId);
-            }
-
-            if (jobInfo.JobCompletedWithErrors)
-            {
-                // if (jobInfo.ExceptionInfo.Type == typeof(Server.PreconditionFailedException).FullName)
-                if ( jobInfo.ExceptionInfo != null && jobInfo.ExceptionInfo.Type == "BrightstarDB.Server.PreconditionFailedException")
-                {
-                    var triples = jobInfo.ExceptionInfo.Message.Substring(jobInfo.ExceptionInfo.Message.IndexOf('\n') + 1);
-                    Preconditions.Clear();
-                    throw new TransactionPreconditionsFailedException(triples);
-                }
-                throw new BrightstarClientException("Error processing update transaction. " + jobInfo.StatusMessage);
-            }
         }
 
         #endregion
@@ -184,7 +145,7 @@ namespace BrightstarDB.Client
 
         private IEnumerable<Triple> GetTriplesForDataObject(string identity)
         {
-            Stream sparqlResultStream = Client.ExecuteQuery(_storeName, string.Format(_dataObjectQueryTemplate, identity), DataSetGraphUris);
+            Stream sparqlResultStream = Client.ExecuteQuery(string.Format(QueryTemplate, identity), DataSetGraphUris);
             XDocument data = XDocument.Load(sparqlResultStream);
 
             foreach (var sparqlResultRow in data.SparqlResultRows())
@@ -220,7 +181,7 @@ namespace BrightstarDB.Client
 
         protected override void Cleanup()
         {
-            // Nothing to cleanup
+            Client.Cleanup();
         }
     }
 }

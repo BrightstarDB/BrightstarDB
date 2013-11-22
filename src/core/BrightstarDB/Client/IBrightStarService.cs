@@ -145,7 +145,7 @@ namespace BrightstarDB.Client
         /// <param name="insertData">The NTriples or NQuads data that will be inserted into the store.</param>
         /// <param name="defaultGraphUri">The URI of the default graph that the transaction will be applied to</param>
         /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         /// <remarks>If <paramref name="preconditions"/>, <paramref name="deletePatterns"/> or <paramref name="insertData"/> contain
         /// quads, the graph URI specified by the quad will override the value provided by <paramref name="defaultGraphUri"/>. </remarks>
         IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri = Constants.DefaultGraphUri, bool waitForCompletion = true);
@@ -156,16 +156,26 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store to be updated</param>
         /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
         /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true);
 #endif
+
+        /// <summary>
+        /// Gets information about jobs recently executed against a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve job information from</param>
+        /// <param name="skip">The number of records to skip</param>
+        /// <param name="take">The number of records to take</param>
+        /// <returns>The subset of job information requested by the skip and take parameters</returns>
+        /// <remarks>Job information is returned in reverse order of the order in which they will be / were executed (most recent first).</remarks>
+        IEnumerable<IJobInfo> GetJobInfo(string storeName, int skip, int take);
 
         /// <summary>
         /// Gets the information about a job. Including status and any messages.
         /// </summary>
         /// <param name="storeName">Name of the store where the job is running</param>
         /// <param name="jobId">The Id of the job</param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         IJobInfo GetJobInfo(string storeName, string jobId);
 
         /// <summary>
@@ -174,7 +184,7 @@ namespace BrightstarDB.Client
         /// <param name="store">The store to perform the import to</param>
         /// <param name="fileName">The name of the file in brighhtstar\import folder to import.</param>
         /// <param name="graphUri">The URI of the default graph to import the data into. Defaults to <see cref="Constants.DefaultGraphUri"/></param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         IJobInfo StartImport(string store, string fileName, string graphUri = Constants.DefaultGraphUri);
 
         /// <summary>
@@ -203,6 +213,14 @@ namespace BrightstarDB.Client
         IEnumerable<ICommitPointInfo> GetCommitPoints(string storeName, int skip, int take);
 
         /// <summary>
+        /// Returns the specified commit point of a BrighstarDB store
+        /// </summary>
+        /// <param name="storeName">The name of the store to open</param>
+        /// <param name="commitId">The identifier of the commit point to be returned</param>
+        /// <returns>The specified commit point or NULL if no matching commit point was found</returns>
+        ICommitPointInfo GetCommitPoint(string storeName, ulong commitId);
+
+        /// <summary>
         /// Returns the commit point that was in effect at a given date/time
         /// </summary>
         /// <param name="storeName">The name of the store to search</param>
@@ -228,6 +246,14 @@ namespace BrightstarDB.Client
         /// <param name="take">How many transactions to return.</param>
         /// <returns>An enumeration over the transactions executed against the store</returns>
         IEnumerable<ITransactionInfo> GetTransactions(string storeName, int skip, int take);
+
+        /// <summary>
+        /// Returns the transaction record creaed by the execution of a specific job against the store
+        /// </summary>
+        /// <param name="storeName">The name of the store where the job was executed</param>
+        /// <param name="jobId">The ID of the job that was executed</param>
+        /// <returns>The transaction information for the execution of the job or NULL if no matching transaction record was found</returns>
+        ITransactionInfo GetTransaction(string storeName, Guid jobId);
 
         /// <summary>
         /// Executes a previous transaction

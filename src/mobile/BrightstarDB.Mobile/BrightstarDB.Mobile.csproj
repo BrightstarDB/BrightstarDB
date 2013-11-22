@@ -60,13 +60,12 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BrightstarDB\Client\CommitPointInfo.cs" />
-    <Compile Include="BrightstarDB\Client\JobInfo.cs" />
-    <Compile Include="BrightstarDB\Client\StoreStatistics.cs" />
-    <Compile Include="BrightstarDB\Client\TransactionInfo.cs" />
-    <Compile Include="BrightstarDB\Client\TransactionStatus.cs" />
-    <Compile Include="BrightstarDB\Client\TransactionType.cs" />
-    <Compile Include="BrightstarDB\ExceptionDetail.cs" />
+    <Compile Include="..\..\core\BrightstarDB\Strings.Designer.cs">
+      <Link>BrightstarDB\Strings.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
     <Compile Include="BrightstarDB\MobileInternals.cs" />
     <Compile Include="BrightstarDB\SmartAssembly.Attributes.cs" />
     <Compile Include="MD5.cs" />
@@ -75,7 +74,7 @@
     <Compile Include="BrightstarDB\Tuple.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\core\BrightStarDB\**\*.cs" Exclude="..\..\core\BrightStarDB\OData\**\*.cs;..\..\core\BrightstarDB\Test\**\*.cs;..\..\core\BrightstarDB\Server\HttpServer.cs;..\..\core\BrightstarDB\Client\Remote*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\Http*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarServiceClient.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarServiceClientExtensions.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarWcfServiceClient.cs;..\..\core\BrightstarDB\Client\BrightstarWcfClusterClient.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\HttpDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\HttpDataObjectStore.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Storage\FileStoreManager.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Storage\FileBlockProvider.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Properties\**\*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Analysis\**\*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NetTcpDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NetTcpDataObjectStore.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NamedPipeDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\NamedPipeDataObjectStore.cs; ..\..\core\BrightstarDB\Client\RestDataObjectStore.cs; &#xD;&#xA;        ..\..\core\BrightstarDB\Client\ReplyMessageInspector.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BlobImportSource.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\RestClientHelper.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\RestDataObjectContext.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\RestJobInfo.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Client\BrightstarRestClient.cs;..\..\core\BrightstarDB\Dynamic\**\*.cs;..\..\core\BrightstarDB\Storage\Persistence\BinaryPageStore.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\SingleVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\TwoVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\ThreeVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\AccumulatorBase.cs;..\..\core\BrightstarDB\Query\Processor\Accumulator.cs;..\..\core\BrightstarDB\Query\Processor\VirtualizingAccumulator.cs">
+    <Compile Include="..\..\core\BrightStarDB\**\*.cs" Exclude="..\..\core\BrightStarDB\OData\**\*.cs;..\..\core\BrightstarDB\Client\BrightstarRestClient.cs;..\..\core\BrightstarDB\Client\Rest*.cs;..\..\core\BrightstarDB\Test\**\*.cs;..\..\core\BrightstarDB\Server\HttpServer.cs;..\..\core\BrightstarDB\Storage\FileStoreManager.cs;..\..\core\BrightstarDB\Storage\FileBlockProvider.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Properties\**\*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Analysis\**\*.cs;..\..\core\BrightstarDB\Client\RestDataObjectContext.cs;..\..\core\BrightstarDB\Dynamic\**\*.cs;..\..\core\BrightstarDB\Storage\Persistence\BinaryPageStore.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\SingleVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\TwoVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\ThreeVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\AccumulatorBase.cs;..\..\core\BrightstarDB\Query\Processor\Accumulator.cs;..\..\core\BrightstarDB\Query\Processor\VirtualizingAccumulator.cs;..\..\core\BrightstarDB\Strings.Designer.cs">
       <Link>BrightstarDB\%(recursivedir)\%(filename)</Link>
     </Compile>
     <Compile Include="..\relinq\**\*.cs" Exclude="..\relinq\Properties\AssemblyInfo.cs;..\relinq\RelinqCore\Properties\AssemblyInfo.cs">
@@ -84,6 +83,12 @@
     <Compile Include="..\..\..\licensing\BrightstarDB.LicenseValidation\**\*.cs" Exclude="..\..\..\licensing\BrightstarDB.LicenseValidation\Properties\*.cs;..\..\..\licensing\BrightstarDB.LicenseValidation\ActivationClient.cs">
       <Link>BrightstarDB\Licensing\%(recursivedir)\%(filename)</Link>
     </Compile>
+    <EmbeddedResource Include="..\..\core\BrightstarDB\Strings.resx">
+      <Link>BrightstarDB\Strings.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
