@@ -960,5 +960,18 @@ namespace BrightstarDB.EntityFramework
                c.RemoveFromLoadedObjects(toRemove.Identity);
            }
         }
+
+        internal void TriggerCreatedEvent(BrightstarEntityContext context)
+        {
+            OnCreated(context);
+        }
+
+        /// <summary>
+        /// Runs after the entity object is created by the specified context.  It is not necessary to call the base method.
+        /// </summary>
+        /// <param name="context"></param>
+        protected virtual void OnCreated(BrightstarEntityContext context)
+        {
+        }
     }
 }
