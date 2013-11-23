@@ -531,7 +531,15 @@ namespace BrightstarDB.EntityFramework
                 }
             }
             var bindType = GetImplType(typeof (T));
-            return ((T) Activator.CreateInstance(bindType, this, dataObject));
+
+            //Trigger OnCreated method if we are able to - GitHub Issue #55
+            T newObj = ((T)Activator.CreateInstance(bindType, this, dataObject));
+            if (newObj is BrightstarEntityObject)
+            {
+                ((BrightstarEntityObject)(object)newObj).TriggerCreatedEvent(this);
+            }
+
+            return newObj;
         }
 
         
