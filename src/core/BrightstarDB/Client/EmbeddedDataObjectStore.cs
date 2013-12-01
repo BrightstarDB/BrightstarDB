@@ -53,8 +53,11 @@ namespace BrightstarDB.Client
 
         public override SparqlResult ExecuteSparql(string sparqlExpression)
         {
-            var xml = _serverCore.Query(_storeName, sparqlExpression, DataSetGraphUris,  SparqlResultsFormat.Xml);
-            return new SparqlResult(xml);
+            var resultStream = new MemoryStream();
+            _serverCore.Query(_storeName, sparqlExpression, DataSetGraphUris, null, SparqlResultsFormat.Xml,
+                              RdfFormat.RdfXml, resultStream);
+            resultStream.Seek(0, SeekOrigin.Begin);
+            return new SparqlResult(resultStream);
         }
 
         public override bool BindDataObject(DataObject dataObject)

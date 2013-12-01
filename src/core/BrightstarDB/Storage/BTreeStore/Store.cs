@@ -9,6 +9,7 @@ using BrightstarDB.Query;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage.Persistence;
 using VDS.RDF;
+using VDS.RDF.Query;
 using Triple = BrightstarDB.Model.Triple;
 
 namespace BrightstarDB.Storage.BTreeStore
@@ -305,6 +306,12 @@ namespace BrightstarDB.Storage.BTreeStore
         }
 
 
+        public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, SparqlResultsFormat resultsFormat,
+                                                              RdfFormat graphFormat, Stream resultsStream,
+                                                              IEnumerable<string> defaultGraphUris = null)
+        {
+            throw new NotImplementedException();
+        }
 
         public void InsertTriple(string subject, string predicate, string objValue, bool isObjectLiteral,
                                  string dataType, string langCode, string graphUri, BrightstarProfiler profiler = null)
@@ -557,46 +564,47 @@ namespace BrightstarDB.Storage.BTreeStore
             return Bind(sid, pid, oid, gids).Select(MakeTriple);
         }
 
-        /// <summary>
-        /// Serialises the SPARQL result as XML into the stream provided.
-        /// </summary>
-        /// <param name="exp">The SPARQL query expression to execute</param>
-        /// <param name="resultsFormat"></param>
-        /// <param name="resultStream">The stream that the SPARQL results will be written to</param>
-        /// <param name="resultsType">Receives an enumeration values specifying the type of SPARQL result being written to the stream</param>
-        public void ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, Stream resultStream, out BrightstarSparqlResultsType resultsType)
-        {
-            var queryHandler = new SparqlQueryHandler();
-            BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
 
-            // NOTE: streamWriter is not wrapped in a using because we don't want to close resultStream at this point
-            var streamWriter = new StreamWriter(resultStream, resultsFormat.Encoding);
-            resultsType = result.ResultType;
-            streamWriter.Write(result.GetString(resultsFormat));
-            streamWriter.Flush();
-        }
+        ///// <summary>
+        ///// Serialises the SPARQL result as XML into the stream provided.
+        ///// </summary>
+        ///// <param name="exp">The SPARQL query expression to execute</param>
+        ///// <param name="resultsFormat"></param>
+        ///// <param name="resultStream">The stream that the SPARQL results will be written to</param>
+        ///// <param name="resultsType">Receives an enumeration values specifying the type of SPARQL result being written to the stream</param>
+        //public void ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, Stream resultStream, out BrightstarSparqlResultsType resultsType)
+        //{
+        //    var queryHandler = new SparqlQueryHandler();
+        //    BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
 
-        /// <summary>
-        /// Returns an XML string of the sparql result set.
-        /// </summary>
-        /// <param name="exp"></param>
-        /// <param name="resultsFormat"></param>
-        /// <param name="defaultGraphUris"></param>
-        /// <returns></returns>
-        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris )
-        {
-            var queryHandler = new SparqlQueryHandler(defaultGraphUris);
-            BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
-            return result.GetString(resultsFormat);
-        }
+        //    // NOTE: streamWriter is not wrapped in a using because we don't want to close resultStream at this point
+        //    var streamWriter = new StreamWriter(resultStream, resultsFormat.Encoding);
+        //    resultsType = result.ResultType;
+        //    streamWriter.Write(result.GetString(resultsFormat));
+        //    streamWriter.Flush();
+        //}
 
-        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, out long rowCount)
-        {
-            var queryHandler = new SparqlQueryHandler();
-            BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
-            rowCount = result.Count;
-            return result.GetString(resultsFormat);
-        }
+        ///// <summary>
+        ///// Returns an XML string of the sparql result set.
+        ///// </summary>
+        ///// <param name="exp"></param>
+        ///// <param name="resultsFormat"></param>
+        ///// <param name="defaultGraphUris"></param>
+        ///// <returns></returns>
+        //public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris )
+        //{
+        //    var queryHandler = new SparqlQueryHandler(defaultGraphUris);
+        //    BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
+        //    return result.GetString(resultsFormat);
+        //}
+
+        //public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, out long rowCount)
+        //{
+        //    var queryHandler = new SparqlQueryHandler();
+        //    BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
+        //    rowCount = result.Count;
+        //    return result.GetString(resultsFormat);
+        //}
 
         public IEnumerable<CommitPoint> GetCommitPoints()
         {

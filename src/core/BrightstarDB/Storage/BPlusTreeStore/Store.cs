@@ -14,6 +14,7 @@ using BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex;
 using BrightstarDB.Storage.BPlusTreeStore.ResourceIndex;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Utils;
+using VDS.RDF.Query;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
@@ -96,31 +97,15 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return BindSubject(sid, new List<int> {gid}).Select(MakeTriple);
         }
 
-        public void ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, Stream resultStream, out BrightstarSparqlResultsType resultsType)
+        public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, SparqlResultsFormat sparqlResultsFormat,
+                                                              RdfFormat rdfResultsFormat, Stream resultsStream,
+            IEnumerable<string> defaultGraphUris )
         {
-            var queryHandler = new SparqlQueryHandler();
-            BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
-
+            var queryHandler = new SparqlQueryHandler(sparqlResultsFormat, rdfResultsFormat, defaultGraphUris);
             // NOTE: streamWriter is not wrapped in a using because we don't want to close resultStream at this point
-            var streamWriter = new StreamWriter(resultStream, resultsFormat.Encoding);
-            resultsType = result.ResultType;
-            streamWriter.Write(result.GetString(resultsFormat));
-            streamWriter.Flush();
-        }
-
-        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris = null)
-        {
-            var queryHandler = new SparqlQueryHandler(defaultGraphUris);
-            BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
-            return result.GetString(resultsFormat);
-        }
-
-        public string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, out long rowCount)
-        {
-            var queryHandler = new SparqlQueryHandler();
-            BrightstarSparqlResultSet result = queryHandler.ExecuteSparql(exp, this);
-            rowCount = result.Count;
-            return result.GetString(resultsFormat);
+            var streamWriter = new StreamWriter(resultsStream, sparqlResultsFormat.Encoding);
+            var resultsType = queryHandler.ExecuteSparql(query, this, streamWriter);
+            return resultsType;
         }
 
         /// <summary>

@@ -19,6 +19,7 @@ namespace BrightstarDB.Server.Modules.Model
         public ulong CommitId { get { return _commitId; } }
         public SparqlRequestObject SparqlRequest { get { return _sparqlRequest; } }
         public SparqlResultsFormat ResultsFormat { get; set; }
+        public RdfFormat GraphFormat { get; set; }
         public string ErrorMessage { get; private set; }
 
         public bool HasFormattedResults { get; private set; }
@@ -26,22 +27,24 @@ namespace BrightstarDB.Server.Modules.Model
         public List<string> Variables { get; set; }
         public List<object[]> Rows { get; set; } 
 
-        public SparqlResultModel(string storeName, IBrightstarService service, SparqlRequestObject sparqlRequest, SparqlResultsFormat resultsFormat)
+        public SparqlResultModel(string storeName, IBrightstarService service, SparqlRequestObject sparqlRequest, SparqlResultsFormat resultsFormat, RdfFormat graphFormat)
         {
             _storeName = storeName;
             _sparqlRequest = sparqlRequest;
             _service = service;
             ResultsFormat = resultsFormat;
+            GraphFormat = graphFormat;
         }
 
         public SparqlResultModel(string storeName, ulong commitId, IBrightstarService service,
-                                 SparqlRequestObject sparqlRequest, SparqlResultsFormat resultsFormat)
+                                 SparqlRequestObject sparqlRequest, SparqlResultsFormat resultsFormat, RdfFormat graphFormat)
         {
             _storeName = storeName;
             _commitId = commitId;
             _sparqlRequest = sparqlRequest;
             _service = service;
             ResultsFormat = resultsFormat;
+            GraphFormat = graphFormat;
         }
 
         public void ExecuteQueryForHtml(DateTime? ifNotModifiedSince)

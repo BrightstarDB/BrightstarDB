@@ -93,6 +93,7 @@
     <Compile Include="DotNetRdfStoreTests.cs" />
     <Compile Include="StatisticsLogTests.cs" />
     <Compile Include="StatsMonitorTests.cs" />
+    <Compile Include="StoreExtensions.cs" />
     <Compile Include="TestConfiguration.cs" />
     <Compile Include="TestPaths.cs" />
     <Compile Include="DataObjectTests.cs" />

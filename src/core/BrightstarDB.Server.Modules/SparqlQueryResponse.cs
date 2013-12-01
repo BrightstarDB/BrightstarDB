@@ -6,13 +6,14 @@ namespace BrightstarDB.Server.Modules
 {
     public class SparqlQueryResponse : Response
     {
-        public SparqlQueryResponse(SparqlQueryProcessingModel model, DateTime? ifNotModifiedSince, SparqlResultsFormat format)
+        public SparqlQueryResponse(SparqlQueryProcessingModel model, DateTime? ifNotModifiedSince, SparqlResultsFormat format, RdfFormat graphFormat)
         {
             try
             {
-                var resultStream = model.GetResultsStream(format, ifNotModifiedSince);
+                ISerializationFormat streamFormat;
+                var resultStream = model.GetResultsStream(format, graphFormat, ifNotModifiedSince, out streamFormat);
                 Contents = resultStream.CopyTo;
-                ContentType = format.MediaTypes[0];
+                ContentType = streamFormat.ToString();
                 StatusCode = HttpStatusCode.OK;
             }
             catch (InvalidCommitPointException)

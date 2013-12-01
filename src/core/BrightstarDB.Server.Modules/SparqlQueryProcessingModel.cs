@@ -16,6 +16,9 @@ namespace BrightstarDB.Server.Modules
         public ulong CommitId { get { return _commitId; } }
         public SparqlRequestObject SparqlRequest { get { return _sparqlRequest; } }
 
+        public SparqlResultsFormat OverrideSparqlFormat { get; set; }
+        public RdfFormat OverrideGraphFormat { get; set; }
+
         public SparqlQueryProcessingModel(string storeName, IBrightstarService service, SparqlRequestObject sparqlRequest)
         {
             _storeName = storeName;
@@ -32,16 +35,17 @@ namespace BrightstarDB.Server.Modules
             _sparqlRequest = sparqlRequest;
         }
 
-        public Stream GetResultsStream(SparqlResultsFormat format, DateTime? ifNotModifiedSince)
+        public Stream GetResultsStream(SparqlResultsFormat format, RdfFormat graphFormat, DateTime? ifNotModifiedSince, out ISerializationFormat streamFormat)
         {
             if (_commitId > 0)
             {
                 var commitPointInfo = _service.GetCommitPoint(_storeName, _commitId);
                 if (commitPointInfo == null) throw new InvalidCommitPointException();
-                return _service.ExecuteQuery(commitPointInfo, _sparqlRequest.Query, _sparqlRequest.DefaultGraphUri, format);
+                return _service.ExecuteQuery(commitPointInfo, _sparqlRequest.Query, _sparqlRequest.DefaultGraphUri, format, graphFormat, out streamFormat);
             }
 
-            return _service.ExecuteQuery(_storeName, _sparqlRequest.Query, _sparqlRequest.DefaultGraphUri, ifNotModifiedSince, format);
+            
+            return _service.ExecuteQuery(_storeName, _sparqlRequest.Query, _sparqlRequest.DefaultGraphUri, ifNotModifiedSince, format, graphFormat, out streamFormat);
         }
 
 
