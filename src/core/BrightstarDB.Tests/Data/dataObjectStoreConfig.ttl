@@ -1,5 +1,6 @@
 ﻿@prefix dnr: <http://www.dotnetrdf.org/configuration#> .
 @prefix bst: <http://www.brightstardb.com/tests#> .
+@prefix : <http://example.org/configuration#>.
 
 bst:peopleStore a dnr:TripleStore;
 	dnr:type "VDS.RDF.TripleStore" ;
@@ -29,3 +30,11 @@ bst:peopleStoreUpdate a dnr:SparqlUpdateProcessor ;
 bst:fuseki a dnr:StorageProvider ;
 	dnr:type "VDS.RDF.Storage.FusekiConnector" ;
 	dnr:server "http://localhost:3030/ds/data" .
+
+:sparqlQuery a dnr:SparqlQueryEndpoint ;
+    dnr:type "VDS.RDF.Query.SparqlRemoteEndpoint" ;
+    dnr:queryEndpointUri <http://127.0.0.1:8081/sparql> .
+
+:sparqlUpdate a dnr:SparqlUpdateEndpoint ;
+    dnr:type "VDS.RDF.Update.SparqlRemoteUpdateEndpoint" ;
+    dnr:updateEndpointUri <http://127.0.0.1:8081/sparql> .

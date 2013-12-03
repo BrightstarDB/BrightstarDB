@@ -83,5 +83,14 @@ namespace BrightstarDB.Tests.DataObjectsTests
             var connectionString = "type=dotNetRdf;configuration=" + configFilePath + ";storeName=example;store=http://www.brightstardb.com/tests#fuseki";
             var doContext = BrightstarService.GetDataObjectContext(connectionString);
         }
+
+        [Test]
+        public void TestInitializeFromDnrSparqlEndpoints()
+        {
+            var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
+            var connectionString = "type=dotNetRdf;configuration=" + configFilePath +
+                                   ";query=http://example.org/configuration#sparqlQuery;update=http://example.org/configuration#sparqlUpdate";
+            var doContext = BrightstarService.GetDataObjectContext(connectionString);
+        }
     }
 }

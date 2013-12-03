@@ -81,15 +81,44 @@ namespace BrightstarDB.Client
                     throw new BrightstarClientException("DotNetRDF connection requires either a Store property or a Query and an Update property.");
                 }
 
-                _queryProcessor = GetConfigurationObject(connectionString.DnrQuery) as ISparqlQueryProcessor;
-                if (_queryProcessor == null)
+                var queryObject = GetConfigurationObject(connectionString.DnrQuery);
+                if (queryObject == null)
                 {
-                    throw new BrightstarClientException("Could not create a SPARQL Query processor from the configured Query property.");
+                    throw new BrightstarClientException("The configured Query property of the connection string could not be resolved.");
                 }
-                _updateProcessor = GetConfigurationObject(connectionString.DnrUpdate) as ISparqlUpdateProcessor;
-                if (_updateProcessor == null)
+                if (queryObject is ISparqlQueryProcessor)
                 {
-                    throw new BrightstarClientException("Could not create a SPARQL Update processor from the configured Update property.");
+                    _queryProcessor = queryObject as ISparqlQueryProcessor;
+                }
+                else if (queryObject is SparqlRemoteEndpoint)
+                {
+                    _queryProcessor = new RemoteQueryProcessor(queryObject as SparqlRemoteEndpoint);
+                }
+                else
+                {
+                    throw new BrightstarClientException(
+                        String.Format("Could not create a SPARQL Query processor from the configured Query property. Expected instance of {0} or {1}. Got an instance of {2}",
+                        typeof(ISparqlQueryProcessor).FullName, typeof(SparqlRemoteEndpoint).FullName, queryObject.GetType().FullName));
+                }
+
+                var updateObject = GetConfigurationObject(connectionString.DnrUpdate);
+                if (updateObject == null)
+                {
+                    throw new BrightstarClientException("The configured Update property of the connection string could not be resolved.");
+                }
+                if (updateObject is ISparqlUpdateProcessor)
+                {
+                    _updateProcessor = queryObject as ISparqlUpdateProcessor;
+                }
+                else if (updateObject is SparqlRemoteUpdateEndpoint)
+                {
+                    _updateProcessor = new RemoteUpdateProcessor(updateObject as SparqlRemoteUpdateEndpoint);
+                }
+                else
+                {
+                    throw new BrightstarClientException(
+                        String.Format("Could not create a SPARQL Update processor from the configured Update property. Expected instance of {0} or {1}. Got an instance of {2}",
+                        typeof(ISparqlUpdateProcessor).FullName, typeof(SparqlRemoteUpdateEndpoint).FullName, updateObject.GetType().FullName));
                 }
             }
         }
