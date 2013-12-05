@@ -78,17 +78,17 @@ namespace BrightstarDB.Client
         /// <remarks>See <see cref="Constants.StoreNameRegex"/> for the regular expression used to validate store names.</remarks>
         public void CreateStore(string storeName, PersistenceType persistenceType)
         {
+            if (storeName == null)
+                throw new ArgumentNullException("storeName", Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
+            if (String.IsNullOrEmpty(storeName))
+                throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString,
+                                            "storeName");
+            if (!System.Text.RegularExpressions.Regex.IsMatch(storeName, Constants.StoreNameRegex))
+            {
+                throw new ArgumentException(Strings.BrightstarServiceClient_InvalidStoreName, "storeName");
+            }
             try
             {
-                if (storeName == null)
-                    throw new ArgumentNullException("storeName", Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
-                if (String.IsNullOrEmpty(storeName))
-                    throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString,
-                                                "storeName");
-                if (!System.Text.RegularExpressions.Regex.IsMatch(storeName, Constants.StoreNameRegex))
-                {
-                    throw new ArgumentException(Strings.BrightstarServiceClient_InvalidStoreName, "storeName");
-                }
                 _serverCore.CreateStore(storeName, persistenceType);
             }
             catch (Exception ex)

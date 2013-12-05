@@ -15,25 +15,38 @@ using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestFixture]
+    [TestFixture("type=rest;endpoint=http://localhost:8090/brightstar")]
+    [TestFixture("type=embedded;storesDirectory=brightstar")]
     public class ClientTests : ClientTestBase
     {
+        private readonly string _connectionString;
 
-        private static IBrightstarService GetClient()
+        public ClientTests(string connectionString)
         {
-            return BrightstarService.GetClient("type=http;endpoint=http://localhost:8090/brightstar");
+            _connectionString = connectionString;
+        }
+
+        private IBrightstarService GetClient()
+        {
+            return BrightstarService.GetClient(_connectionString);
         }
 
         [TestFixtureSetUp]
         public void SetUp()
         {
-            StartService();
+            if (_connectionString.Contains("type=rest"))
+            {
+                StartService();
+            }
         }
 
         [TestFixtureTearDown]
         public void TearDown()
         {
-            CloseService();
+            if (_connectionString.Contains("type=rest"))
+            {
+                CloseService();
+            }
         }
 
         [Test]
@@ -105,7 +118,7 @@ namespace BrightstarDB.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(System.ServiceModel.FaultException<ExceptionDetail>))]
+        [ExpectedException(typeof(BrightstarClientException))]
         public void TestCreateDuplicateStoreFails()
         {
 
@@ -157,6 +170,7 @@ namespace BrightstarDB.Tests
         public void TestQueryIfNotModifiedSince()
         {
             var client = GetClient();
+            if (!(client is BrightstarRestClient)) return;
             var storeName = "Client.TestQueryIfNotModifiedSince_" + DateTime.Now.Ticks;
             client.CreateStore(storeName);
             client.ExecuteQuery(storeName, "SELECT ?s WHERE { ?s ?p ?o }");
@@ -448,23 +462,6 @@ namespace BrightstarDB.Tests
         }
 
         [Test]
-        public void TestBadDataGetsUsefulErrorMessage()
-        {
-            string sid = null;
-            try
-            {
-                var bc = GetClient();
-                sid = Guid.NewGuid().ToString();
-                bc.CreateStore(sid);
-                bc.CreateStore(sid);
-            } catch (FaultException<ExceptionDetail> ex)
-            {
-                var detail = ex.Detail;
-                Assert.AreEqual("Error creating store " + sid + ". Store already exists", detail.Message);
-            }
-        }
-
-        [Test]
         public void TestEmbeddedClient()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -548,7 +545,15 @@ namespace BrightstarDB.Tests
                 exportJobInfo = client.GetJobInfo(storeName, exportJobInfo.JobId);
             }
 
-            var exportFile = new FileInfo("c:\\brightstar\\import\\" + storeName + "_export.nt");
+            FileInfo exportFile;
+            if (client is BrightstarRestClient)
+            {
+                exportFile = new FileInfo("c:\\brightstar\\import\\" + storeName + "_export.nt");
+            }
+            else
+            {
+                exportFile = new FileInfo("brightstar\\import\\" + storeName + "_export.nt");
+            }
             Assert.IsTrue(exportFile.Exists);
             var lineCount = File.ReadAllLines(exportFile.FullName).Where(x => !String.IsNullOrEmpty(x)).Count();
             Assert.AreEqual(firstBatchSize, lineCount);
@@ -889,8 +894,9 @@ namespace BrightstarDB.Tests
             txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
             txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/mbox> ""bob@example.org"" .");
 
-            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
-            Assert.IsTrue(result.JobCompletedOk);
+            Thread.Sleep(1000);
+            client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
+            var commitId = client.GetCommitPoints(storeName, 0, 1).Select(s => s.Id).First();
 
             var stats = client.GetStatistics(storeName);
             Assert.IsNull(stats);
@@ -903,9 +909,8 @@ namespace BrightstarDB.Tests
             Assert.IsNotNull(stats);
             Assert.AreEqual(4, stats.TotalTripleCount);
             Assert.AreEqual(2, stats.PredicateTripleCounts.Count);
-
-            var commitPoint = client.GetCommitPoint(storeName, stats.CommitTimestamp);
-            Assert.AreEqual(commitPoint.Id, stats.CommitId);
+            
+            Assert.AreEqual(commitId, stats.CommitId);
         }
 
         [Test]
@@ -917,11 +922,11 @@ namespace BrightstarDB.Tests
             const string addSet1 = "<http://example.org/people/alice> <http://www.w3.org/2000/01/rdf-schema#label> \"Alice\".";
             const string addSet2 = "<http://example.org/people/bob> <http://www.w3.org/2000/01/rdf-schema#label> \"Bob\".";
             const string addSet3 = "<http://example.org/people/carol> <http://www.w3.org/2000/01/rdf-schema#label> \"Carol\".";
-            var result = client.ExecuteTransaction(storeName, null, null, addSet1);
+            var result = client.ExecuteTransaction(storeName, null, null, addSet1, waitForCompletion:true);
             Assert.IsTrue(result.JobCompletedOk);
-            result = client.ExecuteTransaction(storeName, null, null, addSet2);
+            result = client.ExecuteTransaction(storeName, null, null, addSet2, waitForCompletion:true);
             Assert.IsTrue(result.JobCompletedOk);
-            result = client.ExecuteTransaction(storeName, null, null, addSet3);
+            result = client.ExecuteTransaction(storeName, null, null, addSet3, waitForCompletion:true);
             Assert.IsTrue(result.JobCompletedOk);
 
             var resultsStream = client.ExecuteQuery(storeName, "SELECT * WHERE {?s ?p ?o}");
