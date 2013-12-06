@@ -110,7 +110,7 @@ namespace BrightstarDB.Client
                 {
                     _updateProcessor = queryObject as ISparqlUpdateProcessor;
                 }
-#if !WINDOWS_PHONE
+#if !WINDOWS_PHONE && !PORTABLE
                 else if (updateObject is SparqlRemoteUpdateEndpoint)
                 {
                     _updateProcessor = new RemoteUpdateProcessor(updateObject as SparqlRemoteUpdateEndpoint);
