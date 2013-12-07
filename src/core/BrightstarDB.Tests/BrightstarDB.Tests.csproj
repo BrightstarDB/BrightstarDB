@@ -92,6 +92,7 @@
     <Compile Include="ClientTests.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="ConnectionStringTests.cs" />
+    <Compile Include="DataObjectsTests\BasicDataObjectsTests.cs" />
     <Compile Include="DataObjectsTests\DotNetRdfDataObjectStoreTests.cs" />
     <Compile Include="DataObjectsTests\LiteralPropertiesTests.cs" />
     <Compile Include="DataObjectsTests\StoreCallbackTests.cs" />
