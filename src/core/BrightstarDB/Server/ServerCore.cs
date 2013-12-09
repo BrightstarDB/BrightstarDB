@@ -142,6 +142,10 @@ namespace BrightstarDB.Server
                 {
                     return _stores[_baseLocation + "\\" + storeName];
                 }
+                if (!DoesStoreExist(storeName))
+                {
+                    throw new NoSuchStoreException(storeName);
+                }
                 // create store manager
                 var storeWorker = new StoreWorker(_baseLocation , storeName);
                 storeWorker.JobCompleted += HandleStoreWorkerJobCompleted;

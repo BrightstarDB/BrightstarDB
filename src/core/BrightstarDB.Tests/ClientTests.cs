@@ -969,6 +969,98 @@ namespace BrightstarDB.Tests
 
         }
 
+        [Test]
+        public void TestListJobs()
+        {
+            var storeName = "TestListJobs_" + DateTime.Now.Ticks;
+            var client = GetClient();
+            client.CreateStore(storeName);
+
+            var jobs = client.GetJobInfo(storeName, 0, 10).ToList();
+            Assert.That(jobs.Count == 0);
+
+            var job = client.UpdateStatistics(storeName);
+            job = WaitForJob(job, client, storeName);
+            Assert.That(job.JobCompletedOk);
+
+            jobs = client.GetJobInfo(storeName, 0, 10).ToList();
+            Assert.That(jobs.Count == 1);
+            Assert.That(jobs[0].JobId == job.JobId);
+
+            var job2 = client.ExecuteTransaction(storeName, null, null,
+                                            "<http://example.org/s> <http://example.org/p> <http://example.org/o> .");
+            job2 = WaitForJob(job2, client, storeName);
+            Assert.That(job.JobCompletedOk);
+
+            jobs = client.GetJobInfo(storeName, 0, 10).ToList();
+            Assert.That(jobs.Count, Is.EqualTo(2));
+            Assert.That(jobs[0].JobId, Is.EqualTo(job2.JobId));
+            Assert.That(jobs[1].JobId, Is.EqualTo(job.JobId));
+
+            jobs = client.GetJobInfo(storeName, 0, 1).ToList();
+            Assert.That(jobs.Count, Is.EqualTo(1));
+            Assert.That(jobs[0].JobId, Is.EqualTo(job2.JobId));
+
+            jobs = client.GetJobInfo(storeName, 1, 1).ToList();
+            Assert.That(jobs.Count, Is.EqualTo(1));
+            Assert.That(jobs[0].JobId, Is.EqualTo(job.JobId));
+        }
+
+        [Test]
+        public void TestGetJobInfoParameterValidation()
+        {
+            var storeName = "TestGetJobInfoParameterValidation_" + DateTime.Now.Ticks;
+            var client = GetClient();
+            client.CreateStore(storeName);
+
+            try
+            {
+                client.GetJobInfo(storeName, -1, 10);
+                Assert.Fail("Expected ArgumentException when skip < 0");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.That(ex.ParamName, Is.EqualTo("skip"));
+            }
+
+            try
+            {
+                client.GetJobInfo(storeName, 0, 0);
+                Assert.Fail("Expected ArgumentException when take == 0");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.That(ex.ParamName, Is.EqualTo("take"));
+            }
+
+            try
+            {
+                client.GetJobInfo(storeName, 0, -1);
+                Assert.Fail("Expected ArgumentException when take < 0");
+            }
+            catch (ArgumentException ex)
+            {
+                Assert.That(ex.ParamName, Is.EqualTo("take"));
+            }
+
+            try
+            {
+                client.GetJobInfo(null, 10, 10);
+                Assert.Fail("Expected ArgumentNullException when storeName is NULL");
+            }
+            catch (ArgumentNullException ex)
+            {
+                Assert.That(ex.ParamName, Is.EqualTo("storeName"));
+            }
+
+            try
+            {
+                client.GetJobInfo("Invalid" + storeName, 0, 10);
+                Assert.Fail("Expected BrightstarClientException when store does not exist");
+            } catch(BrightstarClientException){}
+
+        }
+        
         private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
                                               string graphUri)
         {

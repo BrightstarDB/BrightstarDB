@@ -456,14 +456,22 @@ namespace BrightstarDB.Client
         /// <remarks>Job information is returned in reverse order of the order in which they will be / were executed (most recent first).</remarks>
         public IEnumerable<IJobInfo> GetJobInfo(string storeName, int skip, int take)
         {
+            if (storeName == null) throw new ArgumentNullException("storeName", Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
+            if (String.Empty.Equals(storeName)) throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString, "storeName");
+            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative, "skip");
+            if (take <= 0) throw new ArgumentException(Strings.BrightstarServiceClient_TakeMustBeGreaterThanZero, "take");
             try
             {
                 var jobs = _serverCore.GetJobs(storeName).Skip(skip).Take(take);
                 return jobs.Select(jobStatus => new JobInfoObject(jobStatus)).Cast<IJobInfo>();
             }
+            catch (NoSuchStoreException)
+            {
+                throw new BrightstarClientException(String.Format(Strings.BrightstarServiceClient_StoreDoesNotExist, storeName));
+            }
             catch (Exception ex)
             {
-                Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting job listing for store {0}", storeName);
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting job listing for store '{0}'", storeName);
                 throw new BrightstarClientException("Error getting job listing for store " + storeName + ". " + ex.Message, ex);
             }
         }

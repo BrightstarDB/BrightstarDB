@@ -605,9 +605,9 @@ namespace BrightstarDB.Client
         public IEnumerable<IJobInfo> GetJobInfo(string storeName, int skip, int take)
         {
             ValidateStoreName(storeName);
-            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative);
-            if (take <= 0) throw new ArgumentException(Strings.BrightstarServiceClient_TakeMustBeGreaterThanZero);
-            if (take > 100) throw new ArgumentException(Strings.BrightstarServiceClient_GetJobInfo_TakeToLarge);
+            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative, "skip");
+            if (take <= 0) throw new ArgumentException(Strings.BrightstarServiceClient_TakeMustBeGreaterThanZero, "take");
+            if (take > 100) throw new ArgumentException(Strings.BrightstarServiceClient_GetJobInfo_TakeToLarge, "take");
 
             var queryUri = String.Format("{0}/jobs?skip={1}&take={2}", storeName, skip, take);
             var response = AuthenticatedGet(queryUri);
