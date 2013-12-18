@@ -619,7 +619,7 @@ to the programmer).
 To enable optimistic locking in a connection string, simply add "optimisticLocking=true" to 
 the connection string. e.g. ::
 
-  type=http;endpoint=http://localhost:8090/brightstar;storeName=myStore;optimisticLocking=true
+  type=rest;endpoint=http://localhost:8090/brightstar;storeName=myStore;optimisticLocking=true
 
 To enable optimistic locking from code, use the optional optimisticLocking parameter on the 
 constructor of the context class e.g.::
