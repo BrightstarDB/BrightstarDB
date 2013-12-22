@@ -10,8 +10,10 @@ using BrightstarDB.Portable.Compatibility;
 #else
 using System.Collections.Concurrent;
 #endif
+using BrightstarDB.Query;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
+using VDS.RDF.Query;
 #if !SILVERLIGHT
 using System.ServiceModel;
 #endif
@@ -253,28 +255,28 @@ namespace BrightstarDB.Server
             get { return _writeStore ?? (_writeStore = _storeManager.OpenStore(_storeLocation)); }
         }
 
-        public string Query(ulong commitPointId, string queryExpression, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris )
+        public BrightstarSparqlResultsType Query(ulong commitPointId, SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, string[] defaultGraphUris)
         {
             // Not supported by read/write store so no handling for ReadWriteStoreModifiedException required
-            Logging.LogDebug("CommitPointId={0}, Query={1}", commitPointId, queryExpression);
+            Logging.LogDebug("CommitPointId={0}, Query={1}", commitPointId, query);
             using (var readStore = _storeManager.OpenStore(_storeLocation, commitPointId))
             {
-                return readStore.ExecuteSparqlQuery(queryExpression, resultsFormat, defaultGraphUris);
+                return readStore.ExecuteSparqlQuery(query, targetFormat, resultsStream, defaultGraphUris);
             }
         }
 
-        public string Query(string queryExpression, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris )
+        public BrightstarSparqlResultsType Query(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, string[] defaultGraphUris )
         {
-            Logging.LogDebug("Query {0}", queryExpression);
+            Logging.LogDebug("Query {0}", query);
             try
             {
-                return ReadStore.ExecuteSparqlQuery(queryExpression, resultsFormat, defaultGraphUris);
+                return ReadStore.ExecuteSparqlQuery(query, targetFormat, resultsStream, defaultGraphUris);
             }
             catch (ReadWriteStoreModifiedException)
             {
                 Logging.LogDebug("Read/Write store was concurrently modified. Attempting a retry");
                 InvalidateReadStore();
-                return Query(queryExpression, resultsFormat, defaultGraphUris);
+                return Query(query, targetFormat, resultsStream, defaultGraphUris);
             }
         }
 

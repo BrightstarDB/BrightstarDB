@@ -94,8 +94,8 @@ Connecting over SPARQL Protocol
 
 DotNetRDF configuration file (dotNetRdf.config.ttl)::
 
-    @prefix dnr: <http://www.dotnetrdf.org/configuration#>
-    @prefix : <http://example.org/configuration#>
+    @prefix dnr: <http://www.dotnetrdf.org/configuration#> .
+    @prefix : <http://example.org/configuration#> .
     
     :sparqlQuery a dnr:SparqlQueryEndpoint ;
         dnr:type "VDS.RDF.Query.SparqlRemoteEndpoint" ;

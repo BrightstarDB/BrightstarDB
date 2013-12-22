@@ -25,7 +25,7 @@ object. The client implements the ``BrightstarDB.IBrightstarService`` interface.
 The following example shows how to create a new service client using a connection string::
 
   var client = BrightstarService.GetClient(
-                    "Type=http;endpoint=http://localhost:8090/brightstar;");
+                    "Type=rest;endpoint=http://localhost:8090/brightstar;");
 
 For more information about connection strings, please read the :ref:`"Connection Strings" 
 topic <Connection_Strings>`

@@ -140,6 +140,50 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
+        [Test]
+        public void TestOnCreatedCalledWhenUsingCreateMethod()
+        {
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                var entity = context.Entities.Create() as Entity;
+                Assert.That(entity, Is.Not.Null);
+                Assert.That(entity.OnCreatedWasCalled);
+                context.SaveChanges();
+            }
+
+        }
+
+        [Test]
+        public void TestOnCreatedNotCalledWhenBindingExistingResource()
+        {
+            string entityId;
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                var entity = context.Entities.Create();
+                entityId = entity.Id;
+                context.SaveChanges();
+            }
+
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                var entity = context.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+                Assert.That(entity, Is.Not.Null);
+                Assert.That(!(entity as Entity).OnCreatedWasCalled);
+            }
+        }
+
+        [Test]
+        public void TestOnCreatedCalledWhenUsingConstructor()
+        {
+            using (var context = new MyEntityContext(_connectionString))
+            {
+                var entity = new Entity();
+                Assert.That(entity.OnCreatedWasCalled);
+                context.Entities.Add(entity);
+                context.SaveChanges();
+            }
+        }
+
         private void LogChangedItems(object sender, EventArgs e)
         {
             var context = sender as MyEntityContext;

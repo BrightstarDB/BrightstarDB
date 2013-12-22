@@ -4,6 +4,8 @@ namespace BrightstarDB.Tests.EntityFramework
 {
     internal partial class Entity : IEquatable<Entity>
     {
+        public bool OnCreatedWasCalled { get; set; }
+
         public bool Equals(Entity other)
         {
             //Check whether the compared object is null.
@@ -16,5 +18,9 @@ namespace BrightstarDB.Tests.EntityFramework
             return SomeString.Equals(other.SomeString) && SomeInt.Equals(other.SomeInt);
         }
 
+        protected override void OnCreated(BrightstarDB.EntityFramework.BrightstarEntityContext context)
+        {
+            OnCreatedWasCalled = true;
+        }
     }
 }

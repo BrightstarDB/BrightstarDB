@@ -8,6 +8,7 @@ using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
+using VDS.RDF.Parsing;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -22,13 +23,27 @@ namespace BrightstarDB.Server.Modules
 
             Get["/{storeName}/sparql"] = parameters =>
                 {
-                    var requestObject = BindSparqlRequestObject();
-                    return ProcessQuery(parameters["storeName"], requestObject);
+                    try
+                    {
+                        var requestObject = BindSparqlRequestObject();
+                        return ProcessQuery(parameters["storeName"], requestObject);
+                    }
+                    catch (RdfParseException)
+                    {
+                        return HttpStatusCode.BadRequest;
+                    }
                 };
             Post["/{storeName}/sparql"] = parameters =>
                 {
-                    var requestObject = BindSparqlRequestObject();
-                    return ProcessQuery(parameters["storeName"], requestObject);
+                    try
+                    {
+                        var requestObject = BindSparqlRequestObject();
+                        return ProcessQuery(parameters["storeName"], requestObject);
+                    }
+                    catch (RdfParseException)
+                    {
+                        return HttpStatusCode.BadRequest;
+                    }
                 };
             Get["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
             Post["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
@@ -88,14 +103,21 @@ namespace BrightstarDB.Server.Modules
 
         private Negotiator ProcessQuery(string storeName, SparqlRequestObject requestObject)
         {
-            SparqlResultsFormat requestedFormat =
-                String.IsNullOrEmpty(requestObject.Format)
-                    ? SparqlResultsFormat.Xml
-                    : (
-                          SparqlResultsFormat.GetResultsFormat(requestObject.Format) ??
-                          SparqlResultsFormat.Xml);
-            var model = new SparqlResultModel(storeName, _brightstar, requestObject, requestedFormat);
-            
+            //SparqlResultsFormat requestedFormat =
+            //    String.IsNullOrEmpty(requestObject.Format)
+            //        ? SparqlResultsFormat.Xml
+            //        : (
+            //              SparqlResultsFormat.GetResultsFormat(requestObject.Format) ??
+            //              SparqlResultsFormat.Xml);
+            //RdfFormat graphFormat =
+            //    String.IsNullOrEmpty(requestObject.Format)
+            //        ? RdfFormat.RdfXml
+            //        : (RdfFormat.GetResultsFormat(requestObject.Format) ?? RdfFormat.RdfXml);
+
+            var model = new SparqlResultModel(storeName, _brightstar, requestObject,
+                                              //requestedFormat, graphFormat);
+                                              null, null);
+
             return Negotiate
                 .WithMediaRangeModel(MediaRange.FromString("text/html"), model).WithView("SparqlResult")
                 .WithModel(new SparqlQueryProcessingModel(storeName, _brightstar, requestObject));

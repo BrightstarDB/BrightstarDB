@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\key\brightstardb.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
@@ -46,6 +46,12 @@
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net40\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Nancy">
+      <HintPath>..\packages\Nancy.0.21.1\lib\net40\Nancy.dll</HintPath>
+    </Reference>
+    <Reference Include="Nancy.Hosting.Self">
+      <HintPath>..\packages\Nancy.Hosting.Self.0.21.1\lib\net40\Nancy.Hosting.Self.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -82,8 +88,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CachingTests.cs" />
+    <Compile Include="ClientTestBase.cs" />
+    <Compile Include="ClientTests.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="ConnectionStringTests.cs" />
+    <Compile Include="DataObjectsTests\BasicDataObjectsTests.cs" />
     <Compile Include="DataObjectsTests\DotNetRdfDataObjectStoreTests.cs" />
     <Compile Include="DataObjectsTests\LiteralPropertiesTests.cs" />
     <Compile Include="DataObjectsTests\StoreCallbackTests.cs" />
@@ -130,6 +139,7 @@
     <Compile Include="EntityFramework\SimpleContextTests.cs" />
     <Compile Include="EntityFramework\InterfaceInheritanceTests.cs" />
     <Compile Include="EntityFramework\StringComparisonTests.cs" />
+    <Compile Include="SparqlQueryHelperTests.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="GraphTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -164,6 +174,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BrightstarDB.Server.Modules\BrightstarDB.Server.Modules.csproj">
+      <Project>{A6A05324-BA02-4C82-9199-AD19BC442C60}</Project>
+      <Name>BrightstarDB.Server.Modules</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BrightstarDB\BrightstarDB.csproj">
       <Project>{00BECF1C-ED86-4773-98C6-463950D0E55E}</Project>
       <Name>BrightstarDB</Name>

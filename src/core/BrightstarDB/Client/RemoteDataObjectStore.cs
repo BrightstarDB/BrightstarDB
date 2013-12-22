@@ -72,8 +72,14 @@ namespace BrightstarDB.Client
                     sb.AppendFormat(" FROM NAMED <{0}>", dsGraph);
                 }
             }
-            sb.AppendFormat(" FROM NAMED <{0}>", UpdateGraphUri);
-            sb.AppendFormat(" FROM NAMED <{0}>", VersionGraphUri);
+            if (UpdateGraphUri != null)
+            {
+                sb.AppendFormat(" FROM NAMED <{0}>", UpdateGraphUri);
+            }
+            if (VersionGraphUri != null)
+            {
+                sb.AppendFormat(" FROM NAMED <{0}>", VersionGraphUri);
+            }
             sb.Append(" WHERE {{ GRAPH ?g {{ <{0}> ?p ?o }} }}");
             return sb.ToString();
         }

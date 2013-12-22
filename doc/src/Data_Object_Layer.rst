@@ -232,7 +232,7 @@ first option is to enable optimistic locking in the connection string used to cr
 ``IDataObjectContext``::
 
     var context = BrightstarService.GetDataObjectContext(
-                      "type=http;endpoint=http://localhost:8090/brightstar;optimisticLocking=true");
+                      "type=rest;endpoint=http://localhost:8090/brightstar;optimisticLocking=true");
 
 The other option is to enable optimistic locking in the ``OpenStore()`` or ``CreateStore()`` method used to 
 retrieve the IDataObjectStore instance from the IDataObjectContext::

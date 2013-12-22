@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using BrightstarDB.Client;
 using BrightstarDB.Server;
 using BrightstarDB.Storage;
@@ -80,7 +81,12 @@ namespace BrightstarDB.InternalTests
                 Assert.IsNotNull(resource);
                 try
                 {
-                    var results = storeWorker.Query(TestQuery, SparqlResultsFormat.Xml, new[] { Constants.DefaultGraphUri });
+                    var query = StoreExtensions.ParseSparql(TestQuery);
+                    using (var resultStream = new MemoryStream())
+                    {
+                        storeWorker.Query(query, SparqlResultsFormat.Xml, resultStream,
+                                          new[] {Constants.DefaultGraphUri});
+                    }
                     Console.WriteLine("Query succeeded");
                 }
                 catch(Exception ex)

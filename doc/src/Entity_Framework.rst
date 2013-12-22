@@ -619,7 +619,7 @@ to the programmer).
 To enable optimistic locking in a connection string, simply add "optimisticLocking=true" to 
 the connection string. e.g. ::
 
-  type=http;endpoint=http://localhost:8090/brightstar;storeName=myStore;optimisticLocking=true
+  type=rest;endpoint=http://localhost:8090/brightstar;storeName=myStore;optimisticLocking=true
 
 To enable optimistic locking from code, use the optional optimisticLocking parameter on the 
 constructor of the context class e.g.::
@@ -814,6 +814,42 @@ in a LINQ query e.g.::
 
 However, please note that the regular expression options that can be used is limited to a 
 combination of ``IgnoreCase``, ``Multiline``, ``Singleline`` and ``IgnorePatternWhitespace``.
+
+.. _Casting:
+
+Casting Entities
+================
+
+One of the nicest features of RDF is its flexibility - an RDF resource can be of multiple types and
+can support multiple (possibly conflicting) properties according to different schemas. It allows you
+to record different aspects of the same thing all at a single point in the data store. In OO programming
+however, we tend to prefer to separate out different representations of the same thing into different classes
+and to use those classes to encapsulate a specific model. So there is a tension between the freedom in 
+RDF to record anything about any resource and the need in traditional OO programming to have a set of
+types and properties defined at compile time.
+
+In BrightstarDB the way we handle is is to allow you to convert an entity from one type to any other 
+entity type at runtime. This feature is provided by the ``Become<T>()`` method on the entity object.
+Calling ``Become<T>()`` on an entity has two effects:
+
+  1.  It adds one or more RDF type statements to the resource so that it is now recorded as being an
+      instance of the RDF class that the entity type ``T`` is mapped to. When ``T`` inherits from a base entity
+      type both the RDF type for ``T`` and the RDF type for the base type is added.
+  2.  It returns an instance of ``T`` which is bound to the same underlying DataObject as the entity you
+      call ``Become<T>()`` on.
+
+This feature gives you the ability to convert and extend resources at runtime with almost no overhead.
+You should note that ``Become<T>()`` does nothing to ensure that the resource conforms to the constraints
+that the type ``T`` might imply, so your code should be written to robustly handle missing properties.
+
+Once you call ``SaveChanges()`` on the context, the new type statements (and any new properties you created)
+are committed to the store. You will now find the object can be accessed through the context entity set for
+``T``.
+
+There is also an ``Unbecome<T>()`` method. This method can be used to remove RDF type statements from an 
+entity so that it no longer appears in the collection of entities of type ``T`` on  the context. Note that
+this does not remove the RDF type statements for super-types of ``T``, but you can explicitly do this by 
+making further calls to ``Unbecome<T>()`` with the appropriate super-types.
 
 .. _OData:
 

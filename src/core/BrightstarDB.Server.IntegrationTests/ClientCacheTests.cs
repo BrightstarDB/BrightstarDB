@@ -37,7 +37,7 @@ namespace BrightstarDB.Server.IntegrationTests
             client.CreateStore(storeName);
             const string query = "SELECT ?s WHERE { ?s ?p ?o }";
             client.ExecuteQuery(storeName, query);
-            var cacheKey = storeName + "_" + query.GetHashCode();
+            var cacheKey = storeName + "_" + query.GetHashCode() + "_" + SparqlResultsFormat.Xml;
             Assert.IsTrue(testCache.ContainsKey(cacheKey));
             testCache.Insert(cacheKey, new CachedQueryResult(DateTime.UtcNow, "This is a test"), CachePriority.Normal);
             var resultStream = client.ExecuteQuery(storeName, query);

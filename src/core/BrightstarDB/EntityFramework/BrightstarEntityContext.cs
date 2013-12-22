@@ -531,7 +531,8 @@ namespace BrightstarDB.EntityFramework
                 }
             }
             var bindType = GetImplType(typeof (T));
-            return ((T) Activator.CreateInstance(bindType, this, dataObject));
+
+            return ((T)Activator.CreateInstance(bindType, this, dataObject));
         }
 
         

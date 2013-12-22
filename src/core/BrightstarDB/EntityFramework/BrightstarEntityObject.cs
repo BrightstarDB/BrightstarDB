@@ -31,6 +31,7 @@ namespace BrightstarDB.EntityFramework
             _context = context;
             DataObject = dataObject;
             _context.TrackObject(this);
+            this.TriggerCreatedEvent(context);
         }
 
         /// <summary>
@@ -44,6 +45,7 @@ namespace BrightstarDB.EntityFramework
             _context = context;
             DataObject = _context.GetDataObject(identity, false);
             _context.TrackObject(this);
+            this.TriggerCreatedEvent(context);
         }
 
         /// <summary>
@@ -53,6 +55,7 @@ namespace BrightstarDB.EntityFramework
         /// of the object must be set before attempting to get or set any of its other properties.</remarks>
         public BrightstarEntityObject()
         {
+            this.TriggerCreatedEvent(null);
         }
 
         #region Implementation of IEntityObject
@@ -959,6 +962,22 @@ namespace BrightstarDB.EntityFramework
            {
                c.RemoveFromLoadedObjects(toRemove.Identity);
            }
+        }
+
+        internal void TriggerCreatedEvent(BrightstarEntityContext context)
+        {
+            if (context == null || this.DataObject.IsNew)
+            {
+                OnCreated(context);
+            }
+        }
+
+        /// <summary>
+        /// Runs after the entity object is created by the specified context.  It is not necessary to call the base method.
+        /// </summary>
+        /// <param name="context"></param>
+        protected virtual void OnCreated(BrightstarEntityContext context)
+        {
         }
     }
 }

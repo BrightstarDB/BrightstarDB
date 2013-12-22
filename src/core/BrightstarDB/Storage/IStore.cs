@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using BrightstarDB.Client;
 using BrightstarDB.Model;
 using BrightstarDB.Profiling;
 using BrightstarDB.Query;
 using BrightstarDB.Storage.Persistence;
+using VDS.RDF.Query;
 
 namespace BrightstarDB.Storage
 {
@@ -26,26 +26,15 @@ namespace BrightstarDB.Storage
         // get proxy statements
         IEnumerable<Triple> GetResourceStatements(string resource, string graphUri = null);
 
-        // query
-        void ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, Stream resultStream, out BrightstarSparqlResultsType resultsType);
-
         /// <summary>
         /// Execute a SPARQL query against this store
         /// </summary>
-        /// <param name="exp">The SPARQL query expression</param>
-        /// <param name="resultsFormat">The requested SPARQL results format</param>
+        /// <param name="query">The parsed SPARQL query expression</param>
+        /// <param name="targetFormat">The requested results format</param>
+        /// <param name="resultsStream">The stream to write the query results to</param>
         /// <param name="defaultGraphUris">OPTIONAL: An enumeration of the URIs of the graphs to be treated as the default graph in the SPARQL dataset</param>
         /// <returns>The SPARQL query results in the requested format</returns>
-        string ExecuteSparqlQuery(string exp, SparqlResultsFormat resultsFormat, IEnumerable<string> defaultGraphUris = null);
-
-        /// <summary>
-        /// Overload of ExecuteSparqlQuery that returns a count of the number of rows returned by the query
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="resultsFormat"></param>
-        /// <param name="rowCount"></param>
-        /// <returns></returns>
-        string ExecuteSparqlQuery(string expression, SparqlResultsFormat resultsFormat, out long rowCount);
+        BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, IEnumerable<string> defaultGraphUris = null);
 
         /// <summary>
         /// Insert a triple into the store

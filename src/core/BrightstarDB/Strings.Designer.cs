@@ -268,6 +268,15 @@ namespace BrightstarDB {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The store &apos;{0}&apos; does not exist or cannot be accessed..
+        /// </summary>
+        internal static string BrightstarServiceClient_StoreDoesNotExist {
+            get {
+                return ResourceManager.GetString("BrightstarServiceClient_StoreDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Store name conflicts with the name of an existing store..
         /// </summary>
         internal static string BrightstarServiceClient_StoreNameConflict {

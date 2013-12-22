@@ -8,23 +8,8 @@ namespace BrightstarDB
     /// <summary>
     /// An enumeration of the forms of SPARQL result supported by BrightstarDB
     /// </summary>
-    public class SparqlResultsFormat
+    public class SparqlResultsFormat : FormatInfo
     {
-        /// <summary>
-        /// Get the list of media types that are recognized for this results format
-        /// </summary>
-        public List<String> MediaTypes { get; private set; }
-
-        /// <summary>
-        /// The default file extension to use for this results format
-        /// </summary>
-        public string DefaultExtension { get; private set; }
-
-        /// <summary>
-        /// The encoding to be used when streaming the result
-        /// </summary>
-        public Encoding Encoding { get; private set; }
-
         /// <summary>
         /// Gets an enumeration of all of the media types supported by the SPARQL results
         /// formats defined by this class.
@@ -97,7 +82,8 @@ namespace BrightstarDB
         /// Returns the format to use for the specified media type or extension, or null if there is no match found
         /// </summary>
         /// <param name="resultsMediaTypeOrExtension"></param>
-        /// <returns></returns>
+        /// <returns>A <see cref="SparqlResultsFormat"/> instance representing the format type and encoding specified in the string,
+        /// or NULL if no match is found</returns>
         public static SparqlResultsFormat GetResultsFormat(string resultsMediaTypeOrExtension)
         {
             var parts = resultsMediaTypeOrExtension.Split(';').Select(p => p.Trim()).ToList();
@@ -119,19 +105,6 @@ namespace BrightstarDB
                 if (format.DefaultExtension.Equals(mediaType)) return format.WithEncoding(encoding);
             }
             return null;
-        }
-
-        /// <summary>
-        /// Returns the string representation of this object
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString()
-        {
-#if WINDOWS_PHONE || PORTABLE
-            return MediaTypes[0] + "; charset=" + Encoding.WebName;
-#else
-            return MediaTypes[0] + "; charset=" + Encoding.HeaderName;
-#endif
         }
     }
 }

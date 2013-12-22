@@ -173,9 +173,16 @@
     <Compile Include="Dto\TransactionStatus.cs" />
     <Compile Include="Dto\TransactionType.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
+    <Compile Include="FormatInfo.cs" />
+    <Compile Include="ISerializationFormat.cs" />
+    <Compile Include="NoAcceptableFormatException.cs" />
+    <Compile Include="RdfFormat.cs" />
     <Compile Include="Rdf\PlainLiteral.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
+    <Compile Include="SerializableModel.cs" />
+    <Compile Include="Server\NoSuchStoreException.cs" />
+    <Compile Include="Server\QueryCacheEntry.cs" />
     <Compile Include="Server\SnapshotJob.cs" />
     <Compile Include="Server\StatsMonitor.cs" />
     <Compile Include="Server\UpdateStatsJob.cs" />
@@ -443,6 +450,7 @@
     <Compile Include="Storage\StoreExtensions.cs" />
     <Compile Include="Utils\IEnumeratorExtensions.cs" />
     <Compile Include="Utils\LruCache.cs" />
+    <Compile Include="Utils\SparqlQueryHelper.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

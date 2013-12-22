@@ -43,10 +43,10 @@
     <PropertyRef Id="VCSHARP2010EXPRESS_IDE"/>
     <PropertyRef Id="VS2010_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED"/>
     <PropertyRef Id="VS2012_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED"/>
+    <PropertyRef Id="VS2013_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED"/>
     <PropertyRef Id="VS2010_ITEMTEMPLATES_DIR"/>
     <PropertyRef Id="VS2012_ITEMTEMPLATES_DIR"/>
-    <PropertyRef Id="VS2012WINEXPRESS_IDE"/>
-    <PropertyRef Id="VWD2012EXPRESS_IDE"/>
+    <PropertyRef Id="VS2013_ITEMTEMPLATES_DIR"/>
     <PropertyRef Id="VS2010_ROOT_FOLDER"/>
     
     <Property Id="ARPPRODUCTICON" Value="installer.ico"/>
@@ -54,20 +54,21 @@
     <CustomAction Id="SetVS2010ItemTemplatesPath" Directory="VS2010ITEMTEMPLATEDIR" Value="[VS2010_ITEMTEMPLATES_DIR]CSharp\Data"/>
     <CustomAction Id="SetVS2010ExpressItemTemplatesPath" Directory="VS2010ITEMTEMPLATEDIR" Value="[VS2010_ROOT_FOLDER]\Common7\IDE\VCSExpress\ItemTemplates\1033"/>
     <CustomAction Id="SetVS2012ItemTemplatesPath" Directory="VS2012ITEMTEMPLATEDIR" Value="[VS2012_ITEMTEMPLATES_DIR]CSharp\Data"/>
-    <CustomAction Id="SetVS2012ExpressItemTemplatesPath" Directory="VS2012ITEMTEMPLATEDIR" Value="[VS2012EXPRESS_ITEMTEMPLATES_DIR]CSharp\Data"/>
+    <CustomAction Id="SetVS2013ItemTemplatesPath" Directory="VS2013ITEMTEMPLATEDIR" Value="[VS2013_ITEMTEMPLATES_DIR]CSharp\Data"/>
     <CustomActionRef Id="VCSHARP2010InstallVSTemplates"/>
     <CustomActionRef Id="VS2010InstallVSTemplates"/>
     <CustomActionRef Id="VS2012InstallVSTemplates"/>
-    <CustomActionRef Id="VWD2012InstallVSTemplates"/>
-    <CustomActionRef Id="VS2012WinExpressInstallVSTemplates"/>
+    <CustomActionRef Id="VS2013InstallVSTemplates"/>
 
     <InstallExecuteSequence>
       <Custom Action="SetVS2010ItemTemplatesPath" After="CostFinalize"><![CDATA[ &VisualStudioIntegration=3 ]]></Custom>
       <Custom Action="SetVS2012ItemTemplatesPath" After="CostFinalize"><![CDATA[ &VisualStudio2012Integration=3 ]]></Custom>
+      <Custom Action="SetVS2013ItemTemplatesPath" After="CostFinalize"><![CDATA[ &VisualStudio2013Integration=3 ]]></Custom>
       <Custom Action="SetVS2010ExpressItemTemplatesPath" After="CostFinalize"><![CDATA[ &VCSExpressIntegration=3 ]]></Custom>
       <Custom Action='VCSHARP2010InstallVSTemplates' Before='InstallFinalize'><![CDATA[ &VCSExpressIntegration=3 ]]></Custom>
       <Custom Action='VS2010InstallVSTemplates' Before='InstallFinalize'><![CDATA[ &VisualStudioIntegration=3 ]]></Custom>
       <Custom Action='VS2012InstallVSTemplates' Before='InstallFinalize'><![CDATA[ &VisualStudio2012Integration=3 ]]></Custom>
+      <Custom Action='VS2013InstallVSTemplates' Before='InstallFinalize'><![CDATA[ &VisualStudio2013Integration=3 ]]></Custom>
     </InstallExecuteSequence>
 
     <WixVariable Id='WixUILicenseRtf' Value='..\InstallerTmp\EULA.rtf'/>
@@ -81,7 +82,7 @@
       <ProgressText Action="VCSHARP2010InstallVSTemplates">Configuring Visual C# 2010 Express Edition... (this may take a few minutes)</ProgressText>
       <ProgressText Action="VS2010InstallVSTemplates">Configuring Visual Studio 2010... (this may take a few minutes)</ProgressText>
       <ProgressText Action="VS2012InstallVSTemplates">Configuring Visual Studio 2012... (this may take a few minutes)</ProgressText>
-      
+      <ProgressText Action="VS2013InstallVSTemplates">Configuring Visual Studio 2013... (this may take a few minutes)</ProgressText>
     </UI>
 
 
@@ -131,6 +132,7 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="VS2010ITEMTEMPLATEDIR"/>
       <Directory Id="VS2012ITEMTEMPLATEDIR"/>
+      <Directory Id="VS2013ITEMTEMPLATEDIR"/>
       <Directory Id="$(var.PlatformProgramFilesFolder)">
         <Directory Id="INSTALLLOCATION" Name="BrightstarDB">
           <Directory Id="DOCSDIR" Name="Docs"/>
@@ -292,6 +294,17 @@
           <File Id="vs2012EntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
         </Component>
       </Feature>
+    
+      <Feature Id="VisualStudio2013Integration" Title="Visual Studio 2013 Integration" Level="1"
+               Description="Add item and project templates into the local Visual Studio 2013 installation."
+               AllowAdvertise="no">
+        <Condition Level="0">NOT VS2013_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED</Condition>
+          <Component Id="vs2013ItemTemplatesComponent" Guid="{BD4B9CB2-4B92-4C52-9E6E-C504DFE9BD55}" Directory="VS2013ITEMTEMPLATEDIR" Win64="$(var.Win64)">
+            <File Id="vs2013EntityContextItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityContext.zip"/>
+            <File Id="vs2013EntityDefinitionItemTemplate" Source="..\InstallerTmp\ItemTemplates\BrightstarEntityDefinition.zip"/>
+          </Component>
+      </Feature>
+    
     </Feature>
 	</Product>
   

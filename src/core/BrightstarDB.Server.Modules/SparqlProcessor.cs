@@ -18,7 +18,38 @@ namespace BrightstarDB.Server.Modules
         {
             if (model is SparqlQueryProcessingModel)
             {
-                if (SparqlResultsFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(m)))
+                var processingModel = model as SparqlQueryProcessingModel;
+                if (processingModel.SparqlRequest.Format != null)
+                {
+                    var sparqlFormat =
+                        processingModel.SparqlRequest.Format.Select(SparqlResultsFormat.GetResultsFormat)
+                                       .FirstOrDefault();
+                    var graphFormat =
+                        processingModel.SparqlRequest.Format.Select(RdfFormat.GetResultsFormat)
+                                       .FirstOrDefault();
+                    processingModel.OverrideSparqlFormat = sparqlFormat;
+                    processingModel.OverrideGraphFormat = graphFormat;
+                    if (sparqlFormat != null || graphFormat != null)
+                    {
+                        return new ProcessorMatch
+                            {
+                                ModelResult = MatchResult.ExactMatch,
+                                RequestedContentTypeResult = MatchResult.ExactMatch
+                            };
+                    }
+                }
+
+                if ((processingModel.ResultModel == SerializableModel.SparqlResultSet) &&
+                    (SparqlResultsFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(MediaRange.FromString(m)))))
+                {
+                    return new ProcessorMatch
+                        {
+                            ModelResult = MatchResult.ExactMatch,
+                            RequestedContentTypeResult = MatchResult.ExactMatch
+                        };
+                }
+                if ((processingModel.ResultModel == SerializableModel.RdfGraph) &&
+                    (RdfFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(MediaRange.FromString(m)))))
                 {
                     return new ProcessorMatch
                         {
@@ -41,10 +72,15 @@ namespace BrightstarDB.Server.Modules
 
         public Response Process(MediaRange requestedMediaRange, dynamic model, NancyContext context)
         {
-            var format =
-                SparqlResultsFormat.AllFormats.FirstOrDefault(f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)));
             var queryModel = model as SparqlQueryProcessingModel;
-            return new SparqlQueryResponse(queryModel, context.Request.Headers.IfModifiedSince, format);
+            var format = queryModel.OverrideSparqlFormat ??
+                         SparqlResultsFormat.AllFormats.FirstOrDefault(
+                             f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)));
+            var graphFormat =
+                queryModel.OverrideGraphFormat ??
+                RdfFormat.AllFormats.FirstOrDefault(f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)));
+            
+            return new SparqlQueryResponse(queryModel, context.Request.Headers.IfModifiedSince, format, graphFormat);
         }
 
         public IEnumerable<Tuple<string, MediaRange>> ExtensionMappings { get { return SparqlExtensionMappings; } }

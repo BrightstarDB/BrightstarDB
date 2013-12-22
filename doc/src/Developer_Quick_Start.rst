@@ -107,7 +107,7 @@ concludes by showing how to query the database using LINQ::
           {
 
               // define a connection string
-              const string connectionString = "type=http;endpoint=http://localhost:8090/brightstar;storeName=Films";
+              const string connectionString = "type=embedded;storesdirectory=.\\;storename=Films";
 
 
               // if the store does not exist it will be automatically 

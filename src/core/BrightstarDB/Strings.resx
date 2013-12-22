@@ -229,4 +229,7 @@
     <value>The property '{0}' of type '{1}' cannot be used as an identity property. An identity property must be a read-only System.String property. If this property is intended to be the identity property for the entity, please change it to a read-only System.String property. If it is not intended to be the identity property for the entity, please add the [ResourceAddress] attribute to the property which is intended to be the identity property for the entity.</value>
     <comment>Exception detail message for the InvalidIdentityPropertyException class</comment>
   </data>
+  <data name="BrightstarServiceClient_StoreDoesNotExist" xml:space="preserve">
+    <value>The store '{0}' does not exist or cannot be accessed.</value>
+  </data>
 </root>

@@ -4,6 +4,8 @@ using System.Linq;
 using BrightstarDB.Query;
 using BrightstarDB.Storage;
 using VDS.RDF;
+using VDS.RDF.Parsing;
+using VDS.RDF.Query;
 using VDS.RDF.Storage;
 using VDS.RDF.Storage.Management;
 
@@ -199,7 +201,8 @@ namespace BrightstarDB.Update
         public object Query(string sparqlQuery)
         {
             var sh = new SparqlQueryHandler();
-            return sh.ExecuteSparql(sparqlQuery, _store).RawResultSet;
+
+            return sh.ExecuteSparql(ParseSparql(sparqlQuery), _store).RawResultSet;
         }
 
         public void Query(IRdfHandler rdfHandler, ISparqlResultsHandler resultsHandler, string sparqlQuery)
@@ -224,6 +227,16 @@ namespace BrightstarDB.Update
         {
             _store.AddGraph(sourceUri == null ? Constants.DefaultGraphUri : sourceUri.ToString(),
                              destinationUri == null ? Constants.DefaultGraphUri : destinationUri.ToString());
+        }
+
+        private static SparqlQuery ParseSparql(string exp)
+        {
+            var parser = new SparqlQueryParser(SparqlQuerySyntax.Extended);
+            var expressionFactories = parser.ExpressionFactories.ToList();
+            expressionFactories.Add(new BrightstarFunctionFactory());
+            parser.ExpressionFactories = expressionFactories;
+            var query = parser.ParseFromString(exp);
+            return query;
         }
     }
 }

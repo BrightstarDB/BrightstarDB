@@ -213,68 +213,30 @@ namespace BrightstarDB.Client
         }
 
         /// <summary>
-        /// Query the store using a SPARQL query
+        /// Query a specific commit point of a store
         /// </summary>
         /// <param name="storeName">The name of the store to query</param>
-        /// <param name="queryExpression">SPARQL query string</param>
+        /// <param name="queryExpression">The SPARQL query string</param>
         /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
-        /// a BrightstarClientException will be raised with the message "Store not modified".</param>
-        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
-        /// <returns>A stream containing XML SPARQL result XML</returns>
-        public Stream ExecuteQuery(string storeName, string queryExpression,
-                                   DateTime? ifNotModifiedSince = new DateTime?(),
-                                   SparqlResultsFormat resultsFormat = null)
-        {
-            return ExecuteQuery(storeName, queryExpression, (string[]) null, ifNotModifiedSince, resultsFormat);
-        }
-
-        /// <summary>
-        /// Query the store using a SPARQL query
-        /// </summary>
-        /// <param name="storeName">The name of the store to query</param>
-        /// <param name="queryExpression">SPARQL query string</param>
-        /// <param name="defaultGraphUri">The URI of the graph that will be the default graph for the query</param>
-        /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
-        /// a BrightstarClientException will be raised with the message "Store not modified".</param>
-        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
-        /// <returns>A stream containing XML SPARQL result XML</returns>
-        public Stream ExecuteQuery(string storeName, string queryExpression,
-                                   string defaultGraphUri,
-                                   DateTime? ifNotModifiedSince = new DateTime?(),
-                                   SparqlResultsFormat resultsFormat = null)
-        {
-            return ExecuteQuery(storeName, queryExpression, new[] {defaultGraphUri}, ifNotModifiedSince,
-                                resultsFormat);
-        }
-
-        /// <summary>
-        /// Query the store using a SPARQL query
-        /// </summary>
-        /// <param name="storeName">The name of the store to query</param>
-        /// <param name="queryExpression">SPARQL query string</param>
-        /// <param name="defaultGraphUris">An enumeration over the URIs of the graphs that will be taken together as the default graph for the query</param>
-        /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
-        /// a <see cref="BrightstarStoreNotModifiedException"/> will be raised.</param>
-        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
-        /// <returns>A stream containing XML SPARQL result XML</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="storeName"/> or <paramref name="queryExpression"/> is NULL</exception>
-        /// <exception cref="ArgumentException">If <paramref name="storeName"/> or <paramref name="queryExpression"/> is an empty string</exception>
-        /// <exception cref="BrightstarStoreNotModifiedException">Raised if the <paramref name="ifNotModifiedSince"/> parameter has 
-        /// a value and the store has not been modified since the specified time.</exception>
-        public Stream ExecuteQuery(string storeName, string queryExpression,
-            IEnumerable<string> defaultGraphUris,
-            DateTime? ifNotModifiedSince = new DateTime?(),
-            SparqlResultsFormat resultsFormat = null)
+        /// a <see cref="BrightstarClientException"/> will be raised with the message "Store not modified".</param>
+        /// <param name="defaultGraphUris">An enumeration over the URIs of the graphs that will be taken together as the default graph for the query. May be NULL to use the built-in default graph</param>
+        /// <param name="resultsFormat">Specifies the serialization format for the SPARQL result set returned by the query. May be NULL to indicate that an RDF graph is the expected result.</param>
+        /// <param name="graphFormat">Specifies the serialization format for the RDF graph returned by the query. May be NULL to indicate that a SPARQL results set is the expected result.</param>
+        /// <param name="streamFormat">Specifies the serialization format used in the returned <see cref="Stream"/>.</param>
+        /// <returns>A stream containing the results of executing the query</returns>
+        public Stream ExecuteQuery(string storeName, string queryExpression, IEnumerable<string> defaultGraphUris, DateTime? ifNotModifiedSince,
+                                   SparqlResultsFormat resultsFormat, RdfFormat graphFormat, out ISerializationFormat streamFormat)
         {
             // Parameter validation
             ValidateStoreName(storeName);
             if (queryExpression == null) throw new ArgumentNullException("queryExpression", Strings.StringParameterMustBeNonEmpty);
-            if(String.IsNullOrEmpty(queryExpression)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "queryExpression");
-            if (resultsFormat == null) resultsFormat = SparqlResultsFormat.Xml;
+            if (String.IsNullOrEmpty(queryExpression)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "queryExpression");
+            if (resultsFormat == null && graphFormat == null) throw new ArgumentException("Either a SparqlResultsFormat or an RdfFormat (or both) must be specified");
 
             string cacheKey = null;
             var graphs = defaultGraphUris == null ? null : defaultGraphUris.ToArray();
             CachedQueryResult cachedResult = null;
+            ISerializationFormat cachedResultFormat = null;
 
             if (ifNotModifiedSince == null && _clientCache != null)
             {
@@ -284,7 +246,16 @@ namespace BrightstarDB.Client
                 {
                     cacheKey = cacheKey + "_" + String.Join(",", graphs).GetHashCode();
                 }
-                cachedResult = _clientCache.Lookup<CachedQueryResult>(cacheKey);
+                if (resultsFormat != null)
+                {
+                    cachedResult = _clientCache.Lookup<CachedQueryResult>(cacheKey + "_" + resultsFormat);
+                    if (cachedResult != null) cachedResultFormat = resultsFormat;
+                }
+                if (cachedResult == null && graphFormat != null)
+                {
+                    cachedResult = _clientCache.Lookup<CachedQueryResult>(cacheKey + "_" + graphFormat);
+                    if (cachedResult != null) cachedResultFormat = graphFormat;
+                }
                 if (cachedResult != null)
                 {
                     ifNotModifiedSince = cachedResult.Timestamp;
@@ -301,8 +272,9 @@ namespace BrightstarDB.Client
                     if (cachedResult != null)
                     {
                         // Cached result is still valid
+                        streamFormat = cachedResultFormat;
                         return new MemoryStream(
-                            resultsFormat == null 
+                            resultsFormat == null
                             ? Encoding.UTF8.GetBytes(cachedResult.Result)
                             : resultsFormat.Encoding.GetBytes(cachedResult.Result));
                     }
@@ -311,25 +283,28 @@ namespace BrightstarDB.Client
             }
 
             // Construct query request as a form POST
-            var parameters = new List<Tuple<string, string>> {new Tuple<string, string>("query", queryExpression)};
+            var parameters = new List<Tuple<string, string>> { new Tuple<string, string>("query", queryExpression) };
             if (defaultGraphUris != null)
             {
                 parameters.AddRange(defaultGraphUris.Select(g => new Tuple<string, string>("default-graph-uri", g)));
             }
 
             // Execute
-            var queryResponse = AuthenticatedFormPost(storeName + "/sparql", parameters, resultsFormat.MediaTypes[0]);
+            var accept = MakeAcceptHeader(resultsFormat, graphFormat);
+
+            var queryResponse = AuthenticatedFormPost(storeName + "/sparql", parameters, accept);
             var responseStream = queryResponse.GetResponseStream();
+            streamFormat = (ISerializationFormat) SparqlResultsFormat.GetResultsFormat(queryResponse.ContentType) ??
+                           RdfFormat.GetResultsFormat(queryResponse.ContentType);
 
             // Cache result and return
             if (_clientCache != null && cacheKey != null && LastResponseTimestamp.HasValue && responseStream != null)
             {
-
                 using (var streamReader = new StreamReader(responseStream))
                 {
                     var resultString = streamReader.ReadToEnd();
                     cachedResult = new CachedQueryResult(LastResponseTimestamp.Value, resultString);
-                    _clientCache.Insert(cacheKey, cachedResult, CachePriority.Normal);
+                    _clientCache.Insert(cacheKey + "_" + streamFormat, cachedResult, CachePriority.Normal);
                     return new MemoryStream(streamReader.CurrentEncoding.GetBytes(cachedResult.Result));
                 }
             }
@@ -339,6 +314,91 @@ namespace BrightstarDB.Client
             }
 
         }
+
+        private static string MakeAcceptHeader(SparqlResultsFormat resultsFormat, RdfFormat graphFormat)
+        {
+            string accept = String.Empty;
+            if (resultsFormat != null)
+            {
+                accept = resultsFormat.ToString();
+                if (graphFormat != null)
+                {
+                    accept += ", " + graphFormat.ToString();
+                }
+            }
+            else if (graphFormat != null)
+            {
+                accept = graphFormat.ToString();
+            }
+            return accept;
+        }
+
+        /// <summary>
+        /// Query the store using a SPARQL query
+        /// </summary>
+        /// <param name="storeName">The name of the store to query</param>
+        /// <param name="queryExpression">SPARQL query string</param>
+        /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
+        /// a BrightstarClientException will be raised with the message "Store not modified".</param>
+        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <param name="graphFormat">OPTIONAL: Specifies the serialization format for RDF graph results. Defaults to <see cref="RdfFormat.RdfXml"/></param>
+        /// <returns>A stream containing XML SPARQL result XML</returns>
+        public Stream ExecuteQuery(string storeName, string queryExpression,
+                                   DateTime? ifNotModifiedSince = new DateTime?(),
+                                   SparqlResultsFormat resultsFormat = null,
+            RdfFormat graphFormat = null)
+        {
+            return ExecuteQuery(storeName, queryExpression, (string[]) null, ifNotModifiedSince, resultsFormat, graphFormat);
+        }
+
+        /// <summary>
+        /// Query the store using a SPARQL query
+        /// </summary>
+        /// <param name="storeName">The name of the store to query</param>
+        /// <param name="queryExpression">SPARQL query string</param>
+        /// <param name="defaultGraphUri">The URI of the graph that will be the default graph for the query</param>
+        /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
+        /// a BrightstarClientException will be raised with the message "Store not modified".</param>
+        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <param name="graphFormat">OPTIONAL: Specifies the serialization format for RDF graph results. Defaults to <see cref="RdfFormat.RdfXml"/></param>
+        /// <returns>A stream containing XML SPARQL result XML</returns>
+        public Stream ExecuteQuery(string storeName, string queryExpression,
+                                   string defaultGraphUri,
+                                   DateTime? ifNotModifiedSince = new DateTime?(),
+                                   SparqlResultsFormat resultsFormat = null,
+            RdfFormat graphFormat = null)
+        {
+            return ExecuteQuery(storeName, queryExpression, new[] {defaultGraphUri}, ifNotModifiedSince,
+                                resultsFormat, graphFormat);
+        }
+
+        /// <summary>
+        /// Query the store using a SPARQL query
+        /// </summary>
+        /// <param name="storeName">The name of the store to query</param>
+        /// <param name="queryExpression">SPARQL query string</param>
+        /// <param name="defaultGraphUris">An enumeration over the URIs of the graphs that will be taken together as the default graph for the query</param>
+        /// <param name="ifNotModifiedSince">OPTIONAL : If this parameter is provided and the store has not been changed since the time specified,
+        /// a <see cref="BrightstarStoreNotModifiedException"/> will be raised.</param>
+        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <param name="graphFormat">OPTIONAL: Specifies the serialization format for RDF graph results. Defaults to <see cref="RdfFormat.RdfXml"/></param>
+        /// <returns>A stream containing XML SPARQL result XML</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="storeName"/> or <paramref name="queryExpression"/> is NULL</exception>
+        /// <exception cref="ArgumentException">If <paramref name="storeName"/> or <paramref name="queryExpression"/> is an empty string</exception>
+        /// <exception cref="BrightstarStoreNotModifiedException">Raised if the <paramref name="ifNotModifiedSince"/> parameter has 
+        /// a value and the store has not been modified since the specified time.</exception>
+        public Stream ExecuteQuery(string storeName, string queryExpression,
+                                   IEnumerable<string> defaultGraphUris,
+                                   DateTime? ifNotModifiedSince = new DateTime?(),
+                                   SparqlResultsFormat resultsFormat = null,
+                                   RdfFormat graphFormat = null)
+        {
+            ISerializationFormat streamFormat;
+            return ExecuteQuery(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince,
+                                resultsFormat ?? SparqlResultsFormat.Xml, graphFormat ?? RdfFormat.RdfXml,
+                                out streamFormat);
+        }
+
 
         private static DateTime? GetLastModified(HttpWebResponse r)
         {
@@ -354,18 +414,21 @@ namespace BrightstarDB.Client
             return r.LastModified;
 #endif
         }
+
         /// <summary>
         /// Query a specific commit point of a store
         /// </summary>
         /// <param name="commitPoint">The commit point be queried</param>
         /// <param name="queryExpression">The SPARQL query string</param>
         /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <param name="graphFormat">OPTIONAL: Specifies the serialization format for RDF graph results. Defaults to <see cref="RdfFormat.RdfXml"/></param>
         /// <returns>A stream containing XML SPARQL results</returns>
         public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression,
-                                   SparqlResultsFormat resultsFormat)
+                                   SparqlResultsFormat resultsFormat = null, RdfFormat graphFormat = null)
         {
-            return ExecuteQuery(commitPoint, queryExpression, (IEnumerable<string>) null, resultsFormat);
+            return ExecuteQuery(commitPoint, queryExpression, (IEnumerable<string>) null, resultsFormat, graphFormat);
         }
+
 
         /// <summary>
         /// Query a specific commit point of a store
@@ -374,39 +437,65 @@ namespace BrightstarDB.Client
         /// <param name="queryExpression">The SPARQL query string</param>
         /// <param name="defaultGraphUri">The URI of the default graph for the query</param>
         /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <param name="graphFormat">OPTIONAL: Specifies the serialization format for RDF graph results. Defaults to <see cref="RdfFormat.RdfXml"/></param>
         /// <returns>A stream containing XML SPARQL results</returns>
         public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression, string defaultGraphUri,
-                                   SparqlResultsFormat resultsFormat)
+                                   SparqlResultsFormat resultsFormat = null, RdfFormat graphFormat = null)
         {
-            return ExecuteQuery(commitPoint, queryExpression, new string[] {defaultGraphUri}, resultsFormat);
+            return ExecuteQuery(commitPoint, queryExpression, new string[] {defaultGraphUri}, resultsFormat, graphFormat);
         }
+
 
         /// <summary>
         /// Query a specific commit point of a store
         /// </summary>
         /// <param name="commitPoint">The commit point be queried</param>
         /// <param name="queryExpression">The SPARQL query string</param>
-        /// <param name="defaultGraphUris"></param>
-        /// <param name="resultsFormat"> </param>
+        /// <param name="defaultGraphUris">OPTIONAL: An enumeration over the URIs of the graphs that will be taken together as the default graph for the query. May be NULL to use the built-in default graph</param>
+        /// <param name="resultsFormat">OPTIONAL: Specifies the serialization format for the SPARQL results. Defaults to <see cref="SparqlResultsFormat.Xml"/></param>
+        /// <param name="graphFormat">OPTIONAL: Specifies the serialization format for RDF graph results. Defaults to <see cref="RdfFormat.RdfXml"/></param>
         /// <returns>A stream containing XML SPARQL results</returns>
         public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression,
-                                   IEnumerable<string> defaultGraphUris, SparqlResultsFormat resultsFormat)
+                                   IEnumerable<string> defaultGraphUris,
+                                   SparqlResultsFormat resultsFormat = null, RdfFormat graphFormat = null)
+        {
+            ISerializationFormat streamFormat;
+            return ExecuteQuery(commitPoint, queryExpression, defaultGraphUris,
+                                resultsFormat ?? SparqlResultsFormat.Xml, graphFormat ?? RdfFormat.RdfXml,
+                                out streamFormat);
+        }
+
+
+        /// <summary>
+        /// Query a specific commit point of a store
+        /// </summary>
+        /// <param name="commitPoint">The commit point be queried</param>
+        /// <param name="queryExpression">The SPARQL query string</param>
+        /// <param name="defaultGraphUris">An enumeration over the URIs of the graphs that will be taken together as the default graph for the query. May be NULL to use the built-in default graph</param>
+        /// <param name="resultsFormat">Specifies the serialization format for the SPARQL result set returned by the query. May be NULL to indicate that an RDF graph is the expected result.</param>
+        /// <param name="graphFormat">Specifies the serialization format for the RDF graph returned by the query. May be NULL to indicate that a SPARQL results set is the expected result.</param>
+        /// <param name="streamFormat">Specifies the serialization format used in the returned <see cref="Stream"/>.</param>
+        /// <returns>A stream containing the results of executing the query</returns>
+        public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression, IEnumerable<string> defaultGraphUris,
+                                   SparqlResultsFormat resultsFormat, RdfFormat graphFormat, out ISerializationFormat streamFormat)
         {
             if (commitPoint == null) throw new ArgumentNullException("commitPoint");
             ValidateStoreName(commitPoint.StoreName, "commitPoint.StoreName");
-            if (queryExpression == null) throw new ArgumentNullException();
-            if (resultsFormat == null) resultsFormat = SparqlResultsFormat.Xml;
+            if (queryExpression == null) throw new ArgumentNullException("queryExpression");
+            if (resultsFormat == null && graphFormat == null) throw new ArgumentException("Either a SparqlResultsFormat or an RdfFormat (or both) must be specified");
 
             if (String.IsNullOrWhiteSpace(queryExpression))
                 throw new ArgumentException(Strings.BrightstarServiceClient_QueryMustNotBeEmptyString, "queryExpression");
             var queryUri = commitPoint.StoreName + "/commits/" + commitPoint.Id + "/sparql";
-            var postParameters = new List<Tuple<string, string>> {new Tuple<string, string>("query", queryExpression)};
+            var postParameters = new List<Tuple<string, string>> { new Tuple<string, string>("query", queryExpression) };
             if (defaultGraphUris != null)
             {
                 postParameters.AddRange(
                     defaultGraphUris.Select(graphUri => new Tuple<string, string>("default-graph-uri", graphUri)));
             }
-            var queryResponse = AuthenticatedFormPost(queryUri, postParameters, resultsFormat.MediaTypes[0]);
+            var queryResponse = AuthenticatedFormPost(queryUri, postParameters, MakeAcceptHeader(resultsFormat, graphFormat));
+            streamFormat = SparqlResultsFormat.GetResultsFormat(queryResponse.ContentType) ??
+                           (ISerializationFormat) RdfFormat.GetResultsFormat(queryResponse.ContentType);
             return queryResponse.GetResponseStream();
         }
 
@@ -516,9 +605,9 @@ namespace BrightstarDB.Client
         public IEnumerable<IJobInfo> GetJobInfo(string storeName, int skip, int take)
         {
             ValidateStoreName(storeName);
-            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative);
-            if (take <= 0) throw new ArgumentException(Strings.BrightstarServiceClient_TakeMustBeGreaterThanZero);
-            if (take > 100) throw new ArgumentException(Strings.BrightstarServiceClient_GetJobInfo_TakeToLarge);
+            if (skip < 0) throw new ArgumentException(Strings.BrightstarServiceClient_SkipMustNotBeNegative, "skip");
+            if (take <= 0) throw new ArgumentException(Strings.BrightstarServiceClient_TakeMustBeGreaterThanZero, "take");
+            if (take > 100) throw new ArgumentException(Strings.BrightstarServiceClient_GetJobInfo_TakeToLarge, "take");
 
             var queryUri = String.Format("{0}/jobs?skip={1}&take={2}", storeName, skip, take);
             var response = AuthenticatedGet(queryUri);

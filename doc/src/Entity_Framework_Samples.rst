@@ -99,12 +99,12 @@ Initialising the BrightstarDB Context
 
 The BrightstarDB context can be initialised using a connection string::
 
-  var connectionString = "Type=http;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox";
+  var connectionString = "Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox";
   var context = new TweetBoxContext(connectionString);
 
 If you have added the connection string into the Config file::
 
-  <add key="BrightstarDB.ConnectionString" value="Type=http;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox" />
+  <add key="BrightstarDB.ConnectionString" value="Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox" />
 
 then you can initialise the content with a simple::
 
@@ -294,7 +294,7 @@ or Named Pipe connection, the BrightstarDB service must be running::
   <appSettings>
     ...
     <add key="BrightstarDB.ConnectionString" 
-         value="Type=http;endpoint=http://localhost:8090/brightstar;StoreName=NerdDinner" />
+         value="Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=NerdDinner" />
     ...
   </appSettings>
 
@@ -2198,14 +2198,14 @@ string to directly access the store.
 
 ::
 
-  var connectionString = "Type=http;endpoint=http://localhost:8090/brightstar;StoreName=Foaf";
+  var connectionString = "Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Foaf";
   var context = new FoafContext(connectionString);
 
 
 If you have added the connection string into the Config file::
 
   <add key="BrightstarDB.ConnectionString" 
-       value="Type=http;endpoint=http://localhost:8090/brightstar;StoreName=Foaf" />
+       value="Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Foaf" />
 
 Then you can initialise the content with a simple::
 
