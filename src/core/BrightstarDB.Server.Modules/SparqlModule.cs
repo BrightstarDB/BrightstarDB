@@ -8,6 +8,7 @@ using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
+using VDS.RDF.Parsing;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -22,13 +23,27 @@ namespace BrightstarDB.Server.Modules
 
             Get["/{storeName}/sparql"] = parameters =>
                 {
-                    var requestObject = BindSparqlRequestObject();
-                    return ProcessQuery(parameters["storeName"], requestObject);
+                    try
+                    {
+                        var requestObject = BindSparqlRequestObject();
+                        return ProcessQuery(parameters["storeName"], requestObject);
+                    }
+                    catch (RdfParseException)
+                    {
+                        return HttpStatusCode.BadRequest;
+                    }
                 };
             Post["/{storeName}/sparql"] = parameters =>
                 {
-                    var requestObject = BindSparqlRequestObject();
-                    return ProcessQuery(parameters["storeName"], requestObject);
+                    try
+                    {
+                        var requestObject = BindSparqlRequestObject();
+                        return ProcessQuery(parameters["storeName"], requestObject);
+                    }
+                    catch (RdfParseException)
+                    {
+                        return HttpStatusCode.BadRequest;
+                    }
                 };
             Get["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
             Post["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
@@ -99,20 +114,13 @@ namespace BrightstarDB.Server.Modules
             //        ? RdfFormat.RdfXml
             //        : (RdfFormat.GetResultsFormat(requestObject.Format) ?? RdfFormat.RdfXml);
 
-            try
-            {
-                var model = new SparqlResultModel(storeName, _brightstar, requestObject,
-                                                  //requestedFormat, graphFormat);
-                                                  null, null);
+            var model = new SparqlResultModel(storeName, _brightstar, requestObject,
+                                              //requestedFormat, graphFormat);
+                                              null, null);
 
-                return Negotiate
-                    .WithMediaRangeModel(MediaRange.FromString("text/html"), model).WithView("SparqlResult")
-                    .WithModel(new SparqlQueryProcessingModel(storeName, _brightstar, requestObject));
-            }
-            catch (VDS.RDF.Parsing.RdfParseException ex)
-            {
-                return Negotiate.WithStatusCode(HttpStatusCode.BadRequest).WithReasonPhrase(ex.Message);
-            }
+            return Negotiate
+                .WithMediaRangeModel(MediaRange.FromString("text/html"), model).WithView("SparqlResult")
+                .WithModel(new SparqlQueryProcessingModel(storeName, _brightstar, requestObject));
         }
     }
 }
