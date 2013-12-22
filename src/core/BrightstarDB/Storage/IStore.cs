@@ -30,12 +30,11 @@ namespace BrightstarDB.Storage
         /// Execute a SPARQL query against this store
         /// </summary>
         /// <param name="query">The parsed SPARQL query expression</param>
-        /// <param name="resultsFormat">The requested SPARQL results format</param>
-        /// <param name="graphFormat">The requested RDF graph results format</param>
+        /// <param name="targetFormat">The requested results format</param>
         /// <param name="resultsStream">The stream to write the query results to</param>
         /// <param name="defaultGraphUris">OPTIONAL: An enumeration of the URIs of the graphs to be treated as the default graph in the SPARQL dataset</param>
         /// <returns>The SPARQL query results in the requested format</returns>
-        BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, SparqlResultsFormat resultsFormat, RdfFormat graphFormat, Stream resultsStream, IEnumerable<string> defaultGraphUris = null);
+        BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, IEnumerable<string> defaultGraphUris = null);
 
         /// <summary>
         /// Insert a triple into the store

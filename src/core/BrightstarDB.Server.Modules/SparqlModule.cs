@@ -99,12 +99,20 @@ namespace BrightstarDB.Server.Modules
             //        ? RdfFormat.RdfXml
             //        : (RdfFormat.GetResultsFormat(requestObject.Format) ?? RdfFormat.RdfXml);
 
-            var model = new SparqlResultModel(storeName, _brightstar, requestObject, //requestedFormat, graphFormat);
-                                              null, null);
-            
-            return Negotiate
-                .WithMediaRangeModel(MediaRange.FromString("text/html"), model).WithView("SparqlResult")
-                .WithModel(new SparqlQueryProcessingModel(storeName, _brightstar, requestObject));
+            try
+            {
+                var model = new SparqlResultModel(storeName, _brightstar, requestObject,
+                                                  //requestedFormat, graphFormat);
+                                                  null, null);
+
+                return Negotiate
+                    .WithMediaRangeModel(MediaRange.FromString("text/html"), model).WithView("SparqlResult")
+                    .WithModel(new SparqlQueryProcessingModel(storeName, _brightstar, requestObject));
+            }
+            catch (VDS.RDF.Parsing.RdfParseException ex)
+            {
+                return Negotiate.WithStatusCode(HttpStatusCode.BadRequest).WithReasonPhrase(ex.Message);
+            }
         }
     }
 }

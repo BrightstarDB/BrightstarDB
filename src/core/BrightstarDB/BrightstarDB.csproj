@@ -450,6 +450,7 @@
     <Compile Include="Storage\StoreExtensions.cs" />
     <Compile Include="Utils\IEnumeratorExtensions.cs" />
     <Compile Include="Utils\LruCache.cs" />
+    <Compile Include="Utils\SparqlQueryHelper.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

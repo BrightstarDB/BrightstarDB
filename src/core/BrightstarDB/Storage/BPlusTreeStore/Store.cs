@@ -97,13 +97,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return BindSubject(sid, new List<int> {gid}).Select(MakeTriple);
         }
 
-        public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, SparqlResultsFormat sparqlResultsFormat,
-                                                              RdfFormat rdfResultsFormat, Stream resultsStream,
+        public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream,
             IEnumerable<string> defaultGraphUris )
         {
-            var queryHandler = new SparqlQueryHandler(sparqlResultsFormat, rdfResultsFormat, defaultGraphUris);
+            var queryHandler = new SparqlQueryHandler(targetFormat, defaultGraphUris);
             // NOTE: streamWriter is not wrapped in a using because we don't want to close resultStream at this point
-            var streamWriter = new StreamWriter(resultsStream, sparqlResultsFormat.Encoding);
+            
+            var streamWriter = new StreamWriter(resultsStream, targetFormat.Encoding);
             var resultsType = queryHandler.ExecuteSparql(query, this, streamWriter);
             return resultsType;
         }

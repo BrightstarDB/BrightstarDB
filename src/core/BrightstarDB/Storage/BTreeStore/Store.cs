@@ -306,8 +306,7 @@ namespace BrightstarDB.Storage.BTreeStore
         }
 
 
-        public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, SparqlResultsFormat resultsFormat,
-                                                              RdfFormat graphFormat, Stream resultsStream,
+        public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream,
                                                               IEnumerable<string> defaultGraphUris = null)
         {
             throw new NotImplementedException();

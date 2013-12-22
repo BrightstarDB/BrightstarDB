@@ -16,7 +16,7 @@ namespace BrightstarDB.InternalTests
         {
             var query = ParseSparql(sparqlExpression);
             var resultsStream = new MemoryStream();
-            store.ExecuteSparqlQuery(query, resultsFormat.WithEncoding(new UTF8Encoding(false)), RdfFormat.RdfXml.WithEncoding(new UTF8Encoding(false)), resultsStream);
+            store.ExecuteSparqlQuery(query, resultsFormat.WithEncoding(new UTF8Encoding(false)), resultsStream);
             var ret = Encoding.UTF8.GetString(resultsStream.ToArray());
             return ret;
         }
@@ -27,7 +27,7 @@ namespace BrightstarDB.InternalTests
             var query = ParseSparql(sparqlExpression);
             using (var resultsStream = new MemoryStream())
             {
-                storeWorker.Query(query, resultsFormat.WithEncoding(new UTF8Encoding(false)), RdfFormat.RdfXml.WithEncoding(new UTF8Encoding(false)), resultsStream, defaultGraphUris);
+                storeWorker.Query(query, resultsFormat.WithEncoding(new UTF8Encoding(false)), resultsStream, defaultGraphUris);
                 return Encoding.UTF8.GetString(resultsStream.ToArray());
             }
         }
