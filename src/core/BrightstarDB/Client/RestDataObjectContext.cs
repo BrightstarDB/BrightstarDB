@@ -9,8 +9,7 @@ namespace BrightstarDB.Client
     ///</summary>
     public class RestDataObjectContext:IDataObjectContext
     {
-        private ConnectionString _connectionString;
-        private readonly string _endpointUri;
+        private readonly ConnectionString _connectionString;
         private readonly bool _optimisticLockingEnabled;
 
         /// <summary>
@@ -25,7 +24,6 @@ namespace BrightstarDB.Client
                 throw new ArgumentException("Invalid connection type", "connectionString");
             }
             _connectionString = connectionString;
-            _endpointUri = connectionString.ServiceEndpoint;
             _optimisticLockingEnabled = connectionString.OptimisticLocking;
         }
 
@@ -48,11 +46,18 @@ namespace BrightstarDB.Client
         /// <param name="updateGraph">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
         /// not defined, the default graph in the store will be updated.</param>
         /// <param name="defaultDataSet">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve data objects and their properties.
-        /// If not defined, all graphs in the store will be queried.</param>
+        /// See remarks below.</param>
         /// <param name="versionTrackingGraph">OPTIONAL: The URI identifier of the graph that contains version number statements for data objects. 
         /// If not defined, the <paramref name="updateGraph"/> will be used.</param>
         /// <exception cref="BrightstarClientException">Thrown if the store does not exist or cannot be accessed.</exception> 
         /// <returns>IDataObjectStore</returns>
+        /// <remarks>
+        /// <para>The default data set queried by context can be explicitly set by providing a value for the <paramref name="defaultDataSet"/> parameter.
+        /// If an explicit data set is provided then that set of graphs, plus the update and version tracking graph will be queried by the context.
+        /// If an explicit data set is not provided, but update and/or version tracking graphs are specified, then the context will query only the update and version tracking graphs.
+        /// If an explicit data set is not provided and update and version tracking graphs are not specified either, then the context will query across all of the graphs in the store (and updates and version tracking
+        /// information will be written to the default graph).</para>
+        /// </remarks>
         public IDataObjectStore OpenStore(string storeName, Dictionary<string, string> namespaceMappings, bool? optimisticLockingEnabled,
             string updateGraph = null, IEnumerable<string> defaultDataSet = null, string versionTrackingGraph = null)
         {
@@ -98,6 +103,8 @@ namespace BrightstarDB.Client
         {
             Client.CreateStore(storeName,
                                persistenceType.HasValue ? persistenceType.Value : Configuration.PersistenceType);
+            if (String.IsNullOrEmpty(updateGraph)) updateGraph = Constants.DefaultGraphUri;
+            if (String.IsNullOrEmpty(versionTrackingGraph)) versionTrackingGraph = updateGraph;
             return new RestDataObjectStore(
                 _connectionString, storeName, namespaceMappings,
                 optimisticLockingEnabled.HasValue ? optimisticLockingEnabled.Value : _optimisticLockingEnabled,

@@ -38,7 +38,7 @@ namespace BrightstarDB.EntityFramework
     public sealed class InvalidIdentityPropertyException : EntityFrameworkException
     {
         internal InvalidIdentityPropertyException(PropertyInfo invalidProperty) : base(
-            String.Format(Strings.InvalidPropertyMessage, invalidProperty.Name, invalidProperty.DeclaringType.FullName))
+            String.Format(Strings.EntityFramework_InvalidPropertyMessage, invalidProperty.Name, invalidProperty.DeclaringType.FullName))
         {           
         }
     }

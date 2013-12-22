@@ -27,28 +27,31 @@
     <HelpFileFormat>HtmlHelp1, Website</HelpFileFormat>
     <HelpTitle>BrightstarDB API Documentation</HelpTitle>
     <CopyrightText>Copyright %28c%29 2013 Khalil Ahmed, Graham Moore</CopyrightText>
-    <FeedbackEMailAddress>support%40brightstardb.com</FeedbackEMailAddress>
-    <FeedbackEMailLinkText>support%40brightstardb.com</FeedbackEMailLinkText>
+    <FeedbackEMailAddress>
+    </FeedbackEMailAddress>
+    <FeedbackEMailLinkText>
+    </FeedbackEMailLinkText>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="(global)" isDocumented="True">BrightstarDB API Documentation.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB" isDocumented="True">The root namespace for the BrightstarDB API.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB.Analysis" isDocumented="False" />
-      <NamespaceSummaryItem name="BrightstarDB.Client" isDocumented="True">BrightstarDB Client API. Used to connect to a BrightstarDB instance and perform query and update operations.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB.EntityFramework" isDocumented="True">Core classes for binding .NET objects to a BrightstarDB store</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB.EntityFramework.Query" isDocumented="True">Core classes for processing LINQ queries against a BrightstarDB Entity Framework context as SPARQL queries against the underlying BrightstarDB store</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB.OData" isDocumented="True">The BrightstarDB OData service API. Contains classes for creating an OData service context.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB.Storage" isDocumented="False" />
-      <NamespaceSummaryItem name="BrightstarDB.Rdf" isDocumented="True">Provides RDF parsing and serialization facilities for BrightstarDB</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB.Query" isDocumented="False" />
-      <NamespaceSummaryItem name="BrightstarDB.Caching" isDocumented="True">Provides services for in-memory and disk caching in BrightstarDB.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB.Dynamic" isDocumented="True">Extensions for using Dynamic Objects with the BrightstarDB client API</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB.Storage.Persistence" isDocumented="False">Provides persistent configuration for BrightstarDB</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="BrightstarDB.Licensing" isDocumented="True">Provides classes for controlling the licensing of embedded and mobile applications.
+<NamespaceSummaryItem name="BrightstarDB" isDocumented="True">The root namespace for the BrightstarDB API.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.Analysis" isDocumented="False" />
+<NamespaceSummaryItem name="BrightstarDB.Client" isDocumented="True">BrightstarDB Client API. Used to connect to a BrightstarDB instance and perform query and update operations.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.EntityFramework" isDocumented="True">Core classes for binding .NET objects to a BrightstarDB store</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.EntityFramework.Query" isDocumented="True">Core classes for processing LINQ queries against a BrightstarDB Entity Framework context as SPARQL queries against the underlying BrightstarDB store</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.OData" isDocumented="True">The BrightstarDB OData service API. Contains classes for creating an OData service context.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.Storage" isDocumented="False" />
+<NamespaceSummaryItem name="BrightstarDB.Rdf" isDocumented="True">Provides RDF parsing and serialization facilities for BrightstarDB</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.Query" isDocumented="False" />
+<NamespaceSummaryItem name="BrightstarDB.Caching" isDocumented="True">Provides services for in-memory and disk caching in BrightstarDB.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.Dynamic" isDocumented="True">Extensions for using Dynamic Objects with the BrightstarDB client API</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.Storage.Persistence" isDocumented="False">Provides persistent configuration for BrightstarDB</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.Licensing" isDocumented="False">Provides classes for controlling the licensing of embedded and mobile applications.
 
 For embedded and mobile applications, the BrightstarDB.Licensing.License class must be initialized by a call to its Validate() method prior to attempting to open a BrightstarDB database. 
 
 For applications that connect to a BrightstarDB server over HTTP, TCP or NamedPipes connections, this step is not necessary as it is the server that must be licensed, not the client application.</NamespaceSummaryItem>
-    </NamespaceSummaries>
+<NamespaceSummaryItem name="BrightstarDB.Client.RestSecurity" isDocumented="True">Contains an extensible framework for authenticating calls made to the BrightstarDB REST server.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="BrightstarDB.Dto" isDocumented="True">Contains the data transfer object models for the BrightstarDB REST service interface.</NamespaceSummaryItem></NamespaceSummaries>
     <RootNamespaceContainer>True</RootNamespaceContainer>
     <RootNamespaceTitle>BrightstarDB API</RootNamespaceTitle>
     <SyntaxFilters>Standard</SyntaxFilters>

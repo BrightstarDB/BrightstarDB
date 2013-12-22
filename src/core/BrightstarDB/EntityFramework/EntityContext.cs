@@ -178,6 +178,12 @@ namespace BrightstarDB.EntityFramework
         /// <exception cref="ArgumentException">Raised of <paramref name="systemType"/> is not mapped to any RDF datatype known to this entity context</exception>
         public abstract string GetDatatype(Type systemType);
 
+        /// <summary>
+        /// Return the list of graphs to query or null to query the default dataset
+        /// </summary>
+        /// <returns></returns>
+        public abstract IList<string> GetDataset();
+
         #region Partial implementation of IDisposable
 
         /// <summary>
@@ -215,5 +221,6 @@ namespace BrightstarDB.EntityFramework
             Dispose(false);
         }
         #endregion
+
     }
 }

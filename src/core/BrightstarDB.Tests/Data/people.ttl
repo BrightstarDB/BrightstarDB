@@ -1,0 +1,12 @@
+﻿@prefix : <http://www.networkedplanet.com/people/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+:alice a foaf:Person ;
+	foaf:name "Alice" ;
+	foaf:mbox "alice@example.org" ;
+	foaf:knows :bob .
+
+:bob a foaf:Person ;
+	foaf:name "Bob" ;
+	foaf:mbox "bob@example.org" ;
+	foaf:knows :alice .

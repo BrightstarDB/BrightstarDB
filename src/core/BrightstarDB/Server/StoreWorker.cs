@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using BrightstarDB.Dto;
 using BrightstarDB.Model;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
@@ -158,7 +159,7 @@ namespace BrightstarDB.Server
                                                  ex);
                                 jobExecutionStatus.Information = job.ErrorMessage ?? "Job Error";
                                 jobExecutionStatus.Ended = DateTime.UtcNow;
-                                jobExecutionStatus.ExceptionDetail = new ExceptionDetail(ex);
+                                jobExecutionStatus.ExceptionDetail = new ExceptionDetailObject(ex);
                                 jobExecutionStatus.JobStatus = JobStatus.TransactionError;
                             }
                             finally
@@ -192,6 +193,11 @@ namespace BrightstarDB.Server
                                      "Unexpected exception caught in processing Shutdown continuation: {0}", ex);
                 }
             }
+        }
+
+        public IEnumerable<JobExecutionStatus> GetJobs()
+        {
+            return _jobExecutionStatus.Values.OrderByDescending(x => x.Queued);
         }
 
         public JobExecutionStatus GetJobStatus(string jobId)
@@ -280,7 +286,7 @@ namespace BrightstarDB.Server
             {
                 if (
                     _jobExecutionStatus.TryAdd(job.JobId.ToString(),
-                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending}))
+                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending, Queued = DateTime.UtcNow}))
                 {
                     _jobs.Enqueue(job);
                     queuedJob = true;
@@ -323,14 +329,14 @@ namespace BrightstarDB.Server
             var jobId = Guid.NewGuid();
             var exportJob = new ExportJob(jobId, this, fileName, graphUri);
             _jobExecutionStatus.TryAdd(jobId.ToString(),
-                                       new JobExecutionStatus {JobId = jobId, JobStatus = JobStatus.Started});
+                                       new JobExecutionStatus {JobId = jobId, JobStatus = JobStatus.Started, Queued = DateTime.UtcNow, Started = DateTime.UtcNow});
             exportJob.Run((id, ex) =>
                               {
                                   JobExecutionStatus jobExecutionStatus;
                                   if (_jobExecutionStatus.TryGetValue(id.ToString(), out jobExecutionStatus))
                                   {
                                       jobExecutionStatus.Information = "Export failed";
-                                      jobExecutionStatus.ExceptionDetail = new ExceptionDetail(ex);
+                                      jobExecutionStatus.ExceptionDetail = new ExceptionDetailObject(ex);
                                       jobExecutionStatus.JobStatus = JobStatus.TransactionError;
                                       jobExecutionStatus.Ended = DateTime.UtcNow;
                                   }
@@ -440,5 +446,6 @@ namespace BrightstarDB.Server
                                          () => UpdateStatistics());
             }
         }
+
     }
 }

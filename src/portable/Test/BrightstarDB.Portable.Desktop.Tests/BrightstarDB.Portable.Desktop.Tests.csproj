@@ -32,9 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dotNetRDF, Version=1.0.1.2533, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
+    <Reference Include="dotNetRDF, Version=1.0.2.2880, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\dotNetRDF.1.0.1-RC2\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
+      <HintPath>..\..\..\packages\dotNetRDF.1.0.2.2880\lib\net40\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -56,14 +56,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BrightstarDB\Tests\EntityFramework\MyEntityContext.cs">
+    <Compile Include="Tests\EntityFramework\MyEntityContext.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>MyEntityContext.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\..\..\core\BrightstarDB.Tests\**\*.cs" Exclude="..\..\..\core\BrightstarDB.Tests\Sparql11TestSuite\**\*.cs;..\..\..\core\BrightstarDB.Tests\EntityFramework\MyEntityContext.cs;..\..\..\core\BrightstarDB.Tests\Properties\**\*.cs;..\..\..\core\BrightstarDB.Tests\SerializationTests.cs">
-      <Link>BrightstarDB\Tests\%(recursivedir)\%(filename)</Link>
+      <Link>Tests\%(recursivedir)\%(filename)</Link>
     </Compile>
     <Compile Include="TestHelper.cs" />
   </ItemGroup>
@@ -78,7 +78,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="BrightstarDB\Tests\EntityFramework\MyEntityContext.tt">
+    <None Include="Tests\EntityFramework\MyEntityContext.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MyEntityContext.cs</LastGenOutput>
     </None>
@@ -97,6 +97,6 @@
   </Target>
   -->
   <Target Name="BeforeBuild">
-    <Copy SourceFiles="..\..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="BrightstarDB\Tests\EntityFramework\MyEntityContext.tt" />
+    <Copy SourceFiles="..\..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="Tests\EntityFramework\MyEntityContext.tt" />
   </Target>
 </Project>

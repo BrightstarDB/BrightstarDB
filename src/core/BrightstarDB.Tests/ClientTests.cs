@@ -633,7 +633,7 @@ namespace BrightstarDB.Tests
             {
                 Assert.IsNotNull(testDo);
 
-                var propValues = testDo.GetPropertyValues("http://xmlns.com/foaf/0.1/name").Cast<string>();
+                var propValues = testDo.GetPropertyValues("http://xmlns.com/foaf/0.1/name").OfType<PlainLiteral>();
                 Assert.IsNotNull(propValues);
                 Assert.IsTrue(propValues.Count() > 0);
 

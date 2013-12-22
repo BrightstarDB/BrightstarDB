@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Rdf;
 
 namespace BrightstarDB.Server
@@ -146,6 +147,7 @@ namespace BrightstarDB.Server
                 writer.Write(_preconditions);
                 writer.Write(_deletePatterns);
                 writer.Write(_insertData);
+                writer.Write(_defaultGraphUri);
             }
         }
 
@@ -156,9 +158,10 @@ namespace BrightstarDB.Server
                 _preconditions = reader.ReadString();
                 _deletePatterns = reader.ReadString();
                 _insertData = reader.ReadString();
+                _defaultGraphUri = reader.ReadString();
             }
         }
 
-        public override Storage.TransactionType TransactionType { get { return Storage.TransactionType.UpdateTransaction; } }
+        public override TransactionType TransactionType { get { return TransactionType.UpdateTransaction; } }
     }
 }

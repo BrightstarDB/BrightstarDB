@@ -1,95 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- Version Number Generator -->
-	<UsingTask TaskName="Version" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
-		<ParameterGroup>
-			<FileName ParameterType="System.String" Required="true" />
-			<Major ParameterType="System.Int32" Required="false" />
-			<Minor ParameterType="System.Int32" Required="false" />
-			<Build ParameterType="System.String" Required="false" />
-			<Revision ParameterType="System.Int32" Required="false"/>
-			<Increment ParameterType="System.Boolean" Required="true" />
-			<VersionNumber ParameterType="System.String" Output="true" />
-			<BaseVersionNumber ParameterType="System.String" Output="true"/>
-			<BuildNumber ParameterType="System.String" Output="true" />
-		</ParameterGroup>
-		
-		<Task>
-			<Code Type="Fragment" Language="cs">
-				<![CDATA[
-            FileInfo baseVersionFile = new FileInfo(FileName);
-            Log.LogMessage(MessageImportance.Normal, "Base Version File: {0}", baseVersionFile.FullName);
-            if (baseVersionFile.Exists)
-            {
-                BaseVersionNumber = File.ReadAllText(FileName);
-                string[] baseVersionNumbers = BaseVersionNumber.Split('.');
-                Major = int.Parse(baseVersionNumbers[0]);
-                Minor = int.Parse(baseVersionNumbers[1]);
-                Build = baseVersionNumbers[2];
-                Revision = int.Parse(baseVersionNumbers[3]);
-                string previousBuild = Build;
-                int previousRevision = 0;
 
-                string currentVersionFileName = baseVersionFile.DirectoryName + Path.DirectorySeparatorChar + "current_" + baseVersionFile.Name;
-                if (File.Exists(currentVersionFileName))
-                {
-                    string previousVersion = File.ReadAllText(currentVersionFileName);
-                    string[] previousVersionNumbers = previousVersion.Split('.');
-                    int major = int.Parse(previousVersionNumbers[0]);
-                    int minor = int.Parse(previousVersionNumbers[1]);
-                    if (major == Major && minor == Minor)
-                    {
-                        previousBuild = previousVersionNumbers[2];
-                        previousRevision = int.Parse(previousVersionNumbers[3]);
-                    }
-                }
-                if (Increment)
-                {
-                    // Calculate build number
-                    DateTime dDate = DateTime.Now;
-                    Build = String.Format("{0:0}{1:00}{2:00}",dDate.Year - 2009, dDate.Month, dDate.Day);
-
-                    // Get previous version
-                    
-                    if (previousBuild == Build)
-                    {
-                        Revision = previousRevision + 1;
-                    }
-                }
-
-                VersionNumber = string.Format("{0}.{1}.{2}.{3}", Major, Minor, Build, Revision);
-				BuildNumber = String.Format("{0}.{1}.{2}", Major, Minor, Build);
-                // Save new version to file
-                if (Increment)
-                {
-                    File.WriteAllText(currentVersionFileName, VersionNumber);
-                }
-            }
-]]>
-			</Code>
-		</Task>
-	</UsingTask>
-
-	<UsingTask TaskName="Concat" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
-		<ParameterGroup>
-			<Inputs ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
-			<Output ParameterType="System.String" Required="true" />
-		</ParameterGroup>
-		<Task>
-			<Code Type="Fragment" Language="cs">
-				<![CDATA[
-               if (File.Exists(Output)) {
-                   File.Delete(Output);
-               }
-               foreach(var item in Inputs){
-                   var txt = File.ReadAllText(item.ItemSpec) + "\r\n";
-                   File.AppendAllText(Output, txt);
-               }
-				]]>
-			</Code>
-		</Task>
-	</UsingTask>
-	
   <!-- Import CommunityTasks -->
   <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
 
@@ -102,6 +13,15 @@
     <AssemblyTitle></AssemblyTitle>
   </PropertyGroup>
 
+  <!-- BrightstarDB Version Number. Now hardcoded to avoid problems
+       with the MSBuild Community Tasks Version task under monodevelop  -->
+  <PropertyGroup>
+    <Major>1</Major>
+    <Minor>5</Minor>
+    <Build>0</Build>
+    <Revision>0</Revision>
+  </PropertyGroup>
+  
   <ItemGroup>
 	<PropertyFiles Include="**\AssemblyInfo.cs"/>
   </ItemGroup>
@@ -115,21 +35,14 @@
 		<CreateItem Include="$(AssemblyInfoFile)">
 			<Output ItemName="AssemblyInfoFileItem" TaskParameter="Include"/>
 		</CreateItem>
-		<Version FileName="$(BuildNumberFile)" Increment="false" Condition=" '$(Configuration)' != 'Release'">
-			<Output PropertyName="AssemblyVersion" TaskParameter="BaseVersionNumber"/>
-			<Output PropertyName="BuildNumber" TaskParameter="VersionNumber" Condition=" '$(BuildNumber)' == '' "/>
-		</Version>
-		<Version FileName="$(BuildNumberFile)" Increment="true" Condition=" '$(Configuration)' == 'Release' ">
-			<Output PropertyName="AssemblyVersion" TaskParameter="BaseVersionNumber"/>
-			<Output PropertyName="BuildNumber" TaskParameter="VersionNumber" Condition=" '$(BuildNumber)' == '' "/>
-		</Version>
+			
 		<MakeDir Directories="%(AssemblyInfoFileItem.RootDir)%(AssemblyInfoFileItem.Directory)" />
 		<AssemblyInfo
 				Condition="( '$(Configuration)' == 'Release' ) Or (!Exists('$(AssemblyInfoFile)'))"
  				CodeLanguage="CS"
                   OutputFile="$(AssemblyInfoFile)"
-                  AssemblyVersion="$(AssemblyVersion)"
-                  AssemblyFileVersion="$(BuildNumber)"
+                  AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)"
+                  AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)"
                   AssemblyProduct="$(AssemblyProduct)"
                   AssemblyCompany="$(AssemblyCompany)"
                   AssemblyCopyright="$(AssemblyCopyright)"

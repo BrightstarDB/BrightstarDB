@@ -8,7 +8,55 @@
 .. _System.Collections.Specialized.INotifyCollectionChanged: http://msdn.microsoft.com/en-us/library/system.collections.specialized.inotifycollectionchanged%28v=vs.100%29.aspx
 
 
-This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are marked with FIX
+This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require 
+either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
+marked with FIX
+
+****************************
+ BrightstarDB 1.5 Release
+****************************
+
+The following are changes that are contained in the develop branch of the BrightstarDB repository but which have not yet been included in an official binary release.
+These changes will appear in the 1.5 release.
+
+  - **BREAKING** : The WCF server has been replaced with an HTTP server with a full RESTful API. Connection strings of type ``http``, ``tcp`` and ``namedpipe`` are 
+    no longer supported and should be replaced with a connection string of type ``rest`` to connect to the HTTP server. The new HTTP server can be run under IIS
+    or as a Windows Service and the distribution includes both of these configuration options. For more information please refer to :ref:`Running_BrightstarDB`.
+    The configuration for the server has also been changed to enable more complex configuration options. The new configuration structure is detailed in 
+    :ref:`Running_BrightstarDB`. 
+    Please note when upgrading from a previous release of BrightstarDB you may have to manually edit the server configuration file
+    as an existing configuration file cannot be overwritten if it was locally modified.
+    
+  - **BREAKING**: The SDShare server has been removed from the BrightstarDB package. This component is now managed in a separate Github repository (https://github.com/BrightstarDB/SDShare)
+  
+  - **BREAKING**: RDF literal values without an explicit datatype are now exposed through the Data Objects and Entity Framework APIs as instances of the type ``BrightstarDB.Rdf.PlainLiteral``
+    rather than as ``System.String``. This change has been made to better enable the APIs to deal with RDF literals with language tags. This update allows both dynamic objects and
+    Entity Framework interfaces to have properties typed as ``BrightstarDB.Rdf.PlainLiteral`` (or an ``ICollection<BrightstarDB.Rdf.PlainLiteral>``). The LINQ to SPARQL implementation
+    has also been updated to support this type. However, this change may be **BREAKING** for some uses of the API. In particular when using either the dynamic objects API or
+    the SPARQL results set ``XElement`` extension methods, the object returned for an RDF plain literal result will now be a ``BrightstarDB.Rdf.PlainLiteral`` instance rather
+    than a string. The fix for this breaking change is to call ``.ToString()`` on the ``PlainLiteral`` instance. e.g::
+        
+            // This comparison will always return false as the object returned by 
+            // GetColumnValue is a BrightstarDB.Rdf.PlainLiteral
+            bool isFoo = resultRow.GetColumnValue("o").Equals("foo");
+            
+            // To fix this breaking change insert .ToString() like this:
+            bool isActuallyFoo = resultRow.GetColumn("o").ToString().Equals("foo");
+            
+            // Or for a more explicit comparison
+            bool isLiteralFoo = resultRow.GetColumn("o").Equals(new PlainLiteral("foo"));
+        
+  - NEW: Job information now includes date/time when the job was queued, started processing and completed processing.
+  
+  - NEW: BrightstarDB installer now includes both 32-bit and 64-bit versions and will install into ``C:\Program Files\`` on 64-bit platforms.
+  
+  - NEW: Added shell scripts for building BrightstarDB under mono.
+  
+  - NEW: BrightstarDB Entity Framework and Data Objects APIs can now connect to stores other than BrightstarDB. This includes the ability to use the Entity Framework 
+    and DataObjects APIs with generic SPARQL 1.1 Query and Update endpoints, as well as the ability to use these APIs with other stores supported by DotNetRDF. 
+    For more information please refer to :ref:`Other_Stores`
+  
+  - FIX: Fixed incorrect handling of \\ escape sequences in the N-Triples and N-Quads parsers.
 
 ****************************
  BrightstarDB 1.4 Release

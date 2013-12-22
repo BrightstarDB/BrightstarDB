@@ -1,4 +1,5 @@
 using System;
+using BrightstarDB.Dto;
 
 namespace BrightstarDB.Storage
 {

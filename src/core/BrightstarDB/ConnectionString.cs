@@ -15,6 +15,10 @@ namespace BrightstarDB
         private const string OptimisticLockingName = "optimisticlocking";
         private const string AccountPropertyName = "account";
         private const string KeyPropertyName = "key";
+        private const string ConfigurationName = "configuration";
+        private const string DnrStoreName = "store";
+        private const string DnrQueryName = "query";
+        private const string DnrUpdateName = "update";
 
         private readonly Dictionary<string, string> _values;
         private readonly string _rawValue; 
@@ -22,20 +26,20 @@ namespace BrightstarDB
         /// <summary>
         /// Parses the provided connection string
         /// </summary>
-        /// <param name="value">The connection string to be parsed</param>
-        public ConnectionString(string value)
+        /// <param name="connectionString">The connection string to be parsed</param>
+        public ConnectionString(string connectionString)
         {    
-            if (value == null)
+            if (connectionString == null)
             {
-                throw new ArgumentNullException("Connection string must not be NULL.");
+                throw new ArgumentNullException("connectionString", Strings.BrightstarConnectionString_MustMotBeNull);
             }
-            if(String.Empty.Equals(value))
+            if(String.Empty.Equals(connectionString))
             {
-                throw new ArgumentException("Connection string must not be an empty string.");
+                throw new ArgumentException(Strings.BrightstarConnectionString_MustNotBeEmpty, "connectionString");
             }
             _values = new Dictionary<string, string>();
-            ParseValues(value);
-            _rawValue = value;
+            ParseValues(connectionString);
+            _rawValue = connectionString;
         }
 
         internal string Value { get { return _rawValue; } }
@@ -71,25 +75,19 @@ namespace BrightstarDB
                 Type = ConnectionType.Embedded;
                 AssertStoresDirectory();
             }
-            else if (type.Equals("http"))
+            else if (type.Equals("http") || type.Equals("tcp") || type.Equals("namedpipe"))
             {
-                Type = ConnectionType.Http;
-                AssertEndpoint();
-            }
-            else if (type.Equals("tcp"))
-            {
-                Type = ConnectionType.Tcp;
-                AssertEndpoint();
-            }
-            else if (type.Equals("namedpipe"))
-            {
-                Type = ConnectionType.NamedPipe;
-                AssertEndpoint();
+                throw new FormatException(String.Format(Strings.BrightstarConnectionString_ObsoleteType, type));
             }
             else if (type.Equals("rest"))
             {
                 Type = ConnectionType.Rest;
                 AssertEndpoint();
+            }
+            else if (type.Equals("dotnetrdf"))
+            {
+                Type=ConnectionType.DotNetRdf;
+                AssertConfiguration();
             }
             else
             {
@@ -122,6 +120,21 @@ namespace BrightstarDB
             if (String.IsNullOrEmpty(ServiceEndpoint))
             {
                 throw new FormatException("No Endpoint parameter found in the connection string.");
+            }
+        }
+
+        private void AssertConfiguration()
+        {
+            if (String.IsNullOrEmpty(Configuration))
+            {
+                throw new FormatException("No Configuration parameter found in the connection string.");
+            }
+            if (String.IsNullOrEmpty(DnrStoreName) &&
+                (String.IsNullOrEmpty(DnrQueryName) || String.IsNullOrEmpty(DnrUpdateName)))
+            {
+                throw new FormatException(
+                    String.Format("DotNetRdf connection requires either a {0} parameter or {1} and {2} parameters",
+                                  DnrStoreName, DnrQueryName, DnrUpdateName));
             }
         }
 
@@ -163,6 +176,26 @@ namespace BrightstarDB
         public string Key { get { return GetValueOrDefault(KeyPropertyName); } }
 
         /// <summary>
+        /// Get the path to the DotNetRDF configuration file used to configure the underlying store
+        /// </summary>
+        public string Configuration { get { return GetValueOrDefault(ConfigurationName); } }
+
+        /// <summary>
+        /// Get the URI identifier of the store configuration node in the DotNetRDF configuration file
+        /// </summary>
+        public string DnrStore { get { return GetValueOrDefault(DnrStoreName); } }
+
+        /// <summary>
+        /// Get the URI identifier of the SPARQL query endpoint configuration node in the DotNetRDF configuration file
+        /// </summary>
+        public string DnrQuery { get { return GetValueOrDefault(DnrQueryName); } }
+
+        /// <summary>
+        /// Get the URI identifier of the SPARQL update endpoint configuration node in the DotNetRDF configuration file
+        /// </summary>
+        public string DnrUpdate { get { return GetValueOrDefault(DnrUpdateName); } }
+
+        /// <summary>
         /// Returns the string representation of this connection string.
         /// </summary>
         /// <returns>The connection string value</returns>
@@ -171,18 +204,6 @@ namespace BrightstarDB
             if (Type == ConnectionType.Embedded)
             {
                 return String.Format("type=embedded;storesDirectory={0}", StoresDirectory);
-            }
-            if (Type == ConnectionType.Http )
-            {
-                return "type=http;endpoint=" + ServiceEndpoint;
-            }
-            if (Type == ConnectionType.Tcp)
-            {
-                return "type=tcp;endpoint=" + ServiceEndpoint;
-            }
-            if (Type == ConnectionType.NamedPipe)
-            {
-                return "type=namedpipe;endpoint=" + ServiceEndpoint;
             }
             if (Type == ConnectionType.Rest)
             {

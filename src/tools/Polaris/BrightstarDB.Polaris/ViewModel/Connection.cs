@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.ServiceModel;
-using System.Text;
 using System.Xml.Linq;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Polaris.Messages;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -20,9 +19,7 @@ namespace BrightstarDB.Polaris.ViewModel
         private static readonly ConnectionType[] ConnectionTypesArray = new[]
                                                                             {
                                                                                 ConnectionType.Embedded,
-                                                                                ConnectionType.Http,
-                                                                                ConnectionType.Tcp,
-                                                                                ConnectionType.NamedPipe
+                                                                                ConnectionType.Rest
                                                                             };
 
         private ConnectionString _connectionString;
@@ -30,15 +27,13 @@ namespace BrightstarDB.Polaris.ViewModel
         private string _directoryPath;
         private bool _isValid;
         private string _name;
-        private string _pipeName;
-        private string _serverName;
-        private string _serverPath;
-        private string _serverPort;
+        private string _serverEndpoint;
 
         public Connection(string name, string connectionString)
         {
             _name = name;
             _connectionString = new ConnectionString(connectionString);
+            ParseConnectionString();
             Initialize();
         }
 
@@ -105,36 +100,14 @@ namespace BrightstarDB.Polaris.ViewModel
             }
         }
 
-        public string ServerName
+        public string ServerEndpoint
         {
-            get { return _serverName; }
+            get { return _serverEndpoint; }
             set
             {
-                _serverName = value;
+                _serverEndpoint = value;
                 Validate();
-                RaisePropertyChanged("ServerName");
-            }
-        }
-
-        public string ServerPort
-        {
-            get { return _serverPort; }
-            set
-            {
-                _serverPort = value;
-                Validate();
-                RaisePropertyChanged("ServerPort");
-            }
-        }
-
-        public string ServerPath
-        {
-            get { return _serverPath; }
-            set
-            {
-                _serverPath = value;
-                Validate();
-                RaisePropertyChanged("ServerPath");
+                RaisePropertyChanged("ServerEndpoint");
             }
         }
 
@@ -146,17 +119,6 @@ namespace BrightstarDB.Polaris.ViewModel
                 _directoryPath = value;
                 Validate();
                 RaisePropertyChanged("DirectoryPath");
-            }
-        }
-
-        public string PipeName
-        {
-            get { return _pipeName; }
-            set
-            {
-                _pipeName = value;
-                Validate();
-                RaisePropertyChanged("PipeName");
             }
         }
 
@@ -184,63 +146,29 @@ namespace BrightstarDB.Polaris.ViewModel
             {
                 return String.Format("type=embedded;storesDirectory={0}", DirectoryPath);
             }
-            if (ConnectionType == ConnectionType.Http || ConnectionType == ConnectionType.Tcp){
-                    var connString = new StringBuilder();
-                connString.Append(ConnectionType == ConnectionType.Http
-                                      ? "type=http;endpoint=http://"
-                                      : "type=tcp;endpoint=net.tcp://");
-                connString.Append(ServerName);
-                    if (!String.IsNullOrEmpty(ServerPort))
-                    {
-                        connString.Append(":");
-                        connString.Append(ServerPort);
-                    }
-                if (!String.IsNullOrEmpty(ServerPath))
-                {
-                    if (!ServerPath.StartsWith("/"))
-                    {
-                        connString.Append("/");
-                    }
-                    connString.Append(ServerPath);
-                }
-                return connString.ToString();
-            }
-            if (ConnectionType == ConnectionType.NamedPipe)
+            if (ConnectionType == ConnectionType.Rest)
             {
-                var connString = new StringBuilder();
-                connString.Append("type=namedpipe;endpoint=net.pipe://");
-                connString.Append(ServerName);
-                if (!PipeName.StartsWith("/"))
-                {
-                    connString.Append("/");
-                }
-                connString.Append(PipeName);
-                return connString.ToString();
+                var connString = String.Format("type=rest;endpoint={0}", ServerEndpoint);
+                return connString;
             }
             throw new NotSupportedException(String.Format("Cannot generate connection string for connection type {0}", ConnectionType));
         }
 
         private void ParseConnectionString()
         {
-            ConnectionType = _connectionString.Type;
+            _connectionType = _connectionString.Type;
             switch (ConnectionString.Type)
             {
                 case ConnectionType.Embedded:
-                    ServerName = ServerPort = ServerPath = null;
-                    DirectoryPath = _connectionString.StoresDirectory;
+                    _serverEndpoint = null;
+                    _directoryPath = _connectionString.StoresDirectory;
                     break;
-                case ConnectionType.Http:
-                case ConnectionType.Tcp:
-                    var uri = new Uri(_connectionString.ServiceEndpoint);
-                    ServerName = uri.Host;
-                    ServerPort = uri.Port.ToString();
-                    ServerPath = uri.PathAndQuery;
+                case ConnectionType.Rest:
+                    _serverEndpoint = _connectionString.ServiceEndpoint;
+                    _directoryPath = null;
                     break;
-                case ConnectionType.NamedPipe:
-                    var npUri = new Uri(_connectionString.ServiceEndpoint);
-                    ServerName = npUri.Host;
-                    PipeName = npUri.PathAndQuery.TrimStart('/');
-                    break;
+                default:
+                    throw new NotSupportedException(String.Format("Cannot parse connection string containing obsolete connection type property '{0}'", _connectionString.Type));
             }
         }
 
@@ -257,34 +185,32 @@ namespace BrightstarDB.Polaris.ViewModel
                     if (String.IsNullOrEmpty(DirectoryPath))
                     {
                         ValidationMessages.Add("A value is required for the Stores Directory path.");
-                    } else if (!Directory.Exists(DirectoryPath))
+                    }
+                    else if (!Directory.Exists(DirectoryPath))
                     {
                         ValidationMessages.Add(String.Format("Cannot find the directory {0}", DirectoryPath));
                     }
                     break;
-                case ConnectionType.Http:
-                case ConnectionType.Tcp:
-                    if (String.IsNullOrEmpty(ServerName))
+                case ConnectionType.Rest:
+                    if (String.IsNullOrEmpty(ServerEndpoint))
                     {
-                        ValidationMessages.Add("A value is required for the Server Name.");
+                        ValidationMessages.Add("A value is required for the Server Address.");
                     }
-                    if (!String.IsNullOrEmpty(ServerPort))
+                    else
                     {
-                        int port;
-                        if (!Int32.TryParse(ServerPort, out port) || port < 0)
+                        Uri parsedUri;
+                        if (!Uri.TryCreate(ServerEndpoint, UriKind.Absolute, out parsedUri))
                         {
-                            ValidationMessages.Add("The Server Port must be a non-negative integer.");
+                            ValidationMessages.Add("The Server Address must be a valid HTTP/HTTPS URL");
                         }
-                    }
-                    break;
-                case ConnectionType.NamedPipe:
-                    if (String.IsNullOrEmpty(ServerName))
-                    {
-                        ValidationMessages.Add("A value is required for the Server Name.");
-                    }
-                    if (String.IsNullOrEmpty(PipeName))
-                    {
-                        ValidationMessages.Add("A value is required for the Pipe Name.");
+                        else
+                        {
+                            var scheme = parsedUri.Scheme.ToLowerInvariant();
+                            if (!(scheme.Equals("http") || scheme.Equals("https")))
+                            {
+                                ValidationMessages.Add("The Server Address must be a valid HTTP/HTTPS URL");
+                            }
+                        }
                     }
                     break;
             }
@@ -340,18 +266,15 @@ namespace BrightstarDB.Polaris.ViewModel
                         return result;
                     }
                 }
-                else
+                var commitPoint = client.GetCommitPoint(store.Location, targetCommitPoint.CommitTime);
+                if (commitPoint == null)
                 {
-                    var commitPoint = client.GetCommitPoint(store.Location, targetCommitPoint.CommitTime);
-                    if (commitPoint == null)
-                    {
-                        throw new Exception("Could not retrieve specified commit point from store.");
-                    }
-                    using(var resultsStream = client.ExecuteQuery(commitPoint, sparqlQueryString))
-                    {
-                        XDocument result = XDocument.Load(resultsStream);
-                        return result;
-                    }
+                    throw new Exception("Could not retrieve specified commit point from store.");
+                }
+                using(var resultsStream = client.ExecuteQuery(commitPoint, sparqlQueryString))
+                {
+                    XDocument result = XDocument.Load(resultsStream);
+                    return result;
                 }
             }
             catch (BrightstarClientException brightstarClientException)
@@ -387,7 +310,7 @@ namespace BrightstarDB.Polaris.ViewModel
             }
         }
 
-        private static void ExtractSyntaxError(ExceptionDetail exceptionDetail)
+        private static void ExtractSyntaxError(ExceptionDetailObject exceptionDetail)
         {
             if (exceptionDetail == null) return;
             if (exceptionDetail.Type.Equals("VDS.RDF.Parsing.RdfParseException"))
@@ -395,6 +318,16 @@ namespace BrightstarDB.Polaris.ViewModel
                 throw new RdfParseException(exceptionDetail.Message);
             }
             ExtractSyntaxError(exceptionDetail.InnerException);
+        }
+
+        private static void ExtractSyntaxError(Exception exception)
+        {
+            if (exception == null) return;
+            if (exception is RdfParseException)
+            {
+                throw exception;
+            }
+            ExtractSyntaxError(exception);
         }
 
         public IEnumerable<CommitPointViewModel> GetCommitPoints(Store store, int skip, int take)
@@ -432,7 +365,7 @@ namespace BrightstarDB.Polaris.ViewModel
 
         public Connection Clone()
         {
-            var ret = new Connection(this.Name, this.ConnectionString.ToString());
+            var ret = new Connection(Name, ConnectionString.ToString());
             ret.ParseConnectionString();
             return ret;
         }

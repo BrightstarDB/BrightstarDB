@@ -13,10 +13,12 @@ using System.IO.IsolatedStorage;
 
 namespace BrightstarDB
 {
-    internal class Configuration
+    /// <summary>
+    /// Provides the global default configuration for the BrightstarDB service and client
+    /// </summary>
+    public class Configuration
     {
         private const string StoreLocationPropertyName = "BrightstarDB.StoreLocation";
-        private const string LogLevelPropertyName = "BrightstarDB.LogLevel";
         private const string TxnFlushTriggerPropertyName = "BrightstarDB.TxnFlushTripleCount";
         private const string ConnectionStringPropertyName = "BrightstarDB.ConnectionString";
 
@@ -34,9 +36,6 @@ namespace BrightstarDB
         private const string QueryCacheDirectoryName = "BrightstarDB.QueryCacheDirectory";
         private const string QueryCacheMemoryName = "BrightstarDB.QueryCacheMemory";
         private const string QueryCacheDiskSpaceName = "BrightstarDB.QueryCacheDisk";
-        private const string HttpPortName = "BrightstarDB.HttpPort";
-        private const string TcpPortName = "BrightstarDB.TcpPort";
-        private const string NetNamedPipeName = "BrightstarDB.NetNamedPipeName";
         private const string PersistenceTypeName = "BrightstarDB.PersistenceType";
         private const string ClusterNodePortName = "BrightstarDB.ClusterNodePort";
         private const string ResourceCacheLimitName = "BrightstarDB.ResourceCacheLimit";
@@ -49,9 +48,6 @@ namespace BrightstarDB
 
         private const int DefaultQueryCacheDiskSpace = 2048; // in MB
         private const long MegabytesToBytes = 1024*1024;
-
-        private const int DefaultHttpPort = 8090;
-        private const int DefaultTcpPort = 8095;
 
 #if WINDOWS_PHONE
         private const int DefaultPageCacheSize = 4; // in MB
@@ -71,12 +67,10 @@ namespace BrightstarDB
                 store.CreateDirectory("brightstar");
             }
             StoreLocation = "brightstar";
-            LogLevel = "Error";
             TransactionFlushTripleCount = 1000;
             QueryCache = new NullCache();
 #elif PORTABLE
             StoreLocation = "brightstar";
-            LogLevel = "Error";
             TransactionFlushTripleCount = 1000;
             PageCacheSize = DefaultPageCacheSize;
             ResourceCacheLimit = DefaultResourceCacheLimit;
@@ -87,15 +81,6 @@ namespace BrightstarDB
 #else
             var appSettings = ConfigurationManager.AppSettings;
             StoreLocation = appSettings.Get(StoreLocationPropertyName);
-            LogLevel = appSettings.Get(LogLevelPropertyName);
-
-            // Port Numbers
-            HttPort = GetApplicationSetting(HttpPortName, DefaultHttpPort);
-            TcpPort = GetApplicationSetting(TcpPortName, DefaultTcpPort);
-
-            // Named Pipe Name
-            var namedPipeValue = appSettings.Get(NetNamedPipeName);
-            NamedPipeName = !string.IsNullOrEmpty(namedPipeValue) ? namedPipeValue : "brightstar";
 
             // Transaction Flushing
             TransactionFlushTripleCount = GetApplicationSetting(TxnFlushTriggerPropertyName, 10000);
@@ -187,16 +172,24 @@ namespace BrightstarDB
 #endif
         }
 
+        /// <summary>
+        /// Default path to the directory containing BrightstarDB stores
+        /// </summary>
         public static string StoreLocation { get; set; }
 
-        public static string LogLevel { get; set; }
-
+        /// <summary>
+        /// The threshold number of triples to import in a batch before 
+        /// flushing indexes to disk.
+        /// </summary>
         public static int TransactionFlushTripleCount { get; set; }
 
+        /// <summary>
+        /// The default BrightstarDB connection string
+        /// </summary>
         public static string ConnectionString { get; set; }
 
         /// <summary>
-        /// Size of the object cache (in # objects)
+        /// NO LONGER IN USE
         /// </summary>
         public static int ReadStoreObjectCacheSize { get; set; }
 
@@ -210,30 +203,46 @@ namespace BrightstarDB
         /// </summary>
         public static int ResourceCacheLimit { get; set; }
 
+        /// <summary>
+        /// The default setting for optimistic locking in the Data Objects
+        /// and Entity Framework contexts
+        /// </summary>
         public static bool EnableOptimisticLocking { get; set; }
 
+        /// <summary>
+        /// Enable or disable server-side SPARQL query cache
+        /// </summary>
         public static bool EnableQueryCache { get; set; }
 
+        /// <summary>
+        /// The path to the directory to use for the server-side SPARQL query disk cache
+        /// </summary>
         public static string QueryCacheDirectory { get; set; }
 
         /// <summary>
-        /// Maximum size of query memory cache in MB
+        /// Maximum size of server-side SPARQL query memory cache in MB
         /// </summary>
         public static int QueryCacheMemory { get; set; }
 
         /// <summary>
-        /// Maximum size of query disk cache in MB
+        /// Maximum size of the server-side SPARQL query disk cache in MB
         /// </summary>
         public static int QueryCacheDiskSpace { get; set; }
 
+        /// <summary>
+        /// Retrieves the SPARQL query cache
+        /// </summary>
         public static ICache QueryCache { get; private set; }
 
-        public static int HttPort { get; set; }
-        public static int TcpPort { get; set; }
-        public static string NamedPipeName { get; set; }
 
+        /// <summary>
+        /// The port number used for clustered BrightstarDB service communication
+        /// </summary>
         public static int ClusterNodePort { get; set; }
 
+        /// <summary>
+        /// The default BrightstarDB store persistence type
+        /// </summary>
         public static PersistenceType PersistenceType { get; set; }
 
         /// <summary>

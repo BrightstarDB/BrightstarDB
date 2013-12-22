@@ -85,7 +85,10 @@ namespace BrightstarDB
         /// </summary>
         public static SparqlResultsFormat Csv = new SparqlResultsFormat("csv", "text/csv");
 
-        private static readonly SparqlResultsFormat[] AllFormats = new[]
+        /// <summary>
+        /// Returns an array of all the pre-defined <see cref="SparqlResultsFormat"/> instances.
+        /// </summary>
+        public static readonly SparqlResultsFormat[] AllFormats = new[]
                                                            {
                                                                Xml, Json, Tsv, Csv
                                                            };

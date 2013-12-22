@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BrightstarDB.EntityFramework;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 
@@ -205,7 +206,7 @@ namespace BrightstarDB.Client
                 if (value == null) throw new ArgumentNullException("value");
                 string dataType = RdfDatatypes.GetRdfDatatype(value.GetType());
                 string litString = RdfDatatypes.GetLiteralString(value);
-                AddLiteralProperty(type, litString, dataType, lang);
+                AddLiteralProperty(type, litString, dataType, lang ?? RdfDatatypes.GetLiteralLanguageTag(value));
             }
             return this;
         }
@@ -452,7 +453,7 @@ namespace BrightstarDB.Client
             if (triple.IsLiteral)
             {
                 object retValue;
-                if (RdfDatatypes.TryParseLiteralString(triple.Object, triple.DataType, out retValue))
+                if (RdfDatatypes.TryParseLiteralString(triple.Object, triple.DataType, triple.LangCode, out retValue))
                 {
                     return retValue;
                 }
@@ -517,39 +518,12 @@ namespace BrightstarDB.Client
             // Because this is a set, we use a wildcard to delete any existing properties with the same predicate
             if (!_isNew && !_store.DeletePatterns.Any(t=>t.Subject.Equals(triple.Subject) && t.Predicate.Equals(triple.Predicate) && t.Object.Equals(Constants.WildcardUri)))
             {
-                if (_store.DataSetGraphUris == null)
-                {
-                    // Wildcard delete from all graphs
-                    _store.DeletePatterns.Add(new Triple
-                        {
-                            Subject = triple.Subject,
-                            Predicate = triple.Predicate,
-                            Object = Constants.WildcardUri
-                        });
-                }
-                else
-                {
-                    // Targeted delete only from the dataset graphs and the update graph
-                    _store.DeletePatterns.Add(
-                        new Triple
-                        {
-                            Subject = triple.Subject,
-                            Predicate = triple.Predicate,
-                            Object = Constants.WildcardUri,
-                            Graph = _store.UpdateGraphUri
-                        });
-                    foreach (var g in _store.DataSetGraphUris)
+                AddDeleteTriples(new Triple
                     {
-                        _store.DeletePatterns.Add(
-                            new Triple
-                            {
-                                Subject = triple.Subject,
-                                Predicate = triple.Predicate,
-                                Object = Constants.WildcardUri,
-                                Graph = g
-                            });
-                    }
-                }
+                        Subject = triple.Subject,
+                        Predicate = triple.Predicate,
+                        Object = Constants.WildcardUri
+                    });
             }
 
             // add new triple to current triples

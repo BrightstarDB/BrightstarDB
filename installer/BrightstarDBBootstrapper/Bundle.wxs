@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+	<Bundle Name="BrightstarDB" Version="$(var.BuildNumber)" Manufacturer="BrightstarDB Project" UpgradeCode="3df3e049-4957-4b58-b9fb-063d58cf5027" >
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+      <bal:WixStandardBootstrapperApplication
+        LicenseFile="..\InstallerTmp\EULA.rtf"
+        />
+    </BootstrapperApplicationRef>
+		<Chain>
+      <MsiPackage InstallCondition="NOT VersionNT64" SourceFile="BrightstarDBx86.msi" DisplayInternalUI="yes"/>
+      <MsiPackage InstallCondition="VersionNT64" SourceFile="BrightstarDBx64.msi" DisplayInternalUI="yes"/>
+		</Chain>
+	</Bundle>
+</Wix>

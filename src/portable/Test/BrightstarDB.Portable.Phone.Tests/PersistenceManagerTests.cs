@@ -20,6 +20,7 @@ namespace BrightstarDB.Portable.Phone.Tests
         [TestMethod]
         public void TestCreateFile()
         {
+            if (_pm.FileExists("test.txt")) _pm.DeleteFile("test.txt");
             _pm.CreateFile("test.txt");
             Assert.IsTrue(_pm.FileExists("test.txt"));
         }
@@ -36,6 +37,7 @@ namespace BrightstarDB.Portable.Phone.Tests
         [TestMethod]
         public void TestCreateDirectory()
         {
+            if (_pm.DirectoryExists("newdir")) _pm.DeleteDirectory("newdir");
             Assert.IsFalse(_pm.DirectoryExists("newdir"));
             _pm.CreateDirectory("newdir");
             Assert.IsTrue(_pm.DirectoryExists("newdir"));
@@ -66,6 +68,7 @@ namespace BrightstarDB.Portable.Phone.Tests
         [TestMethod]
         public void TestOpenForWriting()
         {
+            if (_pm.FileExists("writeme.txt")) _pm.DeleteFile("writeme.txt");
             Assert.IsFalse(_pm.FileExists("writeme.txt"));
             using (var writer = new StreamWriter(_pm.GetOutputStream("writeme.txt", FileMode.CreateNew)))
             {
@@ -100,6 +103,7 @@ namespace BrightstarDB.Portable.Phone.Tests
         [TestMethod]
         public void TestOpenForReading()
         {
+            if(_pm.FileExists("readme.txt")) _pm.DeleteFile("readme.txt");
             Assert.IsFalse(_pm.FileExists("readme.txt"));
             using (var writer = new StreamWriter(_pm.GetOutputStream("readme.txt", FileMode.CreateNew)))
             {
@@ -114,9 +118,10 @@ namespace BrightstarDB.Portable.Phone.Tests
         [TestMethod]
         public void TestListFolders()
         {
+            if (_pm.DirectoryExists("parent")) _pm.DeleteDirectory("parent");
             try
             {
-                _pm.ListSubDirectories("parent");
+                var list = _pm.ListSubDirectories("parent");
                 Assert.Fail("Expected FileNotFoundException");
             }
             catch (FileNotFoundException)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
@@ -23,7 +24,7 @@ namespace BrightstarDB.EntityFramework
     {
         private readonly IDataObjectStore _store;
         private readonly Dictionary<string, List<BrightstarEntityObject>> _trackedObjects;
-
+ 
         /// <summary>
         /// Creates a new domain context
         /// </summary>
@@ -43,10 +44,15 @@ namespace BrightstarDB.EntityFramework
         ///<param name="enableOptimisticLocking">Optional parameter to override the optimistic locking configuration specified in the connection string</param>
         /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
         /// not defined, the default graph in the store will be updated.</param>
-        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
-        /// If not defined, all graphs in the store will be queried.</param>
+        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties. See
+        /// the remarks below.</param>
         /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
         /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+        /// <remarks>
+        /// <para>If <paramref name="datasetGraphUris"/> is null, then the context will query the graphs defined by 
+        /// <paramref name="updateGraphUri"/> and <paramref name="versionGraphUri"/> only. If all three parameters
+        /// are null then the context will query across all graphs in the store.</para>
+        /// </remarks>
         protected BrightstarEntityContext(EntityMappingStore mappings, string connectionString, bool? enableOptimisticLocking = null,
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null ) : base(mappings)
         {
@@ -70,6 +76,10 @@ namespace BrightstarDB.EntityFramework
 
         private static void AssertStoreFromConnectionString(ConnectionString connectionString)
         {
+            if (connectionString.Type == ConnectionType.DotNetRdf)
+            {
+                return;
+            }
 #if SILVERLIGHT            
             var service = new EmbeddedBrightstarService(connectionString.StoresDirectory);
 #else
@@ -107,28 +117,17 @@ namespace BrightstarDB.EntityFramework
             IDataObjectContext context;
             switch (connectionString.Type)
             {
-#if !REST_CLIENT
                 case ConnectionType.Embedded:
                     context = new EmbeddedDataObjectContext(connectionString);
                     break;
-#endif
-#if !SILVERLIGHT && !PORTABLE
-#if !REST_CLIENT
-                case ConnectionType.Http:
-                    context = new HttpDataObjectContext(connectionString);
-                    break;
-                case ConnectionType.Tcp:
-                    context = new NetTcpDataObjectContext(connectionString);
-                    break;
-
-                case ConnectionType.NamedPipe:
-                    context = new NamedPipeDataObjectContext(connectionString);
-                    break;
-#endif
+#if !SILVERLIGHT && !__MonoCS__
                 case ConnectionType.Rest:
                     context = new RestDataObjectContext(connectionString);
                     break;
 #endif
+                case ConnectionType.DotNetRdf:
+                    context = new DotNetRdfDataObjectContext(connectionString);
+                    break;
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value);
@@ -303,7 +302,8 @@ namespace BrightstarDB.EntityFramework
                     {
                         var argInfo = anonymousConstructorArgs[i];
                         var colValue = row.GetColumnValue(argInfo.VariableName);
-                        args[i] = colValue == null ? argInfo.DefaultValue : argInfo.ValueConverter(colValue.ToString());
+                        var colLang = row.GetLiteralLanguageCode(argInfo.VariableName);
+                        args[i] = colValue == null ? argInfo.DefaultValue : argInfo.ValueConverter(colValue.ToString(), colLang);
                     }
                     yield return (T)Activator.CreateInstance(typeof(T), args);
                 }                
@@ -334,12 +334,20 @@ namespace BrightstarDB.EntityFramework
                 }
                 foreach(var row in resultDoc.SparqlResultRows())
                 {
-                    yield return (T)converter(row.GetColumnValue(0).ToString());
+                    var value = row.GetColumnValue(0);
+                    if (value.GetType() == typeof (T))
+                    {
+                        yield return (T) value;
+                    }
+                    else
+                    {
+                        yield return (T) converter(row.GetColumnValue(0).ToString(), row.GetLiteralLanguageCode(0));
+                    }
                 }
             }
         }
 
-        private object ConvertString(string s, Type t)
+        private object ConvertString(string value, string lang, Type t)
         {
             var converter = GetStringConverter(t);
             if (converter == null)
@@ -347,7 +355,7 @@ namespace BrightstarDB.EntityFramework
                 throw new EntityFrameworkException("No SPARQL results conversion found from string to type '{0}'",
                                                    t.FullName);
             }
-            return converter(s);
+            return converter(value, lang);
         }
 
         /// <summary>
@@ -361,7 +369,9 @@ namespace BrightstarDB.EntityFramework
         /// the enumeration returns a single object, otherwise it returns no objects.</returns>
         public override IEnumerable<T> ExecuteInstanceQuery<T>(string instanceIdentifier, string typeIdentifier)
         {
-            var sparqlQuery = String.Format("ASK {{ <{0}> a <{1}>. }}", instanceIdentifier, typeIdentifier);
+            var sparqlQuery = String.Format("ASK {0} {{ <{1}> a <{2}>. }}", _store.GetDatasetClause(), instanceIdentifier, typeIdentifier);
+
+
             var sparqResult = _store.ExecuteSparql(sparqlQuery);
             var resultDoc = sparqResult.ResultDocument;
             if (resultDoc.SparqlBooleanResult())
@@ -376,32 +386,34 @@ namespace BrightstarDB.EntityFramework
         {
             public string PropertyName;
             public string VariableName;
-            public Converter<String, object> ValueConverter;
+            public Func<string, string, object> ValueConverter;
             public object DefaultValue;
         }
 
-        private Converter<String, object> GetStringConverter(Type targetType)
+        
+        private Func<string, string, object> GetStringConverter(Type targetType)
         {
             if (typeof(BrightstarEntityObject).IsAssignableFrom(GetImplType(targetType)))
             {
-                return x => BindSingleBrightstarObject(targetType, x);
+                return (s,l) => BindSingleBrightstarObject(targetType, s);
             }
-            if (targetType == typeof(string)) return (x => x);
-            if (targetType == typeof(bool)) return x => Convert.ToBoolean(x);
-            if (targetType == typeof(int)) return x => Convert.ToInt32(x);
-            if (targetType == typeof(short)) return x => Convert.ToInt16(x);
-            if (targetType == typeof(long)) return x => Convert.ToInt64(x);
-            if (targetType == typeof(DateTime)) return x => Convert.ToDateTime(x);
-            if (targetType == typeof(Byte)) return x => Convert.ToByte(x);
-            if (targetType == typeof(Decimal)) return x => Convert.ToDecimal(x);
-            if (targetType == typeof(Double)) return x => Convert.ToDouble(x);
-            if (targetType == typeof(SByte)) return x => Convert.ToSByte(x);
-            if (targetType == typeof(Single)) return x => Convert.ToSingle(x);
-            if (targetType == typeof(UInt16)) return x => Convert.ToUInt16(x);
-            if (targetType == typeof(UInt32)) return x => Convert.ToUInt32(x);
-            if (targetType == typeof(UInt64)) return x => Convert.ToUInt64(x);
+            if (targetType == typeof (PlainLiteral)) return (s, l) => new PlainLiteral(s, l);
+            if (targetType == typeof(string)) return (x,l) => x;
+            if (targetType == typeof(bool)) return (x, l) => Convert.ToBoolean(x);
+            if (targetType == typeof(int)) return (x, l) => Convert.ToInt32(x);
+            if (targetType == typeof(short)) return (x, l) => Convert.ToInt16(x);
+            if (targetType == typeof(long)) return (x, l) => Convert.ToInt64(x);
+            if (targetType == typeof(DateTime)) return (x, l) => Convert.ToDateTime(x);
+            if (targetType == typeof(Byte)) return (x, l) => Convert.ToByte(x);
+            if (targetType == typeof(Decimal)) return (x, l) => Convert.ToDecimal(x);
+            if (targetType == typeof(Double)) return (x, l) => Convert.ToDouble(x);
+            if (targetType == typeof(SByte)) return (x, l) => Convert.ToSByte(x);
+            if (targetType == typeof(Single)) return (x, l) => Convert.ToSingle(x);
+            if (targetType == typeof(UInt16)) return (x, l) => Convert.ToUInt16(x);
+            if (targetType == typeof(UInt32)) return (x, l) => Convert.ToUInt32(x);
+            if (targetType == typeof(UInt64)) return (x, l) => Convert.ToUInt64(x);
             var stringConstructor = targetType.GetConstructor(new Type[] {typeof (string)});
-            if (stringConstructor != null) return x => stringConstructor.Invoke(new object[]{x});
+            if (stringConstructor != null) return (x, l) => stringConstructor.Invoke(new object[] { x });
             return null;
         }
 
@@ -476,6 +488,15 @@ namespace BrightstarDB.EntityFramework
         public override string GetDatatype(Type systemType)
         {
             return RdfDatatypes.GetRdfDatatype(systemType);
+        }
+
+        /// <summary>
+        /// Return the list of graphs to query or null to query the default dataset
+        /// </summary>
+        /// <returns></returns>
+        public override IList<string> GetDataset()
+        {
+            return _store.GetDataset();
         }
 
         /// <summary>

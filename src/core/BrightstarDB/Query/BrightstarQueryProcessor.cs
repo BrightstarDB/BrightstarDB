@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BrightstarDB.Query.Processor;
+﻿using BrightstarDB.Query.Processor;
 using BrightstarDB.Storage;
 using VDS.RDF;
 using VDS.RDF.Query;
-using VDS.RDF.Query.Algebra;
 using VDS.RDF.Query.Datasets;
 using VDS.RDF.Query.Optimisation;
-using VDS.RDF.Query.Patterns;
 
 namespace BrightstarDB.Query
 {
     internal class BrightstarQueryProcessor : LeviathanQueryProcessor
     {
-        private readonly IStore _store;
+        // KA: Not currently used
+        //private readonly IStore _store;
 
 
         static BrightstarQueryProcessor()
@@ -28,7 +24,7 @@ namespace BrightstarDB.Query
 
         public BrightstarQueryProcessor(IStore store, ISparqlDataset data) : base(data)
         {
-            _store = store;
+            //_store = store;
         }
 
         // public override 

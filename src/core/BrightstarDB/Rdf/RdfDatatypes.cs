@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace BrightstarDB.Rdf
@@ -117,32 +118,37 @@ namespace BrightstarDB.Rdf
         public const string Char = NetworkedPlanetXsdNamespace + "char";
 
         #region Rdf Datatype Definitions
-        private static readonly RdfDatatype RdfString = new RdfDatatype(String, (o => o as string), (s=>s));
-        private static readonly RdfDatatype RdfBoolean = new RdfDatatype(Boolean, (o => ((bool) o) ? "true" : "false"), (s)=>Convert.ToBoolean(s));
-        private static readonly RdfDatatype RdfDateTime = new RdfDatatype(DateTime, (o => ((DateTime) o).ToString("O")), s=>Convert.ToDateTime(s));
-        private static readonly RdfDatatype RdfDate = new RdfDatatype(Date, (o => ((DateTime)o).ToString("yyyy-MM-dd")), s => Convert.ToDateTime(s));
-        private static readonly RdfDatatype RdfDouble = new RdfDatatype(Double, (o => ((double) o).ToString()), s=>Convert.ToDouble(s));
-        private static readonly RdfDatatype RdfInteger = new RdfDatatype(Integer, (o => ((int) o).ToString()), s=>Convert.ToInt32(s));
-        private static readonly RdfDatatype RdfFloat = new RdfDatatype(Float, (o => ((float) o).ToString()), s=>Convert.ToSingle(s));
-        private static readonly RdfDatatype RdfLong = new RdfDatatype(Long, (o => ((long) o).ToString()), s=>Convert.ToInt64(s));
-        private static readonly RdfDatatype RdfByte = new RdfDatatype(Byte, (o=>((sbyte)o).ToString()), s=>Convert.ToSByte(s));
-        private static readonly RdfDatatype RdfDecimal = new RdfDatatype(Decimal, (o=>((decimal)o).ToString()), s=>Convert.ToDecimal(s));
-        private static readonly RdfDatatype RdfShort = new RdfDatatype(Short, (o=>((short)o).ToString()), s=>Convert.ToInt16(s));
-        private static readonly RdfDatatype RdfUnsignedLong = new RdfDatatype(UnsignedLong, (o=>((ulong)o).ToString()), s=>Convert.ToUInt64(s));
-        private static readonly RdfDatatype RdfUnsignedInt = new RdfDatatype(UnsignedInteger, (o=>((uint)o).ToString()), s=>Convert.ToUInt32(s));
-        private static readonly RdfDatatype RdfUnsignedShort = new RdfDatatype(UnsignedShort, (o=>((ushort)o).ToString()), s=>Convert.ToUInt16(s));
-        private static readonly RdfDatatype RdfUnsignedByte = new RdfDatatype(UnsignedByte, (o=>((byte)o).ToString()), s=>Convert.ToByte(s));
+        private static readonly RdfDatatype RdfString = new RdfDatatype(String, (o => o as string), ((s,l)=>s));
+
+        private static readonly RdfDatatype RdfPlainLiteral = new RdfDatatype(PlainLiteral,
+                                                                              o => ((BrightstarDB.Rdf.PlainLiteral) o).Value,
+                                                                              (s,l) => new BrightstarDB.Rdf.PlainLiteral(s,l));
+        private static readonly RdfDatatype RdfBoolean = new RdfDatatype(Boolean, (o => ((bool) o) ? "true" : "false"), (s,l)=>Convert.ToBoolean(s));
+        private static readonly RdfDatatype RdfDateTime = new RdfDatatype(DateTime, (o => ((DateTime)o).ToString("O", CultureInfo.InvariantCulture)), (s, l) => Convert.ToDateTime(s)); 
+        private static readonly RdfDatatype RdfDate = new RdfDatatype(Date, (o => ((DateTime)o).ToString("yyyy-MM-dd")), (s,l) => Convert.ToDateTime(s));
+        private static readonly RdfDatatype RdfDouble = new RdfDatatype(Double, (o => ((double) o).ToString(CultureInfo.InvariantCulture)), (s,l)=>Convert.ToDouble(s));
+        private static readonly RdfDatatype RdfInteger = new RdfDatatype(Integer, (o => ((int)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToInt32(s));
+        private static readonly RdfDatatype RdfFloat = new RdfDatatype(Float, (o => ((float)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToSingle(s));
+        private static readonly RdfDatatype RdfLong = new RdfDatatype(Long, (o => ((long)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToInt64(s));
+        private static readonly RdfDatatype RdfByte = new RdfDatatype(Byte, (o => ((sbyte)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToSByte(s));
+        private static readonly RdfDatatype RdfDecimal = new RdfDatatype(Decimal, (o => ((decimal)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToDecimal(s));
+        private static readonly RdfDatatype RdfShort = new RdfDatatype(Short, (o => ((short)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToInt16(s));
+        private static readonly RdfDatatype RdfUnsignedLong = new RdfDatatype(UnsignedLong, (o => ((ulong)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToUInt64(s));
+        private static readonly RdfDatatype RdfUnsignedInt = new RdfDatatype(UnsignedInteger, (o => ((uint)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToUInt32(s));
+        private static readonly RdfDatatype RdfUnsignedShort = new RdfDatatype(UnsignedShort, (o => ((ushort)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToUInt16(s));
+        private static readonly RdfDatatype RdfUnsignedByte = new RdfDatatype(UnsignedByte, (o => ((byte)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToByte(s));
 #if PORTABLE
-        private static readonly RdfDatatype RdfChar = new RdfDatatype(Char, o=>((char)o).ToString(), s=>s.ToCharArray().FirstOrDefault());
+        private static readonly RdfDatatype RdfChar = new RdfDatatype(Char, o=>((char)o).ToString(), (s,l)=>s.ToCharArray().FirstOrDefault());
 #else
-        private static readonly RdfDatatype RdfChar = new RdfDatatype(Char, o=>((char)o).ToString(), s=>s.FirstOrDefault());
+        private static readonly RdfDatatype RdfChar = new RdfDatatype(Char, o => ((char)o).ToString(CultureInfo.InvariantCulture), (s,l) => s.FirstOrDefault());
 #endif
-        private static readonly RdfDatatype RdfByteArray = new RdfDatatype(Base64Binary, o=>Convert.ToBase64String((byte[])o), s=>Convert.FromBase64String(s));
+        private static readonly RdfDatatype RdfByteArray = new RdfDatatype(Base64Binary, o=>Convert.ToBase64String((byte[])o), (s,l)=>Convert.FromBase64String(s));
 
         private static readonly Dictionary<Type, RdfDatatype> SystemTypeToRdfType =
             new Dictionary<Type, RdfDatatype>
                 {
                     {typeof (String), RdfString},
+                    {typeof (PlainLiteral), RdfPlainLiteral},
                     {typeof (Boolean), RdfBoolean},
                     {typeof (DateTime), RdfDateTime},
                     {typeof (double), RdfDouble},
@@ -163,6 +169,7 @@ namespace BrightstarDB.Rdf
         private static readonly Dictionary<string, RdfDatatype> DatatypeUriToRdfType =
             new Dictionary<string, RdfDatatype>
                 {
+                    {PlainLiteral, RdfPlainLiteral},
                     {String, RdfString},
                     {Boolean, RdfBoolean},
                     {DateTime, RdfDateTime},
@@ -183,6 +190,7 @@ namespace BrightstarDB.Rdf
                 };
 
         #endregion
+
         /// <summary>
         /// Returns the datatype URI to use for items of the specified type
         /// </summary>
@@ -191,10 +199,10 @@ namespace BrightstarDB.Rdf
         /// <exception cref="ArgumentException">Thrown if <paramref name="systemType"/> does not reference a type that can be mapped to an RDF datatype by this class</exception>
         public static string GetRdfDatatype(Type systemType)
         {
-            if (systemType == null) return PlainLiteral;
+            if (systemType == null || systemType == typeof(BrightstarDB.Rdf.PlainLiteral)) return PlainLiteral;
             RdfDatatype ret;
             if (SystemTypeToRdfType.TryGetValue(systemType, out ret)) return ret.DatatypeUri;
-            throw new ArgumentException(String.Format("The type {0} is not mapped to any known RDF datatype", systemType.FullName), "systemType");
+            throw new ArgumentException(System.String.Format("The type {0} is not mapped to any known RDF datatype", systemType.FullName), "systemType");
         }
 
         ///<summary>
@@ -205,10 +213,22 @@ namespace BrightstarDB.Rdf
         ///<exception cref="ArgumentException">Thrown if <paramref name="value"/> is not of a type that can be mapped to an RDF datatype by this class</exception>
         public static string GetLiteralString(object value)
         {
-            if (value == null) return String.Empty;
+            if (value == null) return System.String.Empty;
             RdfDatatype ret;
             if (SystemTypeToRdfType.TryGetValue(value.GetType(), out ret)) return ret.FormatLiteral(value);
-            throw new ArgumentException(String.Format("The type {0} is not mapped to any known RDF datatype", value.GetType().FullName), "value");
+            throw new ArgumentException(System.String.Format("The type {0} is not mapped to any known RDF datatype", value.GetType().FullName), "value");
+        }
+
+        /// <summary>
+        /// Attempts to extract a language tag from the provided value
+        /// </summary>
+        /// <param name="value">The value to be processed</param>
+        /// <returns>The value of the <see cref="BrightstarDB.Rdf.PlainLiteral.Language"/> property if <paramref name="value"/>
+        /// is a <see cref="BrightstarDB.Rdf.PlainLiteral"/>, or NULL otherwise. </returns>
+        public static string GetLiteralLanguageTag(object value)
+        {
+            var pl = value as PlainLiteral;
+            return pl != null ? pl.Language : null;
         }
 
         /// <summary>
@@ -216,17 +236,18 @@ namespace BrightstarDB.Rdf
         /// </summary>
         /// <param name="literalString">The literal string to be parsed</param>
         /// <param name="literalDatatype">The declared datatype for the literal</param>
+        /// <param name="literalLanguageTag">The language tag for the literal</param>
         /// <returns>The parsed object</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="literalDatatype"/> is not an RDF datatype known to this class</exception>
-        public static object ParseLiteralString(string literalString, string literalDatatype)
+        public static object ParseLiteralString(string literalString, string literalDatatype, string literalLanguageTag)
         {
-            if (literalDatatype.Equals(PlainLiteral) || literalDatatype.Equals(String)) return literalString;
+            if (literalDatatype.Equals(String)) return literalString;
             RdfDatatype datatype;
             if (DatatypeUriToRdfType.TryGetValue(literalDatatype, out datatype))
             {
-                return datatype.ParseLiteral(literalString);
+                return datatype.ParseLiteral(literalString, literalLanguageTag);
             }
-            throw new ArgumentException(String.Format("The datatype URI {0} is not mapped to any known RDF datatype", literalDatatype), "literalDatatype");
+            throw new ArgumentException(System.String.Format("The datatype URI {0} is not mapped to any known RDF datatype", literalDatatype), "literalDatatype");
         }
 
         /// <summary>
@@ -234,13 +255,14 @@ namespace BrightstarDB.Rdf
         /// </summary>
         /// <param name="literalString">The literal string to be parsed</param>
         /// <param name="literalDatatype">The datatype to parse the literal as</param>
+        /// <param name="literalLanguageTag">The language tag of the literal to be parsed</param>
         /// <param name="parsedValue">Receives the parsed literal value, or <paramref name="literalString"/> if the datatype is not supported, or if the datatype conversion failed</param>
         /// <returns>True if the literal was converted to the target datatype successfully, false otherwise.</returns>
-        public static bool TryParseLiteralString(string literalString, string literalDatatype, out object parsedValue)
+        public static bool TryParseLiteralString(string literalString, string literalDatatype, string literalLanguageTag, out object parsedValue)
         {
             try
             {
-                parsedValue = ParseLiteralString(literalString, literalDatatype);
+                parsedValue = ParseLiteralString(literalString, literalDatatype, literalLanguageTag);
                 return true;
             }
             catch (FormatException)
@@ -255,14 +277,23 @@ namespace BrightstarDB.Rdf
             }
         }
 
+        /// <summary>
+        /// Returns true if the specified type is mapped to an RDF literal type by this class
+        /// </summary>
+        /// <param name="type">The type to be checked</param>
+        /// <returns></returns>
+        public static bool IsKnownType(Type type)
+        {
+            return SystemTypeToRdfType.ContainsKey(type);
+        }
 
         class RdfDatatype
         {
             public string DatatypeUri { get; private set; }
             public Func<object, string> FormatLiteral { get; private set; }
-            public Func<string, object> ParseLiteral { get; private set; }
+            public Func<string, string, object> ParseLiteral { get; private set; }
 
-            public RdfDatatype(string datatypeUri, Func<object, string> formatter, Func<string, object> parser)
+            public RdfDatatype(string datatypeUri, Func<object, string> formatter, Func<string, string, object> parser)
             {
                 DatatypeUri = datatypeUri;
                 FormatLiteral = formatter;

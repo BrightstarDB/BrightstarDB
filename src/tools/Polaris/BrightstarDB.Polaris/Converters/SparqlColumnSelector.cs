@@ -42,9 +42,11 @@ namespace BrightstarDB.Polaris.Converters
                         if (bindingElement.Attribute("datatype") != null)
                         {
                             var datatype = bindingElement.Attribute("datatype").Value;
+                            var langAttr = bindingElement.Attribute(XNamespace.Xml + "lang");
+                            var lang = langAttr == null ? String.Empty : langAttr.Value;
                             try
                             {
-                                return RdfDatatypes.ParseLiteralString(bindingElement.Value, datatype);
+                                return RdfDatatypes.ParseLiteralString(bindingElement.Value, datatype, lang);
                             }
                             catch (Exception)
                             {

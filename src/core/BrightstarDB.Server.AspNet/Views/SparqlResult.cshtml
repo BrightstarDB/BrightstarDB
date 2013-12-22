@@ -1,0 +1,65 @@
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Server.Modules.Model.SparqlResultModel>
+@{
+    Layout = "_Layout";
+    Model.ExecuteQueryForHtml(null);
+    ViewBag.Title = "BrightstarDB: SPARQL Query";
+}
+
+<nav>
+    <ul class="horizontal breadcrumb">
+        <li><a href="~/">Home</a></li>
+        <li><a href="~/@Model.StoreName">@Model.StoreName</a></li>
+        @if (@Model.CommitId > 0)
+        {
+            <li><a href="~/@Model.StoreName/commits">Commits</a></li>
+            <li><a href="~/@Model.StoreName/commits/@Model.CommitId">@Model.CommitId</a></li>
+        }
+        <li><a href="#">SPARQL Query</a></li>
+    </ul>
+</nav>
+
+<form method="POST">
+    <fieldset>
+        <legend>Query</legend>
+        <textarea name="query" rows="10" style="width: 100%">@Model.SparqlRequest.Query</textarea>
+        <button type="submit">Query</button>
+    </fieldset>
+</form>
+
+<fieldset>
+<legend>Results</legend>
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <p>One or more errors occurred. See details below.</p>
+    <div class="error">@Model.ErrorMessage</div>
+}
+else if (Model.HasFormattedResults)
+{
+    <p>Query returned @Model.Rows.Count row(s).</p>
+    <table class="items">
+        <thead>
+            <tr>
+                @foreach (var v in Model.Variables)
+                {
+                    <td>@v</td>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.Rows)
+            {
+                <tr>
+                    @foreach (var item in row)
+                    {
+                        <td>@item.ToString()</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <textarea readonly="readonly">@Model.RawResults</textarea>
+}
+    </fieldset>

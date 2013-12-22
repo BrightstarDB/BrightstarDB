@@ -39,7 +39,7 @@ INSERT DATA
             var resultsDoc = XDocument.Load(results);
             var resultRow = resultsDoc.SparqlResultRows().FirstOrDefault();
             Assert.IsNotNull(resultRow);
-            Assert.AreEqual("A new book", resultRow.GetColumnValue("o"));
+            Assert.AreEqual("A new book", resultRow.GetColumnValue("o").ToString());
 
             ExecuteUpdate(storeName,
                      @"PREFIX dc: <http://purl.org/dc/elements/1.1/>
@@ -105,7 +105,7 @@ WHERE
                                                "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?fn WHERE { ?x foaf:givenName ?fn }");
             var resultsDoc = XDocument.Load(results);
             Assert.AreEqual(3, resultsDoc.SparqlResultRows().Count());
-            Assert.IsTrue(resultsDoc.SparqlResultRows().All(r=>r.GetColumnValue("fn").Equals("William")));
+            Assert.IsTrue(resultsDoc.SparqlResultRows().All(r=>r.GetColumnValue("fn").ToString().Equals("William")));
         }
 
         [Test]
@@ -141,8 +141,8 @@ WHERE
                                                "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?b ?t WHERE { ?b dc:title ?t}");
             var resultsDoc = XDocument.Load(results);
             Assert.AreEqual(2, resultsDoc.SparqlResultRows().Count());
-            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r=>r.GetColumnValue("b").Equals(new Uri("http://example/book2")) && r.GetColumnValue("t").Equals("David Copperfield")));
-            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r=>r.GetColumnValue("b").Equals(new Uri("http://example/book3")) && r.GetColumnValue("t").Equals("SPARQL 1.1 Tutorial")));
+            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r=>r.GetColumnValue("b").Equals(new Uri("http://example/book2")) && r.GetColumnValue("t").ToString().Equals("David Copperfield")));
+            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r => r.GetColumnValue("b").Equals(new Uri("http://example/book3")) && r.GetColumnValue("t").ToString().Equals("SPARQL 1.1 Tutorial")));
 
         }
 

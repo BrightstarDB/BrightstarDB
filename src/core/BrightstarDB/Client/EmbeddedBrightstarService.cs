@@ -1,5 +1,4 @@
-﻿#if !REST_CLIENT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,12 +7,9 @@ using System.Threading;
 #if !PORTABLE
 using System.Threading.Tasks;
 #endif
+using BrightstarDB.Dto;
 using BrightstarDB.Storage;
 using BrightstarDB.Server;
-#if !SILVERLIGHT
-using System.ServiceModel;
-
-#endif
 
 namespace BrightstarDB.Client
 {
@@ -211,9 +207,9 @@ namespace BrightstarDB.Client
                 pStream.Seek(0, SeekOrigin.Begin);
                 return pStream;
             }
-            catch (BrightstarStoreNotModifiedException ex)
+            catch (BrightstarStoreNotModifiedException)
             {
-                throw new BrightstarClientException("Store not modified", new ExceptionDetail(ex));
+                throw;
             }
             catch (Exception ex)
             {
@@ -333,7 +329,7 @@ namespace BrightstarDB.Client
             {
                 var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData,
                                                            defaultGraphUri);
-                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -359,7 +355,7 @@ namespace BrightstarDB.Client
                 if (!waitForCompletion)
                 {
                     var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData, defaultGraphUri);
-                    return new JobInfoWrapper(new JobInfo { JobId = jobId.ToString(), JobPending = true });
+                    return new JobInfoObject(jobId);
                 }
                 else
                 {
@@ -370,16 +366,8 @@ namespace BrightstarDB.Client
                         Thread.Sleep(50);
                         status = _serverCore.GetJobStatus(storeName, jobId.ToString());
                     }
-                    return new JobInfoWrapper(new JobInfo
-                                                  {
-                                                      JobId = jobId.ToString(),
-                                                      StatusMessage = status.Information,
-                                                      JobCompletedOk = (status.JobStatus == JobStatus.CompletedOk),
-                                                      JobCompletedWithErrors =
-                                                          (status.JobStatus == JobStatus.TransactionError)
-                                                  });
+                    return new JobInfoObject(status);
                 }
-
             }
             catch (Exception ex)
             {
@@ -395,7 +383,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
-                return new JobInfoWrapper(new JobInfo { JobId = jobId.ToString(), JobPending = true });
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -410,7 +398,7 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store to be updated</param>
         /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
         /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
-        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        /// <returns>An <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         public IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true)
         {
             try
@@ -418,7 +406,7 @@ namespace BrightstarDB.Client
                 if (!waitForCompletion)
                 {
                     var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
-                    return new JobInfoWrapper(new JobInfo{JobId=jobId.ToString(), JobPending = true});
+                    return new JobInfoObject(jobId);
                 } else
                 {
                     var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
@@ -428,14 +416,7 @@ namespace BrightstarDB.Client
                         Thread.Sleep(50);
                         status = _serverCore.GetJobStatus(storeName, jobId.ToString());
                     }
-                    return new JobInfoWrapper(new JobInfo
-                    {
-                        JobId = jobId.ToString(),
-                        StatusMessage = status.Information,
-                        JobCompletedOk = (status.JobStatus == JobStatus.CompletedOk),
-                        JobCompletedWithErrors =
-                            (status.JobStatus == JobStatus.TransactionError)
-                    });
+                    return new JobInfoObject(status);
                 }
             }
             catch (Exception ex)
@@ -445,6 +426,28 @@ namespace BrightstarDB.Client
             }
         }
 #endif
+        /// <summary>
+        /// Gets information about jobs recently executed against a store
+        /// </summary>
+        /// <param name="storeName">The name of the store to retrieve job information from</param>
+        /// <param name="skip">The number of records to skip</param>
+        /// <param name="take">The number of records to take</param>
+        /// <returns>The subset of job information requested by the skip and take parameters</returns>
+        /// <remarks>Job information is returned in reverse order of the order in which they will be / were executed (most recent first).</remarks>
+        public IEnumerable<IJobInfo> GetJobInfo(string storeName, int skip, int take)
+        {
+            try
+            {
+                var jobs = _serverCore.GetJobs(storeName).Skip(skip).Take(take);
+                return jobs.Select(jobStatus => new JobInfoObject(jobStatus)).Cast<IJobInfo>();
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting job listing for store {0}", storeName);
+                throw new BrightstarClientException("Error getting job listing for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
 
 #if SILVERLIGHT
         
@@ -529,18 +532,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobStatus = _serverCore.GetJobStatus(storeName, jobId);
-                return
-                new JobInfoWrapper(
-                    new JobInfo
-                        {
-                            JobId = jobId,
-                            StatusMessage = jobStatus.Information,
-                            ExceptionInfo = jobStatus.ExceptionDetail,
-                            JobPending = (jobStatus.JobStatus == JobStatus.Pending),
-                            JobCompletedOk = (jobStatus.JobStatus == JobStatus.CompletedOk),
-                            JobCompletedWithErrors = (jobStatus.JobStatus == JobStatus.TransactionError),
-                            JobStarted = (jobStatus.JobStatus == JobStatus.Started)
-                        });
+                return new JobInfoObject(jobStatus);
             }
             catch (Exception ex)
             {
@@ -561,7 +553,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.Import(storeName, fileName, graphUri);
-                return new JobInfoWrapper(new JobInfo { JobId = jobId.ToString(), JobPending = true });
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -582,7 +574,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.Export(store, fileName, graphUri);
-                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -602,7 +594,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.Consolidate(store);
-                return new JobInfoWrapper(new JobInfo { JobId = jobId.ToString(), JobPending = true });
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -626,7 +618,7 @@ namespace BrightstarDB.Client
                 var commitPoints = _serverCore.GetCommitPoints(storeName).Skip(skip).Take(take);
 // ReSharper disable RedundantEnumerableCastCall
 // not redundant for SILVERLIGHT build
-                return commitPoints.Select(c => new CommitPointInfoWrapper(new CommitPointInfo {Id = c.LocationOffset, CommitTime = c.CommitTime, JobId = c.JobId, StoreName = storeName})).Cast<ICommitPointInfo>();
+                return commitPoints.Select(c => new CommitPointInfoObject {Id = c.LocationOffset, CommitTime = c.CommitTime, JobId = c.JobId, StoreName = storeName}).Cast<ICommitPointInfo>();
 // ReSharper restore RedundantEnumerableCastCall
             }
             catch (Exception ex)
@@ -658,7 +650,7 @@ namespace BrightstarDB.Client
                         x => x.CommitTime > earliestUtc).Skip(skip).Take(take);
 // ReSharper disable RedundantEnumerableCastCall
 // not redundant for SILVERLIGHT build
-                return commitPoints.Select(c => new CommitPointInfoWrapper(new CommitPointInfo {Id = c.LocationOffset, CommitTime = c.CommitTime, JobId = c.JobId, StoreName = storeName})).Cast<ICommitPointInfo>();
+                return commitPoints.Select(c => new CommitPointInfoObject {Id = c.LocationOffset, CommitTime = c.CommitTime, JobId = c.JobId, StoreName = storeName}).Cast<ICommitPointInfo>();
 // ReSharper restore RedundantEnumerableCastCall
             }
             catch (Exception ex)
@@ -680,13 +672,13 @@ namespace BrightstarDB.Client
             {
                 return _serverCore.GetStatistics(storeName).Select(
                     s =>
-                    new StoreStatisticsWrapper(new StoreStatistics
+                    new StoreStatisticsObject
                         {
                             CommitId = s.CommitNumber,
                             CommitTimestamp = s.CommitTime,
                             TotalTripleCount = s.TripleCount,
                             PredicateTripleCounts = s.PredicateTripleCounts
-                        })
+                        }
                     ).FirstOrDefault();
             }
             catch (Exception ex)
@@ -719,13 +711,13 @@ namespace BrightstarDB.Client
                                   .Where(s => s.CommitTime <= latest && s.CommitTime >= earlierst)
                                   .Skip(skip)
                                   .Take(take)
-                                  .Select(s => new StoreStatisticsWrapper(new StoreStatistics
+                                  .Select(s => new StoreStatisticsObject
                                       {
                                           CommitId = s.CommitNumber,
                                           CommitTimestamp = s.CommitTime,
                                           TotalTripleCount = s.TripleCount,
                                           PredicateTripleCounts = s.PredicateTripleCounts
-                                      })).Cast<IStoreStatistics>();
+                                      }).Cast<IStoreStatistics>();
                 // ReSharper restore RedundantEnumerableCastCall
             }
             catch (Exception ex)
@@ -747,7 +739,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.UpdateStatistics(storeName);
-                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -776,7 +768,7 @@ namespace BrightstarDB.Client
                                                        sourceCommitPoint == null
                                                            ? StoreConstants.NullUlong
                                                            : sourceCommitPoint.Id);
-                return new JobInfoWrapper(new JobInfo {JobId = jobId.ToString(), JobPending = true});
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -787,6 +779,35 @@ namespace BrightstarDB.Client
             }
         }
 
+        /// <summary>
+        /// Returns the specified commit point of a BrighstarDB store
+        /// </summary>
+        /// <param name="storeName">The name of the store to open</param>
+        /// <param name="commitId">The identifier of the commit point to be returned</param>
+        /// <returns>The specified commit point or NULL if no matching commit point was found</returns>
+        public ICommitPointInfo GetCommitPoint(string storeName, ulong commitId)
+        {
+            try
+            {
+                var commitPoint = _serverCore.GetCommitPoint(storeName, commitId);
+                if (commitPoint == null) return null;
+                return new CommitPointInfoObject
+                    {
+                        StoreName = storeName,
+                        Id = commitPoint.LocationOffset,
+                        CommitTime = commitPoint.CommitTime,
+                        JobId = commitPoint.JobId
+                    };
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException,
+                                 "Error getting commit point {0} for store {1}", commitId, storeName);
+                throw new BrightstarClientException(
+                    String.Format("Error getting commit point {0} for store {1}. {2}", commitId, storeName,
+                                  ex.Message), ex);
+            }
+        }
 
         /// <summary>
         /// Returns the commit point that was in effect at a given date/time
@@ -803,13 +824,13 @@ namespace BrightstarDB.Client
             {
                 var commitPoint = _serverCore.GetCommitPoint(storeName, timestamp);
                 if (commitPoint == null) return null;
-                return new CommitPointInfoWrapper(new CommitPointInfo
+                return new CommitPointInfoObject
                                                       {
                                                           StoreName = storeName,
                                                           Id=commitPoint.LocationOffset,
                                                           CommitTime = commitPoint.CommitTime,
                                                           JobId = commitPoint.JobId
-                                                      });
+                                                      };
             }
             catch (Exception ex)
             {
@@ -853,30 +874,43 @@ namespace BrightstarDB.Client
             try
             {
                 return _serverCore.GetTransactions(storeName).Skip(skip).Take(take)
-                    .Select(t => new TransactionInfoWrapper(
-                                     new TransactionInfo
-                                         {
-                                             Id = t.DataStartPosition,
-                                             JobId = t.JobId,
-                                             StartTime = t.TransactionStartTime,
-                                             StoreName = storeName,
-#if SILVERLIGHT || PORTABLE
-                                             Status = (BrightstarTransactionStatus)((int)t.TransactionStatus),
-                                             TransactionType = (BrightstarTransactionType)((int)t.TransactionType)
-#else
-                                             Status = (TransactionStatus)((int)t.TransactionStatus),
-                                             TransactionType = (TransactionType)((int)t.TransactionType)
-#endif
-// ReSharper disable RedundantEnumerableCastCall
-// Cast is not redundant for SILVERLIGHT builds
-                                         })).Cast<ITransactionInfo>();
-// ReSharper restore RedundantEnumerableCastCall
+                                  .Select(t => MakeTransactionInfoWrapper(storeName, t));
             }
             catch (Exception ex)
             {
                 Logging.LogError(BrightstarEventId.ServerCoreException, "Error getting transactions for store {0}", storeName);
                 throw new BrightstarClientException("Error getting transactions for store " + storeName + ". " + ex.Message, ex);
             }
+        }
+
+        private static Client.ITransactionInfo MakeTransactionInfoWrapper(string storeName, Storage.ITransactionInfo t)
+        {
+            return new TransactionInfoObject
+                    {
+                        Id = t.DataStartPosition,
+                        JobId = t.JobId,
+                        StartTime = t.TransactionStartTime,
+                        StoreName = storeName,
+#if SILVERLIGHT || PORTABLE
+                                             Status = (TransactionStatus)((int)t.TransactionStatus),
+                                             TransactionType = (TransactionType)((int)t.TransactionType)
+#else
+                        Status = (TransactionStatus) ((int) t.TransactionStatus),
+                        TransactionType = (TransactionType) ((int) t.TransactionType)
+#endif
+                    };
+        }
+
+        /// <summary>
+        /// Returns the transaction record creaed by the execution of a specific job against the store
+        /// </summary>
+        /// <param name="storeName">The name of the store where the job was executed</param>
+        /// <param name="jobId">The ID of the job that was executed</param>
+        /// <returns>The transaction information for the execution of the job or NULL if no matching transaction record was found</returns>
+        public ITransactionInfo GetTransaction(string storeName, Guid jobId)
+        {
+            var txnMatch = _serverCore.GetTransactions(storeName).FirstOrDefault(t => t.JobId.Equals(jobId));
+            return txnMatch == null ? null : MakeTransactionInfoWrapper(storeName, txnMatch);
         }
 
         /// <summary>
@@ -886,13 +920,13 @@ namespace BrightstarDB.Client
         /// <param name="transactionInfo">Transaction to execute.</param>
         public IJobInfo ReExecuteTransaction(string storeName, ITransactionInfo transactionInfo)
         {
+            if (storeName == null) throw new ArgumentNullException("storeName");
+            if (transactionInfo == null) throw new ArgumentNullException("transactionInfo");
             try
             {
-                var tInfoWrapper = transactionInfo as TransactionInfoWrapper;
-                if (tInfoWrapper == null) throw new ArgumentException("Invalid TransactionInfo object received.", "transactionInfo");
-                var tInfo = tInfoWrapper.TransactionInfo;
-                var jobId = _serverCore.ReExecuteTransaction(storeName, tInfo.Id, (Storage.TransactionType)((int) tInfo.TransactionType));
-                return new JobInfoWrapper(new JobInfo { JobId = jobId.ToString(), JobPending = true });
+                var jobId = _serverCore.ReExecuteTransaction(storeName, transactionInfo.Id,
+                                                             transactionInfo.TransactionType);
+                return new JobInfoObject(jobId);
             }
             catch (Exception ex)
             {
@@ -914,4 +948,3 @@ namespace BrightstarDB.Client
         }
     }
 }
-#endif
