@@ -30,11 +30,17 @@ namespace BrightstarDB.Query
             }
         }
 
-        public SparqlQueryHandler(SparqlResultsFormat sparqlResultsFormat, RdfFormat rdfFormat,
+        public SparqlQueryHandler(ISerializationFormat targetFormat,
                                   IEnumerable<string> defaultGraphUris)
         {
-            _sparqlResultsFormat = sparqlResultsFormat;
-            _rdfFormat = rdfFormat;
+            if (targetFormat is SparqlResultsFormat)
+            {
+                _sparqlResultsFormat = targetFormat as SparqlResultsFormat;
+            }
+            if (targetFormat is RdfFormat)
+            {
+                _rdfFormat = targetFormat as RdfFormat;
+            }
             if (defaultGraphUris != null)
             {
                 _defaultGraphUris = defaultGraphUris.Select(g => new Uri(g)).ToList();

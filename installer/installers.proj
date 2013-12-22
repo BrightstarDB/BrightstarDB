@@ -169,7 +169,7 @@
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
              Properties="Configuration=$(Configuration);Platform=x64;BuildNumber=$(BuildNumber)"/>
     <MSBuild Projects="BrightstarDBBootstrapper\BrightstarDBBootstrapper.wixproj"
-             Properties="BuildNumber=$(BuildNumber)" />
+             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" />
     <ItemGroup>
       <InstallerFiles Include="BrightstarDBBootstrapper\bin\$(Configuration)\*.exe"/>
     </ItemGroup>

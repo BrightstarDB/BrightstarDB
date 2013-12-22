@@ -187,7 +187,7 @@ namespace BrightstarDB.Server
                 // Not in the cache so execute the query on the StoreWorker
                 var storeWorker = GetStoreWorker(storeName);
                 var cacheStream = new MemoryStream();
-                storeWorker.Query(query, sparqlResultFormat, graphFormat, cacheStream, g);
+                storeWorker.Query(query, targetFormat, cacheStream, g);
                 cachedResult = CacheResult(cacheKey, cacheStream.ToArray());
             }
             cachedResult.WriteTo(responseStream);
@@ -224,7 +224,7 @@ namespace BrightstarDB.Server
             {
                 var storeWorker = GetStoreWorker(storeName);
                 var cacheStream = new MemoryStream();
-                storeWorker.Query(commitPointId, query, sparqlResultFormat, graphFormat, cacheStream, g);
+                storeWorker.Query(commitPointId, query, targetFormat, cacheStream, g);
                 cachedResult = CacheResult(cacheKey, cacheStream.ToArray());
             }
 

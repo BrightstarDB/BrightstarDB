@@ -39,8 +39,17 @@ namespace BrightstarDB.Server.Modules
                     }
                 }
 
-                if (SparqlResultsFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(MediaRange.FromString(m))) ||
-                    RdfFormat.AllMediaTypes.Any(m=>requestedMediaRange.Matches(MediaRange.FromString(m))))
+                if ((processingModel.ResultModel == SerializableModel.SparqlResultSet) &&
+                    (SparqlResultsFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(MediaRange.FromString(m)))))
+                {
+                    return new ProcessorMatch
+                        {
+                            ModelResult = MatchResult.ExactMatch,
+                            RequestedContentTypeResult = MatchResult.ExactMatch
+                        };
+                }
+                if ((processingModel.ResultModel == SerializableModel.RdfGraph) &&
+                    (RdfFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(MediaRange.FromString(m)))))
                 {
                     return new ProcessorMatch
                         {

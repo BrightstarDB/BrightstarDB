@@ -84,7 +84,7 @@ namespace BrightstarDB.InternalTests
                     var query = StoreExtensions.ParseSparql(TestQuery);
                     using (var resultStream = new MemoryStream())
                     {
-                        storeWorker.Query(query, SparqlResultsFormat.Xml, RdfFormat.RdfXml, resultStream,
+                        storeWorker.Query(query, SparqlResultsFormat.Xml, resultStream,
                                           new[] {Constants.DefaultGraphUri});
                     }
                     Console.WriteLine("Query succeeded");

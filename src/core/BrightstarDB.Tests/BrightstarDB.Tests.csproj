@@ -139,6 +139,7 @@
     <Compile Include="EntityFramework\SimpleContextTests.cs" />
     <Compile Include="EntityFramework\InterfaceInheritanceTests.cs" />
     <Compile Include="EntityFramework\StringComparisonTests.cs" />
+    <Compile Include="SparqlQueryHelperTests.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="GraphTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

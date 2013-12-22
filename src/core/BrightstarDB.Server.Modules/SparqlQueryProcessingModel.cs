@@ -2,6 +2,7 @@
 using System.IO;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Model;
+using BrightstarDB.Utils;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -19,11 +20,14 @@ namespace BrightstarDB.Server.Modules
         public SparqlResultsFormat OverrideSparqlFormat { get; set; }
         public RdfFormat OverrideGraphFormat { get; set; }
 
+        public SerializableModel ResultModel { get; set; }
+
         public SparqlQueryProcessingModel(string storeName, IBrightstarService service, SparqlRequestObject sparqlRequest)
         {
             _storeName = storeName;
             _service = service;
             _sparqlRequest = sparqlRequest;
+            ResultModel = SparqlQueryHelper.GetResultModel(sparqlRequest.Query);
         }
 
         public SparqlQueryProcessingModel(string storeName, ulong commitId, IBrightstarService service,
@@ -33,6 +37,7 @@ namespace BrightstarDB.Server.Modules
             _commitId = commitId;
             _service = service;
             _sparqlRequest = sparqlRequest;
+            ResultModel = SparqlQueryHelper.GetResultModel(sparqlRequest.Query);
         }
 
         public Stream GetResultsStream(SparqlResultsFormat format, RdfFormat graphFormat, DateTime? ifNotModifiedSince, out ISerializationFormat streamFormat)

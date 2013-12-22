@@ -255,28 +255,28 @@ namespace BrightstarDB.Server
             get { return _writeStore ?? (_writeStore = _storeManager.OpenStore(_storeLocation)); }
         }
 
-        public BrightstarSparqlResultsType Query(ulong commitPointId, SparqlQuery query, SparqlResultsFormat resultsFormat, RdfFormat graphFormat, Stream resultsStream, string[] defaultGraphUris)
+        public BrightstarSparqlResultsType Query(ulong commitPointId, SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, string[] defaultGraphUris)
         {
             // Not supported by read/write store so no handling for ReadWriteStoreModifiedException required
             Logging.LogDebug("CommitPointId={0}, Query={1}", commitPointId, query);
             using (var readStore = _storeManager.OpenStore(_storeLocation, commitPointId))
             {
-                return readStore.ExecuteSparqlQuery(query, resultsFormat,graphFormat, resultsStream, defaultGraphUris);
+                return readStore.ExecuteSparqlQuery(query, targetFormat, resultsStream, defaultGraphUris);
             }
         }
 
-        public BrightstarSparqlResultsType Query(SparqlQuery query, SparqlResultsFormat resultsFormat, RdfFormat graphFormat, Stream resultsStream, string[] defaultGraphUris )
+        public BrightstarSparqlResultsType Query(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, string[] defaultGraphUris )
         {
             Logging.LogDebug("Query {0}", query);
             try
             {
-                return ReadStore.ExecuteSparqlQuery(query, resultsFormat, graphFormat, resultsStream, defaultGraphUris);
+                return ReadStore.ExecuteSparqlQuery(query, targetFormat, resultsStream, defaultGraphUris);
             }
             catch (ReadWriteStoreModifiedException)
             {
                 Logging.LogDebug("Read/Write store was concurrently modified. Attempting a retry");
                 InvalidateReadStore();
-                return Query(query, resultsFormat, graphFormat, resultsStream, defaultGraphUris);
+                return Query(query, targetFormat, resultsStream, defaultGraphUris);
             }
         }
 
