@@ -16,6 +16,17 @@ namespace BrightstarDB.Server.Modules.Tests
     public class SparqlUrlSpec
     {
         private static readonly MediaRange SparqlXml = MediaRange.FromString("application/sparql-results+xml");
+        private const string SparqlQueryString = "SELECT DISTINCT ?t WHERE { ?x a ?t }";
+        private const string DescribeQueryString = "DESCRIBE ?t WHERE { ?x a ?t }";
+
+        [Test]
+        public void TestGetQueryValidation()
+        {
+            const string mockResponse = "<results></results>";
+            ISerializationFormat format = SparqlResultsFormat.Xml;
+            var brightstar = new Mock<IBrightstarService>();
+            TestGetFails(HttpStatusCode.BadRequest, brightstar, "foo", "bad sparql query");
+        }
 
         [Test]
         public void TestGetQueryAsSparqlXmlWithoutAdditionalParameters()
@@ -23,10 +34,10 @@ namespace BrightstarDB.Server.Modules.Tests
             const string mockResponse = "<results></results>";
             ISerializationFormat format = SparqlResultsFormat.Xml;
             var brightstar = new Mock<IBrightstarService>();
-            brightstar.Setup(s => s.ExecuteQuery("foo", "sparql query string", null, null,
+            brightstar.Setup(s => s.ExecuteQuery("foo", SparqlQueryString, null, null,
                                                  SparqlResultsFormat.Xml, It.IsAny<RdfFormat>(), out format))
                                    .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
-            var response = TestGetSucceeds(brightstar, "foo", "sparql query string");
+            var response = TestGetSucceeds(brightstar, "foo", SparqlQueryString);
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
 
@@ -37,10 +48,10 @@ namespace BrightstarDB.Server.Modules.Tests
             ISerializationFormat format = SparqlResultsFormat.Json;
             var brightstar = new Mock<IBrightstarService>();
             brightstar.Setup(
-                s => s.ExecuteQuery("foo", "sparql query string", null, null,
+                s => s.ExecuteQuery("foo", SparqlQueryString, null, null,
                                     SparqlResultsFormat.Json, It.IsAny<RdfFormat>(), out format))
                     .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
-            var response = TestGetSucceeds(brightstar, "foo", "sparql query string",
+            var response = TestGetSucceeds(brightstar, "foo", SparqlQueryString,
                                            accept: MediaRange.FromString("application/sparql-results+json"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
@@ -52,10 +63,10 @@ namespace BrightstarDB.Server.Modules.Tests
             ISerializationFormat format = SparqlResultsFormat.Csv;
             var brightstar = new Mock<IBrightstarService>();
             brightstar.Setup(
-                s => s.ExecuteQuery("foo", "sparql query string", null, null,
+                s => s.ExecuteQuery("foo", SparqlQueryString, null, null,
                                     SparqlResultsFormat.Csv, It.IsAny<RdfFormat>(), out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
-            var response = TestGetSucceeds(brightstar, "foo", "sparql query string",
+            var response = TestGetSucceeds(brightstar, "foo", SparqlQueryString,
                                            accept: MediaRange.FromString("text/csv"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
@@ -66,11 +77,11 @@ namespace BrightstarDB.Server.Modules.Tests
             const string mockResponse = "x\ty";
             ISerializationFormat format = SparqlResultsFormat.Tsv;
             var brightstar = new Mock<IBrightstarService>();
-            brightstar.Setup(s => s.ExecuteQuery("foo", "sparql query string", null, null,
+            brightstar.Setup(s => s.ExecuteQuery("foo", SparqlQueryString, null, null,
                                                  SparqlResultsFormat.Tsv, It.IsAny<RdfFormat>(), out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
             var response = TestGetSucceeds(brightstar,
-                "foo", "sparql query string", accept:MediaRange.FromString("text/tab-separated-values"));
+                "foo", SparqlQueryString, accept:MediaRange.FromString("text/tab-separated-values"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
 
@@ -80,10 +91,10 @@ namespace BrightstarDB.Server.Modules.Tests
             const string mockResponse = "<rdf:RDF/>";
             ISerializationFormat format = RdfFormat.RdfXml.WithEncoding(Encoding.UTF8);
             var brightstar = new Mock<IBrightstarService>();
-            brightstar.Setup(s => s.ExecuteQuery("foo", "sparql query string", null, null,
+            brightstar.Setup(s => s.ExecuteQuery("foo", DescribeQueryString, null, null,
                                                  It.IsAny<SparqlResultsFormat>(), RdfFormat.RdfXml, out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
-            var response = TestGetSucceeds(brightstar, "foo", "sparql query string",
+            var response = TestGetSucceeds(brightstar, "foo", DescribeQueryString,
                                            accept: MediaRange.FromString("application/rdf+xml"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
@@ -96,10 +107,10 @@ namespace BrightstarDB.Server.Modules.Tests
             ISerializationFormat format = SparqlResultsFormat.Xml;
             brightstar.Setup(
                 s =>
-                s.ExecuteQuery("bar", "another query", new[] {"http://some/graph/uri"}, null,
+                s.ExecuteQuery("bar", SparqlQueryString, new[] {"http://some/graph/uri"}, null,
                                SparqlResultsFormat.Xml, It.IsAny<RdfFormat>(), out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
-            var response = TestGetSucceeds(brightstar, "bar", "another query",
+            var response = TestGetSucceeds(brightstar, "bar", SparqlQueryString,
                                            defaultGraphUris: new[] {"http://some/graph/uri"},
                                            accept: MediaRange.FromString("application/sparql-results+xml"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
@@ -113,10 +124,10 @@ namespace BrightstarDB.Server.Modules.Tests
             ISerializationFormat format = SparqlResultsFormat.Xml;
             brightstar.Setup(
                 s =>
-                s.ExecuteQuery("bar", "another query", new[] {"http://some/graph/uri", "http://some/other/graph"}, null,
+                s.ExecuteQuery("bar", SparqlQueryString, new[] {"http://some/graph/uri", "http://some/other/graph"}, null,
                                SparqlResultsFormat.Xml, It.IsAny<RdfFormat>(), out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
-            var response = TestGetSucceeds(brightstar, "bar", "another query",
+            var response = TestGetSucceeds(brightstar, "bar", SparqlQueryString,
                                            defaultGraphUris: new[] {"http://some/graph/uri", "http://some/other/graph"},
                                            accept: MediaRange.FromString("application/sparql-results+xml"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
@@ -130,9 +141,9 @@ namespace BrightstarDB.Server.Modules.Tests
             ISerializationFormat format = SparqlResultsFormat.Json;
             brightstar.Setup(
                 s =>
-                s.ExecuteQuery("foo", "query", null, null, It.IsAny<SparqlResultsFormat>(), It.IsAny<RdfFormat>(), out format))
+                s.ExecuteQuery("foo", SparqlQueryString, null, null, It.IsAny<SparqlResultsFormat>(), It.IsAny<RdfFormat>(), out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
-            var response = TestGetSucceeds(brightstar, "foo", "query",
+            var response = TestGetSucceeds(brightstar, "foo", SparqlQueryString,
                                            formats: new string[] {format.MediaTypes[0]},
                                            accept: "application/xml");
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
@@ -143,22 +154,22 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestFormPostQuery()
         {
-            TestFormPostSucceeds("foo", "query", null, null, SparqlXml,
+            TestFormPostSucceeds("foo", SparqlQueryString, null, null, SparqlXml,
                                  SparqlResultsFormat.Xml, null);
-            TestFormPostSucceeds("foo", "query", new[] {"http://some/graph/uri"}, null,
+            TestFormPostSucceeds("foo", SparqlQueryString, new[] {"http://some/graph/uri"}, null,
                                  MediaRange.FromString("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
-            TestFormPostSucceeds("foo", "query", new[] { "http://some/graph/uri", "http://some/other/uri" }, null,
+            TestFormPostSucceeds("foo", SparqlQueryString, new[] { "http://some/graph/uri", "http://some/other/uri" }, null,
                                  MediaRange.FromString("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
         }
 
         [Test]
         public void TestPostSparql()
         {
-            TestSparqlPostSucceeds("foo", "query", null, null, SparqlXml,
+            TestSparqlPostSucceeds("foo", SparqlQueryString, null, null, SparqlXml,
                                  SparqlResultsFormat.Xml, null);
-            TestSparqlPostSucceeds("foo", "query", new[] { "http://some/graph/uri" }, null,
+            TestSparqlPostSucceeds("foo", SparqlQueryString, new[] { "http://some/graph/uri" }, null,
                                  MediaRange.FromString("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
-            TestSparqlPostSucceeds("foo", "query", new[] { "http://some/graph/uri", "http://some/other/uri" }, null,
+            TestSparqlPostSucceeds("foo",SparqlQueryString, new[] { "http://some/graph/uri", "http://some/other/uri" }, null,
                                  MediaRange.FromString("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
         }
 
@@ -169,7 +180,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             ISerializationFormat format = SparqlResultsFormat.Xml;
             brightstar.Setup(
-                s => s.ExecuteQuery("foo", "query", (IEnumerable<string>)null, It.IsNotNull<DateTime?>(), SparqlResultsFormat.Xml,  It.IsAny<RdfFormat>(), out format))
+                s => s.ExecuteQuery("foo", SparqlQueryString, (IEnumerable<string>)null, It.IsNotNull<DateTime?>(), SparqlResultsFormat.Xml,  It.IsAny<RdfFormat>(), out format))
                       .Throws<BrightstarStoreNotModifiedException>()
                       .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
@@ -177,7 +188,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Get("/foo/sparql", with =>
                 {
-                    with.Query("query", "query");
+                    with.Query("query", SparqlQueryString);
                     with.Accept(SparqlXml);
                     with.Header("If-Modified-Since", DateTime.Now.ToUniversalTime().ToString("r"));
                 });
@@ -194,7 +205,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             ISerializationFormat format = SparqlResultsFormat.Xml;
             brightstar.Setup(
-                s => s.ExecuteQuery("foo", "query", (IEnumerable<string>)null, It.IsNotNull<DateTime?>(), SparqlResultsFormat.Xml,  It.IsAny<RdfFormat>(), out format))
+                s => s.ExecuteQuery("foo", SparqlQueryString, (IEnumerable<string>)null, It.IsNotNull<DateTime?>(), SparqlResultsFormat.Xml,  It.IsAny<RdfFormat>(), out format))
                       .Throws<BrightstarStoreNotModifiedException>()
                       .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
@@ -202,7 +213,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/sparql", with =>
             {
-                with.FormValue("query", "query");
+                with.FormValue("query", SparqlQueryString);
                 with.Accept(SparqlXml);
                 with.Header("If-Modified-Since", DateTime.Now.ToUniversalTime().ToString("r"));
             });
@@ -220,7 +231,7 @@ namespace BrightstarDB.Server.Modules.Tests
             ISerializationFormat format = SparqlResultsFormat.Xml;
             brightstar.Setup(
                 s =>
-                s.ExecuteQuery(It.Is<ICommitPointInfo>(c => c.Id.Equals(123)), "query", null,
+                s.ExecuteQuery(It.Is<ICommitPointInfo>(c => c.Id.Equals(123)), SparqlQueryString, null,
                                SparqlResultsFormat.Xml,  It.IsAny<RdfFormat>(), out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes("mock results")))
                       .Verifiable();
@@ -233,7 +244,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Get("/foo/commits/123/sparql", with =>
                 {
-                    with.Query("query", "query");
+                    with.Query("query", SparqlQueryString);
                     with.Accept(SparqlXml);
                 });
 
@@ -253,7 +264,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Get("/foo/commits/123/sparql", with =>
             {
-                with.Query("query", "query");
+                with.Query("query", SparqlQueryString);
                 with.Accept(SparqlXml);
             });
 
@@ -269,7 +280,7 @@ namespace BrightstarDB.Server.Modules.Tests
             ISerializationFormat format = SparqlResultsFormat.Xml;
             brightstar.Setup(
                 s =>
-                s.ExecuteQuery(It.Is<ICommitPointInfo>(c => c.Id.Equals(123)), "query", (IEnumerable<string>)null,
+                s.ExecuteQuery(It.Is<ICommitPointInfo>(c => c.Id.Equals(123)), SparqlQueryString, (IEnumerable<string>)null,
                                SparqlResultsFormat.Xml,  It.IsAny<RdfFormat>(), out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes("mock results")))
                       .Verifiable();
@@ -282,7 +293,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/commits/123/sparql", with =>
             {
-                with.FormValue("query", "query");
+                with.FormValue("query", SparqlQueryString);
                 with.Accept(SparqlXml);
             });
 
@@ -303,7 +314,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/commits/123/sparql", with =>
             {
-                with.FormValue("query", "query");
+                with.FormValue("query", SparqlQueryString);
                 with.Accept(SparqlXml);
             });
 
@@ -323,7 +334,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Get("/foo/sparql", with =>
             {
-                with.Query("query", "query");
+                with.Query("query", SparqlQueryString);
                 with.Accept(SparqlXml);
             });
 
@@ -342,7 +353,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/sparql", with =>
             {
-                with.FormValue("query", "query");
+                with.FormValue("query", SparqlQueryString);
                 with.Accept(SparqlXml);
             });
 
@@ -351,6 +362,52 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         #region Helper Methods
+        private static BrowserResponse TestGetFails(
+            HttpStatusCode expectedStatusCode,
+            Mock<IBrightstarService> brightstar,
+            string storeName, string query,
+            IEnumerable<string> defaultGraphUris = null,
+            IEnumerable<string> namedGraphUris = null,
+            IEnumerable<string> formats = null,
+            MediaRange accept = null)
+        {
+            // Setup
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+            if (accept == null) accept = MediaRange.FromString("application/sparql-results+xml");
+            // Execute
+            var response = app.Get("/" + storeName + "/sparql", with =>
+            {
+                with.Query("query", query);
+                if (defaultGraphUris != null)
+                {
+                    foreach (var defaultGraph in defaultGraphUris)
+                    {
+                        with.Query("default-graph-uri", defaultGraph);
+                    }
+                }
+                if (namedGraphUris != null)
+                {
+                    foreach (var namedGraph in namedGraphUris)
+                    {
+                        with.Query("named-graph-uri", namedGraph);
+                    }
+                }
+                if (formats != null)
+                {
+                    foreach (var format in formats)
+                    {
+                        with.Query("format", format);
+                    }
+                }
+                with.Accept(accept);
+            });
+
+            Assert.That(response.StatusCode, Is.EqualTo(expectedStatusCode));
+         
+            brightstar.Verify();
+            return response;
+        }
+
         private static BrowserResponse TestGetSucceeds(
             Mock<IBrightstarService> brightstar,
             string storeName, string query, 
