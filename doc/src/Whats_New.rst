@@ -10,14 +10,35 @@
 
 This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require 
 either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
-marked with FIX
+marked with FIX.
 
+****************************
+ BrightstarDB 1.5.2 Release
+****************************
+
+  - FIX: Fixed a regression bug in the SPARQL query template for the browser interface to the BrightstarDB server.
+  
+  - FIX: Added missing sizing parameters to the SPARQL results text box in the browser interface.
+  
+  - FIX: Fixed browser interface for SPARQL queries to not report an error when the form is initially loaded.
+
+****************************
+ BrightstarDB 1.5.1 Release
+****************************
+  - FIX: Fixed the default connection string used in the NerdDinner sample.
+  
+  - NEW: Installer now supports installing the VS extensions into VS2013 Professional edition and above.
+  
+  - NEW: Overhaul of the SPARQL query APIs to allow the specification of both SPARQL results format and RDF graph format. This
+    allows RDF formats other than RDF/XML to be returned by CONSTRUCT and DESCRIBE queries. For more information please refer to
+    :ref:`RDF_Client_API_SPARQL`
+    
+  - NEW: Added an override for GetJobInfo to list the jobs recently queued or executed for a store. Refer to :ref:`Admin_API_Jobs` for
+    more information.
+  
 ****************************
  BrightstarDB 1.5 Release
 ****************************
-
-The following are changes that are contained in the develop branch of the BrightstarDB repository but which have not yet been included in an official binary release.
-These changes will appear in the 1.5 release.
 
   - **BREAKING** : The WCF server has been replaced with an HTTP server with a full RESTful API. Connection strings of type ``http``, ``tcp`` and ``namedpipe`` are 
     no longer supported and should be replaced with a connection string of type ``rest`` to connect to the HTTP server. The new HTTP server can be run under IIS
@@ -52,11 +73,14 @@ These changes will appear in the 1.5 release.
   
   - NEW: Added shell scripts for building BrightstarDB under mono.
   
-  - NEW: BrightstarDB Entity Framework and Data Objects APIs can now connect to stores other than BrightstarDB. This includes the ability to use the Entity Framework 
-    and DataObjects APIs with generic SPARQL 1.1 Query and Update endpoints, as well as the ability to use these APIs with other stores supported by DotNetRDF. 
+  - NEW: BrightstarDB Entity Framework and Data Objects APIs can now connect to stores other than BrightstarDB. 
+    This includes the ability to use the Entity Framework and DataObjects APIs with generic SPARQL 1.1 Query and 
+    Update endpoints, as well as the ability to use these APIs with other stores supported by DotNetRDF. 
     For more information please refer to :ref:`Other_Stores`
   
   - FIX: Fixed incorrect handling of \\ escape sequences in the N-Triples and N-Quads parsers.
+  
+  - FIX: BrightstarDB now uses NuGet to provide the DotNetRDF library rather than using a local copy of the assemblies.
 
 ****************************
  BrightstarDB 1.4 Release

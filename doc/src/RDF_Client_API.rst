@@ -160,6 +160,8 @@ to ``ExecuteTransaction()``::
   The wildcard URI is also supported for the graph URI in delete patterns, allowing you
   to delete matching patterns from all graphs in the BrightstarDB store.
   
+.. _RDF_Client_API_SPARQL:
+
 Querying data using SPARQL
 ==========================
 
@@ -179,7 +181,7 @@ the SPARQL results (See `SPARQL XML Query Results Format`_ for format of the XML
   var result = XDocument.Load(client.ExecuteQuery(storeName, query));
 
 BrightstarDB also supports several different formats for SPARQL results. The default format is XML, 
-but you can also add a BrightstarDB.SparqlResultsFormat parameter to the ExecuteQuery method 
+but you can also add a ``BrightstarDB.SparqlResultsFormat`` parameter to the ``ExecuteQuery`` method 
 to control the format and encoding of the results set. For example::
 
   var jsonResult = client.ExecuteQuery(storeName, query, SparqlResultsFormat.Json);
@@ -193,6 +195,14 @@ instance that will ask for that specific encoding::
                            storeName, query, 
                            SparqlResultsFormat.Xml.WithEncoding(Encoding.Unicode));
 
+SPARQL queries that use the CONSTRUCT or DESCRIBE keywords return an RDF graph rather than a SPARQL
+results set. By default results are returned as RDF/XML using a UTF-8 format, but this can also be
+overridden by passing in an ``BrightstarDB.RdfFormat`` value for the ``graphFormat`` parameters::
+
+  var ntriplesResult = client.ExecuteQuery(
+                         storeName, query, // where query is a CONSTRUCT or DESCRIBE
+                         graphFormat:RdfFormat.NTriples);
+                         
 Querying Graphs
 ===============
 
