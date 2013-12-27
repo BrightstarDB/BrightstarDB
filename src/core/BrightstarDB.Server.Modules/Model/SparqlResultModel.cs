@@ -50,6 +50,15 @@ namespace BrightstarDB.Server.Modules.Model
         public void ExecuteQueryForHtml(DateTime? ifNotModifiedSince)
         {
             Stream resultsStream;
+            
+            // No query => no results rather than triggering an error
+            if (String.IsNullOrEmpty(_sparqlRequest.Query))
+            {
+                HasFormattedResults = false;
+                RawResults = String.Empty;
+                return;
+            }
+
             try
             {
                 if (_commitId > 0)

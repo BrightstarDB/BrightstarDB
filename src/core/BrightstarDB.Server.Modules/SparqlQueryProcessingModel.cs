@@ -27,7 +27,7 @@ namespace BrightstarDB.Server.Modules
             _storeName = storeName;
             _service = service;
             _sparqlRequest = sparqlRequest;
-            ResultModel = SparqlQueryHelper.GetResultModel(sparqlRequest.Query);
+            ResultModel = sparqlRequest.Query == null ? SerializableModel.None : SparqlQueryHelper.GetResultModel(sparqlRequest.Query);
         }
 
         public SparqlQueryProcessingModel(string storeName, ulong commitId, IBrightstarService service,
@@ -37,7 +37,7 @@ namespace BrightstarDB.Server.Modules
             _commitId = commitId;
             _service = service;
             _sparqlRequest = sparqlRequest;
-            ResultModel = SparqlQueryHelper.GetResultModel(sparqlRequest.Query);
+            ResultModel = sparqlRequest.Query == null ? SerializableModel.None : SparqlQueryHelper.GetResultModel(sparqlRequest.Query);
         }
 
         public Stream GetResultsStream(SparqlResultsFormat format, RdfFormat graphFormat, DateTime? ifNotModifiedSince, out ISerializationFormat streamFormat)
