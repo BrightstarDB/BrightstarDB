@@ -9,7 +9,81 @@
     containing some sample applications that use these APIs can be found in 
     [INSTALLDIR]/Samples/StoreAdmin.
 
+.. _Admin_API_Jobs:
 
+Jobs
+====
+
+    When a new job is passed to a store, the job information is added to a queue. Jobs are queued
+    and executed in the order they are received. Through the BrightstarDB APIs you can retrieve
+    that list of jobs and monitor the state of a given job.
+    
+.. _Admin_API_IJobInfo:
+
+IJobInfo 
+--------
+
+Job information retrieved from BrightstarDB is represented by an instance of the ``BrightstarDB.Client.IJobInfo``
+interface. This interface exposes the following properties:
+
+    - ``JobPending``: A boolean flag. If true, the job is in the queue but has not yet been executed.
+    - ``JobStarted``: A boolean flag. If true, the job is in the queue and is currently being executed.
+    - ``JobCompletedWithErrors``: A boolean flag. If true, the processing of the job completed but the job itself failed for some reason.
+      More information can be found by examining the ``StatusMessage`` and ``ExceptionInfo`` properties
+    - ``JobCompletedOk``: A boolean flag. If true the job has completed processing successfully.
+    - ``StatusMessage``: The current job status message. For some long-running jobs such as RDF import,
+      this message will be updated as the job runs. For other types of job the status message may only
+      be updated on completion or failure of the job.
+    - ``JobId``: The unique identifier for the job.
+    - ``ExceptionInfo``: If an error is raised internally as a job is run, the exception information wil be
+      recorded in this property. The value is a ``BrightstarDB.Dto.ExceptionDetailObject`` which provides
+      access to the exception type, message and any inner exceptions.
+    - ``QueuedTime``: The date/time when the job was queued to be processed.
+    - ``StartTime``: The date/time when the job started processing.
+    - ``EndTime``: The date/time when the job completed processing.
+    
+    .. note::
+        Timestamps are all provided in UTC and are serialized with a resolution of 1 second.
+
+Retrieving the Jobs List
+------------------------
+
+    The method to retrieve a list of jobs from a store is ``GetJobInfo(string storeName, int skip, int take)``.
+    The ``storeName`` parameter specifies the name of the store to retrieve job information from.
+    The ``skip`` and ``take`` parameters can be used for paging long lists of jobs.
+    The return values is and enumerable of :ref:`Admin_API_IJobInfo` instances.
+
+    .. note::
+        The list of jobs maintained by the BrightstarDB server is not persistent. This means that the 
+        jobs list is reset whenever the server gets restarted so if you were to retrieve the list of
+        jobs immediately after starting the server you would get an empty list.
+        
+Monitoring Individual Jobs
+--------------------------
+
+    The methods in the BrightstarDB API that queue long running jobs all return an instance of the 
+    :ref:`Admin_API_IJobInfo` interface. To check on the status of a job, you can use the method
+    ``GetJobInfo(string storeName, string jobId)``. The ``storeName`` parameter is the name
+    of the store that the job runs against and ``jobId`` is the unique identifier for the job (which
+    is provided in the ``JobId`` property of the :ref:`Admin_API_IJobInfo` object). The return value
+    of this method is an :ref:`Admin_API_IJobInfo` instance that represents the current state of the job.
+    
+    Monitoring the status of a job is then a question of simply polling the server by calling the
+    ``GetJobInfo(string,string)`` method until either the ``JobCompletedOk`` or ``JobCompletedWithErrors``
+    property on the returned :ref:`Admin_API_IJobInfo` instance gets set to true.
+    
+    When polling status in this way you should be aware of the following:
+    
+    1. Polling for status does require some (fairly minimal) server resources, so you should avoid
+       polling in a very tight loop.
+    2. If the server gets reset before your job has a chance to execute, the job information will
+       be lost and a ``BrightstarClientException`` will get thrown. In this case your code should
+       either notify the user of the failure or you could opt to simply resubmit the job.
+    
+    .. note::
+        Job IDs are assigned by the server using GUIDs so even if the server gets reset it is not possible 
+        to end up monitoring a different job with the same JobId.
+        
 Commit Points
 =============
 
