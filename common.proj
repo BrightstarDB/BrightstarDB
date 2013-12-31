@@ -8,7 +8,7 @@
   <PropertyGroup>
     <AssemblyProduct>BrightstarDB</AssemblyProduct>
     <AssemblyCompany></AssemblyCompany>
-    <AssemblyCopyright>Copyright (c) 2014 Khalil Ahmed, Graham Moore</AssemblyCopyright>
+    <AssemblyCopyright>Copyright (c) 2014 Khalil Ahmed, Graham Moore, and other contributors</AssemblyCopyright>
     <AssemblyTrademark>All rights reserved</AssemblyTrademark>
     <AssemblyTitle></AssemblyTitle>
   </PropertyGroup>
