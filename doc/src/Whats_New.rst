@@ -13,6 +13,11 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX.
 
 ****************************
+BrightstarDB 1.5.3 Release
+****************************
+  - FIX: Fixes a packaging issue with the Polaris tool in the 1.5.2 release.
+  
+****************************
  BrightstarDB 1.5.2 Release
 ****************************
 

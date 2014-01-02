@@ -93,6 +93,8 @@ Where ``options`` are:
     are kept. It is strongly advised that this directory should be outside the directory
     structure used for the IIS website itself.
     
+    For a step-by-step guide please refer to :ref:`BrightstarDB_In_IIS`
+    
 ***********************************
  BrightstarDB Service Configuration 
 ***********************************
