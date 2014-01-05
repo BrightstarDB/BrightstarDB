@@ -12,6 +12,7 @@ namespace BrightstarDB.Client
     {
         private Stream _resultStream;
         private readonly string _resultString;
+        private XDocument _resultDocument;
 
         internal SparqlResult(Stream resultStream)
         {
@@ -46,11 +47,13 @@ namespace BrightstarDB.Client
         {
             get
             {
-                if (_resultString != null)
+                if (_resultDocument == null)
                 {
-                    return XDocument.Parse(_resultString);
+                    _resultDocument = _resultString != null
+                        ? XDocument.Parse(_resultString)
+                        : XDocument.Load(_resultStream);
                 }
-                return XDocument.Load(_resultStream);
+                return _resultDocument;
             }
         }
 
