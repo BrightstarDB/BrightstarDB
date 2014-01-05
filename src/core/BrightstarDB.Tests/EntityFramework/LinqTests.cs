@@ -4,11 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using VDS.RDF;
-using VDS.RDF.Parsing;
-using VDS.RDF.Query;
-using VDS.RDF.Update;
-using VDS.RDF.Update.Commands;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
@@ -68,24 +63,17 @@ namespace BrightstarDB.Tests.EntityFramework
         {
             var connectionString = GetConnectionString("TestLinqLongCount");
             var context = new MyEntityContext(connectionString);
-            for (var i = 0; i < 10000; i++)
+            for (var i = 0; i < 100; i++)
             {
                 var entity = context.Entities.Create();
                 entity.SomeString = "Entity " + i;
-                if (i % 2000 == 0)
-                {
-                    context.SaveChanges();
-                }
             }
             context.SaveChanges();
 
-            var context2 = new MyEntityContext(connectionString);
-            var count = context2.Entities.LongCount();
+            var count = context.Entities.LongCount();
 
             Assert.IsNotNull(count);
-            Assert.AreEqual(10000, count);
-
-          
+            Assert.AreEqual(100, count);
         }
 
         [Test]
@@ -1424,7 +1412,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
             // Assert
             Assert.AreEqual(6, context.Persons.Count());
-            
+
             var age30 = context.Persons.Where(p => p.Age.Equals(30));
             Assert.AreEqual(3, age30.Count());
             var older = context.Persons.Where(p => p.Age > 30);
@@ -1432,7 +1420,6 @@ namespace BrightstarDB.Tests.EntityFramework
             var younger = context.Persons.Where(p => p.Age < 30);
             Assert.AreEqual(2, younger.Count());
 
-            //note - startswith and getchar are not supported
             var startswithA = context.Persons.Where(p => p.Name.StartsWith("A"));
             Assert.AreEqual(2, startswithA.Count());
 
@@ -1458,6 +1445,16 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(1, x.Count());
             Assert.AreEqual("Annie", x.First().Name);
 
+            var annie = context.Persons.Where(p => p.Name.Equals("Annie")).SingleOrDefault();
+            Assert.IsNotNull(annie);
+
+            var mainSkillsOfPeopleOver30 = from s in context.Skills where s.Expert.Age > 30 select s;
+            var results = mainSkillsOfPeopleOver30.ToList();
+            Assert.AreEqual(1, results.Count);
+            Assert.AreEqual("Graphic Design", results.First().Name);
+
+            //note - startswith and getchar are not supported
+
             //note null is not supported
             //not Count() is not supported
             //var hasFriends = context.Persons.Where(p => p.Friends.Count() > 0);
@@ -1467,13 +1464,6 @@ namespace BrightstarDB.Tests.EntityFramework
             //var longNames = context.Persons.Where(p => p.Name.Length > 6);
             //Assert.AreEqual(1, longNames.Count());
 
-            var annie = context.Persons.Where(p => p.Name.Equals("Annie")).SingleOrDefault();
-            Assert.IsNotNull(annie);
-
-            var mainSkillsOfPeopleOver30 = from s in context.Skills where s.Expert.Age > 30 select s;
-            var results = mainSkillsOfPeopleOver30.ToList();
-            Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("Graphic Design", results.First().Name);
 
         }
 
@@ -1682,49 +1672,6 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(100, allPublishersWithArticles.Count);
         }
 
-        [Test]
-        [Ignore]
-        public void DnrMiniTest()
-        {
-            var store = new TripleStore();
-            var updateProcessor = new LeviathanUpdateProcessor(store);
-            var queryProcessor = new LeviathanQueryProcessor(store);
-            
-            var updateCommands = @"INSERT DATA {
-<http://www.brightstardb.com/.well-known/genid/fbb51388-511f-4268-a4d2-14e60288da1b> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.example.org/schema/Person> .
-<http://www.brightstardb.com/.well-known/genid/fbb51388-511f-4268-a4d2-14e60288da1b> <http://www.example.org/schema/name> ""Person 0""^^<http://www.w3.org/2001/XMLSchema#string> .
-<http://www.brightstardb.com/.well-known/genid/fbb51388-511f-4268-a4d2-14e60288da1b> <http://www.example.org/schema/employeeId> ""0""^^<http://www.w3.org/2001/XMLSchema#integer> . 
-<http://www.brightstardb.com/.well-known/genid/778733b6-8f23-4049-bfa0-96d7fa8d23cd> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.example.org/schema/Article> . 
-<http://www.brightstardb.com/.well-known/genid/778733b6-8f23-4049-bfa0-96d7fa8d23cd> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.example.org/schema/Trackable> . 
-<http://www.brightstardb.com/.well-known/genid/778733b6-8f23-4049-bfa0-96d7fa8d23cd> <http://www.example.org/schema/title> ""Article 0""^^<http://www.w3.org/2001/XMLSchema#string> .
-GRAPH <http://www.brightstardb.com/.well-known/model/defaultgraph> {
-  <http://www.brightstardb.com/.well-known/genid/778733b6-8f23-4049-bfa0-96d7fa8d23cd> <http://www.example.org/schema/publisher> <http://www.brightstardb.com/.well-known/genid/fbb51388-511f-4268-a4d2-14e60288da1b> . 
-}
-}";
-            // NOTE: Found the root cause of the problem. Type and property information is getting inserted into the unnamed graph
-            // But relationship triples are getting inserted into the B* default graph.
-            // Need consistency about this - generated query is assuming that all triples are in the unnamed graph.
-
-            var parser = new SparqlUpdateParser();
-            var cmds = parser.ParseFromString(updateCommands);
-            updateProcessor.ProcessCommandSet(cmds);
-
-            Assert.AreEqual(7, store.Triples.Count());
-
-            var query =
-                @"SELECT (COUNT(?a) AS ?v1) WHERE {?a a <http://www.example.org/schema/Article> . OPTIONAL {?a <http://www.example.org/schema/publisher> ?v0 .} FILTER ( bound(?v0)).}";
-            var queryParser = new SparqlQueryParser();
-            var sparqlQuery = queryParser.ParseFromString(query);
-            var queryResult = queryProcessor.ProcessQuery(sparqlQuery);
-            Assert.That(queryResult is SparqlResultSet);
-            var srs = queryResult as SparqlResultSet;
-            Assert.AreEqual(1, srs.Results.Count);
-            var countNode = srs.Results[0].Value("v1");
-            Assert.That(countNode, Is.Not.Null);
-            Assert.That(countNode is ILiteralNode);
-            var l = countNode as ILiteralNode;
-            Assert.AreEqual("1", l.Value);
-        }
 
         [Test]
         public void TestLinqJoinOnId2()
