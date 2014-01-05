@@ -204,13 +204,14 @@ namespace BrightstarDB.EntityFramework.Query
             queryStringBuilder.Append("}");
             AppendFromClause(queryStringBuilder);
             queryStringBuilder.Append("WHERE {");
-            queryStringBuilder.Append(_graphPatternBuilder.ToString());
             foreach (var sv in _selectVars)
             {
                 queryStringBuilder.AppendFormat("?{0} ?{0}_p ?{0}_o .", sv);
             }
-            queryStringBuilder.Append("}");
-            AppendModifiers(queryStringBuilder);
+            queryStringBuilder.Append("{ SELECT ");
+            queryStringBuilder.Append(GetSparqlQuery());
+            queryStringBuilder.Append("} }");
+
             return queryStringBuilder.ToString();
             //return GetPrefixes() + "DESCRIBE " + GetSparqlQuery();
         }
