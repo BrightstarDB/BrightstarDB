@@ -14,7 +14,7 @@ namespace BrightstarDB.Storage.Persistence
     {
         private readonly ConcurrentQueue<WriteTask> _writeTasks;
         private bool _shutdownRequested;
-        private readonly Dictionary<ulong, long> _writeTimestamps;
+        private readonly ConcurrentDictionary<ulong, long> _writeTimestamps;
         private readonly Stream _outputStream;
         private readonly ManualResetEvent _shutdownCompleted;
 
@@ -24,7 +24,7 @@ namespace BrightstarDB.Storage.Persistence
             _writeTasks = new ConcurrentQueue<WriteTask>();
             _shutdownRequested = false;
             _shutdownCompleted = new ManualResetEvent(false);
-            _writeTimestamps = new Dictionary<ulong, long>();
+            _writeTimestamps = new ConcurrentDictionary<ulong, long>();
             ThreadPool.QueueUserWorkItem(Run);
         }
 
