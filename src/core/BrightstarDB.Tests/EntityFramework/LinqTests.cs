@@ -4,6 +4,11 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using VDS.RDF;
+using VDS.RDF.Parsing;
+using VDS.RDF.Query;
+using VDS.RDF.Update;
+using VDS.RDF.Update.Commands;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
@@ -1518,12 +1523,6 @@ namespace BrightstarDB.Tests.EntityFramework
             var context = new MyEntityContext(connectionString);
 
             /// Setup
-            for (var i = 0; i < 100; i++)
-            {
-                var p = context.Persons.Create();
-                p.Name = "Person" + i;
-                p.EmployeeId = i;
-            }
             var jr1 = context.JobRoles.Create();
             jr1.Description = "development";
 
@@ -1539,31 +1538,16 @@ namespace BrightstarDB.Tests.EntityFramework
             var jr5 = context.JobRoles.Create();
             jr5.Description = "administration";
 
-            context.SaveChanges();
-            
-            int e = 0;
-            for (var i = 0; i < 20; i++)
+            var roles = new IJobRole[] {jr1, jr2, jr3, jr4, jr5};
+
+            for (var i = 0; i < 100; i++)
             {
-                var emp = context.Persons.Where(p => p.EmployeeId.Equals(e)).First();
-                emp.JobRole = jr1;
-                e++;
-
-                emp = context.Persons.Where(p => p.EmployeeId == e).First();
-                emp.JobRole = jr2;
-                e++;
-
-                emp = context.Persons.Where(p => p.EmployeeId == e).First();
-                emp.JobRole = jr3;
-                e++;
-
-                emp = context.Persons.Where(p => p.EmployeeId == e).First();
-                emp.JobRole = jr4;
-                e++;
-
-                emp = context.Persons.Where(p => p.EmployeeId == e).First();
-                emp.JobRole = jr5;
-                e++;
+                var p = context.Persons.Create();
+                p.Name = "Person" + i;
+                p.EmployeeId = i;
+                p.JobRole = roles[i%5];
             }
+
             context.SaveChanges();
 
             // Assert
@@ -1681,7 +1665,9 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(100, context.Persons.Count());
             Assert.AreEqual(100, context.Articles.Count());
 
-            
+            var test = context.Articles.Count(a => a.Publisher != null);
+            Assert.AreEqual(100, test);
+
             var allArticlesWithPublishers = (from article in context.Articles
                                              join person in context.Persons on article.Publisher.Id equals
                                                  person.Id
@@ -1694,6 +1680,50 @@ namespace BrightstarDB.Tests.EntityFramework
                                                  article.Publisher.Id
                                              select person).ToList();
             Assert.AreEqual(100, allPublishersWithArticles.Count);
+        }
+
+        [Test]
+        [Ignore]
+        public void DnrMiniTest()
+        {
+            var store = new TripleStore();
+            var updateProcessor = new LeviathanUpdateProcessor(store);
+            var queryProcessor = new LeviathanQueryProcessor(store);
+            
+            var updateCommands = @"INSERT DATA {
+<http://www.brightstardb.com/.well-known/genid/fbb51388-511f-4268-a4d2-14e60288da1b> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.example.org/schema/Person> .
+<http://www.brightstardb.com/.well-known/genid/fbb51388-511f-4268-a4d2-14e60288da1b> <http://www.example.org/schema/name> ""Person 0""^^<http://www.w3.org/2001/XMLSchema#string> .
+<http://www.brightstardb.com/.well-known/genid/fbb51388-511f-4268-a4d2-14e60288da1b> <http://www.example.org/schema/employeeId> ""0""^^<http://www.w3.org/2001/XMLSchema#integer> . 
+<http://www.brightstardb.com/.well-known/genid/778733b6-8f23-4049-bfa0-96d7fa8d23cd> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.example.org/schema/Article> . 
+<http://www.brightstardb.com/.well-known/genid/778733b6-8f23-4049-bfa0-96d7fa8d23cd> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.example.org/schema/Trackable> . 
+<http://www.brightstardb.com/.well-known/genid/778733b6-8f23-4049-bfa0-96d7fa8d23cd> <http://www.example.org/schema/title> ""Article 0""^^<http://www.w3.org/2001/XMLSchema#string> .
+GRAPH <http://www.brightstardb.com/.well-known/model/defaultgraph> {
+  <http://www.brightstardb.com/.well-known/genid/778733b6-8f23-4049-bfa0-96d7fa8d23cd> <http://www.example.org/schema/publisher> <http://www.brightstardb.com/.well-known/genid/fbb51388-511f-4268-a4d2-14e60288da1b> . 
+}
+}";
+            // NOTE: Found the root cause of the problem. Type and property information is getting inserted into the unnamed graph
+            // But relationship triples are getting inserted into the B* default graph.
+            // Need consistency about this - generated query is assuming that all triples are in the unnamed graph.
+
+            var parser = new SparqlUpdateParser();
+            var cmds = parser.ParseFromString(updateCommands);
+            updateProcessor.ProcessCommandSet(cmds);
+
+            Assert.AreEqual(7, store.Triples.Count());
+
+            var query =
+                @"SELECT (COUNT(?a) AS ?v1) WHERE {?a a <http://www.example.org/schema/Article> . OPTIONAL {?a <http://www.example.org/schema/publisher> ?v0 .} FILTER ( bound(?v0)).}";
+            var queryParser = new SparqlQueryParser();
+            var sparqlQuery = queryParser.ParseFromString(query);
+            var queryResult = queryProcessor.ProcessQuery(sparqlQuery);
+            Assert.That(queryResult is SparqlResultSet);
+            var srs = queryResult as SparqlResultSet;
+            Assert.AreEqual(1, srs.Results.Count);
+            var countNode = srs.Results[0].Value("v1");
+            Assert.That(countNode, Is.Not.Null);
+            Assert.That(countNode is ILiteralNode);
+            var l = countNode as ILiteralNode;
+            Assert.AreEqual("1", l.Value);
         }
 
         [Test]

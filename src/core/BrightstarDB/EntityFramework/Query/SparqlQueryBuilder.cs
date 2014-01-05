@@ -194,7 +194,25 @@ namespace BrightstarDB.EntityFramework.Query
 
         public string GetSparqlDescribeString()
         {
-            return GetPrefixes() + "DESCRIBE " + GetSparqlQuery();
+            var queryStringBuilder = new StringBuilder();
+            queryStringBuilder.Append(GetPrefixes());
+            queryStringBuilder.Append("CONSTRUCT {");
+            foreach (var sv in _selectVars)
+            {
+                queryStringBuilder.AppendFormat("?{0} ?{0}_p ?{0}_o .", sv);
+            }
+            queryStringBuilder.Append("}");
+            AppendFromClause(queryStringBuilder);
+            queryStringBuilder.Append("WHERE {");
+            queryStringBuilder.Append(_graphPatternBuilder.ToString());
+            foreach (var sv in _selectVars)
+            {
+                queryStringBuilder.AppendFormat("?{0} ?{0}_p ?{0}_o .", sv);
+            }
+            queryStringBuilder.Append("}");
+            AppendModifiers(queryStringBuilder);
+            return queryStringBuilder.ToString();
+            //return GetPrefixes() + "DESCRIBE " + GetSparqlQuery();
         }
 
         public String GetSparqlString()
@@ -228,6 +246,18 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 queryStringBuilder.AppendFormat("({0} AS ?{1}) ", ag.Item2, ag.Item1);
             }
+            AppendFromClause(queryStringBuilder);
+            queryStringBuilder
+                .Append("WHERE {")
+                .Append(_graphPatternBuilder.ToString())
+                .Append("}");
+            AppendModifiers(queryStringBuilder);
+            var sparqlString = queryStringBuilder.ToString();
+            return ReplaceFixedVariables(sparqlString);
+        }
+
+        private void AppendFromClause(StringBuilder queryStringBuilder)
+        {
             if (_dataset != null)
             {
                 queryStringBuilder.Append("FROM ");
@@ -236,10 +266,10 @@ namespace BrightstarDB.EntityFramework.Query
                     queryStringBuilder.AppendFormat("<{0}> ", g);
                 }
             }
-            queryStringBuilder
-                .Append("WHERE {")
-                .Append(_graphPatternBuilder.ToString())
-                .Append("}");
+        }
+
+        private void AppendModifiers(StringBuilder queryStringBuilder)
+        {
             if (_groupByExpressions.Count > 0)
             {
                 queryStringBuilder.Append(" GROUP BY ");
@@ -260,8 +290,6 @@ namespace BrightstarDB.EntityFramework.Query
                 queryStringBuilder.Append(" OFFSET ");
                 queryStringBuilder.Append(Offset);
             }
-            var sparqlString = queryStringBuilder.ToString();
-            return ReplaceFixedVariables(sparqlString);
         }
 
         public void AddTripleConstraint(GraphNode subjectType, string subject, GraphNode verbType, string verb, GraphNode objectType, string obj)

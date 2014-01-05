@@ -428,11 +428,11 @@ namespace BrightstarDB.Client
             // create a new value triple
             var triple = new Triple
                              {
-                                 Graph = Constants.DefaultGraphUri,
-                                 IsLiteral = false,
-                                 Object = value.Identity,
+                                 Subject = Identity,
                                  Predicate = type.Identity,
-                                 Subject = Identity
+                                 Object = value.Identity,
+                                 IsLiteral = false,
+                                 Graph = _store.UpdateGraphUri
                              };
 
             // use common method for updating local state and the txn
