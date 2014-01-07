@@ -16,9 +16,9 @@ namespace BrightstarDB.EntityFramework.Tests
     public class MockContext : EntityContext
     {
         private string _lastQuery;
-        private SparqlQueryContext _lastQueryContext;
+        private SparqlLinqQueryContext _lastLinqQueryContext;
         public string LastSparqlQuery { get { return _lastQuery; } }
-        public SparqlQueryContext LastSparqlQueryContext { get { return _lastQueryContext; } }
+        public SparqlLinqQueryContext LastSparqlLinqQueryContext { get { return _lastLinqQueryContext; } }
 
         public MockContext() : base()
         {
@@ -69,17 +69,17 @@ namespace BrightstarDB.EntityFramework.Tests
             return new XDocument();
         }
 
-        public override IEnumerable<T> ExecuteQuery<T>(SparqlQueryContext sparqlQuery)
+        public override IEnumerable<T> ExecuteQuery<T>(SparqlLinqQueryContext sparqlLinqQuery)
         {
-            _lastQuery = sparqlQuery.SparqlQuery;
-            _lastQueryContext = sparqlQuery;
+            _lastQuery = sparqlLinqQuery.SparqlQuery;
+            _lastLinqQueryContext = sparqlLinqQuery;
             yield break;
         }
 
         public override IEnumerable<T> ExecuteInstanceQuery<T>(string instanceIdentifier, string typeIdentifier)
         {
             _lastQuery = String.Format("ASK {{ <{0}> a <{1}>. }}", instanceIdentifier, typeIdentifier);
-            _lastQueryContext = null;
+            _lastLinqQueryContext = null;
             yield break;
         }
 

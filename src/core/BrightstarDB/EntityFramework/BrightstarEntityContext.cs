@@ -239,6 +239,8 @@ namespace BrightstarDB.EntityFramework
             return _store.ExecuteSparql(sparqlQuery).ResultDocument;
         }
 
+        #region Bindings
+
         private T BindDataObject<T>(IDataObject dataObject, Type bindType)
         {
             List<BrightstarEntityObject> trackedObjects;
@@ -254,51 +256,114 @@ namespace BrightstarDB.EntityFramework
             return ((T)Activator.CreateInstance(bindType, this, dataObject));
         }
 
-        /// <summary>
-        /// Executes a SPARQL query against the underlying store and binds the results to
-        /// domain context objects
-        /// </summary>
-        /// <typeparam name="T">The type of domain context object to bind to</typeparam>
-        /// <param name="sparqlQueryContext">The query to be executed</param>
-        /// <returns>An enumeration over the bound objects</returns>
-        /// <remarks>The SPARQL query should be written to return a single variable binding.
-        /// Results that bind the variable to anything other than a resource URI are ignored.</remarks>
-        public override IEnumerable<T> ExecuteQuery<T>(SparqlQueryContext sparqlQueryContext)
+
+        private Dictionary<Type, IList<BrightstarEntityObject>> BindSparqlResultToResultDefinedTypes(SparqlResult sparqlQueryResult)
         {
-            var bindType = GetImplType(typeof (T));
-            if (typeof(BrightstarEntityObject).IsAssignableFrom(bindType))
+            var result = new Dictionary<Type, IList<BrightstarEntityObject>>();
+            var helper = new SparqlResultDataObjectHelper(_store);
+            IEnumerable<IDataObject> boundObjects = helper.BindDataObjects(sparqlQueryResult);
+
+            //converts each object to types defined in it's triples
+            foreach (var dataObject in boundObjects)
             {
-                foreach (var dataObject in _store.BindDataObjectsWithSparql(sparqlQueryContext.SparqlQuery))
+                var types = dataObject.GetTypes();
+                foreach (var typeUri in types)
                 {
-                    yield return BindDataObject<T>(dataObject, bindType);
+                    Type bindType = GetTypeForUri(typeUri);
+                    var value = (BrightstarEntityObject)Convert.ChangeType(BindDataObject<BrightstarEntityObject>(dataObject, bindType),
+                        bindType);
+                    if (!result.ContainsKey(bindType))
+                    {
+                        result.Add(bindType, new List<BrightstarEntityObject>());
+                    }
+                    result[bindType].Add(value);
                 }
             }
-            else if (IsAnonymousType(typeof(T)))
+
+            return result;
+        }
+
+        private IEnumerable<T> BindSparqlResultToKnownType<T>(SparqlResult sparqlQueryResult)
+        {
+            var helper = new SparqlResultDataObjectHelper(_store);
+            IEnumerable<IDataObject> boundObjects = helper.BindDataObjects(sparqlQueryResult);
+            var bindType = GetImplType(typeof(T));
+            foreach (var dataObject in boundObjects)
+            {
+                yield return BindDataObject<T>(dataObject, bindType);
+            }
+        }
+
+        private IEnumerable<T> BindRowsToEntites<T>(SparqlResult sparqlQueryResult)
+        {
+            var sparqlResult = sparqlQueryResult;
+            var resultDoc = sparqlResult.ResultDocument;
+            var converter = GetStringConverter(typeof(T));
+            if (converter == null)
+            {
+                throw new EntityFrameworkException("No SPARQL results conversion found from string to type '{0}'", typeof(T).FullName);
+            }
+            foreach (var row in resultDoc.SparqlResultRows())
+            {
+                var value = row.GetColumnValue(0);
+                if (value.GetType() == typeof(T))
+                {
+                    yield return (T)value;
+                }
+                else
+                {
+                    yield return (T)converter(row.GetColumnValue(0).ToString(), row.GetLiteralLanguageCode(0));
+                }
+            }
+        }
+
+        private IEnumerable<T> BindWithLinq<T>(SparqlLinqQueryContext sparqlLinqQueryContext)
+        {
+            if (sparqlLinqQueryContext.HasMemberInitExpression)
+            {
+                var sparqlResult = _store.ExecuteSparql(sparqlLinqQueryContext);
+                var resultDoc = sparqlResult.ResultDocument;
+                foreach (var row in resultDoc.SparqlResultRows())
+                {
+                    var values = new Dictionary<string, object>();
+                    foreach (var c in resultDoc.GetVariableNames())
+                    {
+                        values[c] = row.GetColumnValue(c);
+                    }
+                    var value = sparqlLinqQueryContext.ApplyMemberInitExpression<T>(values, ConvertString);
+                    yield return (T)value;
+                }
+            }
+        }
+
+        private IEnumerable<T> BindSparqlResultToAnonymousType<T>(SparqlResult sparqlQueryResult, List<Tuple<string, string>> anonymousMembersMap)
+        {
+            if (IsAnonymousType(typeof(T)))
             {
                 var anonymousConstructorArgs = new List<AnonymousConstructorArg>();
-                foreach(var tuple in sparqlQueryContext.AnonymousMembersMap)
+                foreach (var tuple in anonymousMembersMap)
                 {
-                    var propertyInfo = typeof (T).GetProperty(tuple.Item1);
+                    var propertyInfo = typeof(T).GetProperty(tuple.Item1);
                     if (propertyInfo == null) throw new EntityFrameworkException("No property named '{0}' on anonymous type", tuple.Item1);
                     var propertyType = propertyInfo.PropertyType;
                     var converter = GetStringConverter(propertyType);
                     if (converter == null) throw new EntityFrameworkException("No converter available for type '{0}'", propertyType.FullName);
                     object defaultValue = propertyType.IsValueType ? Activator.CreateInstance(propertyType) : null;
                     anonymousConstructorArgs.Add(new AnonymousConstructorArg
-                                                     {
-                                                         PropertyName = tuple.Item1,
-                                                         VariableName = tuple.Item2,
-                                                         ValueConverter = converter,
-                                                         DefaultValue = defaultValue
-                                                     });
+                    {
+                        PropertyName = tuple.Item1,
+                        VariableName = tuple.Item2,
+                        ValueConverter = converter,
+                        DefaultValue = defaultValue
+                    });
                 }
 
-                var sparqlResult = _store.ExecuteSparql(sparqlQueryContext.SparqlQuery);
+                var sparqlResult = sparqlQueryResult;
                 var resultDoc = sparqlResult.ResultDocument;
-                foreach(var row in resultDoc.SparqlResultRows())
+                foreach (var row in resultDoc.SparqlResultRows())
                 {
                     var args = new object[anonymousConstructorArgs.Count];
-                    for(int i = 0; i < anonymousConstructorArgs.Count; i++)
+                    for (int i = 0; i < anonymousConstructorArgs.Count; i++)
                     {
                         var argInfo = anonymousConstructorArgs[i];
                         var colValue = row.GetColumnValue(argInfo.VariableName);
@@ -306,44 +371,102 @@ namespace BrightstarDB.EntityFramework
                         args[i] = colValue == null ? argInfo.DefaultValue : argInfo.ValueConverter(colValue.ToString(), colLang);
                     }
                     yield return (T)Activator.CreateInstance(typeof(T), args);
-                }                
-            }
-            else if (sparqlQueryContext.HasMemberInitExpression)
-            {
-                var sparqlResult = _store.ExecuteSparql(sparqlQueryContext.SparqlQuery);
-                var resultDoc = sparqlResult.ResultDocument;
-                foreach(var row in resultDoc.SparqlResultRows())
-                {
-                    var values = new Dictionary<string, object>();
-                    foreach(var c in resultDoc.GetVariableNames())
-                    {
-                        values[c] = row.GetColumnValue(c);
-                    }
-                    var value = sparqlQueryContext.ApplyMemberInitExpression<T>(values, ConvertString);
-                    yield return (T)value;
                 }
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Executes a SPARQL query against the underlying store and binds the results to
+        /// domain context objects based on the info (rdf:type) found in the
+        /// </summary>
+        /// <param name="sparqlQuery">The query to be executed</param>
+        /// <returns>A dictionary with a list of entities for each found type</returns>
+        /// <example>Each type can be retrieved: 
+        /// <![CDATA[ results[typeof(Person)].Cast<Person>().ToList()]]></example>
+        public Dictionary<Type, IList<BrightstarEntityObject>> ExecuteQueryToResultTypes(string sparqlQuery)
+        {
+            var sparqlResult = _store.ExecuteSparql(sparqlQuery);
+
+            return BindSparqlResultToResultDefinedTypes(sparqlResult);
+        }
+
+        /// <summary>
+        /// Executes a SPARQL query against the underlying store and binds the results to
+        /// domain context objects
+        /// </summary>
+        /// <typeparam name="T">The type of domain context object to bind to</typeparam>
+        /// <param name="sparqlQuery">The query to be executed</param>
+        /// <param name="anonymousMembersMap">mappings for anonymous types</param>
+        /// <returns>An enumeration over the bound objects</returns>
+        /// <remarks>The SPARQL query should be written to return a single variable binding or triples binding.</remarks>
+        public IEnumerable<T> ExecuteQuery<T>(string sparqlQuery, List<Tuple<string, string>> anonymousMembersMap = null)
+        {
+            if (anonymousMembersMap != null)
+            {
+                return ExecuteQuery<T>(new SparqlQueryContext(sparqlQuery, anonymousMembersMap));
             }
             else
             {
-                var sparqlResult = _store.ExecuteSparql(sparqlQueryContext.SparqlQuery);
-                var resultDoc = sparqlResult.ResultDocument;
-                var converter = GetStringConverter(typeof(T));
-                if (converter == null)
-                {
-                    throw new EntityFrameworkException("No SPARQL results conversion found from string to type '{0}'", typeof(T).FullName);
-                }
-                foreach(var row in resultDoc.SparqlResultRows())
-                {
-                    var value = row.GetColumnValue(0);
-                    if (value.GetType() == typeof (T))
-                    {
-                        yield return (T) value;
-                    }
-                    else
-                    {
-                        yield return (T) converter(row.GetColumnValue(0).ToString(), row.GetLiteralLanguageCode(0));
-                    }
-                }
+                return ExecuteQuery<T>(new SparqlQueryContext(sparqlQuery));
+            }
+        }
+
+        /// <summary>
+        /// Executes a SPARQL query against the underlying store and binds the results to
+        /// domain context objects
+        /// </summary>
+        /// <typeparam name="T">The type of domain context object to bind to</typeparam>
+        /// <param name="sparqlQuery">The query context that contains sparql query to be executed and it's params</param>
+        /// <returns></returns>
+        public IEnumerable<T> ExecuteQuery<T>(SparqlQueryContext sparqlQuery)
+        {
+            var bindType = GetImplType(typeof(T));
+            var sparqlResult = _store.ExecuteSparql(sparqlQuery);
+            if (typeof(BrightstarEntityObject).IsAssignableFrom(bindType))
+            {
+                return BindSparqlResultToKnownType<T>(sparqlResult);
+            }
+            else if (IsAnonymousType(typeof(T)))
+            {
+                return BindSparqlResultToAnonymousType<T>(sparqlResult, sparqlQuery.AnonymousMembersMap);
+            }
+            else
+            {
+                return BindRowsToEntites<T>(sparqlResult);
+            }
+        }
+
+
+        /// <summary>
+        /// Executes a SPARQL query against the underlying store and binds the results to
+        /// domain context objects
+        /// </summary>
+        /// <typeparam name="T">The type of domain context object to bind to</typeparam>
+        /// <param name="sparqlLinqQueryContext">The query to be executed</param>
+        /// <returns>An enumeration over the bound objects</returns>
+        /// <remarks>The SPARQL query should be written to return a single variable binding or triples binding.</remarks>
+        public override IEnumerable<T> ExecuteQuery<T>(SparqlLinqQueryContext sparqlLinqQueryContext)
+        {
+            var bindType = GetImplType(typeof(T));
+            var sparqlResult = _store.ExecuteSparql(sparqlLinqQueryContext);
+            if (typeof(BrightstarEntityObject).IsAssignableFrom(bindType))
+            {
+                return BindSparqlResultToKnownType<T>(sparqlResult);
+
+            }
+            else if (IsAnonymousType(typeof(T)))
+            {
+                return BindSparqlResultToAnonymousType<T>(sparqlResult, sparqlLinqQueryContext.AnonymousMembersMap);
+            }
+            else if (sparqlLinqQueryContext.HasMemberInitExpression)
+            {
+                return BindWithLinq<T>(sparqlLinqQueryContext);
+            }
+            else
+            {
+                return BindRowsToEntites<T>(sparqlResult);
             }
         }
 

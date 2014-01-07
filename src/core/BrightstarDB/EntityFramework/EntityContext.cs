@@ -75,9 +75,9 @@ namespace BrightstarDB.EntityFramework
         /// Method to execute a SPARQL query against the underlying store and bind its results to instances of a class
         /// </summary>
         /// <typeparam name="T">The type that the SPARQL query results are to be bound to</typeparam>
-        /// <param name="sparqlQueryContext">The context object that specifies the SPARQL query and constructor and member mappings</param>
+        /// <param name="sparqlLinqQueryContext">The context object that specifies the SPARQL query and constructor and member mappings</param>
         /// <returns>An enumeration over the bound result objects</returns>
-        public abstract IEnumerable<T> ExecuteQuery<T>(SparqlQueryContext sparqlQueryContext);
+        public abstract IEnumerable<T> ExecuteQuery<T>(SparqlLinqQueryContext sparqlLinqQueryContext);
 
         /// <summary>
         /// Handler for the special case query that selects a specific instance of a type
@@ -121,6 +121,16 @@ namespace BrightstarDB.EntityFramework
         public Type GetImplType(Type interfaceType)
         {
             return Mappings.GetImplType(interfaceType);
+        }
+
+        /// <summary>
+        /// Returns the entity implementation type for a given uri
+        /// </summary>
+        /// <param name="typeUri">The uri representing a resource type.</param>
+        /// <returns>The entity implementation type</returns>
+        public Type GetTypeForUri(string typeUri)
+        {
+            return Mappings.GetImplTypeForUri(typeUri);
         }
 
         /// <summary>

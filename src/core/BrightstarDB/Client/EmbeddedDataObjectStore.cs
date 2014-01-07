@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using BrightstarDB.Dto;
+using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Server;
@@ -48,16 +49,16 @@ namespace BrightstarDB.Client
         public override IEnumerable<IDataObject> BindDataObjectsWithSparql(string sparqlExpression)
         {
             var helper = new SparqlResultDataObjectHelper(this);
-            return helper.BindDataObjects(ExecuteSparql(sparqlExpression));
+            return helper.BindDataObjects(ExecuteSparql(new SparqlQueryContext(sparqlExpression)));
         }
 
-        public override SparqlResult ExecuteSparql(string sparqlExpression)
+        public override SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext)
         {
             var resultStream = new MemoryStream();
-            _serverCore.Query(_storeName, sparqlExpression, DataSetGraphUris, null, SparqlResultsFormat.Xml,
+            _serverCore.Query(_storeName, sparqlQueryContext.SparqlQuery, DataSetGraphUris, null, SparqlResultsFormat.Xml,
                               RdfFormat.RdfXml, resultStream);
             resultStream.Seek(0, SeekOrigin.Begin);
-            return new SparqlResult(resultStream);
+            return new SparqlResult(resultStream, sparqlQueryContext);
         }
 
         public override bool BindDataObject(DataObject dataObject)

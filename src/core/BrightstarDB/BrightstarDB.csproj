@@ -173,6 +173,7 @@
     <Compile Include="Dto\TransactionStatus.cs" />
     <Compile Include="Dto\TransactionType.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
+    <Compile Include="EntityFramework\Query\SparqlQueryContext.cs" />
     <Compile Include="FormatInfo.cs" />
     <Compile Include="ISerializationFormat.cs" />
     <Compile Include="NoAcceptableFormatException.cs" />
@@ -233,7 +234,7 @@
     <Compile Include="EntityFramework\Query\SparqlGeneratorWhereExpressionTreeVisitor.cs" />
     <Compile Include="EntityFramework\Query\SparqlOrdering.cs" />
     <Compile Include="EntityFramework\Query\SparqlQueryBuilder.cs" />
-    <Compile Include="EntityFramework\Query\SparqlQueryContext.cs" />
+    <Compile Include="EntityFramework\Query\SparqlLinqQueryContext.cs" />
     <Compile Include="EntityFramework\Query\TripleInfo.cs" />
     <Compile Include="EntityFramework\Query\VariableBindingType.cs" />
     <Compile Include="EntityFramework\ReflectionMappingException.cs" />

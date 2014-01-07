@@ -149,6 +149,16 @@ namespace BrightstarDB.Client
         }
 
         /// <summary>
+        /// Gets the uri types of this data object
+        /// </summary>
+        /// <returns>A list of uri types</returns>
+        public IList<string> GetTypes()
+        {
+            return this.Triples.Where(t => t.Predicate == TypeDataObject.Identity).Select(t => t.Object).ToList();
+        }
+
+
+        /// <summary>
         /// Sets the property of this object to the specified value
         /// </summary>
         /// <param name="type">The type of the property to set</param>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
@@ -219,7 +220,12 @@ namespace BrightstarDB.Client
 
         public abstract IDataObject GetDataObject(string identity);
         public abstract IEnumerable<IDataObject> BindDataObjectsWithSparql(string sparqlExpression);
-        public abstract SparqlResult ExecuteSparql(string sparqlExpression);
+
+        public SparqlResult ExecuteSparql(string sparqlQuery)
+        {
+            return this.ExecuteSparql(new SparqlQueryContext(sparqlQuery));
+        }
+        public abstract SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext);
 
         /// <summary>
         /// Commits all changes. Waits for the operation to complete.
@@ -255,7 +261,7 @@ namespace BrightstarDB.Client
             {
                 // We just lookup the new version number
                 UpdateVersionFromSparqlResult(
-                    ExecuteSparql(String.Format(GetVersionSparql, dataObject.Identity)),
+                    ExecuteSparql(new SparqlQueryContext(String.Format(GetVersionSparql, dataObject.Identity))),
                     dataObject);
             }
             else

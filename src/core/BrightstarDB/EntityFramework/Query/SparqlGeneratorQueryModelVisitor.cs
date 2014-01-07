@@ -15,7 +15,7 @@ namespace BrightstarDB.EntityFramework.Query
         private string _instanceUri;
         private string _typeUri;
 
-        public static SparqlQueryContext GenerateSparqlQuery(EntityContext context, QueryModel queryModel)
+        public static SparqlLinqQueryContext GenerateSparqlLinqQuery(EntityContext context, QueryModel queryModel)
         {
             var visitor = new SparqlGeneratorQueryModelVisitor(context);
             visitor.VisitQueryModel(queryModel);
@@ -387,14 +387,14 @@ namespace BrightstarDB.EntityFramework.Query
             return null;
         }
 
-        public SparqlQueryContext GetSparqlQuery(bool useDescribe)
+        public SparqlLinqQueryContext GetSparqlQuery(bool useDescribe)
         {
             if (_isInstanceQuery)
             {
-                return new SparqlQueryContext(_instanceUri, _typeUri);
+                return new SparqlLinqQueryContext(_instanceUri, _typeUri);
             }
             return
-                new SparqlQueryContext(
+                new SparqlLinqQueryContext(
                     useDescribe && !_queryBuilder.IsDistinct && !_queryBuilder.IsOrdered
                         ? _queryBuilder.GetSparqlDescribeString()
                         : _queryBuilder.GetSparqlString(),

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 
@@ -53,12 +54,12 @@ namespace BrightstarDB.Client
         public override IEnumerable<IDataObject> BindDataObjectsWithSparql(string sparqlExpression)
         {
             var binder = new SparqlResultDataObjectHelper(this);
-            return binder.BindDataObjects(ExecuteSparql(sparqlExpression));
+            return binder.BindDataObjects(ExecuteSparql(new SparqlQueryContext(sparqlExpression)));
         }
 
-        public override SparqlResult ExecuteSparql(string sparqlExpression)
+        public override SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext)
         {
-            return new SparqlResult(Client.ExecuteQuery(sparqlExpression, DataSetGraphUris));
+            return new SparqlResult(Client.ExecuteQuery(sparqlQueryContext.SparqlQuery, DataSetGraphUris), sparqlQueryContext);
         }
 
         protected virtual string GetQueryTemplate()
