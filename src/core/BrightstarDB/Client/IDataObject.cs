@@ -33,6 +33,12 @@ namespace BrightstarDB.Client
         IDataObject SetType(IDataObject type);
 
         /// <summary>
+        /// Gets the type of this data object
+        /// </summary>
+        /// <returns>A list of object types</returns>
+        IList<string> GetTypes();
+
+        /// <summary>
         /// Sets the property of this object to the specified value
         /// </summary>
         /// <param name="type">The type of the property to set</param>

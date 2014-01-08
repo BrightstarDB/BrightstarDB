@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
+using BrightstarDB.EntityFramework.Query;
 using NUnit.Framework;
 using System.ComponentModel;
 using UnitTesting = NUnit.Framework;
@@ -47,6 +48,149 @@ namespace BrightstarDB.Tests.EntityFramework
                     Assert.IsNotNull(person);
                 }
             }
+        }
+
+        [Test]
+        public void TestCustomTriplesQuery()
+        {
+            string storeName = Guid.NewGuid().ToString();
+            var people = new Person[10];
+            using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
+            {
+                using (var context = new MyEntityContext(dataObjectStore))
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var person = new Person { Age = 40 - i, Name = "Person #" + i };
+                        context.Persons.Add(person);
+                        people[i] = person;
+                    }
+                    context.SaveChanges();
+                }
+            }
+
+
+            using (var dataObjectStore = _dataObjectContext.OpenStore(storeName))
+            {
+                using (var context = new MyEntityContext(dataObjectStore))
+                {
+                    var query = @"
+select  ?s ?p ?o
+where {
+   ?s ?p ?o.
+        ?s a <http://www.example.org/schema/Person>
+}
+";
+                    IList<Person> results;
+                    results = context.ExecuteQuery<Person>(query).ToList();
+                    Assert.AreEqual(10, results.Count);
+
+                    foreach (Person person in results)
+                    {
+                        Assert.AreNotEqual(0, person.Age);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void TestCustomTriplesQueryWithOrderedSubjects()
+        {
+            string storeName = Guid.NewGuid().ToString();
+            var people = new Person[10];
+            using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
+            {
+                using (var context = new MyEntityContext(dataObjectStore))
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var person = new Person { Age = 40 - i, Name = "Person #" + i };
+                        context.Persons.Add(person);
+                        people[i] = person;
+                    }
+                    context.SaveChanges();
+                }
+            }
+
+
+            using (var dataObjectStore = _dataObjectContext.OpenStore(storeName))
+            {
+                using (var context = new MyEntityContext(dataObjectStore))
+                {
+                    var query = @"
+select  ?s ?p ?o
+where {
+   ?s ?p ?o.
+        ?s a <http://www.example.org/schema/Person>
+}
+order by ?s
+";
+                    IList<Person> results;
+                    results = context.ExecuteQuery<Person>(new SparqlQueryContext(query){ExpectTriplesWithOrderedSubjects = true}).ToList();
+                    Assert.AreEqual(10, results.Count);
+
+                    foreach (Person person in results)
+                    {
+                        Assert.AreNotEqual(0, person.Age);
+                    }
+                }
+            }
+        }
+
+
+        [Test]
+        public void TestCustomTriplesQueryWithMultipleResultTypes()
+        {
+            string storeName = Guid.NewGuid().ToString();
+            var people = new Person[10];
+            using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
+            {
+                using (var context = new MyEntityContext(dataObjectStore))
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        var person = new Person { Age = 40 - i, Name = "Person #" + i };
+                        context.Persons.Add(person);
+                        people[i] = person;
+
+                        if (i >= 5)
+                        {
+                            var session = new Session { Speaker = "Person #" + i };
+                            context.Sessions.Add(session);
+                        }
+                    }
+                    context.SaveChanges();
+                }
+            }
+
+
+            using (var dataObjectStore = _dataObjectContext.OpenStore(storeName))
+            {
+                using (var context = new MyEntityContext(dataObjectStore))
+                {
+                    var query = @"
+select  ?s ?p ?o
+where {
+   ?s ?p ?o.
+   {?s a <http://www.example.org/schema/Person>}
+    union
+   {?s a <http://www.example.org/schema/Session>}
+
+}
+
+";
+                    var results = context.ExecuteQueryToResultTypes(query);
+                    var persons = results[typeof(Person)].Cast<Person>().ToList();
+                    Assert.AreEqual(10, persons.Count);
+
+                    var sessions = results[typeof(Session)].Cast<Session>().ToList();
+                    Assert.AreEqual(5, sessions.Count);
+
+                }
+            }
+
+
+
         }
 
         [Test]

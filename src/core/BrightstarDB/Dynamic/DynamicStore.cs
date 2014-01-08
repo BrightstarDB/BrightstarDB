@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
+using BrightstarDB.EntityFramework.Query;
 
 namespace BrightstarDB.Dynamic
 {

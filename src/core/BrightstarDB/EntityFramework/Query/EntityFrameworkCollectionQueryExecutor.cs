@@ -87,7 +87,7 @@ namespace BrightstarDB.EntityFramework.Query
         /// </returns>
         public IEnumerable<T> ExecuteCollection<T>(QueryModel queryModel)
         {
-            var sparqlQuery = SparqlGeneratorQueryModelVisitor.GenerateSparqlQuery(_context);
+            var sparqlQuery = SparqlGeneratorQueryModelVisitor.GenerateSparqlLinqQuery(_context);
             return sparqlQuery.IsInstanceQuery
                        ? _context.ExecuteInstanceQuery<T>(sparqlQuery.InstanceUri, sparqlQuery.TypeUri)
                        : _context.ExecuteQuery<T>(sparqlQuery);

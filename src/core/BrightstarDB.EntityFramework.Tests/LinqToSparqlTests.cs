@@ -445,7 +445,7 @@ OPTIONAL { ?x <http://purl.org/dc/terms/title> ?v0 . }
 OPTIONAL { ?x <http://www.networkedplanet.com/schemas/test/ticker> ?v1 . }
 OPTIONAL { ?v2 <http://www.networkedplanet.com/schemas/test/listing> ?x .
            ?v2 <http://purl.org/dc/terms/title> ?v3 . } }");
-            Assert.AreEqual("v3", Context.LastSparqlQueryContext.AnonymousMembersMap.Where(x=>x.Item1.Equals("Market")).Select(x=>x.Item2).FirstOrDefault());
+            Assert.AreEqual("v3", Context.LastSparqlLinqQueryContext.AnonymousMembersMap.Where(x=>x.Item1.Equals("Market")).Select(x=>x.Item2).FirstOrDefault());
 
             var r = from x in Context.Companies select new { x.Name, x.TickerSymbol, Market = x.ListedOn };
             r.ToList();

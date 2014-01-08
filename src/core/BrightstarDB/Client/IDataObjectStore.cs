@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BrightstarDB.EntityFramework.Query;
 
 namespace BrightstarDB.Client
 {
@@ -62,9 +63,16 @@ namespace BrightstarDB.Client
         /// <summary>
         /// Executes a SPARQL query against the underlying Brightstar store.
         /// </summary>
-        /// <param name="sparqlExpression">The SPARQL query to execute</param>
+        /// <param name="sparqlQuery">The SPARQL query to execute</param>
         /// <returns>The query result object</returns>
-        SparqlResult ExecuteSparql(string sparqlExpression);
+        SparqlResult ExecuteSparql(string sparqlQuery);
+
+        /// <summary>
+        /// Executes a SPARQL query against the underlying Brightstar store.
+        /// </summary>
+        /// <param name="sparqlQueryContext">The SPARQL query to execute</param>
+        /// <returns>The query result object</returns>
+        SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext);
 
         /// <summary>
         /// Commits all changes. Waits for the operation to complete.

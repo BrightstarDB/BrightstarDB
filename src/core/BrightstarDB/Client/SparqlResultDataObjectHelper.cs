@@ -30,7 +30,7 @@ namespace BrightstarDB.Client
                     return BindRdfDataObjects(xmlReader);
                 }
             }
-            return BindDataObjects(xmlReader);
+            return BindDataObjects(xmlReader, sparqlResult.SourceSparqlQueryContext.ExpectTriplesWithOrderedSubjects);
         }
 
         public IEnumerable<IDataObject> BindRdfDataObjects(XmlReader xmlReader)
@@ -119,30 +119,147 @@ namespace BrightstarDB.Client
             return false;
         }
 
-        public IEnumerable<IDataObject> BindDataObjects(XmlReader xmlReader)
+        public IEnumerable<IDataObject> BindDataObjects(XmlReader xmlReader, bool resultsAreOrdered = false)
         {
+            var variables = new List<string>();
+            var xmlResultNodeTripleValues = new List<string>();
+            bool readingResults = false;
+            var resourceTriples = new Dictionary<string, List<Triple>>();
+            string lastLoadedSubject = null; //if resultsAreOrdered then once we get a new subject we can create the DataObject
+
             while (xmlReader.Read())
             {
-                if (xmlReader.NodeType == XmlNodeType.Element 
-                    && xmlReader.Name.ToLower().Equals("uri") 
-                    && xmlReader.NamespaceURI.Equals("http://www.w3.org/2005/sparql-results#"))
+                if (xmlReader.NamespaceURI.Equals("http://www.w3.org/2005/sparql-results#")
+                    && xmlReader.NodeType == XmlNodeType.Element)
                 {
-                    string uri = null;
-                    try
+                    var nodeName = xmlReader.Name.ToLower();
+                    if (!readingResults) //header part
                     {
-                        uri = xmlReader.ReadElementContentAsString();
+                        if (nodeName.Equals("variable"))
+                        {
+                            variables.Add(xmlReader.GetAttribute("name"));
+                            continue;
+                        }
+                        else if (nodeName.Equals("results"))
+                        {
+                            readingResults = true;
+                            if (variables.Count != 1 && variables.Count != 3)
+                            {
+                                throw new NotSupportedException("Sparql results can be a list of id's(1 variable) or a list of triples(3 variables). Variables found:" + variables.Count);
+                            }
+                            continue;
+                        }
                     }
-                    catch (Exception ex)
+                    else //reading results
                     {
-                        Logging.LogError(BrightstarEventId.ClientDataBindError, "Error binding to SPARQL results element. {0}", ex);
-                    }
-                    if (!String.IsNullOrEmpty(uri))
-                    {
-                        yield return _storeContext.MakeDataObject(uri);
+                        if (variables.Count == 1) //load id's
+                        {
+                            if (nodeName.Equals("uri"))
+                            {
+                                string uri = null;
+                                try
+                                {
+                                    uri = xmlReader.ReadElementContentAsString();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logging.LogError(BrightstarEventId.ClientDataBindError,
+                                        "Error binding to SPARQL results element. {0}", ex);
+                                }
+                                if (!String.IsNullOrEmpty(uri))
+                                {
+                                    yield return _storeContext.MakeDataObject(uri);
+                                }
+                            }
+                        }
+                        else //load triples
+                        {
+                            var isUri = nodeName.Equals("uri");
+                            var isLiteral = nodeName.Equals("literal");
+                            string literalDataType = null;
+                            string literalLanguage = null;
+                            if (isUri || isLiteral)
+                            {
+                                string elementContentAsString = null;
+                                try
+                                {
+                                    literalDataType = xmlReader.GetAttribute("datatype");
+                                    literalLanguage = xmlReader.GetAttribute("xml:lang");
+                                    elementContentAsString = xmlReader.ReadElementContentAsString();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Logging.LogError(BrightstarEventId.ClientDataBindError,
+                                        "Error binding to SPARQL results element. {0}", ex);
+                                }
+                                if (!String.IsNullOrEmpty(elementContentAsString))
+                                {
+                                    xmlResultNodeTripleValues.Add(elementContentAsString);
+                                }
+                            }
+
+                            //create new triple
+                            if (xmlResultNodeTripleValues.Count == 3)
+                            {
+                                var s = xmlResultNodeTripleValues[0];
+
+                                //if object was a literal it's the last read value => datatype, lang must match
+                                var triple = new Triple
+                                {
+                                    Subject = s,
+                                    Predicate = xmlResultNodeTripleValues[1],
+                                    IsLiteral = isLiteral,
+                                    Object = xmlResultNodeTripleValues[2],
+                                    LangCode = literalLanguage,
+                                    DataType = literalDataType ?? RdfDatatypes.String
+                                };
+
+
+                                if (resourceTriples.ContainsKey(s)) //resource already has triples
+                                {
+                                    resourceTriples[s].Add(triple);
+                                }
+                                else
+                                {
+                                    resourceTriples.Add(s, new List<Triple> { triple });
+                                }
+
+                                //if results are in order and we have new subject then we can create a new object for the previous one
+                                if (resultsAreOrdered && lastLoadedSubject != null && lastLoadedSubject != s)
+                                {
+                                    var dataObject = _storeContext.MakeDataObject(lastLoadedSubject) as DataObject;
+                                    dataObject.BindTriples(resourceTriples[lastLoadedSubject]);
+                                    yield return dataObject;
+                                }
+
+                                lastLoadedSubject = s;
+                                xmlResultNodeTripleValues.Clear();
+                            }
+                        }
                     }
                 }
+
             }
             xmlReader.Close();
+
+
+            if (resultsAreOrdered && lastLoadedSubject != null)
+            {
+                var dataObject = _storeContext.MakeDataObject(lastLoadedSubject) as DataObject;
+                dataObject.BindTriples(resourceTriples[lastLoadedSubject]);
+                yield return dataObject;
+            }
+            else
+            {
+                foreach (KeyValuePair<string, List<Triple>> resourceTriple in resourceTriples)
+                {
+                    var dataObject = _storeContext.MakeDataObject(resourceTriple.Key) as DataObject;
+                    dataObject.BindTriples(resourceTriple.Value);
+
+                    yield return dataObject;
+                }
+            }
+
         }
 
     }

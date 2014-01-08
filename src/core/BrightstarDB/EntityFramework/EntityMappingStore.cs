@@ -195,6 +195,19 @@ namespace BrightstarDB.EntityFramework
         }
 
         /// <summary>
+        /// Returns the entity implementation type for a given uri
+        /// </summary>
+        /// <param name="typeUri">The uri representing a resource type.</param>
+        /// <returns>The entity implementation type</returns>
+        public Type GetImplTypeForUri(string typeUri)
+        {
+            Type domainType = _typeMappings.FirstOrDefault(x => x.Value == typeUri).Key;
+            if (domainType == null) return null;
+            Type implType = GetImplType(domainType);
+            return implType;
+        }
+
+        /// <summary>
         /// Returns the entity implementation type for a specific entity interface type
         /// </summary>
         /// <param name="interfaceType">The entity interface type</param>
