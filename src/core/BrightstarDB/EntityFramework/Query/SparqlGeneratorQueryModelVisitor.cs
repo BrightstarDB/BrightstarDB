@@ -25,8 +25,8 @@ namespace BrightstarDB.EntityFramework.Query
                 resultType = resultType.GetGenericArguments()[0];
             }
             var bindType = context.GetImplType(resultType);
-            bool useDescribe = typeof (IEntityObject).IsAssignableFrom(bindType);
-            return visitor.GetSparqlQuery(useDescribe);
+            bool useConstruct = typeof (IEntityObject).IsAssignableFrom(bindType);
+            return visitor.GetSparqlQuery(useConstruct);
         }
 
         SparqlGeneratorQueryModelVisitor(EntityContext context)
@@ -387,7 +387,7 @@ namespace BrightstarDB.EntityFramework.Query
             return null;
         }
 
-        public SparqlLinqQueryContext GetSparqlQuery(bool useDescribe)
+        public SparqlLinqQueryContext GetSparqlQuery(bool useConstruct)
         {
             if (_isInstanceQuery)
             {
@@ -395,8 +395,8 @@ namespace BrightstarDB.EntityFramework.Query
             }
             return
                 new SparqlLinqQueryContext(
-                    useDescribe && !_queryBuilder.IsDistinct && !_queryBuilder.IsOrdered
-                        ? _queryBuilder.GetSparqlDescribeString()
+                    useConstruct && !_queryBuilder.IsDistinct && !_queryBuilder.IsOrdered
+                        ? _queryBuilder.GetSparqlConstructString()
                         : _queryBuilder.GetSparqlString(),
                     _queryBuilder.AnonymousMembersMap,
                     _queryBuilder.Constructor,
