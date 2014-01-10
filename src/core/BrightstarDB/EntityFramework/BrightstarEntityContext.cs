@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -270,8 +271,9 @@ namespace BrightstarDB.EntityFramework
                 foreach (var typeUri in types)
                 {
                     Type bindType = GetTypeForUri(typeUri);
-                    var value = (BrightstarEntityObject)Convert.ChangeType(BindDataObject<BrightstarEntityObject>(dataObject, bindType),
-                        bindType);
+                    var value = (BrightstarEntityObject)Convert.ChangeType(
+                        BindDataObject<BrightstarEntityObject>(dataObject, bindType),
+                        bindType, null);
                     if (!result.ContainsKey(bindType))
                     {
                         result.Add(bindType, new List<BrightstarEntityObject>());
