@@ -45,10 +45,10 @@ namespace BrightstarDB.Tests
         [Test]
         public void TestNamespaceDeclarationsAsTurtle()
         {
-            var sparql = NamespaceDeclarations.ForAssembly().AsTurtle();
-            Assert.That(sparql.Contains("@prefix dc: <http://purl.org/dc/terms/> ."));
-            Assert.That(sparql.Contains("@prefix foaf: <http://xmlns.com/foaf/0.1/> ."));
-            Assert.That(sparql.Contains("@prefix bsi: <http://brightstardb.com/instances/> ."));
+            var turtle = NamespaceDeclarations.ForAssembly().AsTurtle();
+            Assert.That(turtle.Contains("@prefix dc: <http://purl.org/dc/terms/> ."));
+            Assert.That(turtle.Contains("@prefix foaf: <http://xmlns.com/foaf/0.1/> ."));
+            Assert.That(turtle.Contains("@prefix bsi: <http://brightstardb.com/instances/> ."));
         }
     }
 }
