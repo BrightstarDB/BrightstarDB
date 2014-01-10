@@ -173,6 +173,7 @@
     <Compile Include="Dto\TransactionStatus.cs" />
     <Compile Include="Dto\TransactionType.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
+    <Compile Include="EntityFramework\NamespaceDeclarations.cs" />
     <Compile Include="EntityFramework\Query\SparqlQueryContext.cs" />
     <Compile Include="FormatInfo.cs" />
     <Compile Include="ISerializationFormat.cs" />

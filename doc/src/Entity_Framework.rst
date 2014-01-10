@@ -322,6 +322,34 @@ Then these prefixes can be used in property or type annotation using the CURIE s
   [Entity("foaf:Person")]
   public interface IPerson  { ... }
 
+Namespace declarations defined in this way can also be retrieved programatically. The class
+``BrightstarDB.EntityFramework.NamespaceDeclarations`` provides methods for retrieving 
+these declarations in a variety of formats::
+
+    // You can just iterate them as instances of 
+    // BrightstarDB.EntityFramework.NamespaceDeclarationAttribute
+    foreach(var nsDecl in NamespaceDeclarations.ForAssembly(Assembly.GetExecutingAssembly()))
+    {
+        // prefix is in nsDecl.Prefix
+        // Namespace URI is in nsDecl.Reference
+    }
+    
+    // Or you can retrieve them as a dictionary:
+    var dict = NamespaceDeclarations.ForAssembly(Assembly.GetExecutingAssembly());
+    foafUri = dict["foaf"];
+    
+    // You can omit the Assembly parameter if you are calling from the assembly
+    // containing the delcarations.
+    
+    // You can get the declarations formatted for use in SPARQL...
+    // e.g. PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    sparqlPrefixes = NamespaceDeclarations.ForAssembly().AsSparql();
+    
+    // ...or for use in Turtle (or TRiG)
+    // e.g. @prefix foaf: <http://xmlns.com/foaf/0.1/> .
+    turtlePrefixes = NamespaceDeclarations.ForAssembly().AsTurtle();
+    
+
 Property Type Attribute
 -----------------------
 
