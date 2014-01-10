@@ -49,7 +49,7 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <typeparam name="I">The entity definition interface type</typeparam>
         /// <typeparam name="T">The entity implementation class type</typeparam>
-        public void AddImplMapping<I, T>()
+        public void SetImplMapping<I, T>()
             where I : class
             where T : I
         {
@@ -62,7 +62,7 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="mappedType">The entity implementation class type</param>
         /// <param name="prefix">The URI identifier prefix string</param>
-        public void AddIdentifierPrefix(Type mappedType, string prefix)
+        public void SetIdentifierPrefix(Type mappedType, string prefix)
         {
             _identifierPrefixes[mappedType] = prefix;
         }
@@ -93,7 +93,7 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="mappedType">The entity type</param>
         /// <param name="typeUri">The schema type URI</param>
-        public void AddTypeMapping(Type mappedType, string typeUri)
+        public void SetTypeMapping(Type mappedType, string typeUri)
         {
             _typeMappings[mappedType] = typeUri;
         }
@@ -103,7 +103,7 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <typeparam name="T">The entity type</typeparam>
         /// <param name="typeUri">The schema type URI</param>
-        public void AddTypeMapping<T>(string typeUri) where T : class
+        public void SetTypeMapping<T>(string typeUri) where T : class
         {
             _typeMappings[typeof(T)] = typeUri;
         }
@@ -113,9 +113,9 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="propertyInfo">The property that the hint is set for</param>
         /// <param name="propertyHint">The property hint information</param>
-        public void AddPropertyHint(PropertyInfo propertyInfo, PropertyHint propertyHint)
+        public void SetPropertyHint(PropertyInfo propertyInfo, PropertyHint propertyHint)
         {
-            _propertyHints.Add(propertyInfo, propertyHint);
+            _propertyHints[propertyInfo] = propertyHint;
             if (propertyHint.MappingType == PropertyMappingType.Id && propertyInfo.DeclaringType != null)
             {
                 _identityProperties[propertyInfo.DeclaringType] = propertyInfo;

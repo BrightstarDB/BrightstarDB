@@ -27,19 +27,19 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     		TypeMappings = new EntityMappingStore();
     		var provider = new ReflectionMappingProvider();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IAnimal));
-    		TypeMappings.AddImplMapping<BrightstarDB.Server.IntegrationTests.Context.IAnimal, BrightstarDB.Server.IntegrationTests.Context.Animal>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IAnimal, BrightstarDB.Server.IntegrationTests.Context.Animal>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IDepartment));
-    		TypeMappings.AddImplMapping<BrightstarDB.Server.IntegrationTests.Context.IDepartment, BrightstarDB.Server.IntegrationTests.Context.Department>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IDepartment, BrightstarDB.Server.IntegrationTests.Context.Department>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IFoafAgent));
-    		TypeMappings.AddImplMapping<BrightstarDB.Server.IntegrationTests.Context.IFoafAgent, BrightstarDB.Server.IntegrationTests.Context.FoafAgent>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IFoafAgent, BrightstarDB.Server.IntegrationTests.Context.FoafAgent>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IFoafPerson));
-    		TypeMappings.AddImplMapping<BrightstarDB.Server.IntegrationTests.Context.IFoafPerson, BrightstarDB.Server.IntegrationTests.Context.FoafPerson>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IFoafPerson, BrightstarDB.Server.IntegrationTests.Context.FoafPerson>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IJobRole));
-    		TypeMappings.AddImplMapping<BrightstarDB.Server.IntegrationTests.Context.IJobRole, BrightstarDB.Server.IntegrationTests.Context.JobRole>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IJobRole, BrightstarDB.Server.IntegrationTests.Context.JobRole>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IPerson));
-    		TypeMappings.AddImplMapping<BrightstarDB.Server.IntegrationTests.Context.IPerson, BrightstarDB.Server.IntegrationTests.Context.Person>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IPerson, BrightstarDB.Server.IntegrationTests.Context.Person>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.ISkill));
-    		TypeMappings.AddImplMapping<BrightstarDB.Server.IntegrationTests.Context.ISkill, BrightstarDB.Server.IntegrationTests.Context.Skill>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.ISkill, BrightstarDB.Server.IntegrationTests.Context.Skill>();
     	}
     	
     	/// <summary>

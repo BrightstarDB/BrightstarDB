@@ -98,7 +98,7 @@ namespace BrightstarDB.EntityFramework
             {
                 var entityTypeIdentifier = entityAttribute.Identifier ?? GetImplTypeName(mappedType);
 
-                mappingStore.AddTypeMapping(mappedType, assemblyMappingInfo.ResolveIdentifier(entityTypeIdentifier));
+                mappingStore.SetTypeMapping(mappedType, assemblyMappingInfo.ResolveIdentifier(entityTypeIdentifier));
                 var identityProperty = GetIdentityProperty(mappedType);
                 if (identityProperty != null)
                 {
@@ -107,12 +107,12 @@ namespace BrightstarDB.EntityFramework
                             <IdentifierAttribute>().FirstOrDefault();
                     if (identifierAttr != null && !String.IsNullOrEmpty(identifierAttr.BaseAddress))
                     {
-                        mappingStore.AddIdentifierPrefix(mappedType, assemblyMappingInfo.ResolveIdentifier(identifierAttr.BaseAddress));
-                        mappingStore.AddPropertyHint(identityProperty, new PropertyHint(PropertyMappingType.Id));
+                        mappingStore.SetIdentifierPrefix(mappedType, assemblyMappingInfo.ResolveIdentifier(identifierAttr.BaseAddress));
+                        mappingStore.SetPropertyHint(identityProperty, new PropertyHint(PropertyMappingType.Id));
                     }
                     else
                     {
-                        mappingStore.AddPropertyHint(identityProperty, new PropertyHint(PropertyMappingType.Address));
+                        mappingStore.SetPropertyHint(identityProperty, new PropertyHint(PropertyMappingType.Address));
                     }
                 }
 
@@ -128,18 +128,18 @@ namespace BrightstarDB.EntityFramework
                     {
                         if (attr is IdentifierAttribute)
                         {
-                            mappingStore.AddPropertyHint(p, new PropertyHint(PropertyMappingType.Address));
+                            mappingStore.SetPropertyHint(p, new PropertyHint(PropertyMappingType.Address));
                             var idAttr = attr as IdentifierAttribute;
                             if (idAttr.BaseAddress != null)
                             {
-                                mappingStore.AddIdentifierPrefix(mappedType, assemblyMappingInfo.ResolveIdentifier(idAttr.BaseAddress));
+                                mappingStore.SetIdentifierPrefix(mappedType, assemblyMappingInfo.ResolveIdentifier(idAttr.BaseAddress));
                             }
                         }
                         else if (attr is PropertyTypeAttribute)
                         {
                             var propertyUri =
                                 assemblyMappingInfo.ResolveIdentifier((attr as PropertyTypeAttribute).Identifier);
-                            mappingStore.AddPropertyHint(p,
+                            mappingStore.SetPropertyHint(p,
                                                          IsResource(p.PropertyType)
                                                              ? new PropertyHint(PropertyMappingType.Arc, propertyUri)
                                                              : new PropertyHint(PropertyMappingType.Property,
@@ -156,7 +156,7 @@ namespace BrightstarDB.EntityFramework
                             }
                             if (targetType.GetCustomAttributes(typeof(EntityAttribute), false).Any())
                             {
-                                mappingStore.AddPropertyHint(p,
+                                mappingStore.SetPropertyHint(p,
                                                              new PropertyHint(PropertyMappingType.InverseArc,
                                                                               propertyUri));
                             }
@@ -187,7 +187,7 @@ namespace BrightstarDB.EntityFramework
                             }
                             var inversePropertyTypeUri =
                                 assemblyMappingInfo.ResolveIdentifier(GetForwardPropertyTypeUri(forwardProperty, p));
-                            mappingStore.AddPropertyHint(p, new PropertyHint(PropertyMappingType.InverseArc, inversePropertyTypeUri));
+                            mappingStore.SetPropertyHint(p, new PropertyHint(PropertyMappingType.InverseArc, inversePropertyTypeUri));
                         }
                     }
                     if (mappingStore.GetPropertyHint(p) == null)
@@ -196,7 +196,7 @@ namespace BrightstarDB.EntityFramework
                         var propertyName = Char.ToLowerInvariant(p.Name[0]) + p.Name.Substring(1);
                         var propertyUri = assemblyMappingInfo.ResolveIdentifier(propertyName);
 
-                        mappingStore.AddPropertyHint(p,
+                        mappingStore.SetPropertyHint(p,
                             IsResource(p.PropertyType) ? 
                             new PropertyHint(PropertyMappingType.Arc, propertyUri) : 
                             new PropertyHint(PropertyMappingType.Property, propertyUri));

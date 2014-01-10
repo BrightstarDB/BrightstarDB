@@ -26,12 +26,12 @@ namespace BrightstarDB.EntityFramework.Tests
 
         public MockContext(EntityMappingStore mappingStore) : base(mappingStore)
         {
-            mappingStore.AddImplMapping<IDinner,Dinner>();
-            mappingStore.AddImplMapping<ContextObjects.ICompany, ContextObjects.Company>();
-            mappingStore.AddImplMapping<ContextObjects.IMarket,ContextObjects.Market>();
-            mappingStore.AddImplMapping<ContextObjects.IPerson,ContextObjects.Person>();
-            mappingStore.AddImplMapping<IRsvp,Rsvp>();
-            mappingStore.AddImplMapping<IConcept, Concept>();
+            mappingStore.SetImplMapping<IDinner,Dinner>();
+            mappingStore.SetImplMapping<ContextObjects.ICompany, ContextObjects.Company>();
+            mappingStore.SetImplMapping<ContextObjects.IMarket,ContextObjects.Market>();
+            mappingStore.SetImplMapping<ContextObjects.IPerson,ContextObjects.Person>();
+            mappingStore.SetImplMapping<IRsvp,Rsvp>();
+            mappingStore.SetImplMapping<IConcept, Concept>();
         }
 
         #region Overrides of LdoContext
