@@ -265,28 +265,16 @@ namespace BrightstarDB.Server
         #endregion
 
 
-        public Guid ProcessTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri)
+        public Guid ProcessTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri, string jobLabel = null)
         {
             var storeWorker = GetStoreWorker(storeName);
-            return storeWorker.ProcessTransaction(preconditions, deletePatterns, insertData, defaultGraphUri, "nt");
+            return storeWorker.ProcessTransaction(preconditions, deletePatterns, insertData, defaultGraphUri, "nt", jobLabel);
         }
 
-        //public void QueueTransaction(Guid jobId, string storeId, string preconditions, string deletes, string inserts)
-        //{
-        //    var storeWorker = GetStoreWorker(storeId);
-        //    storeWorker.QueueJob(new UpdateTransaction(jobId, storeWorker, preconditions, deletes, inserts));
-        //}
-
-        //public void Insert(string storeName, string data, string format)
-        //{
-        //    var storeWorker = GetStoreWorker(storeName);
-        //    storeWorker.Insert(data, format);
-        //}
-
-        public Guid Import(string storeName, string contentFileName, string graphUri/* = Constants.DefaultGraphUri*/)
+        public Guid Import(string storeName, string contentFileName, string graphUri, string jobLabel = null)
         {
             var storeWorker = GetStoreWorker(storeName);
-            return storeWorker.Import(contentFileName, graphUri);
+            return storeWorker.Import(contentFileName, graphUri, jobLabel);
         }
 
         internal IEnumerable<JobExecutionStatus> GetJobs(string storeName)
@@ -301,10 +289,10 @@ namespace BrightstarDB.Server
             return storeWorker.GetJobStatus(jobId);
         }
 
-        public Guid Export(string storeName, string fileName, string graphUri)
+        public Guid Export(string storeName, string fileName, string graphUri, string jobLabel = null)
         {
             var storeWorker = GetStoreWorker(storeName);
-            return storeWorker.Export(fileName, graphUri);
+            return storeWorker.Export(fileName, graphUri, jobLabel);
         }
 
         public IEnumerable<Triple> GetResourceStatements(string storeId, string resourceUri)
@@ -353,26 +341,26 @@ namespace BrightstarDB.Server
             return transactionLog.GetTransactionList(maxCount, ts);
         } 
 
-        public Guid ReExecuteTransaction(string storeId, ulong dataStartPosition, TransactionType transactionType)
+        public Guid ReExecuteTransaction(string storeId, ulong dataStartPosition, TransactionType transactionType, string jobLabel=null)
         {
             var storeWorker = GetStoreWorker(storeId);
             var transactionLog = _storeManager.GetTransactionLog(_baseLocation + "\\" + storeId);
-
             var jobId = Guid.NewGuid();
+
             switch (transactionType)
             {
                 case TransactionType.ImportJob:
-                    var importJob = new ImportJob(jobId, storeWorker);
+                    var importJob = new ImportJob(jobId, jobLabel, storeWorker);
                     importJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(dataStartPosition));
                     storeWorker.QueueJob(importJob);
                     break;
                 case TransactionType.UpdateTransaction:
-                    var updateJob = new UpdateTransaction(jobId, storeWorker);
+                    var updateJob = new UpdateTransaction(jobId,jobLabel, storeWorker);
                     updateJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(dataStartPosition));
                     storeWorker.QueueJob(updateJob);
                     break;
                 case TransactionType.SparqlUpdateTransaction:
-                    var sparqlUpdateJob = new SparqlUpdateJob(jobId, storeWorker, null);
+                    var sparqlUpdateJob = new SparqlUpdateJob(jobId, jobLabel, storeWorker, null);
                     sparqlUpdateJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(dataStartPosition));
                     storeWorker.QueueJob(sparqlUpdateJob);
                     break;
@@ -391,29 +379,29 @@ namespace BrightstarDB.Server
             return GetCommitPoints(storeName).FirstOrDefault(x => x.CommitTime <= utcTimestamp);
         }
 
-        public Guid Consolidate(string store)
+        public Guid Consolidate(string store, string jobLabel = null)
         {
             var storeWorker = GetStoreWorker(store);
             var jobId = Guid.NewGuid();
-            storeWorker.QueueJob(new ConsolidateJob(jobId, storeWorker));
+            storeWorker.QueueJob(new ConsolidateJob(jobId, jobLabel, storeWorker));
             return jobId;
         }
 
-        public Guid ExecuteUpdate(string store, string updateExpression)
+        public Guid ExecuteUpdate(string store, string updateExpression, string jobLabel = null)
         {
             var storeWorker = GetStoreWorker(store);
             var jobId = Guid.NewGuid();
-            storeWorker.QueueJob(new SparqlUpdateJob(jobId, storeWorker, updateExpression));
+            storeWorker.QueueJob(new SparqlUpdateJob(jobId, jobLabel, storeWorker, updateExpression));
             return jobId;
         }
 
-        public void QueueUpdate(Guid jobId, string store, string updateExpression)
+        public void QueueUpdate(Guid jobId, string store, string updateExpression, string jobLabel = null)
         {
             var storeWorker = GetStoreWorker(store);
-            storeWorker.QueueJob(new SparqlUpdateJob(jobId, storeWorker, updateExpression));
+            storeWorker.QueueJob(new SparqlUpdateJob(jobId, jobLabel, storeWorker, updateExpression));
         }
 
-        public Job LoadTransaction(string storeId, ITransactionInfo txn)
+        public Job LoadTransaction(string storeId, ITransactionInfo txn, string jobLabel = null)
         {
             var transactionLog = _storeManager.GetTransactionLog(_baseLocation + "\\" + storeId);
 
@@ -421,15 +409,15 @@ namespace BrightstarDB.Server
             switch (txn.TransactionType)
             {
                 case TransactionType.ImportJob:
-                    var importJob = new ImportJob(jobId, null);
+                    var importJob = new ImportJob(jobId, jobLabel, null);
                     importJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(txn.DataStartPosition));
                     return importJob;
                 case TransactionType.UpdateTransaction:
-                    var updateJob = new UpdateTransaction(jobId, null);
+                    var updateJob = new UpdateTransaction(jobId, jobLabel, null);
                     updateJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(txn.DataStartPosition));
                     return updateJob;
                 case TransactionType.SparqlUpdateTransaction:
-                    var sparqlUpdateJob = new SparqlUpdateJob(jobId, null, null);
+                    var sparqlUpdateJob = new SparqlUpdateJob(jobId, jobLabel, null, null);
                     sparqlUpdateJob.ReadTransactionDataFromStream(transactionLog.GetTransactionData(txn.DataStartPosition));
                     return sparqlUpdateJob;
             }
@@ -442,17 +430,17 @@ namespace BrightstarDB.Server
             return storeWorker.StoreStatistics.GetStatistics();
         }
 
-        public Guid UpdateStatistics(string storeName)
+        public Guid UpdateStatistics(string storeName, string jobLabel = null)
         {
             var storeWorker = GetStoreWorker(storeName);
-            return storeWorker.UpdateStatistics();
+            return storeWorker.UpdateStatistics(jobLabel);
         }
 
-        public Guid CreateSnapshot(string sourceStoreName, string targetStoreName, PersistenceType persistenceType, ulong sourceCommitPointId)
+        public Guid CreateSnapshot(string sourceStoreName, string targetStoreName, PersistenceType persistenceType, ulong sourceCommitPointId, string jobLabel = null)
         {
 
             var storeWorker = GetStoreWorker(sourceStoreName);
-            return storeWorker.QueueSnapshotJob(targetStoreName, persistenceType, sourceCommitPointId);
+            return storeWorker.QueueSnapshotJob(targetStoreName, persistenceType, sourceCommitPointId, jobLabel);
         }
 
         private static SparqlQuery ParseSparql(string exp)

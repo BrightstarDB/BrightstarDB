@@ -13,7 +13,7 @@ namespace BrightstarDB.Server
     {
         #region Implementation of ILoggable
 
-        protected UpdateJob(Guid jobId, StoreWorker storeWorker) : base(jobId, storeWorker)
+        protected UpdateJob(Guid jobId, string label, StoreWorker storeWorker) : base(jobId, label, storeWorker)
         {
         }
 

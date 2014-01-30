@@ -13,15 +13,17 @@ namespace BrightstarDB.Server
     internal class ExportJob
     {
         private readonly Guid _jobId;
+        private readonly string _label;
         private readonly StoreWorker _storeWorker;
         private readonly string _outputFileName;
         private readonly string _graphUri;
         private Action<Guid, Exception> _errorCallback;
         private Action<Guid> _successCallback;
 
-        public ExportJob(Guid jobId, StoreWorker storeWorker, string outputFileName, string graphUri)
+        public ExportJob(Guid jobId, string label, StoreWorker storeWorker, string outputFileName, string graphUri)
         {
             _jobId = jobId;
+            _label = label;
             _storeWorker = storeWorker;
             _outputFileName = outputFileName;
             _graphUri = graphUri;

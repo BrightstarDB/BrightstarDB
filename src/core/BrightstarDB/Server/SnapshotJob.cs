@@ -9,7 +9,7 @@ namespace BrightstarDB.Server
         private readonly ulong _sourceCommitPointId;
         private readonly PersistenceType _persistenceType;
 
-        public SnapshotJob(Guid jobId, StoreWorker storeWorker, string destinationStoreName, PersistenceType persistenceType, ulong sourceCommitPointId) : base(jobId, storeWorker)
+        public SnapshotJob(Guid jobId, string label, StoreWorker storeWorker, string destinationStoreName, PersistenceType persistenceType, ulong sourceCommitPointId) : base(jobId, label, storeWorker)
         {
             _destinationStoreName = destinationStoreName;
             _sourceCommitPointId = sourceCommitPointId;

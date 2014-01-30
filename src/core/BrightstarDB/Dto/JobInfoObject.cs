@@ -30,6 +30,7 @@ namespace BrightstarDB.Dto
             QueuedTime = executionStatus.Queued;
             StartTime = executionStatus.Started;
             EndTime = executionStatus.Ended;
+            Label = executionStatus.Label;
         }
 
         public bool JobPending { get { return JobStatus == JobStatus.Pending; } }
@@ -48,6 +49,7 @@ namespace BrightstarDB.Dto
 
         public string StatusMessage { get; set; }
         public string JobId { get; set; }
+        public string Label { get; set; }
         public ExceptionDetailObject ExceptionInfo { get; set; }
         public JobStatus JobStatus { get; set; }
 

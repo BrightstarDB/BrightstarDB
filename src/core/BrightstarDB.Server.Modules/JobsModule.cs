@@ -57,7 +57,7 @@ namespace BrightstarDB.Server.Modules
                     if (String.IsNullOrWhiteSpace(jobRequestObject.JobType)) return HttpStatusCode.BadRequest;
 
                     var storeName = parameters["storeName"];
-
+                    var label = jobRequestObject.Label;
                     try
                     {
                         IJobInfo queuedJobInfo;
@@ -65,7 +65,7 @@ namespace BrightstarDB.Server.Modules
                         {
                             case "consolidate":
                                 AssertPermission(StorePermissions.Admin);
-                                queuedJobInfo = brightstarService.ConsolidateStore(storeName);
+                                queuedJobInfo = brightstarService.ConsolidateStore(storeName, label);
                                 break;
 
                             case "createsnapshot":
@@ -100,7 +100,7 @@ namespace BrightstarDB.Server.Modules
                                 // Execute
                                 queuedJobInfo = brightstarService.CreateSnapshot(
                                     storeName, jobRequestObject.JobParameters["TargetStoreName"],
-                                    persistenceType, commitPoint);
+                                    persistenceType, commitPoint, label);
                                 break;
 
                             case "export":

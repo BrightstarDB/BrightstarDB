@@ -27,14 +27,14 @@ namespace BrightstarDB.Server
         private Stream _fileStream;
         private int _tripleCount;
 
-        public ImportJob(Guid jobId, StoreWorker storeWorker, string contentFileName, string graphUri)
-            : base(jobId, storeWorker)
+        public ImportJob(Guid jobId, string label, StoreWorker storeWorker, string contentFileName, string graphUri)
+            : base(jobId, label, storeWorker)
         {
             _contentFileName = contentFileName;
             _graphUri = graphUri;
         }
 
-        public ImportJob(Guid jobId, StoreWorker storeWorker) : base(jobId, storeWorker)
+        public ImportJob(Guid jobId, string label, StoreWorker storeWorker) : base(jobId, label, storeWorker)
         {
         }
 

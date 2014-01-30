@@ -6,6 +6,7 @@ namespace BrightstarDB.Server
     internal class JobExecutionStatus
     {
         public Guid JobId { get; set; }
+        public string Label { get; set; }
         public JobStatus JobStatus { get; set; }
         public string Information { get; set; }
         public ExceptionDetailObject ExceptionDetail { get; set; }

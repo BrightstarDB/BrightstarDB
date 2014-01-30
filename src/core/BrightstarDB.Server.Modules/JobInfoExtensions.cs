@@ -10,6 +10,7 @@ namespace BrightstarDB.Server.Modules
             return new JobResponseModel
                 {
                     JobId = arg.JobId,
+                    Label = arg.Label,
                     JobStatus = GetJobStatusString(arg),
                     StatusMessage = arg.StatusMessage,
                     StoreName = storeName,

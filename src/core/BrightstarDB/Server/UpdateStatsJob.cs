@@ -7,7 +7,7 @@ namespace BrightstarDB.Server
 {
     internal class UpdateStatsJob : Job
     {
-        public UpdateStatsJob(Guid jobId, StoreWorker storeWorker) : base(jobId, storeWorker)
+        public UpdateStatsJob(Guid jobId, string label, StoreWorker storeWorker) : base(jobId, label, storeWorker)
         {
         }
 

@@ -288,7 +288,7 @@ namespace BrightstarDB.Server
             {
                 if (
                     _jobExecutionStatus.TryAdd(job.JobId.ToString(),
-                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending, Queued = DateTime.UtcNow}))
+                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending, Queued = DateTime.UtcNow, Label = job.Label}))
                 {
                     _jobs.Enqueue(job);
                     queuedJob = true;
@@ -306,30 +306,32 @@ namespace BrightstarDB.Server
         /// <param name="insertData"></param>
         /// <param name="defaultGraphUri"></param>
         /// <param name="format"></param>
+        /// <param name="jobLabel"></param>
         /// <returns></returns>
-        public Guid ProcessTransaction(string preconditions, string deletePatterns, string insertData, string defaultGraphUri, string format)
+        public Guid ProcessTransaction(string preconditions, string deletePatterns, string insertData, string defaultGraphUri, string format, string jobLabel= null)
         {
             Logging.LogDebug("ProcessTransaction");
             var jobId = Guid.NewGuid();
-            var job = new UpdateTransaction(jobId, this, preconditions, deletePatterns, insertData, defaultGraphUri);
+            var job = new UpdateTransaction(jobId, jobLabel, this, preconditions, deletePatterns, insertData,
+                                            defaultGraphUri);
             QueueJob(job);
             return jobId;
         }
 
-        public Guid Import(string contentFileName, string graphUri)
+        public Guid Import(string contentFileName, string graphUri, string jobLabel = null)
         {
             Logging.LogDebug("Import {0}, {1}", contentFileName, graphUri);
             var jobId = Guid.NewGuid();
-            var job = new ImportJob(jobId, this, contentFileName, graphUri);
+            var job = new ImportJob(jobId, jobLabel, this, contentFileName, graphUri);
             QueueJob(job);
             return jobId;
         }
 
-        public Guid Export(string fileName, string graphUri)
+        public Guid Export(string fileName, string graphUri, string jobLabel = null)
         {
             Logging.LogDebug("Export {0}, {1}", fileName, graphUri);
             var jobId = Guid.NewGuid();
-            var exportJob = new ExportJob(jobId, this, fileName, graphUri);
+            var exportJob = new ExportJob(jobId, jobLabel, this, fileName, graphUri);
             _jobExecutionStatus.TryAdd(jobId.ToString(),
                                        new JobExecutionStatus {JobId = jobId, JobStatus = JobStatus.Started, Queued = DateTime.UtcNow, Started = DateTime.UtcNow});
             exportJob.Run((id, ex) =>
@@ -356,20 +358,20 @@ namespace BrightstarDB.Server
             return jobId;
         }
 
-        public Guid UpdateStatistics()
+        public Guid UpdateStatistics(string jobLabel = null)
         {
             Logging.LogDebug("UpdateStatistics");
             var jobId = Guid.NewGuid();
-            var job = new UpdateStatsJob(jobId, this);
+            var job = new UpdateStatsJob(jobId, jobLabel, this);
             QueueJob(job);
             return jobId;
         }
 
-        public Guid QueueSnapshotJob(string destinationStoreName, PersistenceType persistenceType, ulong commitPointId = StoreConstants.NullUlong)
+        public Guid QueueSnapshotJob(string destinationStoreName, PersistenceType persistenceType, ulong commitPointId = StoreConstants.NullUlong, string jobLabel = null)
         {
             Logging.LogDebug("QueueSnapshotJob {0}, {1}", destinationStoreName, commitPointId);
             var jobId = Guid.NewGuid();
-            var snapshotJob = new SnapshotJob(jobId, this, destinationStoreName, persistenceType, commitPointId);
+            var snapshotJob = new SnapshotJob(jobId, jobLabel, this, destinationStoreName, persistenceType, commitPointId);
             QueueJob(snapshotJob, false);
             return jobId;
         }
