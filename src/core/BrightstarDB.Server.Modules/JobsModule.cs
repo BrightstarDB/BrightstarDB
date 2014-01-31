@@ -114,7 +114,8 @@ namespace BrightstarDB.Server.Modules
                                 queuedJobInfo = brightstarService.StartExport(
                                     storeName,
                                     jobRequestObject.JobParameters["FileName"],
-                                    jobRequestObject.JobParameters["GraphUri"]);
+                                    jobRequestObject.JobParameters["GraphUri"],
+                                    label);
                                 break;
 
                             case "import":
@@ -128,7 +129,8 @@ namespace BrightstarDB.Server.Modules
                                 queuedJobInfo = brightstarService.StartImport(
                                     storeName,
                                     jobRequestObject.JobParameters["FileName"],
-                                    jobRequestObject.JobParameters["DefaultGraphUri"]);
+                                    jobRequestObject.JobParameters["DefaultGraphUri"],
+                                    label);
                                 break;
 
                             case "repeattransaction":
@@ -148,7 +150,7 @@ namespace BrightstarDB.Server.Modules
                                 {
                                     return HttpStatusCode.BadRequest;
                                 }
-                                queuedJobInfo = brightstarService.ReExecuteTransaction(storeName, transaction);
+                                queuedJobInfo = brightstarService.ReExecuteTransaction(storeName, transaction, label);
                                 break;
 
                             case "sparqlupdate":
@@ -161,7 +163,8 @@ namespace BrightstarDB.Server.Modules
                                 queuedJobInfo = brightstarService.ExecuteUpdate(
                                     storeName,
                                     jobRequestObject.JobParameters["UpdateExpression"],
-                                    false);
+                                    false,
+                                    label);
                                 break;
 
                             case "transaction":
@@ -185,12 +188,13 @@ namespace BrightstarDB.Server.Modules
                                     storeName, preconditions,
                                     deletePatterns, insertTriples,
                                     defaultGraphUri,
-                                    false);
+                                    false,
+                                    label);
                                 break;
 
                             case "updatestats":
                                 AssertPermission(StorePermissions.Admin);
-                                queuedJobInfo = brightstarService.UpdateStatistics(storeName);
+                                queuedJobInfo = brightstarService.UpdateStatistics(storeName, label);
                                 break;
 
                             default:

@@ -333,7 +333,14 @@ namespace BrightstarDB.Server
             var jobId = Guid.NewGuid();
             var exportJob = new ExportJob(jobId, jobLabel, this, fileName, graphUri);
             _jobExecutionStatus.TryAdd(jobId.ToString(),
-                                       new JobExecutionStatus {JobId = jobId, JobStatus = JobStatus.Started, Queued = DateTime.UtcNow, Started = DateTime.UtcNow});
+                                       new JobExecutionStatus
+                                           {
+                                               JobId = jobId,
+                                               JobStatus = JobStatus.Started,
+                                               Queued = DateTime.UtcNow,
+                                               Started = DateTime.UtcNow,
+                                               Label = jobLabel
+                                           });
             exportJob.Run((id, ex) =>
                               {
                                   JobExecutionStatus jobExecutionStatus;

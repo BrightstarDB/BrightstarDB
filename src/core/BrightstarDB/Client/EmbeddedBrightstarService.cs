@@ -343,12 +343,12 @@ namespace BrightstarDB.Client
         /// <param name="defaultGraphUri">The URI of the default graph to apply the transaction to.</param>
         /// <returns>Job Info</returns>
         public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
-                                           string insertData, string defaultGraphUri)
+                                           string insertData, string defaultGraphUri, string label = null)
         {
             try
             {
                 var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData,
-                                                           defaultGraphUri);
+                                                           defaultGraphUri, label);
                 return new JobInfoObject(jobId);
             }
             catch (Exception ex)
@@ -377,11 +377,11 @@ namespace BrightstarDB.Client
                 if (!waitForCompletion)
                 {
                     var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData, defaultGraphUri, label);
-                    return new JobInfoObject(jobId);
+                    return new JobInfoObject(jobId, label);
                 }
                 else
                 {
-                    var jobId = _serverCore.ProcessTransaction(storeName,preconditions, deletePatterns, insertData, defaultGraphUri);
+                    var jobId = _serverCore.ProcessTransaction(storeName,preconditions, deletePatterns, insertData, defaultGraphUri, label);
                     JobExecutionStatus status = _serverCore.GetJobStatus(storeName, jobId.ToString());
                     while (status.JobStatus != JobStatus.CompletedOk && status.JobStatus != JobStatus.TransactionError)
                     {
@@ -429,7 +429,7 @@ namespace BrightstarDB.Client
                 if (!waitForCompletion)
                 {
                     var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression, label);
-                    return new JobInfoObject(jobId);
+                    return new JobInfoObject(jobId, label);
                 } else
                 {
                     var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
@@ -513,7 +513,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.Import(storeName, fileName, graphUri, label);
-                return new JobInfoObject(jobId);
+                return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)
             {
@@ -535,7 +535,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.Export(store, fileName, graphUri, label);
-                return new JobInfoObject(jobId);
+                return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)
             {
@@ -556,7 +556,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.Consolidate(store, label);
-                return new JobInfoObject(jobId);
+                return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)
             {
@@ -702,7 +702,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.UpdateStatistics(storeName, label);
-                return new JobInfoObject(jobId);
+                return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)
             {
@@ -734,7 +734,7 @@ namespace BrightstarDB.Client
                                                            ? StoreConstants.NullUlong
                                                            : sourceCommitPoint.Id,
                                                        label);
-                return new JobInfoObject(jobId);
+                return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)
             {
@@ -894,7 +894,7 @@ namespace BrightstarDB.Client
                 var jobId = _serverCore.ReExecuteTransaction(storeName, transactionInfo.Id,
                                                              transactionInfo.TransactionType,
                                                              label);
-                return new JobInfoObject(jobId);
+                return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)
             {
