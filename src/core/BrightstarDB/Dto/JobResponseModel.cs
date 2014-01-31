@@ -14,6 +14,11 @@ namespace BrightstarDB.Dto
         public string JobId { get; set; }
 
         /// <summary>
+        /// Get / set the user-friendly label of the job
+        /// </summary>
+        public string Label { get; set; }
+
+        /// <summary>
         /// Exception information
         /// </summary>
         public ExceptionDetailObject ExceptionInfo { get; set; }

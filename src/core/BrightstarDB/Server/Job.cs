@@ -10,12 +10,14 @@ namespace BrightstarDB.Server
     internal abstract class Job
     {
         private readonly Guid _jobId;
+        private readonly string _label;
         protected StoreWorker StoreWorker;
         protected ExceptionDetailObject ExceptionDetail;
 
-        protected Job(Guid jobId, StoreWorker storeWorker)
+        protected Job(Guid jobId, string label, StoreWorker storeWorker)
         {
             _jobId = jobId;
+            _label = label;
             StoreWorker = storeWorker;
         }
 
@@ -30,6 +32,8 @@ namespace BrightstarDB.Server
         public abstract void Run();
 
         public Guid JobId { get { return _jobId; } }
+
+        public string Label { get { return _label; } }
 
         /// <summary>
         /// Provides an error message from the job processor

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BrightstarDB.Dto;
+using BrightstarDB.Storage;
 using NUnit.Framework;
 
 namespace BrightstarDB.Server.Modules.Tests
@@ -84,5 +85,49 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(request, Has.Property("JobParameters").EqualTo(new Dictionary<string, string>()));
         }
 
+        [Test]
+        public void TestCreateJobWithLabel()
+        {
+            var request = JobRequestObject.CreateConsolidateJob().WithLabel("My Consolidation");
+            Assert.That(request, Has.Property("Label").EqualTo("My Consolidation"));
+        }
+
+        [Test]
+        public void TestCreateJobWithLabelInConstructor()
+        {
+            // Consolidate
+            var consolidateRequest = JobRequestObject.CreateConsolidateJob(label:"ConsolidationJob");
+            Assert.That(consolidateRequest, Has.Property("Label").EqualTo("ConsolidationJob"));
+            // export
+            var exportRequest = JobRequestObject.CreateExportJob("export.nt", label:"ExportJob");
+            Assert.That(exportRequest, Has.Property("Label").EqualTo("ExportJob"));
+            // import
+            var importRequest = JobRequestObject.CreateImportJob("import.nt", label:"ImportJob");
+            Assert.That(importRequest, Has.Property("Label").EqualTo("ImportJob"));
+            // repeat transaction
+            var repeatRequest = JobRequestObject.CreateRepeatTransactionJob(Guid.Empty, label:"RepeatJob");
+            Assert.That(repeatRequest, Has.Property("Label").EqualTo("RepeatJob"));
+            // Snapshot
+            var snapshotRequest = JobRequestObject.CreateSnapshotJob("storeToSnapshot", PersistenceType.AppendOnly, label:"SnapshotJob");
+            Assert.That(snapshotRequest, Has.Property("Label").EqualTo("SnapshotJob"));
+            // Sparql Update
+            var sparqlUpdateRequest = JobRequestObject.CreateSparqlUpdateJob("update expression", label:"SparqlUpdateJob");
+            Assert.That(sparqlUpdateRequest, Has.Property("Label").EqualTo("SparqlUpdateJob"));
+            // Transaction
+            var transactionJob = JobRequestObject.CreateTransactionJob("precon", "delete", "insert",
+                                                                       label:"TransactionJob");
+            Assert.That(transactionJob, Has.Property("Label").EqualTo("TransactionJob"));
+            // Update Statistics
+            var updateStatsRequest = JobRequestObject.CreateUpdateStatsJob(label:"UpdateStats");
+            Assert.That(updateStatsRequest, Has.Property("Label").EqualTo("UpdateStats"));
+        }
+
+        [Test]
+        public void TestSetJobLabel()
+        {
+            var request = JobRequestObject.CreateExportJob("test.nt");
+            request.Label = "My Export";
+            Assert.That(request, Has.Property("Label").EqualTo("My Export"));
+        }
     }
 }

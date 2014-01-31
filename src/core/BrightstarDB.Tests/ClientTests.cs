@@ -221,14 +221,16 @@ namespace BrightstarDB.Tests
             var triplesToAdd =
                 @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2> .";
 
-            var jobInfo = bc.ExecuteTransaction(storeName,"", "", triplesToAdd);
+            var jobInfo = bc.ExecuteTransaction(storeName,"", "", triplesToAdd, label:"Add Triples");
 
             Assert.IsNotNull(jobInfo);
+            Assert.That(jobInfo.Label, Is.EqualTo("Add Triples"));
 
             while (!jobInfo.JobCompletedOk && !jobInfo.JobCompletedWithErrors)
             {
                 Thread.Sleep(50);
                 jobInfo = bc.GetJobInfo(storeName, jobInfo.JobId);
+                Assert.That(jobInfo.Label, Is.EqualTo("Add Triples"));
             }
 
             //var triples = bc.GetStoreData(storeName);
@@ -522,7 +524,8 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
 
             // Second export with parallel store writes
-            var exportJobInfo = client.StartExport(storeName, storeName + "_export.nt");
+            var exportJobInfo = client.StartExport(storeName, storeName + "_export.nt", label:"Export Data");
+            Assert.That(exportJobInfo.Label, Is.EqualTo("Export Data"));
             jobInfo = client.ExecuteTransaction(storeName, null, null, batch2);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
             exportJobInfo = client.GetJobInfo(storeName, exportJobInfo.JobId);
@@ -534,6 +537,7 @@ namespace BrightstarDB.Tests
             {
                 Assert.Inconclusive("Export job completed before end of first concurrent import job.");
             }
+            Assert.That(exportJobInfo.Label, Is.EqualTo("Export Data"));
             jobInfo = client.ExecuteTransaction(storeName, null, null, batch3);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
             jobInfo = client.ExecuteTransaction(storeName, null, null, batch4);
@@ -620,13 +624,15 @@ namespace BrightstarDB.Tests
             var bc = BrightstarService.GetClient("type=http;endpoint=http://localhost:8090/brightstar");
             var storeName = Guid.NewGuid().ToString();
             bc.CreateStore(storeName);
-            var jobInfo = bc.StartImport(storeName, "persondata_en_subset.nt", null);
+            var jobInfo = bc.StartImport(storeName, "persondata_en_subset.nt", null, label:"Import Persondata");
+            Assert.That(jobInfo.Label, Is.EqualTo("Import Persondata"));
             while (!(jobInfo.JobCompletedOk || jobInfo.JobCompletedWithErrors))
             {
                 Thread.Sleep(1000);
                 jobInfo = bc.GetJobInfo(storeName, jobInfo.JobId);
             }
             Assert.IsTrue(jobInfo.JobCompletedOk, "Import job failed");
+            Assert.That(jobInfo.Label, Is.EqualTo("Import Persondata"));
 
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
             var store = context.OpenStore(storeName);
@@ -688,13 +694,16 @@ namespace BrightstarDB.Tests
             result = client.ExecuteTransaction(storeName, null, null, addSet3);
             Assert.IsTrue(result.JobCompletedOk);
 
-            var job = client.ConsolidateStore(storeName);
+            var job = client.ConsolidateStore(storeName, "Consolidate Store");
+            Assert.IsNotNull(job);
+            Assert.That(job.Label, Is.EqualTo("Consolidate Store"));
             var cycleCount = 0;
             while (!job.JobCompletedOk && !job.JobCompletedWithErrors && cycleCount < 100)
             {
                 Thread.Sleep(500);
                 cycleCount++;
                 job = client.GetJobInfo(storeName, job.JobId);
+                Assert.That(job.Label, Is.EqualTo("Consolidate Store"));
             }
             if (!job.JobCompletedOk && !job.JobCompletedWithErrors)
             {
@@ -901,9 +910,11 @@ namespace BrightstarDB.Tests
             var stats = client.GetStatistics(storeName);
             Assert.IsNull(stats);
 
-            var job = client.UpdateStatistics(storeName);
+            var job = client.UpdateStatistics(storeName, "Update Store Statistics");
+            Assert.That(job.Label, Is.EqualTo("Update Store Statistics"));
             job = WaitForJob(job, client, storeName);
             Assert.IsTrue(job.JobCompletedOk);
+            Assert.That(job.Label, Is.EqualTo("Update Store Statistics"));
 
             stats = client.GetStatistics(storeName);
             Assert.IsNotNull(stats);
@@ -937,9 +948,12 @@ namespace BrightstarDB.Tests
 
             // Append Only targets
             // Create from default (latest) commit
-            var job = client.CreateSnapshot(storeName, storeName + "_snapshot1", PersistenceType.AppendOnly);
+            var job = client.CreateSnapshot(storeName, storeName + "_snapshot1", PersistenceType.AppendOnly, label:"Snapshot Store");
+            Assert.That(job, Is.Not.Null);
+            Assert.That(job.Label, Is.EqualTo("Snapshot Store"));
             job = WaitForJob(job, client, storeName);
             Assert.IsTrue(job.JobCompletedOk);
+            Assert.That(job.Label, Is.EqualTo("Snapshot Store"));
             resultsStream = client.ExecuteQuery(storeName + "_snapshot1", "SELECT * WHERE { ?s ?p ?o }");
             var resultsDoc = XDocument.Load(resultsStream);
             Assert.AreEqual(3, resultsDoc.SparqlResultRows().Count());
@@ -1004,6 +1018,25 @@ namespace BrightstarDB.Tests
             jobs = client.GetJobInfo(storeName, 1, 1).ToList();
             Assert.That(jobs.Count, Is.EqualTo(1));
             Assert.That(jobs[0].JobId, Is.EqualTo(job.JobId));
+        }
+
+        [Test]
+        public void TestJobLabel()
+        {
+            var storeName = "TestJobLabel_" + DateTime.Now.Ticks;
+            var client = GetClient();
+            client.CreateStore(storeName);
+
+            var jobs = client.GetJobInfo(storeName, 0, 10).ToList();
+            Assert.That(jobs.Count(), Is.EqualTo(0));
+
+            var updateStats = client.UpdateStatistics(storeName, "Statistics Update");
+            Assert.That(updateStats.Label, Is.EqualTo("Statistics Update"));
+            jobs = client.GetJobInfo(storeName, 0, 10).ToList();
+            Assert.That(jobs.Count, Is.EqualTo(1));
+            Assert.That(jobs[0].JobId, Is.EqualTo(updateStats.JobId));
+            Assert.That(jobs[0].Label, Is.EqualTo("Statistics Update"));
+
         }
 
         [Test]

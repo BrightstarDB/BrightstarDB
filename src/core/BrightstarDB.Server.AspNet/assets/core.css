@@ -200,6 +200,11 @@ table tr:hover td {
 #jobParameters div {
     margin-top: 1.5ex;
 }
+
+#jobLabel {
+    margin-top: 1.5ex;
+}
+
 .form-label {
     display: inline-block;
     vertical-align: top;

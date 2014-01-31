@@ -188,10 +188,12 @@ namespace BrightstarDB.Client
         /// <param name="insertData">The NTriples or NQuads data that will be inserted into the store.</param>
         /// <param name="defaultGraphUri">The URI of the default graph that the transaction will be applied to</param>
         /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         /// <remarks>If <paramref name="preconditions"/>, <paramref name="deletePatterns"/> or <paramref name="insertData"/> contain
         /// quads, the graph URI specified by the quad will override the value provided by <paramref name="defaultGraphUri"/>. </remarks>
-        IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri = Constants.DefaultGraphUri, bool waitForCompletion = true);
+        IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, 
+            string defaultGraphUri = Constants.DefaultGraphUri, bool waitForCompletion = true, string label = null);
 
         /// <summary>
         /// Execute a SPARQL Update expression against a store
@@ -199,8 +201,9 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store to be updated</param>
         /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
         /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true);
+        IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true, string label = null);
 #endif
 
         /// <summary>
@@ -227,8 +230,9 @@ namespace BrightstarDB.Client
         /// <param name="store">The store to perform the import to</param>
         /// <param name="fileName">The name of the file in brighhtstar\import folder to import.</param>
         /// <param name="graphUri">The URI of the default graph to import the data into. Defaults to <see cref="Constants.DefaultGraphUri"/></param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        IJobInfo StartImport(string store, string fileName, string graphUri = Constants.DefaultGraphUri);
+        IJobInfo StartImport(string store, string fileName, string graphUri = Constants.DefaultGraphUri, string label = null);
 
         /// <summary>
         /// Starts an export job
@@ -236,15 +240,17 @@ namespace BrightstarDB.Client
         /// <param name="store">The store to export data from</param>
         /// <param name="fileName">The name of the file in the brightstar\import folder to write to. This file will be overwritten if it already exists.</param>
         /// <param name="graphUri">The URI of the graph to be exported. If NULL, all graphs in the store are exported.</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A JobInfo instance</returns>
-        IJobInfo StartExport(string store, string fileName, string graphUri = null);
+        IJobInfo StartExport(string store, string fileName, string graphUri = null, string label = null);
 
         /// <summary>
         /// Creates a new store file containing only the data required for the current state
         /// </summary>
         /// <param name="store">The store to consolidate</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A JobInfo instance</returns>
-        IJobInfo ConsolidateStore(string store);
+        IJobInfo ConsolidateStore(string store, string label = null);
 
         /// <summary>
         /// Returns the commit points of a Brightstar store
@@ -303,7 +309,8 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="storeName">The name of the store to re-apply the transaction to</param>
         /// <param name="transactionInfo">The transaction to be applied</param>
-        IJobInfo ReExecuteTransaction(string storeName, ITransactionInfo transactionInfo);
+        /// <param name="label">Optional user-friendly label for the job.</param>
+        IJobInfo ReExecuteTransaction(string storeName, ITransactionInfo transactionInfo, string label=null);
 
         /// <summary>
         /// Get a list of commit points that lie within a specified date/time range
@@ -343,8 +350,9 @@ namespace BrightstarDB.Client
         /// Queues a job to update the statistics for a store
         /// </summary>
         /// <param name="storeName">The name of the store whose statistics are to be updated</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
-        IJobInfo UpdateStatistics(string storeName);
+        IJobInfo UpdateStatistics(string storeName, string label = null);
 
         /// <summary>
         /// Queues a job to create a snapshot of a store
@@ -353,8 +361,9 @@ namespace BrightstarDB.Client
         /// <param name="targetStoreName">The name of the store to be created to receive the snapshot</param>
         /// <param name="persistenceType">The type of persistence to use for the target store</param>
         /// <param name="sourceCommitPoint">OPTIONAL: the commit point in the source store to take a snapshot from</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
-        IJobInfo CreateSnapshot(string storeName, string targetStoreName, PersistenceType persistenceType, ICommitPointInfo sourceCommitPoint = null);
+        IJobInfo CreateSnapshot(string storeName, string targetStoreName, PersistenceType persistenceType, ICommitPointInfo sourceCommitPoint = null, string label = null);
         
     }
 

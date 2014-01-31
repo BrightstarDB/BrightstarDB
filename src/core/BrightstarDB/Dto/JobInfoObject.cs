@@ -9,12 +9,14 @@ namespace BrightstarDB.Dto
         /// <summary>
         /// Creates a JobInfoObject for a newly queued job
         /// </summary>
-        /// <param name="jobId"></param>
-        public JobInfoObject(Guid jobId)
+        /// <param name="jobId">The GUID identifier assigned to the new job.</param>
+        /// <param name="label">The user-friendly label given to the job (may be NULL)</param>
+        public JobInfoObject(Guid jobId, string label)
         {
             JobId = jobId.ToString();
             JobStatus = JobStatus.Pending;
             QueuedTime = DateTime.UtcNow;
+            Label = label;
         }
 
         /// <summary>
@@ -30,6 +32,7 @@ namespace BrightstarDB.Dto
             QueuedTime = executionStatus.Queued;
             StartTime = executionStatus.Started;
             EndTime = executionStatus.Ended;
+            Label = executionStatus.Label;
         }
 
         public bool JobPending { get { return JobStatus == JobStatus.Pending; } }
@@ -48,6 +51,7 @@ namespace BrightstarDB.Dto
 
         public string StatusMessage { get; set; }
         public string JobId { get; set; }
+        public string Label { get; set; }
         public ExceptionDetailObject ExceptionInfo { get; set; }
         public JobStatus JobStatus { get; set; }
 
