@@ -127,21 +127,23 @@
     $('#jobParameters div').hide();
     $('#createJobButton').attr('disabled', 'disabled');
     
-
-    $('#jobType').change(function () {
+    function displayJobParameters() {
         var jobType = $('#jobType option:selected').val();
         if (!jobType) {
             $('#createJobButton').attr('disabled', 'disabled');
         } else {
             $('#createJobButton').removeAttr('disabled');
         }
-        
+
         $('#jobParameters div').hide({
-            complete: function() {
+            complete: function () {
                 $('#jobParameters div.' + jobType).show();
             }
         });
-    });
+    }
+
+    $('#jobType').change(displayJobParameters);
+    $(document).ready(displayJobParameters);
     
     function validateNotNull(inputId, paramName, obj) {
         var val = $('#' + inputId).val();
@@ -164,11 +166,11 @@
             break;
         case 'Import':
             isValid = validateNotNull('fileName', 'FileName', params);
-            isValid = validateNotNull('defaultGraphUri', 'DefaultGraphUri', params) && isValid;
+            //isValid = validateNotNull('defaultGraphUri', 'DefaultGraphUri', params) && isValid;
             break;
         case 'Export':
             isValid = validateNotNull('fileName', 'FileName', params);
-            isValid = validateNotNull('graphUri', 'GraphUri', params) && isValid;
+            //isValid = validateNotNull('graphUri', 'GraphUri', params) && isValid;
             break;
         case 'Transaction':
             params.Preconditions = $('#preconditions').val();
@@ -211,7 +213,7 @@
                     .append('<td>' + data.JobStatus + '</td>')
                     .append('<td></td>')
                     .append('<td></td>')
-                    .append('<td>/<td>')
+                    .append('<td></td>')
                     .append('<td>Job Queued</td>');
             }).fail(function(jqXHR, textStatus) {
                 alert("Request failed: " + textStatus);

@@ -106,7 +106,6 @@ namespace BrightstarDB.Server.Modules
                             case "export":
                                 AssertPermission(StorePermissions.Export);
                                 if (!jobRequestObject.JobParameters.ContainsKey("FileName") ||
-                                    !jobRequestObject.JobParameters.ContainsKey("GraphUri") ||
                                     String.IsNullOrWhiteSpace(jobRequestObject.JobParameters["FileName"]))
                                 {
                                     return HttpStatusCode.BadRequest;
@@ -114,14 +113,13 @@ namespace BrightstarDB.Server.Modules
                                 queuedJobInfo = brightstarService.StartExport(
                                     storeName,
                                     jobRequestObject.JobParameters["FileName"],
-                                    jobRequestObject.JobParameters["GraphUri"],
+                                    jobRequestObject.JobParameters.ContainsKey("GraphUri") ? jobRequestObject.JobParameters["GraphUri"] : null,
                                     label);
                                 break;
 
                             case "import":
                                 AssertPermission(StorePermissions.TransactionUpdate);
                                 if (!jobRequestObject.JobParameters.ContainsKey("FileName") ||
-                                    !jobRequestObject.JobParameters.ContainsKey("DefaultGraphUri") ||
                                     String.IsNullOrWhiteSpace(jobRequestObject.JobParameters["FileName"]))
                                 {
                                     return HttpStatusCode.BadRequest;
@@ -129,7 +127,7 @@ namespace BrightstarDB.Server.Modules
                                 queuedJobInfo = brightstarService.StartImport(
                                     storeName,
                                     jobRequestObject.JobParameters["FileName"],
-                                    jobRequestObject.JobParameters["DefaultGraphUri"],
+                                    jobRequestObject.JobParameters.ContainsKey("DefaultGraphUri") ? jobRequestObject.JobParameters["DefaultGraphUri"] : Constants.DefaultGraphUri,
                                     label);
                                 break;
 
@@ -205,6 +203,7 @@ namespace BrightstarDB.Server.Modules
                         return Negotiate.WithModel(new JobResponseModel
                             {
                                 JobId = queuedJobInfo.JobId,
+                                Label = queuedJobInfo.Label,
                                 StatusMessage = queuedJobInfo.StatusMessage,
                                 JobStatus = queuedJobInfo.GetJobStatusString(),
                                 ExceptionInfo = queuedJobInfo.ExceptionInfo,

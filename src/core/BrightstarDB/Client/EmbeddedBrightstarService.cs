@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using BrightstarDB.Dto;
 using BrightstarDB.Storage;
 using BrightstarDB.Server;
+using Remotion.Linq.Utilities;
 
 namespace BrightstarDB.Client
 {
@@ -510,6 +511,9 @@ namespace BrightstarDB.Client
         /// <returns>An IJobInfo instance</returns>
         public IJobInfo StartImport(string storeName, string fileName, string graphUri = Constants.DefaultGraphUri, string label = null)
         {
+            if (String.IsNullOrEmpty(storeName)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "storeName");
+            if (String.IsNullOrEmpty(fileName)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "fileName");
+            if (String.IsNullOrEmpty(graphUri)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "graphUri");
             try
             {
                 var jobId = _serverCore.Import(storeName, fileName, graphUri, label);
@@ -532,6 +536,8 @@ namespace BrightstarDB.Client
         /// <returns>A JobInfo instance</returns>
         public IJobInfo StartExport(string store, string fileName, string graphUri, string label = null)
         {
+            if (String.IsNullOrEmpty(store)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "store");
+            if (String.IsNullOrEmpty(fileName)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "fileName");
             try
             {
                 var jobId = _serverCore.Export(store, fileName, graphUri, label);
