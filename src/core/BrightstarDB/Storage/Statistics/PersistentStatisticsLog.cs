@@ -36,15 +36,16 @@ namespace BrightstarDB.Storage.Statistics
                 using (var headerReader = new BinaryReader(headerStream))
                 {
                     using (
-                        var recordReader =
-                            new StreamReader(_persistenceManager.GetInputStream(GetStatisticsLogFile())))
+                        var recordStream =
+                            _persistenceManager.GetInputStream(GetStatisticsLogFile()))
                     {
                         long offset = headerStream.Length - StoreStatisticsHeaderRecord.RecordSize;
                         while (offset >= 0)
                         {
                             headerReader.BaseStream.Seek(offset, SeekOrigin.Begin);
                             var header = StoreStatisticsHeaderRecord.Load(headerReader);
-                            recordReader.BaseStream.Seek(header.StartOffset, SeekOrigin.Begin);
+                            recordStream.Seek(header.StartOffset, SeekOrigin.Begin); 
+                            var recordReader = new StreamReader(recordStream);
                             var record = StoreStatisticsRecord.Load(recordReader);
                             yield return
                                 new StoreStatistics(header.CommitNumber, header.Timestamp, record.TotalTripleCount,
