@@ -350,7 +350,7 @@ namespace BrightstarDB.Client
             {
                 var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData,
                                                            defaultGraphUri, label);
-                return new JobInfoObject(jobId);
+                return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)
             {
@@ -406,7 +406,7 @@ namespace BrightstarDB.Client
             try
             {
                 var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression, label);
-                return new JobInfoObject(jobId);
+                return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)
             {

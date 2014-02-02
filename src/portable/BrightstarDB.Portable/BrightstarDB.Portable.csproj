@@ -75,16 +75,16 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="dotNetRDF">
-      <HintPath>..\..\packages\dotNetRDF.1.0.2.2880\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
+      <HintPath>..\packages\dotNetRDF.1.0.3\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Polenter.SharpSerializer.PCL">
       <HintPath>..\packages\SharpSerializer.PCL.2.18\lib\portable-net4+sl4+wp71+win8\Polenter.SharpSerializer.PCL.dll</HintPath>
     </Reference>
     <Reference Include="Portable.Runtime">
-      <HintPath>..\..\packages\dotNetRDF.1.0.2.2880\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>
+      <HintPath>..\packages\dotNetRDF.1.0.3\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="VDS.Common">
       <HintPath>..\packages\VDS.Common.1.2.0\lib\portable-win+net40+sl40+wp\VDS.Common.dll</HintPath>

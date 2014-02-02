@@ -1,6 +1,10 @@
 ﻿using System;
 using VDS.RDF;
 using VDS.RDF.Configuration;
+#if PORTABLE
+using BrightstarDB.Portable.Adaptation;
+using BrightstarDB.Storage;
+#endif
 
 namespace BrightstarDB.Client
 {

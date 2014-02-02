@@ -2,6 +2,7 @@
 using BrightstarDB.Client.RestSecurity;
 using BrightstarDB.Server;
 using System;
+using VDS.RDF;
 using VDS.RDF.Query;
 using VDS.RDF.Storage.Management;
 using VDS.RDF.Update;
@@ -164,14 +165,17 @@ namespace BrightstarDB.Client
             ISparqlUpdateProcessor updateProcessor = null;
             if (!String.IsNullOrEmpty(connectionString.DnrUpdate))
             {
+#if PORTABLE || SILVERLIGHT
+                throw new NotSupportedException("The PCL and mobile builds of BrightstarDB do not currently support stores that use SPARQL Update. The store may be opened as a read-only store by removing the update= parameter in the connection string.");
+#else
                 var updateEndpoint = new SparqlRemoteUpdateEndpoint(new Uri(connectionString.DnrUpdate));
                 if (!String.IsNullOrEmpty(connectionString.UserName) && !String.IsNullOrEmpty(connectionString.Password))
                 {
                     updateEndpoint.SetCredentials(connectionString.UserName, connectionString.Password);
                 }
                 updateProcessor = new RemoteUpdateProcessor(updateEndpoint);
+#endif
             }
-
             return new SparqlDataObjectContext(queryProcessor, updateProcessor, connectionString.OptimisticLocking);
         }
 

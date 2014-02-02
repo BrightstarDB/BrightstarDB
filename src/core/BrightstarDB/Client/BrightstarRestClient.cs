@@ -559,15 +559,15 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="storeName">The name of the store to be updated</param>
         /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
-        /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        public IJobInfo ExecuteUpdate(string storeName, string updateExpression)
+        public IJobInfo ExecuteUpdate(string storeName, string updateExpression, string label = null)
         {
             ValidateStoreName(storeName);
             if (String.IsNullOrWhiteSpace(updateExpression))
                 throw new ArgumentException(Strings.BrightstarServiceClient_UpdateExpressionMustNotBeEmptyString,
                                             "updateExpression");
-            var job = JobRequestObject.CreateSparqlUpdateJob(updateExpression);
+            var job = JobRequestObject.CreateSparqlUpdateJob(updateExpression, label);
             var jobUri = CreateJob(storeName, job);
             var jobResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobResponse);        

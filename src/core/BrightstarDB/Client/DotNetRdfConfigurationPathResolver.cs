@@ -1,5 +1,9 @@
-﻿using System.IO;
-using VDS.RDF.Configuration;
+﻿using VDS.RDF.Configuration;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#else
+using System.IO;
+#endif
 
 namespace BrightstarDB.Client
 {

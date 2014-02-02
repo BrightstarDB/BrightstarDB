@@ -166,18 +166,21 @@ namespace BrightstarDB.Client
         /// <param name="deletePatterns">The delete patterns that will be removed from the store</param>
         /// <param name="insertData">The NTriples or NQuads data that will be inserted into the store.</param>
         /// <param name="defaultGraphUri">The URI of the default graph that the transaction will be applied to</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
         /// <remarks>If <paramref name="preconditions"/>, <paramref name="deletePatterns"/> or <paramref name="insertData"/> contain
         /// quads, the graph URI specified by the quad will override the value provided by <paramref name="defaultGraphUri"/>. </remarks>
-        IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri = Constants.DefaultGraphUri);
+        IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, 
+            string defaultGraphUri = Constants.DefaultGraphUri, string label = null);
 
         /// <summary>
         /// Execute a SPARQL Update expression against a store
         /// </summary>
         /// <param name="storeName">The name of the store to be updated</param>
         /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
-        IJobInfo ExecuteUpdate(string storeName, string updateExpression);
+        IJobInfo ExecuteUpdate(string storeName, string updateExpression, string label = null);
 #else
         /// <summary>
         /// Execute an update transaction.
