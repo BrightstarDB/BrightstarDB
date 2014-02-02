@@ -38,5 +38,11 @@ namespace BrightstarDB
         /// for Data Objects and Entity Framework connections.
         /// </summary>
         DotNetRdf,
+
+        /// <summary>
+        /// Connection type for a connection to a store through SPARQL protocol.
+        /// Used only for Data Objects and Entity Framework connections.
+        /// </summary>
+        Sparql,
     }
 }

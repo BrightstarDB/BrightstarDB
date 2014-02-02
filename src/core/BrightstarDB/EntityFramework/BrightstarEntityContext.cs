@@ -127,7 +127,8 @@ namespace BrightstarDB.EntityFramework
                     break;
 #endif
                 case ConnectionType.DotNetRdf:
-                    context = new DotNetRdfDataObjectContext(connectionString);
+                    context = BrightstarService.GetDataObjectContext(connectionString);
+                    //context = new DotNetRdfDataObjectContext(connectionString);
                     break;
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +

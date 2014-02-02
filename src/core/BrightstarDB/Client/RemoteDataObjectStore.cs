@@ -11,7 +11,7 @@ using BrightstarDB.Rdf;
 namespace BrightstarDB.Client
 {
     /// <summary>
-    /// Use the WCF Client to talk to the service
+    /// Base class for store implementations that talk to a remote service
     /// </summary>
     internal abstract class RemoteDataObjectStore : DataObjectStoreBase
     {
@@ -20,9 +20,9 @@ namespace BrightstarDB.Client
 
         private String QueryTemplate { get { return _queryTemplate ?? (_queryTemplate = GetQueryTemplate()); } }
 
-        protected RemoteDataObjectStore(Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
+        protected RemoteDataObjectStore(bool asReadOnly, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
-            : base(namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
+            : base(asReadOnly, namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             _optimisticLockingEnabled = optimisticLockingEnabled;
             ResetTransactionData();

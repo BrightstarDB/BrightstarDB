@@ -99,6 +99,12 @@ namespace BrightstarDB.Client
         IEnumerable<IDataObject> TrackedObjects { get; }
 
         /// <summary>
+        /// Returns a boolean flag that indicates if this store is read-only.
+        /// </summary>
+        /// <remarks>A read-only store will not support updates via the <see cref="SaveChanges"/> method.</remarks>
+        bool IsReadOnly { get; }
+
+        /// <summary>
         /// Returns the list of graphs to query
         /// </summary>
         /// <returns></returns>

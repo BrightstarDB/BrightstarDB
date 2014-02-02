@@ -15,7 +15,7 @@ namespace BrightstarDB.Tests.EntityFramework
         public void TestInitializeWithStoreConfiguration()
         {
             var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
-            var connectionString = "type=dotNetRdf;configuration=" + configFilePath + ";storeName=example;store=http://www.brightstardb.com/tests#peopleStore";
+            var connectionString = "type=dotNetRdf;configuration=" + configFilePath + ";storeName=http://www.brightstardb.com/tests#people";
             const string baseGraph = "http://example.org/people";
 
             var context = new MyEntityContext(connectionString, updateGraphUri:baseGraph, datasetGraphUris:new string[]{baseGraph});
@@ -32,11 +32,12 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestInsertIntoDefaultGraph()
         {
-            var connectionString = MakeStoreConnectionString("example", "http://www.brightstardb.com/tests#emptyStore");
+            var storeName = "http://www.brightstardb.com/tests#empty";
+            var connectionString = MakeStoreConnectionString(storeName);
             var dataObjectContext = BrightstarService.GetDataObjectContext(connectionString);
 
             string aliceId;
-            using (var store = dataObjectContext.OpenStore("example"))
+            using (var store = dataObjectContext.OpenStore(storeName))
             {
                 using (var context = new MyEntityContext(store))
                 {
@@ -45,7 +46,7 @@ namespace BrightstarDB.Tests.EntityFramework
                     context.SaveChanges();
                 }
             }
-            using (var store = dataObjectContext.OpenStore("example"))
+            using (var store = dataObjectContext.OpenStore(storeName))
             {
                 using (var context = new MyEntityContext(store))
                 {
@@ -56,11 +57,10 @@ namespace BrightstarDB.Tests.EntityFramework
         }
     
 
-        private static string MakeStoreConnectionString(string storeName, string storeId)
+        private static string MakeStoreConnectionString(string storeName)
         {
             var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
-            return string.Format("type=dotNetRdf;configuration={0};storeName={1};store={2}", configFilePath, storeName,
-                                 storeId);
+            return string.Format("type=dotNetRdf;configuration={0};storeName={1}", configFilePath, storeName);
         }
     }
 }

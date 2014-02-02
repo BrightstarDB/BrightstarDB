@@ -9,7 +9,7 @@ using VDS.RDF.Update;
 #if PORTABLE
 using BrightstarDB.Portable.Adaptation;
 #else
-using System.IO;
+
 #endif
 
 namespace BrightstarDB.Client
@@ -261,23 +261,5 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <remarks>Currently this type of DataObjectContext does not support optimistic locking, so this property is always false.</remarks>
         public bool OptimisticLockingEnabled { get { return false; } } // Currently not supported
-    }
-
-    internal class DotNetRdfConfigurationPathResolver : IPathResolver
-    {
-        private readonly string _configurationPath;
-
-        public DotNetRdfConfigurationPathResolver(string configurationPath)
-        {
-#if PORTABLE
-            _configurationPath = Path.GetDirectoryName(configurationPath);
-#else
-            _configurationPath = Path.GetDirectoryName(Path.GetFullPath(configurationPath));
-#endif
-        }
-        public string ResolvePath(string path)
-        {
-            return Path.Combine(_configurationPath, path);
-        }
     }
 }

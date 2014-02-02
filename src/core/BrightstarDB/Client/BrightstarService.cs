@@ -2,6 +2,9 @@
 using BrightstarDB.Client.RestSecurity;
 using BrightstarDB.Server;
 using System;
+using VDS.RDF.Query;
+using VDS.RDF.Storage.Management;
+using VDS.RDF.Update;
 
 
 namespace BrightstarDB.Client
@@ -124,13 +127,52 @@ namespace BrightstarDB.Client
                     return new RestDataObjectContext(connectionString);
 #endif
                 case ConnectionType.DotNetRdf:
-                    return new DotNetRdfDataObjectContext(connectionString);
+                    var configurationGraph = DotNetRdfConfigurationHelper.LoadConfiguration(connectionString.Configuration);
+                    bool optimisticLocking = connectionString.OptimisticLocking;
+                    if (String.IsNullOrEmpty(connectionString.DnrStorageServer))
+                    {
+                        return new DotNetRdfStorageProvidersDataObjectContext(configurationGraph, optimisticLocking);
+                    }
+                    var storageServer = DotNetRdfConfigurationHelper.GetConfigurationObject(
+                        configurationGraph, connectionString.DnrStorageServer) as IStorageServer;
+                    if (storageServer == null)
+                    {
+                        throw new BrightstarClientException("Unable to retrieve a DotNetRDF storage server from the provided configuration.");
+                    }
+                    return new DotNetRdfStorageServerDataObjectContext(storageServer, optimisticLocking);
+
+                case ConnectionType.Sparql:
+                    return MakeSparqlDataObjectContext(connectionString);
+                    
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value +
                                                         ". Cause: unrecognised connection string type: " +
                                                         connectionString.Type);
             }
+        }
+
+        private static IDataObjectContext MakeSparqlDataObjectContext(ConnectionString connectionString)
+        {
+            var queryEndpoint = new SparqlRemoteEndpoint(new Uri(connectionString.DnrQuery));
+            if (!String.IsNullOrEmpty(connectionString.UserName) && !String.IsNullOrEmpty(connectionString.Password))
+            {
+                queryEndpoint.SetCredentials(connectionString.UserName, connectionString.Password);
+            }
+            var queryProcessor = new RemoteQueryProcessor(queryEndpoint);
+
+            ISparqlUpdateProcessor updateProcessor = null;
+            if (!String.IsNullOrEmpty(connectionString.DnrUpdate))
+            {
+                var updateEndpoint = new SparqlRemoteUpdateEndpoint(new Uri(connectionString.DnrUpdate));
+                if (!String.IsNullOrEmpty(connectionString.UserName) && !String.IsNullOrEmpty(connectionString.Password))
+                {
+                    updateEndpoint.SetCredentials(connectionString.UserName, connectionString.Password);
+                }
+                updateProcessor = new RemoteUpdateProcessor(updateEndpoint);
+            }
+
+            return new SparqlDataObjectContext(queryProcessor, updateProcessor, connectionString.OptimisticLocking);
         }
 
 #if !WINDOWS_PHONE

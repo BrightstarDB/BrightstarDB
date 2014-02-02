@@ -40,6 +40,8 @@ namespace BrightstarDB.Client
         /// </summary>
         private List<Triple> _preconditions;
 
+        private bool _isReadOnly;
+
         private EventHandler _savingChanges;
 
         private readonly string _updateGraphUri;
@@ -48,13 +50,14 @@ namespace BrightstarDB.Client
         private readonly string _versionGraphUri;
 
         private const string InverseOfSparql = "SELECT ?s WHERE {{ ?s <{0}> <{1}> }}";
-        private static readonly string GetVersionSparql = "SELECT ?v WHERE {{ <{0}> <" + Constants.VersionPredicateUri + "> ?v }}";
+        private const string GetVersionSparql = "SELECT ?v WHERE {{ <{0}> <" + Constants.VersionPredicateUri + "> ?v }}";
 
         private bool _disposed;
 
         /// <summary>
         /// Creates a new instance
         /// </summary>
+        /// <param name="asReadOnly">Set the new data object store to be readonly.</param>
         /// <param name="namespaceMappings">The initial set of CURIE prefix mappings</param>
         /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
         /// not defined, the default graph in the store will be updated.</param>
@@ -62,9 +65,10 @@ namespace BrightstarDB.Client
         /// If not defined, all graphs in the store will be queried.</param>
         /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for data objects. 
         /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
-        protected DataObjectStoreBase(Dictionary<string, string> namespaceMappings,
+        protected DataObjectStoreBase(bool asReadOnly, Dictionary<string, string> namespaceMappings,
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
         {
+            _isReadOnly = asReadOnly;
             _namespaceMappings = namespaceMappings ?? new Dictionary<string, string>();
             _managedProxies = new Dictionary<string, DataObject>();
 
@@ -147,6 +151,8 @@ namespace BrightstarDB.Client
         }
 
         #region Implementation of IDataObjectStore
+
+        public bool IsReadOnly { get { return _isReadOnly; } }
 
         public EventHandler SavingChanges
         {
@@ -232,6 +238,7 @@ namespace BrightstarDB.Client
         /// </summary>
         public void SaveChanges()
         {
+            if (_isReadOnly) throw new BrightstarStoreIsReadOnlyException();
             if (_savingChanges != null) _savingChanges(this, new EventArgs());
             DoSaveChanges();
         }

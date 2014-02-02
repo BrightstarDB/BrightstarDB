@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace BrightstarDB.Tests.EntityFramework
 {
     [TestFixture("type=embedded;StoresDirectory={1};storeName={2}")]
-    [TestFixture("type=dotnetrdf;configuration={0}dataObjectStoreConfig.ttl;storeName={1};store=http://www.brightstardb.com/tests#emptyStore")]
+    [TestFixture("type=dotnetrdf;configuration={0}dataObjectStoreConfig.ttl;storeName=http://www.brightstardb.com/tests#empty")]
     public class LinqTests
     {
         private readonly string _connectionStringTemplate;

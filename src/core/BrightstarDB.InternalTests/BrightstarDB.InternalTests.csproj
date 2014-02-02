@@ -129,6 +129,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Data\dataObjectStoreConfig.ttl" />
+    <None Include="Data\multipleObjectStoreConfiguration.ttl" />
     <None Include="Data\people.ttl" />
     <None Include="packages.config" />
   </ItemGroup>

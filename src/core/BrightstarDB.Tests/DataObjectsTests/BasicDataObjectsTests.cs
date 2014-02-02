@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using BrightstarDB.Client;
 using NUnit.Framework;
@@ -11,7 +9,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
 {
     [TestFixture("type=embedded;storesDirectory={1};storeName={2}", true)]
     [TestFixture(
-        "type=dotnetrdf;configuration={0}dataObjectStoreConfig.ttl;storeName={1};store=http://www.brightstardb.com/tests#emptyStore"
+        "type=dotnetrdf;configuration={0}dataObjectStoreConfig.ttl;storeName=http://www.brightstardb.com/tests#empty"
         , false)]
     public class BasicDataObjectsTests
     {
