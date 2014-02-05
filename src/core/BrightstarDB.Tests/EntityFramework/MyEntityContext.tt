@@ -243,14 +243,14 @@ private void WriteInterfaceImplementation(CodeGenerationTools code, Helper helpe
 						{
 							#>
 		get { return GetRelatedObjects<<#=t#>>(<#= code.CreateLiteral(p.Name) #>); }
-		set { SetRelatedObjects(<#= code.CreateLiteral(p.Name)#>, value); }
+		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects(<#= code.CreateLiteral(p.Name)#>, value); }
 							<#+
 						} 
 						else 
 						{
 							#>
 		get { return GetRelatedLiteralPropertiesCollection<<#=t#>>(<#= code.CreateLiteral(p.Name) #>); }
-		set { SetRelatedLiteralPropertiesCollection<<#=t#>>(<#= code.CreateLiteral(p.Name)#>, value); }
+		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<<#=t#>>(<#= code.CreateLiteral(p.Name)#>, value); }
 <#+
 						}
 #>

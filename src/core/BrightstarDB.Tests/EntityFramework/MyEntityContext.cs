@@ -424,7 +424,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Rdf.PlainLiteral> PrefLabel
     	{
     		get { return GetRelatedLiteralPropertiesCollection<BrightstarDB.Rdf.PlainLiteral>("PrefLabel"); }
-    		set { SetRelatedLiteralPropertiesCollection<BrightstarDB.Rdf.PlainLiteral>("PrefLabel", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<BrightstarDB.Rdf.PlainLiteral>("PrefLabel", value); }
     	}
     	#endregion
     }
@@ -489,7 +489,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IPerson> Persons
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IPerson>("Persons"); }
-    		set { SetRelatedObjects("Persons", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Persons", value); }
     								}
     	#endregion
     }
@@ -512,7 +512,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IBaseEntity> RelatedEntities
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IBaseEntity>("RelatedEntities"); }
-    		set { SetRelatedObjects("RelatedEntities", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("RelatedEntities", value); }
     								}
     	#endregion
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IBaseEntity
@@ -741,42 +741,42 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<System.String> CollectionOfStrings
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
     	}
     	public System.Collections.Generic.ICollection<System.DateTime> CollectionOfDateTimes
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Boolean> CollectionOfBools
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Decimal> CollectionOfDecimals
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Double> CollectionOfDoubles
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Single> CollectionOfFloats
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Int32> CollectionOfInts
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Int64> CollectionOfLong
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong", value); }
     	}
     	#endregion
     }
@@ -792,7 +792,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<System.String> MboxSums
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("MboxSums"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
     	}
     	#endregion
     }
@@ -830,12 +830,12 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IFoafPerson> Knows
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IFoafPerson>("Knows"); }
-    		set { SetRelatedObjects("Knows", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Knows", value); }
     								}
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IFoafPerson> KnownBy
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IFoafPerson>("KnownBy"); }
-    		set { SetRelatedObjects("KnownBy", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("KnownBy", value); }
     								}
     	
     	[System.ComponentModel.DataAnnotations.DataTypeAttribute(DataType.Date)]
@@ -855,7 +855,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<System.String> MboxSums
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("MboxSums"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
     	}
     	#endregion
     }
@@ -920,7 +920,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IPerson> Persons
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IPerson>("Persons"); }
-    		set { SetRelatedObjects("Persons", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Persons", value); }
     								}
     	#endregion
     }
@@ -943,7 +943,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.ICompany> ListedCompanies
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.ICompany>("ListedCompanies"); }
-    		set { SetRelatedObjects("ListedCompanies", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("ListedCompanies", value); }
     								}
     	#endregion
     }
@@ -996,7 +996,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IPerson> Friends
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IPerson>("Friends"); }
-    		set { SetRelatedObjects("Friends", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Friends", value); }
     								}
     
     	public BrightstarDB.Tests.EntityFramework.IAnimal Pet
@@ -1013,7 +1013,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.ISkill> Skills
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.ISkill>("Skills"); }
-    		set { SetRelatedObjects("Skills", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Skills", value); }
     								}
     
     	public BrightstarDB.Tests.EntityFramework.IDepartment Department
@@ -1036,7 +1036,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<System.Uri> Websites
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Uri>("Websites"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Uri>("Websites", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Uri>("Websites", value); }
     	}
     	#endregion
     }
@@ -1161,12 +1161,12 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.ISkill> Children
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.ISkill>("Children"); }
-    		set { SetRelatedObjects("Children", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Children", value); }
     								}
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IPerson> SkilledPeople
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IPerson>("SkilledPeople"); }
-    		set { SetRelatedObjects("SkilledPeople", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("SkilledPeople", value); }
     								}
     	#endregion
     }
