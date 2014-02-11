@@ -15,7 +15,7 @@
     </Target>
 
     <Target Name="BuildCore">
-        <MSBuild Projects="src\core\BrightstarDB.sln"
+        <MSBuild Projects="src\core\core.sln"
                  Properties="Configuration=$(Configuration)"
                  Targets="Clean;Build"/>
     </Target>
