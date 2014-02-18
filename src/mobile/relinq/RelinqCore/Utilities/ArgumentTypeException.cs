@@ -23,7 +23,9 @@ namespace Remotion.Linq.Utilities
   /// <summary>
   /// This exception is thrown if an argument has an invalid type.
   /// </summary>
-  [Serializable]
+#if !PORTABLE
+    [Serializable]
+#endif
   public class ArgumentTypeException : ArgumentException
   {
     public readonly Type ExpectedType;

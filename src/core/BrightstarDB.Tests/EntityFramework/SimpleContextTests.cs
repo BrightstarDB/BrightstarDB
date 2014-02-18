@@ -546,7 +546,7 @@ where {
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestSetRelatedEntitiesToNullThrowsArgumentNullException()
         {
-            var storeName = "TestSetRelatedEntitiesToNullClearsCollection_" + DateTime.Now.Ticks;
+            var storeName = "TestSetRelatedEntitiesToNullThrowsArgumentNullException_" + DateTime.Now.Ticks;
             string aliceId;
             using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
             {
@@ -567,6 +567,42 @@ where {
                 Assert.AreEqual(2, alice.Friends.Count);
 
                 alice.Friends = null; // throws
+            }
+        }
+
+        [Test]
+        public void TestClearRelatedObjects()
+        {
+            var storeName = "TestClearRelatedObjects_" + DateTime.Now.Ticks;
+            string aliceId;
+            using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
+            {
+                var context = new MyEntityContext(dataObjectStore);
+                var alice = context.Persons.Create();
+                var bob = context.Persons.Create();
+                var carol = context.Persons.Create();
+                alice.Friends = new List<IPerson> { bob, carol };
+                context.SaveChanges();
+                aliceId = alice.Id;
+            }
+
+            using (var dataObjectStore = _dataObjectContext.OpenStore(storeName))
+            {
+                var context = new MyEntityContext(dataObjectStore);
+                var alice = context.Persons.FirstOrDefault(p => p.Id.Equals(aliceId));
+                Assert.IsNotNull(alice);
+                Assert.AreEqual(2, alice.Friends.Count);
+                alice.Friends.Clear();
+                Assert.AreEqual(0, alice.Friends.Count);
+                context.SaveChanges();
+            }
+
+            using (var dataObjectStore = _dataObjectContext.OpenStore(storeName))
+            {
+                var context = new MyEntityContext(dataObjectStore);
+                var alice = context.Persons.FirstOrDefault(p => p.Id.Equals(aliceId));
+                Assert.IsNotNull(alice);
+                Assert.AreEqual(0, alice.Friends.Count);
             }
         }
 

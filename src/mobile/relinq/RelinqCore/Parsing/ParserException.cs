@@ -21,7 +21,9 @@ using Remotion.Linq.Utilities;
 
 namespace Remotion.Linq.Parsing
 {
+#if !PORTABLE
   [Serializable]
+#endif
   public class ParserException : Exception
   {
     private static string CreateMessage (object expected, object expression, string context)

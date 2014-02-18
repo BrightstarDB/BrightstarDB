@@ -38,7 +38,10 @@ namespace Remotion.Linq
   /// <see cref="SelectClause"/>. The simplest way to process all the clauses belonging to a <see cref="QueryModel"/> is by implementing
   /// <see cref="IQueryModelVisitor"/> (or deriving from <see cref="QueryModelVisitorBase"/>) and calling <see cref="Accept"/>.
   /// </remarks>
-  public class QueryModel : ICloneable
+  public class QueryModel 
+#if !PORTABLE
+      : ICloneable
+#endif
   {
     private readonly UniqueIdentifierGenerator _uniqueIdentifierGenerator;
 
@@ -232,10 +235,12 @@ namespace Remotion.Linq
       return clone;
     }
 
+#if !PORTABLE
     object ICloneable.Clone ()
     {
       return Clone();
     }
+#endif
 
     /// <summary>
     /// Transforms all the expressions in this <see cref="QueryModel"/>'s clauses via the given <paramref name="transformation"/> delegate.

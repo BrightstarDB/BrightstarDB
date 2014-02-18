@@ -16,6 +16,8 @@
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,7 +59,7 @@
     <Compile Include="Compatibility\FileMode.cs" />
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\MD5.cs" />
     <Compile Include="..\..\core\BrightStarDB\**\*.cs" Exclude="..\..\core\BrightstarDB\Strings*.cs;..\..\core\BrightStarDB\OData\**\*.cs;..\..\core\BrightstarDB\Test\**\*.cs;..\..\core\BrightstarDB\Server\HttpServer.cs;..\..\core\BrightstarDB\Client\Http*.cs;..\..\core\BrightstarDB\Client\BrightstarServiceClient.cs;..\..\core\BrightstarDB\Client\BrightstarServiceClientExtensions.cs;..\..\core\BrightstarDB\Storage\FileStoreManager.cs;..\..\core\BrightstarDB\Storage\FileBlockProvider.cs;..\..\core\BrightstarDB\Properties\**\*.cs;..\..\core\BrightstarDB\Analysis\**\*.cs;..\..\core\BrightstarDB\Client\RestJobInfo.cs;..\..\core\BrightstarDB\Dynamic\**\*.cs;..\..\core\BrightstarDB\Storage\Persistence\BinaryPageStore.cs;..\..\core\BrightstarDB\Query\Processor\SingleVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\TwoVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\ThreeVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\AccumulatorBase.cs;..\..\core\BrightstarDB\Query\Processor\Accumulator.cs;..\..\core\BrightstarDB\Query\Processor\VirtualizingAccumulator.cs;..\..\core\BrightstarDB\Storage\Persistence\FilePersistenceManager.cs;..\..\core\BrightstarDB\Storage\Persistence\IsolatedStoragePersistenceManager.cs">
-      <Link>%(recursivedir)\%(filename)</Link>
+      <Link>%25%28recursivedir%29\%25%28filename%29</Link>
     </Compile>
     <EmbeddedResource Include="..\..\core\BrightstarDB\Strings.resx">
       <Link>Strings.resx</Link>
@@ -69,8 +71,8 @@
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Tuple.cs" />
     <Compile Include="Adaptation\PlatformAdapter.cs" />
     <Compile Include="Adaptation\ProbingAdapterResolver.cs" />
-    <Compile Include="..\..\mobile\relinq\RelinqCore\**\*.cs;..\..\mobile\relinq\*.cs" Exclude="..\..\mobile\relinq\RelinqCore\Properties\**\*.cs">
-      <Link>relinq\%(recursivedir)\%(filename)</Link>
+    <Compile Include="..\..\mobile\relinq\RelinqCore\**\*.cs" Exclude="..\..\mobile\relinq\RelinqCore\Properties\*.cs">
+      <Link>relinq\%25%28recursivedir%29\%25%28filename%29</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

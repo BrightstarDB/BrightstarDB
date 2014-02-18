@@ -162,7 +162,7 @@ namespace BrightstarDB.Tests
 #endif
     }
 
-#if !SILVERLIGHT && !NETFX_CORE
+#if !SILVERLIGHT && !NETFX_CORE && !PORTABLE
     [Serializable]
 #endif
     public class TestObject
