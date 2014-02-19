@@ -63,6 +63,10 @@ namespace BrightstarDB.Server.Modules
                                ? new FallbackSystemPermissionsProvider(authenticatedPermissions, anonymousPermissions)
                                : new FallbackSystemPermissionsProvider(authenticatedPermissions);
                     
+                case "static":
+                    var staticPermissions = new StaticSystemPermissionsProvider(providerElement);
+                    return staticPermissions;
+
                 default:
                     throw new ConfigurationErrorsException(
                         String.Format(
@@ -99,6 +103,10 @@ namespace BrightstarDB.Server.Modules
                     return TryGetStorePermissionsAttributeValue(providerElement, "anonymous", out anonPermissions)
                                ? new FallbackStorePermissionsProvider(authPermissions, anonPermissions)
                                : new FallbackStorePermissionsProvider(authPermissions);
+                case "static":
+                    var staticPermissions = new StaticStorePermissionsProvider(providerElement);
+                    return staticPermissions;
+
                 default:
                     throw new ConfigurationErrorsException(
                         "Unexecpted configuration element inside 'storePermissions' element. Cannot process element '" +
@@ -122,7 +130,7 @@ namespace BrightstarDB.Server.Modules
             return ret;
         }
 
-        private static bool TryGetStorePermissionsAttributeValue(XmlElement providerElement, string attrName, out StorePermissions storePermissions)
+        public static bool TryGetStorePermissionsAttributeValue(XmlElement providerElement, string attrName, out StorePermissions storePermissions)
         {
             try
             {
@@ -152,7 +160,7 @@ namespace BrightstarDB.Server.Modules
             return ret;
         }
 
-        private static bool TryGetSystemPermissionsAttributeValue(XmlElement providerElement, string attrName,
+        public static bool TryGetSystemPermissionsAttributeValue(XmlElement providerElement, string attrName,
                                                                   out SystemPermissions systemPermissions)
         {
             try

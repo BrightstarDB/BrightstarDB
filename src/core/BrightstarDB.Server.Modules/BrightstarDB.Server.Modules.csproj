@@ -109,6 +109,8 @@
     <Compile Include="Model\TransactionResponseModel.cs" />
     <Compile Include="NegotiatorExtensions.cs" />
     <Compile Include="Permissions\FallbackSystemPermissionsProvider.cs" />
+    <Compile Include="Permissions\StaticStorePermissionsProvider.cs" />
+    <Compile Include="Permissions\StaticSystemPermissionsProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SparqlQueryProcessingModel.cs" />
     <Compile Include="SparqlQueryResponse.cs" />
@@ -160,8 +162,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <RazorAssemblies Include="$(SolutionDir)packages\Nancy.Viewengines.Razor.0.22.0\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll;
-                     $(SolutionDir)packages\Nancy.Viewengines.Razor.0.22.0\lib\net40\Nancy.ViewEngines.Razor.dll" />
+    <RazorAssemblies Include="$(SolutionDir)packages\Nancy.Viewengines.Razor.0.22.0\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll;&#xD;&#xA;                     $(SolutionDir)packages\Nancy.Viewengines.Razor.0.22.0\lib\net40\Nancy.ViewEngines.Razor.dll" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -179,7 +180,7 @@ xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.22.0\lib\Net40\
 )</PostBuildEvent>
 </PropertyGroup>
   -->
-<Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
+  <Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
   <Target Name="AfterBuild" DependsOnTargets="CopyRazorAssemblies" />
   <Target Name="CopyRazorAssemblies" Condition="'$(Configuration)' == 'Debug'">
     <Copy SourceFiles="@(RazorAssemblies)" DestinationFolder="$(ProjectDir)\bin\Debug" />

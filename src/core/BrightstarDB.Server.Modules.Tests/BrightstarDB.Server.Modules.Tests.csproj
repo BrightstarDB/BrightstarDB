@@ -70,8 +70,10 @@
     <Compile Include="JobsUrlSpec.cs" />
     <Compile Include="LatestStatisticsUrlSpec.cs" />
     <Compile Include="LinkExistsConstraint.cs" />
+    <Compile Include="MockUserIdentity.cs" />
     <Compile Include="SparqlUpdateUrlSpec.cs" />
     <Compile Include="SparqlUrlSpec.cs" />
+    <Compile Include="StaticPermissionsProvidersTests.cs" />
     <Compile Include="StatisticsUrlSpec.cs" />
     <Compile Include="StoreResponseObjectSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
