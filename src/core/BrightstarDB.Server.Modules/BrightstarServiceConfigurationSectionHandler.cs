@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Xml;
+using BrightstarDB.Server.Modules.Authentication;
 using BrightstarDB.Server.Modules.Permissions;
 
 namespace BrightstarDB.Server.Modules
@@ -18,10 +20,20 @@ namespace BrightstarDB.Server.Modules
             if (section is XmlElement)
             {
                 var sectionEl = section as XmlElement;
+                
+                var authenticationProviders =
+                    sectionEl.GetElementsByTagName("authenticationProviders").Item(0) as XmlElement;
+                if (authenticationProviders != null)
+                {
+                    configuration.AuthenticationProviders = ProcessAuthenticationProviders(authenticationProviders);
+                }
+
                 var storePermissions = sectionEl.GetElementsByTagName("storePermissions").Item(0) as XmlElement;
                 if (storePermissions != null)
+                {
                     configuration.StorePermissionsProvider = ProcessStorePermissions(storePermissions);
-
+                }
+                
                 var systemPermissions = sectionEl.GetElementsByTagName("systemPermissions").Item(0) as XmlElement;
                 if (systemPermissions != null)
                 {
@@ -29,6 +41,19 @@ namespace BrightstarDB.Server.Modules
                 }
             }
             return configuration;
+        }
+
+        private static ICollection<IAuthenticationProvider> ProcessAuthenticationProviders(XmlElement authenticationProviders)
+        {
+            var providers = new List<IAuthenticationProvider>();
+            foreach (var addElement in authenticationProviders.GetElementsByTagName("add").OfType<XmlElement>().Where(x=>x.HasAttribute("type")))
+            {
+                var typeRef = addElement.GetAttribute("type");
+                var providerType = Type.GetType(typeRef, true);
+                var provider = Activator.CreateInstance(providerType) as IAuthenticationProvider;
+                if (provider != null) providers.Add(provider);
+            }
+            return providers;
         }
 
         private AbstractSystemPermissionsProvider ProcessSystemPermissions(XmlElement systemPermissions)

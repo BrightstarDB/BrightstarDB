@@ -2,6 +2,7 @@
 using System;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules;
+using BrightstarDB.Server.Modules.Authentication;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy.Hosting.Self;
 
@@ -38,6 +39,7 @@ namespace BrightstarDB.Tests
                 {
                     _serviceHost = new NancyHost(new BrightstarBootstrapper(
                                                      BrightstarService.GetClient(),
+                                                     new IAuthenticationProvider[] {new NullAuthenticationProvider()},
                                                      new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All)),
                                                      new HostConfiguration { AllowChunkedEncoding = false },
