@@ -18,6 +18,13 @@ namespace BrightstarDB.Server.Modules
         private readonly IEnumerable<IAuthenticationProvider> _authenticationProviders; 
         private readonly IRootPathProvider _rootPathProvider;
 
+        /// <summary>
+        /// Create a new bootstrapper that initializes itself from the brightstarService section
+        /// of the application (or web) configuration file.
+        /// </summary>
+        /// <exception cref="ConfigurationErrorsException">Raised if the brightstarService configuration
+        /// section does not exist in the application configuration file, or if the configuration is
+        /// invalid.</exception>
         public BrightstarBootstrapper()
         {
             var config = ConfigurationManager.GetSection("brightstarService") as BrightstarServiceConfiguration;
@@ -100,12 +107,18 @@ namespace BrightstarDB.Server.Modules
         /// <param name="storePermissionsProvider">The store permissions provider to be used by the service</param>
         /// <param name="systemPermissionsProvider">The system permissions provider to be used by the service</param>
         /// <param name="rootPath">The path to the directory containing the service Views and assets folder</param>
+        /// <exception cref="ArgumentNullException">Raised if any of the arguments to the method other than <paramref name="rootPath"/> are Null.</exception>
         public BrightstarBootstrapper(IBrightstarService brightstarService,
                                       IEnumerable<IAuthenticationProvider> authenticationProviders,
                                       AbstractStorePermissionsProvider storePermissionsProvider,
                                       AbstractSystemPermissionsProvider systemPermissionsProvider,
                                       string rootPath = null)
         {
+            if (brightstarService == null) throw new ArgumentNullException("brightstarService");
+            if (authenticationProviders == null) throw new ArgumentNullException("authenticationProviders");
+            if (storePermissionsProvider == null) throw new ArgumentNullException("storePermissionsProvider");
+            if (systemPermissionsProvider == null) throw new ArgumentNullException("systemPermissionsProvider");
+
             _brightstarService = brightstarService;
             _authenticationProviders = authenticationProviders;
             _storePermissionsProvider = storePermissionsProvider;
@@ -113,7 +126,6 @@ namespace BrightstarDB.Server.Modules
             _rootPathProvider = (rootPath == null
                                      ? new DefaultRootPathProvider()
                                      : new FixedRootPathProvider(rootPath) as IRootPathProvider);
-            //_rootPathProvider = new FixedRootPathProvider(rootPath);
         }
 
         protected override void ConfigureApplicationContainer(Nancy.TinyIoc.TinyIoCContainer container)
@@ -122,10 +134,6 @@ namespace BrightstarDB.Server.Modules
             container.Register(_brightstarService);
             container.Register(_storePermissionsProvider);
             container.Register(_systemPermissionsProvider);
-            foreach (var authenticationProvider in _authenticationProviders)
-            {
-                container.Register(authenticationProvider);
-            }
             container.Register<RazorViewEngine>();
         }
 
@@ -149,6 +157,10 @@ namespace BrightstarDB.Server.Modules
         protected override void ApplicationStartup(Nancy.TinyIoc.TinyIoCContainer container, Nancy.Bootstrapper.IPipelines pipelines)
         {
             base.ApplicationStartup(container, pipelines);
+            foreach (var authenticationProvider in _authenticationProviders)
+            {
+                authenticationProvider.Enable(pipelines);
+            }
         }
     }
 }

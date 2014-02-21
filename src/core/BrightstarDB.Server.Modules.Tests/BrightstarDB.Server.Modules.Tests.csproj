@@ -44,6 +44,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Nancy.0.22.2\lib\net40\Nancy.dll</HintPath>
     </Reference>
+    <Reference Include="Nancy.Authentication.Basic, Version=0.22.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\BrightstarDB.Server.AspNet\bin\Nancy.Authentication.Basic.dll</HintPath>
+    </Reference>
     <Reference Include="Nancy.Testing, Version=0.22.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Nancy.Testing.0.22.2\lib\net40\Nancy.Testing.dll</HintPath>
@@ -61,6 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication\BasicAuthProviderSpec.cs" />
     <Compile Include="CommitPointsUrlSpec.cs" />
     <Compile Include="ConfigurationSectionHandlerSpec.cs" />
     <Compile Include="CreateStoreRequestObjectSpec.cs" />

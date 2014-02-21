@@ -76,8 +76,6 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authentication\BasicAuthAuthenticationProvider.cs" />
-    <Compile Include="Authentication\IConfigurableUserValidator.cs" />
     <Compile Include="Authentication\MembershipUserIdentity.cs" />
     <Compile Include="Authentication\MembershipValidator.cs" />
     <Compile Include="DefaultBootstrapper.cs" />
