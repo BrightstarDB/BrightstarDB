@@ -1,4 +1,5 @@
-﻿using BrightstarDB.Caching;
+﻿using System.Net;
+using BrightstarDB.Caching;
 using BrightstarDB.Client.RestSecurity;
 using BrightstarDB.Server;
 using System;
@@ -211,6 +212,10 @@ namespace BrightstarDB.Client
             if (connectionString.Account != null && connectionString.Key != null)
             {
                 requestAuthenticator = new SharedSecretAuthenticator(connectionString.Account, connectionString.Key);
+            }
+            else if (connectionString.UserName != null && connectionString.Password != null)
+            {
+                requestAuthenticator = new CredentialsRequestAuthenticator(new NetworkCredential(connectionString.UserName, connectionString.Password));
             }
             return new BrightstarRestClient(endpoint, requestAuthenticator, null);
         }

@@ -6,7 +6,7 @@ using Nancy.Security;
 
 namespace BrightstarDB.Server.Modules.Permissions
 {
-    internal class StaticStorePermissionsProvider : AbstractStorePermissionsProvider
+    public class StaticStorePermissionsProvider : AbstractStorePermissionsProvider
     {
         private const string StoreEl = "store";
         private const string UserEl = "user";
@@ -17,6 +17,22 @@ namespace BrightstarDB.Server.Modules.Permissions
         private readonly Dictionary<string, Dictionary<string, StorePermissions>> _storeUsers;
         private readonly Dictionary<string, Dictionary<string, StorePermissions>> _storeClaims;
  
+        /// <summary>
+        /// Create a new provider with a fixed collection of user and claim permimssions for stores
+        /// </summary>
+        /// <param name="userPermissions">A dictionary mapping a store name to another dictionary that maps a user name to the permissions for that user on that store.</param>
+        /// <param name="claimPermissions">A dictionary mapping a store name to another dictionary that maps a claim to the permissions associated with that claim on that store.</param>
+        public StaticStorePermissionsProvider(IDictionary<string, Dictionary<string, StorePermissions>> userPermissions,
+                                              IDictionary<string, Dictionary<string, StorePermissions>> claimPermissions)
+        {
+            _storeUsers = new Dictionary<string, Dictionary<string, StorePermissions>>(userPermissions);
+            _storeClaims = new Dictionary<string, Dictionary<string, StorePermissions>>(claimPermissions);
+        }
+
+        /// <summary>
+        /// Create a new provider that is initialized from an XML configuration.
+        /// </summary>
+        /// <param name="configEl">The root element for the permissions provider configuration</param>
         public StaticStorePermissionsProvider(XmlNode configEl)
         {
             _storeUsers = new Dictionary<string, Dictionary<string, StorePermissions>>();

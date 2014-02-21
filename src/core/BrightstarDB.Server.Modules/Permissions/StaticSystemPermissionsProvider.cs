@@ -10,7 +10,7 @@ namespace BrightstarDB.Server.Modules.Permissions
     /// Provides a collection of statically configured system permissions.
     /// The permissions are configured using XML fragments in the service configuration section.
     /// </summary>
-    internal class StaticSystemPermissionsProvider : AbstractSystemPermissionsProvider
+    public class StaticSystemPermissionsProvider : AbstractSystemPermissionsProvider
     {
         private const string UserEl = "user";
         private const string ClaimEl = "claim";
@@ -19,6 +19,18 @@ namespace BrightstarDB.Server.Modules.Permissions
 
         private readonly Dictionary<string, SystemPermissions> _userPermissions;
         private readonly Dictionary<string, SystemPermissions> _claimPermissions;
+
+        /// <summary>
+        /// Initialize a new provider with a fixed mapping of users and claims to system permissions
+        /// </summary>
+        /// <param name="userPermissions">A dictionary mapping user name to system permissions for that user</param>
+        /// <param name="claimPermissions">A dictionary mapping a user claim to the system permissions associated with that claim</param>
+        public StaticSystemPermissionsProvider(IDictionary<string, SystemPermissions> userPermissions,
+                                               IDictionary<string, SystemPermissions> claimPermissions)
+        {
+            _userPermissions = new Dictionary<string, SystemPermissions>(userPermissions);
+            _claimPermissions = new Dictionary<string, SystemPermissions>(claimPermissions);
+        }
 
         /// <summary>
         /// Initialize a new provider that reads its configuration from the specified root configuration element
