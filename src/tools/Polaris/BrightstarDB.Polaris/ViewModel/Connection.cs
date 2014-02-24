@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Dto;
@@ -28,6 +29,9 @@ namespace BrightstarDB.Polaris.ViewModel
         private bool _isValid;
         private string _name;
         private string _serverEndpoint;
+        private bool _requiresAuthentication;
+        private string _userName;
+        private string _password;
 
         public Connection(string name, string connectionString)
         {
@@ -122,6 +126,17 @@ namespace BrightstarDB.Polaris.ViewModel
             }
         }
 
+        public bool RequiresAuthentication
+        {
+            get { return _requiresAuthentication; }
+            set
+            {
+                _requiresAuthentication = value;
+                Validate();
+                RaisePropertyChanged("RequiresAuthentication");
+            }
+        }
+
         public ObservableCollection<String> ValidationMessages { get; set; }
 
         private void Initialize()
@@ -148,8 +163,7 @@ namespace BrightstarDB.Polaris.ViewModel
             }
             if (ConnectionType == ConnectionType.Rest)
             {
-                var connString = String.Format("type=rest;endpoint={0}", ServerEndpoint);
-                return connString;
+                return String.Format("type=rest;endpoint={0}", ServerEndpoint);
             }
             throw new NotSupportedException(String.Format("Cannot generate connection string for connection type {0}", ConnectionType));
         }
@@ -219,95 +233,108 @@ namespace BrightstarDB.Polaris.ViewModel
 
         public void TryConnect()
         {
-            try
-            {
-                Stores.Clear();
-                ConnectionError = "Attempting to connect";
-                var client = BrightstarService.GetClient(_connectionString);
-                foreach(var storeName in  client.ListStores())
+            WithClient(client =>
                 {
-                    Stores.Add(new Store(this, storeName));
-                }
-                ConnectionError = null;
-            }
-            catch (Exception)
-            {
-                ConnectionError = "Could not establish connection";
-            }
+                    try
+                    {
+                        Stores.Clear();
+                        ConnectionError = "Attempting to connect";
+                        foreach (var storeName in client.ListStores())
+                        {
+                            Stores.Add(new Store(this, storeName));
+                        }
+                        ConnectionError = null;
+                    }
+                        // TODO: Catch authentication error and reset the user name and password to force authentication
+                    catch (Exception)
+                    {
+                        ConnectionError = "Could not establish connection";
+                        _userName = null;
+                        _password = null;
+                    }
+                });
         }
 
         public void CreateStore(Store store)
         {
-            var client = BrightstarService.GetClient(_connectionString);
-            client.CreateStore(store.Location);
-            Stores.Add(store);
+            WithClient(client =>
+                {
+                    client.CreateStore(store.Location);
+                    Stores.Add(store);
+                });
         }
 
         public void DeleteStore(string storeName)
         {
-            var client = BrightstarService.GetClient(_connectionString);
-            client.DeleteStore(storeName);
-            foreach(var item in Stores.Where(s=>s.Location.Equals(storeName)).ToList())
-            {
-                Stores.Remove(item);
-            }
+            WithClient(client =>
+                {
+                    client.DeleteStore(storeName);
+                    foreach (var item in Stores.Where(s => s.Location.Equals(storeName)).ToList())
+                    {
+                        Stores.Remove(item);
+                    }
+                });
         }
 
         public XDocument ExecuteQuery(Store store, string sparqlQueryString, CommitPointViewModel targetCommitPoint)
         {
-            var client = BrightstarService.GetClient(_connectionString);
-            try
-            {
-                if (targetCommitPoint == null)
+            return WithClient(client =>
                 {
-                    using (var resultsStream = client.ExecuteQuery(store.Location, sparqlQueryString))
+                    try
                     {
-                        XDocument result = XDocument.Load(resultsStream);
-                        return result;
+                        if (targetCommitPoint == null)
+                        {
+                            using (var resultsStream = client.ExecuteQuery(store.Location, sparqlQueryString))
+                            {
+                                XDocument result = XDocument.Load(resultsStream);
+                                return result;
+                            }
+                        }
+                        var commitPoint = client.GetCommitPoint(store.Location, targetCommitPoint.CommitTime);
+                        if (commitPoint == null)
+                        {
+                            throw new Exception("Could not retrieve specified commit point from store.");
+                        }
+                        using (var resultsStream = client.ExecuteQuery(commitPoint, sparqlQueryString))
+                        {
+                            XDocument result = XDocument.Load(resultsStream);
+                            return result;
+                        }
                     }
-                }
-                var commitPoint = client.GetCommitPoint(store.Location, targetCommitPoint.CommitTime);
-                if (commitPoint == null)
-                {
-                    throw new Exception("Could not retrieve specified commit point from store.");
-                }
-                using(var resultsStream = client.ExecuteQuery(commitPoint, sparqlQueryString))
-                {
-                    XDocument result = XDocument.Load(resultsStream);
-                    return result;
-                }
-            }
-            catch (BrightstarClientException brightstarClientException)
-            {
-                ExtractSyntaxError(brightstarClientException.InnerException);
-                throw new SparqlQueryException(brightstarClientException);
-            }
-            catch (Exception ex)
-            {
-                throw new SparqlQueryException(ex);
-            }
+                    catch (BrightstarClientException brightstarClientException)
+                    {
+                        ExtractSyntaxError(brightstarClientException.InnerException);
+                        throw new SparqlQueryException(brightstarClientException);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new SparqlQueryException(ex);
+                    }
+                });
         }
 
         public void ExecuteUpdate(Store store, string sparqlUpdateString)
         {
-            try
-            {
-                var client = BrightstarService.GetClient(_connectionString);
-                var jobInfo = client.ExecuteUpdate(store.Location, sparqlUpdateString);
-                if (!jobInfo.JobCompletedOk)
+            WithClient(client =>
                 {
-                    if (jobInfo.ExceptionInfo != null)
+                    try
                     {
-                        ExtractSyntaxError(jobInfo.ExceptionInfo);
-                        throw new SparqlUpdateException(jobInfo.ExceptionInfo);
+                        var jobInfo = client.ExecuteUpdate(store.Location, sparqlUpdateString);
+                        if (!jobInfo.JobCompletedOk)
+                        {
+                            if (jobInfo.ExceptionInfo != null)
+                            {
+                                ExtractSyntaxError(jobInfo.ExceptionInfo);
+                                throw new SparqlUpdateException(jobInfo.ExceptionInfo);
+                            }
+                            throw new SparqlUpdateException(jobInfo.StatusMessage);
+                        }
                     }
-                    throw new SparqlUpdateException(jobInfo.StatusMessage);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new SparqlUpdateException(ex);
-            }
+                    catch (Exception ex)
+                    {
+                        throw new SparqlUpdateException(ex);
+                    }
+                });
         }
 
         private static void ExtractSyntaxError(ExceptionDetailObject exceptionDetail)
@@ -332,34 +359,34 @@ namespace BrightstarDB.Polaris.ViewModel
 
         public IEnumerable<CommitPointViewModel> GetCommitPoints(Store store, int skip, int take)
         {
-            var client = BrightstarService.GetClient(ConnectionString);
-            return client.GetCommitPoints(store.Location, skip, take).Select(x => new CommitPointViewModel(x));
+            return WithClient(client => client.GetCommitPoints(store.Location, skip, take)
+                                              .Select(x => new CommitPointViewModel(x)));
         }
 
         public void RevertToCommitPoint(Store store, CommitPointViewModel targetCommitPoint)
         {
             if (targetCommitPoint == null) return;
-            var client = BrightstarService.GetClient(ConnectionString);
-            var commitPoint = client.GetCommitPoint(store.Location, targetCommitPoint.CommitTime);
-            if (commitPoint == null)
-            {
-                throw new ApplicationException(String.Format("Could not find commit point for {0} (ID: {1})", targetCommitPoint.CommitTime, targetCommitPoint.Id));
-            }
-            client.RevertToCommitPoint(store.Location, commitPoint);
+            WithClient(client =>
+                {
+                    var commitPoint = client.GetCommitPoint(store.Location, targetCommitPoint.CommitTime);
+                    if (commitPoint == null)
+                    {
+                        throw new ApplicationException(String.Format("Could not find commit point for {0} (ID: {1})",
+                                                                     targetCommitPoint.CommitTime, targetCommitPoint.Id));
+                    }
+                    client.RevertToCommitPoint(store.Location, commitPoint);
+                });
         }
 
         public IEnumerable<CommitPointViewModel> GetCommitPoints(Store store, DateTime latest, DateTime earliest, int skip, int take)
         {
-            var client = BrightstarService.GetClient(ConnectionString);
-            return
-                client.GetCommitPoints(store.Location, latest, earliest, skip, take).Select(
-                    x => new CommitPointViewModel(x));
+            return WithClient(client=> client.GetCommitPoints(store.Location, latest, earliest, skip, take).Select(
+                    x => new CommitPointViewModel(x)));
         }
 
         public StatisticsViewModel GetStatistics(Store store)
         {
-            var client = BrightstarService.GetClient(ConnectionString);
-            var stats = client.GetStatistics(store.Location);
+            var stats = WithClient(client=>client.GetStatistics(store.Location));
             return stats == null ? null : new StatisticsViewModel(stats);
         }
 
@@ -369,5 +396,112 @@ namespace BrightstarDB.Polaris.ViewModel
             ret.ParseConnectionString();
             return ret;
         }
+
+        private T WithClient<T>(Func<IBrightstarService, T> func)
+        {
+            if (RequiresAuthentication)
+            {
+                if (!HaveCredentials())
+                {
+                    MessengerInstance.Send(new AuthenticationRequiredMessage("This operation requires your username and password.", (dialogResult, username, password) =>
+                    {
+                        if (dialogResult.HasValue && dialogResult.Value)
+                        {
+                            _userName = username;
+                            _password = password;
+                        }
+                        else
+                        {
+                            // Ensure we make a connection with no credentials
+                            _password = null;
+                        }
+                    }));
+                    return func(MakeConnection());
+                }
+                return func(MakeConnection());
+            }
+            return func(BrightstarService.GetClient(ConnectionString));
+        }
+
+        private void WithClient(Action<IBrightstarService> action)
+        {
+            if (RequiresAuthentication)
+            {
+                if (!HaveCredentials())
+                {
+                    MessengerInstance.Send(new AuthenticationRequiredMessage("This operation requires your username and password.", (dialogResult, username, password) =>
+                        {
+                            if (dialogResult.HasValue && dialogResult.Value)
+                            {
+                                _userName = username;
+                                _password = password;
+                            }
+                            else
+                            {
+                                // Ensure we make a connection with no credentials
+                                _password = null;
+                            }
+                        }));
+                    action(MakeConnection());
+                }
+                action(MakeConnection());
+            }
+            else
+            {
+                action(BrightstarService.GetClient(ConnectionString));
+            }
+        }
+
+        /// <summary>
+        /// Determine if this model has a complete set of credentials for making an authenticated connection.
+        /// </summary>
+        /// <remarks>This method could be extended later to add support for using an API key in Polaris</remarks>
+        /// <returns></returns>
+        private bool HaveCredentials()
+        {
+            return !String.IsNullOrEmpty(_userName) && _password != null;
+        }
+
+        /// <summary>
+        /// Create a client for the connection. If credentials are available they will be used, otherwise
+        /// an anonymous connection will be attempted.
+        /// </summary>
+        /// <returns></returns>
+        private IBrightstarService MakeConnection()
+        {
+            if (HaveCredentials())
+            {
+                var connectionString = String.Format("{0};userName={1};password={2}", ConnectionString, _userName,
+                                                     _password);
+                return BrightstarService.GetClient(connectionString);
+            }
+            return BrightstarService.GetClient(ConnectionString);
+        }
+    }
+
+    internal class AuthenticationRequiredMessage
+    {
+        public string Message { get; private set; }
+        public Action<bool?, string, string> Callback { get; private set; }
+        
+        public AuthenticationRequiredMessage(string message, Action<bool?, string, string> callback)
+        {
+            Message = message;
+            Callback = callback;
+        }
+
+    }
+
+    internal class AuthenticationRequiredMessage<T>
+    {
+        public string Message { get; private set; }
+        public Func<string, SecureString, T> Callback { get; private set; }
+
+        public AuthenticationRequiredMessage(string message, Func<string, SecureString, T> callback)
+        {
+            Message = message;
+            Callback = callback;
+        }
+         
     }
 }

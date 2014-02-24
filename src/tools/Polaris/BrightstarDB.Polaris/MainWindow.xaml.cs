@@ -38,6 +38,7 @@ namespace BrightstarDB.Polaris
             Messenger.Default.Register<AppExitMessage>(this, HandleAppExitMessage);
             Messenger.Default.Register<CloseTabMessage>(this, HandleCloseTabMessage);
             Messenger.Default.Register<ShowFileDialogMessage>(this, HandleShowFileDialogMessage);
+            Messenger.Default.Register<AuthenticationRequiredMessage>(this, HandleAuthenticationRequiredMessage);
 
             if ((this.DataContext as MainViewModel).StoreSources.Count == 0)
             {
@@ -57,6 +58,15 @@ namespace BrightstarDB.Polaris
                 Messenger.Default.Send(msg, "MainWindow");
             }
         }
+
+        private void HandleAuthenticationRequiredMessage(AuthenticationRequiredMessage msg)
+        {
+            var model = new CredentialsModel {PromptMessage = msg.Message};
+            var credentialsDialog = new CredentialsDialog (model);
+            var dialogResult = credentialsDialog.ShowDialog();
+            msg.Callback(dialogResult, model.UserName, model.Password);
+        }
+
 
         private void HandleCloseTabMessage(CloseTabMessage obj)
         {

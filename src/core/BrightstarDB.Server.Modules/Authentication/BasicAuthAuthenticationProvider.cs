@@ -49,7 +49,7 @@ namespace BrightstarDB.Server.Modules.Authentication
             }
 
             var realmEl = configurationElement.GetElementsByTagName("realm").OfType<XmlElement>().FirstOrDefault();
-            var realm = realmEl == null ? String.Empty : realmEl.InnerText;
+            var realm = realmEl == null ? "BrightstarDB" : realmEl.InnerText;
             _configuration= new BasicAuthenticationConfiguration(userValidator, realm);
         }
 
