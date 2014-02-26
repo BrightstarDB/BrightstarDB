@@ -15,5 +15,8 @@ namespace BrightstarDB.Polaris.Configuration
         /// </summary>
         [XmlAttribute("value")]
         public string ConnectionString { get; set; }
+
+        [XmlAttribute("requiresAuthentication")]
+        public bool RequiresAuthentication { get; set; }
     }
 }

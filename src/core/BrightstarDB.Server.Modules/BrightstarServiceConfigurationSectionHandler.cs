@@ -46,12 +46,20 @@ namespace BrightstarDB.Server.Modules
         private static ICollection<IAuthenticationProvider> ProcessAuthenticationProviders(XmlElement authenticationProviders)
         {
             var providers = new List<IAuthenticationProvider>();
-            foreach (var addElement in authenticationProviders.GetElementsByTagName("add").OfType<XmlElement>().Where(x=>x.HasAttribute("type")))
+            foreach (
+                var addElement in
+                    authenticationProviders.GetElementsByTagName("add")
+                                           .OfType<XmlElement>()
+                                           .Where(x => x.HasAttribute("type")))
             {
                 var typeRef = addElement.GetAttribute("type");
                 var providerType = Type.GetType(typeRef, true);
                 var provider = Activator.CreateInstance(providerType) as IAuthenticationProvider;
-                if (provider != null) providers.Add(provider);
+                if (provider != null)
+                {
+                    provider.Configure(addElement);
+                    providers.Add(provider);
+                }
             }
             return providers;
         }
