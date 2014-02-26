@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security;
 using System.Xml.Linq;
 using BrightstarDB.Client;
@@ -33,10 +34,11 @@ namespace BrightstarDB.Polaris.ViewModel
         private string _userName;
         private string _password;
 
-        public Connection(string name, string connectionString)
+        public Connection(string name, string connectionString, bool requiresAuthentication)
         {
             _name = name;
             _connectionString = new ConnectionString(connectionString);
+            _requiresAuthentication = requiresAuthentication;
             ParseConnectionString();
             Initialize();
         }
@@ -246,9 +248,17 @@ namespace BrightstarDB.Polaris.ViewModel
                         ConnectionError = null;
                     }
                         // TODO: Catch authentication error and reset the user name and password to force authentication
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         ConnectionError = "Could not establish connection";
+                        // Try to provide more specific messages when the error is related to networking...
+                        if (ex is BrightstarClientException)
+                        {
+                            if (ex.InnerException is WebException)
+                            {
+                                ConnectionError = ex.InnerException.Message;
+                            }
+                        }
                         _userName = null;
                         _password = null;
                     }
@@ -392,7 +402,7 @@ namespace BrightstarDB.Polaris.ViewModel
 
         public Connection Clone()
         {
-            var ret = new Connection(Name, ConnectionString.ToString());
+            var ret = new Connection(Name, ConnectionString.ToString(), RequiresAuthentication);
             ret.ParseConnectionString();
             return ret;
         }
@@ -476,6 +486,14 @@ namespace BrightstarDB.Polaris.ViewModel
                 return BrightstarService.GetClient(connectionString);
             }
             return BrightstarService.GetClient(ConnectionString);
+        }
+
+        public void CopyFrom(Connection other)
+        {
+            ConnectionString = other.ConnectionString;
+            RequiresAuthentication = other.RequiresAuthentication;
+            _userName = other._userName;
+            _password = other._password;
         }
     }
 

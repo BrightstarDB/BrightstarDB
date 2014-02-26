@@ -57,7 +57,7 @@
         </TextBox>
 
         <TextBlock Grid.Row="4" Margin="5,6">Authentication</TextBlock>
-        <CheckBox Name="UserNameText" Grid.Row="4" Grid.Column="1" IsChecked="{Binding RequireCredentials, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" Grid.ColumnSpan="2" VerticalAlignment="Center">Ask for login credentials</CheckBox>
+        <CheckBox Name="RequiresAuthenticationCheck" Grid.Row="4" Grid.Column="1" IsChecked="{Binding RequiresAuthentication, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" Grid.ColumnSpan="2" VerticalAlignment="Center">Ask for login credentials</CheckBox>
 
 
         <Grid Name="ValidationErrors" Grid.Row="6" Grid.ColumnSpan="3" Visibility="{Binding IsValid, Converter={StaticResource VisibilityConverter}, ConverterParameter=ShowIfFalse}"

@@ -106,14 +106,9 @@ namespace BrightstarDB.Polaris
                             if (model != null)
                             {
                                 model.StoreSources.Add(connectionModel);
-                                model.Configuration.ConnectionStrings.Add(new NamedConnectionString
-                                                                              {
-                                                                                  Name = connectionModel.Name,
-                                                                                  ConnectionString =
-                                                                                      connectionModel.ConnectionString.
-                                                                                      ToString()
-                                                                              });
-                                model.Configuration.Save();
+                                model.AddConnectionConfiguration(connectionModel.Name,
+                                                                 connectionModel.ConnectionString,
+                                                                 connectionModel.RequiresAuthentication);
                             }
                         }
                         break;
@@ -128,12 +123,18 @@ namespace BrightstarDB.Polaris
                             var dlgResult = dlg.ShowDialog();
                             if (dlgResult.HasValue && dlgResult.Value)
                             {
-                                connectionModel.Name = editModel.Name;
-                                connectionModel.ConnectionString = editModel.ConnectionString;
+                                var oldName = connectionModel.Name;
+                                connectionModel.CopyFrom(editModel);
                                 var mvm = DataContext as MainViewModel;
                                 if (mvm != null)
                                 {
                                     mvm.ServerRefresh(connectionModel);
+                                }
+                                // Update configuration
+                                var model = DataContext as MainViewModel;
+                                if (model != null)
+                                {
+                                    model.UpdateConnectionConfiguration(oldName, connectionModel.Name, connectionModel.ConnectionString, connectionModel.RequiresAuthentication);
                                 }
                             }
                         }
