@@ -110,6 +110,10 @@ The fields of this dialog should be filled out as follows:
     Specify the full URL for the BrightstarDB service. For example, to connect to
     a BrightstarDB service running on the default port (8090) on the local machine
     you would enter ``http://localhost:8090/brightstar`` as the address.
+    
+  - **Authentication:** Check the box if the connection you are using requires
+    a user name and password. You will be prompted for this information after
+    the connection is added.
 
 When you select the Rest connection type from the 
 drop-down list, the dialog will automatically populate with the default 
@@ -123,7 +127,9 @@ displayed in a red area beneath the input fields.
 When you click OK, Polaris will attempt to contact the server using the 
 information you have provided, if contact is established then a list of all 
 stores hosted on that server will be retrieved and displayed under the server 
-name in the Server List area. If contact cannot be established for some 
+name in the Server List area. If you checked the box that indicates that the
+connection requires authentication, you will be prompted to enter your 
+user name and password in a separate dialog. If contact cannot be established for some 
 reason, an error dialog will display the details of the problem encountered.
 
 To remove a connection from the list, select the server name in the Server 
@@ -146,7 +152,36 @@ The connections you add to Polaris are stored in a configuration file under
 your local AppData folder and they will be automatically saved when you 
 add/remove a connection.
 
+Authentication
+==============
 
+Any REST connection to a BrightstarDB server can be configured to require
+authentication. When you configure a new connection in Polaris you can
+specify that the connection requires authentication information. This 
+information will be prompted for when you initally add the connection,
+but your user name and password is **NOT** stored in the configuration
+file. Instead, the next time you start Polaris you will see that connection
+shows an error in connecting (probably with a message saying 401 Authentication
+Required, which is the HTTP protocol message that Polaris receives from the
+server). In this case, simply right-click on the connection and select
+"Refresh" from the popup menu - you should then be prompted for your
+user name and password. If this does not happen, it probably means that
+the connection was added to Polaris without the Authentication box checked.
+
+To force authentication on a connection that does not currently require it,
+simply right-click on the connection, select "Edit" from the popup menu
+and check the Authentication box in the dialog displayed and click OK. You should
+then be prompted for your user name and password, and this update to the
+connection configuration will be stored for future sessions.
+
+If you want to authenticate as multiple different users, or if you want to
+have an authenticated connection and an unauthenticated connection to the
+same server, simply add the same connection details to Polaris multiple times.
+
+.. note::
+    At present it is not possible to associate a user name with a connection.
+    You will always be required to enter both your user name and password.
+    
 ****************
  Managing Stores
 ****************
