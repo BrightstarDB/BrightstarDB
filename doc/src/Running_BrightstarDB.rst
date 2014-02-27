@@ -182,6 +182,30 @@ The permissions that a user has are provided to the BrightstarDB service by one 
         where ``[child providers]`` is exactly two XML elements one for each of the child permission
         providers.
         
+    Static Provider
+        This provider uses a fixed configuration that maps users or claims to permissions.
+        The configuration element for a Static Permissions Provider is::
+        
+            <static>
+                <store name="{storeName}">
+                    <user name="{userName}" permissions="[Flags]" /> *
+                    <claim name="{claimName}" permissions="[Flags]" /> *
+                </store> *
+            </static>
+        
+        where ``storeName`` is the name of the store that the permissions are granted on,
+        ``userName`` and ``claimName`` are the names of a specific user or a claim that a
+        user holds respectively, and ``[Flags]`` is one or more store permission levels.
+        
+        Depending on the user validation you use, the claim names may be specific claims
+        about a user's identity (e.g. their email address) or about their group membership
+        (e.g. group names) or both.
+        
+        Any number of ``store`` elements may appear inside the ``static`` element, and
+        any number of ``user`` and ``claim`` elements may appear inside the ``store``
+        element (in any order).
+        
+        
 .. _Configuring System Permissions:
 
 Configuring System Permissions
@@ -217,6 +241,101 @@ The permissions that a user has are provided to the BrightstarDB service by one 
         
         where ``[child providers]`` is exactly two XML elements one for each of the child permission
         providers.
+        
+    Static Provider
+        This provider uses a fixed configuration that maps users or claims to permissions.
+        The configuration element for a Static Permissions Provider is::
+        
+            <static>
+                <user name="{userName}" permissions="[Flags]" /> *
+                <claim name="{claimName}" permissions="[Flags]" /> *
+            </static>
+        
+        where ``userName`` and ``claimName`` are the names of a specific user or a claim that a
+        user holds respectively, and ``[Flags]`` is one or more system permission levels.
+        
+        Depending on the user validation you use, the claim names may be specific claims
+        about a user's identity (e.g. their email address) or about their group membership
+        (e.g. group names) or both.
+        
+        Any number of ``user`` and ``claim`` elements may appear inside the ``static``
+        element (in any order).
+        
+Configuring Authentication
+==========================
+
+Authentication is the process by which the server determines a user identity for an incoming
+request. BrightstarDB has been developed to give as much flexibility as possible over how
+the server authenticates a user, without (we hope!) making it to complicated to configure.
+
+Authentication is a service that is implemented by an Authentication Provider. You can attach
+multiple Authentication Providers to the BrightstarDB server and each one will attempt to 
+determine the user identity from an incoming request. If none of the attached Authentication
+Providers can determine the user identity, then the request is processed as if the user
+were an anonymous user.
+
+The list of Authentication Providers for the server are configured by adding an ``authenticationProviders``
+element inside the ``brightstarService`` element of the configuration file. The ``authenticationProviders``
+element has the following content::
+
+    <authenticationProviders>
+        <add type="{Provider Type Reference}"/> *
+    </authenticationProviders>
+
+where ``Provider Type Reference`` is the full class and assembly reference for the authentication provider
+class to be used. An Authentication Provider class must implement the ``BrightstarDB.Server.Modules.Authentication.IAuthenticationProvider``
+interface and it must also have a default no-args constructor. The ``add`` element used to add the provider
+is passed to the provider instance after it is constructed so depending on the provider implementation
+you may be allowed/required to add more configuration elements inside the ``add`` element. Check the 
+documentation for the individual provider types below.
+
+BrightstarDB provides the following implementations "out of the box":
+
+    NullAuthenticationProvider
+        Type Reference: ``BrightstarDB.Server.Modules.Authentication.NullAuthenticationProvider, BrightstarDB.Server.Modules``
+        
+        This provider does no authentication at all, so it is probably of very little interest!
+        
+    BasicAuthenticationProvider
+        Type Reference: ``BrightstarDB.Server.Modules.Authentication.BasicAuthenticationProvider, BrightstarDB.Server.Modules``
+        
+        This provider authenticates a user by their credentials being passed using HTTP Basic Authentication. It uses NancyFX's
+        Basic Authentication Module, which accepts a custom validator class which implements the logic that takes the user name
+        and password provided and determines the user identity. This requires some additional configuration, so the 
+        configuration for this provider follows this pattern::
+        
+            <add type="BrightstarDB.Server.Modules.Authentication.BasicAuthenticationProvider,
+                       BrightstarDB.Server.Modules">
+                <validator type="{Validator Type Reference}"/>
+                <realm>{Authentication Realm}</realm> ?
+            </add>
+        
+        Where ``Validator Type Reference`` is the full class and assembly reference for the validator class. A validator
+        must implement the ``Nancy.Authentication.Basic.IUserValidator`` interface, which has a single method
+        called Validate that receives the user name and password that the user entered and returns an IUserIdentity
+        instance (or null if the username/password pair was not valid).
+        
+BrightstarDB provides the following "out of the box" validators:
+
+    MembershipValidator
+        Type Reference: ``BrightstarDB.Server.AspNet.Authentication, BrightstarDB.Server.AspNet``
+        
+        This provider uses the ASP.NET Membership and Roles framework to validate the user identity.
+        To use this provider you must also configure at least a Membership Provider for the server
+        and optionally a Role Provider. The validator will create a user identity where the validated
+        user name from the request is mapped to the user name of the generated user identity, and the
+        roles that the user is in are mapped to claims on the generated user identity.
+        
+An example ASP.NET-based BrightstarDB service is available in the source code for you to see how
+all these pieces hang together (src\\core\\BrightstarDB.Server.AspNet.Secured).
+
+.. note::
+    Please note that at present there are no validator implementations available for BrightstarDB
+    running as a Windows Service. The Membership and Role providers bring in a dependency on 
+    ASP.NET that is not suitable for a Windows Service. A future release will address this 
+    deficit, but for now if you want user authentication you will have to run the ASP.NET  
+    implementation of the BrightstarDB server.
+    
         
 Additional Configuration Options
 ================================
