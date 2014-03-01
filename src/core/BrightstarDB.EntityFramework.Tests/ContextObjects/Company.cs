@@ -33,7 +33,7 @@ namespace BrightstarDB.EntityFramework.Tests.ContextObjects
         bool IsBlueChip { get; set; }
     }
 
-    public class Company : ICompany{
+    public class Company : MockEntityObject, ICompany{
         #region Implementation of ICompany
 
         public string Id

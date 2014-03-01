@@ -13,7 +13,7 @@
         IDinner Dinner { get; set; }
     }
 
-    public class Rsvp : IRsvp
+    public class Rsvp : MockEntityObject, IRsvp
     {
 
         #region Implementation of IRsvp

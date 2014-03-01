@@ -24,7 +24,7 @@ namespace BrightstarDB.EntityFramework.Tests.ContextObjects
         DinnerType? DinnerType { get; set; }
     }
 
-    public class Dinner : IDinner{
+    public class Dinner : MockEntityObject, IDinner{
         #region Implementation of IDinner
 
         public string Id

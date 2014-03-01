@@ -12,7 +12,7 @@ namespace BrightstarDB.EntityFramework.Tests.ContextObjects
         IPerson Father { get; set; }
     }
 
-    public class Person : IPerson
+    public class Person : MockEntityObject, IPerson
     {
         #region Implementation of IPerson
 

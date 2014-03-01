@@ -61,6 +61,7 @@
     <Compile Include="ContextObjects\Dinner.cs" />
     <Compile Include="ContextObjects\DinnerType.cs" />
     <Compile Include="ContextObjects\Market.cs" />
+    <Compile Include="ContextObjects\MockEntityObject.cs" />
     <Compile Include="ContextObjects\Person.cs" />
     <Compile Include="ContextObjects\Rsvp.cs" />
     <Compile Include="DateTimeFunctionTests.cs" />
