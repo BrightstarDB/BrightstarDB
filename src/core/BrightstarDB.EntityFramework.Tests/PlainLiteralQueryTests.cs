@@ -19,7 +19,7 @@ namespace BrightstarDB.EntityFramework.Tests
         [Test]
         public void TestPlainLiteralMatching()
         {
-            var q = Context.Concepts.Where(c => c.PrefLabel.Equals(new PlainLiteral("Test", "en")));
+            var q = Context.Concepts.Where(c => c.PrefLabel.Equals(new PlainLiteral("Test", "en"))).Select(c => c.Id);
             var results = q.ToList();
             AssertQuerySparql(
                 @"SELECT ?c WHERE {
@@ -33,7 +33,8 @@ FILTER(?v0 = 'Test'@en) . }");
         {
             var q =
                 Context.Concepts.Where(
-                    c => c.AltLabels.Any(alt => alt.Equals(new PlainLiteral("Another Test", "en-gb"))));
+                    c => c.AltLabels.Any(alt => alt.Equals(new PlainLiteral("Another Test", "en-gb"))))
+                       .Select(c => c.Id);
             var results = q.ToList();
             AssertQuerySparql(
                 @"SELECT ?c WHERE {
@@ -47,7 +48,8 @@ FILTER EXISTS {
         [Test]
         public void TestSelectPlainLiteralByLanguage()
         {
-            var q = Context.Concepts.Where(c => c.AltLabels.Any(alt => alt.Language.Equals("en-gb")));
+            var q = Context.Concepts.Where(c => c.AltLabels.Any(alt => alt.Language.Equals("en-gb")))
+                           .Select(c => c.Id);
             var results = q.ToList();
             AssertQuerySparql(
                 @"SELECT ?c WHERE {
@@ -63,7 +65,8 @@ FILTER EXISTS {
         {
             var q =
                 Context.Concepts.Where(
-                    c => c.AltLabels.Any(alt => alt.Value.StartsWith("Networked") && alt.Language.Equals("en-gb")));
+                    c => c.AltLabels.Any(alt => alt.Value.StartsWith("Networked") && alt.Language.Equals("en-gb")))
+                       .Select(c => c.Id);
             var results = q.ToList();
             AssertQuerySparql(
                 @"SELECT ?c WHERE {

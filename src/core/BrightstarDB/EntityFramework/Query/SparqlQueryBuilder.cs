@@ -196,20 +196,46 @@ namespace BrightstarDB.EntityFramework.Query
         {
             var queryStringBuilder = new StringBuilder();
             queryStringBuilder.Append(GetPrefixes());
+
+            // CONSTRUCT
             queryStringBuilder.Append("CONSTRUCT {");
             foreach (var sv in _selectVars)
             {
                 queryStringBuilder.AppendFormat("?{0} ?{0}_p ?{0}_o .", sv);
             }
+            if (IsOrdered)
+            {
+                for (int i = 0; i < _ordering.Count; i++)
+                {
+                    queryStringBuilder.AppendFormat(
+                        "?{0} <" + Constants.SortValuePredicateBase + "{1}> ?{0}_sort{1} .",
+                        _selectVars[0], i);
+                }
+            }
+            queryStringBuilder.AppendFormat("?{0} <"+Constants.SelectVariablePredicateUri+"> \"{0}\" .",
+                                            _selectVars[0]);
             queryStringBuilder.Append("}");
+
+            // DATASET SELECTOR
             AppendFromClause(queryStringBuilder);
+
+            // WHERE
             queryStringBuilder.Append("WHERE {");
             foreach (var sv in _selectVars)
             {
                 queryStringBuilder.AppendFormat("?{0} ?{0}_p ?{0}_o .", sv);
             }
+            //if (IsOrdered)
+            //{
+            //    for (int i = 0; i < _ordering.Count; i++)
+            //    {
+            //        queryStringBuilder.AppendFormat(
+            //            "BIND ({0} AS ?{1}_sort{2}) .",
+            //            _ordering[i].SelectorExpression, _selectVars[0], i);
+            //    }
+            //}
             queryStringBuilder.Append("{ SELECT ");
-            queryStringBuilder.Append(GetSparqlQuery(false));
+            queryStringBuilder.Append(GetSparqlQuery(false, IsOrdered));
             queryStringBuilder.Append("} }");
 
             return queryStringBuilder.ToString();
@@ -235,7 +261,7 @@ namespace BrightstarDB.EntityFramework.Query
             return string.Empty;
         }
 
-        private string GetSparqlQuery(bool withDatasetDescription)
+        private string GetSparqlQuery(bool withDatasetDescription, bool projectSortVariables =false)
         {
             var queryStringBuilder = new StringBuilder();
             if (IsDistinct) queryStringBuilder.Append("DISTINCT ");
@@ -247,11 +273,28 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 queryStringBuilder.AppendFormat("({0} AS ?{1}) ", ag.Item2, ag.Item1);
             }
+            if (projectSortVariables)
+            {
+                for (int i = 0; i < _ordering.Count; i++)
+                {
+                    queryStringBuilder.AppendFormat("?{0}_sort{1} ", _selectVars[0], i);
+                }
+            }
             if (withDatasetDescription) AppendFromClause(queryStringBuilder);
             queryStringBuilder
                 .Append("WHERE {")
-                .Append(_graphPatternBuilder.ToString())
-                .Append("}");
+                .Append(_graphPatternBuilder.ToString());
+
+            if (projectSortVariables)
+            {
+                // Bind the expressions to variables
+                for (int i = 0; i < _ordering.Count; i++)
+                {
+                    queryStringBuilder.AppendFormat(" BIND ({0} AS ?{1}_sort{2}) .",
+                                                    _ordering[i].SelectorExpression, _selectVars[0], i);
+                }
+            }
+            queryStringBuilder.Append("}");
             AppendModifiers(queryStringBuilder);
             var sparqlString = queryStringBuilder.ToString();
             return ReplaceFixedVariables(sparqlString);
@@ -468,6 +511,11 @@ namespace BrightstarDB.EntityFramework.Query
             prefix = "ns" + _prefixes.Count;
             _prefixes[extensionNamespace] = prefix;
             return prefix;
+        }
+
+        public IEnumerable<OrderingDirection> GetOrdering()
+        {
+            return _ordering == null ? new OrderingDirection[0] : _ordering.Select(x => x.OrderingDirection);
         }
     }
 }

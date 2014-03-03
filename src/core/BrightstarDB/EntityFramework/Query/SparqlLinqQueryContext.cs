@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Remotion.Linq.Clauses;
 
 namespace BrightstarDB.EntityFramework.Query
 {
@@ -58,9 +59,12 @@ namespace BrightstarDB.EntityFramework.Query
         ///<param name="constructorArgs">A list of the SPARQL bindings that are to be passed into the constructor</param>
         ///<param name="memberMap">A list of tuples that bind the names of result object members to the SPARQL variables that provides the value for the member</param>
         ///<param name="memberInitExpression">A LINQ expression that is used to initialize the members of the results object from a SPARQL results row</param>
-        public SparqlLinqQueryContext(string sparqlQuery, List<Tuple<string, string>> anonymousMembersMap, 
+        /// <param name="orderingDirections">An enumeration of the orderings for each of the sort variables in the SPARQL query</param>
+        public SparqlLinqQueryContext(string sparqlQuery, IEnumerable<Tuple<string, string>> anonymousMembersMap, 
             ConstructorInfo constructor, List<string> constructorArgs, List<Tuple<MemberInfo, string>> memberMap,
-            Expression memberInitExpression) :base(sparqlQuery, anonymousMembersMap)
+            Expression memberInitExpression,
+            IEnumerable<OrderingDirection> orderingDirections 
+            ) :base(sparqlQuery, anonymousMembersMap, orderingDirections)
         {
             IsInstanceQuery = false;
             Constructor = constructor;

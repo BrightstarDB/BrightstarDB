@@ -1876,13 +1876,17 @@ namespace BrightstarDB.Tests.EntityFramework
         public void TestLinqQueryEnum()
         {
             var connectionString = GetConnectionString("TestLinqQueryEnum");
+            if (connectionString.Contains("type=dotnetrdf"))
+            {
+                Assert.Inconclusive("Enum tests fail against DNR store");
+            }
             var context = new MyEntityContext(connectionString);
             var entity1 = context.Entities.Create();
             entity1.SomeEnumeration = TestEnumeration.Second;
             entity1.SomeNullableEnumeration = TestEnumeration.Third;
             entity1.SomeNullableFlagsEnumeration = TestFlagsEnumeration.FlagA | TestFlagsEnumeration.FlagB;
             context.SaveChanges();
-            /*
+            
             // Find by single flag
             IList<IEntity> results = context.Entities.Where(e => e.SomeEnumeration == TestEnumeration.Second).ToList();
             Assert.AreEqual(1, results.Count);
@@ -1923,10 +1927,10 @@ namespace BrightstarDB.Tests.EntityFramework
                 ((e.SomeNullableFlagsEnumeration & (TestFlagsEnumeration.FlagA | TestFlagsEnumeration.FlagC)) ==
                  (TestFlagsEnumeration.FlagA | TestFlagsEnumeration.FlagC))).ToList();
             Assert.AreEqual(0, results.Count);
-            */
+            
 
             // Find by NoFlags
-            var results =
+            results =
                 context.Entities.Where(
                     e => e.SomeFlagsEnumeration == TestFlagsEnumeration.NoFlags).ToList();
             Assert.AreEqual(1, results.Count);

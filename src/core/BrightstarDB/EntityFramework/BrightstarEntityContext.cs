@@ -11,6 +11,7 @@ using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage.Persistence;
+using Remotion.Linq.Clauses;
 
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
@@ -286,10 +287,10 @@ namespace BrightstarDB.EntityFramework
             return result;
         }
 
-        private IEnumerable<T> BindSparqlResultToKnownType<T>(SparqlResult sparqlQueryResult)
+        private IEnumerable<T> BindSparqlResultToKnownType<T>(SparqlResult sparqlQueryResult, IList<OrderingDirection> orderingDirections)
         {
             var helper = new SparqlResultDataObjectHelper(_store);
-            IEnumerable<IDataObject> boundObjects = helper.BindDataObjects(sparqlQueryResult);
+            IEnumerable<IDataObject> boundObjects = helper.BindDataObjects(sparqlQueryResult, orderingDirections);
             var bindType = GetImplType(typeof(T));
             foreach (var dataObject in boundObjects)
             {
@@ -429,7 +430,7 @@ namespace BrightstarDB.EntityFramework
             var sparqlResult = _store.ExecuteSparql(sparqlQuery);
             if (typeof(BrightstarEntityObject).IsAssignableFrom(bindType))
             {
-                return BindSparqlResultToKnownType<T>(sparqlResult);
+                return BindSparqlResultToKnownType<T>(sparqlResult, sparqlQuery.OrderingDirections);
             }
             else if (IsAnonymousType(typeof(T)))
             {
@@ -456,7 +457,7 @@ namespace BrightstarDB.EntityFramework
             var sparqlResult = _store.ExecuteSparql(sparqlLinqQueryContext);
             if (typeof(BrightstarEntityObject).IsAssignableFrom(bindType))
             {
-                return BindSparqlResultToKnownType<T>(sparqlResult);
+                return BindSparqlResultToKnownType<T>(sparqlResult, sparqlLinqQueryContext.OrderingDirections);
 
             }
             else if (IsAnonymousType(typeof(T)))

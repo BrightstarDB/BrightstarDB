@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Linq;
@@ -395,13 +396,15 @@ namespace BrightstarDB.EntityFramework.Query
             }
             return
                 new SparqlLinqQueryContext(
-                    useConstruct && !_queryBuilder.IsDistinct && !_queryBuilder.IsOrdered
+                    useConstruct && !_queryBuilder.IsDistinct && !(_queryBuilder.SelectVariables.Count() > 1 && _queryBuilder.IsOrdered)
                         ? _queryBuilder.GetSparqlConstructString()
                         : _queryBuilder.GetSparqlString(),
                     _queryBuilder.AnonymousMembersMap,
                     _queryBuilder.Constructor,
                     _queryBuilder.ConstructorArgs,
-                    _queryBuilder.MembersMap, _queryBuilder.MemberInitExpression);
+                    _queryBuilder.MembersMap, 
+                    _queryBuilder.MemberInitExpression,
+                    _queryBuilder.GetOrdering());
         }
 
     }

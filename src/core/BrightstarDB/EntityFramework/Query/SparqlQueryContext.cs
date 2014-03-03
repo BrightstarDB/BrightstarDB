@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Remotion.Linq.Clauses;
 
 namespace BrightstarDB.EntityFramework.Query
 {
@@ -20,6 +21,11 @@ namespace BrightstarDB.EntityFramework.Query
         public List<Tuple<string, string>> AnonymousMembersMap { get; private set; }
 
         /// <summary>
+        /// Get the list of ordering directions for the sort expressions in the SPARQL query.
+        /// </summary>
+        public IList<OrderingDirection> OrderingDirections { get; private set; } 
+
+        /// <summary>
         /// If true the result is expected to have triples and their subjects grouped.For each subject group a new entity is created.
         /// </summary>
         public bool ExpectTriplesWithOrderedSubjects { get; set; }
@@ -27,15 +33,15 @@ namespace BrightstarDB.EntityFramework.Query
         internal SparqlQueryContext()
         {
             AnonymousMembersMap = new List<Tuple<string, string>>();
+            OrderingDirections = new List<OrderingDirection>(0);
         }
 
         /// <summary>
         /// Creates a new SparqlQueryContext instance
         /// </summary>
         /// <param name="sparqlQuery">sparql query</param>
-        public SparqlQueryContext(string sparqlQuery)
+        public SparqlQueryContext(string sparqlQuery) : this(sparqlQuery, new Tuple<string, string>[0], new OrderingDirection[0])
         {
-            SparqlQuery = sparqlQuery;
         }
 
         /// <summary>
@@ -43,9 +49,21 @@ namespace BrightstarDB.EntityFramework.Query
         /// </summary>
         /// <param name="sparqlQuery">sparql query</param>
         /// <param name="anonymousMembersMap">mappings for anonymous types</param>
-        public SparqlQueryContext(string sparqlQuery, List<Tuple<string, string>> anonymousMembersMap) :this(sparqlQuery)
+        public SparqlQueryContext(string sparqlQuery, IEnumerable<Tuple<string, string>> anonymousMembersMap) :this(sparqlQuery, anonymousMembersMap, new OrderingDirection[0])
         {
-            AnonymousMembersMap = anonymousMembersMap;
+        }
+
+        /// <summary>
+        /// Creates a new SparqlQueryContext instance
+        /// </summary>
+        /// <param name="sparqlQuery">sparql query</param>
+        /// <param name="anonymousMembersMap">mappings for anonymous types</param>
+        /// <param name="orderingDirections">ordering direction for the sort expressions in the SPARQL query</param>
+        public SparqlQueryContext(string sparqlQuery, IEnumerable<Tuple<string, string>> anonymousMembersMap, IEnumerable<OrderingDirection> orderingDirections)
+        {
+            SparqlQuery = sparqlQuery;
+            AnonymousMembersMap = new List<Tuple<string, string>>(anonymousMembersMap);
+            OrderingDirections = new List<OrderingDirection>(orderingDirections);
         }
     }
 }

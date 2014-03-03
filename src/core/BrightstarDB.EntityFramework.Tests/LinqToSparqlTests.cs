@@ -50,7 +50,7 @@ namespace BrightstarDB.EntityFramework.Tests
             var lastSparql = Context.LastSparqlQuery;
             Assert.IsNotNull(lastSparql);
             Assert.AreEqual(
-                NormalizeSparql(@"CONSTRUCT { ?p ?p_p ?p_o. } WHERE { ?p ?p_p ?p_o . {SELECT ?p WHERE {?p a <http://www.networkedplanet.com/schemas/test/Dinner> .} } }"),
+                NormalizeSparql(@"CONSTRUCT { ?p ?p_p ?p_o. ?p <http://www.brightstardb.com/.well-known/model/selectVariable> ""p"" .} WHERE { ?p ?p_p ?p_o . {SELECT ?p WHERE {?p a <http://www.networkedplanet.com/schemas/test/Dinner> .} } }"),
                 NormalizeSparql(lastSparql));
         }
 
@@ -76,15 +76,15 @@ namespace BrightstarDB.EntityFramework.Tests
         [Test]
         public void TestGetRsvpByDinnerId()
         {
-            var q = from r in Context.Rsvps where r.Dinner.Id.Equals("http://www.networkedplanet.com/dinners/1") select r;
+            var q = from x in Context.Rsvps where x.Dinner.Id.Equals("http://www.networkedplanet.com/dinners/1") select x;
             var results = q.ToList();
             var lastSparql = Context.LastSparqlQuery;
             Assert.IsNotNull(lastSparql);
-            AssertQuerySparql(@"CONSTRUCT { ?r ?r_p ?r_o. } WHERE {
-?r ?r_p ?r_o . {
-    SELECT ?r WHERE { 
-    ?r a <http://www.networkedplanet.com/schemas/test/Rsvp> .
-    <http://www.networkedplanet.com/dinners/1> <http://www.networkedplanet.com/schemas/test/attendees> ?r.} } }");
+            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" .} WHERE {
+?x ?x_p ?x_o . {
+    SELECT ?x WHERE { 
+    ?x a <http://www.networkedplanet.com/schemas/test/Rsvp> .
+    <http://www.networkedplanet.com/dinners/1> <http://www.networkedplanet.com/schemas/test/attendees> ?x.} } }");
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace BrightstarDB.EntityFramework.Tests
             Assert.IsNotNull(lastSparql);
             Assert.AreEqual(
                 NormalizeSparql(
-                    @"CONSTRUCT { ?y ?y_p ?y_o. } WHERE {
+                    @"CONSTRUCT { ?y ?y_p ?y_o. ?y <http://www.brightstardb.com/.well-known/model/selectVariable> ""y"" .} WHERE {
 ?y ?y_p ?y_o . {
     SELECT ?y WHERE {
     <address> a <http://www.networkedplanet.com/schemas/test/Dinner> .
@@ -187,7 +187,7 @@ namespace BrightstarDB.EntityFramework.Tests
             var lastSparql = Context.LastSparqlQuery;
             Assert.IsNotNull(lastSparql);
             Assert.AreEqual(NormalizeSparql(
-                @"CONSTRUCT { ?p ?p_p ?p_o. } WHERE {
+                @"CONSTRUCT { ?p ?p_p ?p_o. ?p <http://www.brightstardb.com/.well-known/model/selectVariable> ""p"" .} WHERE {
 ?p ?p_p ?p_o . {
     SELECT ?p WHERE { 
     ?p a <http://www.networkedplanet.com/schemas/test/Person> .
@@ -207,7 +207,7 @@ namespace BrightstarDB.EntityFramework.Tests
             Assert.IsNotNull(lastSparql);
             Assert.AreEqual(
                 NormalizeSparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
@@ -226,7 +226,7 @@ namespace BrightstarDB.EntityFramework.Tests
                     select r;
             var results = q.ToList();
             AssertQuerySparql(
-                              @"CONSTRUCT { ?r ?r_p ?r_o. } WHERE {
+                              @"CONSTRUCT { ?r ?r_p ?r_o. ?r <http://www.brightstardb.com/.well-known/model/selectVariable> ""r"" .} WHERE {
 ?r ?r_p ?r_o . {
     SELECT ?r WHERE { 
     ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
@@ -244,7 +244,7 @@ namespace BrightstarDB.EntityFramework.Tests
                     select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -255,7 +255,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 where x.CurrentSharePrice <= 1.1m
                 select x;
             q.ToList();
-            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -266,7 +266,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 where x.CurrentSharePrice > 1.2m
                 select x;
             q.ToList();
-            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -277,7 +277,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 where x.CurrentSharePrice >= 1.3m
                 select x;
             q.ToList();
-            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -289,7 +289,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 where x.CurrentSharePrice >= 1.0m && x.CurrentSharePrice <= 2.0m
                 select x;
             q.ToList();
-            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -306,7 +306,7 @@ namespace BrightstarDB.EntityFramework.Tests
                     select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -323,7 +323,7 @@ namespace BrightstarDB.EntityFramework.Tests
                     select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" .} WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -339,7 +339,7 @@ namespace BrightstarDB.EntityFramework.Tests
                     select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -351,7 +351,7 @@ namespace BrightstarDB.EntityFramework.Tests
                     select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -368,8 +368,8 @@ namespace BrightstarDB.EntityFramework.Tests
                     select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
-?x ?x_p ?x_o . {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
+?x ?x_p ?x_o .  {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
     ?x <http://www.networkedplanet.com/schemas/test/isListed> ?v0 .
@@ -380,7 +380,7 @@ namespace BrightstarDB.EntityFramework.Tests
                     select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT {?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT {?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -392,7 +392,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -405,7 +405,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -418,7 +418,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -431,7 +431,7 @@ namespace BrightstarDB.EntityFramework.Tests
                 select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -449,7 +449,7 @@ namespace BrightstarDB.EntityFramework.Tests
                     select x;
             q.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x ?x_p ?x_o. } WHERE {
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" .} WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -533,7 +533,8 @@ FILTER(?v0 > '100'^^<http://www.w3.org/2001/XMLSchema#integer>).
             var q = Context.Dinners.SelectMany(d => d.Rsvps);
             q.ToList();
             AssertQuerySparql(
-                              @"CONSTRUCT { ?x003Cgeneratedx003Ex005Fx0030 ?x003Cgeneratedx003Ex005Fx0030_p ?x003Cgeneratedx003Ex005Fx0030_o. } WHERE {
+                              @"CONSTRUCT { ?x003Cgeneratedx003Ex005Fx0030 ?x003Cgeneratedx003Ex005Fx0030_p ?x003Cgeneratedx003Ex005Fx0030_o. 
+?x003Cgeneratedx003Ex005Fx0030 <http://www.brightstardb.com/.well-known/model/selectVariable> ""x003Cgeneratedx003Ex005Fx0030"" .} WHERE {
 ?x003Cgeneratedx003Ex005Fx0030 ?x003Cgeneratedx003Ex005Fx0030_p ?x003Cgeneratedx003Ex005Fx0030_o . {
     SELECT ?x003Cgeneratedx003Ex005Fx0030 WHERE { 
     ?d a <http://www.networkedplanet.com/schemas/test/Dinner> . 
@@ -548,7 +549,8 @@ FILTER(?v0 > '100'^^<http://www.w3.org/2001/XMLSchema#integer>).
                 Context.Dinners.SelectMany(d => d.Rsvps.Where(x => x.AttendeeEmail.Equals("kal@networkedplanet.com")));
             q2.ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x003Cgeneratedx003Ex005Fx0030 ?x003Cgeneratedx003Ex005Fx0030_p ?x003Cgeneratedx003Ex005Fx0030_o. } WHERE {
+                @"CONSTRUCT { ?x003Cgeneratedx003Ex005Fx0030 ?x003Cgeneratedx003Ex005Fx0030_p ?x003Cgeneratedx003Ex005Fx0030_o.
+?x003Cgeneratedx003Ex005Fx0030 <http://www.brightstardb.com/.well-known/model/selectVariable> ""x003Cgeneratedx003Ex005Fx0030"" .} WHERE {
 ?x003Cgeneratedx003Ex005Fx0030 ?x003Cgeneratedx003Ex005Fx0030_p ?x003Cgeneratedx003Ex005Fx0030_o . {
     SELECT ?x003Cgeneratedx003Ex005Fx0030 WHERE { 
     ?d a <http://www.networkedplanet.com/schemas/test/Dinner> . 
@@ -563,7 +565,8 @@ FILTER(?v0 > '100'^^<http://www.w3.org/2001/XMLSchema#integer>).
         {
             var q = Context.Companies.OfType<ContextObjects.IPerson>().ToList();
             AssertQuerySparql(
-                @"CONSTRUCT { ?x003Cgeneratedx003Ex005Fx0031 ?x003Cgeneratedx003Ex005Fx0031_p ?x003Cgeneratedx003Ex005Fx0031_o. } WHERE {
+                @"CONSTRUCT { ?x003Cgeneratedx003Ex005Fx0031 ?x003Cgeneratedx003Ex005Fx0031_p ?x003Cgeneratedx003Ex005Fx0031_o.
+?x003Cgeneratedx003Ex005Fx0031 <http://www.brightstardb.com/.well-known/model/selectVariable> ""x003Cgeneratedx003Ex005Fx0031"" .} WHERE {
 ?x003Cgeneratedx003Ex005Fx0031 ?x003Cgeneratedx003Ex005Fx0031_p ?x003Cgeneratedx003Ex005Fx0031_o . {
     SELECT ?x003Cgeneratedx003Ex005Fx0031 WHERE {
     ?x003Cgeneratedx003Ex005Fx0031 a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -609,7 +612,9 @@ FILTER(?v0 > '100'^^<http://www.w3.org/2001/XMLSchema#integer>).
         {
             var q = Context.Companies.Cast<IDinner>();
             q.ToList();
-            AssertQuerySparql(@"CONSTRUCT { ?x003Cgeneratedx003Ex005Fx0031 ?x003Cgeneratedx003Ex005Fx0031_p ?x003Cgeneratedx003Ex005Fx0031_o. } WHERE {
+            AssertQuerySparql(@"CONSTRUCT { ?x003Cgeneratedx003Ex005Fx0031 ?x003Cgeneratedx003Ex005Fx0031_p ?x003Cgeneratedx003Ex005Fx0031_o. 
+?x003Cgeneratedx003Ex005Fx0031 <http://www.brightstardb.com/.well-known/model/selectVariable> ""x003Cgeneratedx003Ex005Fx0031"" . 
+} WHERE {
 ?x003Cgeneratedx003Ex005Fx0031 ?x003Cgeneratedx003Ex005Fx0031_p ?x003Cgeneratedx003Ex005Fx0031_o . {
     SELECT ?x003Cgeneratedx003Ex005Fx0031 WHERE {
     ?x003Cgeneratedx003Ex005Fx0031 a <http://www.networkedplanet.com/schemas/test/Company> . } } }");
@@ -649,31 +654,47 @@ FILTER(sameTerm(?m,?v0)) .
         {
             var q = from d in Context.Dinners
                     where d.Rsvps.Any(r => r.AttendeeEmail.Equals("kal@networkedplanet.com"))
-                    select d;
+                    select d.Id;
             var result = q.ToList();
-            AssertQuerySparql(@"CONSTRUCT { ?d ?d_p ?d_o. } WHERE { 
-?d ?d_p ?d_o. { 
-    SELECT ?d WHERE {
+            AssertQuerySparql(@"SELECT ?d WHERE {
     ?d a <http://www.networkedplanet.com/schemas/test/Dinner> .
     FILTER EXISTS {
         ?d <http://www.networkedplanet.com/schemas/test/attendees> ?r .
         ?r <http://www.networkedplanet.com/schemas/test/email> ?v1 .
         FILTER (?v1 = 'kal@networkedplanet.com') .
-    } } } }");
+    } }");
 
             var q2 = from m in Context.Markets
                      where m.ListedCompanies.Any(c => c.CurrentSharePrice > 10.0m)
-                     select m;
+                     select m.Id;
             var r2 = q2.ToList();
-            AssertQuerySparql(@"CONSTRUCT { ?m ?m_p ?m_o. } WHERE {
-?m ?m_p ?m_o . {
-    SELECT ?m WHERE {
+            AssertQuerySparql(@"SELECT ?m WHERE {
     ?m a <http://www.networkedplanet.com/schemas/test/Market> .
     FILTER EXISTS {
         ?m <http://www.networkedplanet.com/schemas/test/listing> ?c .
         ?c <http://www.networkedplanet.com/schemas/test/price> ?v1 .
         FILTER (?v1 > '10.00'^^<http://www.w3.org/2001/XMLSchema#decimal>) .
-    } } } }");
+    } }");
+        }
+
+        [Test]
+        public void TestEagerLoadOrdered()
+        {
+            var q = Context.Dinners.OrderBy(x => x.EventDate);
+            var result = q.ToList();
+            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. 
+?x <http://www.brightstardb.com/.well-known/model/sortValue0> ?x_sort0 . 
+?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"".
+} WHERE {
+    ?x ?x_p ?x_o .
+    {
+        SELECT ?x ?x_sort0 WHERE {
+            ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
+            ?x <http://www.networkedplanet.com/schemas/test/date> ?v0 .
+            BIND (?v0 AS ?x_sort0).
+        } ORDER BY ASC(?v0)
+    } 
+}");
         }
     }
 }
