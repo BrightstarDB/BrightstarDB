@@ -253,4 +253,7 @@
   <data name="BrightstarServiceClient_StoreIsReadOnly" xml:space="preserve">
     <value>Cannot save changes to a read-only store.</value>
   </data>
+  <data name="ExportJob_UnsupportedExportFormat" xml:space="preserve">
+    <value>The media type {0} is not currently supported by Export jobs.</value>
+  </data>
 </root>

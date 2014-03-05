@@ -51,7 +51,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests
             FileLoader.Load(g, dataPath);
             _bnodeMappings = new Dictionary<string, string>();
             var sw = new StringWriter();
-            var ntWriter = new NQuadsWriter(sw, Constants.DefaultGraphUri);
+            var ntWriter = new NQuadsWriter(sw);
             foreach (var t in g.Triples)
             {
                 if (t.Object.NodeType == NodeType.Literal)

@@ -331,7 +331,7 @@ namespace BrightstarDB.Server
         {
             Logging.LogDebug("Export {0}, {1}", fileName, graphUri);
             var jobId = Guid.NewGuid();
-            var exportJob = new ExportJob(jobId, jobLabel, this, fileName, graphUri);
+            var exportJob = new ExportJob(jobId, jobLabel, this, fileName, graphUri, RdfFormat.NQuads);
             _jobExecutionStatus.TryAdd(jobId.ToString(),
                                        new JobExecutionStatus
                                            {

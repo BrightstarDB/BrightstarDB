@@ -6,25 +6,21 @@ using System.Text;
 namespace BrightstarDB.Rdf
 {
     /// <summary>
-    /// A triple sink that writes the received triples out in N4 format
+    /// A triple sink that writes the received triples out in NQuads format
     /// </summary>
-    /// <remarks>This writer does include the Graph URI portion of the RDF statments in the output file.</remarks>
     public class NQuadsWriter : ITripleSink
     {
         private readonly TextWriter _writer;
         private readonly Dictionary<string, string> _bnodeUriMap;
-        private readonly string _defaultGraphUri;
 
         /// <summary>
-        /// Creates a new N3 writer
+        /// Creates a new NQuads writer
         /// </summary>
-        /// <param name="writer">The text writer that the N3 representation will be written to</param>
-        /// <param name="defaultGraphUri">The URI of the default graph to import into if reading a triple rather than a quad</param>
-        public NQuadsWriter(TextWriter writer, string defaultGraphUri)
+        /// <param name="writer">The text writer that the NQuads representation will be written to</param>
+        public NQuadsWriter(TextWriter writer)
         {
             _writer = writer;
             _bnodeUriMap = new Dictionary<string, string>();
-            _defaultGraphUri = defaultGraphUri;
         }
 
         /// <summary>
@@ -161,8 +157,9 @@ namespace BrightstarDB.Rdf
             {
                 AppendResource(line, obj, objIsBNode);
             }
-            if(!String.IsNullOrEmpty(graphUri) && !_defaultGraphUri.Equals(graphUri))
+            if(!String.IsNullOrEmpty(graphUri))
             {
+                line.Append(' ');
                 AppendResource(line, graphUri, false);
             }
             line.Append(" .");
