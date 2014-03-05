@@ -696,5 +696,66 @@ FILTER(sameTerm(?m,?v0)) .
     } 
 }");
         }
+
+        [Test]
+        public void TestEagerLoadDistinct()
+        {
+            var q = Context.Dinners.Distinct();
+            var result = q.ToList();
+            AssertQuerySparql(@"CONSTRUCT { ?x003Cgeneratedx003Ex005Fx0031 ?x003Cgeneratedx003Ex005Fx0031_p ?x003Cgeneratedx003Ex005Fx0031_o.
+?x003Cgeneratedx003Ex005Fx0031 <http://www.brightstardb.com/.well-known/model/selectVariable> ""x003Cgeneratedx003Ex005Fx0031"".
+} WHERE {
+  ?x003Cgeneratedx003Ex005Fx0031 ?x003Cgeneratedx003Ex005Fx0031_p ?x003Cgeneratedx003Ex005Fx0031_o .
+  {
+    SELECT DISTINCT ?x003Cgeneratedx003Ex005Fx0031 WHERE {
+      ?x003Cgeneratedx003Ex005Fx0031 a <http://www.networkedplanet.com/schemas/test/Dinner> .
     }
+  }
+}");
+        }
+
+        [Test]
+        public void TestEagerLoadOrderedDistinct()
+        {
+            var q = Context.Dinners.OrderBy(x => x.EventDate).Distinct();
+            var result = q.ToList();
+            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o.
+?x <http://www.brightstardb.com/.well-known/model/sortValue0> ?x_dsort0.
+?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"".
+} WHERE {
+  ?x ?x_p ?x_o .
+  {
+    SELECT DISTINCT ?x (MAX(?x_sort0) AS ?x_dsort0) WHERE {
+      ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
+      ?x <http://www.networkedplanet.com/schemas/test/date> ?v0 .
+      BIND (?v0 AS ?x_sort0).
+    } 
+    GROUP BY ?x 
+    ORDER BY ASC(MAX(?x_sort0))
+  }
+}");
+        }
+
+        [Test]
+        public void TestEagerLoadOrderedPaged()
+        {
+            var q = Context.Dinners.OrderBy(x => x.EventDate).Skip(10).Take(5);
+            var result = q.ToList();
+            AssertQuerySparql(@"CONSTRUCT { ?x ?x_p ?x_o. 
+?x <http://www.brightstardb.com/.well-known/model/sortValue0> ?x_sort0 . 
+?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"".
+} WHERE {
+    ?x ?x_p ?x_o .
+    {
+        SELECT ?x ?x_sort0 WHERE {
+            ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
+            ?x <http://www.networkedplanet.com/schemas/test/date> ?v0 .
+            BIND (?v0 AS ?x_sort0).
+        } ORDER BY ASC(?v0) LIMIT 5 OFFSET 10
+    } 
+}");
+        }
+
+    }
+
 }

@@ -396,7 +396,7 @@ namespace BrightstarDB.EntityFramework.Query
             }
             return
                 new SparqlLinqQueryContext(
-                    useConstruct && !_queryBuilder.IsDistinct && !(_queryBuilder.SelectVariables.Count() > 1 && _queryBuilder.IsOrdered)
+                    useConstruct && !(_queryBuilder.SelectVariables.Count() > 1 && _queryBuilder.IsOrdered)
                         ? _queryBuilder.GetSparqlConstructString()
                         : _queryBuilder.GetSparqlString(),
                     _queryBuilder.AnonymousMembersMap,
