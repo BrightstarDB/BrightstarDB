@@ -532,15 +532,17 @@ namespace BrightstarDB.Client
         /// <param name="store">The store to export data from</param>
         /// <param name="fileName">The name of the file in the brightstar\import folder to write to. This file will be overwritten if it already exists.</param>
         /// <param name="graphUri">The URI of the graph to be exported. If NULL, all graphs in the store are exported.</param>
+        /// <param name="exportFormat">The <see cref="BrightstarDB.RdfFormat"/> to when serializing the export data. Currently only NQuads and NTriples are supported. Defaults to NQuads</param>
         /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A JobInfo instance</returns>
-        public IJobInfo StartExport(string store, string fileName, string graphUri, string label = null)
+        public IJobInfo StartExport(string store, string fileName, string graphUri, RdfFormat exportFormat = null, string label = null)
         {
             if (String.IsNullOrEmpty(store)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "store");
             if (String.IsNullOrEmpty(fileName)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "fileName");
+            if (exportFormat == null) exportFormat = RdfFormat.NQuads;
             try
             {
-                var jobId = _serverCore.Export(store, fileName, graphUri, label);
+                var jobId = _serverCore.Export(store, fileName, graphUri, exportFormat, label);
                 return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)

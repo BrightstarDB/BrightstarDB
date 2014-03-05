@@ -62,7 +62,7 @@ namespace BrightstarDB.InternalTests
 
             var storeWorker = new StoreWorker(Configuration.StoreLocation , sid);
             storeWorker.Start();
-            var jobId = storeWorker.Export(sid + "_export.nt", null);
+            var jobId = storeWorker.Export(sid + "_export.nt", null, RdfFormat.NQuads);
             JobExecutionStatus status = storeWorker.GetJobStatus(jobId.ToString());
             while (status.JobStatus != JobStatus.CompletedOk)
             {

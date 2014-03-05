@@ -22,11 +22,15 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             var request = JobRequestObject.CreateExportJob("exportFile.nt");
             Assert.That(request, Has.Property("JobType").EqualTo("Export"));
-            Assert.That(request, Has.Property("JobParameters").EqualTo(new Dictionary<string, string>{{"FileName", "exportFile.nt"}, {"GraphUri", null}}));
+            Assert.That(request, Has.Property("JobParameters").EqualTo(new Dictionary<string, string>{{"FileName", "exportFile.nt"}, {"GraphUri", null}, {"Format", RdfFormat.NQuads.MediaTypes[0]}}));
 
             request = JobRequestObject.CreateExportJob("exportFile.rdf", "http://some/graph/uri");
             Assert.That(request, Has.Property("JobType").EqualTo("Export"));
-            Assert.That(request, Has.Property("JobParameters").EqualTo(new Dictionary<string, string>{{"FileName", "exportFile.rdf"}, {"GraphUri", "http://some/graph/uri"}}));
+            Assert.That(request, Has.Property("JobParameters").EqualTo(new Dictionary<string, string>{{"FileName", "exportFile.rdf"}, {"GraphUri", "http://some/graph/uri"}, {"Format", RdfFormat.NQuads.MediaTypes[0]}}));
+
+            request = JobRequestObject.CreateExportJob("exportFile.rdf", "http://some/graph/uri", RdfFormat.NTriples);
+            Assert.That(request, Has.Property("JobType").EqualTo("Export"));
+            Assert.That(request, Has.Property("JobParameters").EqualTo(new Dictionary<string, string> { { "FileName", "exportFile.rdf" }, { "GraphUri", "http://some/graph/uri" }, {"Format", RdfFormat.NTriples.MediaTypes[0]}}));
 
             Assert.That(()=>JobRequestObject.CreateExportJob(null), Throws.TypeOf<ArgumentNullException>().With.Property("ParamName").EqualTo("exportFileName"));
             Assert.That(()=>JobRequestObject.CreateExportJob(""), Throws.TypeOf<ArgumentException>().With.Property("ParamName").EqualTo("exportFileName"));
