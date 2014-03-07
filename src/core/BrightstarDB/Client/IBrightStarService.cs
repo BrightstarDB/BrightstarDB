@@ -243,9 +243,13 @@ namespace BrightstarDB.Client
         /// <param name="store">The store to export data from</param>
         /// <param name="fileName">The name of the file in the brightstar\import folder to write to. This file will be overwritten if it already exists.</param>
         /// <param name="graphUri">The URI of the graph to be exported. If NULL, all graphs in the store are exported.</param>
+        /// <param name="exportFormat">The serialization format to use for the exported data. If unspecified or null, export will default to using NQuads format. </param>
         /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A JobInfo instance</returns>
-        IJobInfo StartExport(string store, string fileName, string graphUri = null, string label = null);
+        /// <remarks>If <paramref name="exportFormat"/> specifies a graph format, then all data in the store will be "flattened" into a single graph, this may
+        /// result in triples being repeated in the exported data and round-tripping will not be possible. Currently only <see cref="RdfFormat.NQuads"/>
+        /// and <see cref="RdfFormat.NTriples"/> are supported export formats.</remarks>
+        IJobInfo StartExport(string store, string fileName, string graphUri = null, RdfFormat exportFormat = null, string label = null);
 
         /// <summary>
         /// Creates a new store file containing only the data required for the current state

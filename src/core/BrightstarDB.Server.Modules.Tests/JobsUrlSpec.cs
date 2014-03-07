@@ -57,7 +57,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("2345");
-            brightstar.Setup(s=>s.StartExport("foo", "export.nt", null, "ExportJob")).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s=>s.StartExport("foo", "export.nt", null, It.Is<RdfFormat>(r=>r.DefaultExtension.Equals(RdfFormat.NQuads.DefaultExtension)), "ExportJob")).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var requestObject = JobRequestObject.CreateExportJob("export.nt", label:"ExportJob");
 
@@ -80,9 +80,9 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("2345");
-            brightstar.Setup(s => s.StartExport("foo", "export.nt", "http://some/graph/uri", "ExportJob")).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s => s.StartExport("foo", "export.nt", "http://some/graph/uri", It.Is<RdfFormat>(r=>r.DefaultExtension.Equals(RdfFormat.NTriples.DefaultExtension)), "ExportJob")).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var requestObject = JobRequestObject.CreateExportJob("export.nt", "http://some/graph/uri", "ExportJob");
+            var requestObject = JobRequestObject.CreateExportJob("export.nt", "http://some/graph/uri", RdfFormat.NTriples, "ExportJob");
 
             // Execute
             var response = app.Post("foo/jobs", with =>

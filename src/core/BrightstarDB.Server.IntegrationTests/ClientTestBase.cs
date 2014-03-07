@@ -2,23 +2,40 @@
 using System;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules;
+using BrightstarDB.Server.Modules.Authentication;
 using BrightstarDB.Server.Modules.Permissions;
+using Nancy.Bootstrapper;
 using Nancy.Hosting.Self;
 
 namespace BrightstarDB.Server.IntegrationTests
 {
     public class ClientTestBase
     {
+        private readonly INancyBootstrapper _bootstrapper;
         private static NancyHost _serviceHost;
         private static bool _closed;
         private static readonly object HostLock = new object();
 
-        protected static void StartService()
+        public ClientTestBase()
+            : this(new BrightstarBootstrapper(
+                       BrightstarService.GetClient(),
+                       new IAuthenticationProvider[] {new NullAuthenticationProvider()},
+                       new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                       new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All)))
+        {
+        }
+
+        public ClientTestBase(INancyBootstrapper bootstrapper)
+        {
+            this._bootstrapper = bootstrapper;
+        }
+
+        protected void StartService()
         {
             StartServer();
         }
 
-        protected static void CloseService()
+        protected void CloseService()
         {
             lock (HostLock)
             {
@@ -27,7 +44,7 @@ namespace BrightstarDB.Server.IntegrationTests
             }
         }
 
-        private static void StartServer()
+        private void StartServer()
         {
             lock (HostLock)
             {
@@ -36,11 +53,8 @@ namespace BrightstarDB.Server.IntegrationTests
 #else
                 if (_serviceHost == null || _closed)
                 {
-                    _serviceHost = new NancyHost(new BrightstarBootstrapper(
-                                                     BrightstarService.GetClient(),
-                                                     new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
-                                                     new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All)),
-                                                     new HostConfiguration{AllowChunkedEncoding = false},
+                    _serviceHost = new NancyHost(_bootstrapper,
+                                                 new HostConfiguration {AllowChunkedEncoding = false},
                                                  new Uri("http://localhost:8090/brightstar/"));
                     _serviceHost.Start();
                 }

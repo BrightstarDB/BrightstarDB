@@ -22,8 +22,7 @@ namespace BrightstarDB.Server.Runner
                 var service = BrightstarService.GetClient(configuration.ConnectionString);
 
                 return new BrightstarBootstrapper(service,
-                                                  configuration.StorePermissionsProvider,
-                                                  configuration.SystemPermissionsProvider,
+                                                  configuration,
                                                   serviceArgs.RootPath);
             }
             catch (Exception ex)

@@ -29,7 +29,7 @@ The following example shows how to create a new service client using a connectio
 
 For more information about connection strings, please read the :ref:`"Connection Strings" 
 topic <Connection_Strings>`
-
+                    
 
 Creating a Store
 ================

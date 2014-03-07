@@ -87,19 +87,22 @@ namespace BrightstarDB.Dto
         /// </summary>
         /// <param name="exportFileName">The name of the file to export the data to</param>
         /// <param name="graphUri">OPTIONAL: The URI identifier of the graph to be exported. If not provided, all graphs in the store are exported</param>
+        /// <param name="exportFormat">The serialization format to use for the exported data. If unspecified or null, export will default to using NQuads format. </param>
         /// <param name="label">A user-friendly label for the job</param>
         /// <returns>A new <see cref="JobRequestObject"/> instance</returns>
-        public static JobRequestObject CreateExportJob(string exportFileName, string graphUri = null, string label = null)
+        public static JobRequestObject CreateExportJob(string exportFileName, string graphUri = null, RdfFormat exportFormat = null, string label = null)
         {
             if (exportFileName == null) throw new ArgumentNullException("exportFileName");
             if (String.IsNullOrWhiteSpace(exportFileName)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "exportFileName");
             if (graphUri != null && String.IsNullOrWhiteSpace(graphUri)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "graphUri");
+            if (exportFormat == null) exportFormat = RdfFormat.NQuads;
 
             return new JobRequestObject("Export",
                                         new Dictionary<string, string>
                                             {
                                                 {"FileName", exportFileName},
-                                                {"GraphUri", graphUri}
+                                                {"GraphUri", graphUri},
+                                                {"Format", exportFormat.MediaTypes[0]}
                                             },
                                         label);
         }

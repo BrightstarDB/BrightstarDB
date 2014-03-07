@@ -17,7 +17,7 @@ namespace BrightstarDB.EntityFramework.Tests
         {
             var q = from c in Context.Companies
                     where c.HeadCount < 10
-                    select c;
+                    select c.Id;
             var results = q.ToList();
             AssertQuerySparql(@"SELECT ?c WHERE { 
 ?c a <http://www.networkedplanet.com/schemas/test/Company> .
@@ -30,7 +30,7 @@ FILTER (?v0 < '10'^^<http://www.w3.org/2001/XMLSchema#integer>) .}");
         {
             var q = from c in Context.Companies
                     where !(c.HeadCount < 10)
-                    select c;
+                    select c.Id;
             var results = q.ToList();
             AssertQuerySparql(@"SELECT ?c WHERE { 
 ?c a <http://www.networkedplanet.com/schemas/test/Company> .

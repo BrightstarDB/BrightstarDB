@@ -40,13 +40,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Moq.4.2.1312.1622\lib\net40\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy, Version=0.22.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy, Version=0.22.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.0.22.0\lib\net40\Nancy.dll</HintPath>
+      <HintPath>..\packages\Nancy.0.22.2\lib\net40\Nancy.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.Testing, Version=0.22.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy.Authentication.Basic, Version=0.22.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Testing.0.22.0\lib\net40\Nancy.Testing.dll</HintPath>
+      <HintPath>..\packages\Nancy.Authentication.Basic.0.22.2\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
+    </Reference>
+    <Reference Include="Nancy.Testing, Version=0.22.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Nancy.Testing.0.22.2\lib\net40\Nancy.Testing.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -61,6 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication\BasicAuthProviderSpec.cs" />
     <Compile Include="CommitPointsUrlSpec.cs" />
     <Compile Include="ConfigurationSectionHandlerSpec.cs" />
     <Compile Include="CreateStoreRequestObjectSpec.cs" />
@@ -70,8 +75,10 @@
     <Compile Include="JobsUrlSpec.cs" />
     <Compile Include="LatestStatisticsUrlSpec.cs" />
     <Compile Include="LinkExistsConstraint.cs" />
+    <Compile Include="MockUserIdentity.cs" />
     <Compile Include="SparqlUpdateUrlSpec.cs" />
     <Compile Include="SparqlUrlSpec.cs" />
+    <Compile Include="StaticPermissionsProvidersTests.cs" />
     <Compile Include="StatisticsUrlSpec.cs" />
     <Compile Include="StoreResponseObjectSpec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

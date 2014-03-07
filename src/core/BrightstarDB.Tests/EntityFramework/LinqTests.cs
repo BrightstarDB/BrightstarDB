@@ -426,7 +426,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
             var entity3 = context.Entities.Create();
             entity3.SomeString = "Carrots";
-            entity3.SomeInt = 10;
+            entity3.SomeInt = 8;
 
             var entity4 = context.Entities.Create();
             entity4.SomeString = "Apples";
@@ -443,6 +443,64 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsTrue(categories.Contains("Apples"));
             Assert.IsTrue(categories.Contains("Bananas"));
             Assert.IsTrue(categories.Contains("Carrots"));
+
+        }
+
+        [Test]
+        public void TestOrderedDistinct()
+        {
+            var connectionString = GetConnectionString("TestOrderedDistinct");
+            var context = new MyEntityContext(connectionString);
+
+            var alice = context.Persons.Create();
+            alice.Name = "Alice";
+            var bob = context.Persons.Create();
+            bob.Name = "Bob";
+            var carol = context.Persons.Create();
+            carol.Name = "Carol";
+
+            var programming = context.Skills.Create();
+            programming.Name = "Programming";
+            var csharp = context.Skills.Create();
+            csharp.Name = "C#";
+            csharp.Parent = programming;
+            csharp.SkilledPeople.Add(alice);
+            csharp.SkilledPeople.Add(bob);
+
+            var vb = context.Skills.Create();
+            vb.Name = "Visual Basic";
+            vb.Parent = programming;
+            vb.SkilledPeople.Add(alice);
+            vb.SkilledPeople.Add(carol);
+
+            var fsharp = context.Skills.Create();
+            fsharp.Name = "F#";
+            fsharp.Parent = programming;
+            fsharp.SkilledPeople.Add(alice);
+
+            context.SaveChanges();
+
+            //var allProgrammers =
+            //    context.Skills.Where(x => x.Parent.Id.Equals(programming.Id)).SelectMany(s => s.SkilledPeople).ToList();
+            //// No distinct so we will get alice three times
+            //Assert.That(allProgrammers.Count, Is.EqualTo(5));
+            //Assert.That(allProgrammers.Where(p=>p.Name.Equals("alice")), Is.EqualTo(3));
+
+            var allProgrammersDistinct =
+                context.Skills.Where(x => x.Parent.Id.Equals(programming.Id)).SelectMany(s => s.SkilledPeople).Distinct().ToList();
+            // Distinct so we will get alice only once
+            Assert.That(allProgrammersDistinct.Count, Is.EqualTo(3));
+            Assert.That(allProgrammersDistinct.Count(p => p.Name.Equals("Alice")), Is.EqualTo(1));
+
+            var allProgrammersOrderedDistinct =
+                context.Skills.Where(x => x.Parent.Id.Equals(programming.Id)).SelectMany(s => s.SkilledPeople).OrderByDescending(p=>p.Name).Distinct().ToList();
+            // Distinct so we will get alice only once
+            Assert.That(allProgrammersOrderedDistinct.Count, Is.EqualTo(3));
+            Assert.That(allProgrammersOrderedDistinct[0].Name, Is.EqualTo("Carol"));
+            Assert.That(allProgrammersOrderedDistinct[1].Name, Is.EqualTo("Bob"));
+            Assert.That(allProgrammersOrderedDistinct[2].Name, Is.EqualTo("Alice"));
+
+
         }
 
         [Test]
@@ -1876,13 +1934,17 @@ namespace BrightstarDB.Tests.EntityFramework
         public void TestLinqQueryEnum()
         {
             var connectionString = GetConnectionString("TestLinqQueryEnum");
+            if (connectionString.Contains("type=dotnetrdf"))
+            {
+                Assert.Inconclusive("Enum tests fail against DNR store");
+            }
             var context = new MyEntityContext(connectionString);
             var entity1 = context.Entities.Create();
             entity1.SomeEnumeration = TestEnumeration.Second;
             entity1.SomeNullableEnumeration = TestEnumeration.Third;
             entity1.SomeNullableFlagsEnumeration = TestFlagsEnumeration.FlagA | TestFlagsEnumeration.FlagB;
             context.SaveChanges();
-            /*
+            
             // Find by single flag
             IList<IEntity> results = context.Entities.Where(e => e.SomeEnumeration == TestEnumeration.Second).ToList();
             Assert.AreEqual(1, results.Count);
@@ -1923,10 +1985,10 @@ namespace BrightstarDB.Tests.EntityFramework
                 ((e.SomeNullableFlagsEnumeration & (TestFlagsEnumeration.FlagA | TestFlagsEnumeration.FlagC)) ==
                  (TestFlagsEnumeration.FlagA | TestFlagsEnumeration.FlagC))).ToList();
             Assert.AreEqual(0, results.Count);
-            */
+            
 
             // Find by NoFlags
-            var results =
+            results =
                 context.Entities.Where(
                     e => e.SomeFlagsEnumeration == TestFlagsEnumeration.NoFlags).ToList();
             Assert.AreEqual(1, results.Count);

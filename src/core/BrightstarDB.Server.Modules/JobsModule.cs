@@ -110,10 +110,16 @@ namespace BrightstarDB.Server.Modules
                                 {
                                     return HttpStatusCode.BadRequest;
                                 }
+                                RdfFormat format = jobRequestObject.JobParameters.ContainsKey("Format")
+                                                       ? RdfFormat.GetResultsFormat(
+                                                           jobRequestObject.JobParameters["Format"])
+                                                       : RdfFormat.NQuads;
+
                                 queuedJobInfo = brightstarService.StartExport(
                                     storeName,
                                     jobRequestObject.JobParameters["FileName"],
                                     jobRequestObject.JobParameters.ContainsKey("GraphUri") ? jobRequestObject.JobParameters["GraphUri"] : null,
+                                    format,
                                     label);
                                 break;
 

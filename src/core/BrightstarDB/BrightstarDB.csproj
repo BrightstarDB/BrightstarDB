@@ -463,6 +463,7 @@
     <Compile Include="Utils\LruCache.cs" />
     <Compile Include="Utils\SparqlQueryHelper.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
+    <Compile Include="Utils\XmlExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Strings.resx">

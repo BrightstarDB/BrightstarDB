@@ -33,6 +33,17 @@ namespace BrightstarDB
         public const string VersionPredicateUri = "http://www.brightstardb.com/.well-known/model/version";
 
         /// <summary>
+        /// Predicate used in eagerly loaded LINQ to SPARQL result graphs
+        /// </summary>
+        public const string SelectVariablePredicateUri = "http://www.brightstardb.com/.well-known/model/selectVariable";
+
+        /// <summary>
+        /// Base string for constrtucting sort value predicates in an eagerly loaded LINQ to SPARQL result graph.
+        /// The actualy URIs have an integer appended, starting with 0 (http://www.brightstardb.com/.well-known/model/sortValue0)
+        /// </summary>
+        public const string SortValuePredicateBase = "http://www.brightstardb.com/.well-known/model/sortValue";
+
+        /// <summary>
         /// A regular expression to use for validating store names
         /// </summary>
         public const string StoreNameRegex = @"^[a-zA-Z0-9-_\.\+,\(\)]{1,1024}$";

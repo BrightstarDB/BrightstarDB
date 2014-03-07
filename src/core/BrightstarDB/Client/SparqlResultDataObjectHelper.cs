@@ -1,8 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
-using BrightstarDB.Model;
+using System.Xml.Linq;
 using BrightstarDB.Rdf;
+using BrightstarDB.Utils;
+using Remotion.Linq.Clauses;
+using VDS.RDF;
+using VDS.RDF.Parsing;
+using VDS.RDF.Query.Datasets;
+using Triple = BrightstarDB.Model.Triple;
 
 namespace BrightstarDB.Client
 {
@@ -19,7 +26,7 @@ namespace BrightstarDB.Client
             _storeContext = storeContext;
         }
 
-        public IEnumerable<IDataObject> BindDataObjects(SparqlResult sparqlResult)
+        public IEnumerable<IDataObject> BindDataObjects(SparqlResult sparqlResult, IList<OrderingDirection> orderingDirections = null )
         {
             var xmlReader = sparqlResult.ResultDocument.CreateReader();
             xmlReader.MoveToContent();
@@ -27,12 +34,99 @@ namespace BrightstarDB.Client
             {
                 if ("RDF".Equals(xmlReader.LocalName) && RdfNamespace.Equals(xmlReader.NamespaceURI))
                 {
-                    return BindRdfDataObjects(xmlReader);
+                    return orderingDirections == null ?
+                        BindRdfDataObjects(xmlReader) :
+                        BindRdfDataObjects(sparqlResult.ResultDocument, orderingDirections);
                 }
             }
             return BindDataObjects(xmlReader, sparqlResult.SourceSparqlQueryContext.ExpectTriplesWithOrderedSubjects);
         }
 
+        public IEnumerable<IDataObject> BindRdfDataObjects(XDocument rdfXmlDocument,
+                                                           IList<OrderingDirection> orderingDirections)
+        {
+            var g = new Graph();
+            var parser = new RdfXmlParser(RdfXmlParserMode.DOM);
+            parser.Load(g, rdfXmlDocument.AsXmlDocument());
+
+            var p = new VDS.RDF.Query.LeviathanQueryProcessor(new InMemoryDataset(g));
+            var queryString = MakeOrderedResourceQuery(orderingDirections);
+            var sparqlParser = new SparqlQueryParser();
+            var query = sparqlParser.ParseFromString(queryString);
+            var queryResultSet = p.ProcessQuery(query) as VDS.RDF.Query.SparqlResultSet;
+            foreach (var row in queryResultSet.Results)
+            {
+                INode uriNode;
+                if (row.TryGetBoundValue("x", out uriNode) && uriNode is IUriNode)
+                {
+                    yield return BindRdfDataObject(uriNode as IUriNode, g);
+                }
+            }
+        } 
+
+        private IDataObject BindRdfDataObject(IUriNode dataObjectResource, IGraph graph)
+        {
+            var triples = new List<Triple>();
+            foreach (var t in graph.GetTriplesWithSubject(dataObjectResource))
+            {
+                if (t.Subject is IUriNode && t.Predicate is IUriNode)
+                {
+                    // Only handling triples that have a URI predicate
+                    // subject will always be a UriNode, because that is what we used in the lookup
+                    var subject = (t.Subject as IUriNode).Uri.ToString();
+                    var predicate = (t.Predicate as IUriNode).Uri.ToString();
+                    if (t.Object is ILiteralNode)
+                    {
+                        var lit = t.Object as ILiteralNode;
+                        triples.Add(new Triple
+                            {
+                                Subject = subject,
+                                Predicate = predicate,
+                                IsLiteral = true,
+                                Object = lit.Value,
+                                DataType = lit.DataType == null ? Constants.DefaultDatatypeUri : lit.DataType.ToString(),
+                                LangCode = lit.Language
+                            });
+                    }
+                    else if (t.Object is IUriNode)
+                    {
+                        var uriNode = t.Object as IUriNode;
+                        triples.Add(new Triple
+                            {
+                                Subject = subject,
+                                Predicate = predicate,
+                                IsLiteral = false,
+                                Object = uriNode.Uri.ToString()
+                            });
+                    }
+                }
+            }
+            var dataObject = _storeContext.MakeDataObject(dataObjectResource.Uri.ToString()) as DataObject;
+            dataObject.BindTriples(triples);
+            return dataObject;
+        }
+
+        private string MakeOrderedResourceQuery(IList<OrderingDirection> orderingDirections)
+        {
+            var query = new StringBuilder();
+            query.Append("SELECT ?x WHERE { ?x <" + Constants.SelectVariablePredicateUri + "> ?sv .");
+            for (var i = 0; i < orderingDirections.Count; i++)
+            {
+                query.AppendFormat("?x <" + Constants.SortValuePredicateBase + "{0}> ?sortValue{0} .", i);
+            }
+            query.Append("}");
+            if (orderingDirections.Count > 0)
+            {
+                query.Append(" ORDER BY ");
+                for (var i = 0; i < orderingDirections.Count; i++)
+                {
+                    query.AppendFormat(
+                        orderingDirections[i] == OrderingDirection.Desc ? " DESC(?sortValue{0})" : " ?sortValue{0} ", i);
+                }
+            }
+            return query.ToString();
+        }
+             
         public IEnumerable<IDataObject> BindRdfDataObjects(XmlReader xmlReader)
         {
             SkipToStartElement(xmlReader);

@@ -120,7 +120,7 @@ namespace BrightstarDB.Client
             }
 
             var deleteData = new StringWriter();
-            var dw = new BrightstarTripleSinkAdapter(new NQuadsWriter(deleteData, UpdateGraphUri));
+            var dw = new BrightstarTripleSinkAdapter(new NQuadsWriter(deleteData));
             foreach (var triple in DeletePatterns)
             {
                 dw.Triple(triple);
@@ -128,7 +128,7 @@ namespace BrightstarDB.Client
             deleteData.Close();
 
             var addData = new StringWriter();
-            var aw = new BrightstarTripleSinkAdapter(new NQuadsWriter(addData, UpdateGraphUri));
+            var aw = new BrightstarTripleSinkAdapter(new NQuadsWriter(addData));
             foreach (var triple in AddTriples)
             {
                 aw.Triple(triple);               
@@ -136,7 +136,7 @@ namespace BrightstarDB.Client
             addData.Close();
 
             var preconditionsData = new StringWriter();
-            var pw = new BrightstarTripleSinkAdapter(new NQuadsWriter(preconditionsData, UpdateGraphUri));
+            var pw = new BrightstarTripleSinkAdapter(new NQuadsWriter(preconditionsData));
             foreach (var triple in Preconditions)
             {
                 pw.Triple(triple);

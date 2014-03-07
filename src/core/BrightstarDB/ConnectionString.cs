@@ -19,8 +19,8 @@ namespace BrightstarDB
         private const string DnrStoreName = "store";
         private const string DnrQueryName = "query";
         private const string DnrUpdateName = "update";
-        private const string DnrStorageServerName = "storageServer";
-        private const string UserNamePropertyName = "userName";
+        private const string DnrStorageServerName = "storageserver";
+        private const string UserNamePropertyName = "username";
         private const string PasswordPropertyName = "password";
 
         private readonly Dictionary<string, string> _values;
@@ -202,7 +202,16 @@ namespace BrightstarDB
             }
             if (Type == ConnectionType.Rest)
             {
-                return String.Format("type=rest;endpoint={0};accountId={1};key={2}",ServiceEndpoint, Account, Key);
+                if (!String.IsNullOrEmpty(Account))
+                {
+                    return String.Format("type=rest;endpoint={0};accountId={1};key={2}", ServiceEndpoint, Account, Key);
+                }
+                if (!String.IsNullOrEmpty(UserName))
+                {
+                    return String.Format("type=rest;endpoint={0};userName={1};password={2}", ServiceEndpoint, UserName,
+                                         Password);
+                }
+                return String.Format("type=rest;endpoint={0}", ServiceEndpoint);
             }
             throw new NotSupportedException(String.Format("Cannot serialize connection string for connection type {0}", Type));
         }

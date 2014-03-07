@@ -58,6 +58,21 @@ is used. This option is only used by the :ref:`Data_Object_Layer` and
 :ref:`Entity_Framework` and is currently not supported on connections
 of type *dotNetRDF*
 
+**UserName**: Specifies the user name to use for authenticating with the server.
+A connection string with this property must also have a **Password** property
+for authentication to take place.
+
+**Password**: Specifies the password to use for authenticating with the server.
+A connection string with this property must also have a **UserName** property
+for authentication to take place.
+
+.. note::
+    You should never store credentials in a connection string as plain text.
+    Instead your application should store the base connection string without
+    the UserName and Password properties. It should then prompt the user to enter their credentials
+    just before it creates the BrightstarDB client and append the UserName and Password
+    properties to the base connection string.
+    
 The following are examples of connection strings. Property value pairs are separated by ';' 
 and property names are case insensitive.::
 

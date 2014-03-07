@@ -658,12 +658,13 @@ namespace BrightstarDB.Client
         /// <param name="store">The store to export data from</param>
         /// <param name="fileName">The name of the file in the brightstar\import folder to write to. This file will be overwritten if it already exists.</param>
         /// <param name="graphUri">The identifier of the store graph to be exported. If NULL, all graphs in the store will be exported.</param>
+        /// <param name="exportFormat">The serialization format to use for the exported data. If unspecified or null, export will default to using NQuads format. </param>
         /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A JobInfo instance</returns>
-        public IJobInfo StartExport(string store, string fileName, string graphUri, string label = null)
+        public IJobInfo StartExport(string store, string fileName, string graphUri, RdfFormat exportFormat = null, string label = null)
         {
             ValidateStoreName(store);
-            var job = JobRequestObject.CreateExportJob(fileName, graphUri, label);
+            var job = JobRequestObject.CreateExportJob(fileName, graphUri, exportFormat, label);
             var jobUri = CreateJob(store, job);
             var jobInfoResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobInfoResponse);

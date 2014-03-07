@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using BrightstarDB.Model;
@@ -27,7 +26,7 @@ namespace BrightstarDB.Client
             string updateGraphUri )
         {
             var deleteData = new StringWriter();
-            var dw = new BrightstarTripleSinkAdapter(new NQuadsWriter(deleteData, updateGraphUri));
+            var dw = new BrightstarTripleSinkAdapter(new NQuadsWriter(deleteData));
             foreach (Triple triple in deletePatterns)
             {
                 dw.Triple(triple);
@@ -35,7 +34,7 @@ namespace BrightstarDB.Client
             deleteData.Close();
 
             var addData = new StringWriter();
-            var aw = new BrightstarTripleSinkAdapter(new NQuadsWriter(addData, updateGraphUri));
+            var aw = new BrightstarTripleSinkAdapter(new NQuadsWriter(addData));
             foreach (Triple triple in inserts)
             {
                 aw.Triple(triple);
@@ -43,7 +42,7 @@ namespace BrightstarDB.Client
             addData.Close();
 
             var preconditionsData = new StringWriter();
-            var pw = new BrightstarTripleSinkAdapter(new NQuadsWriter(preconditionsData, updateGraphUri));
+            var pw = new BrightstarTripleSinkAdapter(new NQuadsWriter(preconditionsData));
             foreach (var triple in preconditions)
             {
                 pw.Triple(triple);

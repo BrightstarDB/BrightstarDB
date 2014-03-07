@@ -121,3 +121,7 @@ UpgradeLog*.XML
 current_buildnumber.txt
 _build/
 build/
+src/core/BrightstarDB.Server.AspNet.Secured/App_Data/aspnetdb.mdf
+src/core/BrightstarDB.Server.AspNet.Secured/App_Data/aspnetdb_log.ldf
+src/core/BrightstarDB.Server.AspNet.Secured/Views/
+src/core/BrightstarDB.Server.AspNet.Secured/assets/

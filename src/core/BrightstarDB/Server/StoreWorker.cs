@@ -327,11 +327,11 @@ namespace BrightstarDB.Server
             return jobId;
         }
 
-        public Guid Export(string fileName, string graphUri, string jobLabel = null)
+        public Guid Export(string fileName, string graphUri, RdfFormat exportFormat, string jobLabel = null)
         {
-            Logging.LogDebug("Export {0}, {1}", fileName, graphUri);
+            Logging.LogDebug("Export {0}, {1}, {2}", fileName, graphUri, exportFormat.DefaultExtension);
             var jobId = Guid.NewGuid();
-            var exportJob = new ExportJob(jobId, jobLabel, this, fileName, graphUri);
+            var exportJob = new ExportJob(jobId, jobLabel, this, fileName, graphUri, RdfFormat.NQuads);
             _jobExecutionStatus.TryAdd(jobId.ToString(),
                                        new JobExecutionStatus
                                            {
