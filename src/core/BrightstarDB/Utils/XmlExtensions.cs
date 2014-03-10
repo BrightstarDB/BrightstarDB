@@ -12,12 +12,13 @@ namespace BrightstarDB.Utils
     /// </summary>
     public static class XmlExtensions
     {
+#if !PORTABLE
         /// <summary>
         /// Utility method to convert and XDocument to an XmlDocument
         /// </summary>
         /// <param name="document">The XDocument to be converted</param>
         /// <returns>The XmlDocument representation of the provided XDocument</returns>
-        public static XmlDocument AsXmlDocument(this XDocument document)
+		public static XmlDocument AsXmlDocument(this XDocument document)
         {
             var xmlDoc = new XmlDocument();
             using (var xmlReader = document.CreateReader())
@@ -26,5 +27,6 @@ namespace BrightstarDB.Utils
             }
             return xmlDoc;
         }
+#endif
     }
 }

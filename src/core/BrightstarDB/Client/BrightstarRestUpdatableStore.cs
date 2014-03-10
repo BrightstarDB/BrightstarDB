@@ -3,6 +3,10 @@ using System.IO;
 using System.Threading;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
+#if PORTABLE
+using VDS.RDF; // Pulls in the extension methods for Close() on streams
+using Triple = BrightstarDB.Model.Triple;
+#endif
 
 namespace BrightstarDB.Client
 {

@@ -15,6 +15,8 @@ namespace BrightstarDB.Portable.Android.Tests
 			// or in any reference assemblies
 			// AddTest (typeof (Your.Library.TestClass).Assembly);
 
+			TestHelper.Context = this;
+
 			// Once you called base.OnCreate(), you cannot add more assemblies.
 			base.OnCreate (bundle);
 		}
