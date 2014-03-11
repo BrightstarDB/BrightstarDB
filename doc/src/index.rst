@@ -3,7 +3,7 @@ BrightstarDB Documentation
 =============================================================
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
 
     Getting Started <Getting_Started>
     Concepts <Concepts>

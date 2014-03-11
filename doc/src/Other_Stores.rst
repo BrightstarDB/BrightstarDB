@@ -41,7 +41,7 @@ and load the configuration from a file whose path you specify in the
 connection string (refer to :ref:`Connection_Strings` for more details).
 
 In the DotNetRDF configuration file you need to either configure one or more `Storage Providers <https://bitbucket.org/dotnetrdf/dotnetrdf/wiki/UserGuide/Configuration/Storage%20Providers>`_ or
-a **single** `Storage Server (at the time of writing the configuration for these has not been
+a **single** Storage Server (at the time of writing the configuration for these has not been
 documented in the DotNetRDF project).
 
 Using Storage Providers
@@ -147,7 +147,7 @@ Example Configurations
 --------------------------
 
 Connecting over SPARQL Protocol
-===============================
+-------------------------------
 
 DotNetRDF configuration file (dotNetRdf.config.ttl)::
 
@@ -167,7 +167,7 @@ connection string::
     type=dotnetrdf;configuration=c:\path\to\dotNetRdf.config.ttl;query=http://example.org/configuration#sparqlQuery;update=http://example.org/configuration#sparqlUpdate;
     
 Connecting to a Fuseki Server
-=============================
+-----------------------------
 
 DotNetRDF configuration file (dotNetRdf.config.ttl)::
 

@@ -22,10 +22,10 @@ Before you can build BrightstarDB you need to install the following tools.
         
         *TBD: Check what can be built with VS 2012 Express*
         
-	#.  Windows Phone SDK
+    #.  **Windows Phone SDK**
 		
-		This is required only to build the mobile solution that targets Windows Phone 7 and 8.
-		Get the Windows Phone SDK from htpp://dev.windowsphone.com/
+        This is required only to build the mobile solution that targets Windows Phone 7 and 8.
+        Get the Windows Phone SDK from htpp://dev.windowsphone.com/
 		
     #.  **MSBuild Community Tasks**
         
@@ -99,11 +99,64 @@ Before you can build BrightstarDB you need to install the following tools.
     and select the branch you want to download from the drop-down box. Then use the
     'Download ZIP' button to retrieve the source.
 
-.. _Build_BuildingTheCore:
+.. _Build_Proj:
 
 *********************
- Building The Core
+ MSBuild build.proj
 *********************
+
+The quickest and simplest way to build BrightstarDB is to use the build.proj MSBuild
+script. This script is found in the top-level directory of the BrightstarDB source.
+
+The script uses the following properties:
+
+	Configuration
+		The project configuration to be built. Can be either 'Debug' or 'Release'. Defaults to 'Debug'.
+	
+	NUnitPath
+		The path to your NUnit bin directory. This is used when running the unit tests. Defaults to
+		C:\Program Files (x86)\NUnit 2.6.2\bin
+		
+You can either override these properties on the command-line using /p:{Property}={Value} switches
+or you can edit the build.proj file (the properties are defined at the top of the file).
+
+The MSBuild script has the following targets:
+
+	BuildAndTest
+		Build Core, Mobile, Portable and Tools and run the unit tests. This is the default target
+		that will be run if you don't specify a /t:{Target} switch on the command-line.
+		
+	BuildCore
+		Performs a clean build of the core .NET 4.0 library only.
+		
+	BuildMobile
+		Performs a clean build of the Windows Phone library only.
+		
+	BuildTools
+		Performs a clean build of the Polaris tool.
+		
+	Test
+		Run Core and Portable unit tests
+		
+	TestCore
+		Run Core unit tests only
+		
+	TestPortable
+		Run Portable unit tests only
+
+
+.. note::
+	The ``build.proj`` script is provided to make it easy to locally build and test 
+	BrightstarDB. It does not contain targets for building release packages. The
+	process for building a full release is a little more involved and requires
+	more pre-requisites to be installed. This is documented below.
+	
+	
+.. _Build_BuildingTheCore:
+
+****************************
+ Building The Core Solution
+****************************
 
     The core BrightstarDB solution can be found at ``src\core\BrighstarDB.sln``. This solution
     will build BrightstarDB's .NET 4 assemblies as well as the BrightstarDB service components
@@ -162,7 +215,34 @@ Before you can build BrightstarDB you need to install the following tools.
     right-click on the solution in the Solution Explorer window and select 
     **Manage NuGet Packages for Solution...** and if necessary follow the prompt
     to download an install missing NuGet packages.
-    
+
+.. _Build_BuildingTheDocumentation:
+
+****************************
+ Building The Documentation
+****************************
+
+	Documentation for BrightstarDB is in two separate parts. 
+	
+**Developers Guide / User Manual**
+
+	The developer and
+	user manual (this document) is maintained as RestructuredText files and
+	uses Sphinx to build.
+	
+	Details on getting and using Sphinx can be found at http://sphinx-doc.org/.
+	Sphinx is a Python based tool so it also requires a Python installation on
+	your machine. You may just find it easier to get the pre-built documentation
+	from http://brightstardb.readthedocs.org/
+	
+**API Documentation**
+
+	The API documentation is generated using Sandcastle Help File Builder. You can
+	get the installer for SHFB from http://shfb.codeplex.com/. The .shfbproj file
+	for the documentation is at ``doc/api/BrightstarDB.shfbproj``. To build the
+	documentation using this project file you must first build the Core in the
+	Debug configuration.
+	
 .. _Build_BuildingThePackages:
 
 ******************************************
@@ -181,3 +261,8 @@ Before you can build BrightstarDB you need to install the following tools.
 		dependencies in both the core solution and the tools solution as described
 		in the sections above.
     
+*********************
+ Building Under Mono
+*********************
+
+Please see :ref:`mono_build` in the section :ref:`BrightstarDB_Under_Mono`

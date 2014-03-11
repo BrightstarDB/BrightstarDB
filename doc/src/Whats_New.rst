@@ -1,8 +1,9 @@
-﻿.. _Whats_New:
+﻿
+.. _Whats_New:
 
-##########
- Whats New
-##########
+############
+ What's New
+############
 
 .. _System.ComponentModel.INotifyPropertyChanged: http://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged%28v=vs.100%29.aspx
 .. _System.Collections.Specialized.INotifyCollectionChanged: http://msdn.microsoft.com/en-us/library/system.collections.specialized.inotifycollectionchanged%28v=vs.100%29.aspx
@@ -12,8 +13,32 @@ This section gives a brief outline of what is new / changed in each official rel
 either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
 marked with FIX.
 
+*************************
+ BrightstarDB 1.6 Release
+*************************
+
+  - FIX: Fix for bug in reading back through multiple entries in the store statistics log.
+
+  - FIX: Fixed the New Job form in the browser interface for the BrightstarDB server so that it properly resets on page load
+
+  - FIX: Fixed the New Job form to allow Import and Export jobs to be created without requiring a Graph URI
+
+  - NEW: Jobs created through the API can now be assigned a user-defined title string, this will be displayed / returned when the jobs are listed.
+
+  - NEW: Entity Framework internals allow better constructor injection of configuration parameters
+
+  - FIX: Fix for concurrency bug in Background Page Writer - with thanks to Michael Schulte for the bug report and suggested fix.
+
+  - NEW: Entity Framework will now "eagerly" load the triples for entities returned by a LINQ query in a wider number of circumstances.
+
+  - NEW: Added a utility class for retrieving the namespace prefix declarations used by entity classes and formatting them for custom SPARQL queries or Turtle files
+
+  - NEW: Export job now has an additional optional parameter to specify the export format. Currently only NTriples and NQuads are supported but this will be extended to support other export syntaxes in future releases.
+
+  - NEW: Added support to the BrightstarDB server for using ASP.NET membership and role providers to secure access to the server and its stores.
+  
 ****************************
-BrightstarDB 1.5.3 Release
+ BrightstarDB 1.5.3 Release
 ****************************
   - FIX: Fixes a packaging issue with the Polaris tool in the 1.5.2 release.
   

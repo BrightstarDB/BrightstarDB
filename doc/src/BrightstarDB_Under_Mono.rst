@@ -1,7 +1,5 @@
 .. _BrightstarDB_Under_Mono:
 
-.. title:Using BrightstarDB Under Mono!
-
 ###############################
  Using BrightstarDB Under Mono
 ###############################
@@ -39,6 +37,8 @@ of Mono.
 TBD: Document how to run the BrightstarDB server from the command line under Mono
 
 TBD: Document how to run the BrightstarDB server in Apache using mod_mono
+
+.. _mono_build:
 
 **********************************
  Building From Source
@@ -95,8 +95,9 @@ The ultimate goal for getting a working build of BrightstarDB under
 Mono is to support development of applications using `Xamarin's <http://xamarin.com>`
 Xamarin.iOS and Xamarin.Android libraries.
 
-At the time of writing, this work is scheduled for the 1.6 release timeframe (target
-release date end of Feb 2014).
+At the time of writing, this work is postponed, waiting on Xamarin to provide
+the project with the necessary licenses for testing. The work done thus far
+can be found in the feature/xamarin branch in our GitHub repository.
 
 We would welcome support for any developers familiar with either of these
 platforms and with plans to make use of a NoSQL / RDF data store in their
