@@ -1,173 +1,201 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.IsolatedStorage;
+using System.Linq;
+using System.Reflection;
 using FileMode = BrightstarDB.Portable.Compatibility.FileMode;
 
 namespace BrightstarDB.Storage
 {
-	public class PersistenceManager : IPersistenceManager
-	{
-		private IsolatedStorageFile _isolatedStorage;
+    public class PersistenceManager : IPersistenceManager
+    {
+        #region Implementation of IPersistenceManager
 
-		public PersistenceManager ()
-		{
-			_isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication ();
-		}
+        /// <summary>
+        /// Returns true if <paramref name="pathName"/> represents
+        /// the path to an existing "file" in the persistence store
+        /// </summary>
+        /// <param name="pathName"></param>
+        /// <returns></returns>
+        public bool FileExists(string pathName)
+        {
+            return File.Exists(pathName);
+        }
 
-		#region Implementation of IPersistenceManager
-		/// <summary>
-		/// Returns true if <paramref name="pathName"/> represents
-		/// the path to an existing "file" in the persistence store
-		/// </summary>
-		/// <param name="pathName"></param>
-		/// <returns></returns>
-		public bool FileExists(string pathName)
-		{
-			return _isolatedStorage.FileExists(pathName);
-		}
+        /// <summary>
+        /// Removes a file from the persistence store
+        /// </summary>
+        /// <param name="pathName"></param>
+        public void DeleteFile(string pathName)
+        {
+            WrapSharingViolations(() => File.Delete(pathName));
+        }
 
-		/// <summary>
-		/// Create a new empty file at the specified path location
-		/// </summary>
-		/// <param name="pathName"></param>
-		public void CreateFile(string pathName)
-		{
-			_isolatedStorage.CreateFile(pathName).Close();
-		}
+        /// <summary>
+        /// Create a new empty file at the specified path location
+        /// </summary>
+        /// <param name="pathName"></param>
+        public void CreateFile(string pathName)
+        {
+            WrapSharingViolations(() => File.Create(pathName).Close());
+        }
 
-		/// <summary>
-		/// Removes a file from the persistence store
-		/// </summary>
-		/// <param name="pathName"></param>
-		public void DeleteFile(string pathName)
-		{
-			if (_isolatedStorage.FileExists(pathName))
-			{
-				_isolatedStorage.DeleteFile(pathName);
-			}
-		}
+        /// <summary>
+        /// Returns true if <paramref name="pathName"/> represents
+        /// the path to an existing "directory" in the persistence store
+        /// </summary>
+        /// <param name="pathName"></param>
+        /// <returns></returns>
+        public bool DirectoryExists(string pathName)
+        {
+            return Directory.Exists(pathName);
+        }
 
-		/// <summary>
-		/// Returns true if <paramref name="pathName"/> represents
-		/// the path to an existing "directory" in the persistence store
-		/// </summary>
-		/// <param name="pathName"></param>
-		/// <returns></returns>
-		public bool DirectoryExists(string pathName)
-		{
-			return _isolatedStorage.DirectoryExists(pathName);
-		}
+        /// <summary>
+        /// Creates a new directory in the persistence store.
+        /// </summary>
+        /// <param name="dirName"></param>
+        /// <returns></returns>
+        public void CreateDirectory(string dirName)
+        {
+            Directory.CreateDirectory(dirName);
+        }
 
-		/// <summary>
-		/// Creates a new directory in the persistence store.
-		/// </summary>
-		/// <param name="dirName"></param>
-		/// <returns></returns>
-		public void CreateDirectory(string dirName)
-		{
-			_isolatedStorage.CreateDirectory(dirName);
-		}
+        /// <summary>
+        /// Removes a directory and any files or subdirectories within it
+        /// from the persistence store
+        /// </summary>
+        /// <param name="dirName"></param>
+        /// <returns></returns>
+        public void DeleteDirectory(string dirName)
+        {
+            Directory.Delete(dirName, true);
+        }
 
-		/// <summary>
-		/// Removes a directory and any files or subdirectories within it
-		/// from the persistence store
-		/// </summary>
-		/// <param name="dirName"></param>
-		/// <returns></returns>
-		public void DeleteDirectory(string dirName)
-		{
-			foreach(var fileName in _isolatedStorage.GetFileNames(dirName + Path.DirectorySeparatorChar + "*"))
-			{
-				DeleteFile(Path.Combine(dirName, fileName));
-			}
-			_isolatedStorage.DeleteDirectory(dirName);
-		}
+        /// <summary>
+        /// Opens a stream to write to a file in the persistence store
+        /// </summary>
+        /// <param name="pathName"></param>
+        /// <param name="mode">The mode used to open the file</param>
+        /// <returns></returns>
+        public Stream GetOutputStream(string pathName, FileMode mode)
+        {
+            switch (mode)
+            {
+                case FileMode.Append:
+                    return new FileStream(pathName, System.IO.FileMode.Append, FileAccess.Write, FileShare.Read, 4096);
+                case FileMode.Create:
+                    return new FileStream(pathName, System.IO.FileMode.Create, FileAccess.Write, FileShare.Read, 4096);
+                case FileMode.CreateNew:
+                    return new FileStream(pathName, System.IO.FileMode.CreateNew, FileAccess.Write, FileShare.Read, 4096);
+                case FileMode.Open:
+                    return new FileStream(pathName, System.IO.FileMode.Open, FileAccess.Write, FileShare.Read, 4096);
+                case FileMode.OpenOrCreate:
+                    return new FileStream(pathName, System.IO.FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read,
+                                          4096);
+                case FileMode.Truncate:
+                    return new FileStream(pathName, System.IO.FileMode.Truncate, FileAccess.Write, FileShare.Read, 4096);
+                default:
+                    throw new ArgumentException("Invalid file mode", "mode");
+            }
+        }
 
-		/// <summary>
-		/// Opens a stream to write to a file in the persistence store
-		/// </summary>
-		/// <param name="pathName"></param>
-		/// <param name="mode">The mode used to open the file</param>
-		/// <returns></returns>
-		public Stream GetOutputStream(string pathName, FileMode mode)
-		{
-			switch (mode)
-			{
-			case FileMode.Append:
-				return _isolatedStorage.OpenFile(pathName, System.IO.FileMode.Append, FileAccess.Write, FileShare.Read);
-			case FileMode.Create:
-				return _isolatedStorage.OpenFile(pathName, System.IO.FileMode.Create, FileAccess.Write, FileShare.Read);
-			case FileMode.CreateNew:
-				return _isolatedStorage.OpenFile(pathName, System.IO.FileMode.CreateNew, FileAccess.Write, FileShare.Read);
-			case FileMode.Open:
-				return _isolatedStorage.OpenFile(pathName, System.IO.FileMode.Open, FileAccess.Write, FileShare.Read);
-			case FileMode.OpenOrCreate:
-				return _isolatedStorage.OpenFile(pathName, System.IO.FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
-			case FileMode.Truncate:
-				return _isolatedStorage.OpenFile(pathName, System.IO.FileMode.Truncate, FileAccess.Write, FileShare.Read);
-			default:
-				throw new ArgumentException("Invalid file mode");
-			}
-		}
+        /// <summary>
+        /// Opens a stream to read from a file in the persistence store
+        /// </summary>
+        /// <param name="pathName"></param>
+        /// <returns></returns>
+        public Stream GetInputStream(string pathName)
+        {
+            return new FileStream(pathName, System.IO.FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 4096);
+        }
 
-		/// <summary>
-		/// Opens a stream to read from a file in the persistence store
-		/// </summary>
-		/// <param name="pathName"></param>
-		/// <returns></returns>
-		public Stream GetInputStream(string pathName)
-		{
-			return _isolatedStorage.OpenFile(pathName, System.IO.FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-		}
+        public long GetFileLength(string pathName)
+        {
+            var fileInfo = new FileInfo(pathName);
+            return !fileInfo.Exists ? 0 : fileInfo.Length;
+        }
 
-		public long GetFileLength(string pathName)
-		{
-			if (_isolatedStorage.FileExists(pathName))
-			{
-				var file = _isolatedStorage.OpenFile(pathName, System.IO.FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-				var length = file.Length;
-				file.Close();
-				return length;
-			}
-			return 0;
-		}
+        public IEnumerable<string> ListSubDirectories(string dirName)
+        {
+            var directoryInfo = new DirectoryInfo(dirName);
+            return directoryInfo.GetDirectories().Select(d => d.Name);
+        }
 
-		public IEnumerable<string> ListSubDirectories(string dirName)
-		{
-			if(!_isolatedStorage.DirectoryExists(dirName)) throw new FileNotFoundException("Cannot find directory '{0}'", dirName);
-			return _isolatedStorage.GetDirectoryNames(dirName+"\\*");
-		}
+        public void RenameFile(string storeConsolidateFile, string storeDataFile)
+        {
+            var fileInfo = new FileInfo(storeConsolidateFile);
+            if (fileInfo.Exists)
+            {
+                WrapSharingViolations(() => fileInfo.MoveTo(storeDataFile), retryCount: 50, waitTime: 500);
+            }
+        }
 
-		public void RenameFile(string storeConsolidateFile, string storeDataFile)
-		{
-			_isolatedStorage.MoveFile(storeConsolidateFile, storeDataFile);
-		}
+        public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite)
+        {
+            var fileInfo = new FileInfo(sourceFilePath);
+            WrapSharingViolations(() => fileInfo.CopyTo(destinationFilePath, overwrite), retryCount: 50, waitTime: 500);
+        }
 
-		public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwrite)
-		{
-			_isolatedStorage.CopyFile(sourceFilePath, destinationFilePath, overwrite);
-		}
+        #endregion
 
-		#endregion
+        private static void WrapSharingViolations(WrapSharingViolationsCallback action, WrapSharingViolationsExceptionsCallback exceptionsCallback = null, int retryCount = 10, int waitTime = 100)
+        {
+            if (action == null) throw new ArgumentNullException("action");
+            for (int i = 0; i < retryCount; i++)
+            {
+                try
+                {
+                    action();
+                    return;
+                }
+                catch (IOException ioe)
+                {
+                    if ((IsSharingViolation(ioe)) && (i < (retryCount - 1)))
+                    {
+                        bool wait = true;
+                        if (exceptionsCallback != null)
+                        {
+                            wait = exceptionsCallback(ioe, i, retryCount, waitTime);
+                        }
+                        if (wait)
+                        {
+                            System.Threading.Thread.Sleep(waitTime);
+                        }
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
 
-		#region Implementation of IDisposable
+        private delegate void WrapSharingViolationsCallback();
 
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		/// <filterpriority>2</filterpriority>
-		public void Dispose()
-		{
-			if (_isolatedStorage !=null)
-			{
-				_isolatedStorage.Dispose();
-				_isolatedStorage = null;
-			}
-		}
+        private delegate bool WrapSharingViolationsExceptionsCallback(
+            IOException ioe, int retry, int retryCount, int waitTime);
 
-		#endregion
+        static bool IsSharingViolation(IOException ioe)
+        {
+            if (ioe == null) throw new ArgumentNullException("ioe");
+            int hr = GetHResult(ioe, 0);
+            return (hr == -2147024864); // 0x80070020 ERROR_SHARING_VIOLATION
+        }
 
-	}
+        static int GetHResult(IOException ioe, int defaultValue)
+        {
+            if (ioe == null) throw new ArgumentNullException("ioe");
+            try
+            {
+                return (int)ioe.GetType()
+                                 .GetProperty("HResult", BindingFlags.NonPublic | BindingFlags.Instance)
+                                 .GetValue(ioe, null);
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
+    }
 }
-

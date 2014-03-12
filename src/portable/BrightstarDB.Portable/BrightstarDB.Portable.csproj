@@ -48,6 +48,7 @@
     <Compile Include="Compatibility\CollectionExtensions.cs" />
     <Compile Include="Compatibility\ConcurrentDictionary.cs" />
     <Compile Include="Compatibility\ConcurrentQueue.cs" />
+    <Compile Include="Compatibility\IPathSeparatorProvider.cs" />
     <Compile Include="Compatibility\Path.cs" />
     <Compile Include="MonoCrypto\CryptoTools.cs" />
     <Compile Include="MonoCrypto\HMAC.cs" />

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,21 +10,17 @@ using NUnit.Framework;
 
 using BrightstarDB.Client;
 using BrightstarDB.Storage;
-using BrightstarDB.Portable.Compatibility;
+using Path = BrightstarDB.Portable.Compatibility.Path;
 
 namespace BrightstarDB.Portable.Android.Tests
 {
 	[TestFixture]
 	public class StoreTests
 	{
-		private readonly string _runId = DateTime.Now.Ticks.ToString();
+		private readonly string _runId = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
 		private readonly IPersistenceManager _pm = new PersistenceManager();
 
-		public StoreTests ()
-		{
-		}
-
-		[Test]
+	    [Test]
 		public void TestCreateStore()
 		{
 			var client = GetEmbeddedClient();
@@ -32,19 +30,19 @@ namespace BrightstarDB.Portable.Android.Tests
 			client.CreateStore(storeName);
 
 
-			Assert.IsTrue(client.DoesStoreExist(storeName));
-			Assert.IsTrue(_pm.DirectoryExists(TestConfiguration.StoreLocation));
-			Assert.IsTrue(_pm.DirectoryExists(storePath));
-			Assert.IsTrue(_pm.FileExists(dataPath));
+			Assert.IsTrue(client.DoesStoreExist(storeName), "Expected True from DoesStoreExist after store created.");
+			Assert.IsTrue(_pm.DirectoryExists(TestConfiguration.StoreLocation), "Expected stores directory at {0}", TestConfiguration.StoreLocation);
+			Assert.IsTrue(_pm.DirectoryExists(storePath), "Expected store directory at {0}", storePath);
+			Assert.IsTrue(_pm.FileExists(dataPath), "Expected B* data file at {0}", dataPath);
 
 			client.DeleteStore(storeName);
 
-			Task.Delay(50).Wait(); // Wait to allow store to shutdown
+            Task.Delay(50).Wait(); // Wait to allow store to shutdown
 
-			Assert.IsTrue(_pm.DirectoryExists(TestConfiguration.StoreLocation));
-			Assert.IsFalse(_pm.DirectoryExists(storePath));
-			Assert.IsFalse(_pm.FileExists(dataPath));
-			Assert.IsFalse(client.DoesStoreExist(storeName));
+			Assert.IsTrue(_pm.DirectoryExists(TestConfiguration.StoreLocation), "Expected stores directory at {0} after store deleted.", TestConfiguration.StoreLocation);
+			Assert.IsFalse(_pm.DirectoryExists(storePath), "Expected store directory to be deleted from {0}.", storePath);
+			Assert.IsFalse(_pm.FileExists(dataPath), "Expected data file to be deleted from {0}.", dataPath);
+			Assert.IsFalse(client.DoesStoreExist(storeName), "Expected False from DoesStoreExist after store deleted.");
 		}
 
 		[Test]
@@ -53,8 +51,9 @@ namespace BrightstarDB.Portable.Android.Tests
 			var client = GetEmbeddedClient();
 			var storeName = "TestRdfImportExport_" + _runId;
 			var importPath = Path.Combine(TestConfiguration.StoreLocation, "import");
+		    if (!Directory.Exists(importPath)) Directory.CreateDirectory(importPath);
 
-			TestHelper.CopyFile("TestData\\simple.txt", importPath, "simple.txt");
+			TestHelper.CopyFile("TestData/simple.txt", importPath, "simple.txt");
 			client.CreateStore(storeName);
 
 			// RDF import

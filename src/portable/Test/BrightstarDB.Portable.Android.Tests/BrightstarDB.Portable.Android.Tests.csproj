@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,13 +11,19 @@
     <RootNamespace>BrightstarDB.Portable.Android.Tests</RootNamespace>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
+    <AndroidUseLatestPlatformSdk>
+    </AndroidUseLatestPlatformSdk>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <AssemblyName>BrightstarDB.Portable.Android.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0.3</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <AndroidSupportedAbis>armeabi,armeabi-v7a,x86</AndroidSupportedAbis>
+    <AndroidStoreUncompressedFileExtensions />
+    <MandroidI18n />
+    <JavaMaximumHeapSize />
+    <JavaOptions />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
+    <Compile Include="StorageTests.cs" />
     <Compile Include="TestsSample.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,14 +80,17 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
+    <ProjectReference Include="..\..\BrightstarDB.Portable.Android\BrightstarDB.Portable.Android.csproj">
+      <Project>{ecaf8e98-0d20-46e4-99b5-c18352a8a732}</Project>
+      <Name>BrightstarDB.Portable.Android</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\BrightstarDB.Portable\BrightstarDB.Portable.csproj">
       <Project>{365E38E3-EDA2-4A3D-9740-375EC496DF79}</Project>
       <Name>BrightstarDB.Portable</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\BrightstarDB.Portable.Android\BrightstarDB.Portable.Android.csproj">
-      <Project>{ECAF8E98-0D20-46E4-99B5-C18352A8A732}</Project>
-      <Name>BrightstarDB.Portable.Android</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidAsset Include="Assets\TestData\simple.txt" />
   </ItemGroup>
   <Target Name="BeforeBuild">
     <Copy SourceFiles="..\..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="Tests\EntityFramework\MyEntityContext.tt" />

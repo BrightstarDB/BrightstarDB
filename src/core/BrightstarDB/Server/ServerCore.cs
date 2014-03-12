@@ -102,7 +102,7 @@ namespace BrightstarDB.Server
             var storeWorker = GetStoreWorker(storeName);
             // remove store worker from collection
             RemoveStoreWorker(storeName);
-            storeWorker.Shutdown(false, () => _storeManager.DeleteStore(_baseLocation + "\\" + storeName));            
+            storeWorker.Shutdown(false, () => _storeManager.DeleteStore(Path.Combine(_baseLocation, storeName)));            
         }
 #else
         public void DeleteStore(string storeName, bool waitForCompletion = true)
