@@ -16,6 +16,7 @@ BrightstarDB Documentation
     SdShare Server <SdShare_Server>
     Building_BrightstarDB
     BrightstarDB_Under_Mono
+    BrightstarDB_Android
     BrightstarDB_In_IIS
     Whats New <Whats_New>
     Known Issues <Known_Issues>
