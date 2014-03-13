@@ -42,6 +42,11 @@ Before you can build BrightstarDB you need to install the following tools.
         recommended to build with the latest version of WiX (3.7 at the time 
         of writing).
         
+    #. **OPTIONAL: Xamarin.Android**
+    
+        Xamarin.Android is required only if you plan to build the Android package
+        for BrightstarDB. Please read :ref:`BrightstarDB_Android` first!
+        
 .. note:
     Please note that you will require an internet connection when first building
     BrightstarDB, even after you have initially retrieved the source, as some 

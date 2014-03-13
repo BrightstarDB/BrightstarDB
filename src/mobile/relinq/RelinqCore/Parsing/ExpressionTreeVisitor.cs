@@ -49,7 +49,9 @@ namespace Remotion.Linq.Parsing
       ArgumentUtility.CheckNotNull ("arguments", arguments);
       ArgumentUtility.CheckNotNull ("members", members);
 
+#if !PORTABLE
       Trace.Assert (arguments.Count == members.Count);
+#endif
 
       for (int i = 0; i < arguments.Count; ++i)
       {

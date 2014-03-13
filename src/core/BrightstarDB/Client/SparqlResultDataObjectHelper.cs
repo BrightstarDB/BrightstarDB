@@ -46,9 +46,14 @@ namespace BrightstarDB.Client
                                                            IList<OrderingDirection> orderingDirections)
         {
             var g = new Graph();
-            var parser = new RdfXmlParser(RdfXmlParserMode.DOM);
+#if PORTABLE || WINDOWS_PHONE
+			var parser = new RdfXmlParser(RdfXmlParserMode.Streaming);
+			// This is pretty nasty, having to deserialize only to go through parsing again
+			parser.Load(g, new System.IO.StringReader(rdfXmlDocument.ToString()));
+#else
+			var parser = new RdfXmlParser(RdfXmlParserMode.DOM);
             parser.Load(g, rdfXmlDocument.AsXmlDocument());
-
+#endif
             var p = new VDS.RDF.Query.LeviathanQueryProcessor(new InMemoryDataset(g));
             var queryString = MakeOrderedResourceQuery(orderingDirections);
             var sparqlParser = new SparqlQueryParser();

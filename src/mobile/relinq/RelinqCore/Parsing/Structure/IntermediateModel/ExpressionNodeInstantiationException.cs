@@ -22,7 +22,9 @@ namespace Remotion.Linq.Parsing.Structure.IntermediateModel
   /// <summary>
   /// Thrown whan an <see cref="IExpressionNode"/> parser cannot be instantiated for a query.
   /// </summary>
+#if !PORTABLE
   [Serializable]
+#endif
   public class ExpressionNodeInstantiationException : Exception
   {
     public ExpressionNodeInstantiationException (string message)

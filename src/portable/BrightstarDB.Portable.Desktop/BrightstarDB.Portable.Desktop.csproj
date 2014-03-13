@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrightstarDB\Compatibilty\PathSeparatorProvider.cs" />
     <Compile Include="BrightstarDB\Storage\PersistenceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

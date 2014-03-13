@@ -1,6 +1,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="BuildAndTest" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <NoXamarin Condition=" '$(NoXamarin)' == '' ">False</NoXamarin>
         <NUnitPath Condition=" '$(NUnitPath)' == '' ">C:\Program Files (x86)\NUnit 2.6.2\bin</NUnitPath>
     </PropertyGroup>
     
@@ -10,7 +11,7 @@
     </Target>
 
     <!-- Build Targets -->
-    <Target Name="Build" DependsOnTargets="BuildCore;BuildMobile;BuildPortable;BuildTools">
+    <Target Name="Build" DependsOnTargets="BuildCore;BuildMobile;BuildPortable;BuildXamarin;BuildTools">
     </Target>
 
     <Target Name="BuildCore">
@@ -31,6 +32,12 @@
                  Targets="Clean;Build"/>
     </Target>
 
+    <Target Name="BuildXamarin" Condition="!$(NoXamarin) AND Exists('$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets')">
+        <MSBuild Projects="src\portable\xamarin.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean;Build"/>
+    </Target>
+    
     <Target Name="BuildTools">
         <MSBuild Projects="src\tools\Polaris\Polaris.sln"
                  Properties="Configuration=$(Configuration)"

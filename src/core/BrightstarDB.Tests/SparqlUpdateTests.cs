@@ -11,13 +11,13 @@ namespace BrightstarDB.Tests
     [TestFixture]
     public class SparqlUpdateTests
     {
-        private IBrightstarService _client;
+        private readonly IBrightstarService _client;
 
 
         public SparqlUpdateTests()
         {
-#if WINDOWS_PHONE
-            _client = BrightstarService.GetEmbeddedClient("brightstar");
+#if WINDOWS_PHONE || PORTABLE
+            _client = BrightstarService.GetClient("type=embedded;storesDirectory=brightstar");
 #else
             _client = BrightstarService.GetClient("type=embedded;storesDirectory=c:\\brightstar");
 #endif
