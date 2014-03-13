@@ -12,7 +12,7 @@ namespace BrightstarDB.Utils
     /// </summary>
     public static class XmlExtensions
     {
-#if !PORTABLE
+#if !PORTABLE && !WINDOWS_PHONE
         /// <summary>
         /// Utility method to convert and XDocument to an XmlDocument
         /// </summary>

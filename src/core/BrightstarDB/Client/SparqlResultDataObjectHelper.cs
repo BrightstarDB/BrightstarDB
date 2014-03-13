@@ -46,7 +46,7 @@ namespace BrightstarDB.Client
                                                            IList<OrderingDirection> orderingDirections)
         {
             var g = new Graph();
-#if PORTABLE
+#if PORTABLE || WINDOWS_PHONE
 			var parser = new RdfXmlParser(RdfXmlParserMode.Streaming);
 			// This is pretty nasty, having to deserialize only to go through parsing again
 			parser.Load(g, new System.IO.StringReader(rdfXmlDocument.ToString()));
