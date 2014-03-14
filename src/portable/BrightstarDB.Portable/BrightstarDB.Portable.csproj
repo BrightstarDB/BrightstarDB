@@ -99,11 +99,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+  <Import Project="..\..\..\common.proj" />
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
+    <AssemblyTitle>BrightstarDB Portable Class Library Core Assembly</AssemblyTitle>
+  </PropertyGroup>
   <Target Name="BeforeBuild">
+    <CallTarget Targets="GenerateAssemblyInfo" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

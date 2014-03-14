@@ -114,11 +114,13 @@
     <VisualStudioVersion>11.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+  <Import Project="..\..\..\common.proj" />
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
+    <AssemblyTitle>BrightstarDB Portable Class Library Store Assembly</AssemblyTitle>
+  </PropertyGroup>
   <Target Name="BeforeBuild">
+    <CallTarget Targets="GenerateAssemblyInfo" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

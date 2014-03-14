@@ -46,6 +46,7 @@
     <Reference Include="Mono.Android" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PathSeparatorProvider.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="PersistenceManager.cs" />
@@ -63,4 +64,13 @@
       <Name>BrightstarDB.Portable</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\..\..\common.proj" />
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
+    <AssemblyTitle>BrightstarDB Portable Class Library Android Assembly</AssemblyTitle>
+  </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <CallTarget Targets="GenerateAssemblyInfo" />
+  </Target>
 </Project>

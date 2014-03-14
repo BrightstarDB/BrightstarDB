@@ -81,11 +81,13 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+  <Import Project="..\..\..\common.proj" />
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
+    <AssemblyTitle>BrightstarDB Portable Class Library Silverlight Assembly</AssemblyTitle>
+  </PropertyGroup>
   <Target Name="BeforeBuild">
+    <CallTarget Targets="GenerateAssemblyInfo" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
