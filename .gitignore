@@ -125,9 +125,3 @@ src/core/BrightstarDB.Server.AspNet.Secured/App_Data/aspnetdb.mdf
 src/core/BrightstarDB.Server.AspNet.Secured/App_Data/aspnetdb_log.ldf
 src/core/BrightstarDB.Server.AspNet.Secured/Views/
 src/core/BrightstarDB.Server.AspNet.Secured/assets/
-src/portable/BrightstarDB.Portable/Properties/AssemblyInfo.cs
-src/portable/BrightstarDB.Portable.Desktop/Properties/AssemblyInfo.cs
-src/portable/BrightstarDB.Portable.Phone/Properties/AssemblyInfo.cs
-src/portable/BrightstarDB.Portable.Silverlight/Properties/AssemblyInfo.cs
-src/portable/BrightstarDB.Portable.Store/Properties/AssemblyInfo.cs
-src/portable/BrightstarDB.Portable.Android/Properties/AssemblyInfo.cs
