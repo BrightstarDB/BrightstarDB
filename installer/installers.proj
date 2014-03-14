@@ -183,6 +183,8 @@
   <Target Name="Portable" DependsOnTargets="Version">
 	<MSBuild Projects="..\src\portable\portable.sln"
 	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+    <MSBuild Projects="..\src\portable\BrightstarDB.Portable.Android\BrightstarDB.Portable.Android.csproj"
+             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" />
   </Target>
   
   <!-- ============================================================ -->
@@ -243,6 +245,7 @@
 		<PortablePhone Include="..\src\portable\BrightstarDB.Portable.Phone\bin\$(Configuration)\BrightstarDB.Portable.Phone.dll"/>
 		<PortableSilverlight Include="..\src\portable\BrightstarDB.Portable.Silverlight\bin\$(Configuration)\BrightstarDB.Portable.Silverlight.dll"/>
 		<PortableStore Include="..\src\portable\BrightstarDB.Portable.Store\bin\$(Configuration)\BrightstarDB.Portable.Store.dll" />
+        <PortableAndroid Include="..\src\portable\BrightstarDB.Portable.Android\bin\$(Configuration)\BrightstarDB.Portable.Android.dll" />
     </ItemGroup>
     
     <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
@@ -293,6 +296,7 @@
 	<Copy SourceFiles="@(PortablePhone)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\wp80" />
 	<Copy SourceFiles="@(PortableSilverlight)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl5" />
 	<Copy SourceFiles="@(PortableStore)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\win8" />
+    <Copy SourceFiles="@(PortableAndroid)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoAndroid" />
 	
     <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" />
     <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec" />
