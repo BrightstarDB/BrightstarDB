@@ -5,13 +5,13 @@
     <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{365E38E3-EDA2-4A3D-9740-375EC496DF79}</ProjectGuid>
+    <ProjectGuid>{F039A0EF-580C-43E7-A7BD-2A733837A8C0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BrightstarDB</RootNamespace>
     <AssemblyName>BrightstarDB.Portable</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Profile158</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile154</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;PORTABLE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PORTABLE;SILVERLIGHT4</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -32,7 +32,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;PORTABLE</DefineConstants>
+    <DefineConstants>TRACE;PORTABLE;SILVERLIGHT4</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -43,22 +43,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
-    <Compile Include="Adaptation\IAdapterResolver.cs" />
-    <Compile Include="AdditionalAssemblyProperties.cs" />
-    <Compile Include="Compatibility\Array.cs" />
-    <Compile Include="Compatibility\CollectionExtensions.cs" />
-    <Compile Include="Compatibility\ConcurrentDictionary.cs" />
-    <Compile Include="Compatibility\ConcurrentQueue.cs" />
-    <Compile Include="Compatibility\IPathSeparatorProvider.cs" />
-    <Compile Include="Compatibility\Path.cs" />
-    <Compile Include="MonoCrypto\CryptoTools.cs" />
-    <Compile Include="MonoCrypto\HMAC.cs" />
-    <Compile Include="MonoCrypto\HMACAlgorithm.cs" />
-    <Compile Include="MonoCrypto\HMACSHA256.cs" />
-    <Compile Include="MonoCrypto\KeyedHashAlgorithm.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Compatibility\Converter.cs" />
-    <Compile Include="Compatibility\FileMode.cs" />
+    <Compile Include="..\BrightstarDB.Portable\**\*.cs">
+      <Link>%(recursivedir)\%(filename)</Link>
+    </Compile>
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\MD5.cs" />
     <Compile Include="..\..\core\BrightStarDB\**\*.cs" Exclude="..\..\core\BrightstarDB\Strings*.cs;..\..\core\BrightStarDB\OData\**\*.cs;..\..\core\BrightstarDB\Test\**\*.cs;..\..\core\BrightstarDB\Server\HttpServer.cs;..\..\core\BrightstarDB\Client\Http*.cs;..\..\core\BrightstarDB\Client\BrightstarServiceClient.cs;..\..\core\BrightstarDB\Client\BrightstarServiceClientExtensions.cs;..\..\core\BrightstarDB\Storage\FileStoreManager.cs;..\..\core\BrightstarDB\Storage\FileBlockProvider.cs;..\..\core\BrightstarDB\Properties\**\*.cs;..\..\core\BrightstarDB\Analysis\**\*.cs;..\..\core\BrightstarDB\Client\RestJobInfo.cs;..\..\core\BrightstarDB\Dynamic\**\*.cs;..\..\core\BrightstarDB\Storage\Persistence\BinaryPageStore.cs;..\..\core\BrightstarDB\Query\Processor\SingleVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\TwoVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\ThreeVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\AccumulatorBase.cs;..\..\core\BrightstarDB\Query\Processor\Accumulator.cs;..\..\core\BrightstarDB\Query\Processor\VirtualizingAccumulator.cs;..\..\core\BrightstarDB\Storage\Persistence\FilePersistenceManager.cs;..\..\core\BrightstarDB\Storage\Persistence\IsolatedStoragePersistenceManager.cs">
       <Link>%(recursivedir)\%(filename)</Link>
@@ -71,8 +58,6 @@
       <CustomToolNamespace>BrightstarDB</CustomToolNamespace>
     </EmbeddedResource>
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Tuple.cs" />
-    <Compile Include="Adaptation\PlatformAdapter.cs" />
-    <Compile Include="Adaptation\ProbingAdapterResolver.cs" />
     <Compile Include="..\..\mobile\relinq\RelinqCore\**\*.cs" Exclude="..\..\mobile\relinq\RelinqCore\Properties\*.cs">
       <Link>relinq\%(recursivedir)\%(filename)</Link>
     </Compile>
@@ -104,7 +89,7 @@
   <PropertyGroup>
     <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
     <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
-    <AssemblyTitle>BrightstarDB Portable Class Library Core Assembly</AssemblyTitle>
+    <AssemblyTitle>BrightstarDB Portable Class Library Core Assembly (Profile 154)</AssemblyTitle>
   </PropertyGroup>
   <Target Name="BeforeBuild">
     <CallTarget Targets="GenerateAssemblyInfo" />

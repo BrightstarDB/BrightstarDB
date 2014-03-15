@@ -14,5 +14,8 @@
 	<releaseNotes>$releaseNotes$</releaseNotes>
     <copyright>Copyright 2014 Khalil Ahmed, Graham Moore, and other contributors</copyright>
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
+    <dependencies>
+      <dependency id="BrightstarDBLibs" version="[$version$]" />
+    </dependencies>
   </metadata>
 </package>

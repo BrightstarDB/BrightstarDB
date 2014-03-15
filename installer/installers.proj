@@ -236,11 +236,12 @@
         <NuspecTemplate Include="nuget\BrightstarDB.nuspec.template"/>
         <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
 		<PlatformNuspecTemplate Include="nuget\BrightstarDB.Platform.nuspec.template"/>
-        <Net40Libs Include="InstallerTmp\SDK\Net40\*.dll" />
-        <WP71Libs Include="InstallerTmp\SDK\WP71\*.dll" />
-		<WP8Libs Include="InstallerTmp\SDK\WP71\*.dll" Exclude="InstallerTmp\SDK\WP71\System.Threading.Tasks.dll" />
+        <Net40Libs Include="InstallerTmp\SDK\Net40\BrightstarDB.dll;InstallerTmp\SDK\Net40\Remotion.Linq.dll" />
+        <WP71Libs Include="InstallerTmp\SDK\WP71\BrightstarDB.Mobile.dll;InstallerTmp\SDK\WP71\System.Threading.Tasks.dll" />
+		<WP8Libs Include="InstallerTmp\SDK\WP71\BrightstarDB.Mobile.dll" />
         <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
-		<PortableLibs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\*.dll" />
+		<Portable158Libs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\BrightstarDB.Portable.dll" />
+		<Portable154Libs Include="..\src\portable\BrightstarDB.Portable.Profile154\bin\$(Configuration)\BrightstarDB.Portable.dll" />
 		<PortableDesktop Include="..\src\portable\BrightstarDB.Portable.Desktop\bin\$(Configuration)\BrightstarDB.Portable.Desktop.dll" />
 		<PortablePhone Include="..\src\portable\BrightstarDB.Portable.Phone\bin\$(Configuration)\BrightstarDB.Portable.Phone.dll"/>
 		<PortableSilverlight Include="..\src\portable\BrightstarDB.Portable.Silverlight\bin\$(Configuration)\BrightstarDB.Portable.Silverlight.dll"/>
@@ -282,19 +283,17 @@
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
     <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\wp71"/>
 	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\windowsphone8" />
-	<Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+wp80+win8" />
+	<Copy SourceFiles="@(Portable154Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+wp80+sl4+win8" />
+    <Copy SourceFiles="@(Portable158Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+wp80+sl5+win8+MonoAndroid10+MonoTouch10" />
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs" />
     
-    <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\net40"/>
-    <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\wp71"/>
-	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\windowsphone8" />
-	<Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\lib\portable-net45+wp80+win8" />
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB" />
     <Copy SourceFiles="@(TextTemplates)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\content" />
     
 	<Copy SourceFiles="@(PortableDesktop)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\net45" />
 	<Copy SourceFiles="@(PortablePhone)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\wp80" />
 	<Copy SourceFiles="@(PortableSilverlight)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl5" />
+    <Copy SourceFiles="@(PortableSilverlight4)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl4" />
 	<Copy SourceFiles="@(PortableStore)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\win8" />
     <Copy SourceFiles="@(PortableAndroid)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoAndroid" />
 	

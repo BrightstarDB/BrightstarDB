@@ -615,7 +615,7 @@ namespace BrightstarDB.Client
 
             var queryUri = String.Format("{0}/jobs?skip={1}&take={2}", storeName, skip, take);
             var response = AuthenticatedGet(queryUri);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
             return Deserialize<List<JobResponseModel>>(response).Cast<IJobInfo>();
 #else
             return Deserialize<List<JobResponseModel>>(response);
@@ -813,7 +813,7 @@ namespace BrightstarDB.Client
 
             var queryUri = String.Format("{0}/transactions?skip={1}&take={2}", storeName, skip, take);
             var response = AuthenticatedGet(queryUri);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
             return Deserialize<List<TransactionInfoObject>>(response).Cast<ITransactionInfo>();
 #else
             return Deserialize<List<TransactionInfoObject>>(response);
@@ -892,7 +892,7 @@ namespace BrightstarDB.Client
                                          storeName, latest.ToString("u"), earliest.ToString("u"),
                                          skip, take);
             var response = AuthenticatedGet(queryUri);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
             return Deserialize<List<CommitPointResponseModel>>(response).Cast<ICommitPointInfo>();
 #else
             return Deserialize<List<CommitPointResponseModel>>(response);
@@ -911,7 +911,7 @@ namespace BrightstarDB.Client
             try
             {
                 var response = AuthenticatedGet(storeName + "/statistics/latest");
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
                 return Deserialize<StoreStatisticsObject>(response) as IStoreStatistics;
 #else
                 return Deserialize<StoreStatisticsObject>(response);
@@ -946,7 +946,7 @@ namespace BrightstarDB.Client
             var uri = String.Format("{0}/statistics?latest={1}&earlies={2}&skip={3}&take={4}",
                                     storeName, latest.ToString("u"), earlierst.ToString("u"), skip, take);
             var response = AuthenticatedGet(uri);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
             return Deserialize<List<StoreStatisticsObject>>(response).Cast<IStoreStatistics>();
 #else
             return Deserialize<List<StoreStatisticsObject>>(response);
