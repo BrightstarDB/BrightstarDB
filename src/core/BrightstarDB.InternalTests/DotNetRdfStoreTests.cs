@@ -11,6 +11,8 @@ using VDS.RDF.Update;
 
 namespace BrightstarDB.InternalTests
 {
+    
+
     [TestFixture]
     public class DotNetRdfStoreTests
     {

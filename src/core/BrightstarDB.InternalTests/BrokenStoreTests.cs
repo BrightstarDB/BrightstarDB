@@ -72,7 +72,7 @@ namespace BrightstarDB.InternalTests
                 txnLog.GetTransactionData(toReplay[i].DataStartPosition);
 
                 var jobId = Guid.NewGuid();
-                var updateJob = new UpdateTransaction(jobId, storeWorker);
+                var updateJob = new UpdateTransaction(jobId, null, storeWorker);
                 updateJob.ReadTransactionDataFromStream(txnLog.GetTransactionData(toReplay[i].DataStartPosition));
                 updateJob.Run();
 

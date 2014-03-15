@@ -15,9 +15,9 @@ using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
 
 using System.ComponentModel;
+using BrightstarDB.Rdf;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using BrightstarDB.Rdf;
 
 namespace BrightstarDB.Tests.EntityFramework 
 {
@@ -29,57 +29,58 @@ namespace BrightstarDB.Tests.EntityFramework
     		TypeMappings = new EntityMappingStore();
     		var provider = new ReflectionMappingProvider();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IAnimal));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IAnimal, BrightstarDB.Tests.EntityFramework.Animal>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IAnimal, BrightstarDB.Tests.EntityFramework.Animal>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IArticle));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IArticle, BrightstarDB.Tests.EntityFramework.Article>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IArticle, BrightstarDB.Tests.EntityFramework.Article>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IBaseEntity));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IBaseEntity, BrightstarDB.Tests.EntityFramework.BaseEntity>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IBaseEntity, BrightstarDB.Tests.EntityFramework.BaseEntity>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ICompany));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.ICompany, BrightstarDB.Tests.EntityFramework.Company>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ICompany, BrightstarDB.Tests.EntityFramework.Company>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IConcept));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IConcept, BrightstarDB.Tests.EntityFramework.Concept>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IConcept, BrightstarDB.Tests.EntityFramework.Concept>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IDBPediaPerson));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IDBPediaPerson, BrightstarDB.Tests.EntityFramework.DBPediaPerson>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDBPediaPerson, BrightstarDB.Tests.EntityFramework.DBPediaPerson>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IDepartment));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IDepartment, BrightstarDB.Tests.EntityFramework.Department>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDepartment, BrightstarDB.Tests.EntityFramework.Department>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IDerivedEntity));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IDerivedEntity, BrightstarDB.Tests.EntityFramework.DerivedEntity>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDerivedEntity, BrightstarDB.Tests.EntityFramework.DerivedEntity>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IEntity));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IEntity, BrightstarDB.Tests.EntityFramework.Entity>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IEntity, BrightstarDB.Tests.EntityFramework.Entity>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IFoafAgent));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IFoafAgent, BrightstarDB.Tests.EntityFramework.FoafAgent>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IFoafAgent, BrightstarDB.Tests.EntityFramework.FoafAgent>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IFoafPerson));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IFoafPerson, BrightstarDB.Tests.EntityFramework.FoafPerson>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IFoafPerson, BrightstarDB.Tests.EntityFramework.FoafPerson>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTest));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTest, BrightstarDB.Tests.EntityFramework.IdentityClashTest>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTest, BrightstarDB.Tests.EntityFramework.IdentityClashTest>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1, BrightstarDB.Tests.EntityFramework.IdentityClashTestLevel1>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1, BrightstarDB.Tests.EntityFramework.IdentityClashTestLevel1>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2, BrightstarDB.Tests.EntityFramework.IdentityClashTestLevel2>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2, BrightstarDB.Tests.EntityFramework.IdentityClashTestLevel2>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IJobRole));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IJobRole, BrightstarDB.Tests.EntityFramework.JobRole>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IJobRole, BrightstarDB.Tests.EntityFramework.JobRole>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IMarket));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IMarket, BrightstarDB.Tests.EntityFramework.Market>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IMarket, BrightstarDB.Tests.EntityFramework.Market>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IPerson));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IPerson, BrightstarDB.Tests.EntityFramework.Person>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IPerson, BrightstarDB.Tests.EntityFramework.Person>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ISession));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.ISession, BrightstarDB.Tests.EntityFramework.Session>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ISession, BrightstarDB.Tests.EntityFramework.Session>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IEveningSession));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.IEveningSession, BrightstarDB.Tests.EntityFramework.EveningSession>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IEveningSession, BrightstarDB.Tests.EntityFramework.EveningSession>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession, BrightstarDB.Tests.EntityFramework.TechnicalEveningSession>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession, BrightstarDB.Tests.EntityFramework.TechnicalEveningSession>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ISkill));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.ISkill, BrightstarDB.Tests.EntityFramework.Skill>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ISkill, BrightstarDB.Tests.EntityFramework.Skill>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ITrackable));
-    		TypeMappings.AddImplMapping<BrightstarDB.Tests.EntityFramework.ITrackable, BrightstarDB.Tests.EntityFramework.Trackable>();
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ITrackable, BrightstarDB.Tests.EntityFramework.Trackable>();
     	}
     	
     	/// <summary>
-    	/// Initialize a new entity context using the specified Brightstar
+    	/// Initialize a new entity context using the specified BrightstarDB
     	/// Data Object Store connection
     	/// </summary>
-    	/// <param name="dataObjectStore">The connection to the Brightstar Data Object Store that will provide the entity objects</param>
-    	public MyEntityContext(IDataObjectStore dataObjectStore) : base(TypeMappings, dataObjectStore)
+    	/// <param name="dataObjectStore">The connection to the BrightstarDB Data Object Store that will provide the entity objects</param>
+        /// <param name="typeMappings">OPTIONAL: A <see cref="EntityMappingStore"/> that overrides the default mappings generated by reflection.</param>
+    	public MyEntityContext(IDataObjectStore dataObjectStore, EntityMappingStore typeMappings = null) : base(typeMappings ?? TypeMappings, dataObjectStore)
     	{
     		InitializeContext();
     	}
@@ -95,13 +96,15 @@ namespace BrightstarDB.Tests.EntityFramework
         /// If not defined, all graphs in the store will be queried.</param>
         /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
         /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+        /// <param name="typeMappings">OPTIONAL: A <see cref="EntityMappingStore"/> that overrides the default mappings generated by reflection.</param>
     	public MyEntityContext(
     	    string connectionString, 
     		bool? enableOptimisticLocking=null,
     		string updateGraphUri = null,
     		IEnumerable<string> datasetGraphUris = null,
-    		string versionGraphUri = null
-        ) : base(TypeMappings, connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+    		string versionGraphUri = null,
+            EntityMappingStore typeMappings = null
+        ) : base(typeMappings ?? TypeMappings, connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -110,7 +113,8 @@ namespace BrightstarDB.Tests.EntityFramework
     	/// Initialize a new entity context using the specified Brightstar
     	/// connection string retrieved from the configuration.
     	/// </summary>
-    	public MyEntityContext() : base(TypeMappings)
+        /// <param name="typeMappings">OPTIONAL: A <see cref="EntityMappingStore"/> that overrides the default mappings generated by reflection.</param>
+    	public MyEntityContext(EntityMappingStore typeMappings = null) : base(typeMappings ?? TypeMappings)
     	{
     		InitializeContext();
     	}
@@ -126,11 +130,13 @@ namespace BrightstarDB.Tests.EntityFramework
         /// If set to null, all graphs in the store will be queried.</param>
         /// <param name="versionGraphUri">The URI identifier of the graph that contains version number statements for entities. 
         /// If set to null, the value of <paramref name="updateGraphUri"/> will be used.</param>
+        /// <param name="typeMappings">OPTIONAL: A <see cref="EntityMappingStore"/> that overrides the default mappings generated by reflection.</param>
     	public MyEntityContext(
     		string updateGraphUri,
     		IEnumerable<string> datasetGraphUris,
-    		string versionGraphUri
-    	) : base(TypeMappings, updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
+    		string versionGraphUri,
+            EntityMappingStore typeMappings = null
+    	) : base(typeMappings ?? TypeMappings, updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -415,10 +421,10 @@ namespace BrightstarDB.Tests.EntityFramework
     	public Concept() : base() { }
     	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IConcept
-    	public System.Collections.Generic.ICollection<PlainLiteral> PrefLabel
+    	public System.Collections.Generic.ICollection<BrightstarDB.Rdf.PlainLiteral> PrefLabel
     	{
-    		get { return GetRelatedLiteralPropertiesCollection<PlainLiteral>("PrefLabel"); }
-    		set { SetRelatedLiteralPropertiesCollection<PlainLiteral>("PrefLabel", value); }
+    		get { return GetRelatedLiteralPropertiesCollection<BrightstarDB.Rdf.PlainLiteral>("PrefLabel"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<BrightstarDB.Rdf.PlainLiteral>("PrefLabel", value); }
     	}
     	#endregion
     }
@@ -483,7 +489,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IPerson> Persons
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IPerson>("Persons"); }
-    		set { SetRelatedObjects("Persons", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Persons", value); }
     								}
     	#endregion
     }
@@ -506,7 +512,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IBaseEntity> RelatedEntities
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IBaseEntity>("RelatedEntities"); }
-    		set { SetRelatedObjects("RelatedEntities", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("RelatedEntities", value); }
     								}
     	#endregion
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IBaseEntity
@@ -735,42 +741,42 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<System.String> CollectionOfStrings
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
     	}
     	public System.Collections.Generic.ICollection<System.DateTime> CollectionOfDateTimes
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Boolean> CollectionOfBools
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Decimal> CollectionOfDecimals
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Double> CollectionOfDoubles
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Single> CollectionOfFloats
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Int32> CollectionOfInts
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Int64> CollectionOfLong
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong", value); }
     	}
     	#endregion
     }
@@ -786,7 +792,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<System.String> MboxSums
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("MboxSums"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
     	}
     	#endregion
     }
@@ -824,12 +830,12 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IFoafPerson> Knows
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IFoafPerson>("Knows"); }
-    		set { SetRelatedObjects("Knows", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Knows", value); }
     								}
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IFoafPerson> KnownBy
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IFoafPerson>("KnownBy"); }
-    		set { SetRelatedObjects("KnownBy", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("KnownBy", value); }
     								}
     	
     	[System.ComponentModel.DataAnnotations.DataTypeAttribute(DataType.Date)]
@@ -849,7 +855,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<System.String> MboxSums
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("MboxSums"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
     	}
     	#endregion
     }
@@ -914,7 +920,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IPerson> Persons
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IPerson>("Persons"); }
-    		set { SetRelatedObjects("Persons", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Persons", value); }
     								}
     	#endregion
     }
@@ -937,7 +943,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.ICompany> ListedCompanies
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.ICompany>("ListedCompanies"); }
-    		set { SetRelatedObjects("ListedCompanies", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("ListedCompanies", value); }
     								}
     	#endregion
     }
@@ -990,7 +996,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IPerson> Friends
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IPerson>("Friends"); }
-    		set { SetRelatedObjects("Friends", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Friends", value); }
     								}
     
     	public BrightstarDB.Tests.EntityFramework.IAnimal Pet
@@ -1007,7 +1013,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.ISkill> Skills
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.ISkill>("Skills"); }
-    		set { SetRelatedObjects("Skills", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Skills", value); }
     								}
     
     	public BrightstarDB.Tests.EntityFramework.IDepartment Department
@@ -1030,7 +1036,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<System.Uri> Websites
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Uri>("Websites"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Uri>("Websites", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Uri>("Websites", value); }
     	}
     	#endregion
     }
@@ -1155,12 +1161,12 @@ namespace BrightstarDB.Tests.EntityFramework
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.ISkill> Children
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.ISkill>("Children"); }
-    		set { SetRelatedObjects("Children", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Children", value); }
     								}
     	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IPerson> SkilledPeople
     	{
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IPerson>("SkilledPeople"); }
-    		set { SetRelatedObjects("SkilledPeople", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("SkilledPeople", value); }
     								}
     	#endregion
     }

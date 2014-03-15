@@ -38,6 +38,7 @@ namespace BrightstarDB.Polaris
             Messenger.Default.Register<AppExitMessage>(this, HandleAppExitMessage);
             Messenger.Default.Register<CloseTabMessage>(this, HandleCloseTabMessage);
             Messenger.Default.Register<ShowFileDialogMessage>(this, HandleShowFileDialogMessage);
+            Messenger.Default.Register<AuthenticationRequiredMessage>(this, HandleAuthenticationRequiredMessage);
 
             if ((this.DataContext as MainViewModel).StoreSources.Count == 0)
             {
@@ -57,6 +58,15 @@ namespace BrightstarDB.Polaris
                 Messenger.Default.Send(msg, "MainWindow");
             }
         }
+
+        private void HandleAuthenticationRequiredMessage(AuthenticationRequiredMessage msg)
+        {
+            var model = new CredentialsModel {PromptMessage = msg.Message};
+            var credentialsDialog = new CredentialsDialog (model);
+            var dialogResult = credentialsDialog.ShowDialog();
+            msg.Callback(dialogResult, model.UserName, model.Password);
+        }
+
 
         private void HandleCloseTabMessage(CloseTabMessage obj)
         {
@@ -96,14 +106,9 @@ namespace BrightstarDB.Polaris
                             if (model != null)
                             {
                                 model.StoreSources.Add(connectionModel);
-                                model.Configuration.ConnectionStrings.Add(new NamedConnectionString
-                                                                              {
-                                                                                  Name = connectionModel.Name,
-                                                                                  ConnectionString =
-                                                                                      connectionModel.ConnectionString.
-                                                                                      ToString()
-                                                                              });
-                                model.Configuration.Save();
+                                model.AddConnectionConfiguration(connectionModel.Name,
+                                                                 connectionModel.ConnectionString,
+                                                                 connectionModel.RequiresAuthentication);
                             }
                         }
                         break;
@@ -118,12 +123,18 @@ namespace BrightstarDB.Polaris
                             var dlgResult = dlg.ShowDialog();
                             if (dlgResult.HasValue && dlgResult.Value)
                             {
-                                connectionModel.Name = editModel.Name;
-                                connectionModel.ConnectionString = editModel.ConnectionString;
+                                var oldName = connectionModel.Name;
+                                connectionModel.CopyFrom(editModel);
                                 var mvm = DataContext as MainViewModel;
                                 if (mvm != null)
                                 {
                                     mvm.ServerRefresh(connectionModel);
+                                }
+                                // Update configuration
+                                var model = DataContext as MainViewModel;
+                                if (model != null)
+                                {
+                                    model.UpdateConnectionConfiguration(oldName, connectionModel.Name, connectionModel.ConnectionString, connectionModel.RequiresAuthentication);
                                 }
                             }
                         }

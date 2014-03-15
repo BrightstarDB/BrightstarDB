@@ -10,9 +10,36 @@
     <projectUrl>http://brightstardb.com/</projectUrl>
     <iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>BrightstarDB is a fast and scalable NoSQL database for .NET with code-first data model generation. This package only installs the BrightstarDB libraries - for entity framework support please install the BrightstarDB package</description>
+    <description>BrightstarDB is a fast and scalable NoSQL database for .NET with code-first data model generation. This package only installs the BrightstarDB libraries - for entity framework support please install the BrightstarDB package.</description>
 	<releaseNotes>$releaseNotes$</releaseNotes>
     <copyright>Copyright 2014 Khalil Ahmed, Graham Moore, and other contributors</copyright>
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
+    <dependencies>
+      <group>
+        <dependency id="dotNetRDF" version="1.0.4" />
+      </group>
+      <group targetFramework="net40">
+        <dependency id="dotNetRDF" version="1.0.4" />
+      </group>
+      <group targetFramework="net45">
+        <dependency id="dotNetRDF" version="1.0.4" />
+      </group>
+      <group targetFramework="wp71">
+        <dependency id="dotNetRDF" version="1.0.4" />
+        <dependency id="SharpSerializer" version="2.18" /> 
+      </group>
+      <group targetFramework="portable-net45+wp80+win8">
+        <dependency id="dotNetRDF" version="1.0.4" />
+        <dependency id="SharpSerializer.PCL" version="2.18" />
+      </group>
+      <group targetFramework="windowsphone8">
+        <dependency id="dotNetRDF" version="1.0.4" />
+        <dependency id="SharpSerializer" version="2.18" />
+      </group>
+      <group targetFramework="portable-net45+wp80+sl5+win8+MonoAndroid10+MonoTouch10">
+        <dependency id="dotNetRDF" version="1.0.4" />
+        <dependency id="SharpSerializer.PCL" version="2.18" />
+      </group>
+    </dependencies>
   </metadata>
 </package>

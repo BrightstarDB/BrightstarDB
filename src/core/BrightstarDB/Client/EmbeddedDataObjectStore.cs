@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using BrightstarDB.Dto;
+using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Server;
@@ -18,7 +19,7 @@ namespace BrightstarDB.Client
 
         internal EmbeddedDataObjectStore(ServerCore serverCore, string storeName, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
             string updateGraphUri, IEnumerable<string> datasetGraphUris, string versionGraphUri)
-            : base(namespaceMappings, updateGraphUri ?? Constants.DefaultGraphUri, datasetGraphUris, versionGraphUri)
+            : base(false, namespaceMappings, updateGraphUri ?? Constants.DefaultGraphUri, datasetGraphUris, versionGraphUri)
         {
             _serverCore = serverCore;
             _storeName = storeName;
@@ -48,16 +49,16 @@ namespace BrightstarDB.Client
         public override IEnumerable<IDataObject> BindDataObjectsWithSparql(string sparqlExpression)
         {
             var helper = new SparqlResultDataObjectHelper(this);
-            return helper.BindDataObjects(ExecuteSparql(sparqlExpression));
+            return helper.BindDataObjects(ExecuteSparql(new SparqlQueryContext(sparqlExpression)));
         }
 
-        public override SparqlResult ExecuteSparql(string sparqlExpression)
+        public override SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext)
         {
             var resultStream = new MemoryStream();
-            _serverCore.Query(_storeName, sparqlExpression, DataSetGraphUris, null, SparqlResultsFormat.Xml,
+            _serverCore.Query(_storeName, sparqlQueryContext.SparqlQuery, DataSetGraphUris, null, SparqlResultsFormat.Xml,
                               RdfFormat.RdfXml, resultStream);
             resultStream.Seek(0, SeekOrigin.Begin);
-            return new SparqlResult(resultStream);
+            return new SparqlResult(resultStream, sparqlQueryContext);
         }
 
         public override bool BindDataObject(DataObject dataObject)
@@ -119,7 +120,7 @@ namespace BrightstarDB.Client
             }
 
             var deleteData = new StringWriter();
-            var dw = new BrightstarTripleSinkAdapter(new NQuadsWriter(deleteData, UpdateGraphUri));
+            var dw = new BrightstarTripleSinkAdapter(new NQuadsWriter(deleteData));
             foreach (var triple in DeletePatterns)
             {
                 dw.Triple(triple);
@@ -127,7 +128,7 @@ namespace BrightstarDB.Client
             deleteData.Close();
 
             var addData = new StringWriter();
-            var aw = new BrightstarTripleSinkAdapter(new NQuadsWriter(addData, UpdateGraphUri));
+            var aw = new BrightstarTripleSinkAdapter(new NQuadsWriter(addData));
             foreach (var triple in AddTriples)
             {
                 aw.Triple(triple);               
@@ -135,7 +136,7 @@ namespace BrightstarDB.Client
             addData.Close();
 
             var preconditionsData = new StringWriter();
-            var pw = new BrightstarTripleSinkAdapter(new NQuadsWriter(preconditionsData, UpdateGraphUri));
+            var pw = new BrightstarTripleSinkAdapter(new NQuadsWriter(preconditionsData));
             foreach (var triple in Preconditions)
             {
                 pw.Triple(triple);

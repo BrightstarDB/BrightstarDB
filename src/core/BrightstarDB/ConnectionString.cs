@@ -19,6 +19,9 @@ namespace BrightstarDB
         private const string DnrStoreName = "store";
         private const string DnrQueryName = "query";
         private const string DnrUpdateName = "update";
+        private const string DnrStorageServerName = "storageserver";
+        private const string UserNamePropertyName = "username";
+        private const string PasswordPropertyName = "password";
 
         private readonly Dictionary<string, string> _values;
         private readonly string _rawValue; 
@@ -56,13 +59,6 @@ namespace BrightstarDB
                     var v = keyValuePair.Substring(ix + 1);
                     _values[key] = v;
                 }
-                /*
-                var keyValue = keyValuePair.Split('=');
-                if (keyValue.Count() >= 2)
-                {
-                    _values.Add(keyValue[0].ToLower(), keyValue[1]);
-                }
-                 */
             }
             if (!_values.ContainsKey(TypePropertyName))
             {
@@ -73,7 +69,7 @@ namespace BrightstarDB
             if (type.Equals("embedded"))
             {
                 Type = ConnectionType.Embedded;
-                AssertStoresDirectory();
+                RequiredProperty(StoresDirectoryPropertyName);
             }
             else if (type.Equals("http") || type.Equals("tcp") || type.Equals("namedpipe"))
             {
@@ -82,12 +78,17 @@ namespace BrightstarDB
             else if (type.Equals("rest"))
             {
                 Type = ConnectionType.Rest;
-                AssertEndpoint();
+                RequiredProperty(EndpointPropertyName);
             }
             else if (type.Equals("dotnetrdf"))
             {
                 Type=ConnectionType.DotNetRdf;
-                AssertConfiguration();
+                RequiredProperty(ConfigurationName);
+            }
+            else if (type.Equals("sparql"))
+            {
+                Type = ConnectionType.Sparql;
+                RequiredProperty(DnrQueryName);
             }
             else
             {
@@ -107,34 +108,13 @@ namespace BrightstarDB
             }
         }
 
-        private void AssertStoresDirectory()
-        {
-            if (string.IsNullOrEmpty(StoresDirectory))
-            {
-                throw new FormatException("No StoresDirectory parameter found in the connection string.");
-            }
-        }
+        
 
-        private void AssertEndpoint()
+        private void RequiredProperty(string requiredPropertyName)
         {
-            if (String.IsNullOrEmpty(ServiceEndpoint))
+            if (String.IsNullOrEmpty(GetValueOrDefault(requiredPropertyName)))
             {
-                throw new FormatException("No Endpoint parameter found in the connection string.");
-            }
-        }
-
-        private void AssertConfiguration()
-        {
-            if (String.IsNullOrEmpty(Configuration))
-            {
-                throw new FormatException("No Configuration parameter found in the connection string.");
-            }
-            if (String.IsNullOrEmpty(DnrStoreName) &&
-                (String.IsNullOrEmpty(DnrQueryName) || String.IsNullOrEmpty(DnrUpdateName)))
-            {
-                throw new FormatException(
-                    String.Format("DotNetRdf connection requires either a {0} parameter or {1} and {2} parameters",
-                                  DnrStoreName, DnrQueryName, DnrUpdateName));
+                throw new FormatException(String.Format("Missing required property '{0}'", requiredPropertyName));
             }
         }
 
@@ -196,6 +176,21 @@ namespace BrightstarDB
         public string DnrUpdate { get { return GetValueOrDefault(DnrUpdateName); } }
 
         /// <summary>
+        /// Get the URI identifier of the storage server configuration node in the DotNetRDF configuration file
+        /// </summary>
+        public string DnrStorageServer { get { return GetValueOrDefault(DnrStorageServerName); } }
+
+        /// <summary>
+        /// Get the user name to use where credentials are required
+        /// </summary>
+        public string UserName { get { return GetValueOrDefault(UserNamePropertyName); } }
+
+        /// <summary>
+        /// Get the password to use where credentials are required
+        /// </summary>
+        public string Password { get { return GetValueOrDefault(PasswordPropertyName); } }
+
+        /// <summary>
         /// Returns the string representation of this connection string.
         /// </summary>
         /// <returns>The connection string value</returns>
@@ -207,7 +202,16 @@ namespace BrightstarDB
             }
             if (Type == ConnectionType.Rest)
             {
-                return String.Format("type=rest;endpoint={0};accountId={1};key={2}",ServiceEndpoint, Account, Key);
+                if (!String.IsNullOrEmpty(Account))
+                {
+                    return String.Format("type=rest;endpoint={0};accountId={1};key={2}", ServiceEndpoint, Account, Key);
+                }
+                if (!String.IsNullOrEmpty(UserName))
+                {
+                    return String.Format("type=rest;endpoint={0};userName={1};password={2}", ServiceEndpoint, UserName,
+                                         Password);
+                }
+                return String.Format("type=rest;endpoint={0}", ServiceEndpoint);
             }
             throw new NotSupportedException(String.Format("Cannot serialize connection string for connection type {0}", Type));
         }

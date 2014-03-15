@@ -13,7 +13,7 @@
         IEntitySet<ICompany> ListedCompanies { get; set; }
     }
 
-    public class Market : IMarket{
+    public class Market : MockEntityObject, IMarket{
         #region Implementation of IMarket
 
         public string Id

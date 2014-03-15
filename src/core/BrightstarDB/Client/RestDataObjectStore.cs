@@ -11,7 +11,7 @@ namespace BrightstarDB.Client
                                    Dictionary<string, string> namespaceMappings, bool isOptimisticLockingEnabled,
                                    string updateGraphUri, IEnumerable<string> datasetGraphUris, string versionGraphUri
             )
-            : base(namespaceMappings, isOptimisticLockingEnabled,
+            : base(false, namespaceMappings, isOptimisticLockingEnabled,
                    updateGraphUri ?? Constants.DefaultGraphUri, datasetGraphUris, versionGraphUri)
         {
             _storeName = storeName;

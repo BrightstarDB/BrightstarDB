@@ -232,4 +232,28 @@
   <data name="BrightstarServiceClient_StoreDoesNotExist" xml:space="preserve">
     <value>The store '{0}' does not exist or cannot be accessed.</value>
   </data>
+  <data name="DotNetRdf_ErrorFromUnderlyingServer" xml:space="preserve">
+    <value>An exception was raised by the DotNetRDF storage server. See Inner Exception for details.</value>
+  </data>
+  <data name="DotNetRdf_NotAStorageProvider" xml:space="preserve">
+    <value>The configured item must be a DotNetRDF IStorageProvider instance.</value>
+  </data>
+  <data name="DotNetRdf_StoreCreationFailed" xml:space="preserve">
+    <value>Store creation failed. No further information is available. Please check your storage server configuration and permissions.</value>
+  </data>
+  <data name="DotNetRdf_StoreDoesNotSupportDelete" xml:space="preserve">
+    <value>The storage provider for this store does not provide the methods required to clear the store data.</value>
+  </data>
+  <data name="DotNetRdf_StoreMustImplementIQueryableStorage" xml:space="preserve">
+    <value>The storage provider for this store does not support SPARQL query.</value>
+  </data>
+  <data name="DotNetRdf_UnsupportedByServer" xml:space="preserve">
+    <value>The operation is not supported by the DotNetRDF storage server.</value>
+  </data>
+  <data name="BrightstarServiceClient_StoreIsReadOnly" xml:space="preserve">
+    <value>Cannot save changes to a read-only store.</value>
+  </data>
+  <data name="ExportJob_UnsupportedExportFormat" xml:space="preserve">
+    <value>The media type {0} is not currently supported by Export jobs.</value>
+  </data>
 </root>

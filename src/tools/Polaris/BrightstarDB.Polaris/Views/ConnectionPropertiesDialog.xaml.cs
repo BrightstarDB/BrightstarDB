@@ -55,6 +55,8 @@ namespace BrightstarDB.Polaris.Views
                     DirectorySelectorButton.IsEnabled = true;
                     ServerEndpointText.Text = string.Empty;
                     ServerEndpointText.IsEnabled = false;
+                    RequiresAuthenticationCheck.IsChecked = false;
+                    RequiresAuthenticationCheck.IsEnabled = false;
                     break;
                 case ConnectionType.Rest:
                     DirectoryPathText.Text = string.Empty;
@@ -62,6 +64,7 @@ namespace BrightstarDB.Polaris.Views
                     DirectorySelectorButton.IsEnabled = false;
                     ServerEndpointText.Text = "http://localhost:8090/brightstar";
                     ServerEndpointText.IsEnabled = true;
+                    RequiresAuthenticationCheck.IsEnabled = true;
                     break;
             }
         }

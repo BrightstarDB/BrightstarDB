@@ -19,7 +19,7 @@ namespace BrightstarDB.EntityFramework.Tests.ContextObjects
         ICollection<PlainLiteral> AltLabels { get; set; } 
     }
 
-    class Concept : IConcept
+    class Concept : MockEntityObject, IConcept
     {
         public string Id { get; private set; }
         public PlainLiteral PrefLabel { get; set; }

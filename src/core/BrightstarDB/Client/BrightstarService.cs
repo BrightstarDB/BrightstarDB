@@ -1,7 +1,12 @@
-﻿using BrightstarDB.Caching;
+﻿using System.Net;
+using BrightstarDB.Caching;
 using BrightstarDB.Client.RestSecurity;
 using BrightstarDB.Server;
 using System;
+using VDS.RDF;
+using VDS.RDF.Query;
+using VDS.RDF.Storage.Management;
+using VDS.RDF.Update;
 
 
 namespace BrightstarDB.Client
@@ -124,13 +129,55 @@ namespace BrightstarDB.Client
                     return new RestDataObjectContext(connectionString);
 #endif
                 case ConnectionType.DotNetRdf:
-                    return new DotNetRdfDataObjectContext(connectionString);
+                    var configurationGraph = DotNetRdfConfigurationHelper.LoadConfiguration(connectionString.Configuration);
+                    bool optimisticLocking = connectionString.OptimisticLocking;
+                    if (String.IsNullOrEmpty(connectionString.DnrStorageServer))
+                    {
+                        return new DotNetRdfStorageProvidersDataObjectContext(configurationGraph, optimisticLocking);
+                    }
+                    var storageServer = DotNetRdfConfigurationHelper.GetConfigurationObject(
+                        configurationGraph, connectionString.DnrStorageServer) as IStorageServer;
+                    if (storageServer == null)
+                    {
+                        throw new BrightstarClientException("Unable to retrieve a DotNetRDF storage server from the provided configuration.");
+                    }
+                    return new DotNetRdfStorageServerDataObjectContext(storageServer, optimisticLocking);
+
+                case ConnectionType.Sparql:
+                    return MakeSparqlDataObjectContext(connectionString);
+                    
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value +
                                                         ". Cause: unrecognised connection string type: " +
                                                         connectionString.Type);
             }
+        }
+
+        private static IDataObjectContext MakeSparqlDataObjectContext(ConnectionString connectionString)
+        {
+            var queryEndpoint = new SparqlRemoteEndpoint(new Uri(connectionString.DnrQuery));
+            if (!String.IsNullOrEmpty(connectionString.UserName) && !String.IsNullOrEmpty(connectionString.Password))
+            {
+                queryEndpoint.SetCredentials(connectionString.UserName, connectionString.Password);
+            }
+            var queryProcessor = new RemoteQueryProcessor(queryEndpoint);
+
+            ISparqlUpdateProcessor updateProcessor = null;
+            if (!String.IsNullOrEmpty(connectionString.DnrUpdate))
+            {
+#if PORTABLE || SILVERLIGHT
+                throw new NotSupportedException("The PCL and mobile builds of BrightstarDB do not currently support stores that use SPARQL Update. The store may be opened as a read-only store by removing the update= parameter in the connection string.");
+#else
+                var updateEndpoint = new SparqlRemoteUpdateEndpoint(new Uri(connectionString.DnrUpdate));
+                if (!String.IsNullOrEmpty(connectionString.UserName) && !String.IsNullOrEmpty(connectionString.Password))
+                {
+                    updateEndpoint.SetCredentials(connectionString.UserName, connectionString.Password);
+                }
+                updateProcessor = new RemoteUpdateProcessor(updateEndpoint);
+#endif
+            }
+            return new SparqlDataObjectContext(queryProcessor, updateProcessor, connectionString.OptimisticLocking);
         }
 
 #if !WINDOWS_PHONE
@@ -165,6 +212,10 @@ namespace BrightstarDB.Client
             if (connectionString.Account != null && connectionString.Key != null)
             {
                 requestAuthenticator = new SharedSecretAuthenticator(connectionString.Account, connectionString.Key);
+            }
+            else if (connectionString.UserName != null && connectionString.Password != null)
+            {
+                requestAuthenticator = new CredentialsRequestAuthenticator(new NetworkCredential(connectionString.UserName, connectionString.Password));
             }
             return new BrightstarRestClient(endpoint, requestAuthenticator, null);
         }

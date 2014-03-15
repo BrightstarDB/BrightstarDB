@@ -25,17 +25,17 @@ namespace BrightstarDB.PerformanceTests.Model
     		TypeMappings = new EntityMappingStore();
     		var provider = new ReflectionMappingProvider();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.PerformanceTests.Model.IArticle));
-    		TypeMappings.AddImplMapping<BrightstarDB.PerformanceTests.Model.IArticle, BrightstarDB.PerformanceTests.Model.Article>();
+    		TypeMappings.SetImplMapping<BrightstarDB.PerformanceTests.Model.IArticle, BrightstarDB.PerformanceTests.Model.Article>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.PerformanceTests.Model.IDepartment));
-    		TypeMappings.AddImplMapping<BrightstarDB.PerformanceTests.Model.IDepartment, BrightstarDB.PerformanceTests.Model.Department>();
+    		TypeMappings.SetImplMapping<BrightstarDB.PerformanceTests.Model.IDepartment, BrightstarDB.PerformanceTests.Model.Department>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.PerformanceTests.Model.IJobRole));
-    		TypeMappings.AddImplMapping<BrightstarDB.PerformanceTests.Model.IJobRole, BrightstarDB.PerformanceTests.Model.JobRole>();
+    		TypeMappings.SetImplMapping<BrightstarDB.PerformanceTests.Model.IJobRole, BrightstarDB.PerformanceTests.Model.JobRole>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.PerformanceTests.Model.IPerson));
-    		TypeMappings.AddImplMapping<BrightstarDB.PerformanceTests.Model.IPerson, BrightstarDB.PerformanceTests.Model.Person>();
+    		TypeMappings.SetImplMapping<BrightstarDB.PerformanceTests.Model.IPerson, BrightstarDB.PerformanceTests.Model.Person>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.PerformanceTests.Model.ISkill));
-    		TypeMappings.AddImplMapping<BrightstarDB.PerformanceTests.Model.ISkill, BrightstarDB.PerformanceTests.Model.Skill>();
+    		TypeMappings.SetImplMapping<BrightstarDB.PerformanceTests.Model.ISkill, BrightstarDB.PerformanceTests.Model.Skill>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.PerformanceTests.Model.IWebsite));
-    		TypeMappings.AddImplMapping<BrightstarDB.PerformanceTests.Model.IWebsite, BrightstarDB.PerformanceTests.Model.Website>();
+    		TypeMappings.SetImplMapping<BrightstarDB.PerformanceTests.Model.IWebsite, BrightstarDB.PerformanceTests.Model.Website>();
     	}
     	
     	/// <summary>

@@ -1,7 +1,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="BuildAndTest" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <NoDocs Condition=" '$(NoDocs)' == '' ">False</NoDocs>
+        <NoXamarin Condition=" '$(NoXamarin)' == '' ">False</NoXamarin>
         <NUnitPath Condition=" '$(NUnitPath)' == '' ">C:\Program Files (x86)\NUnit 2.6.2\bin</NUnitPath>
     </PropertyGroup>
     
@@ -11,11 +11,11 @@
     </Target>
 
     <!-- Build Targets -->
-    <Target Name="Build" DependsOnTargets="BuildCore;BuildMobile;BuildPortable;BuildTools">
+    <Target Name="Build" DependsOnTargets="BuildCore;BuildMobile;BuildPortable;BuildXamarin;BuildTools">
     </Target>
 
     <Target Name="BuildCore">
-        <MSBuild Projects="src\core\BrightstarDB.sln"
+        <MSBuild Projects="src\core\core.sln"
                  Properties="Configuration=$(Configuration)"
                  Targets="Clean;Build"/>
     </Target>
@@ -32,6 +32,12 @@
                  Targets="Clean;Build"/>
     </Target>
 
+    <Target Name="BuildXamarin" Condition="!$(NoXamarin) AND Exists('$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets')">
+        <MSBuild Projects="src\portable\xamarin.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean;Build"/>
+    </Target>
+    
     <Target Name="BuildTools">
         <MSBuild Projects="src\tools\Polaris\Polaris.sln"
                  Properties="Configuration=$(Configuration)"
@@ -44,36 +50,41 @@
         <MakeDir Directories="TestResults"/>
     </Target>
 
-    <Target Name="Test" Condition=" '$(Configuration)' == 'Debug'">
-        <CallTarget Targets="Internal;Core;EntityFramework;OData" RunEachTargetSeparately="True"/>
-        <CallTarget Targets="PortableDesktop" RunEachTargetSeparately="True"/>
+	<Target Name="Test" DependsOnTargets="TestCore;TestPortable" />
+	
+    <Target Name="TestCore">
+        <CallTarget Targets="_TestInternal;_TestCore;_TestEntityFramework;_TestOData" RunEachTargetSeparately="True"/>
+	</Target>
+	
+	<Target Name="TestPortable">
+        <CallTarget Targets="_TestPortableDesktop" RunEachTargetSeparately="True"/>
     </Target>
     
-    <Target Name="EntityFramework" DependsOnTargets="ResultsDir">
+    <Target Name="_TestEntityFramework" DependsOnTargets="ResultsDir">
 		<NUnit Assemblies="src\core\BrightstarDB.EntityFramework.Tests\bin\Debug\BrightstarDB.EntityFramework.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.EntityFramework.Tests.xml" />
 	</Target>
 
-	<Target Name="Internal" DependsOnTargets="ResultsDir">
+	<Target Name="_TestInternal" DependsOnTargets="ResultsDir">
 		<NUnit Assemblies="src\core\BrightstarDB.InternalTests\bin\Debug\BrightstarDB.InternalTests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.InternalTests.xml" />
 	</Target>
 
-	<Target Name="OData" DependsOnTargets="ResultsDir">
+	<Target Name="_TestOData" DependsOnTargets="ResultsDir">
 		<NUnit Assemblies="src\core\BrightstarDB.OData.Tests\bin\Debug\BrightstarDB.OData.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.OData.Tests.xml" />
 	</Target>
 
-	<Target Name="Core" DependsOnTargets="ResultsDir">
+	<Target Name="_TestCore" DependsOnTargets="ResultsDir">
 		<NUnit Assemblies="src\core\BrightstarDB.Tests\bin\Debug\BrightstarDB.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.Tests.xml" />
 	</Target>
 
-    <Target Name="PortableDesktop" DependsOnTargets="ResultsDir">
+    <Target Name="_TestPortableDesktop" DependsOnTargets="ResultsDir">
 		<NUnit Assemblies="src\portable\Test\BrightstarDB.Portable.Desktop.Tests\bin\Debug\BrightstarDB.Portable.Desktop.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.Portable.Desktop.Tests.xml" />

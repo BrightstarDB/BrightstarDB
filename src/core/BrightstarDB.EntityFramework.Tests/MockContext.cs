@@ -16,9 +16,9 @@ namespace BrightstarDB.EntityFramework.Tests
     public class MockContext : EntityContext
     {
         private string _lastQuery;
-        private SparqlQueryContext _lastQueryContext;
+        private SparqlLinqQueryContext _lastLinqQueryContext;
         public string LastSparqlQuery { get { return _lastQuery; } }
-        public SparqlQueryContext LastSparqlQueryContext { get { return _lastQueryContext; } }
+        public SparqlLinqQueryContext LastSparqlLinqQueryContext { get { return _lastLinqQueryContext; } }
 
         public MockContext() : base()
         {
@@ -26,12 +26,12 @@ namespace BrightstarDB.EntityFramework.Tests
 
         public MockContext(EntityMappingStore mappingStore) : base(mappingStore)
         {
-            mappingStore.AddImplMapping<IDinner,Dinner>();
-            mappingStore.AddImplMapping<ContextObjects.ICompany, ContextObjects.Company>();
-            mappingStore.AddImplMapping<ContextObjects.IMarket,ContextObjects.Market>();
-            mappingStore.AddImplMapping<ContextObjects.IPerson,ContextObjects.Person>();
-            mappingStore.AddImplMapping<IRsvp,Rsvp>();
-            mappingStore.AddImplMapping<IConcept, Concept>();
+            mappingStore.SetImplMapping<IDinner,Dinner>();
+            mappingStore.SetImplMapping<ContextObjects.ICompany, ContextObjects.Company>();
+            mappingStore.SetImplMapping<ContextObjects.IMarket,ContextObjects.Market>();
+            mappingStore.SetImplMapping<ContextObjects.IPerson,ContextObjects.Person>();
+            mappingStore.SetImplMapping<IRsvp,Rsvp>();
+            mappingStore.SetImplMapping<IConcept, Concept>();
         }
 
         #region Overrides of LdoContext
@@ -69,17 +69,17 @@ namespace BrightstarDB.EntityFramework.Tests
             return new XDocument();
         }
 
-        public override IEnumerable<T> ExecuteQuery<T>(SparqlQueryContext sparqlQuery)
+        public override IEnumerable<T> ExecuteQuery<T>(SparqlLinqQueryContext sparqlLinqQuery)
         {
-            _lastQuery = sparqlQuery.SparqlQuery;
-            _lastQueryContext = sparqlQuery;
+            _lastQuery = sparqlLinqQuery.SparqlQuery;
+            _lastLinqQueryContext = sparqlLinqQuery;
             yield break;
         }
 
         public override IEnumerable<T> ExecuteInstanceQuery<T>(string instanceIdentifier, string typeIdentifier)
         {
             _lastQuery = String.Format("ASK {{ <{0}> a <{1}>. }}", instanceIdentifier, typeIdentifier);
-            _lastQueryContext = null;
+            _lastLinqQueryContext = null;
             yield break;
         }
 

@@ -1,4 +1,6 @@
-﻿using BrightstarDB.Client;
+﻿using System.Linq;
+using BrightstarDB.Client;
+using BrightstarDB.Server.Modules.Authentication;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 
@@ -6,9 +8,11 @@ namespace BrightstarDB.Server.Modules.Tests
 {
     public class FakeNancyBootstrapper : DefaultNancyBootstrapper
     {
+
         private readonly IBrightstarService _brightstarService;
         private readonly AbstractStorePermissionsProvider _storePermissionsProvider;
         private readonly AbstractSystemPermissionsProvider _systemPermissionsProvider;
+        private readonly IAuthenticationProvider _authenticationProvider;
 
         public FakeNancyBootstrapper(IBrightstarService brightstarService) : this(
             brightstarService, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All))
@@ -31,12 +35,24 @@ namespace BrightstarDB.Server.Modules.Tests
             _systemPermissionsProvider = systemPermissionsProvider;
         }
 
+        public FakeNancyBootstrapper(IBrightstarService brightstarService,
+                                     IAuthenticationProvider authenticationProvider,
+                                     AbstractStorePermissionsProvider storePermissionsProvider,
+                                     AbstractSystemPermissionsProvider systemPermissionsProvider)
+        {
+            _brightstarService = brightstarService;
+            _authenticationProvider = authenticationProvider;
+            _systemPermissionsProvider = systemPermissionsProvider;
+            _storePermissionsProvider = storePermissionsProvider;
+        }
+
         protected override void ConfigureApplicationContainer(Nancy.TinyIoc.TinyIoCContainer container)
         {
             base.ConfigureApplicationContainer(container);
             container.Register<IBrightstarService>(_brightstarService);
             container.Register<AbstractStorePermissionsProvider>(_storePermissionsProvider);
             container.Register(_systemPermissionsProvider);
+            if (_authenticationProvider != null) container.Register(_authenticationProvider);
         }
 
         protected override IRootPathProvider RootPathProvider
@@ -44,6 +60,14 @@ namespace BrightstarDB.Server.Modules.Tests
             get
             {
                 return new DefaultRootPathProvider();
+            }
+        }
+
+        protected override void ApplicationStartup(Nancy.TinyIoc.TinyIoCContainer container, Nancy.Bootstrapper.IPipelines pipelines)
+        {
+            if (_authenticationProvider != null)
+            {
+                _authenticationProvider.Enable(pipelines);
             }
         }
     }

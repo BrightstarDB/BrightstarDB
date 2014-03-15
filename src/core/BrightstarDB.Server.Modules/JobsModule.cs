@@ -57,7 +57,7 @@ namespace BrightstarDB.Server.Modules
                     if (String.IsNullOrWhiteSpace(jobRequestObject.JobType)) return HttpStatusCode.BadRequest;
 
                     var storeName = parameters["storeName"];
-
+                    var label = jobRequestObject.Label;
                     try
                     {
                         IJobInfo queuedJobInfo;
@@ -65,7 +65,7 @@ namespace BrightstarDB.Server.Modules
                         {
                             case "consolidate":
                                 AssertPermission(StorePermissions.Admin);
-                                queuedJobInfo = brightstarService.ConsolidateStore(storeName);
+                                queuedJobInfo = brightstarService.ConsolidateStore(storeName, label);
                                 break;
 
                             case "createsnapshot":
@@ -100,27 +100,32 @@ namespace BrightstarDB.Server.Modules
                                 // Execute
                                 queuedJobInfo = brightstarService.CreateSnapshot(
                                     storeName, jobRequestObject.JobParameters["TargetStoreName"],
-                                    persistenceType, commitPoint);
+                                    persistenceType, commitPoint, label);
                                 break;
 
                             case "export":
                                 AssertPermission(StorePermissions.Export);
                                 if (!jobRequestObject.JobParameters.ContainsKey("FileName") ||
-                                    !jobRequestObject.JobParameters.ContainsKey("GraphUri") ||
                                     String.IsNullOrWhiteSpace(jobRequestObject.JobParameters["FileName"]))
                                 {
                                     return HttpStatusCode.BadRequest;
                                 }
+                                RdfFormat format = jobRequestObject.JobParameters.ContainsKey("Format")
+                                                       ? RdfFormat.GetResultsFormat(
+                                                           jobRequestObject.JobParameters["Format"])
+                                                       : RdfFormat.NQuads;
+
                                 queuedJobInfo = brightstarService.StartExport(
                                     storeName,
                                     jobRequestObject.JobParameters["FileName"],
-                                    jobRequestObject.JobParameters["GraphUri"]);
+                                    jobRequestObject.JobParameters.ContainsKey("GraphUri") ? jobRequestObject.JobParameters["GraphUri"] : null,
+                                    format,
+                                    label);
                                 break;
 
                             case "import":
                                 AssertPermission(StorePermissions.TransactionUpdate);
                                 if (!jobRequestObject.JobParameters.ContainsKey("FileName") ||
-                                    !jobRequestObject.JobParameters.ContainsKey("DefaultGraphUri") ||
                                     String.IsNullOrWhiteSpace(jobRequestObject.JobParameters["FileName"]))
                                 {
                                     return HttpStatusCode.BadRequest;
@@ -128,7 +133,8 @@ namespace BrightstarDB.Server.Modules
                                 queuedJobInfo = brightstarService.StartImport(
                                     storeName,
                                     jobRequestObject.JobParameters["FileName"],
-                                    jobRequestObject.JobParameters["DefaultGraphUri"]);
+                                    jobRequestObject.JobParameters.ContainsKey("DefaultGraphUri") ? jobRequestObject.JobParameters["DefaultGraphUri"] : Constants.DefaultGraphUri,
+                                    label);
                                 break;
 
                             case "repeattransaction":
@@ -148,7 +154,7 @@ namespace BrightstarDB.Server.Modules
                                 {
                                     return HttpStatusCode.BadRequest;
                                 }
-                                queuedJobInfo = brightstarService.ReExecuteTransaction(storeName, transaction);
+                                queuedJobInfo = brightstarService.ReExecuteTransaction(storeName, transaction, label);
                                 break;
 
                             case "sparqlupdate":
@@ -161,7 +167,8 @@ namespace BrightstarDB.Server.Modules
                                 queuedJobInfo = brightstarService.ExecuteUpdate(
                                     storeName,
                                     jobRequestObject.JobParameters["UpdateExpression"],
-                                    false);
+                                    false,
+                                    label);
                                 break;
 
                             case "transaction":
@@ -185,12 +192,13 @@ namespace BrightstarDB.Server.Modules
                                     storeName, preconditions,
                                     deletePatterns, insertTriples,
                                     defaultGraphUri,
-                                    false);
+                                    false,
+                                    label);
                                 break;
 
                             case "updatestats":
                                 AssertPermission(StorePermissions.Admin);
-                                queuedJobInfo = brightstarService.UpdateStatistics(storeName);
+                                queuedJobInfo = brightstarService.UpdateStatistics(storeName, label);
                                 break;
 
                             default:
@@ -201,6 +209,7 @@ namespace BrightstarDB.Server.Modules
                         return Negotiate.WithModel(new JobResponseModel
                             {
                                 JobId = queuedJobInfo.JobId,
+                                Label = queuedJobInfo.Label,
                                 StatusMessage = queuedJobInfo.StatusMessage,
                                 JobStatus = queuedJobInfo.GetJobStatusString(),
                                 ExceptionInfo = queuedJobInfo.ExceptionInfo,

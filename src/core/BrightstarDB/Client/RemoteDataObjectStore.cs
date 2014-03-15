@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 
 namespace BrightstarDB.Client
 {
     /// <summary>
-    /// Use the WCF Client to talk to the service
+    /// Base class for store implementations that talk to a remote service
     /// </summary>
     internal abstract class RemoteDataObjectStore : DataObjectStoreBase
     {
@@ -19,9 +20,9 @@ namespace BrightstarDB.Client
 
         private String QueryTemplate { get { return _queryTemplate ?? (_queryTemplate = GetQueryTemplate()); } }
 
-        protected RemoteDataObjectStore(Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
+        protected RemoteDataObjectStore(bool asReadOnly, Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled,
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
-            : base(namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
+            : base(asReadOnly, namespaceMappings, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             _optimisticLockingEnabled = optimisticLockingEnabled;
             ResetTransactionData();
@@ -53,12 +54,12 @@ namespace BrightstarDB.Client
         public override IEnumerable<IDataObject> BindDataObjectsWithSparql(string sparqlExpression)
         {
             var binder = new SparqlResultDataObjectHelper(this);
-            return binder.BindDataObjects(ExecuteSparql(sparqlExpression));
+            return binder.BindDataObjects(ExecuteSparql(new SparqlQueryContext(sparqlExpression)));
         }
 
-        public override SparqlResult ExecuteSparql(string sparqlExpression)
+        public override SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext)
         {
-            return new SparqlResult(Client.ExecuteQuery(sparqlExpression, DataSetGraphUris));
+            return new SparqlResult(Client.ExecuteQuery(sparqlQueryContext.SparqlQuery, DataSetGraphUris), sparqlQueryContext);
         }
 
         protected virtual string GetQueryTemplate()

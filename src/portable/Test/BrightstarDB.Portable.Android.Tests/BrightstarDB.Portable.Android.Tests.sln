@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Portable.Android.Tests", "BrightstarDB.Portable.Android.Tests.csproj", "{377B1260-3DED-482D-B2E4-0CC83AD5ADFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Portable", "..\..\BrightstarDB.Portable\BrightstarDB.Portable.csproj", "{365E38E3-EDA2-4A3D-9740-375EC496DF79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Portable.Android", "..\..\BrightstarDB.Portable.Android\BrightstarDB.Portable.Android.csproj", "{ECAF8E98-0D20-46E4-99B5-C18352A8A732}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{365E38E3-EDA2-4A3D-9740-375EC496DF79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{365E38E3-EDA2-4A3D-9740-375EC496DF79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{365E38E3-EDA2-4A3D-9740-375EC496DF79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{365E38E3-EDA2-4A3D-9740-375EC496DF79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{377B1260-3DED-482D-B2E4-0CC83AD5ADFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{377B1260-3DED-482D-B2E4-0CC83AD5ADFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{377B1260-3DED-482D-B2E4-0CC83AD5ADFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{377B1260-3DED-482D-B2E4-0CC83AD5ADFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECAF8E98-0D20-46E4-99B5-C18352A8A732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECAF8E98-0D20-46E4-99B5-C18352A8A732}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECAF8E98-0D20-46E4-99B5-C18352A8A732}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECAF8E98-0D20-46E4-99B5-C18352A8A732}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = BrightstarDB.Portable.Android.Tests.csproj
+	EndGlobalSection
+EndGlobal

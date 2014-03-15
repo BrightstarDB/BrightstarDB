@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Remotion.Linq;
@@ -15,7 +16,7 @@ namespace BrightstarDB.EntityFramework.Query
         private string _instanceUri;
         private string _typeUri;
 
-        public static SparqlQueryContext GenerateSparqlQuery(EntityContext context, QueryModel queryModel)
+        public static SparqlLinqQueryContext GenerateSparqlLinqQuery(EntityContext context, QueryModel queryModel)
         {
             var visitor = new SparqlGeneratorQueryModelVisitor(context);
             visitor.VisitQueryModel(queryModel);
@@ -25,8 +26,8 @@ namespace BrightstarDB.EntityFramework.Query
                 resultType = resultType.GetGenericArguments()[0];
             }
             var bindType = context.GetImplType(resultType);
-            bool useDescribe = typeof (IEntityObject).IsAssignableFrom(bindType);
-            return visitor.GetSparqlQuery(useDescribe);
+            bool useConstruct = typeof (IEntityObject).IsAssignableFrom(bindType);
+            return visitor.GetSparqlQuery(useConstruct);
         }
 
         SparqlGeneratorQueryModelVisitor(EntityContext context)
@@ -387,21 +388,23 @@ namespace BrightstarDB.EntityFramework.Query
             return null;
         }
 
-        public SparqlQueryContext GetSparqlQuery(bool useDescribe)
+        public SparqlLinqQueryContext GetSparqlQuery(bool useConstruct)
         {
             if (_isInstanceQuery)
             {
-                return new SparqlQueryContext(_instanceUri, _typeUri);
+                return new SparqlLinqQueryContext(_instanceUri, _typeUri);
             }
             return
-                new SparqlQueryContext(
-                    useDescribe && !_queryBuilder.IsDistinct && !_queryBuilder.IsOrdered
-                        ? _queryBuilder.GetSparqlDescribeString()
+                new SparqlLinqQueryContext(
+                    useConstruct && !(_queryBuilder.SelectVariables.Count() > 1 && _queryBuilder.IsOrdered)
+                        ? _queryBuilder.GetSparqlConstructString()
                         : _queryBuilder.GetSparqlString(),
                     _queryBuilder.AnonymousMembersMap,
                     _queryBuilder.Constructor,
                     _queryBuilder.ConstructorArgs,
-                    _queryBuilder.MembersMap, _queryBuilder.MemberInitExpression);
+                    _queryBuilder.MembersMap, 
+                    _queryBuilder.MemberInitExpression,
+                    _queryBuilder.GetOrdering());
         }
 
     }

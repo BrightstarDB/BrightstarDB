@@ -39,6 +39,11 @@ namespace BrightstarDB.Client
         string JobId { get; }
 
         /// <summary>
+        /// The user-friendly label for the job
+        /// </summary>
+        string Label { get; }
+
+        /// <summary>
         /// Exception information
         /// </summary>
         ExceptionDetailObject ExceptionInfo { get; }

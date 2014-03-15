@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using BrightstarDB.Client;
 using BrightstarDB.Dto;
-using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using BrightstarDB.Storage;
 using Moq;
@@ -26,10 +25,10 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("1234");
-            brightstar.Setup(s => s.ConsolidateStore("foo"))
+            brightstar.Setup(s => s.ConsolidateStore("foo", "Consolidate Job"))
                       .Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var requestObject = JobRequestObject.CreateConsolidateJob();
+            var requestObject = JobRequestObject.CreateConsolidateJob("Consolidate Job");
 
             // Execute
             var response = app.Post("/foo/jobs", with =>
@@ -58,9 +57,9 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("2345");
-            brightstar.Setup(s=>s.StartExport("foo", "export.nt", null)).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s=>s.StartExport("foo", "export.nt", null, It.Is<RdfFormat>(r=>r.DefaultExtension.Equals(RdfFormat.NQuads.DefaultExtension)), "ExportJob")).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var requestObject = JobRequestObject.CreateExportJob("export.nt");
+            var requestObject = JobRequestObject.CreateExportJob("export.nt", label:"ExportJob");
 
             // Execute
             var response = app.Post("foo/jobs", with =>
@@ -81,9 +80,9 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("2345");
-            brightstar.Setup(s => s.StartExport("foo", "export.nt", "http://some/graph/uri")).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s => s.StartExport("foo", "export.nt", "http://some/graph/uri", It.Is<RdfFormat>(r=>r.DefaultExtension.Equals(RdfFormat.NTriples.DefaultExtension)), "ExportJob")).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var requestObject = JobRequestObject.CreateExportJob("export.nt", "http://some/graph/uri");
+            var requestObject = JobRequestObject.CreateExportJob("export.nt", "http://some/graph/uri", RdfFormat.NTriples, "ExportJob");
 
             // Execute
             var response = app.Post("foo/jobs", with =>
@@ -114,9 +113,9 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("3456");
-            brightstar.Setup(s=>s.StartImport("foo", "import.nt", null)).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s=>s.StartImport("foo", "import.nt", null, "ImportJob")).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var requestObject = JobRequestObject.CreateImportJob("import.nt");
+            var requestObject = JobRequestObject.CreateImportJob("import.nt", label:"ImportJob");
 
             // Execute
             var response = app.Post("/foo/jobs", with =>
@@ -137,9 +136,9 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("3456");
-            brightstar.Setup(s => s.StartImport("foo", "import.nt", "http://import/graph/uri")).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s => s.StartImport("foo", "import.nt", "http://import/graph/uri", "ImportGraphJob")).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var requestObject = JobRequestObject.CreateImportJob("import.nt", "http://import/graph/uri");
+            var requestObject = JobRequestObject.CreateImportJob("import.nt", "http://import/graph/uri", "ImportGraphJob");
 
             // Execute
             var response = app.Post("/foo/jobs", with =>
@@ -171,9 +170,9 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("4567");
-            brightstar.Setup(s => s.ExecuteUpdate("foo", "update expression", false)).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s => s.ExecuteUpdate("foo", "update expression", false,"SparqlUpdateJob")).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var requestObject = JobRequestObject.CreateSparqlUpdateJob("update expression");
+            var requestObject = JobRequestObject.CreateSparqlUpdateJob("update expression", "SparqlUpdateJob");
 
             // Execute
             var response = app.Post("/foo/jobs", with =>
@@ -219,12 +218,12 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(
                 s =>
                 s.ExecuteTransaction("foo", "preconditions string", "delete patterns string", "insert triples string",
-                                     null, false))
+                                     null, false, "TransactionJob"))
                                      .Returns(mockJobInfo.Object)
                                      .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var requestObject = JobRequestObject.CreateTransactionJob("preconditions string", "delete patterns string",
-                                                                      "insert triples string");
+                                                                      "insert triples string", label:"TransactionJob");
 
             // Execute
             var response = app.Post("/foo/jobs", with =>
@@ -249,12 +248,12 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(
                 s =>
                 s.ExecuteTransaction("foo", "preconditions string", "delete patterns string", "insert triples string",
-                                     "http://update/graph/uri", false))
+                                     "http://update/graph/uri", false, "TransactionGraphJob"))
                                      .Returns(mockJobInfo.Object)
                                      .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var requestObject = JobRequestObject.CreateTransactionJob("preconditions string", "delete patterns string",
-                                                                      "insert triples string", "http://update/graph/uri");
+                                                                      "insert triples string", "http://update/graph/uri", "TransactionGraphJob");
 
             // Execute
             var response = app.Post("/foo/jobs", with =>
@@ -276,7 +275,7 @@ namespace BrightstarDB.Server.Modules.Tests
             TestValidPost("/foo/jobs",
                           "{ JobType: \"Transaction\", JobParameters: { Deletes: \"delete\", Inserts: \"insert\", DefaultGraphUri:\"graph\"}}",
                           (b, m) =>
-                          b.Setup(s => s.ExecuteTransaction("foo", null, "delete", "insert", "graph", false))
+                          b.Setup(s => s.ExecuteTransaction("foo", null, "delete", "insert", "graph", false, It.IsAny<string>()))
                            .Returns(m.Object)
                            .Verifiable());
 
@@ -284,14 +283,14 @@ namespace BrightstarDB.Server.Modules.Tests
             TestValidPost("/foo/jobs",
                           "{ JobType: \"Transaction\", JobParameters: { Inserts: \"insert\", DefaultGraphUri:\"graph\"}}",
                           (b, m) =>
-                          b.Setup(s => s.ExecuteTransaction("foo", null, null, "insert", "graph", false))
+                          b.Setup(s => s.ExecuteTransaction("foo", null, null, "insert", "graph", false, It.IsAny<string>()))
                            .Returns(m.Object)
                            .Verifiable());
 
             // Can omit inserts
             TestValidPost("/foo/jobs", "{ JobType: \"Transaction\", JobParameters: { DefaultGraphUri:\"graph\"}}",
                           (b, m) =>
-                          b.Setup(s => s.ExecuteTransaction("foo", null, null, null, "graph", false))
+                          b.Setup(s => s.ExecuteTransaction("foo", null, null, null, "graph", false, It.IsAny<string>()))
                            .Returns(m.Object)
                            .Verifiable());
         }
@@ -309,8 +308,8 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestPostUpdateStatsJob()
         {
-            TestValidPost("/foo/jobs", JobRequestObject.CreateUpdateStatsJob(),
-                          (b, m) => b.Setup(s => s.UpdateStatistics("foo")).Returns(m.Object).Verifiable());
+            TestValidPost("/foo/jobs", JobRequestObject.CreateUpdateStatsJob(label:"UpdateStatsJob"),
+                          (b, m) => b.Setup(s => s.UpdateStatistics("foo", "UpdateStatsJob")).Returns(m.Object).Verifiable());
         }
 
         [Test]
@@ -324,14 +323,14 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestPostRepeatTransactionJob()
         {
-            TestValidPost("/foo/jobs", JobRequestObject.CreateRepeatTransactionJob(Guid.NewGuid()),
+            TestValidPost("/foo/jobs", JobRequestObject.CreateRepeatTransactionJob(Guid.NewGuid(), "ReExecuteTransaction"),
                           (b, m) =>
                               {
                                   var mockTransaction = new Mock<ITransactionInfo>();
                                   b.Setup(s => s.GetTransaction("foo", It.IsAny<Guid>()))
                                    .Returns(mockTransaction.Object)
                                    .Verifiable();
-                                  b.Setup(s => s.ReExecuteTransaction("foo", mockTransaction.Object))
+                                  b.Setup(s => s.ReExecuteTransaction("foo", mockTransaction.Object, "ReExecuteTransaction"))
                                    .Returns(m.Object)
                                    .Verifiable();
                               });
@@ -348,12 +347,12 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestPostSnapshotJob()
         {
-            TestValidPost("/foo/jobs", JobRequestObject.CreateSnapshotJob("bar", "AppendOnly", 123),
+            TestValidPost("/foo/jobs", JobRequestObject.CreateSnapshotJob("bar", PersistenceType.AppendOnly, 123, "SnapshotJob"),
                 (b, m) =>
                     {
                         var mockCommitPoint = new Mock<ICommitPointInfo>();
                         b.Setup(s => s.GetCommitPoint("foo", 123)).Returns(mockCommitPoint.Object);
-                        b.Setup(s=>s.CreateSnapshot("foo", "bar", PersistenceType.AppendOnly, It.IsAny<ICommitPointInfo>()))
+                        b.Setup(s=>s.CreateSnapshot("foo", "bar", PersistenceType.AppendOnly, It.IsAny<ICommitPointInfo>(), "SnapshotJob"))
                             .Returns(m.Object)
                             .Verifiable();
                     });
@@ -362,8 +361,8 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestPostSnapshotJobWithDefaultCommitPoint()
         {
-            TestValidPost("/foo/jobs", JobRequestObject.CreateSnapshotJob("bar", "Rewrite"),
-                (b, m) => b.Setup(s => s.CreateSnapshot("foo", "bar", PersistenceType.Rewrite, null))
+            TestValidPost("/foo/jobs", JobRequestObject.CreateSnapshotJob("bar", PersistenceType.Rewrite, label:"SnapshotJob"),
+                (b, m) => b.Setup(s => s.CreateSnapshot("foo", "bar", PersistenceType.Rewrite, null, "SnapshotJob"))
                            .Returns(m.Object)
                            .Verifiable());
             
@@ -372,8 +371,8 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestPostSnapshotJobRequiresAdminPermissions()
         {
-            AssertPermissionRequired(JobRequestObject.CreateSnapshotJob("bar", "AppendOnly", 123), StorePermissions.Admin);
-            AssertPermissionRequired(JobRequestObject.CreateSnapshotJob("bletch", "Rewrite"), StorePermissions.Admin);
+            AssertPermissionRequired(JobRequestObject.CreateSnapshotJob("bar", PersistenceType.AppendOnly, 123), StorePermissions.Admin);
+            AssertPermissionRequired(JobRequestObject.CreateSnapshotJob("bletch", PersistenceType.Rewrite), StorePermissions.Admin);
         }
         #endregion
 
@@ -413,6 +412,7 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             var mockJob = new Mock<IJobInfo>();
             mockJob.Setup(j => j.JobId).Returns("EDBB1735-426B-4A57-B8E2-91C581D54075");
+            mockJob.Setup(j=> j.Label).Returns("MockJobLabel");
             mockJob.Setup(j => j.StatusMessage).Returns("Mock Job");
             mockJob.Setup(j => j.JobCompletedOk).Returns(true);
             var brightstar = new Mock<IBrightstarService>();
@@ -430,6 +430,7 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(job.StatusMessage, Is.EqualTo("Mock Job"));
             Assert.That(job.JobCompletedOk, Is.EqualTo(true));
             Assert.That(job.JobCompletedWithErrors, Is.EqualTo(false));
+            Assert.That(job.Label, Is.EqualTo("MockJobLabel"));
             brightstar.Verify();
         }
 

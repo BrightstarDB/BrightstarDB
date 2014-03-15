@@ -2,14 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BrightstarDB.Compatibility;
+using BrightstarDB.Portable.Adaptation;
 
 namespace BrightstarDB.Portable.Compatibility
 {
     public static class Path
     {
-        public const char DirectorySeparatorChar = '\\';
-        public const char AltDirectorySeparatorChar = '/';
-        public const char VolumeSeparatorChar = ':';
+        public static readonly char DirectorySeparatorChar = '\\';
+        public static readonly char AltDirectorySeparatorChar = '/';
+        public static readonly char VolumeSeparatorChar = ':';
+
+
+        static Path()
+        {
+            var provider = PlatformAdapter.Resolve<IPathSeparatorProvider>();
+            if (provider != null)
+            {
+                DirectorySeparatorChar = provider.DirectorySeparator;
+                AltDirectorySeparatorChar = provider.AltDirectorySeparator;
+                VolumeSeparatorChar = provider.VolumeSeparator;
+            }
+        }
 
         public static string GetFileName(string path)
         {

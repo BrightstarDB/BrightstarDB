@@ -11,7 +11,7 @@ For details and documentation, please see our website at http://brightstardb.com
 
 To get started with BrightstarDB you may want to check out the following resources:
  * [Getting Started](http://brightstardb.readthedocs.org/en/latest/Getting_Started/) provides you with links into the User and Developer documentation
- * [API Documentation](http://brightstardb.com/api/1.3/)
+ * [API Documentation](http://brightstardb.com/api/latest/)
  
 If you want a binary installer that includes BrightstarDB, the BrightstarDB service and the Polaris management tool, 
 please get them from our [Codeplex project homepage](http://brightstardb.codeplex.com/)
@@ -29,7 +29,7 @@ For a commercial support contract please [contact NetworkedPlanet](http://www.ne
 Questions ?
 -----------
 
-If you have questions please come to the [BrightstarDB Users Group](https://groups.google.com/d/forum/brightstardb-users).
+If you have questions please come to the [BrightstarDB Discussion Forum on Codeplex](http://brightstardb.codeplex.com/discussions).
 
 Bugs ?
 ------

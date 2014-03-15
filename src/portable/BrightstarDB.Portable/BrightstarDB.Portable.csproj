@@ -16,6 +16,8 @@
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,10 +44,12 @@
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
     <Compile Include="Adaptation\IAdapterResolver.cs" />
+    <Compile Include="AdditionalAssemblyProperties.cs" />
     <Compile Include="Compatibility\Array.cs" />
     <Compile Include="Compatibility\CollectionExtensions.cs" />
     <Compile Include="Compatibility\ConcurrentDictionary.cs" />
     <Compile Include="Compatibility\ConcurrentQueue.cs" />
+    <Compile Include="Compatibility\IPathSeparatorProvider.cs" />
     <Compile Include="Compatibility\Path.cs" />
     <Compile Include="MonoCrypto\CryptoTools.cs" />
     <Compile Include="MonoCrypto\HMAC.cs" />
@@ -69,37 +73,40 @@
     <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Tuple.cs" />
     <Compile Include="Adaptation\PlatformAdapter.cs" />
     <Compile Include="Adaptation\ProbingAdapterResolver.cs" />
-    <Compile Include="..\..\mobile\relinq\RelinqCore\**\*.cs;..\..\mobile\relinq\*.cs" Exclude="..\..\mobile\relinq\RelinqCore\Properties\**\*.cs">
+    <Compile Include="..\..\mobile\relinq\RelinqCore\**\*.cs" Exclude="..\..\mobile\relinq\RelinqCore\Properties\*.cs">
       <Link>relinq\%(recursivedir)\%(filename)</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="dotNetRDF">
-      <HintPath>..\..\packages\dotNetRDF.1.0.2.2880\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
+      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Polenter.SharpSerializer.PCL">
-      <HintPath>..\packages\SharpSerializer.PCL.2.18\lib\portable-net4+sl4+wp71+win8\Polenter.SharpSerializer.PCL.dll</HintPath>
+      <HintPath>..\packages\SharpSerializer.PCL.2.18.5\lib\portable-net4+sl4+wp71+win8\Polenter.SharpSerializer.PCL.dll</HintPath>
     </Reference>
     <Reference Include="Portable.Runtime">
-      <HintPath>..\..\packages\dotNetRDF.1.0.2.2880\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>
+      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="VDS.Common">
       <HintPath>..\packages\VDS.Common.1.2.0\lib\portable-win+net40+sl40+wp\VDS.Common.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+  <Import Project="..\..\..\common.proj" />
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
+    <AssemblyTitle>BrightstarDB Portable Class Library Core Assembly</AssemblyTitle>
+  </PropertyGroup>
   <Target Name="BeforeBuild">
+    <CallTarget Targets="GenerateAssemblyInfo" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

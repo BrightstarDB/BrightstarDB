@@ -1,0 +1,10 @@
+﻿@prefix dnr: <http://www.dotnetrdf.org/configuration#> .
+
+:emptyStore a dnr:TripleStore;
+	dnr:type "VDS.RDF.TripleStore" .
+
+:anotherStore a dnr:TripleStore;
+	dnr:type "VDS.RDF.TripleStore" .
+
+:yetAnotherStore a dnr:TripleStore;
+	dnr:type "VDS.RDF.TripleStore" .

@@ -48,10 +48,17 @@ namespace BrightstarDB.Tests.SparqlDawgTests
         {
             var g = new Graph();
             var importId = Guid.NewGuid();
+#if PORTABLE
+            using (var s = File.OpenRead(dataPath))
+            {
+                StreamLoader.Load(g, dataPath, s);
+            }
+#else
             FileLoader.Load(g, dataPath);
+#endif
             _bnodeMappings = new Dictionary<string, string>();
             var sw = new StringWriter();
-            var ntWriter = new NQuadsWriter(sw, Constants.DefaultGraphUri);
+            var ntWriter = new NQuadsWriter(sw);
             foreach (var t in g.Triples)
             {
                 if (t.Object.NodeType == NodeType.Literal)
@@ -164,12 +171,9 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                     Assert.Fail("Don't know how to compare results to results file {0}", expectedResultPath);
                 }
             }
-            catch (AssertionException)
+            catch (AssertionException ex)
             {
-                Console.WriteLine("Expected Results Path: {0}", expectedResultPath);
-                Console.WriteLine("Actual Results:");
-                Console.WriteLine(results);
-                throw;
+                throw new AssertionException(ex.Message + String.Format("Expected Results Path: {0}\nActual Results: {1}", expectedResultPath, results));
             }
         }
 
@@ -232,7 +236,14 @@ namespace BrightstarDB.Tests.SparqlDawgTests
         private void CompareResultGraphs(string results, string expectedResultsPath, bool reduced)
         {
             var expectedResultGraph = new Graph();
+#if PORTABLE
+            using (var s = File.OpenRead(expectedResultsPath))
+            {
+                StreamLoader.Load(expectedResultGraph, expectedResultsPath, s);
+            }
+#else
             FileLoader.Load(expectedResultGraph, expectedResultsPath);
+#endif
             var resultSet = expectedResultGraph.GetUriNode(new Uri("http://www.w3.org/2001/sw/DataAccess/tests/result-set#ResultSet"));
             if (resultSet != null)
             {

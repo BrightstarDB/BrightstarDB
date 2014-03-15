@@ -18,8 +18,10 @@ properties.
                    file system.
     rest           Uses HTTP(S) to connect to a            Endpoint
                    BrightstarDB service.
-    dotNetRdf      Connects to another (non-BrightstarDB)  Configuration, StoreName,
-                   store using DotNetRDF connectors        Store or Query **and** Update
+    dotNetRdf      Connects to another (non-BrightstarDB)  Configuration, StorageServer
+                   store using DotNetRDF connectors        
+    sparql         Connects to another (non-BrightstarDB)  Query, Update
+                   store using SPARQL protocols
     ============== ======================================= ================================
 
 **StoresDirectory** : value is a file system path to the directory containing all BrightstarDB 
@@ -33,21 +35,21 @@ when creating an EntityFramework connection or when creating a connection using 
 dotNetRdf connection type.
 
 **Configuration** : The path to the RDF file that contains the configuration for the
-DotNetRDF connector. For more information please refer to the section :ref:Other_Stores
+DotNetRDF connector. 
+Only valid for connections with **Type** set to *dotNetRdf*.
+For more information please refer to the section :ref:Other_Stores
 
-**Store** : The URI identifier of the node in the DotNetRDF configuration file that
-configures the store to connect to. The connection will then attempt to establish
-the most efficient SPARQL Query and SPARQL Update connections to the configured store.
-If this option is used in a connection string then any **Query** or **Update** options
-in the connection string will be ignored.
+**StorageServer** : The URI of the resource in the DotNetRDF configuration file that
+configures the DotNetRDF storage server to be used for the connection.
+Only valid for connections with **Type** set to *dotNetRdf*.
+For more information please refer to the section :ref:Other_Stores
 
-**Query** : The URI identifier of the node in the DotNetRDF configuration file
-that configures the SPARQL query endpoint to connect to. If this option is used 
-in a connection string, then the **Update** property must also be provided.
+**Query** : The URI the SPARQL query endpoint to connect to. 
+Only valid for connections with **Type** set to *sparql*.
 
-**Update**: The URI identifier of the node in the DotNetRDF configuration file
-that configures the SPARQL update endpoint to connect to. If this option is used
-in a connection string, then the **Query** property must also be provided.
+**Update**: The URI of the SPARQL update endpoint to connect to. 
+Only valid for connections with **Type** set to *sparql*.
+If this option is used in a connection string, then the **Query** property must also be provided.
 
 **OptimisticLocking**: Specifies if optimistic locking should be enabled for
 the connection by default. Note that this setting can be overridden in code,
@@ -56,15 +58,44 @@ is used. This option is only used by the :ref:`Data_Object_Layer` and
 :ref:`Entity_Framework` and is currently not supported on connections
 of type *dotNetRDF*
 
+**UserName**: Specifies the user name to use for authenticating with the server.
+A connection string with this property must also have a **Password** property
+for authentication to take place.
+
+**Password**: Specifies the password to use for authenticating with the server.
+A connection string with this property must also have a **UserName** property
+for authentication to take place.
+
+.. note::
+    You should never store credentials in a connection string as plain text.
+    Instead your application should store the base connection string without
+    the UserName and Password properties. It should then prompt the user to enter their credentials
+    just before it creates the BrightstarDB client and append the UserName and Password
+    properties to the base connection string.
+    
 The following are examples of connection strings. Property value pairs are separated by ';' 
 and property names are case insensitive.::
 
+  // A connection to a BrightstarDB server running on localhost.
+  // The connection is configured with a default store to use for the Entity Framework
   "type=rest;endpoint=http://localhost:8090/brightstar;storename=test"
 
+  // An embedded connection to the store named "test" in the directory c:\Brightstar
   "type=embedded;storesdirectory=c:\brightstar;storename=test"
 
+  // An embedded connection to the stores contained in the directory c:\Brightstar
   "Type=embedded;StoresDirectory=c:\Brightstar"
   
-  "Type=dotnetrdf;configuration=c:\brightstar\dotNetRDFConfiguration.ttl;store=http://example.org/configuration#mystore"
+  // A connection to one or more store providers configured in a DotNetRDF configuration file
+  "Type=dotnetrdf;configuration=c:\brightstar\dotNetRDFConfiguration.ttl"
   
-  "Type=dotnetrdf;configuration=c:\brightstar\dotNetRDFConfiguration.ttl;query=http://example.org/configuration#sparqlQuery;update=http://example.org/configuration#sparqlUpdate"
+  // A connection to a storage server such as a Sesame server configured in a DotNetRDF configuration file
+  "Type=dotnetrdf;configuration=c:\brightstar\sesameConfiguration.ttl;storageServer=http://example.org/configurations/#sesameServer"
+  // NOTE: It is also possible to use relative URIs (resolved against the base URI of the configuration graph) e.g.
+  "Type=dotnetrdf;configuration=c:\brightstar\sesameConfiguration.ttl;storageServer=#sesameServer"
+  
+  // A read-write connection to a server with SPARQL query and SPARQL update endpoints
+  "Type=sparql;query=http://example.org/sparql;update=http://example.org/sparql-update"
+  
+  // A read-only connection to a server with only a SPARQL query endpoint
+  "Type=sparql;query=http://example.org/sparql"

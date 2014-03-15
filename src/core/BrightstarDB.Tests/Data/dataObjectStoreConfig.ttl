@@ -2,14 +2,18 @@
 @prefix bst: <http://www.brightstardb.com/tests#> .
 @prefix : <http://example.org/configuration#>.
 
-bst:peopleStore a dnr:TripleStore;
+bst:people a dnr:StorageProvider;
+	dnr:type "VDS.RDF.Storage.InMemoryManager" ;
+	dnr:usingStore _:peopleStore.
+
+_:peopleStore a dnr:TripleStore;
 	dnr:type "VDS.RDF.TripleStore" ;
 	dnr:usingGraph bst:peopleGraph ;
 	dnr:usingGraph bst:addGraph .
 
-bst:emptyStore a dnr:TripleStore;
-	dnr:type "VDS.RDF.TripleStore" .
-	
+bst:empty a dnr:StorageProvider;
+	dnr:type "VDS.RDF.Storage.InMemoryManager" .
+
 bst:peopleGraph a dnr:Graph ;
 	dnr:type "VDS.RDF.Graph" ;
 	dnr:fromFile "people.ttl" ;
@@ -19,22 +23,6 @@ bst:addGraph a dnr:Graph ;
 	dnr:type "VDS.RDF.Graph" ;
 	dnr:assignUri <http://example.org/addGraph> .
 
-bst:peopleStoreQuery a dnr:SparqlQueryProcessor;
-	dnr:type "VDS.RDF.Query.LeviathanQueryProcessor" ;
-	dnr:usingStore bst:peopleStore .
-	
-bst:peopleStoreUpdate a dnr:SparqlUpdateProcessor ;
-	dnr:type "VDS.RDF.Update.SimpleUpdateProcessor" ;
-	dnr:usingStore bst:peopleStore .
-
 bst:fuseki a dnr:StorageProvider ;
 	dnr:type "VDS.RDF.Storage.FusekiConnector" ;
 	dnr:server "http://localhost:3030/ds/data" .
-
-:sparqlQuery a dnr:SparqlQueryEndpoint ;
-    dnr:type "VDS.RDF.Query.SparqlRemoteEndpoint" ;
-    dnr:queryEndpointUri <http://127.0.0.1:8081/sparql> .
-
-:sparqlUpdate a dnr:SparqlUpdateEndpoint ;
-    dnr:type "VDS.RDF.Update.SparqlRemoteUpdateEndpoint" ;
-    dnr:updateEndpointUri <http://127.0.0.1:8081/sparql> .

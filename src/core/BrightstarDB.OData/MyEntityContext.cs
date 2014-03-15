@@ -25,11 +25,11 @@ namespace BrightstarDB.OData
     		TypeMappings = new EntityMappingStore();
     		var provider = new ReflectionMappingProvider();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.IDepartment));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.IDepartment, BrightstarDB.OData.Department>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.IDepartment, BrightstarDB.OData.Department>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.IPerson));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.IPerson, BrightstarDB.OData.Person>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.IPerson, BrightstarDB.OData.Person>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.ISkill));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.ISkill, BrightstarDB.OData.Skill>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.ISkill, BrightstarDB.OData.Skill>();
     	}
     	
     	/// <summary>

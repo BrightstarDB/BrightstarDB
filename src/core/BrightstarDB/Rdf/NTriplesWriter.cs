@@ -6,18 +6,18 @@ using System.Text;
 namespace BrightstarDB.Rdf
 {
     /// <summary>
-    /// A triple sink that writes the received triples out in N3 format
+    /// A triple sink that writes the received triples out in NTriples format
     /// </summary>
-    /// <remarks>Due to the limitations of the N3 syntax, the Graph URI portion of the RDF statments will not be represented in the output file.</remarks>
+    /// <remarks>Due to the limitations of the NTriples syntax, the Graph URI portion of the RDF statments will not be represented in the output file.</remarks>
     public class NTriplesWriter : ITripleSink
     {
         private readonly TextWriter _writer;
         private readonly Dictionary<string, string> _bnodeUriMap;
 
         /// <summary>
-        /// Creates a new N3 writer
+        /// Creates a new NTriples writer
         /// </summary>
-        /// <param name="writer">The text writer that the N3 representation will be written to</param>
+        /// <param name="writer">The text writer that the NTriples representation will be written to</param>
         public NTriplesWriter(TextWriter writer)
         {
             _writer = writer;

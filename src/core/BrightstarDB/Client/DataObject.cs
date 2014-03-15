@@ -149,6 +149,16 @@ namespace BrightstarDB.Client
         }
 
         /// <summary>
+        /// Gets the uri types of this data object
+        /// </summary>
+        /// <returns>A list of uri types</returns>
+        public IList<string> GetTypes()
+        {
+            return this.Triples.Where(t => t.Predicate == TypeDataObject.Identity).Select(t => t.Object).ToList();
+        }
+
+
+        /// <summary>
         /// Sets the property of this object to the specified value
         /// </summary>
         /// <param name="type">The type of the property to set</param>
@@ -428,11 +438,11 @@ namespace BrightstarDB.Client
             // create a new value triple
             var triple = new Triple
                              {
-                                 Graph = Constants.DefaultGraphUri,
-                                 IsLiteral = false,
-                                 Object = value.Identity,
+                                 Subject = Identity,
                                  Predicate = type.Identity,
-                                 Subject = Identity
+                                 Object = value.Identity,
+                                 IsLiteral = false,
+                                 Graph = _store.UpdateGraphUri
                              };
 
             // use common method for updating local state and the txn

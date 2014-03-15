@@ -31,10 +31,10 @@ namespace BrightstarDB.Tests.DataObjectsTests
 #if PORTABLE
         [Ignore("Configuration not supported by DotNetRDF Portable")]
 #endif
-        public void TestInitializeFromDnrStoreConfiguration()
+        public void TestInitializeFromInMemoryStore()
         {
             var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
-            var connectionString = "type=dotNetRdf;configuration=" + configFilePath + ";storeName=example;store=http://www.brightstardb.com/tests#peopleStore";
+            var connectionString = "type=dotNetRdf;configuration=" + configFilePath;
             var namespaceMappings = new Dictionary<string, string>
                 {
                     {"npp", "http://www.networkedplanet.com/people/"},
@@ -42,8 +42,8 @@ namespace BrightstarDB.Tests.DataObjectsTests
                 };
             var doContext = BrightstarService.GetDataObjectContext(connectionString);
             Assert.That(doContext, Is.Not.Null);
-            Assert.That(doContext.DoesStoreExist("example"));
-            var doStore = doContext.OpenStore("example", namespaceMappings, updateGraph:"http://example.org/people");
+            Assert.That(doContext.DoesStoreExist("http://www.brightstardb.com/tests#people"));
+            var doStore = doContext.OpenStore("http://www.brightstardb.com/tests#people", namespaceMappings, updateGraph: "http://example.org/people");
             var alice = doStore.GetDataObject("npp:alice");
             Assert.That(alice, Is.Not.Null);
             var email = alice.GetPropertyValue("foaf:mbox");
@@ -54,34 +54,13 @@ namespace BrightstarDB.Tests.DataObjectsTests
 #if PORTABLE
         [Ignore("Configuration not supported by DotNetRDF Portable")]
 #endif
-        public void TestInitializeFromDnrQueryAndUpdateConfiguration()
+        public void TestInitializeFromFusekiStorageProvider()
         {
             var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
-            var connectionString = "type=dotNetRdf;configuration=" + configFilePath + ";storeName=example;query=http://www.brightstardb.com/tests#peopleStoreQuery;update=http://www.brightstardb.com/tests#peopleStoreUpdate";
-            var namespaceMappings = new Dictionary<string, string>
-                {
-                    {"npp", "http://www.networkedplanet.com/people/"},
-                    {"foaf", "http://xmlns.com/foaf/0.1/"}
-                };
+            var connectionString = "type=dotNetRdf;configuration=" + configFilePath;
             var doContext = BrightstarService.GetDataObjectContext(connectionString);
-            Assert.That(doContext, Is.Not.Null);
-            Assert.That(doContext.DoesStoreExist("example"));
-            var doStore = doContext.OpenStore("example", namespaceMappings, updateGraph: "http://example.org/people");
-            var alice = doStore.GetDataObject("npp:alice");
-            Assert.That(alice, Is.Not.Null);
-            var email = alice.GetPropertyValue("foaf:mbox");
-            Assert.That(email, Is.Not.Null);
-        }
-
-        [Test]
-#if PORTABLE
-        [Ignore("Configuration not supported by DotNetRDF Portable")]
-#endif
-        public void TestInitializeFromDnrStorageProvider()
-        {
-            var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
-            var connectionString = "type=dotNetRdf;configuration=" + configFilePath + ";storeName=example;store=http://www.brightstardb.com/tests#fuseki";
-            var doContext = BrightstarService.GetDataObjectContext(connectionString);
+            Assert.That(doContext.DoesStoreExist("http://www.brightstardb.com/tests#fuseki"));
+            Assert.That(doContext.OpenStore("http://www.brightstardb.com/tests#fuseki"), Is.Not.Null);
         }
 
         [Test]

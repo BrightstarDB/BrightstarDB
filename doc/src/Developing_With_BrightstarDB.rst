@@ -38,6 +38,7 @@ moment to read about Running the BrightstarDB Samples first.
     Running the BrightstarDB Samples <Running_The_Samples>
     BrightstarDB Entity Framework <Entity_Framework>
     Entity Framework Samples <Entity_Framework_Samples>
+    Advanced Entity Framework <Advanced_Entity_Framework>
     Data Object Layer <Data_Object_Layer>
 	Dynamic API <Dynamic_API>
     RDF Client API <RDF_Client_API>

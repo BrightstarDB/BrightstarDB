@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Xml.Linq;
+using BrightstarDB.EntityFramework.Query;
 
 namespace BrightstarDB.Client
 {
@@ -12,15 +13,23 @@ namespace BrightstarDB.Client
     {
         private Stream _resultStream;
         private readonly string _resultString;
+        private XDocument _resultDocument;
 
-        internal SparqlResult(Stream resultStream)
+        /// <summary>
+        /// The SparqlQueryContext that generated this result
+        /// </summary>
+        public readonly SparqlQueryContext SourceSparqlQueryContext;
+
+        internal SparqlResult(Stream resultStream, SparqlQueryContext sparqlQueryContext)
         {
             _resultStream = resultStream;
+            SourceSparqlQueryContext = sparqlQueryContext;
         }
 
-        internal SparqlResult(string xml)
+        internal SparqlResult(string xml, SparqlQueryContext sparqlQueryContext)
         {
             _resultString = xml;
+            SourceSparqlQueryContext = sparqlQueryContext;
         }
 
         /// <summary>
@@ -46,11 +55,13 @@ namespace BrightstarDB.Client
         {
             get
             {
-                if (_resultString != null)
+                if (_resultDocument == null)
                 {
-                    return XDocument.Parse(_resultString);
+                    _resultDocument = _resultString != null
+                        ? XDocument.Parse(_resultString)
+                        : XDocument.Load(_resultStream);
                 }
-                return XDocument.Load(_resultStream);
+                return _resultDocument;
             }
         }
 

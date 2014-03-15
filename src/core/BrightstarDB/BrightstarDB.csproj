@@ -80,15 +80,17 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dotNetRDF">
-      <HintPath>..\packages\dotNetRDF.1.0.2.2880\lib\net40\dotNetRDF.dll</HintPath>
+    <Reference Include="dotNetRDF, Version=1.0.3.0, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\net40\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net40\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Remotion.Linq, Version=1.13.102.1, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -136,9 +138,15 @@
     <Compile Include="Client\BrightstarRestUpdatableStore.cs" />
     <Compile Include="Client\BrightstarService.cs" />
     <Compile Include="Client\BrightstarServiceClientExtensions.cs" />
+    <Compile Include="Client\BrightstarStoreIsReadOnlyException.cs" />
     <Compile Include="Client\CachedQueryResult.cs" />
     <Compile Include="Client\DataObjectStoreBase.cs" />
+    <Compile Include="Client\DotNetRdfConfigurationHelper.cs" />
+    <Compile Include="Client\DotNetRdfConfigurationPathResolver.cs" />
     <Compile Include="Client\DotNetRdfDataObjectContext.cs" />
+    <Compile Include="Client\DotNetRdfDataObjectContextBase.cs" />
+    <Compile Include="Client\DotNetRdfStorageProvidersDataObjectContext.cs" />
+    <Compile Include="Client\DotNetRdfStorageServerDataObjectContext.cs" />
     <Compile Include="Client\EmbeddedBrightstarService.cs" />
     <Compile Include="Client\IBrightStarService.cs" />
     <Compile Include="Client\ICommitPointInfo.cs" />
@@ -156,6 +164,7 @@
     <Compile Include="Client\RestSecurity\PassthroughRequestAuthenticator.cs" />
     <Compile Include="Client\RestSecurity\SharedSecretAuthenticator.cs" />
     <Compile Include="Client\SignatureType.cs" />
+    <Compile Include="Client\SparqlDataObjectContext.cs" />
     <Compile Include="Client\SparqlDataObjectStore.cs" />
     <Compile Include="Client\SparqlUpdatableStore.cs" />
     <Compile Include="Dto\CommitPointInfoObject.cs" />
@@ -173,6 +182,8 @@
     <Compile Include="Dto\TransactionStatus.cs" />
     <Compile Include="Dto\TransactionType.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
+    <Compile Include="EntityFramework\NamespaceDeclarations.cs" />
+    <Compile Include="EntityFramework\Query\SparqlQueryContext.cs" />
     <Compile Include="FormatInfo.cs" />
     <Compile Include="ISerializationFormat.cs" />
     <Compile Include="NoAcceptableFormatException.cs" />
@@ -233,7 +244,7 @@
     <Compile Include="EntityFramework\Query\SparqlGeneratorWhereExpressionTreeVisitor.cs" />
     <Compile Include="EntityFramework\Query\SparqlOrdering.cs" />
     <Compile Include="EntityFramework\Query\SparqlQueryBuilder.cs" />
-    <Compile Include="EntityFramework\Query\SparqlQueryContext.cs" />
+    <Compile Include="EntityFramework\Query\SparqlLinqQueryContext.cs" />
     <Compile Include="EntityFramework\Query\TripleInfo.cs" />
     <Compile Include="EntityFramework\Query\VariableBindingType.cs" />
     <Compile Include="EntityFramework\ReflectionMappingException.cs" />
@@ -452,6 +463,7 @@
     <Compile Include="Utils\LruCache.cs" />
     <Compile Include="Utils\SparqlQueryHelper.cs" />
     <Compile Include="Utils\StringExtensions.cs" />
+    <Compile Include="Utils\XmlExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Strings.resx">
@@ -461,6 +473,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

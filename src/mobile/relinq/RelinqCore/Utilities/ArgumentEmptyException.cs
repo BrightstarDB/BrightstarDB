@@ -23,7 +23,9 @@ namespace Remotion.Linq.Utilities
   /// <summary>
   /// This exception is thrown if an argument is empty although it must have a content.
   /// </summary>
+#if !PORTABLE
   [Serializable]
+#endif
   public class ArgumentEmptyException : ArgumentException
   {
     public ArgumentEmptyException ([InvokerParameterName] string paramName)

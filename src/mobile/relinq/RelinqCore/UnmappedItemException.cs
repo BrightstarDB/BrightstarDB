@@ -22,7 +22,9 @@ namespace Remotion.Linq
   /// <summary>
   /// TODO: add summary
   /// </summary>
+#if !PORTABLE
   [Serializable]
+#endif
   public class UnmappedItemException : Exception
   {
     public UnmappedItemException (string message)

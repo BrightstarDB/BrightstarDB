@@ -32,6 +32,11 @@
                 </select>
             </div>
             <div id="jobParameters">
+                <div class="Consolidate Export Import Transaction SparqlUpdate UpdateStats CreateSnapshot">
+                    <label class="form-label" for="label">Job Label:</label>
+                    <input class="form-field long" type="text" id="label" name="label"/>
+                    <span id="labelValidation" class="validation"></span>
+                </div>
                 <div class="Import Export required">
                     <label class="form-label"for="fileName">File Name:</label>
                     <input class="form-field long" type="text" id="fileName" name="fileName" />
@@ -87,6 +92,7 @@
     <table id="jobsTable" style="width:63%">
         <thead>
             <tr>
+                <th>Job Label</th>
                 <th>Job ID</th>
                 <th>Status</th>
                 <th>Queued</th>
@@ -99,7 +105,8 @@
             @foreach (var item in Model.Items)
             {
                 <tr>
-                    <td><a href="~/@Model.RequestProperties.StoreName/jobs/@item.JobId"></a>@item.JobId</td>
+                    <td><a href="~/@Model.RequestProperties.StoreName/jobs/@item.JobId">@item.Label</a></td>
+                    <td><a href="~/@Model.RequestProperties.StoreName/jobs/@item.JobId">@item.JobId</a></td>
                     <td>@item.JobStatus</td>
                     <td>@item.QueuedTime</td>
                     <td>@item.StartTime</td>
@@ -120,21 +127,23 @@
     $('#jobParameters div').hide();
     $('#createJobButton').attr('disabled', 'disabled');
     
-
-    $('#jobType').change(function () {
+    function displayJobParameters() {
         var jobType = $('#jobType option:selected').val();
         if (!jobType) {
             $('#createJobButton').attr('disabled', 'disabled');
         } else {
             $('#createJobButton').removeAttr('disabled');
         }
-        
+
         $('#jobParameters div').hide({
-            complete: function() {
+            complete: function () {
                 $('#jobParameters div.' + jobType).show();
             }
         });
-    });
+    }
+
+    $('#jobType').change(displayJobParameters);
+    $(document).ready(displayJobParameters);
     
     function validateNotNull(inputId, paramName, obj) {
         var val = $('#' + inputId).val();
@@ -157,11 +166,11 @@
             break;
         case 'Import':
             isValid = validateNotNull('fileName', 'FileName', params);
-            isValid = validateNotNull('defaultGraphUri', 'DefaultGraphUri', params) && isValid;
+            //isValid = validateNotNull('defaultGraphUri', 'DefaultGraphUri', params) && isValid;
             break;
         case 'Export':
             isValid = validateNotNull('fileName', 'FileName', params);
-            isValid = validateNotNull('graphUri', 'GraphUri', params) && isValid;
+            //isValid = validateNotNull('graphUri', 'GraphUri', params) && isValid;
             break;
         case 'Transaction':
             params.Preconditions = $('#preconditions').val();
@@ -193,16 +202,18 @@
                 data: JSON.stringify ({
                     StoreName: '@Model.RequestProperties.StoreName',
                     JobType: $('#jobType').val(),
-                    JobParameters: jobParameters
+                    JobParameters: jobParameters,
+                    Label: $('#label').val()
                 }),
                 dataType: 'json'
             }).done(function(data) {
                 $('<tr></tr>').prependTo($('#jobsTable tbody'))
+                    .append('<td>' + data.Label + '</td>')
                     .append('<td>' + data.JobId + '</td>')
                     .append('<td>' + data.JobStatus + '</td>')
                     .append('<td></td>')
                     .append('<td></td>')
-                    .append('<td>/<td>')
+                    .append('<td></td>')
                     .append('<td>Job Queued</td>');
             }).fail(function(jqXHR, textStatus) {
                 alert("Request failed: " + textStatus);

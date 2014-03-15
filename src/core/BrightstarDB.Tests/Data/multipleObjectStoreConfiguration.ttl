@@ -1,0 +1,11 @@
+﻿@prefix dnr: <http://www.dotnetrdf.org/configuration#> .
+@prefix : <#> .
+
+<#emptyStore> a dnr:StorageProvider;
+	dnr:type "VDS.RDF.Storage.InMemoryManager" .
+
+<anotherStore>  a dnr:StorageProvider;
+	dnr:type "VDS.RDF.Storage.InMemoryManager" .
+
+:yetAnotherStore  a dnr:StorageProvider;
+	dnr:type "VDS.RDF.Storage.InMemoryManager" .

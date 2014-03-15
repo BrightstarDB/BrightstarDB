@@ -6,6 +6,7 @@ using BrightstarDB.Portable.Adaptation;
 using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
 #endif
+using BrightstarDB.Client;
 using BrightstarDB.Rdf;
 
 namespace BrightstarDB.Server
@@ -13,18 +14,22 @@ namespace BrightstarDB.Server
     internal class ExportJob
     {
         private readonly Guid _jobId;
+        private readonly string _label;
         private readonly StoreWorker _storeWorker;
         private readonly string _outputFileName;
         private readonly string _graphUri;
         private Action<Guid, Exception> _errorCallback;
         private Action<Guid> _successCallback;
+        private RdfFormat _exportFormat;
 
-        public ExportJob(Guid jobId, StoreWorker storeWorker, string outputFileName, string graphUri)
+        public ExportJob(Guid jobId, string label, StoreWorker storeWorker, string outputFileName, string graphUri, RdfFormat exportFormat)
         {
             _jobId = jobId;
+            _label = label;
             _storeWorker = storeWorker;
             _outputFileName = outputFileName;
             _graphUri = graphUri;
+            _exportFormat = exportFormat;
         }
 
         public void Run(Action<Guid, Exception> errorCallback, Action<Guid> successCallback)
@@ -59,7 +64,8 @@ namespace BrightstarDB.Server
                                           : new[] {exportJob._graphUri};
                     var triples = exportJob._storeWorker.ReadStore.Match(null, null, null, graphs:graphs);
                     var sw = new StreamWriter(stream);
-                    var nw = new BrightstarTripleSinkAdapter(new NTriplesWriter(sw));
+                    var sink = GetWriterSink(exportJob._exportFormat, sw);
+                    var nw = new BrightstarTripleSinkAdapter(sink);
                     foreach (var triple in triples)
                     {
                         nw.Triple(triple);
@@ -78,6 +84,19 @@ namespace BrightstarDB.Server
                 exportJob._errorCallback(exportJob._jobId, ex);
             }
 
+        }
+
+        private static ITripleSink GetWriterSink(RdfFormat exportFormat, TextWriter textWriter)
+        {
+            if (exportFormat == RdfFormat.NTriples)
+            {
+                return new NTriplesWriter(textWriter);
+            } 
+            if (exportFormat == RdfFormat.NQuads)
+            {
+                return new NQuadsWriter(textWriter);
+            }
+            throw new BrightstarClientException(String.Format(Strings.ExportJob_UnsupportedExportFormat, exportFormat.MediaTypes[0]));
         }
     }
 }

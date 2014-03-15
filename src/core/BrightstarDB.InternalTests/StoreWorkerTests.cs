@@ -62,7 +62,7 @@ namespace BrightstarDB.InternalTests
 
             var storeWorker = new StoreWorker(Configuration.StoreLocation , sid);
             storeWorker.Start();
-            var jobId = storeWorker.Export(sid + "_export.nt", null);
+            var jobId = storeWorker.Export(sid + "_export.nt", null, RdfFormat.NQuads);
             JobExecutionStatus status = storeWorker.GetJobStatus(jobId.ToString());
             while (status.JobStatus != JobStatus.CompletedOk)
             {
@@ -273,7 +273,7 @@ namespace BrightstarDB.InternalTests
             Assert.AreEqual(TransactionStatus.CompletedOk, tinfo.TransactionStatus);
             Assert.IsTrue(tinfo.TransactionStartTime < DateTime.UtcNow);
 
-            var job = new UpdateTransaction(Guid.NewGuid(), storeWorker);
+            var job = new UpdateTransaction(Guid.NewGuid(), null, storeWorker);
             using (var tdStream = storeWorker.TransactionLog.GetTransactionData(tinfo.DataStartPosition))
             {
                 job.ReadTransactionDataFromStream(tdStream);
@@ -446,7 +446,7 @@ namespace BrightstarDB.InternalTests
             }
 
             jobId = Guid.NewGuid();
-            storeWorker.QueueJob(new ConsolidateJob(jobId, storeWorker));
+            storeWorker.QueueJob(new ConsolidateJob(jobId, null, storeWorker));
             jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk && jobStatus.JobStatus != JobStatus.TransactionError)
             {
@@ -477,7 +477,7 @@ namespace BrightstarDB.InternalTests
 
             // consolidate again
             jobId = Guid.NewGuid();
-            storeWorker.QueueJob(new ConsolidateJob(jobId, storeWorker));
+            storeWorker.QueueJob(new ConsolidateJob(jobId, null, storeWorker));
             jobStatus = storeWorker.GetJobStatus(jobId.ToString());
             while (jobStatus.JobStatus != JobStatus.CompletedOk && jobStatus.JobStatus != JobStatus.TransactionError)
             {

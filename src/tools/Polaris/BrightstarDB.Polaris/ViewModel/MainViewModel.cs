@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using BrightstarDB.Polaris.Configuration;
 using BrightstarDB.Polaris.Messages;
@@ -65,7 +66,7 @@ namespace BrightstarDB.Polaris.ViewModel
             {
                 try
                 {
-                    var connection = new Connection(namedConnection.Name, namedConnection.ConnectionString);
+                    var connection = new Connection(namedConnection.Name, namedConnection.ConnectionString, namedConnection.RequiresAuthentication);
                     connection.TryConnect();
                     StoreSources.Add(connection);
                 }
@@ -371,6 +372,39 @@ namespace BrightstarDB.Polaris.ViewModel
         {
             var msg = new ShowWindowMessage {Name = "EditConnection", ViewModel = serverConnection};
             Messenger.Default.Send(msg);
+        }
+
+        public void AddConnectionConfiguration(string name, ConnectionString connectionString,
+                                               bool requiresAuthentication)
+        {
+            Configuration.ConnectionStrings.Add(new NamedConnectionString
+            {
+                Name = name,
+                ConnectionString = connectionString.ToString(),
+                RequiresAuthentication = requiresAuthentication
+            });
+            Configuration.Save();
+        }
+
+        public void UpdateConnectionConfiguration(string oldName, string newName, ConnectionString connectionString, bool requiresAuthentication)
+        {
+            var toEdit = Configuration.ConnectionStrings.FirstOrDefault(x => x.Name.Equals(oldName));
+            if (toEdit != null)
+            {
+                toEdit.Name = newName;
+                toEdit.ConnectionString = connectionString.ToString();
+                toEdit.RequiresAuthentication = requiresAuthentication;
+            }
+            else
+            {
+                Configuration.ConnectionStrings.Add(new NamedConnectionString
+                    {
+                        Name = newName,
+                        ConnectionString = connectionString.ToString(),
+                        RequiresAuthentication = requiresAuthentication
+                    });
+            }
+            Configuration.Save();
         }
     }
 }

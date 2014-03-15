@@ -508,15 +508,16 @@ namespace BrightstarDB.Client
         /// <param name="deletePatterns">The delete patterns that will be removed from the store</param>
         /// <param name="insertData">The NTriples data that will be inserted into the store.</param>
         /// <param name="defaultGraphUri">The URI of the default graph to be updated by the transaction.</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>Job Info</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="storeName"/> is NULL</exception>
         /// <exception cref="ArgumentException">If <paramref name="storeName"/> is an empty string or not a valid store name</exception>
         public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
-                                           string insertData, string defaultGraphUri)
+                                           string insertData, string defaultGraphUri, string label = null)
         {
             ValidateStoreName(storeName);
             var transactionJob = JobRequestObject.CreateTransactionJob(preconditions, deletePatterns, insertData,
-                                                                       defaultGraphUri);
+                                                                       defaultGraphUri, label);
             var jobUri = CreateJob(storeName, transactionJob);
             var jobInfoResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobInfoResponse);
@@ -531,15 +532,17 @@ namespace BrightstarDB.Client
         /// <param name="insertData">The NTriples data that will be inserted into the store.</param>
         /// <param name="defaultGraphUri">The URI of the default graph to be updated by the transaction.</param>
         /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>Job Info</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="storeName"/> is NULL</exception>
         /// <exception cref="ArgumentException">If <paramref name="storeName"/> is an empty string or not a valid store name</exception>
         public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
-                                           string insertData, string defaultGraphUri, bool waitForCompletion = true)
+                                           string insertData, string defaultGraphUri, bool waitForCompletion = true,
+            string label = null)
         {
             ValidateStoreName(storeName);
             var transactionJob = JobRequestObject.CreateTransactionJob(preconditions, deletePatterns, insertData,
-                                                                       defaultGraphUri);
+                                                                       defaultGraphUri, label);
             var jobUri = CreateJob(storeName, transactionJob);
             if (waitForCompletion)
             {
@@ -556,15 +559,15 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="storeName">The name of the store to be updated</param>
         /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
-        /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        public IJobInfo ExecuteUpdate(string storeName, string updateExpression)
+        public IJobInfo ExecuteUpdate(string storeName, string updateExpression, string label = null)
         {
             ValidateStoreName(storeName);
             if (String.IsNullOrWhiteSpace(updateExpression))
                 throw new ArgumentException(Strings.BrightstarServiceClient_UpdateExpressionMustNotBeEmptyString,
                                             "updateExpression");
-            var job = JobRequestObject.CreateSparqlUpdateJob(updateExpression);
+            var job = JobRequestObject.CreateSparqlUpdateJob(updateExpression, label);
             var jobUri = CreateJob(storeName, job);
             var jobResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobResponse);        
@@ -576,14 +579,15 @@ namespace BrightstarDB.Client
         /// <param name="storeName">The name of the store to be updated</param>
         /// <param name="updateExpression">The SPARQL Update expression to be applied</param>
         /// <param name="waitForCompletion">If set to true, the method will block until the transaction completes</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        public IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true)
+        public IJobInfo ExecuteUpdate(string storeName, string updateExpression, bool waitForCompletion = true, string label = null)
         {
             ValidateStoreName(storeName);
             if (String.IsNullOrWhiteSpace(updateExpression))
                 throw new ArgumentException(Strings.BrightstarServiceClient_UpdateExpressionMustNotBeEmptyString,
                                             "updateExpression");
-            var job = JobRequestObject.CreateSparqlUpdateJob(updateExpression);
+            var job = JobRequestObject.CreateSparqlUpdateJob(updateExpression, label);
             var jobUri = CreateJob(storeName, job);
             if (waitForCompletion)
             {
@@ -611,7 +615,7 @@ namespace BrightstarDB.Client
 
             var queryUri = String.Format("{0}/jobs?skip={1}&take={2}", storeName, skip, take);
             var response = AuthenticatedGet(queryUri);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
             return Deserialize<List<JobResponseModel>>(response).Cast<IJobInfo>();
 #else
             return Deserialize<List<JobResponseModel>>(response);
@@ -637,11 +641,12 @@ namespace BrightstarDB.Client
         /// <param name="store">The store to import into</param>
         /// <param name="fileName">The URI of the data to import</param>
         /// <param name="graphUri">The URI identifier of the graph that the data is to be imported into. If NULL, import is into the default graph</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance to use for monitoring the progress of the job</returns>
-        public IJobInfo StartImport(string store, string fileName, string graphUri)
+        public IJobInfo StartImport(string store, string fileName, string graphUri, string label = null)
         {
             ValidateStoreName(store);
-            var job = JobRequestObject.CreateImportJob(fileName, graphUri);
+            var job = JobRequestObject.CreateImportJob(fileName, graphUri, label);
             var jobUri = CreateJob(store, job);
             var jobInfoResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobInfoResponse);
@@ -653,11 +658,13 @@ namespace BrightstarDB.Client
         /// <param name="store">The store to export data from</param>
         /// <param name="fileName">The name of the file in the brightstar\import folder to write to. This file will be overwritten if it already exists.</param>
         /// <param name="graphUri">The identifier of the store graph to be exported. If NULL, all graphs in the store will be exported.</param>
+        /// <param name="exportFormat">The serialization format to use for the exported data. If unspecified or null, export will default to using NQuads format. </param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A JobInfo instance</returns>
-        public IJobInfo StartExport(string store, string fileName, string graphUri)
+        public IJobInfo StartExport(string store, string fileName, string graphUri, RdfFormat exportFormat = null, string label = null)
         {
             ValidateStoreName(store);
-            var job = JobRequestObject.CreateExportJob(fileName, graphUri);
+            var job = JobRequestObject.CreateExportJob(fileName, graphUri, exportFormat, label);
             var jobUri = CreateJob(store, job);
             var jobInfoResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobInfoResponse);
@@ -667,11 +674,12 @@ namespace BrightstarDB.Client
         /// Creates a new store file containing only the data required for the current state
         /// </summary>
         /// <param name="store">The store to consolidate</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A JobInfo instance</returns>
-        public IJobInfo ConsolidateStore(string store)
+        public IJobInfo ConsolidateStore(string store, string label = null)
         {
             ValidateStoreName(store);
-            var job = JobRequestObject.CreateConsolidateJob();
+            var job = JobRequestObject.CreateConsolidateJob(label);
             var jobUri = CreateJob(store, job);
             var jobInfoResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobInfoResponse);
@@ -805,7 +813,7 @@ namespace BrightstarDB.Client
 
             var queryUri = String.Format("{0}/transactions?skip={1}&take={2}", storeName, skip, take);
             var response = AuthenticatedGet(queryUri);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
             return Deserialize<List<TransactionInfoObject>>(response).Cast<ITransactionInfo>();
 #else
             return Deserialize<List<TransactionInfoObject>>(response);
@@ -843,13 +851,14 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="storeName">The name of the store to re-apply the transaction to</param>
         /// <param name="transactionInfo">The transaction to be applied</param>
-        public IJobInfo ReExecuteTransaction(string storeName, ITransactionInfo transactionInfo)
+        /// <param name="label">Optional user-friendly label for the job.</param>
+        public IJobInfo ReExecuteTransaction(string storeName, ITransactionInfo transactionInfo, string label)
         {
             ValidateStoreName(storeName);
             if (transactionInfo == null) throw new ArgumentNullException("transactionInfo");
             if (transactionInfo.StoreName != storeName) throw new ArgumentException(Strings.BrightstarServiceClient_InvalidTransactionInfoObject, "transactionInfo");
 
-            var job = JobRequestObject.CreateRepeatTransactionJob(transactionInfo.JobId);
+            var job = JobRequestObject.CreateRepeatTransactionJob(transactionInfo.JobId, label);
             var jobUri = CreateJob(storeName, job);
             var jobResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobResponse);
@@ -883,7 +892,7 @@ namespace BrightstarDB.Client
                                          storeName, latest.ToString("u"), earliest.ToString("u"),
                                          skip, take);
             var response = AuthenticatedGet(queryUri);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
             return Deserialize<List<CommitPointResponseModel>>(response).Cast<ICommitPointInfo>();
 #else
             return Deserialize<List<CommitPointResponseModel>>(response);
@@ -902,7 +911,7 @@ namespace BrightstarDB.Client
             try
             {
                 var response = AuthenticatedGet(storeName + "/statistics/latest");
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
                 return Deserialize<StoreStatisticsObject>(response) as IStoreStatistics;
 #else
                 return Deserialize<StoreStatisticsObject>(response);
@@ -937,7 +946,7 @@ namespace BrightstarDB.Client
             var uri = String.Format("{0}/statistics?latest={1}&earlies={2}&skip={3}&take={4}",
                                     storeName, latest.ToString("u"), earlierst.ToString("u"), skip, take);
             var response = AuthenticatedGet(uri);
-#if WINDOWS_PHONE
+#if WINDOWS_PHONE || SILVERLIGHT4
             return Deserialize<List<StoreStatisticsObject>>(response).Cast<IStoreStatistics>();
 #else
             return Deserialize<List<StoreStatisticsObject>>(response);
@@ -948,11 +957,12 @@ namespace BrightstarDB.Client
         /// Queues a job to update the statistics for a store
         /// </summary>
         /// <param name="storeName">The name of the store whose statistics are to be updated</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
-        public IJobInfo UpdateStatistics(string storeName)
+        public IJobInfo UpdateStatistics(string storeName, string label)
         {
             ValidateStoreName(storeName);
-            var job = JobRequestObject.CreateUpdateStatsJob();
+            var job = JobRequestObject.CreateUpdateStatsJob(label);
             var jobUri = CreateJob(storeName, job);
             var response = AuthenticatedGet(jobUri);
             var jobInfo = Deserialize<JobResponseModel>(response);
@@ -966,15 +976,16 @@ namespace BrightstarDB.Client
         /// <param name="targetStoreName">The name of the store to be created to receive the snapshot</param>
         /// <param name="persistenceType">The type of persistence to use for the target store</param>
         /// <param name="sourceCommitPoint">OPTIONAL: the commit point in the source store to take a snapshot from</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for tracking the current status of the job.</returns>
-        public IJobInfo CreateSnapshot(string storeName, string targetStoreName, PersistenceType persistenceType, ICommitPointInfo sourceCommitPoint = null)
+        public IJobInfo CreateSnapshot(string storeName, string targetStoreName, PersistenceType persistenceType, ICommitPointInfo sourceCommitPoint = null, string label = null)
         {
             ValidateStoreName(storeName);
             ValidateStoreName(targetStoreName, "targetStoreName");
             var job = sourceCommitPoint == null
-                          ? JobRequestObject.CreateSnapshotJob(targetStoreName, persistenceType.ToString())
-                          : JobRequestObject.CreateSnapshotJob(targetStoreName, persistenceType.ToString(),
-                                                               sourceCommitPoint.Id);
+                          ? JobRequestObject.CreateSnapshotJob(targetStoreName, persistenceType, label)
+                          : JobRequestObject.CreateSnapshotJob(targetStoreName, persistenceType,
+                                                               sourceCommitPoint.Id, label);
             var jobUri = CreateJob(storeName, job);
             var jobResponse = AuthenticatedGet(jobUri);
             var jobStatus = Deserialize<JobResponseModel>(jobResponse);

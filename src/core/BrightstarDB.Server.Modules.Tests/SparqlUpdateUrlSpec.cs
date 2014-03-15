@@ -17,7 +17,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(j => j.JobCompletedOk).Returns(true);
-            brightstar.Setup(s => s.ExecuteUpdate("foo", "update expression", true))
+            brightstar.Setup(s => s.ExecuteUpdate("foo", "update expression", true, It.IsAny<string>()))
                       .Returns(mockJobInfo.Object)
                       .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
@@ -36,7 +36,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(j => j.JobCompletedOk).Returns(true);
-            brightstar.Setup(s=>s.ExecuteUpdate("foo", "update expression", true))
+            brightstar.Setup(s=>s.ExecuteUpdate("foo", "update expression", true, It.IsAny<string>()))
                 .Returns(mockJobInfo.Object)
                 .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
@@ -60,7 +60,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(j => j.JobCompletedOk).Returns(false);
             mockJobInfo.Setup(j => j.JobCompletedWithErrors).Returns(true);
-            brightstar.Setup(s=>s.ExecuteUpdate("foo", "update expression", true))
+            brightstar.Setup(s=>s.ExecuteUpdate("foo", "update expression", true, It.IsAny<string>()))
                 .Returns(mockJobInfo.Object)
                 .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));

@@ -26,6 +26,9 @@ IJobInfo
 Job information retrieved from BrightstarDB is represented by an instance of the ``BrightstarDB.Client.IJobInfo``
 interface. This interface exposes the following properties:
 
+    - ``JobId``: The unique identifier for the job.
+    - ``Label``: An optional user-friendly name for the job. The label is set by passing it in with the optional
+      ``label`` parameter on methods that start a job.
     - ``JobPending``: A boolean flag. If true, the job is in the queue but has not yet been executed.
     - ``JobStarted``: A boolean flag. If true, the job is in the queue and is currently being executed.
     - ``JobCompletedWithErrors``: A boolean flag. If true, the processing of the job completed but the job itself failed for some reason.
@@ -34,7 +37,6 @@ interface. This interface exposes the following properties:
     - ``StatusMessage``: The current job status message. For some long-running jobs such as RDF import,
       this message will be updated as the job runs. For other types of job the status message may only
       be updated on completion or failure of the job.
-    - ``JobId``: The unique identifier for the job.
     - ``ExceptionInfo``: If an error is raised internally as a job is run, the exception information wil be
       recorded in this property. The value is a ``BrightstarDB.Dto.ExceptionDetailObject`` which provides
       access to the exception type, message and any inner exceptions.

@@ -13,7 +13,7 @@ namespace BrightstarDB.Server
         private string _updateExpression;
         private readonly SparqlUpdateParser _parser = new SparqlUpdateParser();
 
-        public SparqlUpdateJob(Guid jobId, StoreWorker storeWorker, string updateExpression) : base(jobId, storeWorker)
+        public SparqlUpdateJob(Guid jobId, string label, StoreWorker storeWorker, string updateExpression) : base(jobId, label, storeWorker)
         {
             _updateExpression = updateExpression;               
         }

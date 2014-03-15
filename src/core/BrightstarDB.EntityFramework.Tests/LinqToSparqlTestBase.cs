@@ -30,6 +30,7 @@ namespace BrightstarDB.EntityFramework.Tests
             input = Regex.Replace(input, @"\s*\{\s*", "{", RegexOptions.Multiline);
             input = Regex.Replace(input, @"\s*\(\s*", "(", RegexOptions.Multiline);
             input = Regex.Replace(input, @"\s*=\s*", "=", RegexOptions.Multiline);
+            input = Regex.Replace(input, @"\s*}\s*", "}", RegexOptions.Multiline);
             return input;
         }
 

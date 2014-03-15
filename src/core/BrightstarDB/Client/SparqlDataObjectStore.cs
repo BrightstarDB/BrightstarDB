@@ -16,7 +16,7 @@ namespace BrightstarDB.Client
             ISparqlQueryProcessor queryProcessor, ISparqlUpdateProcessor updateProcessor,
             Dictionary<string, string> namespaceMappings, bool optimisticLockingEnabled, 
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null) 
-            : base(namespaceMappings, optimisticLockingEnabled, updateGraphUri, datasetGraphUris, versionGraphUri)
+            : base(updateProcessor == null, namespaceMappings, optimisticLockingEnabled, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             _client = new SparqlUpdatableStore(queryProcessor, updateProcessor);
         }

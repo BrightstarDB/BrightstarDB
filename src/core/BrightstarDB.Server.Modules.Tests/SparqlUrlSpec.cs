@@ -22,8 +22,6 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestGetQueryValidation()
         {
-            const string mockResponse = "<results></results>";
-            ISerializationFormat format = SparqlResultsFormat.Xml;
             var brightstar = new Mock<IBrightstarService>();
             TestGetFails(HttpStatusCode.BadRequest, brightstar, "foo", "bad sparql query");
         }

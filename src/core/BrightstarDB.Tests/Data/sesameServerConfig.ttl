@@ -1,0 +1,5 @@
+﻿@prefix <http://www.dotnetrdf.org/configuration#> .
+
+:sesame a dnr:StorageServer ;
+  dnr:type "VDS.RDF.Storage.Management.SesameServer" ;
+  dnr:server "http://sesame.example.com" .

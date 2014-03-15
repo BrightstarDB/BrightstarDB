@@ -25,21 +25,21 @@ namespace BrightstarDB.OData.Tests
     		TypeMappings = new EntityMappingStore();
     		var provider = new ReflectionMappingProvider();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IArticle));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.Tests.IArticle, BrightstarDB.OData.Tests.Article>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IArticle, BrightstarDB.OData.Tests.Article>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.ICompany));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.Tests.ICompany, BrightstarDB.OData.Tests.Company>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.ICompany, BrightstarDB.OData.Tests.Company>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IDataTypeTestEntity));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.Tests.IDataTypeTestEntity, BrightstarDB.OData.Tests.DataTypeTestEntity>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IDataTypeTestEntity, BrightstarDB.OData.Tests.DataTypeTestEntity>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IDepartment));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.Tests.IDepartment, BrightstarDB.OData.Tests.Department>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IDepartment, BrightstarDB.OData.Tests.Department>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IJobRole));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.Tests.IJobRole, BrightstarDB.OData.Tests.JobRole>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IJobRole, BrightstarDB.OData.Tests.JobRole>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IPerson));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.Tests.IPerson, BrightstarDB.OData.Tests.Person>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IPerson, BrightstarDB.OData.Tests.Person>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IProject));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.Tests.IProject, BrightstarDB.OData.Tests.Project>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IProject, BrightstarDB.OData.Tests.Project>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.ISkill));
-    		TypeMappings.AddImplMapping<BrightstarDB.OData.Tests.ISkill, BrightstarDB.OData.Tests.Skill>();
+    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.ISkill, BrightstarDB.OData.Tests.Skill>();
     	}
     	
     	/// <summary>
