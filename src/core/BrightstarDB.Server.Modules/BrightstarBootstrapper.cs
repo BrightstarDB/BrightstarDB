@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Authentication;
@@ -31,9 +32,12 @@ namespace BrightstarDB.Server.Modules
             if (config == null) throw new ConfigurationErrorsException(Strings.NoServiceConfiguration);
 
             _brightstarService = BrightstarService.GetClient(config.ConnectionString);
-            _storePermissionsProvider = config.StorePermissionsProvider;
-            _systemPermissionsProvider = config.SystemPermissionsProvider;
-            _authenticationProviders = config.AuthenticationProviders;
+            _storePermissionsProvider = config.StorePermissionsProvider ??
+                                        new FallbackStorePermissionsProvider(StorePermissions.All);
+            _systemPermissionsProvider = config.SystemPermissionsProvider ??
+                                         new FallbackSystemPermissionsProvider(SystemPermissions.All);
+            _authenticationProviders = config.AuthenticationProviders ??
+                                       new Collection<IAuthenticationProvider> {new NullAuthenticationProvider()};
         }
 
         /// <summary>
