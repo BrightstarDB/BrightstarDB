@@ -261,6 +261,8 @@ The permissions that a user has are provided to the BrightstarDB service by one 
         Any number of ``user`` and ``claim`` elements may appear inside the ``static``
         element (in any order).
         
+.. _Configuration_Authentication:
+
 Configuring Authentication
 ==========================
 
