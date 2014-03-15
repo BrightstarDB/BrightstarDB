@@ -32,8 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dotNetRDF">
-      <HintPath>..\..\packages\dotNetRDF.1.0.3\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
+    <Reference Include="dotNetRDF, Version=1.0.3.0, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\dotNetRDF.1.0.4.3225\lib\net40\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="Portable.Runtime">
       <HintPath>..\..\packages\dotNetRDF.1.0.3\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>

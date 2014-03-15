@@ -52,7 +52,7 @@
   <ItemGroup>
     <Reference Include="dotNetRDF, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\dotNetRDF.1.0.3\lib\sl4-wp\dotNetRDF.dll</HintPath>
+      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\sl4-wp\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Interop" />
