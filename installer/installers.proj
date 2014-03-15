@@ -281,6 +281,7 @@
 			 Value="$(PackageBuildNumber)" />
 
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
+    <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net45"/>
     <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\wp71"/>
 	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\windowsphone8" />
 	<Copy SourceFiles="@(Portable154Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+wp80+sl4+win8" />
