@@ -1,11 +1,9 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using System.IO;
 using BrightstarDB.Caching;
 using BrightstarDB.Storage;
-
-#if !PORTABLE
 using System.Configuration;
-#endif
 
 #if SILVERLIGHT
 using System.IO.IsolatedStorage;
@@ -327,3 +325,4 @@ namespace BrightstarDB
 
     }
 }
+#endif
