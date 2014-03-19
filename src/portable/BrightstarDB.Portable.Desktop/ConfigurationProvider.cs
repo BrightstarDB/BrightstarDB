@@ -16,6 +16,8 @@ namespace BrightstarDB
         public int StatsUpdateTransactionCount { get; set; }
         public int TransactionFlushTripleCount { get; set; }
 
+        #region AppSetting Property Names
+        private const string PageCacheSizePropertyName = "BrightstarDB.PageCacheSize";
         private const string TxnFlushTriggerPropertyName = "BrightstarDB.TxnFlushTripleCount";
         private const string ResourceCacheLimitName = "BrightstarDB.ResourceCacheLimit";
         private const string ConnectionStringPropertyName = "BrightstarDB.ConnectionString";
@@ -26,34 +28,29 @@ namespace BrightstarDB
         private const string PersistenceTypeRewrite = "rewrite";
         private const string StatsUpdateTransactionCountName = "BrightstarDB.StatsUpdate.TransactionCount";
         private const string StatsUpdateTimeSpanName = "BrightstarDB.StatsUpdate.TimeSpan";
+        #endregion
 
+        #region Default Values and constants
         private const PersistenceType DefaultPersistenceType = PersistenceType.AppendOnly;
         private const int DefaultQueryCacheMemory = 256; // in MB
+        private const int DefaultPageCacheSize = 256; // in MB
         private const int DefaultResourceCacheLimit = 1000000; // number of entries
+        private const int DefaultTransactionFlushTripleCount = 10000;
         private const long MegabytesToBytes = 1024 * 1024;
+        #endregion
 
         public ConfigurationProvider()
         {
             var appSettings = ConfigurationManager.AppSettings;
-            
-            // Transaction Flushing
-            TransactionFlushTripleCount = GetApplicationSetting(TxnFlushTriggerPropertyName, 10000);
-
-            // ResourceCacheLimit
-            ResourceCacheLimit = GetApplicationSetting(ResourceCacheLimitName, DefaultResourceCacheLimit);
 
             // Connection String
             ConnectionString = appSettings.Get(ConnectionStringPropertyName);
 
-            // Query Caching
-            var enableQueryCacheString = appSettings.Get(EnableQueryCacheName);
-            var enableQueryCache = true;
-            if (!string.IsNullOrEmpty(enableQueryCacheString))
-            {
-                enableQueryCache = bool.Parse(enableQueryCacheString);
-            }
-            var queryCacheMemory = GetApplicationSetting(QueryCacheMemoryName, DefaultQueryCacheMemory);
-            QueryCache = GetQueryCache(enableQueryCache, queryCacheMemory);
+            // Page Cache Size
+            PageCacheSize = GetApplicationSetting(PageCacheSizePropertyName, DefaultPageCacheSize);
+
+            // ResourceCacheLimit
+            ResourceCacheLimit = GetApplicationSetting(ResourceCacheLimitName, DefaultResourceCacheLimit);
 
             // Persistence Type
             var persistenceTypeSetting = appSettings.Get(PersistenceTypeName);
@@ -77,9 +74,23 @@ namespace BrightstarDB
                 PersistenceType = DefaultPersistenceType;
             }
 
+            // Query Caching
+            var enableQueryCacheString = appSettings.Get(EnableQueryCacheName);
+            var enableQueryCache = true;
+            if (!string.IsNullOrEmpty(enableQueryCacheString))
+            {
+                enableQueryCache = bool.Parse(enableQueryCacheString);
+            }
+            var queryCacheMemory = GetApplicationSetting(QueryCacheMemoryName, DefaultQueryCacheMemory);
+            QueryCache = GetQueryCache(enableQueryCache, queryCacheMemory);
+
             // StatsUpdate properties
             StatsUpdateTransactionCount = GetApplicationSetting(StatsUpdateTransactionCountName, 0);
             StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
+
+            // Transaction Flushing
+            TransactionFlushTripleCount = GetApplicationSetting(TxnFlushTriggerPropertyName, DefaultTransactionFlushTripleCount);
+
         }
 
 
