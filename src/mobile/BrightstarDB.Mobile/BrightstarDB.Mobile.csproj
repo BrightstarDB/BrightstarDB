@@ -56,9 +56,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\SharpSerializer.2.18\lib\sl4-windowsphone71\Polenter.SharpSerializer.Silverlight.dll</HintPath>
     </Reference>
-    <Reference Include="System.Threading.Tasks">
-      <HintPath>..\lib\System.Threading.Tasks.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -80,6 +77,8 @@
     </Compile>
     <Compile Include="BrightstarDB\MobileInternals.cs" />
     <Compile Include="BrightstarDB\SmartAssembly.Attributes.cs" />
+    <Compile Include="Compatibility\ConcurrentDictionary.cs" />
+    <Compile Include="Compatibility\ConcurrentQueue.cs" />
     <Compile Include="MD5.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BrightstarDB\SilverlightCollectionExtensions.cs" />

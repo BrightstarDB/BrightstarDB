@@ -34,16 +34,18 @@
   <ItemGroup>
     <Reference Include="dotNetRDF, Version=1.0.3.0, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\dotNetRDF.1.0.4.3225\lib\net40\dotNetRDF.dll</HintPath>
+      <HintPath>..\..\packages\dotNetRDF.1.0.4.3225\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
     </Reference>
-    <Reference Include="Portable.Runtime">
-      <HintPath>..\..\packages\dotNetRDF.1.0.3\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="HtmlAgilityPack">
+    <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Portable.Runtime">
+      <HintPath>..\..\packages\dotNetRDF.1.0.4.3225\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
@@ -56,7 +58,8 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="VDS.Common">
+    <Reference Include="VDS.Common, Version=1.2.0.0, Culture=neutral, PublicKeyToken=ab5f4eb908061bf0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\VDS.Common.1.2.0\lib\net40-client\VDS.Common.dll</HintPath>
     </Reference>
   </ItemGroup>
@@ -67,7 +70,7 @@
       <DependentUpon>MyEntityContext.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\..\..\core\BrightstarDB.Tests\**\*.cs" Exclude="..\..\..\core\BrightstarDB.Tests\Sparql11TestSuite\**\*.cs;..\..\..\core\BrightstarDB.Tests\EntityFramework\MyEntityContext.cs;..\..\..\core\BrightstarDB.Tests\Properties\**\*.cs;..\..\..\core\BrightstarDB.Tests\SerializationTests.cs">
+    <Compile Include="..\..\..\core\BrightstarDB.Tests\**\*.cs" Exclude="..\..\..\core\BrightstarDB.Tests\Sparql11TestSuite\**\*.cs;..\..\..\core\BrightstarDB.Tests\SparqlDawgTests\**\*.cs;..\..\..\core\BrightstarDB.Tests\EntityFramework\MyEntityContext.cs;..\..\..\core\BrightstarDB.Tests\Properties\**\*.cs;..\..\..\core\BrightstarDB.Tests\SerializationTests.cs">
       <Link>Tests\%(recursivedir)\%(filename)</Link>
     </Compile>
     <Compile Include="TestHelper.cs" />
