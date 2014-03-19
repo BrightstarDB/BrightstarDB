@@ -76,7 +76,7 @@ namespace BrightstarDB.Storage.Persistence
             if (args.Partition.Equals(_path))
             {
                 // Evicting a page from this store
-                if (args.PageId > _newPageOffset)
+                if (args.PageId >= _newPageOffset)
                 {
                     // Evicting a writeable page - add the page to the background write queue to ensure it gets written out.
                     if (_backgroundPageWriter == null)
