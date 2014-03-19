@@ -99,9 +99,6 @@ namespace BrightstarDB
                 }
             }
 
-            // ResourceCacheLimit
-            ResourceCacheLimit = GetApplicationSetting(ResourceCacheLimitName, DefaultResourceCacheLimit);
-
             // Connection String
             ConnectionString = appSettings.Get(ConnectionStringPropertyName);
 
@@ -117,8 +114,19 @@ namespace BrightstarDB
             QueryCacheDirectory = appSettings.Get(QueryCacheDirectoryName);
             QueryCache = GetQueryCache();
 
+
+
+            // StatsUpdate properties
+            StatsUpdateTransactionCount = GetApplicationSetting(StatsUpdateTransactionCountName, 0);
+            StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
+
+#endif
+#if !PORTABLE
+            // ResourceCacheLimit
+            ResourceCacheLimit = GetApplicationSetting(ResourceCacheLimitName, DefaultResourceCacheLimit);
+
             // Persistence Type
-            var persistenceTypeSetting = appSettings.Get(PersistenceTypeName);
+            var persistenceTypeSetting = GetApplicationSetting(PersistenceTypeName);
             if (!String.IsNullOrEmpty(persistenceTypeSetting))
             {
                 switch (persistenceTypeSetting.ToLowerInvariant())
@@ -139,12 +147,7 @@ namespace BrightstarDB
                 PersistenceType = DefaultPersistenceType;
             }
 
-            // StatsUpdate properties
-            StatsUpdateTransactionCount = GetApplicationSetting(StatsUpdateTransactionCountName, 0);
-            StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
-
-#endif
-#if !PORTABLE
+            // Page Cache Size
             var pageCacheSizeSetting = GetApplicationSetting(PageCacheSizeName);
             int pageCacheSize;
             if (!String.IsNullOrEmpty(pageCacheSizeSetting) && Int32.TryParse(pageCacheSizeSetting, out pageCacheSize))
@@ -156,6 +159,8 @@ namespace BrightstarDB
                 PageCacheSize = DefaultPageCacheSize;
             }
 
+#if !WINDOWS_PHONE
+            // Clustering
             var clusterNodePortSetting = GetApplicationSetting(ClusterNodePortName);
             int clusterNodePort;
             if (!String.IsNullOrEmpty(clusterNodePortSetting) &&
@@ -167,6 +172,7 @@ namespace BrightstarDB
             {
                 ClusterNodePort = 10001;
             }
+#endif
 #endif
         }
 

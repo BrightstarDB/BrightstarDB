@@ -1,8 +1,10 @@
 ﻿using System;
-#if !PORTABLE
-using System.Collections.Concurrent;
-#else
+#if PORTABLE
 using BrightstarDB.Portable.Compatibility;
+#elif WINDOWS_PHONE
+using BrightstarDB.Mobile.Compatibility;
+#else
+using System.Collections.Concurrent;
 #endif
 
 namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
