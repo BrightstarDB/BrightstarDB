@@ -7,6 +7,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Profiling;
 using BrightstarDB.Query;
 using BrightstarDB.Rdf;
+using BrightstarDB.Storage.BPlusTreeStore.ResourceIndex;
 using BrightstarDB.Storage.Persistence;
 using VDS.RDF;
 using VDS.RDF.Query;
@@ -676,6 +677,11 @@ namespace BrightstarDB.Storage.BTreeStore
             throw new NotImplementedException();
         }
 
+        IResource IStore.Resolve(ulong nodeId)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// All persisted objects both data and index are given a unique integer id.
         /// </summary>
@@ -1223,6 +1229,38 @@ namespace BrightstarDB.Storage.BTreeStore
         public string ResolvePrefixedUri(string prefixedUri)
         {
             return _prefixManager.ResolvePrefixedUri(prefixedUri);
+        }
+
+        public ulong LookupResource(string uri)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ulong LookupResource(string value, string datatype, string langCode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int LookupGraph(string graphUri)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ResolveGraphUri(int graphId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null,
+                                       string langCode = null, string graph = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null,
+                                       string langCode = null, IEnumerable<string> graphs = null)
+        {
+            throw new NotImplementedException();
         }
 
         private Triple MakeTriple(Tuple<ulong, ulong, ulong, ulong> data)

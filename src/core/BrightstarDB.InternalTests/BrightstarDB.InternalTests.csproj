@@ -39,10 +39,6 @@
     <AssemblyOriginatorKeyFile>..\..\..\key\brightstardb.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dotNetRDF, Version=1.0.3.0, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\net40\dotNetRDF.dll</HintPath>
-    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net40\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -118,6 +114,10 @@
     <Compile Include="StreamTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\dotnetrdf\project_repo\Libraries\core\net40\dotNetRDF.csproj">
+      <Project>{bfbac159-1e60-4d03-8aca-d34e31eb83bf}</Project>
+      <Name>dotNetRDF</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BrightstarDB.Tests\BrightstarDB.Tests.csproj">
       <Project>{4EB8BF43-94B1-4264-B2C9-9EE1BAB7F094}</Project>
       <Name>BrightstarDB.Tests</Name>

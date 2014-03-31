@@ -80,10 +80,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dotNetRDF, Version=1.0.3.0, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\net40\dotNetRDF.dll</HintPath>
-    </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net40\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -187,6 +183,9 @@
     <Compile Include="FormatInfo.cs" />
     <Compile Include="ISerializationFormat.cs" />
     <Compile Include="NoAcceptableFormatException.cs" />
+    <Compile Include="Query\BrightstarRdfProvider.cs" />
+    <Compile Include="Query\BrightstarVirtualNode.cs" />
+    <Compile Include="Query\VirtualizingSparqlDataset.cs" />
     <Compile Include="RdfFormat.cs" />
     <Compile Include="Rdf\PlainLiteral.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
@@ -475,6 +474,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\dotnetrdf\project_repo\Libraries\core\net40\dotNetRDF.csproj">
+      <Project>{bfbac159-1e60-4d03-8aca-d34e31eb83bf}</Project>
+      <Name>dotNetRDF</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\..\common.proj" />

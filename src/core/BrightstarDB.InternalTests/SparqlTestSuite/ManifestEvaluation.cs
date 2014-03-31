@@ -11,7 +11,8 @@ using VDS.RDF.Query;
 using System.Linq;
 
 namespace BrightstarDB.InternalTests.SparqlTestSuite {
-    [TestFixture]
+    [TestFixture(true)]
+    [TestFixture(false)]
 	public partial class ManifestEvaluation {
 
 		private readonly IStoreManager _storeManager;
@@ -19,8 +20,9 @@ namespace BrightstarDB.InternalTests.SparqlTestSuite {
         private readonly string _testSuitePath;
         private IStore _store;
 
-        public ManifestEvaluation()
+        public ManifestEvaluation(bool virtualizing)
         {
+            Configuration.EnableVirtualizedQueries = virtualizing;
             _storeManager = StoreManagerFactory.GetStoreManager();
             _testSuitePath = TestPaths.DataPath + "sparql-test-suite\\";
         }

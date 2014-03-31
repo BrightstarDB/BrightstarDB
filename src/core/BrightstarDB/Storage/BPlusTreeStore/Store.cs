@@ -630,7 +630,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             };
         }
 
-        private IResource Resolve(ulong resourceId)
+        public IResource Resolve(ulong resourceId)
         {
             var ret = _resourceIndex.GetResource(resourceId);
 #if DEBUG
@@ -640,6 +640,57 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
 #endif
             return ret;
+        }
+
+        public string ResolvePrefixedUri(string prefixedUri)
+        {
+            return _prefixManager.ResolvePrefixedUri(prefixedUri);
+        }
+
+        public ulong LookupResource(string uri)
+        {
+            var curie = _prefixManager.MakePrefixedUri(uri);
+            return _resourceIndex.GetResourceId(curie);
+        }
+
+        public ulong LookupResource(string value, string datatype, string langCode)
+        {
+            return _resourceIndex.GetResourceId(value, true, datatype, langCode);
+        }
+
+        public int LookupGraph(string graphUri)
+        {
+            int graphId;
+            if (_graphIndex.TryFindGraphId(graphUri, out graphId)) return graphId;
+            return -1;
+        }
+
+        public string ResolveGraphUri(int graphId)
+        {
+            return _graphIndex.GetGraphUri(graphId);
+        }
+
+        public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null,
+                                       string langCode = null, string graph = null)
+        {
+            return GetBindings(subject, predicate, obj, isLiteral, dataType, langCode, graph == null ? null : new[] { graph });
+        }
+
+        public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null,
+                                       string langCode = null, IEnumerable<string> graphs = null)
+        {
+            if (langCode != null) langCode = langCode.ToLowerInvariant();
+            ulong sid = FindResourceId(subject);
+            ulong pid = FindResourceId(predicate);
+            ulong oid = FindResourceId(obj, isLiteral, dataType, langCode);
+            var gids = LookupGraphIds(graphs);
+
+            if (sid == StoreConstants.NullUlong && !String.IsNullOrEmpty(subject)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (pid == StoreConstants.NullUlong && !String.IsNullOrEmpty(predicate)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (oid == StoreConstants.NullUlong && !String.IsNullOrEmpty(obj)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (gids.Count == 0) return new Tuple<ulong, ulong, ulong, int>[0];
+
+            return Bind(sid, pid, oid, gids);
         }
 
         #region Triple Pattern Binding
