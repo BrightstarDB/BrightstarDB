@@ -126,9 +126,34 @@ namespace BrightstarDB.Client
 
         private static string FormatDeletePattern(Triple p, ref int propId)
         {
-            return p.Predicate.Equals(Constants.WildcardUri)
-                       ? String.Format("  <{0}> ?d{1} ?d{2} .", p.Subject, propId++, propId++)
-                       : String.Format("  <{0}> <{1}> ?d{2} .", p.Subject, p.Predicate, propId++);
+            return String.Format(" {0} {1} {2} .",
+                                 FormatDeletePatternItem(p.Subject, ref propId),
+                                 FormatDeletePatternItem(p.Predicate, ref propId),
+                                 p.IsLiteral
+                                     ? FormatDeletePatternItem(p.Object, p.DataType, p.LangCode)
+                                     : FormatDeletePatternItem(p.Object, ref propId));
+        }
+
+        private static string FormatDeletePatternItem(string uri, ref int propId)
+        {
+            return uri.Equals(Constants.WildcardUri) ? String.Format("?d{0}", propId++) : String.Format("<{0}>", uri);
+        }
+
+        private static string FormatDeletePatternItem(string literal, string dataType, string languageCode)
+        {
+            var builder = new StringBuilder();
+            builder.AppendFormat("\"{0}\"", literal );
+            if (dataType != null)
+            {
+                builder.Append("^^");
+                builder.AppendFormat("<{0}>", dataType);
+            }
+            if (languageCode != null)
+            {
+                builder.Append("@");
+                builder.Append(languageCode);
+            }
+            return builder.ToString();
         }
 
         /// <summary>
