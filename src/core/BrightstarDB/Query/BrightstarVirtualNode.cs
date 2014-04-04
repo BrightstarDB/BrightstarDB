@@ -66,6 +66,12 @@ namespace BrightstarDB.Query
                 return _value;
             }
         }
+
+        public int CompareVirtualId(ulong otherId)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region IComparable Implementation
@@ -459,6 +465,31 @@ namespace BrightstarDB.Query
             return this._nodeId.GetHashCode();
         }
 
+        /// <summary>
+        /// Attempt to compare this object with another INode instance
+        /// </summary>
+        /// <param name="other">The other INode instance to compare with</param>
+        /// <param name="compareResult">Receives the result of the comparison if it could be performed</param>
+        /// <returns>True if a virutal ID comparison could be performed, false otherwise.</returns>
+        public bool TryCompareVirtualId(INode other, out int compareResult)
+        {
+            if (other is BrightstarVirtualNode)
+            {
+                var virt = other as BrightstarVirtualNode;
+                if (ReferenceEquals(_provider, virt.Provider))
+                {
+                    compareResult = _nodeId.CompareTo(virt.VirtualID);
+                    return true;
+                }
+            }
+            compareResult = 0;
+            return false;
+        }
+
+        /// <summary>
+        /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> to populate with data. </param><param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext"/>) for this serialization. </param><exception cref="T:System.Security.SecurityException">The caller does not have the required permission. </exception>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             throw new NotImplementedException();

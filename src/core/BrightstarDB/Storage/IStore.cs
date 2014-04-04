@@ -190,7 +190,9 @@ namespace BrightstarDB.Storage
 
         IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null, string langCode = null, string graph = null);
         IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null, string langCode = null, IEnumerable<string> graphs = null);
+        IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(ulong? subjNodeId, string subjValue, ulong? predNodeId, string predValue, ulong? objNodeId, string objValue, bool isLiteral, string dataType, string languageCode, List<string> graphUris);
 
         #endregion
+
     }
 }

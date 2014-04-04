@@ -1263,6 +1263,12 @@ namespace BrightstarDB.Storage.BTreeStore
             throw new NotImplementedException();
         }
 
+        public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(ulong? subjNodeId, string subjValue, ulong? predNodeId, string predValue, ulong? objNodeId,
+                                       string objValue, bool isLiteral, string dataType, string languageCode, List<string> graphUris)
+        {
+            throw new NotImplementedException();
+        }
+
         private Triple MakeTriple(Tuple<ulong, ulong, ulong, ulong> data)
         {
             string subject = _prefixManager.ResolvePrefixedUri(Resolve(data.Item1).LexicalValue);

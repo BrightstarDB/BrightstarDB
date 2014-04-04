@@ -693,6 +693,25 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return Bind(sid, pid, oid, gids);
         }
 
+        public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(ulong? subjNodeId, string subjValue, ulong? predNodeId, string predValue, ulong? objNodeId,
+                                       string objValue, bool isLiteral, string dataType, string languageCode, List<string> graphUris)
+        {
+            if (languageCode != null) languageCode = languageCode.ToLowerInvariant();
+            ulong sid = subjNodeId.HasValue ? subjNodeId.Value : FindResourceId(subjValue);
+            ulong pid = predNodeId.HasValue ? predNodeId.Value : FindResourceId(predValue);
+            ulong oid = objNodeId.HasValue
+                            ? objNodeId.Value
+                            : FindResourceId(objValue, isLiteral, dataType, languageCode);
+            var gids = LookupGraphIds(graphUris);
+
+            if (sid == StoreConstants.NullUlong && !String.IsNullOrEmpty(subjValue)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (pid == StoreConstants.NullUlong && !String.IsNullOrEmpty(predValue)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (oid == StoreConstants.NullUlong && !String.IsNullOrEmpty(objValue)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (gids.Count == 0) return new Tuple<ulong, ulong, ulong, int>[0];
+
+            return Bind(sid, pid, oid, gids);
+        }
+
         #region Triple Pattern Binding
         private IEnumerable<Tuple<ulong, ulong, ulong, int>> Bind(ulong s = StoreConstants.NullUlong, ulong p = StoreConstants.NullUlong,
                                                                     ulong o = StoreConstants.NullUlong,

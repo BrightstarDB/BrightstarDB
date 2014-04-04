@@ -182,7 +182,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\dotnetrdf\project_repo\Libraries\core\net40\dotNetRDF.csproj">
+    <ProjectReference Include="..\..\..\..\dotnetrdf\kal_ahmed\Libraries\core\net40\dotNetRDF.csproj">
       <Project>{bfbac159-1e60-4d03-8aca-d34e31eb83bf}</Project>
       <Name>dotNetRDF</Name>
     </ProjectReference>

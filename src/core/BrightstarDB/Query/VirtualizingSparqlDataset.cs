@@ -153,7 +153,8 @@ namespace BrightstarDB.Query
                 // Can't be a match if there is a literal for subject or predicate
                 return new Triple[0];
             }
-            return _store.GetBindings(GetNodeMatchString(subj), null, null, graphs: _graphUris).Select(MakeVdsTriple);
+            return GetTriples(subj, null, null);
+            //return _store.GetBindings(GetNodeMatchString(subj), null, null, graphs: _graphUris).Select(MakeVdsTriple);
         }
 
         public IEnumerable<Triple> GetTriplesWithPredicate(INode pred)
@@ -164,27 +165,28 @@ namespace BrightstarDB.Query
                 // Can't be a match if there is a literal for subject or predicate
                 return new Triple[0];
             }
-
-            return _store.GetBindings(null, GetNodeMatchString(pred), null, graphs: _graphUris).Select(MakeVdsTriple);
+            return GetTriples(null, pred, null);
+            //return _store.GetBindings(null, GetNodeMatchString(pred), null, graphs: _graphUris).Select(MakeVdsTriple);
         }
 
         public IEnumerable<Triple> GetTriplesWithObject(INode obj)
         {
-            if (obj.NodeType == NodeType.Literal)
-            {
-                var objLit = obj as ILiteralNode;
-                var dataType = RdfDatatypes.PlainLiteral;
-                if (objLit.DataType != null)
-                {
-                    dataType = objLit.DataType.ToString();
-                }
-                return
-                    _store.GetBindings(
-                        null, null, objLit.Value,
-                        true, dataType, objLit.Language, _graphUris)
-                          .Select(MakeVdsTriple);
-            }
-            return _store.GetBindings(null, null, GetNodeMatchString(obj), false, null, null, _graphUris).Select(MakeVdsTriple);
+            return GetTriples(null, null, obj);
+            //if (obj.NodeType == NodeType.Literal)
+            //{
+            //    var objLit = obj as ILiteralNode;
+            //    var dataType = RdfDatatypes.PlainLiteral;
+            //    if (objLit.DataType != null)
+            //    {
+            //        dataType = objLit.DataType.ToString();
+            //    }
+            //    return
+            //        _store.GetBindings(
+            //            null, null, objLit.Value,
+            //            true, dataType, objLit.Language, _graphUris)
+            //              .Select(MakeVdsTriple);
+            //}
+            //return _store.GetBindings(null, null, GetNodeMatchString(obj), false, null, null, _graphUris).Select(MakeVdsTriple);
         }
 
         public IEnumerable<Triple> GetTriplesWithSubjectPredicate(INode subj, INode pred)
@@ -195,11 +197,12 @@ namespace BrightstarDB.Query
                 // Can't be a match if there is a literal for subject or predicate
                 return new Triple[0];
             }
-            return _store.GetBindings(GetNodeMatchString(subj),
-                                GetNodeMatchString(pred), 
-                                null, 
-                                graphs: _graphUris)
-                .Select(MakeVdsTriple);
+            return GetTriples(subj, pred, null);
+            //return _store.GetBindings(GetNodeMatchString(subj),
+            //                    GetNodeMatchString(pred), 
+            //                    null, 
+            //                    graphs: _graphUris)
+            //    .Select(MakeVdsTriple);
         }
 
         public IEnumerable<Triple> GetTriplesWithSubjectObject(INode subj, INode obj)
@@ -210,29 +213,30 @@ namespace BrightstarDB.Query
                 // Can't be a match if there is a literal for subject or predicate
                 return new Triple[0];
             }
-            if (obj.NodeType == NodeType.Literal)
-            {
-                var objLit = obj as ILiteralNode;
-                var dataType = RdfDatatypes.PlainLiteral;
-                if (objLit.DataType != null)
-                {
-                    dataType = objLit.DataType.ToString();
-                }
-                return
-                    _store.GetBindings(GetNodeMatchString(subj),
-                                        null,
-                                        objLit.Value,
-                                        true, dataType, objLit.Language,
-                                        _graphUris)
-                            .Select(MakeVdsTriple);
-            }
-            return
-                _store.GetBindings(GetNodeMatchString(subj),
-                             null,
-                             GetNodeMatchString(obj),
-                             false, null, null,
-                             _graphUris)
-                    .Select(MakeVdsTriple);
+            return GetTriples(subj, null, obj);
+            //if (obj.NodeType == NodeType.Literal)
+            //{
+            //    var objLit = obj as ILiteralNode;
+            //    var dataType = RdfDatatypes.PlainLiteral;
+            //    if (objLit.DataType != null)
+            //    {
+            //        dataType = objLit.DataType.ToString();
+            //    }
+            //    return
+            //        _store.GetBindings(GetNodeMatchString(subj),
+            //                            null,
+            //                            objLit.Value,
+            //                            true, dataType, objLit.Language,
+            //                            _graphUris)
+            //                .Select(MakeVdsTriple);
+            //}
+            //return
+            //    _store.GetBindings(GetNodeMatchString(subj),
+            //                 null,
+            //                 GetNodeMatchString(obj),
+            //                 false, null, null,
+            //                 _graphUris)
+            //        .Select(MakeVdsTriple);
         }
 
         public IEnumerable<Triple> GetTriplesWithPredicateObject(INode pred, INode obj)
@@ -243,31 +247,79 @@ namespace BrightstarDB.Query
                 // Can't be a match if there is a literal for subject or predicate
                 return new Triple[0];
             }
-            if (obj.NodeType == NodeType.Literal)
-            {
-                var objLit = obj as ILiteralNode;
-                var dataType = RdfDatatypes.PlainLiteral;
-                if (objLit.DataType != null)
-                {
-                    dataType = objLit.DataType.ToString();
-                }
-                return
-                    _store.GetBindings(
-                        null,
-                        GetNodeMatchString(pred),
-                        objLit.Value,
-                        true, dataType, objLit.Language,
-                        _graphUris)
-                            .Select(MakeVdsTriple);
-            }
-            return
-                _store.GetBindings(null,
-                             GetNodeMatchString(pred),
-                             GetNodeMatchString(obj),
-                             false, null, null,
-                             _graphUris)
-                    .Select(MakeVdsTriple);
+
+            return GetTriples(null, pred, obj);
+
+            //if (obj.NodeType == NodeType.Literal)
+            //{
+            //    var objLit = obj as ILiteralNode;
+            //    var dataType = RdfDatatypes.PlainLiteral;
+            //    if (objLit.DataType != null)
+            //    {
+            //        dataType = objLit.DataType.ToString();
+            //    }
+            //    return
+            //        _store.GetBindings(
+            //            null,
+            //            GetNodeMatchString(pred),
+            //            objLit.Value,
+            //            true, dataType, objLit.Language,
+            //            _graphUris)
+            //                .Select(MakeVdsTriple);
+            //}
+            //return
+            //    _store.GetBindings(null,
+            //                 GetNodeMatchString(pred),
+            //                 GetNodeMatchString(obj),
+            //                 false, null, null,
+            //                 _graphUris)
+            //        .Select(MakeVdsTriple);
         }
+
+        public IEnumerable<Triple> GetTriples(INode subj, INode pred, INode obj)
+        {
+            ulong? subjNodeId = null, predNodeId = null, objNodeId = null;
+            if (subj == null) subjNodeId = StoreConstants.NullUlong;
+            if (pred == null) predNodeId = StoreConstants.NullUlong;
+            if (obj == null) objNodeId = StoreConstants.NullUlong;
+            if (subj is BrightstarVirtualNode) subjNodeId = (subj as BrightstarVirtualNode).VirtualID;
+            if (pred is BrightstarVirtualNode) predNodeId = (pred as BrightstarVirtualNode).VirtualID;
+            if (obj is BrightstarVirtualNode) objNodeId = (obj as BrightstarVirtualNode).VirtualID;
+
+            string subjValue = null, predValue = null, objValue = null, dataType = RdfDatatypes.PlainLiteral, languageCode = null;
+            bool objIsLiteral = false;
+
+            if (!subjNodeId.HasValue)
+            {
+                if (subj is ILiteralNode) return new Triple[0];
+                subjValue = GetNodeMatchString(subj);
+            }
+            if (!predNodeId.HasValue)
+            {
+                if (pred is ILiteralNode) return new Triple[0];
+                predValue = GetNodeMatchString(pred);
+            }
+            if (!objNodeId.HasValue)
+            {
+                if (obj is ILiteralNode)
+                {
+                    var lit = obj as ILiteralNode;
+                    objValue = lit.Value;
+                    dataType = lit.DataType == null ? RdfDatatypes.PlainLiteral : lit.DataType.ToString();
+                    languageCode = lit.Language;
+                    objIsLiteral = true;
+                }
+                else
+                {
+                    objValue = GetNodeMatchString(obj);
+                }
+            }
+
+            return _store.GetBindings(subjNodeId, subjValue,
+                                      predNodeId, predValue,
+                                      objNodeId, objValue, objIsLiteral, dataType, languageCode,
+                                      _graphUris).Select(MakeVdsTriple);
+        } 
 
         private static string GetNodeMatchString(INode node)
         {
