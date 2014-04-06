@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
@@ -46,6 +47,12 @@ namespace BrightstarDB.Server.Runner
         {
 // Running from the command line
             WriteWelcomeHeader();
+#if DEBUG
+            Logging.EnableConsoleOutput(true);
+#else
+            Logging.EnableConsoleOutput(false);
+#endif
+
             var serviceArgs = new ServiceArgs();
             if (CommandLine.Parser.ParseArgumentsWithUsage(args, serviceArgs))
             {
@@ -72,7 +79,7 @@ namespace BrightstarDB.Server.Runner
 
         private static void WriteWelcomeHeader()
         {
-            var fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+            var fvi = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
             var assemVer = fvi.FileMajorPart + "." + fvi.FileMinorPart + "." + fvi.FileBuildPart;
 
             Console.WriteLine("BrightstarDB REST Server {0}.", assemVer);
