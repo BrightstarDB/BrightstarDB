@@ -233,7 +233,7 @@
         <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
 		<PlatformNuspecTemplate Include="nuget\BrightstarDB.Platform.nuspec.template"/>
         <Net40Libs Include="InstallerTmp\SDK\Net40\BrightstarDB.dll;InstallerTmp\SDK\Net40\Remotion.Linq.dll" />
-        <WP71Libs Include="InstallerTmp\SDK\WP71\BrightstarDB.Mobile.dll;InstallerTmp\SDK\WP71\System.Threading.Tasks.dll" />
+        <WP71Libs Include="InstallerTmp\SDK\WP71\BrightstarDB.Mobile.dll" />
 		<WP8Libs Include="InstallerTmp\SDK\WP71\BrightstarDB.Mobile.dll" />
         <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
 		<Portable158Libs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\BrightstarDB.Portable.dll" />
