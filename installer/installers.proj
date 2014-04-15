@@ -90,9 +90,6 @@
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <Net40Dep Include="..\src\lib\unused_dependencies\*.dll;..\src\lib\Remotion.Linq.dll" />
       <WP71Sdk Include="..\src\mobile\BrightstarDB.Mobile\bin\$(Configuration)\*.dll"/>
-      <WP71Dep Include="..\src\mobile\lib\Newtonsoft.Json.dll;
-			..\src\mobile\lib\Polenter.SharpSerializer.Silverlight.dll;
-			..\src\mobile\lib\System.Threading.Tasks.dll"/>
 	  <Service Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.dll"/>
 	  <ServiceAssets Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\assets\**\*.*"/>
 	  <ServiceViews Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\views\**\*.*"/>
@@ -128,7 +125,6 @@
     <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\SDK\NET40"/>
     <Copy SourceFiles="@(Net40Dep)" DestinationFolder="InstallerTmp\SDK\NET40"/>
     <Copy SourceFiles="@(WP71Sdk)" DestinationFolder="InstallerTmp\SDK\WP71"/>
-    <Copy SourceFiles="@(WP71Dep)" DestinationFolder="InstallerTmp\SDK\WP71"/>
     <Copy SourceFiles="@(Docs)" DestinationFolder="InstallerTmp\Docs"/>
     <Copy SourceFiles="@(VisualStudio)" DestinationFolder="InstallerTmp\VisualStudio"/>
     <Copy SourceFiles="@(Root)" DestinationFolder="InstallerTmp"/>
