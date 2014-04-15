@@ -24,6 +24,8 @@ marked with FIX.
   
   - FIX: SPARQL endpoint connection strings now default the store name to "sparql". Thanks to 
          feugen24 for raising the bug report.
+         
+  - FIX: Fixed sample projects included in the MSI installer. Thanks to aleblanc70 for the bug report.
   
   - NEW: Added platform-specific default configuration settings and removed dependency on 
          third-party System.Threading.Tasks.dll from Windows Phone build.
