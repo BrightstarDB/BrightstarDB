@@ -13,6 +13,21 @@ This section gives a brief outline of what is new / changed in each official rel
 either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
 marked with FIX.
 
+***************************
+ BrightstarDB 1.6.1 Release
+***************************
+
+  - FIX: Restored default logging configuration for BrightstarDB service
+  
+  - FIX: Fix for wildcard delete patterns in a transaction processed against a SPARQL endpoint.
+         Thanks to feugen24 for the bug report and suggested fix.
+  
+  - FIX: SPARQL endpoint connection strings now default the store name to "sparql". Thanks to 
+         feugen24 for raising the bug report.
+  
+  - NEW: Added platform-specific default configuration settings and removed dependency on 
+         third-party System.Threading.Tasks.dll from Windows Phone build.
+         
 *************************
  BrightstarDB 1.6 Release
 *************************
