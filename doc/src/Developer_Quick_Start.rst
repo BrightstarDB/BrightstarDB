@@ -143,7 +143,7 @@ concludes by showing how to query the database using LINQ::
 
 
               // open a new context, not required
-              ctx = new MyEntityContext(store);
+              ctx = new MyEntityContext(connectionString);
 
 
               // find an actor via LINQ
