@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BrightstarDB\Compatibilty\PathSeparatorProvider.cs" />
+    <Compile Include="BrightstarDB\ConfigurationProvider.cs" />
     <Compile Include="BrightstarDB\Storage\PersistenceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

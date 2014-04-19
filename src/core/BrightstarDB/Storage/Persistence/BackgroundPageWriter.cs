@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
+#elif WINDOWS_PHONE
+using BrightstarDB.Mobile.Compatibility;
 #else
 using System.Collections.Concurrent;
 #endif

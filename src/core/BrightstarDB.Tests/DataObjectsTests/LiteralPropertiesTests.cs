@@ -10,6 +10,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
         [Test]
         public void TestOverwriteSingleProperty()
         {
+            BrightstarDB.Configuration.PageCacheSize = 0; // Force non-new pages to be evicted from the cache
             string storeName = "OverwriteSingleProperty_" + DateTime.Now.Ticks;
             var store = GetDataObjectStore(storeName);
 
@@ -46,7 +47,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
 
         private static IDataObjectStore GetDataObjectStore(string storeName)
         {
-            var context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
+            var context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation));
             if (!context.DoesStoreExist(storeName))
             {
                 return context.CreateStore(storeName);

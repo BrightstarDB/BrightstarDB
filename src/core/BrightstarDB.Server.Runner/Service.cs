@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
+using CommandLine;
 using Nancy.Hosting.Self;
 
 namespace BrightstarDB.Server.Runner
@@ -16,7 +18,7 @@ namespace BrightstarDB.Server.Runner
         protected override void OnStart(string[] args)
         {
             var serviceArgs = new ServiceArgs();
-            CommandLine.Parser.ParseArguments(args, serviceArgs); // TODO: parser error reporting should not go to console
+            Parser.ParseArguments(args, serviceArgs, new ErrorReporter(s=>Logging.BrightstarTraceSource.TraceEvent(TraceEventType.Error, (int)ServerEventId.InvalidArguments, s)));
             var bootstrapper = ServiceBootstrap.GetBootstrapper(serviceArgs);
             _nancyHost = new NancyHost(bootstrapper, 
                 new HostConfiguration{AllowChunkedEncoding = false},

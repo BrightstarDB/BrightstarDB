@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-#if !PORTABLE
+#if !PORTABLE && !WINDOWS_PHONE
 using System.Threading.Tasks;
 #endif
 using BrightstarDB.Dto;
@@ -302,7 +302,7 @@ namespace BrightstarDB.Client
                 streamFormat = _serverCore.Query(commitPoint.StoreName, commitPoint.Id, queryExpression, defaultGraphUris, resultsFormat, graphFormat, pStream);
                 return new MemoryStream(pStream.ToArray());
             }
-#if !PORTABLE
+#if !PORTABLE && !WINDOWS_PHONE
             catch (AggregateException aggregateException)
             {
                 Logging.LogError(BrightstarEventId.ServerCoreException,

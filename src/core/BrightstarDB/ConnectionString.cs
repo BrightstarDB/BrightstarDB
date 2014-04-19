@@ -22,6 +22,7 @@ namespace BrightstarDB
         private const string DnrStorageServerName = "storageserver";
         private const string UserNamePropertyName = "username";
         private const string PasswordPropertyName = "password";
+        private const string DefaultSparqlStoreName = "sparql";
 
         private readonly Dictionary<string, string> _values;
         private readonly string _rawValue; 
@@ -88,6 +89,7 @@ namespace BrightstarDB
             else if (type.Equals("sparql"))
             {
                 Type = ConnectionType.Sparql;
+                _values[StoreNamePropertyName] = DefaultSparqlStoreName;
                 RequiredProperty(DnrQueryName);
             }
             else

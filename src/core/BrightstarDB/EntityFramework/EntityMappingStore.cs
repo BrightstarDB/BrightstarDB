@@ -80,10 +80,16 @@ namespace BrightstarDB.EntityFramework
             {
                 return prefix;
             }
+
             if (_interfaceMappings.TryGetValue(mappedType, out interfaceType) &&
                 _identifierPrefixes.TryGetValue(interfaceType, out prefix))
             {
                 return prefix;
+            }
+
+            foreach (var iface in mappedType.GetInterfaces())
+            {
+                if (_identifierPrefixes.TryGetValue(iface, out prefix)) return prefix;
             }
             return null;
         }

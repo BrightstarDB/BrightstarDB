@@ -51,5 +51,8 @@
         UndefinedWarning = 10000,
         // Store warnings 10001 - 10500
         StorePerformanceWarning = 10001,
+
+        // 11000 - 12000 Reserved for server / server runner
+
     }
 }

@@ -354,6 +354,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public BaseEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public BaseEntity() : base() { }
+    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IBaseEntity
     
     	public System.String BaseStringValue

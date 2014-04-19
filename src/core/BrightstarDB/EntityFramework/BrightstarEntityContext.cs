@@ -78,7 +78,7 @@ namespace BrightstarDB.EntityFramework
 
         private static void AssertStoreFromConnectionString(ConnectionString connectionString)
         {
-            if (connectionString.Type == ConnectionType.DotNetRdf)
+            if (connectionString.Type == ConnectionType.DotNetRdf || connectionString.Type == ConnectionType.Sparql)
             {
                 return;
             }
@@ -131,6 +131,11 @@ namespace BrightstarDB.EntityFramework
                     context = BrightstarService.GetDataObjectContext(connectionString);
                     //context = new DotNetRdfDataObjectContext(connectionString);
                     break;
+
+                case ConnectionType.Sparql:
+                    context = BrightstarService.GetDataObjectContext(connectionString);
+                    break;
+
                 default:
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value);
