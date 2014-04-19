@@ -13,7 +13,7 @@
   </PropertyGroup>  
 
   <Target Name="BuildSDK">
-    <MSBuild Projects="..\installer\installers.proj" Targets="BuildSdk" />    
+    <MSBuild Projects="..\installer\installers.proj" Targets="SamplesSDK" />    
   </Target>
 
   <Target Name="SDK" DependsOnTargets="BuildSDK">
@@ -32,7 +32,7 @@
     <Copy SourceFiles="@(MobileDllsToCopy)" DestinationFolder="SDK\WP71"/>
   </Target>
   
-  <Target Name="CopySdkFiles">
+  <Target Name="CopySdkFiles" DependsOnTargets="BuildSDK">
     <MakeDir Directories="SDK;SDK\net40;SDK\WP71"/>
     
     <!-- delete dlls -->

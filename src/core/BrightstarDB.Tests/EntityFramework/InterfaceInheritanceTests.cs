@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using BrightstarDB.EntityFramework;
-using BrightstarDB.Server.Modules;
 using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
