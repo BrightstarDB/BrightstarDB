@@ -304,18 +304,19 @@ namespace BrightstarDB.Server
         /// Queue a txn job.
         /// </summary>
         /// <param name="preconditions">The triples that must be present for txn to succeed</param>
+        /// <param name="notExistsPreconditions">The triples that must not be present for txn to succeed</param>
         /// <param name="deletePatterns"></param>
         /// <param name="insertData"></param>
         /// <param name="defaultGraphUri"></param>
         /// <param name="format"></param>
         /// <param name="jobLabel"></param>
         /// <returns></returns>
-        public Guid ProcessTransaction(string preconditions, string deletePatterns, string insertData, string defaultGraphUri, string format, string jobLabel= null)
+        public Guid ProcessTransaction(string preconditions, string notExistsPreconditions, string deletePatterns, string insertData, string defaultGraphUri, string format, string jobLabel= null)
         {
             Logging.LogDebug("ProcessTransaction");
             var jobId = Guid.NewGuid();
-            var job = new UpdateTransaction(jobId, jobLabel, this, preconditions, deletePatterns, insertData,
-                                            defaultGraphUri);
+            var job = new GuardedUpdateTransaction(jobId, jobLabel, this, preconditions, notExistsPreconditions,
+                                                   deletePatterns, insertData, defaultGraphUri);
             QueueJob(job);
             return jobId;
         }

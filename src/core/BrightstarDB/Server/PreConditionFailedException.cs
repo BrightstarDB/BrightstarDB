@@ -7,14 +7,32 @@ namespace BrightstarDB.Server
 #endif
     internal class PreconditionFailedException : BrightstarInternalException
     {
-        public int FailureCount { get; private set; }
-        public string FailedTriples { get; private set; }
-
-        public PreconditionFailedException(int failureCount, string failedNTriples) : base("Transaction preconditions were not met.\n" + failedNTriples)
+        public int ExistanceFailureCount { get; private set; }
+        public string ExistanceFailedTriples { get; private set; }
+        public int NonExistanceFailureCount { get; private set; }
+        public string NonExistanceFailedTriples { get; private set; }
+        private string _msg;
+        
+        public PreconditionFailedException(int existancePreconditionFailureCount, string existancePreconditionFailedNTriples,
+            int nonExistancePreconditionFailureCount, string nonExistancePreconditionFailedNTriples) : base(Strings.PreconditionFailedBasicMessage)
         {
-            FailureCount = failureCount;
-            FailedTriples = failedNTriples;
+            ExistanceFailureCount = existancePreconditionFailureCount;
+            ExistanceFailedTriples = existancePreconditionFailedNTriples;
+            NonExistanceFailureCount = nonExistancePreconditionFailureCount;
+            NonExistanceFailedTriples = nonExistancePreconditionFailedNTriples;
+            _msg = String.Format(Strings.PreconditionFailedFullMessage, existancePreconditionFailureCount,
+                              existancePreconditionFailedNTriples, nonExistancePreconditionFailureCount,
+                              nonExistancePreconditionFailedNTriples);
+
         }
 
+        public override string Message
+        {
+            get
+            {
+                return _msg;
+            }
+        }
     }
+
 }

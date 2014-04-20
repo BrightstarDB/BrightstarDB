@@ -66,12 +66,13 @@ namespace BrightstarDB.Server
                 Logging.LogInfo("UpdateTransaction {0} - processing preconditions", JobId);
                 try
                 {
-                    var preconditionSink = new PreconditionSink(writeStore);
+                    var preconditionSink = new PreconditionSink(writeStore, PreconditionSink.PreconditionType.ExistsPrecondition);
                     var parser = new NTriplesParser();
                     parser.Parse(new StringReader(_preconditions), preconditionSink, _defaultGraphUri);
                     if (preconditionSink.FailedPreconditionCount > 0)
                     {
-                        throw new PreconditionFailedException(preconditionSink.FailedPreconditionCount, preconditionSink.GetFailedPreconditions());
+                        throw new PreconditionFailedException(preconditionSink.FailedPreconditionCount, preconditionSink.GetFailedPreconditions(),
+                            0, String.Empty);
                     }
                 }
                 catch (RdfParserException parserException)
@@ -122,7 +123,7 @@ namespace BrightstarDB.Server
             catch (PreconditionFailedException ex)
             {
                 StoreWorker.TransactionLog.LogEndFailedTransaction(this);
-                Logging.LogInfo("Preconditions failed in UpdateTransaction ({0}): Count={1}, Triples={2}", JobId, ex.FailureCount, ex.FailedTriples);
+                Logging.LogInfo("Preconditions failed in UpdateTransaction ({0}): Count={1}, Triples={2}", JobId, ex.ExistanceFailureCount, ex.ExistanceFailedTriples);
                 throw;
             }
             catch (BrightstarClientException ex)

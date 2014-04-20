@@ -265,10 +265,10 @@ namespace BrightstarDB.Server
         #endregion
 
 
-        public Guid ProcessTransaction(string storeName, string preconditions, string deletePatterns, string insertData, string defaultGraphUri, string jobLabel = null)
+        public Guid ProcessTransaction(string storeName, string preconditions, string notExistsPreconditions, string deletePatterns, string insertData, string defaultGraphUri, string jobLabel = null)
         {
             var storeWorker = GetStoreWorker(storeName);
-            return storeWorker.ProcessTransaction(preconditions, deletePatterns, insertData, defaultGraphUri, "nt", jobLabel);
+            return storeWorker.ProcessTransaction(preconditions, notExistsPreconditions, deletePatterns, insertData, defaultGraphUri, "nt", jobLabel);
         }
 
         public Guid Import(string storeName, string contentFileName, string graphUri, string jobLabel = null)
