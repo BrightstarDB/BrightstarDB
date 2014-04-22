@@ -28,7 +28,7 @@ namespace BrightstarDB.Server.Modules
                                                                                                            1);
                             ICommitPointInfo commit = commitPoints.FirstOrDefault();
                             return
-                                Negotiate.WithHeader("Last-Modified", commit.CommitTime.ToString("r"))
+                                Negotiate.WithHeader("Last-Modified", commit.CommitTime.ToUniversalTime().ToString("r"))
                                          .WithStatusCode(HttpStatusCode.OK)
                                          .WithModel(new StoreResponseModel(parameters["storeName"]));
                         }
