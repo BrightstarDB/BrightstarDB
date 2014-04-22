@@ -110,8 +110,8 @@ namespace BrightstarDB.Server
                 Logging.LogInfo(
                     "Preconditions failed in GuardedUpdateTransaction ({0}): Count={1}.\nMissing Triples:\n{2}\nUnexpectedTriples:\n{3}",
                     JobId,
-                    ex.ExistanceFailureCount + ex.NonExistanceFailureCount, ex.ExistanceFailedTriples,
-                    ex.NonExistanceFailedTriples);
+                    ex.ExistenceFailureCount + ex.NonExistenceFailureCount, ex.ExistenceFailedTriples,
+                    ex.NonExistenceFailedTriples);
                 throw;
             }
             catch (BrightstarClientException ex)

@@ -294,6 +294,7 @@ namespace BrightstarDB.Server.IntegrationTests
             catch (TransactionPreconditionsFailedException ex)
             {
                 // Expected
+                Assert.That(ex.InvalidSubjects, Is.Not.Null);
                 Assert.AreEqual(1, ex.InvalidSubjects.Count());
                 Assert.AreEqual("http://example.org/alice", ex.InvalidSubjects.First());
             }

@@ -348,13 +348,43 @@ namespace BrightstarDB.Client
         {
             try
             {
-                var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData,
+                var jobId = _serverCore.ProcessTransaction(storeName, preconditions, String.Empty,
+                                                           deletePatterns, insertData,
                                                            defaultGraphUri, label);
                 return new JobInfoObject(jobId, label);
             }
             catch (Exception ex)
             {
                 Logging.LogError(BrightstarEventId.ServerCoreException, "Error Queing Transaction {0} {1} {2}", storeName, deletePatterns, insertData);
+                throw new BrightstarClientException("Error queing transaction in store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="updateTransaction">The update transaction data</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
+        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        public IJobInfo ExecuteTransaction(string storeName, UpdateTransactionData updateTransaction,
+                                           string label = null)
+        {
+            try
+            {
+                var jobId = _serverCore.ProcessTransaction(storeName,
+                                                           updateTransaction.ExistencePreconditions,
+                                                           updateTransaction.NonexistencePreconditions,
+                                                           updateTransaction.DeletePatterns,
+                                                           updateTransaction.InsertData,
+                                                           updateTransaction.DefaultGraphUri,
+                                                           label);
+                return new JobInfoObject(jobId, label);
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error Queing Transaction {0} {1} {2}",
+                                 storeName, updateTransaction.DeletePatterns, updateTransaction.InsertData);
                 throw new BrightstarClientException("Error queing transaction in store " + storeName + ". " + ex.Message, ex);
             }
         }
@@ -370,19 +400,52 @@ namespace BrightstarDB.Client
         /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
         /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>Job Info</returns>
-        public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, 
-            string defaultGraphUri, bool waitForCompletion = true, string label = null)
+        public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
+                                           string insertData,
+                                           string defaultGraphUri, bool waitForCompletion = true, string label = null)
+        {
+            return ExecuteTransaction(storeName,
+                                      new UpdateTransactionData
+                                          {
+                                              ExistencePreconditions = preconditions,
+                                              NonexistencePreconditions = String.Empty,
+                                              DeletePatterns = deletePatterns,
+                                              InsertData = insertData,
+                                              DefaultGraphUri = defaultGraphUri
+                                          },
+                                      waitForCompletion, label);
+        }
+
+
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="updateTransaction">The update transaction data</param>
+        /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
+        public IJobInfo ExecuteTransaction(string storeName, UpdateTransactionData updateTransaction,
+                                           bool waitForCompletion = true, string label = null)
         {
             try
             {
                 if (!waitForCompletion)
                 {
-                    var jobId = _serverCore.ProcessTransaction(storeName, preconditions, deletePatterns, insertData, defaultGraphUri, label);
+                    var jobId = _serverCore.ProcessTransaction(storeName, updateTransaction.ExistencePreconditions,
+                                                               updateTransaction.NonexistencePreconditions,
+                                                               updateTransaction.DeletePatterns,
+                                                               updateTransaction.InsertData,
+                                                               updateTransaction.DefaultGraphUri, label);
                     return new JobInfoObject(jobId, label);
                 }
                 else
                 {
-                    var jobId = _serverCore.ProcessTransaction(storeName,preconditions, deletePatterns, insertData, defaultGraphUri, label);
+                    var jobId = _serverCore.ProcessTransaction(storeName, updateTransaction.ExistencePreconditions,
+                                                               updateTransaction.NonexistencePreconditions,
+                                                               updateTransaction.DeletePatterns,
+                                                               updateTransaction.InsertData,
+                                                               updateTransaction.DefaultGraphUri, label);
                     JobExecutionStatus status = _serverCore.GetJobStatus(storeName, jobId.ToString());
                     while (status.JobStatus != JobStatus.CompletedOk && status.JobStatus != JobStatus.TransactionError)
                     {
@@ -394,8 +457,10 @@ namespace BrightstarDB.Client
             }
             catch (Exception ex)
             {
-                Logging.LogError(BrightstarEventId.ServerCoreException, "Error Queing Transaction {0} {1} {2}", storeName, deletePatterns, insertData);
-                throw new BrightstarClientException("Error queing transaction in store " + storeName + ". " + ex.Message, ex);
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error Queing Transaction {0} {1} {2}",
+                                 storeName, updateTransaction.DeletePatterns, updateTransaction.InsertData);
+                throw new BrightstarClientException(
+                    "Error queing transaction in store " + storeName + ". " + ex.Message, ex);
             }
         }
 #endif

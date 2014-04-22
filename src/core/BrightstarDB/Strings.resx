@@ -261,7 +261,7 @@
     <comment>Short message for PreconditionFailedException</comment>
   </data>
   <data name="PreconditionFailedFullMessage" xml:space="preserve">
-    <value>Transaction preconditions failed.\n{0} existance preconditions failed:\n{1}\n{2} non-existance preconditions failed:\n{3}</value>
+    <value>Transaction preconditions failed. {0} existence preconditions failed. {1} non-existence preconditions failed.</value>
     <comment>Detailed message for PreconditionFailedException.</comment>
   </data>
 </root>

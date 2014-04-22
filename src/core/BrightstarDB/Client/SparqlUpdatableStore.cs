@@ -48,10 +48,11 @@ namespace BrightstarDB.Client
             //return new MemoryStream(Encoding.UTF8.GetBytes(buff.ToString()), false);
         }
 
-        public void ApplyTransaction(IList<Triple> preconditions, IList<Triple> deletePatterns, IList<Triple> inserts,
+        public void ApplyTransaction(IList<Triple> existencePreconditions, IList<Triple> nonexistencePreconditions,
+                                     IList<Triple> deletePatterns, IList<Triple> inserts,
                                      string updateGraphUri)
         {
-            if (preconditions.Count > 0)
+            if (existencePreconditions.Count > 0 || nonexistencePreconditions.Count > 0)
             {
                 throw new NotSupportedException("SparqlDataObjectStore does not support conditional updates");
             }

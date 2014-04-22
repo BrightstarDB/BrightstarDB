@@ -123,7 +123,7 @@ namespace BrightstarDB.Server
             catch (PreconditionFailedException ex)
             {
                 StoreWorker.TransactionLog.LogEndFailedTransaction(this);
-                Logging.LogInfo("Preconditions failed in UpdateTransaction ({0}): Count={1}, Triples={2}", JobId, ex.ExistanceFailureCount, ex.ExistanceFailedTriples);
+                Logging.LogInfo("Preconditions failed in UpdateTransaction ({0}): Count={1}, Triples={2}", JobId, ex.ExistenceFailureCount, ex.ExistenceFailedTriples);
                 throw;
             }
             catch (BrightstarClientException ex)

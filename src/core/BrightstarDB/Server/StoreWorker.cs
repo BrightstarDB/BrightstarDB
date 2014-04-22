@@ -163,7 +163,7 @@ namespace BrightstarDB.Server
                                                  ex);
                                 jobExecutionStatus.Information = job.ErrorMessage ?? "Job Error";
                                 jobExecutionStatus.Ended = DateTime.UtcNow;
-                                jobExecutionStatus.ExceptionDetail = new ExceptionDetailObject(ex);
+                                jobExecutionStatus.ExceptionDetail = GetExceptionDetail(ex);
                                 jobExecutionStatus.JobStatus = JobStatus.TransactionError;
                             }
                             finally
@@ -197,6 +197,16 @@ namespace BrightstarDB.Server
                                      "Unexpected exception caught in processing Shutdown continuation: {0}", ex);
                 }
             }
+        }
+
+        private static ExceptionDetailObject GetExceptionDetail(Exception ex)
+        {
+            if (ex is PreconditionFailedException)
+            {
+                var pfe = ex as PreconditionFailedException;
+                return pfe.AsExceptionDetailObject();
+            }
+            return new ExceptionDetailObject(ex);
         }
 
         public IEnumerable<JobExecutionStatus> GetJobs()
@@ -350,7 +360,7 @@ namespace BrightstarDB.Server
                                   if (_jobExecutionStatus.TryGetValue(id.ToString(), out jobExecutionStatus))
                                   {
                                       jobExecutionStatus.Information = "Export failed";
-                                      jobExecutionStatus.ExceptionDetail = new ExceptionDetailObject(ex);
+                                      jobExecutionStatus.ExceptionDetail = GetExceptionDetail(ex);
                                       jobExecutionStatus.JobStatus = JobStatus.TransactionError;
                                       jobExecutionStatus.Ended = DateTime.UtcNow;
                                   }

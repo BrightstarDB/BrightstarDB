@@ -466,7 +466,7 @@ namespace BrightstarDB {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Transaction preconditions failed.\n{0} existance preconditions failed:\n{1}\n{2} non-existance preconditions failed:\n{3}.
+        ///   Looks up a localized string similar to Transaction preconditions failed. {0} existence preconditions failed. {1} non-existence preconditions failed..
         /// </summary>
         internal static string PreconditionFailedFullMessage {
             get {

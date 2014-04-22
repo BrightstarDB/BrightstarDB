@@ -26,34 +26,28 @@ namespace BrightstarDB.Client
             return _client.ExecuteQuery(_storeName, queryExpression, datasetGraphUris);
         }
 
-        public void ApplyTransaction(IList<Triple> preconditions, IList<Triple> deletePatterns, IList<Triple> inserts, 
-            string updateGraphUri )
+        public void ApplyTransaction(IList<Triple> existencePreconditions, IList<Triple> nonexistencePreconditions, 
+            IList<Triple> deletePatterns, IList<Triple> inserts, string updateGraphUri)
         {
-            var deleteData = new StringWriter();
-            var dw = new BrightstarTripleSinkAdapter(new NQuadsWriter(deleteData));
-            foreach (Triple triple in deletePatterns)
-            {
-                dw.Triple(triple);
-            }
-            deleteData.Close();
+            var existencePreconditionsData = SerializeTriples(existencePreconditions);
+            var nonexistencePreconditionsData = SerializeTriples(nonexistencePreconditions);
+            var deleteData = SerializeTriples(deletePatterns);
+            var addData = SerializeTriples(inserts);
 
-            var addData = new StringWriter();
-            var aw = new BrightstarTripleSinkAdapter(new NQuadsWriter(addData));
-            foreach (Triple triple in inserts)
-            {
-                aw.Triple(triple);
-            }
-            addData.Close();
+            PostTransaction(existencePreconditionsData, nonexistencePreconditionsData, deleteData, addData,
+                            updateGraphUri);
+        }
 
-            var preconditionsData = new StringWriter();
-            var pw = new BrightstarTripleSinkAdapter(new NQuadsWriter(preconditionsData));
-            foreach (var triple in preconditions)
+        private static string SerializeTriples(IEnumerable<Triple> triples)
+        {
+            if (triples == null) return string.Empty;
+            using (var writer = new StringWriter())
             {
-                pw.Triple(triple);
+                var sink = new BrightstarTripleSinkAdapter(new NQuadsWriter(writer));
+                foreach(var t in triples) sink.Triple(t);
+                writer.Close();
+                return writer.ToString();
             }
-            preconditionsData.Close();
-
-            PostTransaction(preconditionsData.ToString(), deleteData.ToString(), addData.ToString(), updateGraphUri);
         }
 
         public void Cleanup()
@@ -61,9 +55,17 @@ namespace BrightstarDB.Client
             // Nothing to do
         }
 
-        private void PostTransaction(string preconditions, string patternsToDelete, string triplesToAdd, string defaultGraphUri)
+        private void PostTransaction(string existencePreconditions, string nonexistencePreconditions, string patternsToDelete, string triplesToAdd, string defaultGraphUri)
         {
-            var jobInfo = _client.ExecuteTransaction(_storeName, preconditions, patternsToDelete, triplesToAdd, defaultGraphUri);
+            var jobInfo = _client.ExecuteTransaction(_storeName,
+                                                     new UpdateTransactionData
+                                                         {
+                                                             ExistencePreconditions = existencePreconditions,
+                                                             NonexistencePreconditions = nonexistencePreconditions,
+                                                             DeletePatterns = patternsToDelete,
+                                                             InsertData = triplesToAdd,
+                                                             DefaultGraphUri = defaultGraphUri
+                                                         });
 
             while (!(jobInfo.JobCompletedOk || jobInfo.JobCompletedWithErrors))
             {
@@ -82,8 +84,7 @@ namespace BrightstarDB.Client
                 // if (jobInfo.ExceptionInfo.Type == typeof(Server.PreconditionFailedException).FullName)
                 if (jobInfo.ExceptionInfo != null && jobInfo.ExceptionInfo.Type == "BrightstarDB.Server.PreconditionFailedException")
                 {
-                    var triples = jobInfo.ExceptionInfo.Message.Substring(jobInfo.ExceptionInfo.Message.IndexOf('\n') + 1);
-                    throw new TransactionPreconditionsFailedException(triples);
+                    throw TransactionPreconditionsFailedException.FromExceptionDetail(jobInfo.ExceptionInfo);
                 }
                 throw new BrightstarClientException("Error processing update transaction. " + jobInfo.StatusMessage);
             }

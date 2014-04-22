@@ -45,7 +45,8 @@ namespace BrightstarDB.Server.Modules
                     }
                     var job = brightstarService.GetJobInfo(request.StoreName, request.JobId);
                     if (job == null) return HttpStatusCode.NotFound;
-                    return job.MakeResponseObject(request.StoreName);
+                    var responseDto = job.MakeResponseObject(request.StoreName);
+                    return responseDto;
                 };
 
             Post["/{storeName}/jobs"] = parameters =>
@@ -176,6 +177,10 @@ namespace BrightstarDB.Server.Modules
                                 var preconditions = jobRequestObject.JobParameters.ContainsKey("Preconditions")
                                                         ? jobRequestObject.JobParameters["Preconditions"]
                                                         : null;
+                                var nonexistence =
+                                    jobRequestObject.JobParameters.ContainsKey("NonexistencePreconditions")
+                                        ? jobRequestObject.JobParameters["NonexistencePreconditions"]
+                                        : null;
                                 var deletePatterns = jobRequestObject.JobParameters.ContainsKey("Deletes")
                                                          ? jobRequestObject.JobParameters["Deletes"]
                                                          : null;
@@ -189,9 +194,14 @@ namespace BrightstarDB.Server.Modules
                                         : null;
 
                                 queuedJobInfo = brightstarService.ExecuteTransaction(
-                                    storeName, preconditions,
-                                    deletePatterns, insertTriples,
-                                    defaultGraphUri,
+                                    storeName, new UpdateTransactionData
+                                        {
+                                            ExistencePreconditions = preconditions,
+                                            NonexistencePreconditions = nonexistence,
+                                            DeletePatterns = deletePatterns,
+                                            InsertData = insertTriples,
+                                            DefaultGraphUri = defaultGraphUri
+                                        },
                                     false,
                                     label);
                                 break;

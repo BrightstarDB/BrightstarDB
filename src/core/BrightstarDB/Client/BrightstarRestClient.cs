@@ -500,7 +500,7 @@ namespace BrightstarDB.Client
         }
 
 #if PORTABLE
-                /// <summary>
+        /// <summary>
         /// Execute an update transaction.
         /// </summary>
         /// <param name="storeName">The name of the store to modify</param>
@@ -515,9 +515,27 @@ namespace BrightstarDB.Client
         public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
                                            string insertData, string defaultGraphUri, string label = null)
         {
+            return ExecuteTransaction(storeName,
+                                      new UpdateTransactionData
+                                          {
+                                              ExistencePreconditions = preconditions,
+                                              DeletePatterns = deletePatterns,
+                                              InsertData = insertData,
+                                              DefaultGraphUri = defaultGraphUri
+                                          }, label);
+        }
+
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="updateTransaction">The update transaction data</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
+        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        public IJobInfo ExecuteTransaction(string storeName, UpdateTransactionData updateTransaction, string label)
+        {
             ValidateStoreName(storeName);
-            var transactionJob = JobRequestObject.CreateTransactionJob(preconditions, deletePatterns, insertData,
-                                                                       defaultGraphUri, label);
+            var transactionJob = JobRequestObject.CreateTransactionJob(updateTransaction, label);
             var jobUri = CreateJob(storeName, transactionJob);
             var jobInfoResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobInfoResponse);
@@ -536,13 +554,38 @@ namespace BrightstarDB.Client
         /// <returns>Job Info</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="storeName"/> is NULL</exception>
         /// <exception cref="ArgumentException">If <paramref name="storeName"/> is an empty string or not a valid store name</exception>
+        [Obsolete("This method has been superceeded by " +
+                  "ExecuteTransaction(storeName, existencePreconditions, nonexistencePreconditions, " +
+                  "deletePatterns, insertData, defaultGraphUri, waitForCompletion, label)")]
         public IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns,
                                            string insertData, string defaultGraphUri, bool waitForCompletion = true,
             string label = null)
         {
+            return ExecuteTransaction(storeName,
+                                      new UpdateTransactionData
+                                          {
+                                              ExistencePreconditions = preconditions,
+                                              NonexistencePreconditions = String.Empty,
+                                              DeletePatterns = deletePatterns,
+                                              InsertData = insertData,
+                                              DefaultGraphUri = defaultGraphUri
+                                          }, waitForCompletion, label);
+        }
+
+
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="updateTransaction">The update transaction data</param>
+        /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
+        public IJobInfo ExecuteTransaction(string storeName, UpdateTransactionData updateTransaction,
+                                           bool waitForCompletion = true, string label = null)
+        {
             ValidateStoreName(storeName);
-            var transactionJob = JobRequestObject.CreateTransactionJob(preconditions, deletePatterns, insertData,
-                                                                       defaultGraphUri, label);
+            var transactionJob = JobRequestObject.CreateTransactionJob(updateTransaction, label);
             var jobUri = CreateJob(storeName, transactionJob);
             if (waitForCompletion)
             {

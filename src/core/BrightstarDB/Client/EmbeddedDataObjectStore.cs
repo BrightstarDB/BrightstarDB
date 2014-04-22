@@ -160,10 +160,8 @@ namespace BrightstarDB.Client
             {
                 if (status.ExceptionDetail.Type.Equals(typeof(PreconditionFailedException).FullName))
                 {
-                    var failedTriples =
-                        status.ExceptionDetail.Message.Substring(status.ExceptionDetail.Message.IndexOf("\n") + 1);
                     Preconditions.Clear();
-                    throw new TransactionPreconditionsFailedException(failedTriples);
+                    throw TransactionPreconditionsFailedException.FromExceptionDetail(status.ExceptionDetail);
                 }
                 throw new BrightstarClientException(status.ExceptionDetail != null  && !String.IsNullOrEmpty(status.ExceptionDetail.Message) ? status.ExceptionDetail.Message : "The transaction encountered an error");
             }

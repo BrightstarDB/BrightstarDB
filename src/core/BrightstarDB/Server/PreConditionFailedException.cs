@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using BrightstarDB.Dto;
 
 namespace BrightstarDB.Server
 {
@@ -7,23 +9,20 @@ namespace BrightstarDB.Server
 #endif
     internal class PreconditionFailedException : BrightstarInternalException
     {
-        public int ExistanceFailureCount { get; private set; }
-        public string ExistanceFailedTriples { get; private set; }
-        public int NonExistanceFailureCount { get; private set; }
-        public string NonExistanceFailedTriples { get; private set; }
-        private string _msg;
+        public int ExistenceFailureCount { get; private set; }
+        public string ExistenceFailedTriples { get; private set; }
+        public int NonExistenceFailureCount { get; private set; }
+        public string NonExistenceFailedTriples { get; private set; }
+        private readonly string _msg;
         
         public PreconditionFailedException(int existancePreconditionFailureCount, string existancePreconditionFailedNTriples,
             int nonExistancePreconditionFailureCount, string nonExistancePreconditionFailedNTriples) : base(Strings.PreconditionFailedBasicMessage)
         {
-            ExistanceFailureCount = existancePreconditionFailureCount;
-            ExistanceFailedTriples = existancePreconditionFailedNTriples;
-            NonExistanceFailureCount = nonExistancePreconditionFailureCount;
-            NonExistanceFailedTriples = nonExistancePreconditionFailedNTriples;
-            _msg = String.Format(Strings.PreconditionFailedFullMessage, existancePreconditionFailureCount,
-                              existancePreconditionFailedNTriples, nonExistancePreconditionFailureCount,
-                              nonExistancePreconditionFailedNTriples);
-
+            ExistenceFailureCount = existancePreconditionFailureCount;
+            ExistenceFailedTriples = existancePreconditionFailedNTriples;
+            NonExistenceFailureCount = nonExistancePreconditionFailureCount;
+            NonExistenceFailedTriples = nonExistancePreconditionFailedNTriples;
+            _msg = String.Format(Strings.PreconditionFailedFullMessage, existancePreconditionFailureCount, nonExistancePreconditionFailureCount);
         }
 
         public override string Message
@@ -32,6 +31,15 @@ namespace BrightstarDB.Server
             {
                 return _msg;
             }
+        }
+
+        public ExceptionDetailObject AsExceptionDetailObject()
+        {
+            return new ExceptionDetailObject(this, new Dictionary<string, string>
+                {
+                    {"existenceFailedTriples", ExistenceFailedTriples},
+                    {"nonexistenceFailedTriples", NonExistenceFailedTriples}
+                });
         }
     }
 
