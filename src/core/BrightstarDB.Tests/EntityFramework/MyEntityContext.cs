@@ -14,10 +14,10 @@ using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
 
+using System.Text;
 using System.ComponentModel;
 using BrightstarDB.Rdf;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace BrightstarDB.Tests.EntityFramework 
 {
@@ -32,6 +32,8 @@ namespace BrightstarDB.Tests.EntityFramework
     		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IAnimal, BrightstarDB.Tests.EntityFramework.Animal>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IArticle));
     		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IArticle, BrightstarDB.Tests.EntityFramework.Article>();
+    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IStringKeyEntity));
+    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IStringKeyEntity, BrightstarDB.Tests.EntityFramework.StringKeyEntity>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IBaseEntity));
     		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IBaseEntity, BrightstarDB.Tests.EntityFramework.BaseEntity>();
     		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ICompany));
@@ -145,6 +147,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
     		Animals = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IAnimal>(this);
     		Articles = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IArticle>(this);
+    		StringKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IStringKeyEntity>(this);
     		BaseEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IBaseEntity>(this);
     		Companies = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ICompany>(this);
     		Concepts = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IConcept>(this);
@@ -173,6 +176,11 @@ namespace BrightstarDB.Tests.EntityFramework
     	}
     	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.IArticle> Articles
+    	{
+    		get; private set;
+    	}
+    	
+    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IStringKeyEntity> StringKeyEntities
     	{
     		get; private set;
     	}
@@ -343,6 +351,30 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
             		get { return GetRelatedProperty<System.DateTime>("LastModified"); }
             		set { SetRelatedProperty("LastModified", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
+    public partial class StringKeyEntity : BrightstarEntityObject, IStringKeyEntity 
+    {
+    	public StringKeyEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public StringKeyEntity() : base() { }
+    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.IStringKeyEntity
+    
+    	public System.String Name
+    	{
+            		get { return GetRelatedProperty<System.String>("Name"); }
+            		set { SetRelatedProperty("Name", value); }
+    	}
+    
+    	public System.String Description
+    	{
+            		get { return GetRelatedProperty<System.String>("Description"); }
+            		set { SetRelatedProperty("Description", value); }
     	}
     	#endregion
     }

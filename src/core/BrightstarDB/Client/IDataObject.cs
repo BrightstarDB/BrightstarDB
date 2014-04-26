@@ -174,5 +174,13 @@ namespace BrightstarDB.Client
         /// Removes this data object from the store
         /// </summary>
         void Delete();
+
+        /// <summary>
+        /// Change the URI identifier for this data object.
+        /// </summary>
+        /// <remarks>This change will update all triples where the data object identity
+        /// is the subject or object. It will not change predicates.</remarks>
+        /// <param name="newIdentity">The new URI identifier</param>
+        IDataObject UpdateIdentity(string newIdentity);
     }
 }

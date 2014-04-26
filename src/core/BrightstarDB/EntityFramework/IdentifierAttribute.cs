@@ -12,6 +12,24 @@ namespace BrightstarDB.EntityFramework
         /// Get or set the base address URI used by the decorated property
         /// </summary>
         public string BaseAddress { get; set; }
+
+        /// <summary>
+        /// Get or set the names of the properties to be used to generate a unique key for this identifier
+        /// </summary>
+        public string[] KeyProperties { get; set; }
+
+        /// <summary>
+        /// Get or set the string to insert between key values when generating a unique key for this
+        /// identifier from multiple key properties.
+        /// </summary>
+        public string KeySeparator { get; set; }
+
+        /// <summary>
+        /// Get or set the type of the custom converter to use to convert key properties into a key
+        /// </summary>
+        /// <remarks>The provided type must implement <see cref="IKeyConverter"/>.</remarks>
+        public Type KeyConverterType { get; set; }
+
         /// <summary>
         /// Used to decorate a property that provides a full URI identifier for an entity
         /// </summary>
@@ -19,6 +37,7 @@ namespace BrightstarDB.EntityFramework
         {
             BaseAddress = null;
         }
+
         /// <summary>
         /// Used to decorate a property that provides a relative URI identifier for an entity
         /// </summary>
@@ -27,5 +46,7 @@ namespace BrightstarDB.EntityFramework
         {
             BaseAddress = baseAddress;
         }
+
+        
     }
 }

@@ -421,8 +421,50 @@ namespace BrightstarDB.Client
             _triples.Clear();
         }
 
+        public IDataObject UpdateIdentity(string newIdentity)
+        {
+            if (newIdentity == null) throw new ArgumentNullException("newIdentity", "DataObject Identity must not be null");
+            if (String.IsNullOrWhiteSpace(newIdentity)) throw new ArgumentException("DataObject Identity must not be an empty string or whitespace.", "newIdentity");
+            if (newIdentity.Equals(Identity))
+            {
+                // No change
+                return this;
+            }
+
+            if (IsNew)
+            {
+                // Simple case - we only have to change the uncommitted triples locally.
+                CheckLoaded();
+                var ret = new DataObject(_store, newIdentity, true);
+                ret.BindTriples(_triples.Select(t => ReplaceIdentity(t, newIdentity)), true);
+                Delete();
+                return ret;
+            }
+            else
+            {
+                CheckLoaded();
+                var ret = new DataObject(_store, newIdentity, true);
+                ret.BindTriples(_triples.Union(_store.GetReferencingTriples(this)).Select(t => ReplaceIdentity(t, newIdentity)), true);
+                Delete();
+                return ret;
+            }
+        }
+
         #endregion
 
+        private Triple ReplaceIdentity(Triple t, string newIdentity)
+        {
+            return new Triple
+                {
+                    Subject = t.Subject.Equals(_identity) ? newIdentity : t.Subject,
+                    Predicate = t.Predicate,
+                    IsLiteral = t.IsLiteral,
+                    Object = t.Object.Equals(_identity) && !t.IsLiteral ? newIdentity : t.Object,
+                    DataType = t.DataType,
+                    LangCode = t.LangCode,
+                    Graph = t.Graph
+                };
+        }
         /// <summary>
         /// Sets the property of this object to the specified data object
         /// </summary>
@@ -720,7 +762,8 @@ namespace BrightstarDB.Client
         /// Set the current state of this dataobject to be the set of triples provided.
         /// </summary>
         /// <param name="triples">Dataobject state</param>
-        internal bool BindTriples(IEnumerable<Triple> triples)
+        /// <param name="asNewTriples">Also add the triples to the list of new triples on the context store</param>
+        internal bool BindTriples(IEnumerable<Triple> triples, bool asNewTriples = false)
         {
             if (_isLoaded)
             {
@@ -732,9 +775,17 @@ namespace BrightstarDB.Client
                     return false;
                 }
                 _triples = updateTriples;
+                if (asNewTriples)
+                {
+                    _store.AddTriples.AddRange(_triples);
+                }
                 return true;
             }
             _triples = triples.ToList();
+            if (asNewTriples)
+            {
+                _store.AddTriples.AddRange(_triples);
+            }
             _isLoaded = true;
             return true;
         }

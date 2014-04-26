@@ -51,6 +51,7 @@ namespace BrightstarDB.Client
 
         private const string InverseOfSparql = "SELECT ?s WHERE {{ ?s <{0}> <{1}> }}";
         private const string GetVersionSparql = "SELECT ?v WHERE {{ <{0}> <" + Constants.VersionPredicateUri + "> ?v }}";
+        private const string AllInverseOfSparql = "SELECT ?s ?p ?g WHERE {{ GRAPH ?g {{ ?s ?p <{0}> }} }}";
 
         private bool _disposed;
 
@@ -371,6 +372,20 @@ namespace BrightstarDB.Client
                 }
             }
         }
+
+
+        public IEnumerable<Triple> GetReferencingTriples(IDataObject obj)
+        {
+            var queryResults = ExecuteSparql(String.Format(AllInverseOfSparql, obj.Identity));
+            return queryResults.ResultDocument.SparqlResultRows().Select(row => new Triple
+                {
+                    Subject = row.GetColumnValue("s").ToString(),
+                    Predicate = row.GetColumnValue("p").ToString(),
+                    Object = obj.Identity,
+                    IsLiteral = false,
+                    Graph = row.GetColumnValue("g").ToString()
+                });
+        } 
 
         #endregion
 

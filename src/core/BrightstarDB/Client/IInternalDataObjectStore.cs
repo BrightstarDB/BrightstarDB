@@ -47,5 +47,13 @@ namespace BrightstarDB.Client
         /// <returns>An enumeration of all matching subject resources</returns>
         IEnumerable<IDataObject> GetInverseOf(IDataObject obj, IDataObject pred);
 
+
+        /// <summary>
+        /// Returns an enumeration of all triples that have the specified
+        /// data object as the object of the triple.
+        /// </summary>
+        /// <param name="obj">The object resource</param>
+        /// <returns>An enumeration of all triples that have <paramref name="obj"/> as the object of the triple.</returns>
+        IEnumerable<Triple> GetReferencingTriples(IDataObject obj);
     }
 }

@@ -114,11 +114,13 @@
     <Compile Include="EntityFramework\DotNetRdfContextTests.cs" />
     <Compile Include="EntityFramework\EmbeddedOptimisticLockingTests.cs" />
     <Compile Include="EntityFramework\EntityFrameworkGraphTargetingTests.cs" />
+    <Compile Include="EntityFramework\GeneratedKeyTests.cs" />
     <Compile Include="EntityFramework\IArticle.cs" />
     <Compile Include="EntityFramework\EFClientTests.cs" />
     <Compile Include="EntityFramework\DataTypeTests.cs" />
     <Compile Include="EntityFramework\Entity.cs" />
     <Compile Include="EntityFramework\ExtendedContextTests.cs" />
+    <Compile Include="EntityFramework\IAutoKeyEntity.cs" />
     <Compile Include="EntityFramework\IBaseEntity.cs" />
     <Compile Include="EntityFramework\ICompany.cs" />
     <Compile Include="EntityFramework\IConcept.cs" />
