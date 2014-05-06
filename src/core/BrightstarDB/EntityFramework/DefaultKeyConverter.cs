@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -38,7 +36,7 @@ namespace BrightstarDB.EntityFramework
         /// <returns>The URI encoded string</returns>
         public virtual string Convert(object v)
         {
-            string ret = null;
+            string ret;
             if (v is int)
             {
                 ret=((int)v).ToString(CultureInfo.InvariantCulture);
@@ -54,6 +52,10 @@ namespace BrightstarDB.EntityFramework
             else if (v is string)
             {
                 ret = v as string;
+            }
+            else if (v is IEntityObject)
+            {
+                ret = (v as IEntityObject).GetKey();
             }
             else ret = v.ToString();
             return Uri.EscapeUriString(ret);

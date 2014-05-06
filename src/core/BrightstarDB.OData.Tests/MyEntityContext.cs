@@ -132,7 +132,7 @@ namespace BrightstarDB.OData.Tests
     {
     	public Article(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Article() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IArticle
     
     	public System.String Title
@@ -161,7 +161,7 @@ namespace BrightstarDB.OData.Tests
     {
     	public Company(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Company() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.ICompany
     
     	public System.String Name
@@ -207,7 +207,7 @@ namespace BrightstarDB.OData.Tests
     {
     	public DataTypeTestEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public DataTypeTestEntity() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IDataTypeTestEntity
     
     	public System.String SomeString
@@ -420,7 +420,7 @@ namespace BrightstarDB.OData.Tests
     {
     	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IDepartment
     
     	public System.String Name
@@ -454,7 +454,7 @@ namespace BrightstarDB.OData.Tests
     {
     	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IJobRole
     
     	public System.String Description
@@ -476,7 +476,7 @@ namespace BrightstarDB.OData.Tests
     {
     	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IPerson
     
     	public System.String Name
@@ -544,7 +544,7 @@ namespace BrightstarDB.OData.Tests
     {
     	public Project(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Project() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IProject
     
     	public System.String Title
@@ -585,7 +585,7 @@ namespace BrightstarDB.OData.Tests
     {
     	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.ISkill
     
     	public System.String Name

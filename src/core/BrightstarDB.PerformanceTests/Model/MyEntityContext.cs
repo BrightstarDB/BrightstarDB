@@ -116,7 +116,7 @@ namespace BrightstarDB.PerformanceTests.Model
     {
     	public Article(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Article() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IArticle
     
     	public System.String Title
@@ -157,7 +157,7 @@ namespace BrightstarDB.PerformanceTests.Model
     {
     	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IDepartment
     
     	public System.String Name
@@ -185,7 +185,7 @@ namespace BrightstarDB.PerformanceTests.Model
     {
     	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IJobRole
     
     	public System.String Description
@@ -207,7 +207,7 @@ namespace BrightstarDB.PerformanceTests.Model
     {
     	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IPerson
     
     	public System.String Fullname
@@ -270,7 +270,7 @@ namespace BrightstarDB.PerformanceTests.Model
     {
     	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.ISkill
     
     	public System.String Description
@@ -298,7 +298,7 @@ namespace BrightstarDB.PerformanceTests.Model
     {
     	public Website(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Website() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IWebsite
     
     	public System.String Name

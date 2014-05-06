@@ -92,7 +92,7 @@ namespace BrightstarDB.OData
     {
     	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.IDepartment
     
     	public System.String Name
@@ -114,7 +114,7 @@ namespace BrightstarDB.OData
     {
     	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.IPerson
     
     	public System.String Name
@@ -165,7 +165,7 @@ namespace BrightstarDB.OData
     {
     	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.OData.ISkill
     
     	public System.String Name

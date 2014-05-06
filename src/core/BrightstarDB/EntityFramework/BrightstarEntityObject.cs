@@ -177,12 +177,12 @@ namespace BrightstarDB.EntityFramework
         }
 
         /// <summary>
-        /// Returns the identity for this object.
+        /// Returns the key for this object.
         /// </summary>
-        /// <returns>The object identity</returns>
-        /// <remarks>The identity string returned by this method is relative to the base resource address specified in 
-        /// the <see cref="IdentifierAttribute"/> on the entity definition interface.</remarks>
-        protected string GetIdentity()
+        /// <returns>The object key</returns>
+        /// <remarks>The string returned by this method is the unique key part of the resource address of
+        /// the underlying data object.</remarks>
+        public string GetKey()
         {
             var baseUri = GetIdentityBase();
             var identity = Identity;
@@ -208,7 +208,7 @@ namespace BrightstarDB.EntityFramework
                     SetIdentity(Constants.GeneratedUriPrefix + idOrAddress);
                 }
             }
-            return GetIdentity();
+            return GetKey();
         }
 
         private string GenerateEntityKey()

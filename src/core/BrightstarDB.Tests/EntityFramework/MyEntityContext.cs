@@ -294,7 +294,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Animal(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Animal() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IAnimal
     
     	public System.String Name
@@ -318,7 +318,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Article(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Article() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IArticle
     
     	public System.String Title
@@ -362,7 +362,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public StringKeyEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public StringKeyEntity() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IStringKeyEntity
     
     	public System.String Name
@@ -386,7 +386,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public BaseEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public BaseEntity() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IBaseEntity
     
     	public System.String BaseStringValue
@@ -404,7 +404,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Company(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Company() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ICompany
     
     	public System.String Name
@@ -452,7 +452,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Concept(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Concept() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IConcept
     	public System.Collections.Generic.ICollection<BrightstarDB.Rdf.PlainLiteral> PrefLabel
     	{
@@ -469,7 +469,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public DBPediaPerson(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public DBPediaPerson() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IDBPediaPerson
     
     	public System.DateTime BirthDate
@@ -505,7 +505,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IDepartment
     
     	public System.String Name
@@ -534,7 +534,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public DerivedEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public DerivedEntity() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IDerivedEntity
     
     	public System.DateTime DateTimeProperty
@@ -565,7 +565,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Entity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Entity() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IEntity
     
     	public System.String SomeString
@@ -837,7 +837,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public FoafPerson(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public FoafPerson() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IFoafPerson
     	
     	[System.ComponentModel.DisplayNameAttribute("Also Known As")]
@@ -900,7 +900,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public IdentityClashTest(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public IdentityClashTest() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTest
     	#endregion
     }
@@ -912,7 +912,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public IdentityClashTestLevel1(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public IdentityClashTestLevel1() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1
     	#endregion
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTest
@@ -926,7 +926,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public IdentityClashTestLevel2(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public IdentityClashTestLevel2() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2
     	#endregion
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1
@@ -942,7 +942,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IJobRole
     
     	public System.String Description
@@ -965,7 +965,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Market(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Market() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IMarket
     
     	public System.String Name
@@ -988,7 +988,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IPerson
     
     	public System.String Name
@@ -1081,7 +1081,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Session(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Session() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ISession
     
     	public System.String Speaker
@@ -1099,7 +1099,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public EveningSession(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public EveningSession() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IEveningSession
     
     	public System.String DateTime
@@ -1131,7 +1131,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public TechnicalEveningSession(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public TechnicalEveningSession() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession
     
     	public System.String Subject
@@ -1171,7 +1171,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ISkill
     
     	public System.String Name

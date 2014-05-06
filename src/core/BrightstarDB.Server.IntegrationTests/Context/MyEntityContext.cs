@@ -158,7 +158,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public Animal(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Animal() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IAnimal
     
     	public System.String Name
@@ -182,7 +182,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IDepartment
     
     	public System.String Name
@@ -227,7 +227,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public FoafPerson(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public FoafPerson() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IFoafPerson
     	
     	[System.ComponentModel.DisplayNameAttribute("Also Known As")]
@@ -290,7 +290,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IJobRole
     
     	public System.String Description
@@ -313,7 +313,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IPerson
     
     	public System.String Name
@@ -406,7 +406,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.ISkill
     
     	public System.String Name
