@@ -14,6 +14,15 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX.
 
 ***************************
+ BrightstarDB 1.6.2 Release
+***************************
+
+  - FIX: Fixed an error in the LRU cache implementation that could corrupt the cache during import / update operations.
+         Thanks to pcoppney for the bug report.
+         
+  - FIX: Fixed version number specified in the setup bootstrapper and reported when looking at the installed programs under Windows.
+
+***************************
  BrightstarDB 1.6.1 Release
 ***************************
 
