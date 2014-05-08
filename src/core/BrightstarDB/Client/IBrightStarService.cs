@@ -168,10 +168,23 @@ namespace BrightstarDB.Client
         /// <param name="defaultGraphUri">The URI of the default graph that the transaction will be applied to</param>
         /// <param name="label">Optional user-friendly label for the job.</param>
         /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
-        /// <remarks>If <paramref name="preconditions"/>, <paramref name="deletePatterns"/> or <paramref name="insertData"/> contain
-        /// quads, the graph URI specified by the quad will override the value provided by <paramref name="defaultGraphUri"/>. </remarks>
+        /// <remarks>
+        /// If <paramref name="existencePreconditions"/>, <paramref name="nonexistencePreconditions"/>, 
+        /// <paramref name="deletePatterns"/> or <paramref name="insertData"/> contain
+        /// quads, the graph URI specified by the quad will override the value provided by <paramref name="defaultGraphUri"/>. 
+        /// </remarks>
+        [Obsolete("This method has been superceeded by ExecuteTransaction(string, UpdateTranscation, string)")]
         IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, 
             string defaultGraphUri = Constants.DefaultGraphUri, string label = null);
+
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="updateTransaction">The update transaction data</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
+        /// <returns>A <see cref="JobInfo"/> instance for monitoring the status of the job</returns>
+        IJobInfo ExecuteTransaction(string storeName, UpdateTransactionData updateTransaction, string label = null);
 
         /// <summary>
         /// Execute a SPARQL Update expression against a store
@@ -195,8 +208,20 @@ namespace BrightstarDB.Client
         /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
         /// <remarks>If <paramref name="preconditions"/>, <paramref name="deletePatterns"/> or <paramref name="insertData"/> contain
         /// quads, the graph URI specified by the quad will override the value provided by <paramref name="defaultGraphUri"/>. </remarks>
+        [Obsolete("This method has been superceeded by ExecuteTransaction(string, UpdateTransaction, bool, string)")]
         IJobInfo ExecuteTransaction(string storeName, string preconditions, string deletePatterns, string insertData, 
             string defaultGraphUri = Constants.DefaultGraphUri, bool waitForCompletion = true, string label = null);
+
+        /// <summary>
+        /// Execute an update transaction.
+        /// </summary>
+        /// <param name="storeName">The name of the store to modify</param>
+        /// <param name="updateTransaction">The update transaction data</param>
+        /// <param name="waitForCompletion">If set to true the method will block until the transaction completes</param>
+        /// <param name="label">Optional user-friendly label for the job.</param>
+        /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
+        IJobInfo ExecuteTransaction(string storeName, UpdateTransactionData updateTransaction, bool waitForCompletion = true,
+                                    string label = null);
 
         /// <summary>
         /// Execute a SPARQL Update expression against a store

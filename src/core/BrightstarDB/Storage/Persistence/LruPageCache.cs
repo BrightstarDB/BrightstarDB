@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BrightstarDB.Storage.Persistence
 {
@@ -56,6 +57,7 @@ namespace BrightstarDB.Storage.Persistence
                     }
                 }
             }
+            Debug.Assert(_count == _cacheItems.Count, "Internal count is out of sync with _cacheItems count.");
         }
 
         public IPageCacheItem Lookup(string partition, ulong pageId)
@@ -87,6 +89,7 @@ namespace BrightstarDB.Storage.Persistence
                         var tmp = p.Next;
                         _accessList.Remove(p);
                         _cacheItems.Remove(cacheKey);
+                        _count--;
                         p = tmp;
                     }
                     else

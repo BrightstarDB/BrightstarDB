@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BrightstarDB.Client;
 using BrightstarDB.Dto;
 using BrightstarDB.Storage;
 using NUnit.Framework;
@@ -68,13 +69,21 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestCreateTransactionJob()
         {
-            var request = JobRequestObject.CreateTransactionJob("preconditions", "deletes", "inserts");
+            var request = JobRequestObject.CreateTransactionJob(new UpdateTransactionData
+                {
+                    ExistencePreconditions = "preconditions",
+                    NonexistencePreconditions = "nonexistencePreconditions",
+                    DeletePatterns = "deletes",
+                    InsertData = "inserts",
+                    DefaultGraphUri = null
+                }, null);
             Assert.That(request, Has.Property("JobType").EqualTo("Transaction"));
             Assert.That(request,
                         Has.Property("JobParameters")
                            .EqualTo(new Dictionary<string, string>
                                {
                                    {"Preconditions", "preconditions"},
+                                   {"NonexistencePreconditions", "nonexistencePreconditions"},
                                    {"Deletes", "deletes"},
                                    {"Inserts", "inserts"},
                                    {"DefaultGraphUri", null}
@@ -118,8 +127,15 @@ namespace BrightstarDB.Server.Modules.Tests
             var sparqlUpdateRequest = JobRequestObject.CreateSparqlUpdateJob("update expression", label:"SparqlUpdateJob");
             Assert.That(sparqlUpdateRequest, Has.Property("Label").EqualTo("SparqlUpdateJob"));
             // Transaction
-            var transactionJob = JobRequestObject.CreateTransactionJob("precon", "delete", "insert",
-                                                                       label:"TransactionJob");
+            var transactionJob = JobRequestObject.CreateTransactionJob(
+                new UpdateTransactionData
+                    {
+                        ExistencePreconditions = "precon",
+                        NonexistencePreconditions = "nexist",
+                        DeletePatterns = "delete",
+                        InsertData = "insert",
+                        DefaultGraphUri = null,
+                    }, "TransactionJob");
             Assert.That(transactionJob, Has.Property("Label").EqualTo("TransactionJob"));
             // Update Statistics
             var updateStatsRequest = JobRequestObject.CreateUpdateStatsJob(label:"UpdateStats");

@@ -11,7 +11,8 @@ namespace BrightstarDB.Storage.BTreeStore
         public ObjectCache(bool clearAtMax)
         {
             //_highPriorityItems = new ItemCache(1, 1000, clearAtMax);
-            _lowPriorityItems = new ItemCache(100, Configuration.ReadStoreObjectCacheSize, clearAtMax);
+            //_lowPriorityItems = new ItemCache(100, Configuration.ReadStoreObjectCacheSize, clearAtMax);
+            _lowPriorityItems = new ItemCache(100, 10000, clearAtMax);
         }
 
         public int CachedObjectCount

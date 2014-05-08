@@ -48,10 +48,11 @@ namespace BrightstarDB.Client
             //return new MemoryStream(Encoding.UTF8.GetBytes(buff.ToString()), false);
         }
 
-        public void ApplyTransaction(IList<Triple> preconditions, IList<Triple> deletePatterns, IList<Triple> inserts,
+        public void ApplyTransaction(IList<Triple> existencePreconditions, IList<Triple> nonexistencePreconditions,
+                                     IList<Triple> deletePatterns, IList<Triple> inserts,
                                      string updateGraphUri)
         {
-            if (preconditions.Count > 0)
+            if (existencePreconditions.Count > 0 || nonexistencePreconditions.Count > 0)
             {
                 throw new NotSupportedException("SparqlDataObjectStore does not support conditional updates");
             }
@@ -126,9 +127,34 @@ namespace BrightstarDB.Client
 
         private static string FormatDeletePattern(Triple p, ref int propId)
         {
-            return p.Predicate.Equals(Constants.WildcardUri)
-                       ? String.Format("  <{0}> ?d{1} ?d{2} .", p.Subject, propId++, propId++)
-                       : String.Format("  <{0}> <{1}> ?d{2} .", p.Subject, p.Predicate, propId++);
+            return String.Format(" {0} {1} {2} .",
+                                 FormatDeletePatternItem(p.Subject, ref propId),
+                                 FormatDeletePatternItem(p.Predicate, ref propId),
+                                 p.IsLiteral
+                                     ? FormatDeletePatternItem(p.Object, p.DataType, p.LangCode)
+                                     : FormatDeletePatternItem(p.Object, ref propId));
+        }
+
+        private static string FormatDeletePatternItem(string uri, ref int propId)
+        {
+            return uri.Equals(Constants.WildcardUri) ? String.Format("?d{0}", propId++) : String.Format("<{0}>", uri);
+        }
+
+        private static string FormatDeletePatternItem(string literal, string dataType, string languageCode)
+        {
+            var builder = new StringBuilder();
+            builder.AppendFormat("\"{0}\"", literal );
+            if (dataType != null)
+            {
+                builder.Append("^^");
+                builder.AppendFormat("<{0}>", dataType);
+            }
+            if (languageCode != null)
+            {
+                builder.Append("@");
+                builder.Append(languageCode);
+            }
+            return builder.ToString();
         }
 
         /// <summary>

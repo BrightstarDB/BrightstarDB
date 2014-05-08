@@ -131,7 +131,7 @@ namespace BrightstarDB.Client
 
             try
             {
-                Client.ApplyTransaction(Preconditions, DeletePatterns, AddTriples, UpdateGraphUri);
+                Client.ApplyTransaction(Preconditions, new Triple[0], DeletePatterns, AddTriples, UpdateGraphUri);
             }
             catch (TransactionPreconditionsFailedException)
             {

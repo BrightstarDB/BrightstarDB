@@ -30,7 +30,13 @@ namespace BrightstarDB.Client
 
         public static object GetConfigurationObject(IGraph configurationGraph, string id)
         {
-            var configNode = configurationGraph.GetUriNode(new Uri(configurationGraph.BaseUri, id));
+#if PORTABLE
+            // Bug in portable class library - if id is a fragment identifier the URI is not combined correctly
+            Uri targetUri = id.StartsWith("#") ? new Uri(configurationGraph.BaseUri + id) : new Uri(configurationGraph.BaseUri, id);
+#else
+            var targetUri = new Uri(configurationGraph.BaseUri, id);
+#endif
+            var configNode = configurationGraph.GetUriNode(targetUri);
             return configNode == null ? null : ConfigurationLoader.LoadObject(configurationGraph, configNode);
         }
     }

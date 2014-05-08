@@ -16,7 +16,7 @@ namespace BrightstarDB.Tests
 
         public static string DataLocation
         {
-            get { return "..\\..\\..\\..\\..\\..\\src\\core\\BrightstarDB.Tests\\Data\\"; }
+            get { return System.IO.Path.GetFullPath("..\\..\\..\\..\\..\\..\\src\\core\\BrightstarDB.Tests\\Data\\"); }
         }
 #else
         public static string StoreLocation

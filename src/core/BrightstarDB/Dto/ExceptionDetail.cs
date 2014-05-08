@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BrightstarDB.Dto
 {
@@ -38,6 +39,16 @@ namespace BrightstarDB.Dto
         }
 
         /// <summary>
+        /// Creates a new instance of the <see cref="ExceptionDetailObject"/> class from the exception.
+        /// </summary>
+        /// <param name="exception">The exception to be serialized as an <see cref="ExceptionDetailObject"/></param>
+        /// <param name="data">Additional data to serialize with the type and message of the exception.</param>
+        public ExceptionDetailObject(Exception exception, Dictionary<string, string> data) : this(exception)
+        {
+            Data = new Dictionary<string, string>(data);
+        }
+
+        /// <summary>
         /// Get or set the type string for the exception 
         /// </summary>
         public string Type { get; set; }
@@ -53,6 +64,12 @@ namespace BrightstarDB.Dto
         /// Get or set the help link from the exception
         /// </summary>
         public string HelpLink { get; set; }
+
+        /// <summary>
+        /// Additional data
+        /// </summary>
+        public Dictionary<string, string> Data { get; set; }
+
         /// <summary>
         /// Get or set the <see cref="ExceptionDetailObject"/> that represents the inner exception.
         /// </summary>

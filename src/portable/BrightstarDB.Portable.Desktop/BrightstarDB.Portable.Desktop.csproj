@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -45,6 +46,7 @@
   <ItemGroup>
     <Compile Include="BrightstarDB\Compatibilty\PathSeparatorProvider.cs" />
     <Compile Include="BrightstarDB\Storage\PersistenceManager.cs" />
+    <Compile Include="ConfigurationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -256,4 +256,12 @@
   <data name="ExportJob_UnsupportedExportFormat" xml:space="preserve">
     <value>The media type {0} is not currently supported by Export jobs.</value>
   </data>
+  <data name="PreconditionFailedBasicMessage" xml:space="preserve">
+    <value>Transaction preconditions failed.</value>
+    <comment>Short message for PreconditionFailedException</comment>
+  </data>
+  <data name="PreconditionFailedFullMessage" xml:space="preserve">
+    <value>Transaction preconditions failed. {0} existence preconditions failed. {1} non-existence preconditions failed.</value>
+    <comment>Detailed message for PreconditionFailedException.</comment>
+  </data>
 </root>

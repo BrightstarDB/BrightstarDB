@@ -217,13 +217,28 @@ namespace BrightstarDB.Server.Modules.Tests
             mockJobInfo.Setup(s => s.JobId).Returns("5678");
             brightstar.Setup(
                 s =>
-                s.ExecuteTransaction("foo", "preconditions string", "delete patterns string", "insert triples string",
-                                     null, false, "TransactionJob"))
-                                     .Returns(mockJobInfo.Object)
-                                     .Verifiable();
+                s.ExecuteTransaction("foo", It.Is<UpdateTransactionData>(txn =>
+                                                                         txn.ExistencePreconditions ==
+                                                                         "preconditions string" &&
+                                                                         txn.NonexistencePreconditions ==
+                                                                         "nonexistence preconditions string" &&
+                                                                         txn.DeletePatterns == "delete patterns string" &&
+                                                                         txn.InsertData == "insert triples string" &&
+                                                                         txn.DefaultGraphUri == null), false,
+                                     "TransactionJob"))
+                      .Returns(mockJobInfo.Object)
+                      .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var requestObject = JobRequestObject.CreateTransactionJob("preconditions string", "delete patterns string",
-                                                                      "insert triples string", label:"TransactionJob");
+            var requestObject = JobRequestObject.CreateTransactionJob(
+                new UpdateTransactionData
+                    {
+                        ExistencePreconditions = "preconditions string",
+                        NonexistencePreconditions = "nonexistence preconditions string",
+                        DeletePatterns = "delete patterns string",
+                        InsertData = "insert triples string",
+                        DefaultGraphUri = null
+                    }, "TransactionJob");
+            
 
             // Execute
             var response = app.Post("/foo/jobs", with =>
@@ -247,13 +262,26 @@ namespace BrightstarDB.Server.Modules.Tests
             mockJobInfo.Setup(s => s.JobId).Returns("5678");
             brightstar.Setup(
                 s =>
-                s.ExecuteTransaction("foo", "preconditions string", "delete patterns string", "insert triples string",
-                                     "http://update/graph/uri", false, "TransactionGraphJob"))
-                                     .Returns(mockJobInfo.Object)
-                                     .Verifiable();
+                s.ExecuteTransaction("foo",
+                                     It.Is<UpdateTransactionData>(
+                                         x => x.ExistencePreconditions == "preconditions string" &&
+                                              x.NonexistencePreconditions == "nonexistence preconditions string" &&
+                                              x.DeletePatterns == "delete patterns string" &&
+                                              x.InsertData == "insert triples string" &&
+                                              x.DefaultGraphUri == "http://update/graph/uri"), false,
+                                     "TransactionGraphJob"))
+                      .Returns(mockJobInfo.Object)
+                      .Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            var requestObject = JobRequestObject.CreateTransactionJob("preconditions string", "delete patterns string",
-                                                                      "insert triples string", "http://update/graph/uri", "TransactionGraphJob");
+            var requestObject = JobRequestObject.CreateTransactionJob(
+                new UpdateTransactionData
+                    {
+                        ExistencePreconditions = "preconditions string",
+                        NonexistencePreconditions = "nonexistence preconditions string",
+                        DeletePatterns = "delete patterns string",
+                        InsertData = "insert triples string",
+                        DefaultGraphUri = "http://update/graph/uri"
+                    }, "TransactionGraphJob");
 
             // Execute
             var response = app.Post("/foo/jobs", with =>
@@ -275,7 +303,16 @@ namespace BrightstarDB.Server.Modules.Tests
             TestValidPost("/foo/jobs",
                           "{ JobType: \"Transaction\", JobParameters: { Deletes: \"delete\", Inserts: \"insert\", DefaultGraphUri:\"graph\"}}",
                           (b, m) =>
-                          b.Setup(s => s.ExecuteTransaction("foo", null, "delete", "insert", "graph", false, It.IsAny<string>()))
+                          b.Setup(
+                              s =>
+                              s.ExecuteTransaction("foo",
+                                                   It.Is<UpdateTransactionData>(x => x.ExistencePreconditions==null &&
+                                                                                     x.NonexistencePreconditions==null &&
+                                                                                     x.DeletePatterns.Equals("delete") &&
+                                                                                     x.InsertData.Equals("insert") &&
+                                                                                     x.DefaultGraphUri.Equals("graph")
+                                                       )
+                                                   , false, It.IsAny<string>()))
                            .Returns(m.Object)
                            .Verifiable());
 
@@ -283,14 +320,28 @@ namespace BrightstarDB.Server.Modules.Tests
             TestValidPost("/foo/jobs",
                           "{ JobType: \"Transaction\", JobParameters: { Inserts: \"insert\", DefaultGraphUri:\"graph\"}}",
                           (b, m) =>
-                          b.Setup(s => s.ExecuteTransaction("foo", null, null, "insert", "graph", false, It.IsAny<string>()))
+                          b.Setup(s => s.ExecuteTransaction("foo",
+                                                            It.Is<UpdateTransactionData>(
+                                                                x => x.ExistencePreconditions == null &&
+                                                                     x.NonexistencePreconditions == null &&
+                                                                     x.DeletePatterns == null &&
+                                                                     x.InsertData == "insert" &&
+                                                                     x.DefaultGraphUri == "graph"), false,
+                                                            It.IsAny<string>()))
                            .Returns(m.Object)
                            .Verifiable());
 
             // Can omit inserts
             TestValidPost("/foo/jobs", "{ JobType: \"Transaction\", JobParameters: { DefaultGraphUri:\"graph\"}}",
                           (b, m) =>
-                          b.Setup(s => s.ExecuteTransaction("foo", null, null, null, "graph", false, It.IsAny<string>()))
+                          b.Setup(s => s.ExecuteTransaction("foo",
+                                                            It.Is<UpdateTransactionData>(
+                                                                x => x.ExistencePreconditions == null &&
+                                                                     x.NonexistencePreconditions == null &&
+                                                                     x.DeletePatterns == null &&
+                                                                     x.InsertData == null &&
+                                                                     x.DefaultGraphUri == "graph"), false,
+                                                            It.IsAny<string>()))
                            .Returns(m.Object)
                            .Verifiable());
         }
@@ -298,8 +349,31 @@ namespace BrightstarDB.Server.Modules.Tests
         [Test]
         public void TestPostTransactionRequiresTransactionalUpdatePermission()
         {
-            AssertPermissionRequired(JobRequestObject.CreateTransactionJob("pre", "del", "ins"), StorePermissions.TransactionUpdate);
-            AssertPermissionRequired(JobRequestObject.CreateTransactionJob("pre", "del", "ins", "http://some/graph/uri"), StorePermissions.TransactionUpdate);
+            AssertPermissionRequired(
+                JobRequestObject.CreateTransactionJob(new UpdateTransactionData
+                    {
+                        ExistencePreconditions = "pre",
+                        NonexistencePreconditions = "nexist",
+                        DeletePatterns = "del",
+                        InsertData = "ins",
+                        DefaultGraphUri = null
+                    }, null), StorePermissions.TransactionUpdate);
+        }
+
+        [Test]
+        public void TestPostGraphTransactionRequiresTransactionalUpdatePermission()
+        {
+            AssertPermissionRequired(
+                JobRequestObject.CreateTransactionJob(
+                    new UpdateTransactionData
+                        {
+                            ExistencePreconditions = "pre",
+                            NonexistencePreconditions = "nexist",
+                            DeletePatterns = "del",
+                            InsertData = "ins",
+                            DefaultGraphUri = "http://some/graph/uri"
+                        }, null),
+                StorePermissions.TransactionUpdate);
         }
 
         #endregion

@@ -143,7 +143,9 @@ namespace BrightstarDB.Client
             }
             preconditionsData.Close();
 
-            var jobId = _serverCore.ProcessTransaction(_storeName, preconditionsData.ToString(), deleteData.ToString(), addData.ToString(), UpdateGraphUri);
+            var jobId = _serverCore.ProcessTransaction(_storeName, preconditionsData.ToString(), 
+                String.Empty, // TODO: Replace with non-existance preconditions
+                deleteData.ToString(), addData.ToString(), UpdateGraphUri);
             var status = _serverCore.GetJobStatus(_storeName, jobId.ToString());
             while (!(status.JobStatus == JobStatus.CompletedOk || status.JobStatus == JobStatus.TransactionError))
             {
@@ -158,10 +160,8 @@ namespace BrightstarDB.Client
             {
                 if (status.ExceptionDetail.Type.Equals(typeof(PreconditionFailedException).FullName))
                 {
-                    var failedTriples =
-                        status.ExceptionDetail.Message.Substring(status.ExceptionDetail.Message.IndexOf("\n") + 1);
                     Preconditions.Clear();
-                    throw new TransactionPreconditionsFailedException(failedTriples);
+                    throw TransactionPreconditionsFailedException.FromExceptionDetail(status.ExceptionDetail);
                 }
                 throw new BrightstarClientException(status.ExceptionDetail != null  && !String.IsNullOrEmpty(status.ExceptionDetail.Message) ? status.ExceptionDetail.Message : "The transaction encountered an error");
             }

@@ -7,6 +7,8 @@ using BrightstarDB.Dto;
 using BrightstarDB.Model;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
+#elif WINDOWS_PHONE
+using BrightstarDB.Mobile.Compatibility;
 #else
 using System.Collections.Concurrent;
 #endif
@@ -161,7 +163,7 @@ namespace BrightstarDB.Server
                                                  ex);
                                 jobExecutionStatus.Information = job.ErrorMessage ?? "Job Error";
                                 jobExecutionStatus.Ended = DateTime.UtcNow;
-                                jobExecutionStatus.ExceptionDetail = new ExceptionDetailObject(ex);
+                                jobExecutionStatus.ExceptionDetail = GetExceptionDetail(ex);
                                 jobExecutionStatus.JobStatus = JobStatus.TransactionError;
                             }
                             finally
@@ -195,6 +197,16 @@ namespace BrightstarDB.Server
                                      "Unexpected exception caught in processing Shutdown continuation: {0}", ex);
                 }
             }
+        }
+
+        private static ExceptionDetailObject GetExceptionDetail(Exception ex)
+        {
+            if (ex is PreconditionFailedException)
+            {
+                var pfe = ex as PreconditionFailedException;
+                return pfe.AsExceptionDetailObject();
+            }
+            return new ExceptionDetailObject(ex);
         }
 
         public IEnumerable<JobExecutionStatus> GetJobs()
@@ -302,18 +314,19 @@ namespace BrightstarDB.Server
         /// Queue a txn job.
         /// </summary>
         /// <param name="preconditions">The triples that must be present for txn to succeed</param>
+        /// <param name="notExistsPreconditions">The triples that must not be present for txn to succeed</param>
         /// <param name="deletePatterns"></param>
         /// <param name="insertData"></param>
         /// <param name="defaultGraphUri"></param>
         /// <param name="format"></param>
         /// <param name="jobLabel"></param>
         /// <returns></returns>
-        public Guid ProcessTransaction(string preconditions, string deletePatterns, string insertData, string defaultGraphUri, string format, string jobLabel= null)
+        public Guid ProcessTransaction(string preconditions, string notExistsPreconditions, string deletePatterns, string insertData, string defaultGraphUri, string format, string jobLabel= null)
         {
             Logging.LogDebug("ProcessTransaction");
             var jobId = Guid.NewGuid();
-            var job = new UpdateTransaction(jobId, jobLabel, this, preconditions, deletePatterns, insertData,
-                                            defaultGraphUri);
+            var job = new GuardedUpdateTransaction(jobId, jobLabel, this, preconditions, notExistsPreconditions,
+                                                   deletePatterns, insertData, defaultGraphUri);
             QueueJob(job);
             return jobId;
         }
@@ -347,7 +360,7 @@ namespace BrightstarDB.Server
                                   if (_jobExecutionStatus.TryGetValue(id.ToString(), out jobExecutionStatus))
                                   {
                                       jobExecutionStatus.Information = "Export failed";
-                                      jobExecutionStatus.ExceptionDetail = new ExceptionDetailObject(ex);
+                                      jobExecutionStatus.ExceptionDetail = GetExceptionDetail(ex);
                                       jobExecutionStatus.JobStatus = JobStatus.TransactionError;
                                       jobExecutionStatus.Ended = DateTime.UtcNow;
                                   }

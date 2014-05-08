@@ -69,6 +69,24 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
+        public void TestIdentifierPrefixOnBaseEntity()
+        {
+            var storeName = MakeStoreName("IdentifierPrefixOnBaseEntity");
+            using (var context = new MyEntityContext(ConnectionString + storeName))
+            {
+                var entity1 = new DerivedEntity {Id = "entity1"};
+                context.DerivedEntities.Add(entity1);
+                entity1.BaseStringValue = "Entity1";
+                context.SaveChanges();
+            }
+
+            var doContext = BrightstarDB.Client.BrightstarService.GetDataObjectContext(ConnectionString + storeName);
+            var store = doContext.OpenStore(storeName);
+            var dataObject = store.GetDataObject("http://example.org/entities/entity1");
+            Assert.That(dataObject, Is.Not.Null);
+        }
+
+        [Test]
         public void TestBecomeAndUnbecome()
         {
             var storeName = MakeStoreName("becomeAndUnbecome");

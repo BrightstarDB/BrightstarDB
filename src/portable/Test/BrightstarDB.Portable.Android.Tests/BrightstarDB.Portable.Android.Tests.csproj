@@ -53,10 +53,10 @@
     <Reference Include="Mono.Android" />
     <Reference Include="Xamarin.Android.NUnitLite" />
     <Reference Include="dotNetRDF">
-      <HintPath>..\..\packages\dotNetRDF.1.0.3\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
+      <HintPath>..\..\packages\dotNetRDF.1.0.4.3225\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="Portable.Runtime">
-      <HintPath>..\..\packages\dotNetRDF.1.0.3\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>
+      <HintPath>..\..\packages\dotNetRDF.1.0.4.3225\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>

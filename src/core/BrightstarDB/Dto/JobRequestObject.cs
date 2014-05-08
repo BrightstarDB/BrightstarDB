@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using BrightstarDB.Client;
 using BrightstarDB.Storage;
 
 namespace BrightstarDB.Dto
@@ -52,22 +53,20 @@ namespace BrightstarDB.Dto
         /// <summary>
         /// Creates a transaction update job request object
         /// </summary>
-        /// <param name="preconditions">Transaction precondition triples encoded as N-Triples or N-Quads</param>
-        /// <param name="deletes">Triples to be deleted encoded as N-Triples or N-Quads</param>
-        /// <param name="inserts">Triples to be inserted encoded as N-Triples or N-Quads</param>
-        /// <param name="defaultGraphUri">OPTIONAL: The default graph URI to apply to N-Triples. If not provided, the system default graph will be targetted.</param>
-        /// <param name="label">A user-friendly label for the job</param>
+        /// <param name="updateTransaction">The update transaction data</param>
+        /// <param name="label">OPTIONAL: A user-friendly label for the job. May be NULL to </param>
         /// <returns>A new <see cref="JobRequestObject"/> instance</returns>
-        public static JobRequestObject CreateTransactionJob(string preconditions, string deletes, string inserts,
-                                                            string defaultGraphUri = null, string label = null)
+        public static JobRequestObject CreateTransactionJob(UpdateTransactionData updateTransaction, 
+                                                            string label)
         {
             return new JobRequestObject("Transaction",
                                         new Dictionary<string, string>
                                             {
-                                                {"Preconditions", preconditions},
-                                                {"Deletes", deletes},
-                                                {"Inserts", inserts},
-                                                {"DefaultGraphUri", defaultGraphUri}
+                                                {"Preconditions", updateTransaction.ExistencePreconditions},
+                                                {"NonexistencePreconditions", updateTransaction.NonexistencePreconditions},
+                                                {"Deletes", updateTransaction.DeletePatterns},
+                                                {"Inserts", updateTransaction.InsertData},
+                                                {"DefaultGraphUri", updateTransaction.DefaultGraphUri}
                                             },
                                         label);
         }

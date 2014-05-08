@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using BrightstarDB.Dto;
 using BrightstarDB.Rdf;
 
 namespace BrightstarDB.Client
@@ -23,22 +25,25 @@ namespace BrightstarDB.Client
         /// </summary>
         public IEnumerable<string> InvalidSubjects { get { return _invalidSubjects; } }
 
-        internal TransactionPreconditionsFailedException(string failedTriples)
+        internal TransactionPreconditionsFailedException(string existenceFailures, string nonexistenceFailures)
             : base("Transaction preconditions were not met.")
         {
-            FailedPreconditions = failedTriples;
-            try
+            FailedPreconditions = existenceFailures;
+            if (existenceFailures != null)
             {
-                _invalidSubjects = new List<string>();
-                var p = new NTriplesParser();
-                using (var rdr = new StringReader(failedTriples))
+                try
                 {
-                    p.Parse(rdr, this, Constants.DefaultGraphUri);
+                    _invalidSubjects = new List<string>();
+                    var p = new NTriplesParser();
+                    using (var rdr = new StringReader(existenceFailures))
+                    {
+                        p.Parse(rdr, this, Constants.DefaultGraphUri);
+                    }
                 }
-            }
-            catch
-            {
-                // Ignore any errors when trying to parse the failed preconditions
+                catch
+                {
+                    // Ignore any errors when trying to parse the failed preconditions
+                }
             }
         }
 
@@ -63,5 +68,22 @@ namespace BrightstarDB.Client
         }
 
         #endregion
+
+        /// <summary>
+        /// Returns a new instance of the <see cref="TransactionPreconditionsFailedException"/> by retrieving
+        /// the failed precondition strings from the provided <see cref="ExceptionDetailObject"/> instance. 
+        /// </summary>
+        /// <remarks>This method is used to "deserialize" a precondition failure exception from the ExceptionInfo
+        /// field of a <see cref="IJobInfo"/> instance.</remarks>
+        /// <param name="exceptionDetail"></param>
+        /// <returns>A new <see cref="TransactionPreconditionsFailedException"/>.</returns>
+        internal static Exception FromExceptionDetail(ExceptionDetailObject exceptionDetail)
+        {
+            string existenceFailures;
+            string nonexistenceFailures;
+            exceptionDetail.Data.TryGetValue("existenceFailedTriples", out existenceFailures);
+            exceptionDetail.Data.TryGetValue("nonexistenceFailedTriples", out nonexistenceFailures);
+            return new TransactionPreconditionsFailedException(existenceFailures, nonexistenceFailures);
+        }
     }
 }

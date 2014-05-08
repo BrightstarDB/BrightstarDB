@@ -13,13 +13,18 @@
         ImportJob = 0,
 
         /// <summary>
-        /// Type for a triple update transaction
+        /// Type for a triple update transaction -- OBSOLETE, replaced with GuardedUpdateTransaction
         /// </summary>
         UpdateTransaction = 1,
 
         /// <summary>
         /// Type for a SPARQL update transaction
         /// </summary>
-        SparqlUpdateTransaction = 2
+        SparqlUpdateTransaction = 2,
+
+        /// <summary>
+        /// Type for a triple update transaction with support for non-existance guards
+        /// </summary>
+        GuardedUpdateTransaction = 3,
     }
 }

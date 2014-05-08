@@ -167,6 +167,7 @@
     <Compile Include="Client\SparqlDataObjectContext.cs" />
     <Compile Include="Client\SparqlDataObjectStore.cs" />
     <Compile Include="Client\SparqlUpdatableStore.cs" />
+    <Compile Include="Client\UpdateTransaction.cs" />
     <Compile Include="Dto\CommitPointInfoObject.cs" />
     <Compile Include="Dto\CommitPointResponseModel.cs" />
     <Compile Include="Dto\CreateStoreRequestObject.cs" />
@@ -192,6 +193,7 @@
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
     <Compile Include="SerializableModel.cs" />
+    <Compile Include="Server\GuardedUpdateTransaction.cs" />
     <Compile Include="Server\NoSuchStoreException.cs" />
     <Compile Include="Server\QueryCacheEntry.cs" />
     <Compile Include="Server\SnapshotJob.cs" />
