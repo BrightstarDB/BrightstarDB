@@ -7,7 +7,7 @@ into the main documentation.
 
 Version
 -------
-1.5.3
+1.6.2
 
 We welcome feedback, comments, feature requests and bug reports. Please use
 our issue tracker at https://github.com/BrightstarDB/BrightstarDB/issues 
