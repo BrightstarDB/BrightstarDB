@@ -13,38 +13,12 @@ namespace BrightstarDB.EntityFramework
     /// </summary>
     public class BrightstarEntityObject : IEntityObject, INotifyPropertyChanged
     {
-        /// <summary>
-        /// Cached identity information structure
-        /// </summary>
-        private class IdentityCacheInfo
-        {
-            /// <summary>
-            /// The base string for generated identity URIs
-            /// </summary>
-            public string BaseUri { get; set; }
-
-            /// <summary>
-            /// The properties to use to generate a key
-            /// </summary>
-            public PropertyInfo[] KeyProperties { get; set; }
-            
-            /// <summary>
-            /// The separator to insert between values when multiple properties
-            /// are used to generate the key
-            /// </summary>
-            public string KeySeparator { get; set; }
-
-            public IKeyConverter KeyConverter { get; set; }
-        }
-
         private BrightstarEntityContext _context;
         private string _identity;
         internal IDataObject DataObject { get; set; }
         private readonly Dictionary<string, object> _currentItemValues = new Dictionary<string, object>();
         private readonly Dictionary<string, BrightstarEntityObject> _currentPropertyValues = new Dictionary<string, BrightstarEntityObject>();
         private readonly Dictionary<string, IBrightstarEntityCollection> _currentPropertyCollections = new Dictionary<string, IBrightstarEntityCollection>();
-        private static readonly Dictionary<Type, IdentityCacheInfo> IdentityBaseCache = new Dictionary<Type, IdentityCacheInfo>();
-        private const string DefaultCompositeKeySeparator = "/";
 
         /// <summary>
         /// Creates a domain object
@@ -213,7 +187,7 @@ namespace BrightstarDB.EntityFramework
 
         private string GenerateEntityKey()
         {
-            var identityCacheInfo = GetIdentityInfo();
+            var identityCacheInfo = _context.GetIdentityInfo(GetType());
             if (identityCacheInfo != null && identityCacheInfo.KeyProperties != null)
             {
                 // Generate the key string
@@ -229,83 +203,11 @@ namespace BrightstarDB.EntityFramework
 
         internal string GetIdentityBase()
         {
-            var identityCacheInfo = GetIdentityInfo();
+            var identityCacheInfo = _context.GetIdentityInfo(GetType());
             return identityCacheInfo.BaseUri;
         }
 
-        private IdentityCacheInfo GetIdentityInfo()
-        {
-            IdentityCacheInfo cachedInfo;
-            if (IdentityBaseCache.TryGetValue(GetType(), out cachedInfo)) return cachedInfo;
 
-            cachedInfo = new IdentityCacheInfo();
-            var interfaces = GetType().GetInterfaces().Where(i => i.GetCustomAttributes(typeof(EntityAttribute), true).Any());
-            var identityProperty =
-                interfaces.SelectMany(i => i.GetProperties()).FirstOrDefault(
-                    x => x.GetCustomAttributes(typeof(IdentifierAttribute), true).Any());
-            if (identityProperty != null)
-            {
-                var identityAttr =
-                    identityProperty.GetCustomAttributes(typeof(IdentifierAttribute), true).FirstOrDefault() as
-                    IdentifierAttribute;
-                var declaringType = identityProperty.DeclaringType;
-                if (identityAttr != null)
-                {
-                    if (identityAttr.BaseAddress != null && identityAttr.BaseAddress.Contains(":"))
-                    {
-                        var prefix = identityAttr.BaseAddress.Substring(0, identityAttr.BaseAddress.IndexOf(':'));
-                        var namespaceDecl = identityProperty.DeclaringType == null ? null :
-                            identityProperty.DeclaringType.Assembly.GetCustomAttributes(
-                                typeof(NamespaceDeclarationAttribute), false).Cast<NamespaceDeclarationAttribute>().
-                                FirstOrDefault(nda => nda.Prefix.Equals(prefix));
-                        if (namespaceDecl != null)
-                        {
-                            cachedInfo.BaseUri = namespaceDecl.Reference +
-                                      identityAttr.BaseAddress.Substring(identityAttr.BaseAddress.IndexOf(':') + 1);
-                        }
-                        else
-                        {
-                            cachedInfo.BaseUri = identityAttr.BaseAddress;
-                        }
-                    }
-
-                    if (identityAttr.KeyProperties != null && declaringType != null)
-                    {
-                        cachedInfo.KeyProperties = new PropertyInfo[identityAttr.KeyProperties.Length];
-                        for (int i = 0; i < identityAttr.KeyProperties.Length;i++ )
-                        {
-                            var propertyName = identityAttr.KeyProperties[i];
-                            var propertyInfo = declaringType.GetProperty(propertyName);
-                            if (propertyInfo == null)
-                            {
-                                throw new EntityFrameworkException(
-                                    "Cannot find declared (composite) key property '{0}' on type '{1}'.", propertyName,
-                                    declaringType.FullName);
-                            }
-                            cachedInfo.KeyProperties[i]=propertyInfo;
-                        }
-                        cachedInfo.KeySeparator = identityAttr.KeySeparator ?? DefaultCompositeKeySeparator;
-                        if (identityAttr.KeyConverterType != null)
-                        {
-                            cachedInfo.KeyConverter = Activator.CreateInstance(identityAttr.KeyConverterType) as IKeyConverter;
-                            if (cachedInfo.KeyConverter == null)
-                            {
-                                throw new EntityFrameworkException(
-                                    "Cannot instantiate class {0} as an IKeyConverter instance.", identityAttr.KeyConverterType);
-                            }
-                        }
-                        else
-                        {
-                            cachedInfo.KeyConverter = new DefaultKeyConverter();
-                        }
-
-                    }
-
-                }
-            }
-            IdentityBaseCache[GetType()] = cachedInfo;
-            return cachedInfo;
-        }
 
         /// <summary>
         /// Returns the value of a property of the object
@@ -1022,7 +924,7 @@ namespace BrightstarDB.EntityFramework
         /// <param name="propertyName">The name of the property that has been modified</param>
         protected virtual void OnPropertyChanged(string propertyName)
         {
-            var identityInfo = GetIdentityInfo();
+            var identityInfo = _context.GetIdentityInfo(GetType());
             if (identityInfo != null && identityInfo.KeyProperties.Any(p => p.Name.Equals(propertyName)))
             {
                 var newKey = GenerateEntityKey();

@@ -26,7 +26,9 @@ namespace BrightstarDB.EntityFramework
     {
         private readonly IDataObjectStore _store;
         private readonly Dictionary<string, List<BrightstarEntityObject>> _trackedObjects;
- 
+        private readonly Dictionary<Type, IdentityInfo> _identityCache = new Dictionary<Type, IdentityInfo>();
+        private const string DefaultCompositeKeySeparator = "/";
+
         /// <summary>
         /// Creates a new domain context
         /// </summary>
@@ -171,7 +173,8 @@ namespace BrightstarDB.EntityFramework
             if (_trackedObjects.TryGetValue(obj.DataObject.Identity, out trackedObjects))
             {
                 if (!trackedObjects.Contains(obj)) trackedObjects.Add(obj);
-            }else
+            }
+            else
             {
                 trackedObjects = new List<BrightstarEntityObject> {obj};
                 _trackedObjects[obj.DataObject.Identity] = trackedObjects;
@@ -198,9 +201,122 @@ namespace BrightstarDB.EntityFramework
             {
                 SavingChanges(this, new EventArgs());
             }
+            EnsureIdentity();
             _store.SaveChanges();
         }
 
+        /// <summary>
+        /// Ensure that each of the tracked objects in the context 
+        /// that have key properties have those key properties set.
+        /// </summary>
+        private void EnsureIdentity()
+        {
+            foreach (var entry in _trackedObjects)
+            {
+                foreach (var item in entry.Value)
+                {
+                    if (item.IsModified)
+                    {
+                        EnsureIdentity(item);
+                    }
+                }
+            }
+        }
+
+        private void EnsureIdentity(IEntityObject item)
+        {
+            IdentityInfo identityInfo = GetIdentityInfo(item.GetType());
+            if (identityInfo.KeyConverter != null)
+            {
+                var propertyValues = new object[identityInfo.KeyProperties.Length];
+                for (var i = 0; i < identityInfo.KeyProperties.Length; i++)
+                {
+                    propertyValues[i] = identityInfo.KeyProperties[i].GetValue(item, null);
+                }
+                var key = identityInfo.KeyConverter.GenerateKey(propertyValues, identityInfo.KeySeparator, item.GetType());
+                if (key == null) throw new EntityKeyRequiredException();
+                if (!key.Equals(item.GetKey())) throw new EntityKeyChangedException();
+            }
+        }
+
+        internal IdentityInfo GetIdentityInfo(Type t)
+        {
+            IdentityInfo cachedInfo;
+            if (_identityCache.TryGetValue(t, out cachedInfo)) return cachedInfo;
+
+            var baseUri = Constants.GeneratedUriPrefix;
+            PropertyInfo[] keyProperties = null;
+            var keySeparator = DefaultCompositeKeySeparator;
+            IKeyConverter keyConverter = null;
+
+            var interfaces = t.GetInterfaces().Where(i => i.GetCustomAttributes(typeof(EntityAttribute), true).Any());
+            var identityProperty =
+                interfaces.SelectMany(i => i.GetProperties()).FirstOrDefault(
+                    x => x.GetCustomAttributes(typeof(IdentifierAttribute), true).Any());
+            if (identityProperty != null)
+            {
+                var identityAttr =
+                    identityProperty.GetCustomAttributes(typeof(IdentifierAttribute), true).FirstOrDefault() as
+                    IdentifierAttribute;
+                var declaringType = identityProperty.DeclaringType;
+                if (identityAttr != null)
+                {
+                    if (identityAttr.BaseAddress != null && identityAttr.BaseAddress.Contains(":"))
+                    {
+                        var prefix = identityAttr.BaseAddress.Substring(0, identityAttr.BaseAddress.IndexOf(':'));
+                        var namespaceDecl = identityProperty.DeclaringType == null ? null :
+                            identityProperty.DeclaringType.Assembly.GetCustomAttributes(
+                                typeof(NamespaceDeclarationAttribute), false).Cast<NamespaceDeclarationAttribute>().
+                                FirstOrDefault(nda => nda.Prefix.Equals(prefix));
+                        if (namespaceDecl != null)
+                        {
+                            baseUri = namespaceDecl.Reference +
+                                      identityAttr.BaseAddress.Substring(identityAttr.BaseAddress.IndexOf(':') + 1);
+                        }
+                        else
+                        {
+                            baseUri = identityAttr.BaseAddress;
+                        }
+                    }
+
+                    if (identityAttr.KeyProperties != null && declaringType != null)
+                    {
+                        keyProperties = new PropertyInfo[identityAttr.KeyProperties.Length];
+                        for (int i = 0; i < identityAttr.KeyProperties.Length; i++)
+                        {
+                            var propertyName = identityAttr.KeyProperties[i];
+                            var propertyInfo = declaringType.GetProperty(propertyName);
+                            if (propertyInfo == null)
+                            {
+                                throw new EntityFrameworkException(
+                                    "Cannot find declared (composite) key property '{0}' on type '{1}'.", propertyName,
+                                    declaringType.FullName);
+                            }
+                            keyProperties[i] = propertyInfo;
+                        }
+                        keySeparator = identityAttr.KeySeparator ?? DefaultCompositeKeySeparator;
+                        if (identityAttr.KeyConverterType != null)
+                        {
+                            keyConverter = Activator.CreateInstance(identityAttr.KeyConverterType) as IKeyConverter;
+                            if (keyConverter == null)
+                            {
+                                throw new EntityFrameworkException(
+                                    "Cannot instantiate class {0} as an IKeyConverter instance.", identityAttr.KeyConverterType);
+                            }
+                        }
+                        else
+                        {
+                            keyConverter = new DefaultKeyConverter();
+                        }
+
+                    }
+
+                }
+            }
+            cachedInfo = new IdentityInfo(baseUri, keyProperties, keySeparator, keyConverter);
+            _identityCache[t] = cachedInfo;
+            return cachedInfo;
+        }
         /// <summary>
         /// Updates a single object in the object context with data from the data source
         /// </summary>
@@ -919,5 +1035,6 @@ namespace BrightstarDB.EntityFramework
                 beo.DataObject.RemoveProperty(DataObject.TypeDataObject, typeDo);
             }
         }
+
     }
 }

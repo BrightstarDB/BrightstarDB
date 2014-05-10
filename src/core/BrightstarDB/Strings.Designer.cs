@@ -394,6 +394,15 @@ namespace BrightstarDB {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The entity&apos;s key properties have been modified without updating the identity value..
+        /// </summary>
+        internal static string EntityFramework_EntityKeyChanged {
+            get {
+                return ResourceManager.GetString("EntityFramework_EntityKeyChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The argument provided was not of or assignable to the expected type &apos;{0}&apos;.
         /// </summary>
         internal static string EntityFramework_InvalidEntityType {
@@ -408,6 +417,15 @@ namespace BrightstarDB {
         internal static string EntityFramework_InvalidPropertyMessage {
             get {
                 return ResourceManager.GetString("EntityFramework_InvalidPropertyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The key properties for the entity must be set before adding then entity to a context..
+        /// </summary>
+        internal static string EntityFramework_KeyRequired {
+            get {
+                return ResourceManager.GetString("EntityFramework_KeyRequired", resourceCulture);
             }
         }
         

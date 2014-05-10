@@ -51,6 +51,23 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
+        [ExpectedException(typeof(EntityKeyRequiredException))]
+        public void TestCannotCreateEntityWithKey()
+        {
+            string storeName = "CannotCreateEntityWithKey_" + DateTime.UtcNow.Ticks;
+            using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
+            {
+                using (var context = new MyEntityContext(dataObjectStore))
+                {
+                    // Should throw an exception as the Name property is required to generate the key
+                    context.StringKeyEntities.Create();
+                    context.SaveChanges();
+                }
+            }
+        }
+
+
+        [Test]
         public void TestCustomTriplesQuery()
         {
             string storeName = Guid.NewGuid().ToString();

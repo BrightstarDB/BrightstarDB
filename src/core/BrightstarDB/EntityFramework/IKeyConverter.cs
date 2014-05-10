@@ -19,7 +19,8 @@ namespace BrightstarDB.EntityFramework
         /// and <paramref name="forType"/> parameters are provided for information. The converter
         /// SHOULD honour the <paramref name="keySeparator"/> parameter when inserting separators between
         /// key values.</remarks>
-        /// <returns>A URI-path encoded string</returns>
+        /// <returns>A URI-path encoded string, or null if the key could not be generated (e.g. because one or
+        /// more of the key values are not specified or out of range).</returns>
         string GenerateKey(object[] keyValues, string keySeparator, Type forType);
     }
 }

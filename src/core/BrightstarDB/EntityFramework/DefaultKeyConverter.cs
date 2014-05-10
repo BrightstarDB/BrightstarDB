@@ -25,7 +25,7 @@ namespace BrightstarDB.EntityFramework
         public string GenerateKey(object[] keyValues, string keySeparator, Type forType)
         {
             keyValues = keyValues.Where(x => x != null).ToArray();
-            if (keyValues.Length == 0) return string.Empty;
+            if (keyValues.Length == 0) return null;
             return keyValues.Length == 1 ? Convert(keyValues[0]) : String.Join(keySeparator, keyValues.Select(Convert));
         }
 
