@@ -18,37 +18,46 @@ using BrightstarDB.EntityFramework;
 namespace BrightstarDB.OData 
 {
     public partial class MyEntityContext : BrightstarEntityContext {
-    	private static readonly EntityMappingStore TypeMappings;
     	
     	static MyEntityContext() 
     	{
-    		TypeMappings = new EntityMappingStore();
     		var provider = new ReflectionMappingProvider();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.IDepartment));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.IDepartment, BrightstarDB.OData.Department>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.IPerson));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.IPerson, BrightstarDB.OData.Person>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.ISkill));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.ISkill, BrightstarDB.OData.Skill>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.IDepartment));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.IDepartment, BrightstarDB.OData.Department>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.IPerson));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.IPerson, BrightstarDB.OData.Person>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.ISkill));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.ISkill, BrightstarDB.OData.Skill>();
     	}
     	
     	/// <summary>
-    	/// Initialize a new entity context using the specified Brightstar
+    	/// Initialize a new entity context using the specified BrightstarDB
     	/// Data Object Store connection
     	/// </summary>
-    	/// <param name="dataObjectStore">The connection to the Brightstar Data Object Store that will provide the entity objects</param>
-    	public MyEntityContext(IDataObjectStore dataObjectStore) : base(TypeMappings, dataObjectStore)
+    	/// <param name="dataObjectStore">The connection to the BrightstarDB Data Object Store that will provide the entity objects</param>
+    	public MyEntityContext(IDataObjectStore dataObjectStore) : base(dataObjectStore)
     	{
     		InitializeContext();
     	}
     
     	/// <summary>
-    	/// Initialize a new entity context using the specified Brightstar
-    	/// connection string
+    	/// Initialize a new entity context using the specified Brightstar connection string
     	/// </summary>
     	/// <param name="connectionString">The connection to be used to connect to an existing BrightstarDB store</param>
-    	/// <param name="enableOptimisticLocking">Optional boolean flag to override the optimistic locking setting specified in the connection string.</param>
-    	public MyEntityContext(string connectionString, bool? enableOptimisticLocking = null) : base(TypeMappings, connectionString, enableOptimisticLocking)
+    	/// <param name="enableOptimisticLocking">OPTIONAL: If set to true optmistic locking will be applied to all entity updates</param>
+        /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// not defined, the default graph in the store will be updated.</param>
+        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
+        /// If not defined, all graphs in the store will be queried.</param>
+        /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
+        /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+    	public MyEntityContext(
+    	    string connectionString, 
+    		bool? enableOptimisticLocking=null,
+    		string updateGraphUri = null,
+    		IEnumerable<string> datasetGraphUris = null,
+    		string versionGraphUri = null
+        ) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -57,7 +66,27 @@ namespace BrightstarDB.OData
     	/// Initialize a new entity context using the specified Brightstar
     	/// connection string retrieved from the configuration.
     	/// </summary>
-    	public MyEntityContext() : base(TypeMappings)
+    	public MyEntityContext() : base()
+    	{
+    		InitializeContext();
+    	}
+    	
+    	/// <summary>
+    	/// Initialize a new entity context using the specified Brightstar
+    	/// connection string retrieved from the configuration and the
+    	//  specified target graphs
+    	/// </summary>
+        /// <param name="updateGraphUri">The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// set to null, the default graph in the store will be updated.</param>
+        /// <param name="datasetGraphUris">The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
+        /// If set to null, all graphs in the store will be queried.</param>
+        /// <param name="versionGraphUri">The URI identifier of the graph that contains version number statements for entities. 
+        /// If set to null, the value of <paramref name="updateGraphUri"/> will be used.</param>
+    	public MyEntityContext(
+    		string updateGraphUri,
+    		IEnumerable<string> datasetGraphUris,
+    		string versionGraphUri
+    	) : base(updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -69,17 +98,17 @@ namespace BrightstarDB.OData
     		Skills = 	new BrightstarEntitySet<BrightstarDB.OData.ISkill>(this);
     	}
     	
-    	public IEntitySet<BrightstarDB.OData.IDepartment> Departments 
+    	public IEntitySet<BrightstarDB.OData.IDepartment> Departments
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.OData.IPerson> Persons 
+    	public IEntitySet<BrightstarDB.OData.IPerson> Persons
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.OData.ISkill> Skills 
+    	public IEntitySet<BrightstarDB.OData.ISkill> Skills
     	{
     		get; private set;
     	}
@@ -88,11 +117,12 @@ namespace BrightstarDB.OData
 }
 namespace BrightstarDB.OData 
 {
+    
     public partial class Department : BrightstarEntityObject, IDepartment 
     {
     	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.IDepartment
     
     	public System.String Name
@@ -103,18 +133,19 @@ namespace BrightstarDB.OData
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.IPerson> Members
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.IPerson>("Members"); }
-    		set { SetRelatedObjects("Members", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Members", value); }
     								}
     	#endregion
     }
 }
 namespace BrightstarDB.OData 
 {
+    
     public partial class Person : BrightstarEntityObject, IPerson 
     {
     	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.IPerson
     
     	public System.String Name
@@ -137,7 +168,7 @@ namespace BrightstarDB.OData
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.ISkill> Skills
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.ISkill>("Skills"); }
-    		set { SetRelatedObjects("Skills", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Skills", value); }
     								}
     
     	public BrightstarDB.OData.ISkill MainSkill
@@ -148,7 +179,7 @@ namespace BrightstarDB.OData
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.ISkill> BackupSkills
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.ISkill>("BackupSkills"); }
-    		set { SetRelatedObjects("BackupSkills", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("BackupSkills", value); }
     								}
     
     	public BrightstarDB.OData.IDepartment Department
@@ -161,11 +192,12 @@ namespace BrightstarDB.OData
 }
 namespace BrightstarDB.OData 
 {
+    
     public partial class Skill : BrightstarEntityObject, ISkill 
     {
     	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.ISkill
     
     	public System.String Name
@@ -182,7 +214,7 @@ namespace BrightstarDB.OData
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.IPerson> BackupPeople
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.IPerson>("BackupPeople"); }
-    		set { SetRelatedObjects("BackupPeople", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("BackupPeople", value); }
     								}
     	#endregion
     }

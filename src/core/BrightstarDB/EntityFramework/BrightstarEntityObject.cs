@@ -136,17 +136,17 @@ namespace BrightstarDB.EntityFramework
         }
         
         /// <summary>
-        /// Sets the identity for this object
+        /// Sets the key for this object
         /// </summary>
-        /// <param name="id">The new object identity</param>
+        /// <param name="key">The new object identity</param>
         /// <remarks>If the entity definition interface has a <see cref="IdentifierAttribute"/> on it,
         /// then the full identity of the object will be the value of the <see cref="IdentifierAttribute.BaseAddress"/> 
-        /// property followed by the <paramref name="id"/> parameter value, otherwise the <paramref name="id"/>
-        /// parameter value should be an absolute URI.</remarks>
-        protected void SetIdentity(string id)
+        /// property followed by the <paramref name="key"/> parameter value, otherwise the default <see cref="Constants.GeneratedUriPrefix"/>
+        /// is prepended to make a full URI.</remarks>
+        protected void SetKey(string key)
         {
             var baseUri = GetIdentityBase();
-            var identity = String.IsNullOrEmpty(baseUri) ? id : baseUri + id;
+            var identity = String.IsNullOrEmpty(baseUri) ? key : baseUri + key;
             Identity = identity;
         }
 
@@ -175,11 +175,11 @@ namespace BrightstarDB.EntityFramework
             {
                 if (!String.IsNullOrEmpty(GetIdentityBase()))
                 {
-                    SetIdentity(idOrAddress);
+                    SetKey(idOrAddress);
                 }
                 else
                 {
-                    SetIdentity(Constants.GeneratedUriPrefix + idOrAddress);
+                    SetKey(Constants.GeneratedUriPrefix + idOrAddress);
                 }
             }
             return GetKey();
@@ -768,7 +768,7 @@ namespace BrightstarDB.EntityFramework
             if (DataObject == null && _identity != null)
             {
                 DataObject = _context.GetDataObject(new Uri(_identity), false);
-                foreach(var typeUri in _context.Mappings.MapTypeToUris(GetType()))
+                foreach(var typeUri in EntityMappingStore.MapTypeToUris(GetType()))
                 {
                     if (!String.IsNullOrEmpty(typeUri))
                     {

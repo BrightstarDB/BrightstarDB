@@ -9,10 +9,9 @@ namespace BrightstarDB.EntityFramework.Tests
 
         protected void InitializeContext()
         {
-            var contextMappings = new EntityMappingStore();
             var rmp = new ReflectionMappingProvider();
-            rmp.AddMappingsForAssembly(contextMappings, typeof(LinqToSparqlTests).Assembly);
-            Context = new MockContext(contextMappings);
+            rmp.AddMappingsForAssembly(EntityMappingStore.Instance, typeof(LinqToSparqlTests).Assembly);
+            Context = new MockContext();
         }
 
         protected void AssertQuerySparql(string expected)

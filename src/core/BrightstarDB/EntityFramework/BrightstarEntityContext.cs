@@ -32,9 +32,8 @@ namespace BrightstarDB.EntityFramework
         /// <summary>
         /// Creates a new domain context
         /// </summary>
-        /// <param name="mappings">The context type and property mappings</param>
         /// <param name="store">The Brightstar store that manages the data</param>
-        protected BrightstarEntityContext(EntityMappingStore mappings, IDataObjectStore store) :base(mappings)
+        protected BrightstarEntityContext(IDataObjectStore store)
         {
             _store = store;
             _trackedObjects = new Dictionary<string, List<BrightstarEntityObject>>();
@@ -43,7 +42,6 @@ namespace BrightstarDB.EntityFramework
         /// <summary>
         /// Creates a new domain context
         /// </summary>
-        /// <param name="mappings">The context type and property mappings</param>
         ///<param name="connectionString">The connection string that will be used to connect to an existing BrightstarDB store</param>
         ///<param name="enableOptimisticLocking">Optional parameter to override the optimistic locking configuration specified in the connection string</param>
         /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
@@ -57,8 +55,8 @@ namespace BrightstarDB.EntityFramework
         /// <paramref name="updateGraphUri"/> and <paramref name="versionGraphUri"/> only. If all three parameters
         /// are null then the context will query across all graphs in the store.</para>
         /// </remarks>
-        protected BrightstarEntityContext(EntityMappingStore mappings, string connectionString, bool? enableOptimisticLocking = null,
-            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null ) : base(mappings)
+        protected BrightstarEntityContext(string connectionString, bool? enableOptimisticLocking = null,
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null )
         {
             var cstr = new ConnectionString(connectionString);
             AssertStoreFromConnectionString(cstr);
@@ -98,16 +96,14 @@ namespace BrightstarDB.EntityFramework
         /// <summary>
         /// Creates a new domain context and connects to the store specified in the configuration connectionString.
         /// </summary>
-        /// <param name="mappings">The context type and property mappings</param>
         /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
         /// not defined, the default graph in the store will be updated.</param>
         /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
         /// If not defined, all graphs in the store will be queried.</param>
         /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
         /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
-        protected BrightstarEntityContext(EntityMappingStore mappings,
+        protected BrightstarEntityContext(
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
-            : base(mappings)
         {
             var cstr = new ConnectionString(Configuration.ConnectionString);
             AssertStoreFromConnectionString(cstr);
@@ -703,7 +699,7 @@ namespace BrightstarDB.EntityFramework
         public override string MapIdToUri(PropertyInfo identifierProperty, string id)
         {
             var entityType = identifierProperty.DeclaringType;
-            var prefix = Mappings.GetIdentifierPrefix(entityType);
+            var prefix = EntityMappingStore.GetIdentifierPrefix(entityType);
             return prefix + id;
         }
 
@@ -764,12 +760,12 @@ namespace BrightstarDB.EntityFramework
         ///<returns>The new object</returns>
         public T CreateObject<T>() where T : class
         {
-            var prefix = Mappings.GetIdentifierPrefix(typeof (T));
+            var prefix = EntityMappingStore.GetIdentifierPrefix(typeof (T));
             //var dataObject = String.IsNullOrEmpty(prefix)
             //                     ? _store.MakeDataObject()
             //                     : _store.MakeDataObject(prefix + Guid.NewGuid());
             var dataObject = _store.MakeNewDataObject(prefix);
-            IEnumerable<string> typeIds = Mappings.MapTypeToUris(typeof (T));            
+            IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(typeof (T));
             foreach (var typeId in typeIds)
             {
                 if (!String.IsNullOrEmpty(typeId))
@@ -997,11 +993,11 @@ namespace BrightstarDB.EntityFramework
         /// <returns>An instance of <typeparamref name="T"/> that is bound to the same underlying resource as <paramref name="beo"/>.</returns>
         public T Become<T>(BrightstarEntityObject beo)
         {
-            if (!Mappings.IsKnownInterface(typeof(T)))
+            if (!EntityMappingStore.IsKnownInterface(typeof(T)))
             {
                 throw new MappingNotFoundException(typeof(T));
             }
-            var implType = Mappings.GetImplType(typeof (T));
+            var implType = EntityMappingStore.GetImplType(typeof (T));
             List<BrightstarEntityObject> trackedObjects;
             if (_trackedObjects.TryGetValue(beo.DataObject.Identity, out trackedObjects))
             {
@@ -1009,7 +1005,7 @@ namespace BrightstarDB.EntityFramework
                 if (ret != null) return ret;
             }
             var dataObject = beo.DataObject;
-            foreach(var typeUri in Mappings.MapTypeToUris(implType))
+            foreach(var typeUri in EntityMappingStore.MapTypeToUris(implType))
             {
                 var typeDo = GetDataObject(new Uri(typeUri), false);
                 dataObject.AddProperty(DataObject.TypeDataObject, typeDo);
@@ -1024,11 +1020,11 @@ namespace BrightstarDB.EntityFramework
         /// <param name="beo">An existing entity bound to the resource to be updated</param>
         public void Unbecome<T>(BrightstarEntityObject beo) 
         {
-            if (!Mappings.IsKnownInterface(typeof(T)))
+            if (!EntityMappingStore.IsKnownInterface(typeof(T)))
             {
                 throw new MappingNotFoundException(typeof(T));
             }
-            var typeUri = Mappings.GetMappedInterfaceTypeUri(Mappings.GetImplType(typeof (T)));
+            var typeUri = EntityMappingStore.GetMappedInterfaceTypeUri(EntityMappingStore.GetImplType(typeof (T)));
             if (!String.IsNullOrEmpty(typeUri))
             {
                 var typeDo = GetDataObject(new Uri(typeUri), false);

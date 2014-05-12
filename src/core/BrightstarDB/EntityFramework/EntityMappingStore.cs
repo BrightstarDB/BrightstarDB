@@ -9,19 +9,36 @@ namespace BrightstarDB.EntityFramework
     /// Manages the interface to implementation class mappings, interface to resource type mappings
     /// and property to RDF property type mappings required by a <see cref="EntityContext"/>.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This is a singleton instance to allow all entities to access mapping information
+    /// even when not currently attached to a context. It is therefore important that if multiple
+    /// contexts are concurrently actvie they all share the same type and property mapping
+    /// information. This will always be the case using the default <see cref="ReflectionMappingProvider"/>
+    /// as the mapping information comes from compile-time type specification. 
+    /// </para>
+    /// <para>Change made to a mapping will not affect pre-existing items in the context, it will only 
+    /// affect those items when they are modified or when new items are created or retrieved from a context.</para>
+    /// </remarks>
     public class EntityMappingStore
     {
         private readonly Dictionary<Type, string> _typeMappings;
-        private readonly Dictionary<Type, string> _identifierPrefixes; 
+        private readonly Dictionary<Type, string> _identifierPrefixes;
         private readonly Dictionary<PropertyInfo, PropertyHint> _propertyHints;
         private readonly Dictionary<Type, Type> _implMappings;
         private readonly Dictionary<Type, Type> _interfaceMappings;
-        private readonly Dictionary<Type, PropertyInfo> _identityProperties; 
+        private readonly Dictionary<Type, PropertyInfo> _identityProperties;
+
+        /// <summary>
+        /// Returns the singleton instance of this class that tracks all entity mapping
+        /// information for the current application domain.
+        /// </summary>
+        public static readonly EntityMappingStore Instance = new EntityMappingStore();
 
         /// <summary>
         /// Creates a new mapping store with no mappings defined
         /// </summary>
-        public EntityMappingStore()
+        private EntityMappingStore()
         {
             _typeMappings = new Dictionary<Type, string>();
             _identifierPrefixes = new Dictionary<Type, string>();
@@ -31,18 +48,8 @@ namespace BrightstarDB.EntityFramework
             _identityProperties = new Dictionary<Type, PropertyInfo>();
         }
 
-        /// <summary>
-        /// Creates a new mapping store that copies its initial mappings from the specified source store
-        /// </summary>
-        /// <param name="source">The source <see cref="EntityMappingStore"/> from which mappings are copied</param>
-        public EntityMappingStore(EntityMappingStore source)
-        {
-            _typeMappings = new Dictionary<Type, string>(source._typeMappings);
-            _identifierPrefixes = new Dictionary<Type, string>(source._identifierPrefixes);
-            _propertyHints = new Dictionary<PropertyInfo, PropertyHint>(source._propertyHints);
-            _implMappings = new Dictionary<Type, Type>(source._implMappings);
-            _identityProperties = new Dictionary<Type, PropertyInfo>(source._identityProperties);
-        }
+
+        #region Instance Methods
 
         /// <summary>
         /// Adds a mapping between an entity definition interface and its implementation class
@@ -53,7 +60,7 @@ namespace BrightstarDB.EntityFramework
             where I : class
             where T : I
         {
-            _implMappings[typeof(I)] = typeof(T);
+            _implMappings[typeof (I)] = typeof (T);
             _interfaceMappings[typeof (T)] = typeof (I);
         }
 
@@ -72,7 +79,12 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="mappedType">The entity implementation class type</param>
         /// <returns>The URI identifier prefix string for the entity implementation type or null if there is no mapping</returns>
-        public string GetIdentifierPrefix(Type mappedType)
+        public static string GetIdentifierPrefix(Type mappedType)
+        {
+            return Instance._GetIdentifierPrefix(mappedType);
+        }
+
+        private string _GetIdentifierPrefix(Type mappedType)
         {
             string prefix;
             Type interfaceType;
@@ -111,7 +123,7 @@ namespace BrightstarDB.EntityFramework
         /// <param name="typeUri">The schema type URI</param>
         public void SetTypeMapping<T>(string typeUri) where T : class
         {
-            _typeMappings[typeof(T)] = typeUri;
+            _typeMappings[typeof (T)] = typeUri;
         }
 
         /// <summary>
@@ -138,7 +150,9 @@ namespace BrightstarDB.EntityFramework
             if (propertyInfo == null) throw new ArgumentNullException("propertyInfo");
             if ((propertyInfo.DeclaringType != null) && _interfaceMappings.ContainsKey(propertyInfo.DeclaringType))
             {
-                foreach(var @interface in propertyInfo.DeclaringType.GetInterfaces().Where(i=>_implMappings.ContainsKey(i)))
+                foreach (
+                    var @interface in
+                        propertyInfo.DeclaringType.GetInterfaces().Where(i => _implMappings.ContainsKey(i)))
                 {
                     var interfaceProperty = @interface.GetProperty(propertyInfo.Name);
                     if (interfaceProperty != null)
@@ -158,7 +172,12 @@ namespace BrightstarDB.EntityFramework
         /// <param name="type">The entity implementation type</param>
         /// <returns>The schema type URI</returns>
         /// <exception cref="MappingNotFoundException">Raised if <paramref name="type"/> is not a mapped entity implementation type or if no schema type URI has been mapped</exception>
-        public string GetMappedInterfaceTypeUri(Type type)
+        public static string GetMappedInterfaceTypeUri(Type type)
+        {
+            return Instance._GetMappedInterfaceTypeUri(type);
+        }
+
+        private string _GetMappedInterfaceTypeUri(Type type)
         {
             Type interfaceType;
             string identifier;
@@ -169,7 +188,7 @@ namespace BrightstarDB.EntityFramework
             }
             throw new MappingNotFoundException(type);
         }
-        
+
         /// <summary>
         /// Returns the collection of schema type URIs that a given entity implementation type can be mapped to
         /// </summary>
@@ -177,7 +196,12 @@ namespace BrightstarDB.EntityFramework
         /// <returns>An enumeration over the collection of schema type URIs that the implementation type can be mapped to</returns>
         /// <remarks>An entity implementation type can potentially map to multiple schema type URIs e.g. when the implementation type
         /// implements multiple interfaces or where there is an inheritance hierarchy on the interfaces</remarks>
-        public IEnumerable<string> MapTypeToUris(Type type)
+        public static IEnumerable<string> MapTypeToUris(Type type)
+        {
+            return Instance._MapTypeToUris(type);
+        }
+
+        private IEnumerable<string> _MapTypeToUris(Type type)
         {
             bool haveMapping = false;
             if (_typeMappings.ContainsKey(type))
@@ -185,10 +209,10 @@ namespace BrightstarDB.EntityFramework
                 haveMapping = true;
                 yield return _typeMappings[type];
             }
-            foreach(var typeUri in 
+            foreach (var typeUri in
                 type.GetInterfaces().Where(i => _typeMappings.ContainsKey(i)).Select(i => _typeMappings[i]))
             {
-                if(typeUri != null)
+                if (typeUri != null)
                 {
                     haveMapping = true;
                     yield return typeUri;
@@ -220,7 +244,12 @@ namespace BrightstarDB.EntityFramework
         /// <returns>The entity implementation type or <paramref name="interfaceType"/> is no mapping is found</returns>
         /// <remarks>This method returns the input <paramref name="interfaceType"/> to allow a caller to pass a type that may be either an interface or an implementation type in and get the interface type out
         /// without having to know if the parameter actually is an interface type already.</remarks>
-        public Type GetImplType(Type interfaceType)
+        public static Type GetImplType(Type interfaceType)
+        {
+            return Instance._GetImplType(interfaceType);
+        }
+
+        private Type _GetImplType(Type interfaceType)
         {
             Type implType;
             if (_implMappings.TryGetValue(interfaceType, out implType))
@@ -235,9 +264,9 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="t">The type to be tested</param>
         /// <returns>True if the type is an entity implementation type, false otherwise</returns>
-        public bool IsMappedImplementation(Type t)
+        public static bool IsMappedImplementation(Type t)
         {
-            return _interfaceMappings.ContainsKey(t);
+            return Instance._interfaceMappings.ContainsKey(t);
         }
 
         /// <summary>
@@ -245,9 +274,9 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="t">The type to be tested</param>
         /// <returns>True if the type is an entity interface type, false otherwise</returns>
-        public bool IsKnownInterface(Type t)
+        public static bool IsKnownInterface(Type t)
         {
-            return _implMappings.ContainsKey(t);
+            return Instance._implMappings.ContainsKey(t);
         }
 
         /// <summary>
@@ -268,5 +297,7 @@ namespace BrightstarDB.EntityFramework
             }
             return ret;
         }
+
+        #endregion
     }
 }

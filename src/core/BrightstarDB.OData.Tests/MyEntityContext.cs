@@ -18,47 +18,56 @@ using BrightstarDB.EntityFramework;
 namespace BrightstarDB.OData.Tests 
 {
     public partial class MyEntityContext : BrightstarEntityContext {
-    	private static readonly EntityMappingStore TypeMappings;
     	
     	static MyEntityContext() 
     	{
-    		TypeMappings = new EntityMappingStore();
     		var provider = new ReflectionMappingProvider();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IArticle));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IArticle, BrightstarDB.OData.Tests.Article>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.ICompany));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.ICompany, BrightstarDB.OData.Tests.Company>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IDataTypeTestEntity));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IDataTypeTestEntity, BrightstarDB.OData.Tests.DataTypeTestEntity>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IDepartment));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IDepartment, BrightstarDB.OData.Tests.Department>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IJobRole));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IJobRole, BrightstarDB.OData.Tests.JobRole>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IPerson));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IPerson, BrightstarDB.OData.Tests.Person>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.IProject));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.IProject, BrightstarDB.OData.Tests.Project>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.OData.Tests.ISkill));
-    		TypeMappings.SetImplMapping<BrightstarDB.OData.Tests.ISkill, BrightstarDB.OData.Tests.Skill>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.Tests.IArticle));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.Tests.IArticle, BrightstarDB.OData.Tests.Article>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.Tests.ICompany));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.Tests.ICompany, BrightstarDB.OData.Tests.Company>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.Tests.IDataTypeTestEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.Tests.IDataTypeTestEntity, BrightstarDB.OData.Tests.DataTypeTestEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.Tests.IDepartment));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.Tests.IDepartment, BrightstarDB.OData.Tests.Department>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.Tests.IJobRole));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.Tests.IJobRole, BrightstarDB.OData.Tests.JobRole>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.Tests.IPerson));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.Tests.IPerson, BrightstarDB.OData.Tests.Person>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.Tests.IProject));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.Tests.IProject, BrightstarDB.OData.Tests.Project>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.OData.Tests.ISkill));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.OData.Tests.ISkill, BrightstarDB.OData.Tests.Skill>();
     	}
     	
     	/// <summary>
-    	/// Initialize a new entity context using the specified Brightstar
+    	/// Initialize a new entity context using the specified BrightstarDB
     	/// Data Object Store connection
     	/// </summary>
-    	/// <param name="dataObjectStore">The connection to the Brightstar Data Object Store that will provide the entity objects</param>
-    	public MyEntityContext(IDataObjectStore dataObjectStore) : base(TypeMappings, dataObjectStore)
+    	/// <param name="dataObjectStore">The connection to the BrightstarDB Data Object Store that will provide the entity objects</param>
+    	public MyEntityContext(IDataObjectStore dataObjectStore) : base(dataObjectStore)
     	{
     		InitializeContext();
     	}
     
     	/// <summary>
-    	/// Initialize a new entity context using the specified Brightstar
-    	/// connection string
+    	/// Initialize a new entity context using the specified Brightstar connection string
     	/// </summary>
     	/// <param name="connectionString">The connection to be used to connect to an existing BrightstarDB store</param>
     	/// <param name="enableOptimisticLocking">OPTIONAL: If set to true optmistic locking will be applied to all entity updates</param>
-    	public MyEntityContext(string connectionString, bool? enableOptimisticLocking=null) : base(TypeMappings, connectionString, enableOptimisticLocking)
+        /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// not defined, the default graph in the store will be updated.</param>
+        /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
+        /// If not defined, all graphs in the store will be queried.</param>
+        /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
+        /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+    	public MyEntityContext(
+    	    string connectionString, 
+    		bool? enableOptimisticLocking=null,
+    		string updateGraphUri = null,
+    		IEnumerable<string> datasetGraphUris = null,
+    		string versionGraphUri = null
+        ) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -67,7 +76,27 @@ namespace BrightstarDB.OData.Tests
     	/// Initialize a new entity context using the specified Brightstar
     	/// connection string retrieved from the configuration.
     	/// </summary>
-    	public MyEntityContext() : base(TypeMappings)
+    	public MyEntityContext() : base()
+    	{
+    		InitializeContext();
+    	}
+    	
+    	/// <summary>
+    	/// Initialize a new entity context using the specified Brightstar
+    	/// connection string retrieved from the configuration and the
+    	//  specified target graphs
+    	/// </summary>
+        /// <param name="updateGraphUri">The URI identifier of the graph to be updated with any new triples created by operations on the store. If
+        /// set to null, the default graph in the store will be updated.</param>
+        /// <param name="datasetGraphUris">The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
+        /// If set to null, all graphs in the store will be queried.</param>
+        /// <param name="versionGraphUri">The URI identifier of the graph that contains version number statements for entities. 
+        /// If set to null, the value of <paramref name="updateGraphUri"/> will be used.</param>
+    	public MyEntityContext(
+    		string updateGraphUri,
+    		IEnumerable<string> datasetGraphUris,
+    		string versionGraphUri
+    	) : base(updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -128,11 +157,12 @@ namespace BrightstarDB.OData.Tests
 }
 namespace BrightstarDB.OData.Tests 
 {
+    
     public partial class Article : BrightstarEntityObject, IArticle 
     {
     	public Article(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Article() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IArticle
     
     	public System.String Title
@@ -157,11 +187,12 @@ namespace BrightstarDB.OData.Tests
 }
 namespace BrightstarDB.OData.Tests 
 {
+    
     public partial class Company : BrightstarEntityObject, ICompany 
     {
     	public Company(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Company() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.ICompany
     
     	public System.String Name
@@ -196,18 +227,19 @@ namespace BrightstarDB.OData.Tests
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.Tests.IDepartment> Departments
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.Tests.IDepartment>("Departments"); }
-    		set { SetRelatedObjects("Departments", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Departments", value); }
     								}
     	#endregion
     }
 }
 namespace BrightstarDB.OData.Tests 
 {
+    
     public partial class DataTypeTestEntity : BrightstarEntityObject, IDataTypeTestEntity 
     {
     	public DataTypeTestEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public DataTypeTestEntity() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IDataTypeTestEntity
     
     	public System.String SomeString
@@ -374,53 +406,54 @@ namespace BrightstarDB.OData.Tests
     	public System.Collections.Generic.ICollection<System.String> CollectionOfStrings
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
     	}
     	public System.Collections.Generic.ICollection<System.DateTime> CollectionOfDateTimes
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Boolean> CollectionOfBools
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Decimal> CollectionOfDecimals
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Double> CollectionOfDoubles
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Single> CollectionOfFloats
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Int32> CollectionOfInts
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts", value); }
     	}
     	public System.Collections.Generic.ICollection<System.Int64> CollectionOfLong
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong", value); }
     	}
     	#endregion
     }
 }
 namespace BrightstarDB.OData.Tests 
 {
+    
     public partial class Department : BrightstarEntityObject, IDepartment 
     {
     	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IDepartment
     
     	public System.String Name
@@ -437,7 +470,7 @@ namespace BrightstarDB.OData.Tests
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.Tests.IPerson> Persons
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.Tests.IPerson>("Persons"); }
-    		set { SetRelatedObjects("Persons", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Persons", value); }
     								}
     
     	public BrightstarDB.OData.Tests.ICompany Company
@@ -450,11 +483,12 @@ namespace BrightstarDB.OData.Tests
 }
 namespace BrightstarDB.OData.Tests 
 {
+    
     public partial class JobRole : BrightstarEntityObject, IJobRole 
     {
     	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IJobRole
     
     	public System.String Description
@@ -465,18 +499,19 @@ namespace BrightstarDB.OData.Tests
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.Tests.IPerson> Persons
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.Tests.IPerson>("Persons"); }
-    		set { SetRelatedObjects("Persons", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Persons", value); }
     								}
     	#endregion
     }
 }
 namespace BrightstarDB.OData.Tests 
 {
+    
     public partial class Person : BrightstarEntityObject, IPerson 
     {
     	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IPerson
     
     	public System.String Name
@@ -505,7 +540,7 @@ namespace BrightstarDB.OData.Tests
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.Tests.ISkill> Skills
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.Tests.ISkill>("Skills"); }
-    		set { SetRelatedObjects("Skills", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Skills", value); }
     								}
     
     	public BrightstarDB.OData.Tests.IDepartment Department
@@ -528,23 +563,24 @@ namespace BrightstarDB.OData.Tests
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.Tests.IArticle> Articles
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.Tests.IArticle>("Articles"); }
-    		set { SetRelatedObjects("Articles", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Articles", value); }
     								}
     	public System.Collections.Generic.ICollection<System.String> CollectionOfStrings
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
     	}
     	#endregion
     }
 }
 namespace BrightstarDB.OData.Tests 
 {
+    
     public partial class Project : BrightstarEntityObject, IProject 
     {
     	public Project(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Project() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IProject
     
     	public System.String Title
@@ -581,11 +617,12 @@ namespace BrightstarDB.OData.Tests
 }
 namespace BrightstarDB.OData.Tests 
 {
+    
     public partial class Skill : BrightstarEntityObject, ISkill 
     {
     	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.ISkill
     
     	public System.String Name
@@ -602,12 +639,12 @@ namespace BrightstarDB.OData.Tests
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.Tests.ISkill> Children
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.Tests.ISkill>("Children"); }
-    		set { SetRelatedObjects("Children", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Children", value); }
     								}
     	public System.Collections.Generic.ICollection<BrightstarDB.OData.Tests.IPerson> SkilledPeople
     	{
     		get { return GetRelatedObjects<BrightstarDB.OData.Tests.IPerson>("SkilledPeople"); }
-    		set { SetRelatedObjects("SkilledPeople", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("SkilledPeople", value); }
     								}
     	#endregion
     }
