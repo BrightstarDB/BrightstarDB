@@ -28,7 +28,7 @@ namespace BrightstarDB.EntityFramework.Tests
             var id = dinnerType.GetProperty("Id");
             var hint = Context.GetPropertyHint(id);
             Assert.IsNotNull(hint);
-            Assert.AreEqual(PropertyMappingType.Address, hint.MappingType);
+            Assert.AreEqual(PropertyMappingType.Id, hint.MappingType);
             var title = dinnerType.GetProperty("Title");
             hint = Context.GetPropertyHint(title);
             Assert.IsNotNull(hint);
@@ -69,7 +69,7 @@ namespace BrightstarDB.EntityFramework.Tests
             lastSparql = Context.LastSparqlQuery;
             Assert.IsNotNull(lastSparql);
             Assert.AreEqual(
-                NormalizeSparql("ASK { <1> a <http://www.networkedplanet.com/schemas/test/Dinner> . }"),
+                NormalizeSparql("ASK { <id:1> a <http://www.networkedplanet.com/schemas/test/Dinner> . }"),
                 NormalizeSparql(lastSparql));
         }
 
@@ -191,7 +191,7 @@ namespace BrightstarDB.EntityFramework.Tests
 ?p ?p_p ?p_o . {
     SELECT ?p WHERE { 
     ?p a <http://www.networkedplanet.com/schemas/test/Person> .
-    ?p <http://www.networkedplanet.com/schemas/test/father> <address> .} } }"), NormalizeSparql(lastSparql));
+    ?p <http://www.networkedplanet.com/schemas/test/father> <id:address> .} } }"), NormalizeSparql(lastSparql));
         }
 
 
