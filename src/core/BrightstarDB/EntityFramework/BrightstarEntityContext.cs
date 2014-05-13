@@ -26,8 +26,6 @@ namespace BrightstarDB.EntityFramework
     {
         private readonly IDataObjectStore _store;
         private readonly Dictionary<string, List<BrightstarEntityObject>> _trackedObjects;
-        private readonly Dictionary<Type, IdentityInfo> _identityCache = new Dictionary<Type, IdentityInfo>();
-        private const string DefaultCompositeKeySeparator = "/";
 
         /// <summary>
         /// Creates a new domain context
@@ -221,8 +219,8 @@ namespace BrightstarDB.EntityFramework
 
         private void EnsureIdentity(IEntityObject item)
         {
-            IdentityInfo identityInfo = GetIdentityInfo(item.GetType());
-            if (identityInfo.KeyConverter != null)
+            IdentityInfo identityInfo = EntityMappingStore.GetIdentityInfo(item.GetType());
+            if (identityInfo != null && identityInfo.KeyConverter != null)
             {
                 var propertyValues = new object[identityInfo.KeyProperties.Length];
                 for (var i = 0; i < identityInfo.KeyProperties.Length; i++)
@@ -235,6 +233,7 @@ namespace BrightstarDB.EntityFramework
             }
         }
 
+        /*
         internal IdentityInfo GetIdentityInfo(Type t)
         {
             IdentityInfo cachedInfo;
@@ -313,6 +312,7 @@ namespace BrightstarDB.EntityFramework
             _identityCache[t] = cachedInfo;
             return cachedInfo;
         }
+         */
         /// <summary>
         /// Updates a single object in the object context with data from the data source
         /// </summary>

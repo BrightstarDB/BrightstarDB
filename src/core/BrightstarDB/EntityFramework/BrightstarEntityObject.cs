@@ -187,7 +187,7 @@ namespace BrightstarDB.EntityFramework
 
         private string GenerateEntityKey()
         {
-            var identityCacheInfo = _context.GetIdentityInfo(GetType());
+            var identityCacheInfo = EntityMappingStore.GetIdentityInfo(GetType());
             if (identityCacheInfo != null && identityCacheInfo.KeyProperties != null)
             {
                 // Generate the key string
@@ -203,10 +203,9 @@ namespace BrightstarDB.EntityFramework
 
         internal string GetIdentityBase()
         {
-            var identityCacheInfo = _context.GetIdentityInfo(GetType());
+            var identityCacheInfo = EntityMappingStore.GetIdentityInfo(GetType());
             return identityCacheInfo.BaseUri;
         }
-
 
 
         /// <summary>
@@ -924,8 +923,8 @@ namespace BrightstarDB.EntityFramework
         /// <param name="propertyName">The name of the property that has been modified</param>
         protected virtual void OnPropertyChanged(string propertyName)
         {
-            var identityInfo = _context.GetIdentityInfo(GetType());
-            if (identityInfo != null && identityInfo.KeyProperties.Any(p => p.Name.Equals(propertyName)))
+            var identityInfo = EntityMappingStore.GetIdentityInfo(GetType());
+            if (identityInfo != null && identityInfo.KeyProperties != null && identityInfo.KeyProperties.Any(p => p.Name.Equals(propertyName)))
             {
                 var newKey = GenerateEntityKey();
                 var newIdentity = identityInfo.BaseUri + newKey;

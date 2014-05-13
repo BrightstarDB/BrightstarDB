@@ -23,11 +23,11 @@ namespace BrightstarDB.EntityFramework
     public class EntityMappingStore
     {
         private readonly Dictionary<Type, string> _typeMappings;
-        private readonly Dictionary<Type, string> _identifierPrefixes;
+        //private readonly Dictionary<Type, string> _identifierPrefixes;
         private readonly Dictionary<PropertyInfo, PropertyHint> _propertyHints;
         private readonly Dictionary<Type, Type> _implMappings;
         private readonly Dictionary<Type, Type> _interfaceMappings;
-        private readonly Dictionary<Type, PropertyInfo> _identityProperties;
+        private readonly Dictionary<Type, IdentityInfo> _identityInfo;
 
         /// <summary>
         /// Returns the singleton instance of this class that tracks all entity mapping
@@ -41,11 +41,12 @@ namespace BrightstarDB.EntityFramework
         private EntityMappingStore()
         {
             _typeMappings = new Dictionary<Type, string>();
-            _identifierPrefixes = new Dictionary<Type, string>();
+            //_identifierPrefixes = new Dictionary<Type, string>();
             _propertyHints = new Dictionary<PropertyInfo, PropertyHint>();
             _implMappings = new Dictionary<Type, Type>();
             _interfaceMappings = new Dictionary<Type, Type>();
-            _identityProperties = new Dictionary<Type, PropertyInfo>();
+            //_identityProperties = new Dictionary<Type, PropertyInfo>();
+            _identityInfo = new Dictionary<Type, IdentityInfo>();
         }
 
 
@@ -64,15 +65,17 @@ namespace BrightstarDB.EntityFramework
             _interfaceMappings[typeof (T)] = typeof (I);
         }
 
+        /*
         /// <summary>
         /// Sets the prefix string for generated URI identifiers for the instances of an entity type
         /// </summary>
         /// <param name="mappedType">The entity implementation class type</param>
         /// <param name="prefix">The URI identifier prefix string</param>
-        public void SetIdentifierPrefix(Type mappedType, string prefix)
-        {
-            _identifierPrefixes[mappedType] = prefix;
-        }
+        //public void SetIdentifierPrefix(Type mappedType, string prefix)
+        //{
+        //    _identifierPrefixes[mappedType] = prefix;
+        //}
+        */
 
         /// <summary>
         /// Gets the prefix string for the generated URI identifiers for the instances of an entity type
@@ -81,9 +84,11 @@ namespace BrightstarDB.EntityFramework
         /// <returns>The URI identifier prefix string for the entity implementation type or null if there is no mapping</returns>
         public static string GetIdentifierPrefix(Type mappedType)
         {
-            return Instance._GetIdentifierPrefix(mappedType);
+            var identityInfo = GetIdentityInfo(mappedType);
+            return identityInfo == null ? null : identityInfo.BaseUri;
         }
 
+        /*
         private string _GetIdentifierPrefix(Type mappedType)
         {
             string prefix;
@@ -105,6 +110,7 @@ namespace BrightstarDB.EntityFramework
             }
             return null;
         }
+        */
 
         /// <summary>
         /// Sets the URI identifier for the RDF schema type that is mapped to an entity type
@@ -117,7 +123,7 @@ namespace BrightstarDB.EntityFramework
         }
 
         /// <summary>
-        /// Sets the URI identifier for the RDF schema tyep that is mapped to an entity type
+        /// Sets the URI identifier for the RDF schema type that is mapped to an entity type
         /// </summary>
         /// <typeparam name="T">The entity type</typeparam>
         /// <param name="typeUri">The schema type URI</param>
@@ -134,10 +140,39 @@ namespace BrightstarDB.EntityFramework
         public void SetPropertyHint(PropertyInfo propertyInfo, PropertyHint propertyHint)
         {
             _propertyHints[propertyInfo] = propertyHint;
-            if (propertyHint.MappingType == PropertyMappingType.Id && propertyInfo.DeclaringType != null)
+        }
+
+        /// <summary>
+        /// Sets the identity mapping information for a .NET type
+        /// </summary>
+        /// <param name="identityInfo">The entity identity mapping information</param>
+        /// <param name="type">The entity type</param>
+        public void SetIdentityInfo(Type type, IdentityInfo identityInfo)
+        {
+            _identityInfo[type] = identityInfo;
+        }
+
+        /// <summary>
+        /// Gets the entity identifier information
+        /// </summary>
+        /// <param name="type">The entity type</param>
+        /// <returns>The identifier information for the type or null if not information could be found</returns>
+        public static IdentityInfo GetIdentityInfo(Type type)
+        {
+            return Instance._GetIdentityInfo(type);
+        }
+
+        private IdentityInfo _GetIdentityInfo(Type type)
+        {
+            IdentityInfo ret;
+            if (_identityInfo.TryGetValue(type, out ret)) return ret;
+            Type interfaceType;
+            if (_interfaceMappings.TryGetValue(type, out interfaceType))
             {
-                _identityProperties[propertyInfo.DeclaringType] = propertyInfo;
+                if (_identityInfo.TryGetValue(interfaceType, out ret)) return ret;
+                if (interfaceType.BaseType != null) return _GetIdentityInfo(interfaceType.BaseType);
             }
+            return type.BaseType != null ? _GetIdentityInfo(type.BaseType) : null;
         }
 
         /// <summary>
@@ -286,16 +321,20 @@ namespace BrightstarDB.EntityFramework
         /// <returns>The mapped property info or null if no match is found</returns>
         public PropertyInfo GetIdentityProperty(Type t)
         {
-            PropertyInfo ret;
-            if (!_identityProperties.TryGetValue(t, out ret))
+            IdentityInfo identityInfo;
+            if (_identityInfo.TryGetValue(t, out identityInfo))
             {
-                Type interfaceType;
-                if (_interfaceMappings.TryGetValue(t, out interfaceType))
+                return identityInfo.IdentityProperty;
+            }
+            Type interfaceType;
+            if (_interfaceMappings.TryGetValue(t, out interfaceType))
+            {
+                if (_identityInfo.TryGetValue(interfaceType, out identityInfo))
                 {
-                    _identityProperties.TryGetValue(interfaceType, out ret);
+                    return identityInfo.IdentityProperty;
                 }
             }
-            return ret;
+            return null;
         }
 
         #endregion

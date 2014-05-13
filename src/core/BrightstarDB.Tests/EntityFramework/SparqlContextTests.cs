@@ -48,7 +48,7 @@ namespace BrightstarDB.Tests.EntityFramework
             context.SaveChanges();
 
             mockUpdateProcessor.Verify(m=>m.ProcessCommandSet(It.Is<SparqlUpdateCommandSet>(s=>s.CommandCount == 3
-                && s[1].CommandType == SparqlUpdateCommandType.Delete && s[1].ToString().Contains("?d0 ?d1 <" + pid + ">")) 
+                && s[1].CommandType == SparqlUpdateCommandType.Delete && s[1].ToString().Contains("?d0 ?d1 <" + Constants.GeneratedUriPrefix + pid + ">")) 
                 ));
 
             mockQueryProcessor.VerifyAll();
