@@ -97,7 +97,6 @@
 	<MSBuild Projects="samples\Embedded\RDF\RdfClientSamples.sln" Properties="Configuration=$(Configuration)"/>  	
     <MSBuild Projects="samples\Embedded\StoreAdmin\StoreAdministrationSamples.sln" Properties="Configuration=$(Configuration)"/>  
 	<MSBuild Projects="samples\Server\NerdDinner\BrightstarDB.Samples.NerdDinner.sln" Properties="Configuration=$(Configuration)"/>  
-	<MSBuild Projects="samples\Server\SparqlService\SparqlService.sln" Properties="Configuration=$(Configuration)"/>  
 	<MSBuild Projects="samples\WP7\WindowsPhone7Samples.sln" Properties="Configuration=$(Configuration)"/>
 	<MSBuild Projects="samples\WP8\WindowsPhone8Samples.sln" Properties="Configuration=$(Configuration)"/>
   </Target>
