@@ -194,7 +194,10 @@ namespace BrightstarDB.EntityFramework
                 var values = new object[identityCacheInfo.KeyProperties.Length];
                 for (var i = 0; i < identityCacheInfo.KeyProperties.Length; i++)
                 {
-                    values[i] = identityCacheInfo.KeyProperties[i].GetValue(this, null);
+                    if (!_currentItemValues.TryGetValue(identityCacheInfo.KeyProperties[i].Name, out values[i]))
+                    {
+                        values[i] = identityCacheInfo.KeyProperties[i].GetValue(this, null);
+                    }
                 }
                 return identityCacheInfo.KeyConverter.GenerateKey(values, identityCacheInfo.KeySeparator, GetType());
             }
@@ -928,7 +931,12 @@ namespace BrightstarDB.EntityFramework
             {
                 var newKey = GenerateEntityKey();
                 var newIdentity = identityInfo.BaseUri + newKey;
-                Identity = newIdentity; // This will throw an InvalidOperationException if the object is attached to a context
+                // Only update Identity if necessary
+                if (!newIdentity.Equals(Identity))
+                {
+                    // This will throw an InvalidOperationException if the object is attached to a context
+                    Identity = newIdentity;
+                }
             }
 
             PropertyChangedEventHandler handler = PropertyChanged;

@@ -22,7 +22,7 @@ namespace BrightstarDB.EntityFramework
         /// if there are multiple non-null values they are joined using <paramref name="keySeparator"/> as the separator. The
         /// value of <paramref name="keySeparator"/> is NOT URI-encoded.</remarks>
         /// <returns>The generated key string or null if <paramref name="keyValues"/> is empty after all null values are removed.</returns>
-        public string GenerateKey(object[] keyValues, string keySeparator, Type forType)
+        public virtual string GenerateKey(object[] keyValues, string keySeparator, Type forType)
         {
             keyValues = keyValues.Where(x => x != null).ToArray();
             if (keyValues.Length == 0) return null;

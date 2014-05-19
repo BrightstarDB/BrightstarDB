@@ -122,7 +122,9 @@
     <Compile Include="EntityFramework\ExtendedContextTests.cs" />
     <Compile Include="EntityFramework\IAutoKeyEntity.cs" />
     <Compile Include="EntityFramework\IBaseEntity.cs" />
+    <Compile Include="EntityFramework\IChildKeyEntity.cs" />
     <Compile Include="EntityFramework\ICompany.cs" />
+    <Compile Include="EntityFramework\ICompositeKeyEntity.cs" />
     <Compile Include="EntityFramework\IConcept.cs" />
     <Compile Include="EntityFramework\IDBPediaPerson.cs" />
     <Compile Include="EntityFramework\IdentifierEncodingTests.cs" />
@@ -131,8 +133,10 @@
     <Compile Include="EntityFramework\IEntity.cs" />
     <Compile Include="EntityFramework\IFoafAgent.cs" />
     <Compile Include="EntityFramework\IFoafPerson.cs" />
+    <Compile Include="EntityFramework\IHierarchicalKeyEntity.cs" />
     <Compile Include="EntityFramework\IIdentityClashTest.cs" />
     <Compile Include="EntityFramework\IJobRole.cs" />
+    <Compile Include="EntityFramework\ILowerKeyEntity.cs" />
     <Compile Include="EntityFramework\IMarket.cs" />
     <Compile Include="EntityFramework\ISession.cs" />
     <Compile Include="EntityFramework\ITrackable.cs" />
@@ -140,6 +144,7 @@
     <Compile Include="EntityFramework\IAnimal.cs" />
     <Compile Include="EntityFramework\IPerson.cs" />
     <Compile Include="EntityFramework\ISkill.cs" />
+    <Compile Include="EntityFramework\LowercaseKeyConverter.cs" />
     <Compile Include="EntityFramework\MyEntityContext.cs">
       <DependentUpon>MyEntityContext.tt</DependentUpon>
       <SubType>Code</SubType>
