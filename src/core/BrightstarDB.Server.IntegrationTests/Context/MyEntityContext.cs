@@ -20,34 +20,32 @@ using System.ComponentModel.DataAnnotations;
 namespace BrightstarDB.Server.IntegrationTests.Context 
 {
     public partial class MyEntityContext : BrightstarEntityContext {
-    	private static readonly EntityMappingStore TypeMappings;
     	
     	static MyEntityContext() 
     	{
-    		TypeMappings = new EntityMappingStore();
     		var provider = new ReflectionMappingProvider();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IAnimal));
-    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IAnimal, BrightstarDB.Server.IntegrationTests.Context.Animal>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IDepartment));
-    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IDepartment, BrightstarDB.Server.IntegrationTests.Context.Department>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IFoafAgent));
-    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IFoafAgent, BrightstarDB.Server.IntegrationTests.Context.FoafAgent>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IFoafPerson));
-    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IFoafPerson, BrightstarDB.Server.IntegrationTests.Context.FoafPerson>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IJobRole));
-    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IJobRole, BrightstarDB.Server.IntegrationTests.Context.JobRole>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.IPerson));
-    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IPerson, BrightstarDB.Server.IntegrationTests.Context.Person>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Server.IntegrationTests.Context.ISkill));
-    		TypeMappings.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.ISkill, BrightstarDB.Server.IntegrationTests.Context.Skill>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Server.IntegrationTests.Context.IAnimal));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IAnimal, BrightstarDB.Server.IntegrationTests.Context.Animal>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Server.IntegrationTests.Context.IDepartment));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IDepartment, BrightstarDB.Server.IntegrationTests.Context.Department>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Server.IntegrationTests.Context.IFoafAgent));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IFoafAgent, BrightstarDB.Server.IntegrationTests.Context.FoafAgent>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Server.IntegrationTests.Context.IFoafPerson));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IFoafPerson, BrightstarDB.Server.IntegrationTests.Context.FoafPerson>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Server.IntegrationTests.Context.IJobRole));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IJobRole, BrightstarDB.Server.IntegrationTests.Context.JobRole>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Server.IntegrationTests.Context.IPerson));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.IPerson, BrightstarDB.Server.IntegrationTests.Context.Person>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Server.IntegrationTests.Context.ISkill));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Server.IntegrationTests.Context.ISkill, BrightstarDB.Server.IntegrationTests.Context.Skill>();
     	}
     	
     	/// <summary>
-    	/// Initialize a new entity context using the specified Brightstar
+    	/// Initialize a new entity context using the specified BrightstarDB
     	/// Data Object Store connection
     	/// </summary>
-    	/// <param name="dataObjectStore">The connection to the Brightstar Data Object Store that will provide the entity objects</param>
-    	public MyEntityContext(IDataObjectStore dataObjectStore) : base(TypeMappings, dataObjectStore)
+    	/// <param name="dataObjectStore">The connection to the BrightstarDB Data Object Store that will provide the entity objects</param>
+    	public MyEntityContext(IDataObjectStore dataObjectStore) : base(dataObjectStore)
     	{
     		InitializeContext();
     	}
@@ -69,7 +67,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     		string updateGraphUri = null,
     		IEnumerable<string> datasetGraphUris = null,
     		string versionGraphUri = null
-        ) : base(TypeMappings, connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+        ) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -78,7 +76,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	/// Initialize a new entity context using the specified Brightstar
     	/// connection string retrieved from the configuration.
     	/// </summary>
-    	public MyEntityContext() : base(TypeMappings)
+    	public MyEntityContext() : base()
     	{
     		InitializeContext();
     	}
@@ -98,7 +96,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     		string updateGraphUri,
     		IEnumerable<string> datasetGraphUris,
     		string versionGraphUri
-    	) : base(TypeMappings, updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
+    	) : base(updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -158,7 +156,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public Animal(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Animal() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IAnimal
     
     	public System.String Name
@@ -182,7 +180,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IDepartment
     
     	public System.String Name
@@ -199,7 +197,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	public System.Collections.Generic.ICollection<BrightstarDB.Server.IntegrationTests.Context.IPerson> Persons
     	{
     		get { return GetRelatedObjects<BrightstarDB.Server.IntegrationTests.Context.IPerson>("Persons"); }
-    		set { SetRelatedObjects("Persons", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Persons", value); }
     								}
     	#endregion
     }
@@ -215,7 +213,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	public System.Collections.Generic.ICollection<System.String> MboxSums
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("MboxSums"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
     	}
     	#endregion
     }
@@ -227,7 +225,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public FoafPerson(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public FoafPerson() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IFoafPerson
     	
     	[System.ComponentModel.DisplayNameAttribute("Also Known As")]
@@ -253,12 +251,12 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	public System.Collections.Generic.ICollection<BrightstarDB.Server.IntegrationTests.Context.IFoafPerson> Knows
     	{
     		get { return GetRelatedObjects<BrightstarDB.Server.IntegrationTests.Context.IFoafPerson>("Knows"); }
-    		set { SetRelatedObjects("Knows", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Knows", value); }
     								}
     	public System.Collections.Generic.ICollection<BrightstarDB.Server.IntegrationTests.Context.IFoafPerson> KnownBy
     	{
     		get { return GetRelatedObjects<BrightstarDB.Server.IntegrationTests.Context.IFoafPerson>("KnownBy"); }
-    		set { SetRelatedObjects("KnownBy", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("KnownBy", value); }
     								}
     	
     	[System.ComponentModel.DataAnnotations.DataTypeAttribute(DataType.Date)]
@@ -278,7 +276,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	public System.Collections.Generic.ICollection<System.String> MboxSums
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("MboxSums"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("MboxSums", value); }
     	}
     	#endregion
     }
@@ -290,7 +288,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IJobRole
     
     	public System.String Description
@@ -301,7 +299,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	public System.Collections.Generic.ICollection<BrightstarDB.Server.IntegrationTests.Context.IPerson> Persons
     	{
     		get { return GetRelatedObjects<BrightstarDB.Server.IntegrationTests.Context.IPerson>("Persons"); }
-    		set { SetRelatedObjects("Persons", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Persons", value); }
     								}
     	#endregion
     }
@@ -313,7 +311,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IPerson
     
     	public System.String Name
@@ -354,7 +352,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	public System.Collections.Generic.ICollection<BrightstarDB.Server.IntegrationTests.Context.IPerson> Friends
     	{
     		get { return GetRelatedObjects<BrightstarDB.Server.IntegrationTests.Context.IPerson>("Friends"); }
-    		set { SetRelatedObjects("Friends", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Friends", value); }
     								}
     
     	public BrightstarDB.Server.IntegrationTests.Context.IAnimal Pet
@@ -371,7 +369,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	public System.Collections.Generic.ICollection<BrightstarDB.Server.IntegrationTests.Context.ISkill> Skills
     	{
     		get { return GetRelatedObjects<BrightstarDB.Server.IntegrationTests.Context.ISkill>("Skills"); }
-    		set { SetRelatedObjects("Skills", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Skills", value); }
     								}
     
     	public BrightstarDB.Server.IntegrationTests.Context.IDepartment Department
@@ -394,7 +392,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	public System.Collections.Generic.ICollection<System.Uri> Websites
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.Uri>("Websites"); }
-    		set { SetRelatedLiteralPropertiesCollection<System.Uri>("Websites", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Uri>("Websites", value); }
     	}
     	#endregion
     }
@@ -406,7 +404,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     {
     	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.ISkill
     
     	public System.String Name
@@ -429,12 +427,12 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     	public System.Collections.Generic.ICollection<BrightstarDB.Server.IntegrationTests.Context.ISkill> Children
     	{
     		get { return GetRelatedObjects<BrightstarDB.Server.IntegrationTests.Context.ISkill>("Children"); }
-    		set { SetRelatedObjects("Children", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Children", value); }
     								}
     	public System.Collections.Generic.ICollection<BrightstarDB.Server.IntegrationTests.Context.IPerson> SkilledPeople
     	{
     		get { return GetRelatedObjects<BrightstarDB.Server.IntegrationTests.Context.IPerson>("SkilledPeople"); }
-    		set { SetRelatedObjects("SkilledPeople", value); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("SkilledPeople", value); }
     								}
     	#endregion
     }

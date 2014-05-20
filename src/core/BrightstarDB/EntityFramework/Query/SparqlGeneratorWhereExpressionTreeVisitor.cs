@@ -359,9 +359,7 @@ namespace BrightstarDB.EntityFramework.Query
                                 filter = nodeType == ExpressionType.GreaterThan
                                   ? "(str(?{0}) > '{1}')"
                                   : "(str(?{0}) < '{1}')";
-                                var prefix =
-                                       QueryBuilder.Context.Mappings.GetIdentifierPrefix(
-                                       propertyInfo.DeclaringType);
+                                var prefix = EntityMappingStore.GetIdentifierPrefix(propertyInfo.DeclaringType);
                                 _filterWriter.AppendFormat(filter, sourceVarName, prefix + value);
                                 break;
                                 

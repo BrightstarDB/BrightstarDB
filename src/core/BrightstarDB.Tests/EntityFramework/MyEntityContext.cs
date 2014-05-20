@@ -14,64 +14,72 @@ using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
 
+using System.Text;
 using System.ComponentModel;
 using BrightstarDB.Rdf;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace BrightstarDB.Tests.EntityFramework 
 {
     public partial class MyEntityContext : BrightstarEntityContext {
-    	private static readonly EntityMappingStore TypeMappings;
     	
     	static MyEntityContext() 
     	{
-    		TypeMappings = new EntityMappingStore();
     		var provider = new ReflectionMappingProvider();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IAnimal));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IAnimal, BrightstarDB.Tests.EntityFramework.Animal>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IArticle));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IArticle, BrightstarDB.Tests.EntityFramework.Article>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IBaseEntity));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IBaseEntity, BrightstarDB.Tests.EntityFramework.BaseEntity>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ICompany));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ICompany, BrightstarDB.Tests.EntityFramework.Company>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IConcept));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IConcept, BrightstarDB.Tests.EntityFramework.Concept>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IDBPediaPerson));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDBPediaPerson, BrightstarDB.Tests.EntityFramework.DBPediaPerson>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IDepartment));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDepartment, BrightstarDB.Tests.EntityFramework.Department>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IDerivedEntity));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDerivedEntity, BrightstarDB.Tests.EntityFramework.DerivedEntity>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IEntity));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IEntity, BrightstarDB.Tests.EntityFramework.Entity>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IFoafAgent));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IFoafAgent, BrightstarDB.Tests.EntityFramework.FoafAgent>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IFoafPerson));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IFoafPerson, BrightstarDB.Tests.EntityFramework.FoafPerson>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTest));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTest, BrightstarDB.Tests.EntityFramework.IdentityClashTest>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1, BrightstarDB.Tests.EntityFramework.IdentityClashTestLevel1>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2, BrightstarDB.Tests.EntityFramework.IdentityClashTestLevel2>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IJobRole));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IJobRole, BrightstarDB.Tests.EntityFramework.JobRole>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IMarket));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IMarket, BrightstarDB.Tests.EntityFramework.Market>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IPerson));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IPerson, BrightstarDB.Tests.EntityFramework.Person>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ISession));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ISession, BrightstarDB.Tests.EntityFramework.Session>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.IEveningSession));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.IEveningSession, BrightstarDB.Tests.EntityFramework.EveningSession>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession, BrightstarDB.Tests.EntityFramework.TechnicalEveningSession>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ISkill));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ISkill, BrightstarDB.Tests.EntityFramework.Skill>();
-    		provider.AddMappingsForType(TypeMappings, typeof(BrightstarDB.Tests.EntityFramework.ITrackable));
-    		TypeMappings.SetImplMapping<BrightstarDB.Tests.EntityFramework.ITrackable, BrightstarDB.Tests.EntityFramework.Trackable>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IAnimal));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IAnimal, BrightstarDB.Tests.EntityFramework.Animal>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IArticle));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IArticle, BrightstarDB.Tests.EntityFramework.Article>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IStringKeyEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IStringKeyEntity, BrightstarDB.Tests.EntityFramework.StringKeyEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IBaseEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IBaseEntity, BrightstarDB.Tests.EntityFramework.BaseEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IChildKeyEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IChildKeyEntity, BrightstarDB.Tests.EntityFramework.ChildKeyEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ICompany));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ICompany, BrightstarDB.Tests.EntityFramework.Company>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity, BrightstarDB.Tests.EntityFramework.CompositeKeyEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IConcept));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IConcept, BrightstarDB.Tests.EntityFramework.Concept>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IDBPediaPerson));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDBPediaPerson, BrightstarDB.Tests.EntityFramework.DBPediaPerson>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IDepartment));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDepartment, BrightstarDB.Tests.EntityFramework.Department>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IDerivedEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDerivedEntity, BrightstarDB.Tests.EntityFramework.DerivedEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IEntity, BrightstarDB.Tests.EntityFramework.Entity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IFoafAgent));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IFoafAgent, BrightstarDB.Tests.EntityFramework.FoafAgent>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IFoafPerson));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IFoafPerson, BrightstarDB.Tests.EntityFramework.FoafPerson>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity, BrightstarDB.Tests.EntityFramework.HierarchicalKeyEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTest));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTest, BrightstarDB.Tests.EntityFramework.IdentityClashTest>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1, BrightstarDB.Tests.EntityFramework.IdentityClashTestLevel1>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2, BrightstarDB.Tests.EntityFramework.IdentityClashTestLevel2>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IJobRole));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IJobRole, BrightstarDB.Tests.EntityFramework.JobRole>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ILowerKeyEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ILowerKeyEntity, BrightstarDB.Tests.EntityFramework.LowerKeyEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IMarket));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IMarket, BrightstarDB.Tests.EntityFramework.Market>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IPerson));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IPerson, BrightstarDB.Tests.EntityFramework.Person>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ISession));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ISession, BrightstarDB.Tests.EntityFramework.Session>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IEveningSession));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IEveningSession, BrightstarDB.Tests.EntityFramework.EveningSession>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession, BrightstarDB.Tests.EntityFramework.TechnicalEveningSession>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ISkill));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ISkill, BrightstarDB.Tests.EntityFramework.Skill>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ITrackable));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ITrackable, BrightstarDB.Tests.EntityFramework.Trackable>();
     	}
     	
     	/// <summary>
@@ -79,8 +87,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	/// Data Object Store connection
     	/// </summary>
     	/// <param name="dataObjectStore">The connection to the BrightstarDB Data Object Store that will provide the entity objects</param>
-        /// <param name="typeMappings">OPTIONAL: A <see cref="EntityMappingStore"/> that overrides the default mappings generated by reflection.</param>
-    	public MyEntityContext(IDataObjectStore dataObjectStore, EntityMappingStore typeMappings = null) : base(typeMappings ?? TypeMappings, dataObjectStore)
+    	public MyEntityContext(IDataObjectStore dataObjectStore) : base(dataObjectStore)
     	{
     		InitializeContext();
     	}
@@ -96,15 +103,13 @@ namespace BrightstarDB.Tests.EntityFramework
         /// If not defined, all graphs in the store will be queried.</param>
         /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
         /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
-        /// <param name="typeMappings">OPTIONAL: A <see cref="EntityMappingStore"/> that overrides the default mappings generated by reflection.</param>
     	public MyEntityContext(
     	    string connectionString, 
     		bool? enableOptimisticLocking=null,
     		string updateGraphUri = null,
     		IEnumerable<string> datasetGraphUris = null,
-    		string versionGraphUri = null,
-            EntityMappingStore typeMappings = null
-        ) : base(typeMappings ?? TypeMappings, connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+    		string versionGraphUri = null
+        ) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -113,8 +118,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	/// Initialize a new entity context using the specified Brightstar
     	/// connection string retrieved from the configuration.
     	/// </summary>
-        /// <param name="typeMappings">OPTIONAL: A <see cref="EntityMappingStore"/> that overrides the default mappings generated by reflection.</param>
-    	public MyEntityContext(EntityMappingStore typeMappings = null) : base(typeMappings ?? TypeMappings)
+    	public MyEntityContext() : base()
     	{
     		InitializeContext();
     	}
@@ -130,13 +134,11 @@ namespace BrightstarDB.Tests.EntityFramework
         /// If set to null, all graphs in the store will be queried.</param>
         /// <param name="versionGraphUri">The URI identifier of the graph that contains version number statements for entities. 
         /// If set to null, the value of <paramref name="updateGraphUri"/> will be used.</param>
-        /// <param name="typeMappings">OPTIONAL: A <see cref="EntityMappingStore"/> that overrides the default mappings generated by reflection.</param>
     	public MyEntityContext(
     		string updateGraphUri,
     		IEnumerable<string> datasetGraphUris,
-    		string versionGraphUri,
-            EntityMappingStore typeMappings = null
-    	) : base(typeMappings ?? TypeMappings, updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
+    		string versionGraphUri
+    	) : base(updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
     	{
     		InitializeContext();
     	}
@@ -145,8 +147,11 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
     		Animals = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IAnimal>(this);
     		Articles = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IArticle>(this);
+    		StringKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IStringKeyEntity>(this);
     		BaseEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IBaseEntity>(this);
+    		ChildKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IChildKeyEntity>(this);
     		Companies = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ICompany>(this);
+    		CompositeKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity>(this);
     		Concepts = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IConcept>(this);
     		DBPediaPersons = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IDBPediaPerson>(this);
     		Departments = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IDepartment>(this);
@@ -154,10 +159,12 @@ namespace BrightstarDB.Tests.EntityFramework
     		Entities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IEntity>(this);
     		FoafAgents = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IFoafAgent>(this);
     		FoafPersons = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IFoafPerson>(this);
+    		HierarchicalKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity>(this);
     		IdentityClashTests = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTest>(this);
     		IdentityClashTestLevel1s = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1>(this);
     		IdentityClashTestLevel2s = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2>(this);
     		JobRoles = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IJobRole>(this);
+    		LowerKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ILowerKeyEntity>(this);
     		Markets = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IMarket>(this);
     		Persons = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IPerson>(this);
     		Sessions = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ISession>(this);
@@ -177,12 +184,27 @@ namespace BrightstarDB.Tests.EntityFramework
     		get; private set;
     	}
     	
+    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IStringKeyEntity> StringKeyEntities
+    	{
+    		get; private set;
+    	}
+    	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.IBaseEntity> BaseEntities
     	{
     		get; private set;
     	}
     	
+    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IChildKeyEntity> ChildKeyEntities
+    	{
+    		get; private set;
+    	}
+    	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.ICompany> Companies
+    	{
+    		get; private set;
+    	}
+    	
+    	public IEntitySet<BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity> CompositeKeyEntities
     	{
     		get; private set;
     	}
@@ -222,6 +244,11 @@ namespace BrightstarDB.Tests.EntityFramework
     		get; private set;
     	}
     	
+    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity> HierarchicalKeyEntities
+    	{
+    		get; private set;
+    	}
+    	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTest> IdentityClashTests
     	{
     		get; private set;
@@ -238,6 +265,11 @@ namespace BrightstarDB.Tests.EntityFramework
     	}
     	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.IJobRole> JobRoles
+    	{
+    		get; private set;
+    	}
+    	
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.ILowerKeyEntity> LowerKeyEntities
     	{
     		get; private set;
     	}
@@ -286,7 +318,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Animal(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Animal() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IAnimal
     
     	public System.String Name
@@ -310,7 +342,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Article(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Article() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IArticle
     
     	public System.String Title
@@ -350,11 +382,35 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
+    public partial class StringKeyEntity : BrightstarEntityObject, IStringKeyEntity 
+    {
+    	public StringKeyEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public StringKeyEntity() : base() { }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.IStringKeyEntity
+    
+    	public System.String Name
+    	{
+            		get { return GetRelatedProperty<System.String>("Name"); }
+            		set { SetRelatedProperty("Name", value); }
+    	}
+    
+    	public System.String Description
+    	{
+            		get { return GetRelatedProperty<System.String>("Description"); }
+            		set { SetRelatedProperty("Description", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
     public partial class BaseEntity : BrightstarEntityObject, IBaseEntity 
     {
     	public BaseEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public BaseEntity() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IBaseEntity
     
     	public System.String BaseStringValue
@@ -368,11 +424,35 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
+    public partial class ChildKeyEntity : BrightstarEntityObject, IChildKeyEntity 
+    {
+    	public ChildKeyEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public ChildKeyEntity() : base() { }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.IChildKeyEntity
+    
+    	public BrightstarDB.Tests.EntityFramework.IBaseEntity Parent
+    	{
+            get { return GetRelatedObject<BrightstarDB.Tests.EntityFramework.IBaseEntity>("Parent"); }
+            set { SetRelatedObject<BrightstarDB.Tests.EntityFramework.IBaseEntity>("Parent", value); }
+    	}
+    
+    	public System.Int32 Position
+    	{
+            		get { return GetRelatedProperty<System.Int32>("Position"); }
+            		set { SetRelatedProperty("Position", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
     public partial class Company : BrightstarEntityObject, ICompany 
     {
     	public Company(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Company() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ICompany
     
     	public System.String Name
@@ -416,11 +496,35 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
+    public partial class CompositeKeyEntity : BrightstarEntityObject, ICompositeKeyEntity 
+    {
+    	public CompositeKeyEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public CompositeKeyEntity() : base() { }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity
+    
+    	public System.String First
+    	{
+            		get { return GetRelatedProperty<System.String>("First"); }
+            		set { SetRelatedProperty("First", value); }
+    	}
+    
+    	public System.Int32 Second
+    	{
+            		get { return GetRelatedProperty<System.Int32>("Second"); }
+            		set { SetRelatedProperty("Second", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
     public partial class Concept : BrightstarEntityObject, IConcept 
     {
     	public Concept(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Concept() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IConcept
     	public System.Collections.Generic.ICollection<BrightstarDB.Rdf.PlainLiteral> PrefLabel
     	{
@@ -437,7 +541,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public DBPediaPerson(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public DBPediaPerson() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IDBPediaPerson
     
     	public System.DateTime BirthDate
@@ -473,7 +577,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IDepartment
     
     	public System.String Name
@@ -502,7 +606,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public DerivedEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public DerivedEntity() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IDerivedEntity
     
     	public System.DateTime DateTimeProperty
@@ -533,7 +637,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Entity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Entity() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IEntity
     
     	public System.String SomeString
@@ -805,7 +909,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public FoafPerson(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public FoafPerson() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IFoafPerson
     	
     	[System.ComponentModel.DisplayNameAttribute("Also Known As")]
@@ -864,11 +968,35 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
+    public partial class HierarchicalKeyEntity : BrightstarEntityObject, IHierarchicalKeyEntity 
+    {
+    	public HierarchicalKeyEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public HierarchicalKeyEntity() : base() { }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity
+    
+    	public BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity Parent
+    	{
+            get { return GetRelatedObject<BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity>("Parent"); }
+            set { SetRelatedObject<BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity>("Parent", value); }
+    	}
+    
+    	public System.String Code
+    	{
+            		get { return GetRelatedProperty<System.String>("Code"); }
+            		set { SetRelatedProperty("Code", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
     public partial class IdentityClashTest : BrightstarEntityObject, IIdentityClashTest 
     {
     	public IdentityClashTest(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public IdentityClashTest() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTest
     	#endregion
     }
@@ -880,7 +1008,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public IdentityClashTestLevel1(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public IdentityClashTestLevel1() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1
     	#endregion
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTest
@@ -894,7 +1022,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public IdentityClashTestLevel2(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public IdentityClashTestLevel2() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2
     	#endregion
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1
@@ -910,7 +1038,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IJobRole
     
     	public System.String Description
@@ -929,11 +1057,29 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
+    internal partial class LowerKeyEntity : BrightstarEntityObject, ILowerKeyEntity 
+    {
+    	public LowerKeyEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public LowerKeyEntity() : base() { }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.ILowerKeyEntity
+    
+    	public System.String Name
+    	{
+            		get { return GetRelatedProperty<System.String>("Name"); }
+            		set { SetRelatedProperty("Name", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
     public partial class Market : BrightstarEntityObject, IMarket 
     {
     	public Market(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Market() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IMarket
     
     	public System.String Name
@@ -956,7 +1102,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IPerson
     
     	public System.String Name
@@ -1049,7 +1195,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Session(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Session() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ISession
     
     	public System.String Speaker
@@ -1067,7 +1213,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public EveningSession(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public EveningSession() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IEveningSession
     
     	public System.String DateTime
@@ -1099,7 +1245,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public TechnicalEveningSession(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public TechnicalEveningSession() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession
     
     	public System.String Subject
@@ -1139,7 +1285,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
     	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
-    	public System.String Id { get {return GetIdentity(); } set { SetIdentity(value); } }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ISkill
     
     	public System.String Name

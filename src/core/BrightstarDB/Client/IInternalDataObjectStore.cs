@@ -47,5 +47,21 @@ namespace BrightstarDB.Client
         /// <returns>An enumeration of all matching subject resources</returns>
         IEnumerable<IDataObject> GetInverseOf(IDataObject obj, IDataObject pred);
 
+
+        /// <summary>
+        /// Returns an enumeration of all triples that have the specified
+        /// data object as the object of the triple.
+        /// </summary>
+        /// <param name="obj">The object resource</param>
+        /// <returns>An enumeration of all triples that have <paramref name="obj"/> as the object of the triple.</returns>
+        IEnumerable<Triple> GetReferencingTriples(IDataObject obj);
+
+        /// <summary>
+        /// Adds preconditions to validate that there is no existing resource with the URI
+        /// <paramref name="identity"/> that is an instance of one or more of the specified types.
+        /// </summary>
+        /// <param name="identity">The identity of the resource to be validated</param>
+        /// <param name="types">An enumeration of class resources URIs</param>
+        void SetClassUniqueConstraints(string identity, IEnumerable<string> types);
     }
 }

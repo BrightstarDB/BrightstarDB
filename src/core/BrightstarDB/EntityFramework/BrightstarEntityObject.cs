@@ -19,7 +19,6 @@ namespace BrightstarDB.EntityFramework
         private readonly Dictionary<string, object> _currentItemValues = new Dictionary<string, object>();
         private readonly Dictionary<string, BrightstarEntityObject> _currentPropertyValues = new Dictionary<string, BrightstarEntityObject>();
         private readonly Dictionary<string, IBrightstarEntityCollection> _currentPropertyCollections = new Dictionary<string, IBrightstarEntityCollection>();
-        static readonly Dictionary<Type, string> IdentityBaseCache = new Dictionary<Type, string>();
 
         /// <summary>
         /// Creates a domain object
@@ -31,7 +30,7 @@ namespace BrightstarDB.EntityFramework
             _context = context;
             DataObject = dataObject;
             _context.TrackObject(this);
-            this.TriggerCreatedEvent(context);
+            TriggerCreatedEvent(context);
         }
 
         /// <summary>
@@ -45,7 +44,7 @@ namespace BrightstarDB.EntityFramework
             _context = context;
             DataObject = _context.GetDataObject(identity, false);
             _context.TrackObject(this);
-            this.TriggerCreatedEvent(context);
+            TriggerCreatedEvent(context);
         }
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace BrightstarDB.EntityFramework
         /// of the object must be set before attempting to get or set any of its other properties.</remarks>
         public BrightstarEntityObject()
         {
-            this.TriggerCreatedEvent(null);
+            TriggerCreatedEvent(null);
         }
 
         #region Implementation of IEntityObject
@@ -106,9 +105,11 @@ namespace BrightstarDB.EntityFramework
             get { return DataObject != null ? DataObject.Identity : _identity; }
             set
             {
+                if (value == _identity) return;
                 if (DataObject != null)
                 {
-                    throw new InvalidOperationException("Cannot modify the identity of an attached BrightstarEntityObject");
+                    DataObject = DataObject.UpdateIdentity(value, true);
+                    //throw new InvalidOperationException("Cannot modify the identity of an attached BrightstarEntityObject");
                 }
                 _identity = value;
                 if (_context != null)
@@ -135,93 +136,87 @@ namespace BrightstarDB.EntityFramework
         }
         
         /// <summary>
-        /// Sets the identity for this object
+        /// Sets the key for this object
         /// </summary>
-        /// <param name="id">The new object identity</param>
+        /// <param name="key">The new object identity</param>
         /// <remarks>If the entity definition interface has a <see cref="IdentifierAttribute"/> on it,
         /// then the full identity of the object will be the value of the <see cref="IdentifierAttribute.BaseAddress"/> 
-        /// property followed by the <paramref name="id"/> parameter value, otherwise the <paramref name="id"/>
-        /// parameter value should be an absolute URI.</remarks>
-        protected void SetIdentity(string id)
+        /// property followed by the <paramref name="key"/> parameter value, otherwise the default <see cref="Constants.GeneratedUriPrefix"/>
+        /// is prepended to make a full URI.</remarks>
+        protected void SetKey(string key)
         {
             var baseUri = GetIdentityBase();
-            var identity = String.IsNullOrEmpty(baseUri) ? id : baseUri + id;
-            Identity = identity;
+            var identity = String.IsNullOrEmpty(baseUri) ? key : baseUri + key;
+            if (!identity.Equals(Identity))
+            {
+                if (_context != null && _context.TrackedObjects.Any(x => x.Identity.Equals(identity) && !ReferenceEquals(x, this)))
+                {
+                    throw new UniqueConstraintViolationException();
+                }
+                Identity = identity;
+            }
         }
 
         /// <summary>
-        /// Returns the identity for this object.
+        /// Returns the key for this object.
         /// </summary>
-        /// <returns>The object identity</returns>
-        /// <remarks>The identity string returned by this method is relative to the base resource address specified in 
-        /// the <see cref="IdentifierAttribute"/> on the entity definition interface.</remarks>
-        protected string GetIdentity()
+        /// <returns>The object key</returns>
+        /// <remarks>The string returned by this method is the unique key part of the resource address of
+        /// the underlying data object.</remarks>
+        public string GetKey()
         {
             var baseUri = GetIdentityBase();
             var identity = Identity;
             if (String.IsNullOrEmpty(identity) || String.IsNullOrEmpty(baseUri)) return identity;
-            if (identity.StartsWith(baseUri)) return identity.Substring(baseUri.Length);
-            return identity;
+            return identity.StartsWith(baseUri) ? identity.Substring(baseUri.Length) : identity;
         }
 
         internal string AssertIdentity(string idOrAddress = null)
         {
             if (DataObject != null) return DataObject.Identity;
-            if (String.IsNullOrEmpty(idOrAddress)) idOrAddress = Guid.NewGuid().ToString();
+            if (String.IsNullOrEmpty(idOrAddress))
+            {
+                idOrAddress = GenerateEntityKey();
+            }
             if (String.IsNullOrEmpty(_identity))
             {
                 if (!String.IsNullOrEmpty(GetIdentityBase()))
                 {
-                    SetIdentity(idOrAddress);
+                    SetKey(idOrAddress);
                 }
                 else
                 {
-                    SetIdentity(Constants.GeneratedUriPrefix + idOrAddress);
+                    SetKey(Constants.GeneratedUriPrefix + idOrAddress);
                 }
             }
-            return GetIdentity();
+            return GetKey();
+        }
+
+        private string GenerateEntityKey()
+        {
+            var identityCacheInfo = EntityMappingStore.GetIdentityInfo(GetType());
+            if (identityCacheInfo != null && identityCacheInfo.KeyProperties != null)
+            {
+                // Generate the key string
+                var values = new object[identityCacheInfo.KeyProperties.Length];
+                for (var i = 0; i < identityCacheInfo.KeyProperties.Length; i++)
+                {
+                    if (!_currentItemValues.TryGetValue(identityCacheInfo.KeyProperties[i].Name, out values[i]))
+                    {
+                        values[i] = identityCacheInfo.KeyProperties[i].GetValue(this, null);
+                    }
+                }
+                return identityCacheInfo.KeyConverter.GenerateKey(values, identityCacheInfo.KeySeparator, GetType());
+            }
+            return Guid.NewGuid().ToString();
         }
 
         internal string GetIdentityBase()
         {
-            string baseUri;
-            if (IdentityBaseCache.TryGetValue(GetType(), out baseUri)) return baseUri;
-
-            var interfaces = GetType().GetInterfaces().Where(i => i.GetCustomAttributes(typeof (EntityAttribute), true).Any());
-            var identityProperty =
-                interfaces.SelectMany(i=>i.GetProperties()).FirstOrDefault(
-                    x => x.GetCustomAttributes(typeof(IdentifierAttribute), true).Any());
-            if (identityProperty != null)
-            {
-                var identityAttr =
-                    identityProperty.GetCustomAttributes(typeof(IdentifierAttribute), true).FirstOrDefault() as
-                    IdentifierAttribute;
-                if (identityAttr != null)
-                {
-                    if (identityAttr.BaseAddress != null && identityAttr.BaseAddress.Contains(":"))
-                    {
-                        var prefix = identityAttr.BaseAddress.Substring(0, identityAttr.BaseAddress.IndexOf(':'));
-                        var namespaceDecl =
-                            identityProperty.DeclaringType.Assembly.GetCustomAttributes(
-                                typeof (NamespaceDeclarationAttribute), false).Cast<NamespaceDeclarationAttribute>().
-                                FirstOrDefault(nda => nda.Prefix.Equals(prefix));
-                        if (namespaceDecl != null)
-                        {
-                            baseUri = namespaceDecl.Reference +
-                                      identityAttr.BaseAddress.Substring(identityAttr.BaseAddress.IndexOf(':') + 1);
-                        }
-                        else
-                        {
-                            baseUri = identityAttr.BaseAddress;
-                        }
-                    }
-                    //baseUri =  identityAttr.BaseAddress;
-                    //baseUri = _context.MapIdToUri(identityProperty, String.Empty);
-                }
-            }
-            IdentityBaseCache[GetType()] = baseUri;
-            return baseUri;
+            var identityCacheInfo = EntityMappingStore.GetIdentityInfo(GetType());
+            return identityCacheInfo.BaseUri;
         }
+
 
         /// <summary>
         /// Returns the value of a property of the object
@@ -782,19 +777,27 @@ namespace BrightstarDB.EntityFramework
             if (DataObject == null && _identity != null)
             {
                 DataObject = _context.GetDataObject(new Uri(_identity), false);
-                foreach(var typeUri in _context.Mappings.MapTypeToUris(GetType()))
+                var identityInfo = EntityMappingStore.GetIdentityInfo(GetType());
+                if (identityInfo != null && identityInfo.EnforceClassUniqueConstraint)
+                {
+                    _context.EnforceClassUniqueConstraint(_identity, EntityMappingStore.MapTypeToUris(GetType()));
+                }
+                foreach(var typeUri in EntityMappingStore.MapTypeToUris(GetType()))
                 {
                     if (!String.IsNullOrEmpty(typeUri))
                     {
                         var typeDo = _context.GetDataObject(new Uri(typeUri), false);
-                        if (typeDo != null) DataObject.AddProperty(Client.DataObject.TypeDataObject, typeDo);
+                        if (typeDo != null)
+                        {
+                            DataObject.AddProperty(Client.DataObject.TypeDataObject, typeDo);
+                        }
                     }
                 }
             }
-            if (DataObject != null)
-            {
+//            if (DataObject != null)
+//            {
                 _context.TrackObject(this);
-            }
+//            }
 
             if (_currentItemValues != null)
             {
@@ -938,6 +941,13 @@ namespace BrightstarDB.EntityFramework
         /// <param name="propertyName">The name of the property that has been modified</param>
         protected virtual void OnPropertyChanged(string propertyName)
         {
+            var identityInfo = EntityMappingStore.GetIdentityInfo(GetType());
+            if (identityInfo != null && identityInfo.KeyProperties != null && identityInfo.KeyProperties.Any(p => p.Name.Equals(propertyName)))
+            {
+                var newKey = GenerateEntityKey();
+                SetKey(newKey);
+            }
+
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -966,7 +976,7 @@ namespace BrightstarDB.EntityFramework
 
         internal void TriggerCreatedEvent(BrightstarEntityContext context)
         {
-            if (context == null || this.DataObject.IsNew)
+            if (context == null || this.DataObject == null || this.DataObject.IsNew)
             {
                 OnCreated(context);
             }

@@ -105,15 +105,9 @@ namespace BrightstarDB.EntityFramework
                     var identifierAttr =
                         identityProperty.GetCustomAttributes(typeof (IdentifierAttribute), true).Cast
                             <IdentifierAttribute>().FirstOrDefault();
-                    if (identifierAttr != null && !String.IsNullOrEmpty(identifierAttr.BaseAddress))
-                    {
-                        mappingStore.SetIdentifierPrefix(mappedType, assemblyMappingInfo.ResolveIdentifier(identifierAttr.BaseAddress));
-                        mappingStore.SetPropertyHint(identityProperty, new PropertyHint(PropertyMappingType.Id));
-                    }
-                    else
-                    {
-                        mappingStore.SetPropertyHint(identityProperty, new PropertyHint(PropertyMappingType.Address));
-                    }
+                    var identityInfo = GetIdentityInfo(assemblyMappingInfo, mappedType, identityProperty, identifierAttr);
+                    mappingStore.SetIdentityInfo(mappedType, identityInfo);
+                    mappingStore.SetPropertyHint(identityProperty, new PropertyHint(PropertyMappingType.Id));
                 }
 
                 foreach (var p in mappedType.GetProperties())
@@ -126,6 +120,7 @@ namespace BrightstarDB.EntityFramework
 
                     foreach (var attr in p.GetCustomAttributes(false))
                     {
+                        /*
                         if (attr is IdentifierAttribute)
                         {
                             mappingStore.SetPropertyHint(p, new PropertyHint(PropertyMappingType.Address));
@@ -135,7 +130,8 @@ namespace BrightstarDB.EntityFramework
                                 mappingStore.SetIdentifierPrefix(mappedType, assemblyMappingInfo.ResolveIdentifier(idAttr.BaseAddress));
                             }
                         }
-                        else if (attr is PropertyTypeAttribute)
+                        else*/
+                        if (attr is PropertyTypeAttribute)
                         {
                             var propertyUri =
                                 assemblyMappingInfo.ResolveIdentifier((attr as PropertyTypeAttribute).Identifier);
@@ -205,6 +201,43 @@ namespace BrightstarDB.EntityFramework
             }
         }
 
+        private static IdentityInfo GetIdentityInfo(AssemblyMappingInfo assemblyMappingInfo, Type entityType,
+            PropertyInfo identityProperty, IdentifierAttribute identifierAttr)
+        {
+            string baseUri = identifierAttr == null || String.IsNullOrWhiteSpace(identifierAttr.BaseAddress)
+                                 ? Constants.GeneratedUriPrefix
+                                 : assemblyMappingInfo.ResolveIdentifier(identifierAttr.BaseAddress);
+            if (identifierAttr != null && identifierAttr.KeyProperties != null && identifierAttr.KeyProperties.Length > 0)
+            {
+                var keyProperties = new PropertyInfo[identifierAttr.KeyProperties.Length];
+                for (var i = 0; i < identifierAttr.KeyProperties.Length; i++)
+                {
+                    var property = entityType.GetProperty(identifierAttr.KeyProperties[i]);
+                    if (property == null)
+                    {
+                        throw new ReflectionMappingException(
+                            String.Format("Could not find key property {0} on type {1}.", identifierAttr.KeyProperties[i], entityType.FullName));
+                    }
+                    keyProperties[i] = property;
+                }
+                IKeyConverter keyConverter = null;
+                if (identifierAttr.KeyConverterType != null)
+                {
+                    keyConverter = Activator.CreateInstance(identifierAttr.KeyConverterType) as IKeyConverter;
+                    if (keyConverter == null)
+                    {
+                        throw new ReflectionMappingException(
+                            String.Format("Could not instantiate type {0} as a key converter for entity type {1}. Ensure that this type implements the IKeyConverter interface.",
+                                          identifierAttr.KeyConverterType.FullName, entityType.FullName));
+                    }
+                }
+                return new IdentityInfo(baseUri, identityProperty, keyProperties,
+                                        identifierAttr.KeySeparator ?? Constants.DefaultKeySeparator,
+                                        keyConverter ?? new DefaultKeyConverter());
+            }
+            return new IdentityInfo(baseUri, identityProperty, null, null, null);
+        }
+
         private static string GetForwardPropertyTypeUri(PropertyInfo property, PropertyInfo inverseProperty)
         {
             if (property.GetCustomAttributes(typeof(InversePropertyAttribute), false).Any())
@@ -247,21 +280,60 @@ namespace BrightstarDB.EntityFramework
 
         private static PropertyInfo GetIdentityProperty(Type type)
         {
+            var properties = GetPublicProperties(type);
             string identityPrefix = type.Name.StartsWith("I") ? type.Name.Substring(1) : type.Name;
             var identityProperty =
-                type.GetProperties().Where(
-                    p =>
-                    p.GetCustomAttributes(typeof (IdentifierAttribute), true).OfType<IdentifierAttribute>().
-                        Any()).FirstOrDefault();
-            if (identityProperty == null) identityProperty = type.GetProperty(identityPrefix + "Id");
-            if (identityProperty == null) identityProperty = type.GetProperty(identityPrefix + "ID");
-            if (identityProperty == null) identityProperty = type.GetProperty("Id");
-            if (identityProperty == null) identityProperty = type.GetProperty("ID");
+                properties.FirstOrDefault(p =>
+                                          p.GetCustomAttributes(typeof (IdentifierAttribute), true)
+                                           .OfType<IdentifierAttribute>().Any());
+            if (identityProperty == null) identityProperty = properties.FirstOrDefault(p=>p.Name.Equals(identityPrefix + "Id"));
+            if (identityProperty == null) identityProperty = properties.FirstOrDefault(p=>p.Name.Equals(identityPrefix + "ID"));
+            if (identityProperty == null) identityProperty = properties.FirstOrDefault(p=>p.Name.Equals("Id"));
+            if (identityProperty == null) identityProperty = properties.FirstOrDefault(p=>p.Name.Equals("ID"));
             if (identityProperty != null)
             {
                 ValidateIdentityProperty(identityProperty);
             }
             return identityProperty;
+        }
+
+
+        private static PropertyInfo[] GetPublicProperties(Type type)
+        {
+            if (type.IsInterface)
+            {
+                var propertyInfos = new List<PropertyInfo>();
+
+                var considered = new List<Type>();
+                var queue = new Queue<Type>();
+                considered.Add(type);
+                queue.Enqueue(type);
+                while (queue.Count > 0)
+                {
+                    var subType = queue.Dequeue();
+                    foreach (var subInterface in subType.GetInterfaces())
+                    {
+                        if (considered.Contains(subInterface)) continue;
+
+                        considered.Add(subInterface);
+                        queue.Enqueue(subInterface);
+                    }
+
+                    var typeProperties = subType.GetProperties(
+                        BindingFlags.FlattenHierarchy
+                        | BindingFlags.Public
+                        | BindingFlags.Instance);
+
+                    var newPropertyInfos = typeProperties
+                        .Where(x => !propertyInfos.Contains(x));
+
+                    propertyInfos.InsertRange(0, newPropertyInfos);
+                }
+
+                return propertyInfos.ToArray();
+            }
+            return type.GetProperties(BindingFlags.FlattenHierarchy
+                                      | BindingFlags.Public | BindingFlags.Instance);
         }
 
         private static void ValidateIdentityProperty(PropertyInfo identityProperty)

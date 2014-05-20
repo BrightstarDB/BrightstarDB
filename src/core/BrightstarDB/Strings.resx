@@ -264,4 +264,13 @@
     <value>Transaction preconditions failed. {0} existence preconditions failed. {1} non-existence preconditions failed.</value>
     <comment>Detailed message for PreconditionFailedException.</comment>
   </data>
+  <data name="EntityFramework_EntityKeyChanged" xml:space="preserve">
+    <value>The entity's key properties have been modified without updating the identity value.</value>
+  </data>
+  <data name="EntityFramework_KeyRequired" xml:space="preserve">
+    <value>The key properties for the entity must be set before adding then entity to a context.</value>
+  </data>
+  <data name="EntityFramework_UniqueConstraintViolation" xml:space="preserve">
+    <value>One or more new resources have an identifier that conflicts with an existing resource of the same type.</value>
+  </data>
 </root>

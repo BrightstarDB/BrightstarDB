@@ -26,13 +26,12 @@ namespace BrightstarDB.EntityFramework
     {
         private readonly IDataObjectStore _store;
         private readonly Dictionary<string, List<BrightstarEntityObject>> _trackedObjects;
- 
+
         /// <summary>
         /// Creates a new domain context
         /// </summary>
-        /// <param name="mappings">The context type and property mappings</param>
         /// <param name="store">The Brightstar store that manages the data</param>
-        protected BrightstarEntityContext(EntityMappingStore mappings, IDataObjectStore store) :base(mappings)
+        protected BrightstarEntityContext(IDataObjectStore store)
         {
             _store = store;
             _trackedObjects = new Dictionary<string, List<BrightstarEntityObject>>();
@@ -41,7 +40,6 @@ namespace BrightstarDB.EntityFramework
         /// <summary>
         /// Creates a new domain context
         /// </summary>
-        /// <param name="mappings">The context type and property mappings</param>
         ///<param name="connectionString">The connection string that will be used to connect to an existing BrightstarDB store</param>
         ///<param name="enableOptimisticLocking">Optional parameter to override the optimistic locking configuration specified in the connection string</param>
         /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
@@ -55,8 +53,8 @@ namespace BrightstarDB.EntityFramework
         /// <paramref name="updateGraphUri"/> and <paramref name="versionGraphUri"/> only. If all three parameters
         /// are null then the context will query across all graphs in the store.</para>
         /// </remarks>
-        protected BrightstarEntityContext(EntityMappingStore mappings, string connectionString, bool? enableOptimisticLocking = null,
-            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null ) : base(mappings)
+        protected BrightstarEntityContext(string connectionString, bool? enableOptimisticLocking = null,
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null )
         {
             var cstr = new ConnectionString(connectionString);
             AssertStoreFromConnectionString(cstr);
@@ -96,16 +94,14 @@ namespace BrightstarDB.EntityFramework
         /// <summary>
         /// Creates a new domain context and connects to the store specified in the configuration connectionString.
         /// </summary>
-        /// <param name="mappings">The context type and property mappings</param>
         /// <param name="updateGraphUri">OPTIONAL: The URI identifier of the graph to be updated with any new triples created by operations on the store. If
         /// not defined, the default graph in the store will be updated.</param>
         /// <param name="datasetGraphUris">OPTIONAL: The URI identifiers of the graphs that will be queried to retrieve entities and their properties.
         /// If not defined, all graphs in the store will be queried.</param>
         /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
         /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
-        protected BrightstarEntityContext(EntityMappingStore mappings,
+        protected BrightstarEntityContext(
             string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null)
-            : base(mappings)
         {
             var cstr = new ConnectionString(Configuration.ConnectionString);
             AssertStoreFromConnectionString(cstr);
@@ -168,10 +164,16 @@ namespace BrightstarDB.EntityFramework
         internal void TrackObject(BrightstarEntityObject obj)
         {
             List<BrightstarEntityObject> trackedObjects;
+            if (obj.DataObject == null)
+            {
+                // Don't track the object until it has an underlying data object
+                return;
+            }
             if (_trackedObjects.TryGetValue(obj.DataObject.Identity, out trackedObjects))
             {
                 if (!trackedObjects.Contains(obj)) trackedObjects.Add(obj);
-            }else
+            }
+            else
             {
                 trackedObjects = new List<BrightstarEntityObject> {obj};
                 _trackedObjects[obj.DataObject.Identity] = trackedObjects;
@@ -180,6 +182,11 @@ namespace BrightstarDB.EntityFramework
 
         internal void UntrackObject(BrightstarEntityObject obj)
         {
+            if (obj.DataObject == null)
+            {
+                // No data object to provide a key for lookup
+                return;
+            }
             if (_trackedObjects.ContainsKey(obj.DataObject.Identity))
             {
                 _trackedObjects.Remove(obj.DataObject.Identity);
@@ -198,9 +205,135 @@ namespace BrightstarDB.EntityFramework
             {
                 SavingChanges(this, new EventArgs());
             }
-            _store.SaveChanges();
+            EnsureIdentity();
+            try
+            {
+                _store.SaveChanges();
+            }
+            catch (TransactionPreconditionsFailedException ex)
+            {
+                if (ex.InvalidNonExistenceSubjects.Any())
+                {
+                    throw new UniqueConstraintViolationException(ex.InvalidNonExistenceSubjects);
+                }
+                throw;
+            }
         }
 
+        /// <summary>
+        /// Ensure that each of the tracked objects in the context 
+        /// that have key properties have those key properties set.
+        /// </summary>
+        private void EnsureIdentity()
+        {
+            foreach (var entry in _trackedObjects)
+            {
+                foreach (var item in entry.Value)
+                {
+                    if (item.IsModified)
+                    {
+                        EnsureIdentity(item);
+                    }
+                }
+            }
+        }
+
+        private void EnsureIdentity(IEntityObject item)
+        {
+            IdentityInfo identityInfo = EntityMappingStore.GetIdentityInfo(item.GetType());
+            if (identityInfo != null && identityInfo.KeyConverter != null)
+            {
+                var propertyValues = new object[identityInfo.KeyProperties.Length];
+                for (var i = 0; i < identityInfo.KeyProperties.Length; i++)
+                {
+                    propertyValues[i] = identityInfo.KeyProperties[i].GetValue(item, null);
+                }
+                var key = identityInfo.KeyConverter.GenerateKey(propertyValues, identityInfo.KeySeparator, item.GetType());
+                if (key == null) throw new EntityKeyRequiredException();
+                if (!key.Equals(item.GetKey())) throw new EntityKeyChangedException();
+            }
+        }
+
+        /*
+        internal IdentityInfo GetIdentityInfo(Type t)
+        {
+            IdentityInfo cachedInfo;
+            if (_identityCache.TryGetValue(t, out cachedInfo)) return cachedInfo;
+
+            var baseUri = Constants.GeneratedUriPrefix;
+            PropertyInfo[] keyProperties = null;
+            var keySeparator = DefaultCompositeKeySeparator;
+            IKeyConverter keyConverter = null;
+
+            var interfaces = t.GetInterfaces().Where(i => i.GetCustomAttributes(typeof(EntityAttribute), true).Any());
+            var identityProperty =
+                interfaces.SelectMany(i => i.GetProperties()).FirstOrDefault(
+                    x => x.GetCustomAttributes(typeof(IdentifierAttribute), true).Any());
+            if (identityProperty != null)
+            {
+                var identityAttr =
+                    identityProperty.GetCustomAttributes(typeof(IdentifierAttribute), true).FirstOrDefault() as
+                    IdentifierAttribute;
+                var declaringType = identityProperty.DeclaringType;
+                if (identityAttr != null)
+                {
+                    if (identityAttr.BaseAddress != null && identityAttr.BaseAddress.Contains(":"))
+                    {
+                        var prefix = identityAttr.BaseAddress.Substring(0, identityAttr.BaseAddress.IndexOf(':'));
+                        var namespaceDecl = identityProperty.DeclaringType == null ? null :
+                            identityProperty.DeclaringType.Assembly.GetCustomAttributes(
+                                typeof(NamespaceDeclarationAttribute), false).Cast<NamespaceDeclarationAttribute>().
+                                FirstOrDefault(nda => nda.Prefix.Equals(prefix));
+                        if (namespaceDecl != null)
+                        {
+                            baseUri = namespaceDecl.Reference +
+                                      identityAttr.BaseAddress.Substring(identityAttr.BaseAddress.IndexOf(':') + 1);
+                        }
+                        else
+                        {
+                            baseUri = identityAttr.BaseAddress;
+                        }
+                    }
+
+                    if (identityAttr.KeyProperties != null && declaringType != null)
+                    {
+                        keyProperties = new PropertyInfo[identityAttr.KeyProperties.Length];
+                        for (int i = 0; i < identityAttr.KeyProperties.Length; i++)
+                        {
+                            var propertyName = identityAttr.KeyProperties[i];
+                            var propertyInfo = declaringType.GetProperty(propertyName);
+                            if (propertyInfo == null)
+                            {
+                                throw new EntityFrameworkException(
+                                    "Cannot find declared (composite) key property '{0}' on type '{1}'.", propertyName,
+                                    declaringType.FullName);
+                            }
+                            keyProperties[i] = propertyInfo;
+                        }
+                        keySeparator = identityAttr.KeySeparator ?? DefaultCompositeKeySeparator;
+                        if (identityAttr.KeyConverterType != null)
+                        {
+                            keyConverter = Activator.CreateInstance(identityAttr.KeyConverterType) as IKeyConverter;
+                            if (keyConverter == null)
+                            {
+                                throw new EntityFrameworkException(
+                                    "Cannot instantiate class {0} as an IKeyConverter instance.", identityAttr.KeyConverterType);
+                            }
+                        }
+                        else
+                        {
+                            keyConverter = new DefaultKeyConverter();
+                        }
+
+                    }
+
+                }
+            }
+            cachedInfo = new IdentityInfo(baseUri, keyProperties, keySeparator, keyConverter);
+            _identityCache[t] = cachedInfo;
+            return cachedInfo;
+        }
+         */
         /// <summary>
         /// Updates a single object in the object context with data from the data source
         /// </summary>
@@ -587,7 +720,7 @@ namespace BrightstarDB.EntityFramework
         public override string MapIdToUri(PropertyInfo identifierProperty, string id)
         {
             var entityType = identifierProperty.DeclaringType;
-            var prefix = Mappings.GetIdentifierPrefix(entityType);
+            var prefix = EntityMappingStore.GetIdentifierPrefix(entityType);
             return prefix + id;
         }
 
@@ -648,18 +781,20 @@ namespace BrightstarDB.EntityFramework
         ///<returns>The new object</returns>
         public T CreateObject<T>() where T : class
         {
-            var prefix = Mappings.GetIdentifierPrefix(typeof (T));
-            //var dataObject = String.IsNullOrEmpty(prefix)
-            //                     ? _store.MakeDataObject()
-            //                     : _store.MakeDataObject(prefix + Guid.NewGuid());
-            var dataObject = _store.MakeNewDataObject(prefix);
-            IEnumerable<string> typeIds = Mappings.MapTypeToUris(typeof (T));            
-            foreach (var typeId in typeIds)
+            //string prefix = EntityMappingStore.GetIdentifierPrefix(typeof (T));
+            var identifierInfo = EntityMappingStore.GetIdentityInfo(typeof(T));
+            string prefix = identifierInfo == null ? null : identifierInfo.BaseUri;
+            var dataObject = identifierInfo != null && identifierInfo.KeyProperties != null ? null : _store.MakeNewDataObject(prefix);
+            if (dataObject != null)
             {
-                if (!String.IsNullOrEmpty(typeId))
+                IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(typeof (T));
+                foreach (var typeId in typeIds)
                 {
-                    var typeObject = _store.MakeDataObject(typeId);
-                    dataObject.AddProperty(DataObject.TypeDataObject, typeObject);
+                    if (!String.IsNullOrEmpty(typeId))
+                    {
+                        var typeObject = _store.MakeDataObject(typeId);
+                        dataObject.AddProperty(DataObject.TypeDataObject, typeObject);
+                    }
                 }
             }
             var bindType = GetImplType(typeof (T));
@@ -881,11 +1016,11 @@ namespace BrightstarDB.EntityFramework
         /// <returns>An instance of <typeparamref name="T"/> that is bound to the same underlying resource as <paramref name="beo"/>.</returns>
         public T Become<T>(BrightstarEntityObject beo)
         {
-            if (!Mappings.IsKnownInterface(typeof(T)))
+            if (!EntityMappingStore.IsKnownInterface(typeof(T)))
             {
                 throw new MappingNotFoundException(typeof(T));
             }
-            var implType = Mappings.GetImplType(typeof (T));
+            var implType = EntityMappingStore.GetImplType(typeof (T));
             List<BrightstarEntityObject> trackedObjects;
             if (_trackedObjects.TryGetValue(beo.DataObject.Identity, out trackedObjects))
             {
@@ -893,7 +1028,7 @@ namespace BrightstarDB.EntityFramework
                 if (ret != null) return ret;
             }
             var dataObject = beo.DataObject;
-            foreach(var typeUri in Mappings.MapTypeToUris(implType))
+            foreach(var typeUri in EntityMappingStore.MapTypeToUris(implType))
             {
                 var typeDo = GetDataObject(new Uri(typeUri), false);
                 dataObject.AddProperty(DataObject.TypeDataObject, typeDo);
@@ -908,15 +1043,28 @@ namespace BrightstarDB.EntityFramework
         /// <param name="beo">An existing entity bound to the resource to be updated</param>
         public void Unbecome<T>(BrightstarEntityObject beo) 
         {
-            if (!Mappings.IsKnownInterface(typeof(T)))
+            if (!EntityMappingStore.IsKnownInterface(typeof(T)))
             {
                 throw new MappingNotFoundException(typeof(T));
             }
-            var typeUri = Mappings.GetMappedInterfaceTypeUri(Mappings.GetImplType(typeof (T)));
+            var typeUri = EntityMappingStore.GetMappedInterfaceTypeUri(EntityMappingStore.GetImplType(typeof (T)));
             if (!String.IsNullOrEmpty(typeUri))
             {
                 var typeDo = GetDataObject(new Uri(typeUri), false);
                 beo.DataObject.RemoveProperty(DataObject.TypeDataObject, typeDo);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="typeUris"></param>
+        internal void EnforceClassUniqueConstraint(string identity, IEnumerable<string> typeUris)
+        {
+            foreach (var t in typeUris)
+            {
+                _store.AddPrecondition(false, identity, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", t);
             }
         }
     }
