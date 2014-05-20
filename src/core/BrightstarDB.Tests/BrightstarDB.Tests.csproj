@@ -120,7 +120,7 @@
     <Compile Include="EntityFramework\DataTypeTests.cs" />
     <Compile Include="EntityFramework\Entity.cs" />
     <Compile Include="EntityFramework\ExtendedContextTests.cs" />
-    <Compile Include="EntityFramework\IAutoKeyEntity.cs" />
+    <Compile Include="EntityFramework\IStringKeyEntity.cs" />
     <Compile Include="EntityFramework\IBaseEntity.cs" />
     <Compile Include="EntityFramework\IChildKeyEntity.cs" />
     <Compile Include="EntityFramework\ICompany.cs" />
@@ -159,6 +159,7 @@
     <Compile Include="EntityFramework\InterfaceInheritanceTests.cs" />
     <Compile Include="EntityFramework\SparqlContextTests.cs" />
     <Compile Include="EntityFramework\StringComparisonTests.cs" />
+    <Compile Include="EntityFramework\UniqueKeyConstraintTests.cs" />
     <Compile Include="NamespaceDeclarationTests.cs" />
     <Compile Include="SparqlQueryHelperTests.cs" />
     <Compile Include="TestHelper.cs" />

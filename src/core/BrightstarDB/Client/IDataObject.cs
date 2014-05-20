@@ -181,6 +181,8 @@ namespace BrightstarDB.Client
         /// <remarks>This change will update all triples where the data object identity
         /// is the subject or object. It will not change predicates.</remarks>
         /// <param name="newIdentity">The new URI identifier</param>
-        IDataObject UpdateIdentity(string newIdentity);
+        /// <param name="enforceClassUniqueConstraint">Add an update precondition to ensure that the update will fail if the store already
+        /// contains an RDF resource with the same rdf:type(s) as this data object.</param>
+        IDataObject UpdateIdentity(string newIdentity, bool enforceClassUniqueConstraint);
     }
 }

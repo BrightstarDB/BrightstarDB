@@ -108,7 +108,7 @@ namespace BrightstarDB.EntityFramework
                 if (value == _identity) return;
                 if (DataObject != null)
                 {
-                    DataObject = DataObject.UpdateIdentity(value);
+                    DataObject = DataObject.UpdateIdentity(value, true);
                     //throw new InvalidOperationException("Cannot modify the identity of an attached BrightstarEntityObject");
                 }
                 _identity = value;
@@ -147,7 +147,14 @@ namespace BrightstarDB.EntityFramework
         {
             var baseUri = GetIdentityBase();
             var identity = String.IsNullOrEmpty(baseUri) ? key : baseUri + key;
-            Identity = identity;
+            if (!identity.Equals(Identity))
+            {
+                if (_context != null && _context.TrackedObjects.Any(x => x.Identity.Equals(identity) && !ReferenceEquals(x, this)))
+                {
+                    throw new UniqueConstraintViolationException();
+                }
+                Identity = identity;
+            }
         }
 
         /// <summary>
@@ -770,19 +777,27 @@ namespace BrightstarDB.EntityFramework
             if (DataObject == null && _identity != null)
             {
                 DataObject = _context.GetDataObject(new Uri(_identity), false);
+                var identityInfo = EntityMappingStore.GetIdentityInfo(GetType());
+                if (identityInfo != null && identityInfo.EnforceClassUniqueConstraint)
+                {
+                    _context.EnforceClassUniqueConstraint(_identity, EntityMappingStore.MapTypeToUris(GetType()));
+                }
                 foreach(var typeUri in EntityMappingStore.MapTypeToUris(GetType()))
                 {
                     if (!String.IsNullOrEmpty(typeUri))
                     {
                         var typeDo = _context.GetDataObject(new Uri(typeUri), false);
-                        if (typeDo != null) DataObject.AddProperty(Client.DataObject.TypeDataObject, typeDo);
+                        if (typeDo != null)
+                        {
+                            DataObject.AddProperty(Client.DataObject.TypeDataObject, typeDo);
+                        }
                     }
                 }
             }
-            if (DataObject != null)
-            {
+//            if (DataObject != null)
+//            {
                 _context.TrackObject(this);
-            }
+//            }
 
             if (_currentItemValues != null)
             {
@@ -930,13 +945,7 @@ namespace BrightstarDB.EntityFramework
             if (identityInfo != null && identityInfo.KeyProperties != null && identityInfo.KeyProperties.Any(p => p.Name.Equals(propertyName)))
             {
                 var newKey = GenerateEntityKey();
-                var newIdentity = identityInfo.BaseUri + newKey;
-                // Only update Identity if necessary
-                if (!newIdentity.Equals(Identity))
-                {
-                    // This will throw an InvalidOperationException if the object is attached to a context
-                    Identity = newIdentity;
-                }
+                SetKey(newKey);
             }
 
             PropertyChangedEventHandler handler = PropertyChanged;
@@ -967,7 +976,7 @@ namespace BrightstarDB.EntityFramework
 
         internal void TriggerCreatedEvent(BrightstarEntityContext context)
         {
-            if (context == null || this.DataObject.IsNew)
+            if (context == null || this.DataObject == null || this.DataObject.IsNew)
             {
                 OnCreated(context);
             }

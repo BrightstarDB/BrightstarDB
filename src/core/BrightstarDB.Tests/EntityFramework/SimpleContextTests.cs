@@ -52,6 +52,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         [Test]
         [ExpectedException(typeof(EntityKeyRequiredException))]
+        [Ignore("Behaviour is changed - an entity can be created, but will not be tracked or saved until its identity is set")]
         public void TestCannotCreateEntityWithKey()
         {
             string storeName = "CannotCreateEntityWithKey_" + DateTime.UtcNow.Ticks;
@@ -1138,7 +1139,7 @@ where {
             }
         }
 
-        [Ignore]
+        //[Ignore]
         [Test]
         public void TestAddGeneratesIdentity()
         {
@@ -1171,10 +1172,11 @@ where {
                     Assert.IsNotNull(foundSkill);
                     Assert.IsNotNull(foundCompany);
 
-                    Assert.IsTrue(foundPerson.Id.StartsWith(Constants.GeneratedUriPrefix));
-                    Assert.IsTrue(foundCompany.Id.StartsWith(Constants.GeneratedUriPrefix));
-                    Guid guid;
-                    Assert.IsTrue(Guid.TryParse(foundSkill.Id, out guid));
+                    // Generated Ids should be GUIDs
+                    Guid g;
+                    Assert.IsTrue(Guid.TryParse(foundPerson.Id, out g));
+                    Assert.IsTrue(Guid.TryParse(foundCompany.Id, out g));
+                    Assert.IsTrue(Guid.TryParse(foundSkill.Id, out g));
                 }
             }
         }

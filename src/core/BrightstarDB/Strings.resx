@@ -270,4 +270,7 @@
   <data name="EntityFramework_KeyRequired" xml:space="preserve">
     <value>The key properties for the entity must be set before adding then entity to a context.</value>
   </data>
+  <data name="EntityFramework_UniqueConstraintViolation" xml:space="preserve">
+    <value>One or more new resources have an identifier that conflicts with an existing resource of the same type.</value>
+  </data>
 </root>

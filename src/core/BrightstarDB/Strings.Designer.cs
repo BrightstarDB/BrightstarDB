@@ -430,6 +430,15 @@ namespace BrightstarDB {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One or more new resources have an identifier that conflicts with an existing resource of the same type..
+        /// </summary>
+        internal static string EntityFramework_UniqueConstraintViolation {
+            get {
+                return ResourceManager.GetString("EntityFramework_UniqueConstraintViolation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The media type {0} is not currently supported by Export jobs..
         /// </summary>
         internal static string ExportJob_UnsupportedExportFormat {

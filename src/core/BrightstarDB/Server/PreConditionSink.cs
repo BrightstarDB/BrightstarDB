@@ -40,7 +40,8 @@ namespace BrightstarDB.Server
             var triplesEnum = _store.Match((Constants.WildcardUri.Equals(subject)) ? null : subject,
                                            (Constants.WildcardUri.Equals(predicate)) ? null : predicate,
                                            (Constants.WildcardUri.Equals(obj) && !isLiteral) ? null : obj,
-                                           isLiteral, dataType, langCode, graphUri);
+                                           isLiteral, dataType, langCode, 
+                                           (Constants.WildcardUri.Equals(graphUri)) ? null : graphUri);
             if (_preconditionType == PreconditionType.ExistsPrecondition)
             {
                 Logging.LogDebug("Check triple exists precondition {0} {1} {2} {3} {4} {5} {6}", subject, predicate, obj,

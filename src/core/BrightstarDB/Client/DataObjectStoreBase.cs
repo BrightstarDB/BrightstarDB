@@ -40,6 +40,11 @@ namespace BrightstarDB.Client
         /// </summary>
         private List<Triple> _preconditions;
 
+        /// <summary>
+        /// Collection of triples that must no be present before the transaction can be executed.
+        /// </summary>
+        private List<Triple> _nonExistencePreconditions;
+
         private bool _isReadOnly;
 
         private EventHandler _savingChanges;
@@ -300,6 +305,30 @@ namespace BrightstarDB.Client
         {
             return _datasetClause;
         }
+
+        public void AddPrecondition(bool matchExisting, string subject, string predicate, string @object, string graph = Constants.WildcardUri,
+                                    bool isLiteral = false, string datatype = null, string language = null)
+        {
+            var t = new Triple
+                {
+                    Subject = subject,
+                    Predicate = predicate,
+                    Object = @object,
+                    Graph = graph,
+                    IsLiteral = isLiteral,
+                    DataType = datatype,
+                    LangCode = language
+                };
+            if (matchExisting)
+            {
+                Preconditions.Add(t);
+            }
+            else
+            {
+                NonExistencePreconditions.Add(t);
+            }
+        }
+
         #endregion
 
         #region Implementation of IInternalDataObjectStore
@@ -336,6 +365,7 @@ namespace BrightstarDB.Client
         /// </summary>
         public List<Triple> Preconditions { get { return _preconditions; } }
 
+        public List<Triple> NonExistencePreconditions { get { return _nonExistencePreconditions; } }
         /// <summary>
         /// Returns an enumeration of all data objects that are the subject
         /// of a triple that binds a predicate of type <paramref name="pred"/>
@@ -385,7 +415,22 @@ namespace BrightstarDB.Client
                     IsLiteral = false,
                     Graph = row.GetColumnValue("g").ToString()
                 });
-        } 
+        }
+
+
+        /// <summary>
+        /// Adds preconditions to validate that there is no existing resource with the URI
+        /// <paramref name="identity"/> that is an instance of one or more of the specified types.
+        /// </summary>
+        /// <param name="identity">The identity of the resource to be validated</param>
+        /// <param name="types">An enumeration of class resources URIs</param>
+        public void SetClassUniqueConstraints(string identity, IEnumerable<string> types)
+        {
+            _nonExistencePreconditions.RemoveAll(
+                x => x.Subject.Equals(identity) && x.Predicate.Equals(DataObject.TypeDataObject.Identity));
+            _nonExistencePreconditions.AddRange(
+                types.Select(x=>new Triple{Subject = identity, Predicate = DataObject.TypeDataObject.Identity, Object = x, Graph = Constants.WildcardUri}));
+        }
 
         #endregion
 
@@ -398,6 +443,7 @@ namespace BrightstarDB.Client
             _deletePatterns = new List<Triple>();
             _addTriples = new List<Triple>();
             _preconditions = new List<Triple>();
+            _nonExistencePreconditions = new List<Triple>();
         }
 
         private static void UpdateVersionFromSparqlResult(SparqlResult sparqlResult, IDataObject dataObject)

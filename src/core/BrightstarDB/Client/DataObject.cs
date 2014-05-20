@@ -421,7 +421,15 @@ namespace BrightstarDB.Client
             _triples.Clear();
         }
 
-        public IDataObject UpdateIdentity(string newIdentity)
+        /// <summary>
+        /// Change the URI identifier for this data object.
+        /// </summary>
+        /// <remarks>This change will update all triples where the data object identity
+        /// is the subject or object. It will not change predicates.</remarks>
+        /// <param name="newIdentity">The new URI identifier</param>
+        /// <param name="enforceClassUniqueConstraint">Add an update precondition to ensure that the update will fail if the store already
+        /// contains an RDF resource with the same rdf:type(s) as this data object.</param>
+        public IDataObject UpdateIdentity(string newIdentity, bool enforceClassUniqueConstraint)
         {
             if (newIdentity == null) throw new ArgumentNullException("newIdentity", "DataObject Identity must not be null");
             if (String.IsNullOrWhiteSpace(newIdentity)) throw new ArgumentException("DataObject Identity must not be an empty string or whitespace.", "newIdentity");
@@ -436,7 +444,7 @@ namespace BrightstarDB.Client
                 // Simple case - we only have to change the uncommitted triples locally.
                 CheckLoaded();
                 var ret = new DataObject(_store, newIdentity, true);
-                ret.BindTriples(_triples.Select(t => ReplaceIdentity(t, newIdentity)), true);
+                ret.BindTriples(_triples.Select(t => ReplaceIdentity(t, newIdentity)), true, enforceClassUniqueConstraint);
                 Delete();
                 return ret;
             }
@@ -444,7 +452,7 @@ namespace BrightstarDB.Client
             {
                 CheckLoaded();
                 var ret = new DataObject(_store, newIdentity, true);
-                ret.BindTriples(_triples.Union(_store.GetReferencingTriples(this)).Select(t => ReplaceIdentity(t, newIdentity)), true);
+                ret.BindTriples(_triples.Union(_store.GetReferencingTriples(this)).Select(t => ReplaceIdentity(t, newIdentity)), true, enforceClassUniqueConstraint);
                 Delete();
                 return ret;
             }
@@ -763,7 +771,9 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="triples">Dataobject state</param>
         /// <param name="asNewTriples">Also add the triples to the list of new triples on the context store</param>
-        internal bool BindTriples(IEnumerable<Triple> triples, bool asNewTriples = false)
+        /// <param name="enforceClassUniqueConstraint">Add update preconditions to ensure that the update fails if the store already contains
+        /// a resource with the same identity and the same rdf:type(s) as this data object.</param>
+        internal bool BindTriples(IEnumerable<Triple> triples, bool asNewTriples = false, bool enforceClassUniqueConstraint = false)
         {
             if (_isLoaded)
             {
@@ -778,6 +788,13 @@ namespace BrightstarDB.Client
                 if (asNewTriples)
                 {
                     _store.AddTriples.AddRange(_triples);
+                    if (enforceClassUniqueConstraint)
+                    {
+                        _store.SetClassUniqueConstraints(
+                            Identity,
+                            _triples.Where(
+                                x => x.Predicate.Equals(TypeDataObject.Identity) && x.Subject.Equals(Identity)).Select(x=>x.Object));
+                    }
                 }
                 return true;
             }
@@ -785,6 +802,14 @@ namespace BrightstarDB.Client
             if (asNewTriples)
             {
                 _store.AddTriples.AddRange(_triples);
+                if (enforceClassUniqueConstraint)
+                {
+                    _store.SetClassUniqueConstraints(
+                        Identity,
+                        _triples.Where(
+                            x => x.Predicate.Equals(TypeDataObject.Identity) && x.Subject.Equals(Identity))
+                            .Select(x=>x.Object));
+                }
             }
             _isLoaded = true;
             return true;

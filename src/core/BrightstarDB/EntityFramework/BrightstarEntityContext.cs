@@ -164,6 +164,11 @@ namespace BrightstarDB.EntityFramework
         internal void TrackObject(BrightstarEntityObject obj)
         {
             List<BrightstarEntityObject> trackedObjects;
+            if (obj.DataObject == null)
+            {
+                // Don't track the object until it has an underlying data object
+                return;
+            }
             if (_trackedObjects.TryGetValue(obj.DataObject.Identity, out trackedObjects))
             {
                 if (!trackedObjects.Contains(obj)) trackedObjects.Add(obj);
@@ -177,6 +182,11 @@ namespace BrightstarDB.EntityFramework
 
         internal void UntrackObject(BrightstarEntityObject obj)
         {
+            if (obj.DataObject == null)
+            {
+                // No data object to provide a key for lookup
+                return;
+            }
             if (_trackedObjects.ContainsKey(obj.DataObject.Identity))
             {
                 _trackedObjects.Remove(obj.DataObject.Identity);
@@ -196,7 +206,18 @@ namespace BrightstarDB.EntityFramework
                 SavingChanges(this, new EventArgs());
             }
             EnsureIdentity();
-            _store.SaveChanges();
+            try
+            {
+                _store.SaveChanges();
+            }
+            catch (TransactionPreconditionsFailedException ex)
+            {
+                if (ex.InvalidNonExistenceSubjects.Any())
+                {
+                    throw new UniqueConstraintViolationException(ex.InvalidNonExistenceSubjects);
+                }
+                throw;
+            }
         }
 
         /// <summary>
@@ -760,18 +781,20 @@ namespace BrightstarDB.EntityFramework
         ///<returns>The new object</returns>
         public T CreateObject<T>() where T : class
         {
-            var prefix = EntityMappingStore.GetIdentifierPrefix(typeof (T));
-            //var dataObject = String.IsNullOrEmpty(prefix)
-            //                     ? _store.MakeDataObject()
-            //                     : _store.MakeDataObject(prefix + Guid.NewGuid());
-            var dataObject = _store.MakeNewDataObject(prefix);
-            IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(typeof (T));
-            foreach (var typeId in typeIds)
+            //string prefix = EntityMappingStore.GetIdentifierPrefix(typeof (T));
+            var identifierInfo = EntityMappingStore.GetIdentityInfo(typeof(T));
+            string prefix = identifierInfo == null ? null : identifierInfo.BaseUri;
+            var dataObject = identifierInfo != null && identifierInfo.KeyProperties != null ? null : _store.MakeNewDataObject(prefix);
+            if (dataObject != null)
             {
-                if (!String.IsNullOrEmpty(typeId))
+                IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(typeof (T));
+                foreach (var typeId in typeIds)
                 {
-                    var typeObject = _store.MakeDataObject(typeId);
-                    dataObject.AddProperty(DataObject.TypeDataObject, typeObject);
+                    if (!String.IsNullOrEmpty(typeId))
+                    {
+                        var typeObject = _store.MakeDataObject(typeId);
+                        dataObject.AddProperty(DataObject.TypeDataObject, typeObject);
+                    }
                 }
             }
             var bindType = GetImplType(typeof (T));
@@ -1032,5 +1055,17 @@ namespace BrightstarDB.EntityFramework
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="identity"></param>
+        /// <param name="typeUris"></param>
+        internal void EnforceClassUniqueConstraint(string identity, IEnumerable<string> typeUris)
+        {
+            foreach (var t in typeUris)
+            {
+                _store.AddPrecondition(false, identity, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", t);
+            }
+        }
     }
 }

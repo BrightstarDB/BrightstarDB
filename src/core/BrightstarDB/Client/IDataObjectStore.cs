@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using BrightstarDB.EntityFramework.Query;
+using BrightstarDB.Model;
 
 namespace BrightstarDB.Client
 {
@@ -116,5 +117,20 @@ namespace BrightstarDB.Client
         /// <returns></returns>
         /// <remarks>The string returned by this method follows the DatasetClause production of the SPARQL 1.1 grammar</remarks>
         String GetDatasetClause();
+
+        /// <summary>
+        /// Add a precondition statement to the current context. All precondition
+        /// statements are evaluated prior to any update being applied.
+        /// </summary>
+        /// <param name="matchExisting">If true, then the triple pattern must match an existing triple in the store. If false then the triple
+        /// pattern must not match an existing triple in the store.</param>
+        /// <param name="subject">The subject of the triple pattern</param>
+        /// <param name="predicate">The predicate of the triple pattern</param>
+        /// <param name="object">The object of the triple pattern</param>
+        /// <param name="graph">The graph identifier of the triple pattern</param>
+        /// <param name="isLiteral">True if the object is a literal value, false if it is a resource URI</param>
+        /// <param name="datatype">The datatype of the literal value</param>
+        /// <param name="language">The language code of the literal value</param>
+        void AddPrecondition(bool matchExisting, string subject, string predicate, string @object, string graph = Constants.WildcardUri, bool isLiteral = false, string datatype = null, string language = null);
     }
 }

@@ -53,5 +53,13 @@ namespace BrightstarDB.EntityFramework
         /// values of an entity into a single composite key string
         /// </summary>
         public IKeyConverter KeyConverter { get; private set; }
+
+        /// <summary>
+        /// Return a flag indicating if type-based unique constraints should be enforced
+        /// </summary>
+        public bool EnforceClassUniqueConstraint
+        {
+            get { return KeyConverter != null; }
+        }
     }
 }
