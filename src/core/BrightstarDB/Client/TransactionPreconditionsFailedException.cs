@@ -12,14 +12,37 @@ namespace BrightstarDB.Client
     /// </summary>
     public class TransactionPreconditionsFailedException : BrightstarException, ITripleSink
     {
+#if WINDOWS_PHONE
+        private readonly Dictionary<string, bool> _invalidSubjects;
+        private readonly Dictionary<string, bool> _invalidNonExistenceSubjects;
+#else
         private readonly HashSet<string> _invalidSubjects;
         private readonly HashSet<string> _invalidNonExistenceSubjects;
- 
+#endif
+
         /// <summary>
         /// Returns the failed precondition triples in NTriples format
         /// </summary>
         public string FailedPreconditions { get; private set; }
 
+        /// <summary>
+        /// Returns the triples that failed the non-existence precondition tests
+        /// </summary>
+        public string FailedNonExistencePreconditions { get; private set; }
+
+#if WINDOWS_PHONE
+        /// <summary>
+        /// Returns an enumeration over the subject resource URIs for all preconditions reported
+        /// as not being met.
+        /// </summary>
+        public IEnumerable<string> InvalidSubjects { get { return _invalidSubjects.Keys; } }
+
+        /// <summary>
+        /// Returns an enumeration over the subject resource URIs for all triples that failed
+        /// the non-existence precondition.
+        /// </summary>
+        public IEnumerable<string> InvalidNonExistenceSubjects { get { return _invalidNonExistenceSubjects.Keys; } }
+#else
         /// <summary>
         /// Returns an enumeration over the subject resource URIs for all preconditions reported
         /// as not being met.
@@ -27,16 +50,11 @@ namespace BrightstarDB.Client
         public IEnumerable<string> InvalidSubjects { get { return _invalidSubjects; } }
 
         /// <summary>
-        /// Returns the triples that failed the non-existence precondition tests
-        /// </summary>
-        public string FailedNonExistencePreconditions { get; private set; }
-
-        /// <summary>
         /// Returns an enumeration over the subject resource URIs for all triples that failed
         /// the non-existence precondition.
         /// </summary>
         public IEnumerable<string> InvalidNonExistenceSubjects { get { return _invalidNonExistenceSubjects; } }
-
+#endif
         private bool _parsingNonexistenceFailures;
 
 
@@ -48,7 +66,11 @@ namespace BrightstarDB.Client
             {
                 try
                 {
+#if WINDOWS_PHONE
+                    _invalidSubjects = new Dictionary<string, bool>();
+#else
                     _invalidSubjects = new HashSet<string>();
+#endif
                     var p = new NTriplesParser();
                     this._parsingNonexistenceFailures = false;
                     using (var rdr = new StringReader(existenceFailures))
@@ -67,7 +89,11 @@ namespace BrightstarDB.Client
             {
                 try
                 {
+#if WINDOWS_PHONE
+                    _invalidNonExistenceSubjects = new Dictionary<string, bool>();
+#else
                     _invalidNonExistenceSubjects = new HashSet<string>();
+#endif
                     this._parsingNonexistenceFailures = true;
                     var p = new NTriplesParser();
                     using (var rdr = new StringReader(nonexistenceFailures))
@@ -99,6 +125,16 @@ namespace BrightstarDB.Client
         /// <param name="graphUri">The graph URI for the statement</param>
         public void Triple(string subject, bool subjectIsBNode, string predicate, bool predicateIsBNode, string obj, bool objIsBNode, bool objIsLiteral, string dataType, string langCode, string graphUri)
         {
+#if WINDOWS_PHONE
+            if (_parsingNonexistenceFailures)
+            {
+                _invalidNonExistenceSubjects[subject] = true;
+            }
+            else
+            {
+                _invalidSubjects[subject] = true;
+            }
+#else
             if (_parsingNonexistenceFailures)
             {
                 _invalidNonExistenceSubjects.Add(subject);
@@ -107,6 +143,7 @@ namespace BrightstarDB.Client
             {
                 _invalidSubjects.Add(subject);
             }
+#endif
         }
 
         #endregion
