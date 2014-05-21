@@ -5,7 +5,9 @@ using NUnit.Framework;
 namespace BrightstarDB.Tests.EntityFramework
 {
     [TestFixture("type=embedded;storesDirectory=c:\\brightstar;storeName={0}")]
+#if !PORTABLE
     [TestFixture("type=rest;endpoint=http://localhost:8090/brightstar/;storeName={0}")]
+#endif
     public class UniqueKeyConstraintTests : ClientTestBase
     {
         private readonly string _connectionString;

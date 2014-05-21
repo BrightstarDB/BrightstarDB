@@ -6,6 +6,7 @@ using BrightstarDB.Server.Modules.Authentication;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy.Hosting.Self;
 
+
 namespace BrightstarDB.Tests
 {
     public class ClientTestBase
@@ -51,4 +52,23 @@ namespace BrightstarDB.Tests
         }
     }
 }
+
+#else
+
+namespace BrightstarDB.Tests
+{
+    public class ClientTestBase
+    {
+        protected static void StartService()
+        {
+            // The test framework will have to control the service for us
+        }
+
+        protected static void CloseService()
+        {
+            // The test framework will have to control the service for us
+        }
+    }
+}
+
 #endif
