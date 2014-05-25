@@ -13,6 +13,18 @@ This section gives a brief outline of what is new / changed in each official rel
 either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
 marked with FIX.
 
+****************************
+ BrightstarDB Develop Branch
+****************************
+The following changes are committed to the develop branch to be included in the next release.
+
+    - NEW: Added support for non-existence preconditions on transactional updates. This precondition
+           fails if one or more of the specified triples already exists in the store prior to executing
+           the update. See :ref:`RDF_Transactional_Update`.
+    
+    - NEW: Added support for generated and composite keys for entities. See :ref:`Key_Properties_In_EF`.
+           This includes a new type-based unique constraint check for entities with generated or composite keys.
+
 ***************************
  BrightstarDB 1.6.2 Release
 ***************************
