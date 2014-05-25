@@ -47,60 +47,128 @@ Deleting a store is also straight forward::
 
   client.DeleteStore(storeName);
 
+Jobs and IJobInfo
+=================
 
-Adding data
-===========
+In BrightstarDB, many operations are executed as jobs. A job is simply an asynchronous task
+that is processed by the BrightstarDB server. BrightstarDB maintains a queue of jobs for
+each store and each store will process its jobs one at a time.
 
-Data is added to the store by sending the data to add in N-Triples format. Each triple must be 
+In the API, the methods that run as jobs all return an IJobInfo result. This interface
+defines a number of properties that can be used to check the status of a job.
+
+======================= ===============================================================
+Property Name           Description
+======================= ===============================================================
+JobId                   The unique identifier for the job. This can be used with the ``GetJobInfo`` method
+                        to retrieve updates about the job as it is processed.
+Label                   A user-provided label for the job. This label can be set when the job is created.
+JobPending              A boolean flag that is true if the job is currently queued for execution.
+JobStarted              A boolean flag that is true if the job is currently being executed.
+JobCompletedWithErrors  A boolean flag that is true if the job has failed.
+JobCompletedOk          A boolean flag that is true if the job has completed successfully.
+QueuedTime              The date/time when the job was queued to be processed
+StartTime               The date/time when the job entered processing.
+EndTime                 The date/time when the job completed processing.
+ExceptionInfo           If an error occurred, this property exposed the detailed exception information.
+======================= ===============================================================
+
+Typically calling one of these methods simply queues the job for update and returns an IJobInfo structure
+straight away (the exceptions are the ``ExecuteTransaction`` and ``ExecuteUpdate`` methods which by 
+default will only return when the job has completed successfully or failed).
+
+You can monitor the progress of a job by making a call to the ``GetJobInfo`` method on the client.
+There are two variants of ``GetJobInfo`` the first takes a store name and a job ID and returns the
+status of that specific job. The second takes a store name, an offset and a length and returns
+the status of the jobs in that portion of the queue.
+
+.. note::
+    Job status is not persisted by a store. This means that a server is restarted for any reason, 
+    all queued jobs and job information is lost. Additionally, job status records for completed 
+    (or failed) jobs may be periodically culled from the queue.
+    
+    Therefore it is possible for ``GetJobInfo`` to fail to find the details of a previously 
+    submitted job in some circumstances.
+    
+.. _RDF_Transactional_Update:
+
+Transactional Update
+====================
+
+BrightstarDB supports a transactional update model that allows you to group together
+a collection of triples to remove and triples to add as a single atomic operation, that
+will either succeed and modify the store, or if it fails will leave the store unmodified.
+
+A transaction is defined by creating a new instance of the ``BrightstarDB.Client.UpdateTransactionData``
+class and setting its properties. The transaction is then executed by passing the ``UpdateTransactionData``
+instance to the ``ExecuteTransaction()`` method on the client::
+
+  var transactionData = new UpdateTransactionData();
+  
+  // ... set properties of transactionData here...
+  
+  var jobInfo = client.ExecuteTransaction(storeName, transactionData);
+
+By default the method will block until the job completes processing (either successfully or with errors). You can then check the
+value of the ``IJobInfo`` object returned for the job status and any exception details. Alternatively, you can
+pass ``false`` for the optional ``waitForCompletion`` parameter and the update job will be queued and the ``IJobInfo``
+object returned straight away that you can then monitor asynchronously from your code. To provide a custom
+label for the job, you can pass the label string in to the optional ``label`` parameter.
+
+
+Inserting Data
+--------------
+
+Data is added to the store by specifying the data to be added in N-Triples or N-Quads format 
+on the ``InsertData`` property of the ``UpdateTransactionData`` class. Each triple or quad must be 
 on a single line with no line breaks, a good way to do this is to use a ``StringBuilder`` and then 
-using ``AppendLine()`` for each triple::
+using ``AppendLine()`` for each triple. ::
 
-  var data = new StringBuilder();
-  data.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/name> \\"BrightstarDB\\" .");
-  data.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/nosql> .");
-  data.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/.net> .");
-  data.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/rdf> .");
+  var addTriples = new StringBuilder();
+  addTriples.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/name> \\"BrightstarDB\\" .");
+  addTriples.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/nosql> .");
+  addTriples.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/.net> .");
+  addTriples.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/rdf> .");
+
+  var transactionData = new UpdateTransactionData { InsertData = addTriples };
+
+The ``ExecuteTransaction()`` method is used to insert the data into the store::
+
+  var jobInfo = client.ExecuteTransaction(storeName, transactionData);
 
 
-The ``ExecuteTransaction()`` method is used to insert the N-Triples data into the store::
-
-  client.ExecuteTransaction(storeName,null, null, data.ToString());
-
-
-Deleting data
-=============
+Deleting Data
+-------------
 
 Deletion is done by defining a pattern that should matching the triples to be deleted. The 
-following example deletes all the category data about BrightstarDB, again we use the 
-``StringBuilder`` to create the delete pattern.
+following example deletes the triple that asserts that BrightstarDB is in the product category NoSQL::
 
-::
-
-  var deletePatternsData = new StringBuilder();
-  deletePatternsData.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/.well-known/model/wildcard> .");
-
+  var deletePatterns = "<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/categories/nosql> .";
+  var transactionData = new UpdateTransactionData { DeletePatterns = deletePatterns };
+  client.ExecuteTransaction(storeName, transactionData);
 
 The identifier ``http://www.brightstardb.com/.well-known/model/wildcard`` is a wildcard 
-match for any value, so the above example deletes all triples that have a subject of
+match for any value, so the following example deletes all triples that have a subject of
 ``http://www.brightstardb.com/products/brightstar`` and a predicate of
-``http://www.brightstardb.com/schemas/product/category``.
+``http://www.brightstardb.com/schemas/product/category``::
 
-The ``ExecuteTransaction()`` method is used to delete the data from the store::
-
-  client.ExecuteTransaction(storeName, null, deletePatternsData.ToString(), null);
+  var deletePatterns = "<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/category> <http://www.brightstardb.com/.well-known/model/wildcard> .";
+  var transactionData = new UpdateTransactionData { DeletePatterns = deletePatterns };
+  var jobInfo = client.ExecuteTransaction(storeName, transactionData);
 
 .. note::
   The string ``http://www.brightstardb.com/.well-known/model/wildcard`` is also defined
   as the constant string ``BrightstarDB.Constants.WildcardUri``.
+
   
 Conditional Updates
-===================
+-------------------
 
 The execution of a transaction can be made conditional on certain triples existing in the 
-store. The following example updates the ``productCode`` property of a resource only if its 
-current value is ``640``.
+store. This is done by specifying the triples or triple patterns to be matched on the 
+``ExistencePreconditions`` property of the ``UpdateTransactionData`` class.
 
-::
+The following example updates the ``productCode`` property of a resource only if its current value is ``640``::
 
   var preconditions = new StringBuilder();
   preconditions.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
@@ -108,12 +176,33 @@ current value is ``640``.
   deletes.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "640"^^<http://www.w3.org/2001/XMLSchema#integer> .");
   var inserts = new StringBuilder();
   inserts.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "973"^^<http://www.w3.org/2001/XMLSchema#integer> .");
-  client.ExecuteTransaction(storeName, preconditions.ToString(), deletes.ToString(), inserts.ToString());
-
+  var transactionData = new UpdateTransactionData { 
+        ExistencePreconditions = preconditions.ToString(), 
+        DeletePatterns = deletes.ToString(), 
+        InsertData = inserts.ToString() };
+  client.ExecuteTransaction(storeName, transactionData);
 
 When a transaction contains condition triples, every triple specified in the preconditions 
 must exist in the store before the transaction is applied. If one or more triples specified in 
-the preconditions are not matched, a ``BrightstarClientException`` will be raised.
+the preconditions are not matched, the update will not be applied.
+
+In addition to being able to specify triple patterns that must exist in the store, it is also possible to
+specify patterns that MUST NOT exist before the update is applied. As with the existence preconditions,
+a failure
+
+The following example adds a ``productCode`` property to a resource, only if the resource currently does not have
+a ``productCode`` property::
+
+    var preconditions = new StringBuilder();
+    preconditions.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> <http://www.brightstardb.com/.well-known/model/wildcard> .");
+    var inserts = new StringBuilder();
+    inserts.AppendLine("<http://www.brightstardb.com/products/brightstar> <http://www.brightstardb.com/schemas/product/productCode> "973"^^<http://www.w3.org/2001/XMLSchema#integer> .");
+    var transactionData = new UpdateTransactionData { 
+        NonexistencePreconditions = preconditions.ToString(), 
+        InsertData = inserts.ToString() };
+    client.ExecuteTransaction(storeName, transactionData);
+
+Existence and non-existence preconditions may both be specified on a transaction, both are checked before applying the update.
 
 
 Data Types
