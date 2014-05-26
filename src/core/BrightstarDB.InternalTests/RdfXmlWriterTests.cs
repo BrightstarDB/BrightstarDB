@@ -182,5 +182,28 @@ namespace BrightstarDB.InternalTests
             Assert.That(lang, Is.Not.Null);
             Assert.That(lang.Value, Is.EqualTo("en"));
         }
+
+        [Test]
+        public void TestMultipleTriples()
+        {
+            StringWriter sw;
+            using (var writer = GetStringWriter(out sw))
+            {
+                writer.Triple("http://example.org/s", false,
+                    "http://example.org/p", false,
+                    "http://example.org/o", false, false, null, null, null);
+                writer.Triple("http://example.org/s", false,
+                    "http://example.org/p2", false,
+                    "123", false, true, "http://www.w3.org/2001/XMLSchema#int", "en", null);
+                writer.Triple("http://example.org/s", false,
+                              "http://example.org/p2", false,
+                              "foo", false, true, null, null, null);
+
+            }
+            XDocument doc = XDocument.Parse(sw.ToString());
+            Console.WriteLine(sw.ToString());
+            var descriptions = doc.Root.Elements(RdfNS + "Description");
+            Assert.That(descriptions.Count(), Is.EqualTo(3));
+        }
     }
 }

@@ -12,18 +12,25 @@ using BrightstarDB.Client;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
 using NUnit.Framework;
+using VDS.RDF;
+using VDS.RDF.Parsing;
+using NTriplesParser = BrightstarDB.Rdf.NTriplesParser;
 
 namespace BrightstarDB.Tests
 {
     [TestFixture("type=rest;endpoint=http://localhost:8090/brightstar")]
-    [TestFixture("type=embedded;storesDirectory=brightstar")]
+    [TestFixture("type=embedded;storesDirectory={0}")]
     public class ClientTests : ClientTestBase
     {
         private readonly string _connectionString;
+#if PORTABLE
+        private IPersistenceManager _persistenceManager;
+#endif
+
 
         public ClientTests(string connectionString)
         {
-            _connectionString = connectionString;
+            _connectionString = String.Format(connectionString, Configuration.StoreLocation);
         }
 
         private IBrightstarService GetClient()
@@ -31,6 +38,31 @@ namespace BrightstarDB.Tests
             return BrightstarService.GetClient(_connectionString);
         }
 
+
+        private void CopyTestDataToImportFolder(string testDataFileName, string targetFileName = null)
+        {
+#if PORTABLE
+            using (var srcStream = _persistenceManager.GetInputStream(Configuration.DataLocation + testDataFileName))
+            {
+                var targetDir = Path.Combine(Configuration.StoreLocation, "import");
+                var targetPath = Path.Combine(targetDir, (targetFileName ?? testDataFileName));
+                if (!_persistenceManager.DirectoryExists(targetDir)) _persistenceManager.CreateDirectory(targetDir);
+                if (_persistenceManager.FileExists(targetPath)) _persistenceManager.DeleteFile(targetPath);
+                using (var targetStream = _persistenceManager.GetOutputStream(targetPath, FileMode.CreateNew))
+                {
+                    srcStream.CopyTo(targetStream);
+                }
+            }
+#else
+            var importFile = new FileInfo(Path.Combine(Configuration.DataLocation, testDataFileName));
+            var targetDir = new DirectoryInfo(Path.Combine(Configuration.StoreLocation, "import"));
+            if (!targetDir.Exists)
+            {
+                targetDir.Create();
+            }
+            importFile.CopyTo(Path.Combine(targetDir.FullName, targetFileName ?? testDataFileName), true);
+#endif
+        }
         [TestFixtureSetUp]
         public void SetUp()
         {
@@ -38,6 +70,11 @@ namespace BrightstarDB.Tests
             {
                 StartService();
             }
+#if PORTABLE
+        _persistenceManager = new PersistenceManager();
+#endif
+            CopyTestDataToImportFolder("graph_triples.nt");
+
         }
 
         [TestFixtureTearDown]
@@ -588,6 +625,14 @@ namespace BrightstarDB.Tests
                 _count++;
             }
 
+            /// <summary>
+            /// Method invoked to indicate that no more triples remain to be written to the sink.
+            /// </summary>
+            public void Close()
+            {
+                // No-op
+            }
+
             #endregion
         }
 
@@ -1093,7 +1138,36 @@ namespace BrightstarDB.Tests
             } catch(BrightstarClientException){}
 
         }
-        
+
+        [Test]
+        public void TestRdfXmlExport()
+        {
+            CopyTestDataToImportFolder("simple.txt");
+            var storeName = "TestRdfXmlExport_" + DateTime.Now.Ticks;
+            var client = GetClient();
+            client.CreateStore(storeName);
+
+            var importJob = client.StartImport(storeName, "simple.txt");
+            importJob = WaitForJob(importJob, client, storeName);
+            Assert.That(importJob.JobCompletedOk, "Import failed: {0} - {1}", importJob.StatusMessage, importJob.ExceptionInfo);
+            var pathToExport = Path.Combine(Configuration.StoreLocation, "import", "simple.rdf");
+            if (File.Exists(pathToExport)) File.Delete(pathToExport);
+
+            var exportJob = client.StartExport(storeName, "simple.rdf", exportFormat: RdfFormat.RdfXml,
+                                               graphUri: Constants.DefaultGraphUri);
+            exportJob = WaitForJob(exportJob, client, storeName);
+            Assert.That(exportJob.JobCompletedOk, "Export failed: {0} - {1}", exportJob.StatusMessage, exportJob.ExceptionInfo);
+            Assert.That(File.Exists(pathToExport));
+
+            var g = new Graph();
+            var parser = new RdfXmlParser();
+            parser.Load(g, pathToExport);
+
+            // TODO: Validate expected content
+
+        }
+
+
         private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
                                               string graphUri)
         {

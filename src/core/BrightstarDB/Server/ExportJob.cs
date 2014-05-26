@@ -6,6 +6,7 @@ using BrightstarDB.Portable.Adaptation;
 using BrightstarDB.Portable.Compatibility;
 using BrightstarDB.Storage;
 #endif
+using System.Xml;
 using BrightstarDB.Client;
 using BrightstarDB.Rdf;
 
@@ -70,7 +71,9 @@ namespace BrightstarDB.Server
                     {
                         nw.Triple(triple);
                     }
+                    sink.Close();
                     sw.Flush();
+
 #if !PORTABLE
                     stream.Flush(true);
                     stream.Close();
@@ -88,13 +91,18 @@ namespace BrightstarDB.Server
 
         private static ITripleSink GetWriterSink(RdfFormat exportFormat, TextWriter textWriter)
         {
-            if (exportFormat == RdfFormat.NTriples)
+            if (exportFormat.MatchesMediaType(RdfFormat.NTriples))
             {
                 return new NTriplesWriter(textWriter);
             } 
-            if (exportFormat == RdfFormat.NQuads)
+            if (exportFormat.MatchesMediaType(RdfFormat.NQuads))
             {
                 return new NQuadsWriter(textWriter);
+            }
+            if (exportFormat.MatchesMediaType(RdfFormat.RdfXml))
+            {
+                var xw = XmlWriter.Create(textWriter, new XmlWriterSettings {CloseOutput = false, Indent = true});
+                return new RdfXmlWriter(xw);
             }
             throw new BrightstarClientException(String.Format(Strings.ExportJob_UnsupportedExportFormat, exportFormat.MediaTypes[0]));
         }
