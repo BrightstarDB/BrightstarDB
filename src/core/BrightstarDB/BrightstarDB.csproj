@@ -198,6 +198,7 @@
     <Compile Include="Rdf\PlainLiteral.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
+    <Compile Include="Rdf\RdfXmlWriter.cs" />
     <Compile Include="SerializableModel.cs" />
     <Compile Include="Server\GuardedUpdateTransaction.cs" />
     <Compile Include="Server\NoSuchStoreException.cs" />
