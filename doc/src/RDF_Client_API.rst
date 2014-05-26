@@ -47,6 +47,8 @@ Deleting a store is also straight forward::
 
   client.DeleteStore(storeName);
 
+.. _RDF_Jobs:
+
 Jobs and IJobInfo
 =================
 
@@ -372,15 +374,52 @@ BrigtstarDB store data folders. After a default installation the stores folder i
 about the RDF syntaxes that BrightstarDB supports for import, please refer to :ref:`Supported 
 RDF Syntaxes <Supported_RDF_Syntaxes>`.
 
-
 With the data copied into the folder the following client method can be called. The parameter 
-is the name of the file that was copied into the import folder::
+is the name of the file that was copied into the import folder. You can optionally specify
+the default graph for the data to be imported into, and the format that the data is in. Import
+is executed asynchronously - the client will return an ``IJobInfo`` instance to allow you to 
+monitor the progress of the job. See :ref:`RDF_Jobs` for more information about managing
+asynchronous jobs.
 
-  client.StartImport("data.nt");
+Examples::
+
+  // Import the NTriples data into the default graph in "mystore"
+  var importJob = client.StartImport("mystore", "data.nt");
+  
+  // Import the RDF/XML data into a specific graph in "mystore"
+  var importJob = client.StartImport("mystore", "data.rdf", "http://example.org/graphs/1", RdfFormat.RdfXml);
+
+Data Exports
+============
+
+BrightstarDB also supports the bulk export of triples from a store. You can choose either to export
+a single graph or all of the graphs in the store. You can choose to export in the formats listed
+in the table below.
+
+==================== ==============
+For Single Graph     For Full Store
+==================== ==============
+NTriples             NQuads
+RDF/XML
+==================== ==============
+
+The exported data will be written to a file contained in the BrightstarDB import folder (the same
+path as used for data import). Export is executed asynchronously - the client will return an 
+``IJobInfo`` instance to allow you to monitor the progress of the job. See :ref:`RDF_Jobs`
+for more information about managing asynchronous jobs.
+
+Examples::
+
+    // Export all graphs in "mystore" in default NQuads format
+    var exportAllJob = client.StartExport("mystore", "data.nq");
+    
+    // Export a single graph in RDF/XML format
+    var exportGraphJob = client.StartExport("mystore", "data.rdf",
+                     "http://example.org/graph/1", RdfFormat.RdfXml);
+
 
 
 .. _Introduction_To_NTriples:
-
 
 Introduction To N-Triples
 =========================

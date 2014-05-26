@@ -25,6 +25,8 @@ The following changes are committed to the develop branch to be included in the 
     - NEW: Added support for generated and composite keys for entities. See :ref:`Key_Properties_In_EF`.
            This includes a new type-based unique constraint check for entities with generated or composite keys.
 
+    - NEW: RDF/XML is now supported as an export format.
+    
 ***************************
  BrightstarDB 1.6.2 Release
 ***************************
