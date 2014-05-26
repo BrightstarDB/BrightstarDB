@@ -299,8 +299,15 @@ namespace BrightstarDB.Server
             while (!queuedJob)
             {
                 if (
-                    _jobExecutionStatus.TryAdd(job.JobId.ToString(),
-                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending, Queued = DateTime.UtcNow, Label = job.Label}))
+                    _jobExecutionStatus.TryAdd(
+                        job.JobId.ToString(),
+                        new JobExecutionStatus
+                            {
+                                JobId = job.JobId,
+                                JobStatus = JobStatus.Pending,
+                                Queued = DateTime.UtcNow,
+                                Label = job.Label
+                            }))
                 {
                     _jobs.Enqueue(job);
                     queuedJob = true;
@@ -309,6 +316,7 @@ namespace BrightstarDB.Server
                 }
             }
         }
+
 
         /// <summary>
         /// Queue a txn job.

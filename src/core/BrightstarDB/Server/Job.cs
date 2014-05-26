@@ -17,7 +17,7 @@ namespace BrightstarDB.Server
         protected Job(Guid jobId, string label, StoreWorker storeWorker)
         {
             _jobId = jobId;
-            _label = label;
+            _label = String.IsNullOrEmpty(label) ? DefaultJobLabel : label;
             StoreWorker = storeWorker;
         }
 
@@ -34,6 +34,12 @@ namespace BrightstarDB.Server
         public Guid JobId { get { return _jobId; } }
 
         public string Label { get { return _label; } }
+
+        /// <summary>
+        /// Provides a default label for this type of job to be used if no custom label
+        /// is provided.
+        /// </summary>
+        public virtual string DefaultJobLabel { get { return GetType().Name; } }
 
         /// <summary>
         /// Provides an error message from the job processor
