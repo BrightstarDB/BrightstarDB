@@ -38,12 +38,14 @@ namespace BrightstarDB.Rdf
                     WriteXmlLang(langCode);
                     _writer.WriteAttributeString("datatype", RdfNamespace, dataType);
                     _writer.WriteString(obj);
+                    _writer.WriteEndElement();
                 }
             }
             else
             {
                 _writer.WriteStartElement(predicateTuple.Item2, predicateTuple.Item1);
                 _writer.WriteAttributeString(objIsBNode ? "nodeID" : "resource", RdfNamespace, obj);
+                _writer.WriteEndElement();
             }
 
             _writer.WriteEndElement(); // rdf:Description
@@ -60,11 +62,9 @@ namespace BrightstarDB.Rdf
         public void Close()
         {
             if (_writer.WriteState == WriteState.Closed) return;
-            while (_writer.WriteState == WriteState.Element)
-            {
-                _writer.WriteEndElement();
-            }
+            _writer.WriteEndElement(); // rdf:RDF
             _writer.WriteEndDocument();
+            _writer.Close();
         }
 
         private Tuple<String, String> SplitUri(string uriString)

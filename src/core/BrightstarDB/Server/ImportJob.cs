@@ -163,6 +163,11 @@ namespace BrightstarDB.Server
             }
         }
 
+        public void Close()
+        {
+            // No-op
+        }
+
         #endregion
 
         private static IRdfParser GetParser(string fileName)

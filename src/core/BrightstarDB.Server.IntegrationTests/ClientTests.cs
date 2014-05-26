@@ -729,6 +729,14 @@ WHERE { ?s ?p 'foo' }";
                 _count++;
             }
 
+            /// <summary>
+            /// Method invoked to indicate that no more triples remain to be written to the sink.
+            /// </summary>
+            public void Close()
+            {
+                // No-op
+            }
+
             #endregion
         }
 

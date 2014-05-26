@@ -64,6 +64,11 @@ namespace BrightstarDB.Server
             }
         }
 
+        public void Close()
+        {
+            // No-op
+        }
+
         private void FailedPrecondition(string subject, bool subjectIsBNode, string predicate, bool predicateIsBNode, string obj, bool objIsBNode, bool isLiteral, string dataType, string langCode, string graphUri)
         {
             if (_failedPreconditionsWriter == null)

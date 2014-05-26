@@ -162,6 +162,14 @@ namespace BrightstarDB.Rdf
             _writer.WriteLine(line.ToString());
         }
 
+        /// <summary>
+        /// Method invoked to indicate that no more triples remain to be written to the sink.
+        /// </summary>
+        public void Close()
+        {
+            // No op
+        }
+
         #endregion
     }
 }

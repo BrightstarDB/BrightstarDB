@@ -23,5 +23,10 @@
             string predicate, bool predicateIsBNode, 
             string obj, bool objIsBNode, bool objIsLiteral, 
             string dataType, string langCode, string graphUri);
+
+        /// <summary>
+        /// Method invoked to indicate that no more triples remain to be written to the sink.
+        /// </summary>
+        void Close();
     }
 }
