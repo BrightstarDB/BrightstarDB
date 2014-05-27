@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules;
 using BrightstarDB.Server.Modules.Authentication;
+using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy.Bootstrapper;
 

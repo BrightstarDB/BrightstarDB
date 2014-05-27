@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using BrightstarDB.Config;
 using BrightstarDB.Server.Modules.Authentication;
 using BrightstarDB.Server.Modules.Permissions;
 
-namespace BrightstarDB.Server.Modules
+namespace BrightstarDB.Server.Modules.Configuration
 {
     public class BrightstarServiceConfiguration
     {
@@ -11,5 +12,6 @@ namespace BrightstarDB.Server.Modules
         public AbstractStorePermissionsProvider StorePermissionsProvider { get; set; }
         public AbstractSystemPermissionsProvider SystemPermissionsProvider { get; set; }
         public string RootPath { get; set; }
+        public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
     }
 }

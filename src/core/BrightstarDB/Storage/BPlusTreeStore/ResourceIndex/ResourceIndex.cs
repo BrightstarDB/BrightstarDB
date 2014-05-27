@@ -206,6 +206,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
             return builder.Build(transactionId, Scan(profiler), profiler);
         }
 
+        public int Preload(int numPages, BrightstarProfiler profiler)
+        {
+            return PreloadTree(numPages, profiler);
+        }
+
         #endregion
         #region Private functions
 

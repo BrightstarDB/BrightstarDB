@@ -65,5 +65,10 @@ namespace BrightstarDB.Tests.BPlusTreeTests
         {
             // No-op
         }
+
+        public int Preload(int numPages, BrightstarProfiler profiler)
+        {
+            return 0;
+        }
     }
 }

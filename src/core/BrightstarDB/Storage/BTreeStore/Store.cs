@@ -676,6 +676,11 @@ namespace BrightstarDB.Storage.BTreeStore
             throw new NotImplementedException();
         }
 
+        public void WarmupPageCache(int pagesToPreload, BrightstarProfiler profiler = null)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// All persisted objects both data and index are given a unique integer id.
         /// </summary>

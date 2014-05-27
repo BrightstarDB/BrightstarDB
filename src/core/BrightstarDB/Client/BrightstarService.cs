@@ -3,7 +3,6 @@ using BrightstarDB.Caching;
 using BrightstarDB.Client.RestSecurity;
 using BrightstarDB.Server;
 using System;
-using VDS.RDF;
 using VDS.RDF.Query;
 using VDS.RDF.Storage.Management;
 using VDS.RDF.Update;
@@ -16,8 +15,6 @@ namespace BrightstarDB.Client
     /// </summary>
     public static class BrightstarService
     {
-
-        private static ICache _configuredCache;
         /// <summary>
         /// This method should be called when using an embedded Brightstar clients when a program is about to terminate. This ensures
         /// all job threads are properly terminated and the application can exit. 
@@ -33,17 +30,19 @@ namespace BrightstarDB.Client
         /// Returns a client for the embededd stores in the specified location
         ///</summary>
         ///<param name="baseLocation">The base directory for stores accessed by this client</param>
+        /// <param name="clientConfiguration">Configuration options for the client.</param>
         ///<returns>A new Brightstar service client</returns>
-        internal static IBrightstarService GetEmbeddedClient(string baseLocation)
+        internal static IBrightstarService GetEmbeddedClient(string baseLocation, ClientConfiguration clientConfiguration = null)
         {
-            return new EmbeddedBrightstarService(baseLocation);
+            return new EmbeddedBrightstarService(baseLocation, clientConfiguration);
         }
 
         ///<summary>
         /// Gets a client based on the connection string specified in the configuration.
         ///</summary>
+        /// <param name="clientConfiguration">Configuration options for the client.</param>
         ///<returns>A new Brightstar service client</returns>
-        public static IBrightstarService GetClient()
+        public static IBrightstarService GetClient(ClientConfiguration clientConfiguration = null)
         {
             var configuration = Configuration.ConnectionString;
             if(String.IsNullOrEmpty(configuration))
@@ -51,30 +50,36 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException(Strings.BrightstarServiceClient_NoConnectionStringConfiguration);
             }
             // use connection string in config
-            return GetClient(new ConnectionString(Configuration.ConnectionString));
+            return GetClient(new ConnectionString(Configuration.ConnectionString), clientConfiguration);
         }
 
         ///<summary>
         /// Gets a client based on the connection string parameter
         ///</summary>
         ///<param name="connectionString">The connection string</param>
+        /// <param name="clientConfiguration">Configuration options for the client.</param>
         ///<returns>A new Brightstar service client</returns>
-        public static IBrightstarService GetClient(string connectionString)
+        public static IBrightstarService GetClient(string connectionString, ClientConfiguration clientConfiguration = null)
         {
-            return GetClient(new ConnectionString(connectionString));
+            return GetClient(new ConnectionString(connectionString), clientConfiguration);
         }
 
         ///<summary>
         /// Gets a client based on the connection string parameter
         ///</summary>
         ///<param name="connectionString">The connection string</param>
+        /// <param name="clientConfiguration">Configuration options for the client.</param>
         ///<returns>A new Brightstar service client</returns>
-        public static IBrightstarService GetClient(ConnectionString connectionString)
+        public static IBrightstarService GetClient(ConnectionString connectionString, ClientConfiguration clientConfiguration = null)
         {
+            if (clientConfiguration == null)
+            {
+                clientConfiguration = ClientConfiguration.Default;
+            }
             switch (connectionString.Type)
             {
                 case ConnectionType.Embedded:
-                    return new EmbeddedBrightstarService(connectionString.StoresDirectory);
+                    return new EmbeddedBrightstarService(connectionString.StoresDirectory, clientConfiguration);
 #if !WINDOWS_PHONE
                 case ConnectionType.Rest:
                     return GetRestClient(connectionString);
@@ -83,15 +88,6 @@ namespace BrightstarDB.Client
                     throw new BrightstarClientException("Unable to create valid context with connection string " +
                                                         connectionString.Value);
             }
-        }
-
-        /// <summary>
-        /// Returns a cache object representing the cache options specified in the app.config file
-        /// </summary>
-        /// <returns></returns>
-        private static ICache GetConfiguredCache()
-        {
-            return _configuredCache ?? (_configuredCache = Configuration.QueryCache);
         }
 
         /// <summary>

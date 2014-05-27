@@ -11,5 +11,8 @@
         void InsertOrUpdate(string partition, IPageCacheItem page);
         IPageCacheItem Lookup(string partition, ulong pageId);
         void Clear(string partition);
+        int FreePages { get;}
+
+        void Clear();
     }
 }

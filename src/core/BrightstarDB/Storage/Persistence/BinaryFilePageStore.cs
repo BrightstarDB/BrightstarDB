@@ -309,6 +309,18 @@ namespace BrightstarDB.Storage.Persistence
             _modifiedPages[pageId] = bfp;
         }
 
+        public int Preload(int numPages, BrightstarProfiler profiler)
+        {
+            var maxPage = Math.Min((ulong)numPages/2, _nextPageId - 1);
+            int loadCount = 0;
+            for (ulong pageId = 0; pageId < maxPage; pageId++)
+            {
+                Retrieve(pageId, profiler);
+                loadCount++;
+            }
+            return loadCount;
+        }
+
         #endregion
 
         private BinaryFilePage GetPage(ulong pageId, BrightstarProfiler profiler)

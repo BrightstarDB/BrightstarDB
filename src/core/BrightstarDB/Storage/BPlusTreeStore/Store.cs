@@ -462,6 +462,14 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return _subjectRelatedResourceIndex.CountPredicateRelationships(predicateId, profiler);
         }
 
+        public void WarmupPageCache(int pagesToPreload, BrightstarProfiler profiler = null)
+        {
+            int totalLoaded = _subjectRelatedResourceIndex.Preload(pagesToPreload/3, profiler);
+            totalLoaded += _objectRelatedResourceIndex.Preload(pagesToPreload - totalLoaded, profiler);
+            totalLoaded += _resourceIndex.Preload(pagesToPreload - totalLoaded, profiler);
+            _resourceTable.Preload(pagesToPreload - totalLoaded, profiler);
+        }
+
         #endregion
 
         #region Serialization

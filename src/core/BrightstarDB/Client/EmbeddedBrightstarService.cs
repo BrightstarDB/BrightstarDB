@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 #if !PORTABLE && !WINDOWS_PHONE
-using System.Threading.Tasks;
 #endif
 using BrightstarDB.Dto;
 using BrightstarDB.Storage;
 using BrightstarDB.Server;
-using Remotion.Linq.Utilities;
 
 namespace BrightstarDB.Client
 {
@@ -30,12 +27,15 @@ namespace BrightstarDB.Client
         /// Create a new instance of the service that attaches to the specified directory location
         /// </summary>
         /// <param name="baseLocation">The full path to the location of the directory that contains one or more Brightstar stores</param>
+        /// <param name="clientConfiguration">An optional configuration for the client.</param>
         /// <remarks>The embedded server is thread-safe but doesn't support concurrent access to the same base location by multiple
         /// instances. You should ensure in your code that only one EmbeddedBrightstarService instance is connected to any given base location
         /// at a given time.</remarks>
-        public EmbeddedBrightstarService(string baseLocation)
+        public EmbeddedBrightstarService(string baseLocation, ClientConfiguration clientConfiguration = null)
         {
-            _serverCore = ServerCoreManager.GetServerCore(baseLocation);
+            _serverCore = ServerCoreManager.GetServerCore(
+                baseLocation, 
+                clientConfiguration == null ? null : clientConfiguration.PreloadConfiguration);
         }
 
         #region Implementation of IBrightstarService
@@ -169,7 +169,7 @@ namespace BrightstarDB.Client
                                    SparqlResultsFormat resultsFormat = null,
             RdfFormat graphFormat = null)
         {
-            return ExecuteQuery(storeName, queryExpression, new string[] { defaultGraphUri }, ifNotModifiedSince,
+            return ExecuteQuery(storeName, queryExpression, new[] { defaultGraphUri }, ifNotModifiedSince,
                                 resultsFormat, graphFormat);
         }
 
@@ -256,7 +256,7 @@ namespace BrightstarDB.Client
         public Stream ExecuteQuery(ICommitPointInfo commitPoint, string queryExpression,
                                    string defaultGraphUri, SparqlResultsFormat resultsFormat = null, RdfFormat graphFormat = null)
         {
-            return ExecuteQuery(commitPoint, queryExpression, new string[] { defaultGraphUri }, resultsFormat, graphFormat);
+            return ExecuteQuery(commitPoint, queryExpression, new[] { defaultGraphUri }, resultsFormat, graphFormat);
         }
 
         /// <summary>

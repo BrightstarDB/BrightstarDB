@@ -148,6 +148,7 @@
     <Compile Include="Client\DotNetRdfStorageProvidersDataObjectContext.cs" />
     <Compile Include="Client\DotNetRdfStorageServerDataObjectContext.cs" />
     <Compile Include="Client\EmbeddedBrightstarService.cs" />
+    <Compile Include="Client\ClientConfiguration.cs" />
     <Compile Include="Client\IBrightStarService.cs" />
     <Compile Include="Client\ICommitPointInfo.cs" />
     <Compile Include="Client\ICommitPointStats.cs" />
@@ -168,6 +169,10 @@
     <Compile Include="Client\SparqlDataObjectStore.cs" />
     <Compile Include="Client\SparqlUpdatableStore.cs" />
     <Compile Include="Client\UpdateTransaction.cs" />
+    <Compile Include="Config\BrightstarConfiguration.cs" />
+    <Compile Include="Config\BrightstarConfigurationSectionHandler.cs" />
+    <Compile Include="Config\PageCachePreloadConfiguration.cs" />
+    <Compile Include="Config\StorePreloadConfiguration.cs" />
     <Compile Include="Dto\CommitPointInfoObject.cs" />
     <Compile Include="Dto\CommitPointResponseModel.cs" />
     <Compile Include="Dto\CreateStoreRequestObject.cs" />
