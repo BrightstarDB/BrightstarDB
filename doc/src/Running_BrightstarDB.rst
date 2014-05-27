@@ -374,6 +374,14 @@ The sample below shows all the BrightstarDB options with usage comments. ::
 
   <?xml version="1.0"?>
   <configuration>
+    <configSections>
+      <!-- This configuration section is required to configure server security -->
+      <section name="brightstarService" type="BrightstarDB.Server.Modules.BrightstarServiceConfigurationSectionHandler, BrightstarDB.Server.Modules" />
+      <!-- This configuration section is required only for advanced configuration options 
+           such as page-cache warmup -->
+      <section name="brightstar" type="BrightstarDB.Config.BrightstarConfigurationSectionHandler, BrightstarDB" />
+    </configSections>
+
     <appSettings>
 
       <!-- The logging level for the server. -->
@@ -416,6 +424,14 @@ The sample below shows all the BrightstarDB options with usage comments. ::
       </systemPermissions>
 
     </brightstarService>
+    
+    <brightstar>
+    
+      <!-- Enable page-cache warmup -->
+      <preloadPages enabled="true" />
+    
+    </brightstar>
+    
   </configuration>
 
 
@@ -530,10 +546,117 @@ Equally you can use other switchValue settings to reduce the amount of logging p
 BrightstarDB.
 
 
+.. _Preloading_Stores
 
+******************
+ Preloading Stores
+******************
 
+The BrightstarDB server can be configured to automatically preload the active pages from one
+or more stores into the in-memory page-cache. Preloading the pages trades-off a slightly longer 
+server start-up time for a reduced time to respond to the first incoming request. By default
+preloading is disabled and pages will be pulled into the cache on an as-needed basis.
 
+Configuring Basic Preloading
+============================
 
+As preloading is concerned with populating the BrightstarDB store page cache, it can only be
+enabled on a BrightstarDB server that is using an embedded connection to a store directory.
+Basic preloading will fill the cache with pages from all stores in the store directory in
+an equal ratio, so if there are 10 stores in the directory, each will be allowed to use
+up to 10% of the available cache. Basic preloading proceeds in order of store size
+(from smallest to largest store based on their data file sizes), so if smaller stores
+do not use up their full allocation of pages, the remaining space can be shared amongst
+the remaining larger stores as they are pre-loaded. 
 
+To enable basic preloading, the following needs to be added to the ``brightstar``
+element in the server application (or web) configuration file::
 
+  <preloadPages enabled="true" />
+
+Advanced Preloading
+===================
+
+Basic preloading is a simple strategy that makes the assumption that all stores in a directory
+are equally important - each is preloaded to the same extent. In some cases as an administrator
+you may want to prioritize some stores over others. 
+
+To allow for this you can assign one or more stores a cache ratio number. This number specifies the 
+relative amount of page cache space to be assigned to the store, so a store with a cache ratio of 3 
+gets 3x the pages that a store with a cache ratio of 1 is assigned, and 1.5x the pages that a store 
+with a cache ratio of 2. By default all stores have a cache ratio of 1 assigned, but you can also
+set this default to 0.
+
+To configure advanced preloading you add a ``store`` element child to the ``preloadPages`` element
+as shown here::
+
+    <preloadPages enabled="true">
+        <store name="storeA" cacheRatio="4" />
+        <store name="storeB" cacheRatio="2" />
+    </preloadPages>
+
+To understand how cache ratios work, imagine that the server using this configuration is actually
+serving 4 stores, storeA, storeB, storeC and storeD, and that the server is configured with a 
+page cache size of 2048M As the default cache ratio for a store is 1, the effective ratios for 
+the stores are:
+
+========== ==============
+Store Name Cache Ratio
+========== ==============
+storeA     4
+storeB     2
+storeC     1
+storeD     1
+========== ==============
+
+The sum of those ratios is (4+2+1+1) = 8. So storeC and storeD are assigned one-eighth of the
+page cache, storeB is assigned one-quarter and storeA one-half, making the assigned page cache
+preload sizes:
+
+========== ============== =================
+Store Name Cache Ratio    Preload Size
+========== ============== =================
+storeA     4              1024M
+storeB     2              512M
+storeC     1              256M
+storeD     1              256M
+========== ============== =================
+
+It is also possible to change the default cache ratio assigned to stores that are not explicitly
+configured by adding a ``defaultCacheRatio`` attribute to the ``preloadPages`` element::
+
+    <preloadPages enabled="true" defaultCacheRatio="2">
+        <store name="storeA" cacheRatio="4" />
+        <store name="storeB" cacheRatio="2" />
+    </preloadPages>
+    
+The configuration above changes the cache preload sizes for the stores as follows:
+
+========== ============== =================
+Store Name Cache Ratio    Preload Size
+========== ============== =================
+storeA     4              819.2M
+storeB     2              409.6M
+storeC     2              409.6M
+storeD     2              409.6M
+========== ============== =================
+
+It is also possible to use the ``defaultCacheRatio`` to disable preloading for stores
+that are not explicitly named, by setting the default ratio to zero::
+
+    <preloadPages enabled="true" defaultCacheRatio="0">
+        <store name="storeA" cacheRatio="4" />
+        <store name="storeB" cacheRatio="2" />
+    </preloadPages>
+
+This leads the the following preloaded cache sizes:
+
+========== ============== =================
+Store Name Cache Ratio    Preload Size
+========== ============== =================
+storeA     4              1365.3M
+storeB     2              682.7M
+storeC     0              0M
+storeD     0              0M
+========== ============== =================
 

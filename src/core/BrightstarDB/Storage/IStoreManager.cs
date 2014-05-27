@@ -56,5 +56,13 @@ namespace BrightstarDB.Storage
         /// <param name="commitPointId">OPTIONAL: The commit point in the source store to copy from</param>
         void CreateSnapshot(string srcStoreLocation, string destStoreLocation,
                             PersistenceType storePersistenceType, ulong commitPointId = StoreConstants.NullUlong);
+
+        /// <summary>
+        /// Returns the size (in bytes) of the specified store's data.
+        /// </summary>
+        /// <param name="storeName">The name of the store</param>
+        /// <returns>The total size of the index files in the store directory.</returns>
+        ulong GetDataSize(string storeName);
+
     }
 }

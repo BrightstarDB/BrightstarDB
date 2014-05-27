@@ -242,6 +242,32 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
             }
         }
 
+        public int Preload(int maxPages, BrightstarProfiler profiler=null)
+        {
+            int pagesLoaded = this.PreloadTree(maxPages, profiler);
+            int remainingPages = maxPages - pagesLoaded;
+            if (remainingPages > 0)
+            {
+                // We have managed to load the complete index of predicate trees into memory
+                // See if there is enough room to preload at least the root node of each predicate tree
+                var numPredicatesToLoad = EnumeratePredicates(profiler).Count();
+                if (remainingPages >= numPredicatesToLoad)
+                {
+                    // We are OK to load some pages from each predicate.
+                    // It would be relatively expensive to precompute which indexes have most pages
+                    // instead we will just enumerate through them loading remainingPages / numPredicatesToLoad
+                    foreach (var predicateIndex in EnumeratePredicateIndexes(profiler))
+                    {
+                        pagesLoaded += predicateIndex.Value.PreloadTree(remainingPages/numPredicatesToLoad, profiler);
+                        remainingPages = maxPages - pagesLoaded;
+                        if (remainingPages <= 0) break;
+                        numPredicatesToLoad--;
+                    }
+                }
+            }
+            return pagesLoaded;
+        }
+
         #endregion
         private PredicateRelatedResourceIndex AssertPredicateIndex(ulong transactionId, ulong predicateId, BrightstarProfiler profiler)
         {

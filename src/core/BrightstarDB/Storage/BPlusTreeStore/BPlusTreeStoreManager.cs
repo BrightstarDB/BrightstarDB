@@ -294,6 +294,22 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
         }
 
+        public ulong GetDataSize(string storeLocation)
+        {
+            ulong ret = 0;
+            var dataFilePath = Path.Combine(storeLocation, DataFileName);
+            var resourceFilePath = Path.Combine(storeLocation, ResourceFileName);
+            if (_persistenceManager.FileExists(dataFilePath))
+            {
+                ret += (ulong)_persistenceManager.GetFileLength(dataFilePath);
+            }
+            if (_persistenceManager.FileExists(resourceFilePath))
+            {
+                ret += (ulong)_persistenceManager.GetFileLength(resourceFilePath);
+            }
+            return ret;
+        }
+
         #endregion
 
     }

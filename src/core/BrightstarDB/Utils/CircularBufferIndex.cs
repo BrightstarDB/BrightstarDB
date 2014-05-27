@@ -4,6 +4,7 @@ namespace BrightstarDB.Utils
 {
     internal class IndexedCircularBuffer<TKey, TValue>
     {
+        private readonly int _capacity;
         private readonly Dictionary<TKey, int> _index;
         private readonly CircularBuffer<TValue> _values;
         private readonly CircularBuffer<TKey> _keys;
@@ -11,6 +12,7 @@ namespace BrightstarDB.Utils
 
         public IndexedCircularBuffer(int capacity)
         {
+            _capacity = capacity;
             _index = new Dictionary<TKey, int>(capacity);
             _values = new CircularBuffer<TValue>(capacity);
             _keys = new CircularBuffer<TKey>(capacity);
@@ -19,6 +21,11 @@ namespace BrightstarDB.Utils
         public IEnumerable<TKey> Keys
         {
             get { return _index.Keys; }
+        }
+
+        public int FreePages
+        {
+            get { return _capacity - _index.Count; }
         }
 
         public void Insert(TKey key, TValue value)

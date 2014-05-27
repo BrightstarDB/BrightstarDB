@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Xml;
 using BrightstarDB.Server.Modules.Authentication;
+using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 
 namespace BrightstarDB.Server.Modules
@@ -39,6 +40,7 @@ namespace BrightstarDB.Server.Modules
                 {
                     configuration.SystemPermissionsProvider = ProcessSystemPermissions(systemPermissions);
                 }
+
             }
             return configuration;
         }
@@ -147,6 +149,7 @@ namespace BrightstarDB.Server.Modules
             }
         }
 
+        
         private static StorePermissions GetStorePermissionsAttributeValue(XmlElement providerElement, string attrName)
         {
             var szAttrValue = providerElement.GetAttribute(attrName);

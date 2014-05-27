@@ -306,6 +306,16 @@ namespace BrightstarDB.Storage.Persistence
             }
         }
 
+        public int Preload(int numPages, BrightstarProfiler profiler)
+        {
+            var maxPages = Math.Min(_stream.Length/PageSize, numPages);
+            for (int pageId = 0; pageId < maxPages; pageId++)
+            {
+                Retrieve((ulong)pageId, profiler);
+            }
+            return (int)maxPages;
+        }
+
         #endregion
 
         #region Implementation of IDisposable

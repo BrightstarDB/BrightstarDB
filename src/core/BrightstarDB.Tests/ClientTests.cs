@@ -586,17 +586,9 @@ namespace BrightstarDB.Tests
                 exportJobInfo = client.GetJobInfo(storeName, exportJobInfo.JobId);
             }
 
-            FileInfo exportFile;
-            if (client is BrightstarRestClient)
-            {
-                exportFile = new FileInfo("c:\\brightstar\\import\\" + storeName + "_export.nt");
-            }
-            else
-            {
-                exportFile = new FileInfo("brightstar\\import\\" + storeName + "_export.nt");
-            }
+            var exportFile = new FileInfo(Path.Combine(Configuration.StoreLocation, "import", storeName + "_export.nt"));
             Assert.IsTrue(exportFile.Exists);
-            var lineCount = File.ReadAllLines(exportFile.FullName).Where(x => !String.IsNullOrEmpty(x)).Count();
+            var lineCount = File.ReadAllLines(exportFile.FullName).Count(x => !String.IsNullOrEmpty(x));
             Assert.AreEqual(firstBatchSize, lineCount);
         }
 

@@ -479,5 +479,15 @@ namespace BrightstarDB.Server
             }
         }
 
+        /// <summary>
+        /// Preload index and resource pages for this store
+        /// </summary>
+        /// <param name="pageCacheRatio">The fractional amount of the number of available cache pages to use in the preload</param>
+        public void WarmupStore(decimal pageCacheRatio)
+        {
+            if (pageCacheRatio > 1.0m) pageCacheRatio = 1.0m;
+            var pagesToPreload = (int)Math.Floor(PageCache.Instance.FreePages*pageCacheRatio);
+            ReadStore.WarmupPageCache(pagesToPreload);
+        }
     }
 }

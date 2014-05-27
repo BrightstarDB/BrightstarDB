@@ -139,5 +139,12 @@ namespace BrightstarDB.Storage
         /// <param name="profiler"></param>
         /// <returns>The number of triples matching the specified predicate</returns>
         ulong GetTripleCount(string predicateUri, BrightstarProfiler profiler = null);
+
+        /// <summary>
+        /// Preload data pages used by this store into the cache
+        /// </summary>
+        /// <param name="pagesToPreload">The maximum number of pages to load</param>
+        /// <param name="profiler"></param>
+        void WarmupPageCache(int pagesToPreload, BrightstarProfiler profiler = null);
     }
 }
