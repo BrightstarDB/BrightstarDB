@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E88178BE-AB2F-46BF-96FD-991A29B58A11}"
 	ProjectSection(SolutionItems) = preProject
 		BrightstarDB.vsmdi = BrightstarDB.vsmdi
@@ -8,6 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		MemoryProfiling.psess = MemoryProfiling.psess
 		Performance.testsettings = Performance.testsettings
 		Performance1.psess = Performance1.psess
+		Performance2.psess = Performance2.psess
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
@@ -46,10 +49,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EACA0627
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.AspNet.Secured", "BrightstarDB.Server.AspNet.Secured\BrightstarDB.Server.AspNet.Secured.csproj", "{47A553A3-2214-40B7-A6C5-EC2609B53B3F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.PerformanceBenchmarks", "BrightstarDB.PerformanceBenchmarks\BrightstarDB.PerformanceBenchmarks.csproj", "{09511934-6AE4-49D3-AF00-A7AB74770257}"
+EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = BrightstarDB.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -189,6 +191,16 @@ Global
 		{47A553A3-2214-40B7-A6C5-EC2609B53B3F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{47A553A3-2214-40B7-A6C5-EC2609B53B3F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{47A553A3-2214-40B7-A6C5-EC2609B53B3F}.Release|x86.ActiveCfg = Release|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{09511934-6AE4-49D3-AF00-A7AB74770257}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -201,5 +213,8 @@ Global
 		{523BB67E-CEB7-4144-AACB-AB5937F8872E} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{DF96239F-5240-475C-BD33-52F0EE2536C2} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{4EB8BF43-94B1-4264-B2C9-9EE1BAB7F094} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = BrightstarDB.vsmdi
 	EndGlobalSection
 EndGlobal
