@@ -46,8 +46,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EACA0627
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.AspNet.Secured", "BrightstarDB.Server.AspNet.Secured\BrightstarDB.Server.AspNet.Secured.csproj", "{47A553A3-2214-40B7-A6C5-EC2609B53B3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotNetRDF", "..\..\..\dotnetrdf\kal_ahmed\Libraries\core\net40\dotNetRDF.csproj", "{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}"
-EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = BrightstarDB.vsmdi
@@ -191,16 +189,6 @@ Global
 		{47A553A3-2214-40B7-A6C5-EC2609B53B3F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{47A553A3-2214-40B7-A6C5-EC2609B53B3F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{47A553A3-2214-40B7-A6C5-EC2609B53B3F}.Release|x86.ActiveCfg = Release|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{BFBAC159-1E60-4D03-8ACA-D34E31EB83BF}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -213,6 +201,9 @@ Global
 		{523BB67E-CEB7-4144-AACB-AB5937F8872E} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{DF96239F-5240-475C-BD33-52F0EE2536C2} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{4EB8BF43-94B1-4264-B2C9-9EE1BAB7F094} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = BrightstarDB.vsmdi
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = BrightstarDB.vsmdi
