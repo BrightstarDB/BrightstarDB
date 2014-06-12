@@ -141,10 +141,7 @@ allowing the calls to be chained::
       .AddProperty(knows, alice);
 	  
 Adding and removing properties and changing the type simply adds and removes triples from the set of 
-locally managed triples for the data object. You can access the RDF data that an object has at any time 
-by using the following code::
-
-  var triples = ((DataObject)fred).Triples;
+locally managed triples for the data object. 
 
 A data object can be deleted using the ``Delete()`` method on the data object itself::
 
