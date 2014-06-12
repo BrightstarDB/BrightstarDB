@@ -28,8 +28,8 @@ namespace BrightstarDB.PerformanceBenchmarks
 
             // todo: use introspection to detect benchmarks
             ICollection<BenchmarkBase> benchmarks = new Collection<BenchmarkBase>();
-            benchmarks.Add(new ExampleBenchmark(reportFolder + "\\" + Guid.NewGuid() + ".xml", connectionString));
-            // var taxonomyDocumentBenchmark = new TaxonomyDocumentBenchmark();
+            benchmarks.Add(new ExampleBenchmark(reportFolder + "\\example-benchmark-results-" + Guid.NewGuid() + ".xml", connectionString));
+            benchmarks.Add(new TaxonomyDocumentBenchmark(reportFolder + "\\taxonomy-benchmark-results-" + Guid.NewGuid() + ".xml", connectionString));
             foreach (var benchmark in benchmarks)
             {
                 benchmark.Setup();
@@ -40,7 +40,7 @@ namespace BrightstarDB.PerformanceBenchmarks
 
         static void Usage()
         {
-            System.Console.WriteLine(@"Usage: BenchmarkRunner.exe [storeFolderPath] [reportPath] [benchmark scale (1-5)]");
+            Console.WriteLine(@"Usage: BenchmarkRunner.exe [storeFolderPath] [reportPath] [benchmark scale (1-5)]");
         }
 
         private void RunBenchmark(BenchmarkBase benchmark)
