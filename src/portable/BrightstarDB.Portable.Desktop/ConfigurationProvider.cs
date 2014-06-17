@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using BrightstarDB.Caching;
+using BrightstarDB.Config;
 using BrightstarDB.Storage;
 
 namespace BrightstarDB
@@ -15,6 +16,7 @@ namespace BrightstarDB
         public int StatsUpdateTimespan { get; set; }
         public int StatsUpdateTransactionCount { get; set; }
         public int TransactionFlushTripleCount { get; set; }
+        public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
 
         #region AppSetting Property Names
         private const string PageCacheSizePropertyName = "BrightstarDB.PageCacheSize";
@@ -28,6 +30,8 @@ namespace BrightstarDB
         private const string PersistenceTypeRewrite = "rewrite";
         private const string StatsUpdateTransactionCountName = "BrightstarDB.StatsUpdate.TransactionCount";
         private const string StatsUpdateTimeSpanName = "BrightstarDB.StatsUpdate.TimeSpan";
+        private const string CachePreloadRatioName = "BrightstarDB.PageCachePreload.Ratio";
+        private const string CachePreloadEnabledName = "BrightstarDB.PageCachePreload.Enabled";
         #endregion
 
         #region Default Values and constants
@@ -91,6 +95,13 @@ namespace BrightstarDB
             // Transaction Flushing
             TransactionFlushTripleCount = GetApplicationSetting(TxnFlushTriggerPropertyName, DefaultTransactionFlushTripleCount);
 
+            // Cache Preload Configuration
+            PreloadConfiguration = new PageCachePreloadConfiguration
+            {
+                DefaultCacheRatio = GetApplicationSetting(CachePreloadRatioName, 0.5m),
+                Enabled = GetApplicationSetting(CachePreloadEnabledName, false)
+            };
+
         }
 
 
@@ -106,6 +117,28 @@ namespace BrightstarDB
             if (!String.IsNullOrEmpty(setting) && Int32.TryParse(setting, out intValue))
             {
                 return intValue;
+            }
+            return defaultValue;
+        }
+
+        private static decimal GetApplicationSetting(string key, decimal defaultValue)
+        {
+            var setting = GetApplicationSetting(key);
+            decimal value;
+            if (!String.IsNullOrEmpty(setting) && Decimal.TryParse(setting, out value))
+            {
+                return value;
+            }
+            return defaultValue;
+        }
+
+        private static bool GetApplicationSetting(string key, bool defaultValue)
+        {
+            var setting = GetApplicationSetting(key);
+            bool value;
+            if (!String.IsNullOrEmpty(setting) && Boolean.TryParse(setting, out value))
+            {
+                return value;
             }
             return defaultValue;
         }

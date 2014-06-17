@@ -76,17 +76,30 @@ namespace BrightstarDB.Portable.Tests
             insertData.AppendLine(@"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"".");
             insertData.AppendLine(
                 @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"".");
-            var job = client.ExecuteTransaction(storeName, null, null, insertData.ToString());
+            var job = client.ExecuteTransaction(storeName,
+                                                new UpdateTransactionData {InsertData = insertData.ToString()});
             AssertJobSuccessful(client, storeName, job);
 
             // Test an update with a precondition which is met
             const string tripleToDelete = @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"".";
             const string tripleToInsert = @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox_sha1sum> ""FAKESHA1""";
-            job = client.ExecuteTransaction(storeName, tripleToDelete, tripleToDelete, tripleToInsert);
+            job = client.ExecuteTransaction(storeName,
+                                            new UpdateTransactionData
+                                                {
+                                                    ExistencePreconditions = tripleToDelete,
+                                                    DeletePatterns = tripleToDelete,
+                                                    InsertData = tripleToInsert
+                                                });
             AssertJobSuccessful(client, storeName, job);
 
             // Test an update with a precondition which is not met
-            job = client.ExecuteTransaction(storeName, tripleToDelete, tripleToDelete, tripleToInsert);
+            job = client.ExecuteTransaction(storeName,
+                                            new UpdateTransactionData
+                                            {
+                                                ExistencePreconditions = tripleToDelete,
+                                                DeletePatterns = tripleToDelete,
+                                                InsertData = tripleToInsert
+                                            });
             while (!(job.JobCompletedOk || job.JobCompletedWithErrors))
             {
                 Task.Delay(3).Wait();
@@ -110,7 +123,7 @@ namespace BrightstarDB.Portable.Tests
             insertData.AppendLine(@"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
             insertData.AppendLine(@"<http://example.org/people/carol> <http://xmlns.com/foaf/0.1/name> ""Carol"" .");
 
-            var job = client.ExecuteTransaction(storeName, null, null, insertData.ToString());
+            var job = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = insertData.ToString()});
             AssertJobSuccessful(client, storeName, job);
 
             const string query = "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?p ?n WHERE { <http://example.org/people/alice> foaf:knows ?p . ?p foaf:name ?n }";

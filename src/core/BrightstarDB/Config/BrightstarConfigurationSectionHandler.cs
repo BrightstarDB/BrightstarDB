@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !PORTABLE
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -66,3 +67,4 @@ namespace BrightstarDB.Config
 
     }
 }
+#endif
