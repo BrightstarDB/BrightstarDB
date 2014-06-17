@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;
 using System.Text;
 using BrightstarDB.Client;
 
@@ -13,7 +12,7 @@ namespace BrightstarDB.Samples.EntityFramework.Foaf
     /// </summary>
     class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             // Initialise license and stores directory location
             SamplesConfiguration.Register();
@@ -82,7 +81,7 @@ namespace BrightstarDB.Samples.EntityFramework.Foaf
                 }
             }
 
-            client.ExecuteTransaction(storeName, null, null, triples.ToString());
+            client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = triples.ToString()});
         }
 
         /// <summary>
@@ -101,7 +100,7 @@ namespace BrightstarDB.Samples.EntityFramework.Foaf
             Console.WriteLine();
             foreach (var person in context.Persons.ToList())
             {
-                Console.WriteLine(string.Format("PERSON ID: {0}", person.Id));
+                Console.WriteLine("PERSON ID: {0}", person.Id);
                 var knows = new List<IPerson>();
                 knows.AddRange(person.Knows);
                 knows.AddRange(person.KnownBy);

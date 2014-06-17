@@ -105,9 +105,6 @@
     <Reference Include="dotNetRDF">
       <HintPath>..\..\..\SDK\WP71\dotNetRDF.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\..\..\SDK\WP71\HtmlAgilityPack.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Phone.Controls, Version=8.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\SDK\WP71\Newtonsoft.Json.dll</HintPath>
