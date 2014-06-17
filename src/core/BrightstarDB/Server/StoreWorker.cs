@@ -486,7 +486,7 @@ namespace BrightstarDB.Server
         public void WarmupStore(decimal pageCacheRatio)
         {
             if (pageCacheRatio > 1.0m) pageCacheRatio = 1.0m;
-#if PORTABLE
+#if PORTABLE || WINDOWS_PHONE
             var pagesToPreload = (int)Math.Floor(PageCache.Instance.FreePages * (float)pageCacheRatio);
 #else
             var pagesToPreload = (int)Math.Floor(PageCache.Instance.FreePages*pageCacheRatio);

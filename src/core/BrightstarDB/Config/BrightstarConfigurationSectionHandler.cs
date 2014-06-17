@@ -1,4 +1,4 @@
-﻿#if !PORTABLE
+﻿#if !PORTABLE && !WINDOWS_PHONE
 using System;
 using System.Collections.Generic;
 using System.Configuration;
