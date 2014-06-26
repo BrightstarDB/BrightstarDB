@@ -56,7 +56,7 @@
         }).done(function(data) {
             $('<tr></tr>')
                 .appendTo($('#storesTable tbody'))
-                .append('<td><a href="' + data.Name + '">' + data.Name + '</a></td>');
+                .append('<td><a href="@Url.Content("~/")' + data.name + '">' + data.name + '</a></td>');
         }).fail(function (jqXHR, textStatus) {
             alert("Request failed: " + textStatus);
         });
