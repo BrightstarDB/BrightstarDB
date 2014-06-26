@@ -1,8 +1,9 @@
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Server.Modules.Model.JobResponseModel>
+﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Dto.JobResponseModel>
 @{
     Layout = "_Layout";
     ViewBag.Title = "BrightstarDB: Job Information";
 }
+<script src="~/assets/jquery-1.10.2.min.js" type="text/javascript"></script>
 
 <nav>
     <ul class="horizontal breadcrumb">
@@ -16,6 +17,10 @@
 <fieldset>
     <legend>Job Info</legend>
     <div class="field">
+        <span class="label">Job Label</span>
+        <span class="value">@Model.Label</span>
+    </div>
+    <div class="field">
         <span class="label">Job ID</span>
         <span class="value">@Model.JobId</span>
     </div>
@@ -24,15 +29,35 @@
         <span class="value">@Model.JobStatus</span>
     </div>
     <div class="field">
+        <span class="label">Queued At</span>
+        <span class="value time">@Model.QueuedTime.ToString("o")</span>
+    </div>
+    <div class="field">
         <span class="label">Started At</span>
-        <span class="value">@Model.Started</span>
+        <span class="value time">@Model.StartTime.ToString("o")</span>
     </div>
     <div class="field">
         <span class="label">Ended At</span>
-        <span class="value">@Model.Ended</span>
+        <span class="value time">@Model.EndTime.ToString("o")</span>
     </div>
     <div class="field">
         <span class="label">Message</span>
         <span class="value">@Model.StatusMessage</span>
     </div>
 </fieldset>
+
+<script type="text/javascript">
+    function localizeTimes() {
+        $('.time').each(function (ix) {
+            var str = $(this).text();
+            var time = new Date(str);
+            $(this).text(time.toLocaleDateString() + " " + time.toLocaleTimeString());
+        });
+    }
+
+    $(document).ready(function () {
+        localizeTimes(); 
+    });
+
+
+</script>

@@ -242,3 +242,20 @@ a:hover {
     padding: 20px;
     white-space: pre;
 }
+
+div.field {
+    padding: 0.3em 0.3em;
+}
+
+div.field span.label {
+    min-width: 10em;
+    display: inline-block;
+}
+
+div.field span.label:after {
+    content: ': ';
+}
+
+div.field:nth-child(odd) {
+    background-color: #eee;
+}
