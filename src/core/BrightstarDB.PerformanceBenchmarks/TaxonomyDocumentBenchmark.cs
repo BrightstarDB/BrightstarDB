@@ -6,6 +6,9 @@ using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using BrightstarDB.Client;
+using System.Xml.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BrightstarDB.PerformanceBenchmarks
 {
@@ -18,18 +21,54 @@ namespace BrightstarDB.PerformanceBenchmarks
         public override void Setup()
         {
             var start = DateTime.UtcNow;
-            CreateTaxonomy();
-            CreateDocumentsInBatches(10, 10000);
+            int tripleCount = CreateTaxonomy();
             var end = DateTime.UtcNow;
-            LogOperation("created-data", "created 500,000 triples", end.Subtract(start).TotalMilliseconds.ToString(), null);
+            LogOperation("created-taxonomy", string.Format("Created {0} triples", tripleCount), end.Subtract(start).TotalMilliseconds.ToString(), null);
+
+            start = DateTime.UtcNow;
+            tripleCount = CreateDocumentsInBatches(10, 10000);
+            end = DateTime.UtcNow;
+            LogOperation("created-documents", string.Format("created {0} triples",  tripleCount), end.Subtract(start).TotalMilliseconds.ToString(), null);
+
+            CheckConsistency();
         }
 
-        private void CreateTaxonomy()
+        /// <summary>
+        /// Used to check that the data structures are in the expected form before doing any queries or updates
+        /// </summary>
+        private void CheckConsistency()
+        {
+            var docUri = "http://example.org/taxonomybenchmark/documents/400";
+            var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <" + docUri + "> ?p ?o }"));
+            if (result.SparqlResultRows().Count() == 0)
+            {
+                throw new Exception("Bad data - document resource not found.");
+            }
+
+            var taxterm = "http://example.org/taxonomybenchmark/classification/l1-0-l2-87-l3-69";
+            result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <" + taxterm + "> ?p ?o }"));
+            var hasParent = false;
+            foreach (XElement row in result.SparqlResultRows())
+            {
+                if (row.GetColumnValue("p").Equals("http://example.org/taxonomybenchmark/schema/parent"))
+                {
+                    hasParent = true;
+                }
+            }
+            
+            if (!hasParent) {
+                throw new Exception("Bad data - resource not connected to a taxonomy term.");
+            }
+        }
+
+        private int CreateTaxonomy()
         {
             var sb = new StringBuilder();
+            int tripleCount = 0;
 
             // root node
             MakeTriple("classification", "root", "schema", "a", "schema", "TaxonomyTerm", sb);
+            tripleCount++;
 
             // level 1
             int countLevelOne = 10;
@@ -40,24 +79,26 @@ namespace BrightstarDB.PerformanceBenchmarks
 
             for (var i = 0; i < countLevelOne; i++)
             {
-                MakeTaxonomyNode("l1-" + i, "root", sb);
+                tripleCount += MakeTaxonomyNode("l1-" + i, "root", sb);
                 for (var j = 0; j < countLevelTwo; j++)
                 {
-                    MakeTaxonomyNode("l1-" + i + "-l2-" + j, "l1" + i, sb);
+                    tripleCount += MakeTaxonomyNode("l1-" + i + "-l2-" + j, "l1" + i, sb);
                     for (var k = 0; k < countLevelThree; k++)
                     {
-                        MakeTaxonomyNode("l1-" + i + "-l2-" + j + "-l3-" + k, "l1-" + i + "-l2-" + j, sb);                        
+                        tripleCount += MakeTaxonomyNode("l1-" + i + "-l2-" + j + "-l3-" + k, "l1-" + i + "-l2-" + j, sb);                        
                     }
                 }
             }
 
             InsertData(sb.ToString());
+            return tripleCount;
         }
 
-        private void MakeTaxonomyNode(string id, string parentId, StringBuilder sb)
+        private int MakeTaxonomyNode(string id, string parentId, StringBuilder sb)
         {
             MakeTriple("classification", id, "schema", "a", "schema", "TaxonomyTerm", sb);
             MakeTriple("classification", id, "schema", "parent", "classification", parentId, sb);
+            return 2;
         }
 
         private const string TriplePattern = "<{0}> <{1}> <{2}> .";
@@ -83,8 +124,9 @@ namespace BrightstarDB.PerformanceBenchmarks
             return String.Format(ResourcePrefix, container, id);
         }
 
-        private void CreateDocumentsInBatches(int batchSize, int batchItemCount)
+        private int CreateDocumentsInBatches(int batchSize, int batchItemCount)
         {
+            var tripleCount = 0;
             var docId = 0;
             var rnd = new Random(1000000);
             string template = "l1-{0}-l2-{1}-l3-{2}";
@@ -99,26 +141,98 @@ namespace BrightstarDB.PerformanceBenchmarks
                         string.Format(template, rnd.Next(10), rnd.Next(100), rnd.Next(100)),
                         string.Format(template, rnd.Next(10), rnd.Next(100), rnd.Next(100))
                     };
-                    MakeDocumentNode(docId.ToString(), classification, sb);
+                    tripleCount += MakeDocumentNode(docId.ToString(), classification, sb);
                     docId++;
                 }
                 InsertData(sb.ToString());
             }
+            return tripleCount;
         }
 
-        private void MakeDocumentNode(string id, IEnumerable<string> classification, StringBuilder sb)
+        private int MakeDocumentNode(string id, IEnumerable<string> classification, StringBuilder sb)
         {
+            int count = 1;
             MakeTriple("documents", id, "schema", "a", "schema", "Document", sb);
 
             foreach (var c in classification)
             {
-                MakeTriple("documents", id, "schema", "classified-by", "classification", c, sb);                
+                MakeTriple("documents", id, "schema", "classified-by", "classification", c, sb);
+                count++;
             }
+
+            return count;
         }
 
-
         public override void RunMix()
-        {            
+        {
+            // get document metadata
+            Random rnd = new Random(565979575);
+
+            var start = DateTime.UtcNow;
+            for (int i = 0; i < 10000; i++)
+            {
+                var docId = rnd.Next(400000);
+                var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));
+            }
+            var end = DateTime.UtcNow;
+            LogOperation("completed-document-metadata-lookup-random-small-sample", string.Format("Fetched metadata for {0} documents", 1000), end.Subtract(start).TotalMilliseconds.ToString(), null);
+
+            start = DateTime.UtcNow;
+            for (int i = 0; i < 10000; i++)
+            {
+                var docId = 60000;
+                var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));
+            }
+            end = DateTime.UtcNow;
+            LogOperation("completed-document-metadata-lookup-repeated-document", string.Format("Fetched metadata for 1 document"), end.Subtract(start).TotalMilliseconds.ToString(), null);
+
+            start = DateTime.UtcNow;
+            for (int i = 0; i < 400000; i++)
+            {
+                var docId = rnd.Next(400000);
+                var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));
+            } 
+            end = DateTime.UtcNow;
+            LogOperation("completed-document-metadata-lookup", string.Format("Fetched metadata for {0} documents", 400000), end.Subtract(start).TotalMilliseconds.ToString(), null);
+
+            // run threaded document lookup
+            start = DateTime.UtcNow;
+            Parallel.Invoke(() =>
+                                {
+                                    Random rnd1 = new Random(1);
+                                    GetDocumentMetadata(rnd);
+                                 },  // close
+
+                                 () =>
+                                 {
+                                    Random rnd2 = new Random(2);
+                                    GetDocumentMetadata(rnd);
+                                 }, //close 
+
+                                () =>
+                                {
+                                    Random rnd3 = new Random(3);
+                                    GetDocumentMetadata(rnd);
+                                }, //close 
+
+                                () =>
+                                {
+                                    Random rnd4 = new Random(4);
+                                    GetDocumentMetadata(rnd);
+                                } 
+                         ); //close parallel.invoke
+
+            end = DateTime.UtcNow;
+            LogOperation("completed-parallel-document-metadata-lookup", string.Format("Fetched metadata for {0} documents using {1} parallel tasks", 400000, 4), end.Subtract(start).TotalMilliseconds.ToString(), null);
+        }
+
+        private void GetDocumentMetadata(Random rnd)
+        {
+            for (int i = 0; i < 100000; i++)
+            {
+                var docId = rnd.Next(400000);
+                var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));                
+            }   
         }
     }
 }
