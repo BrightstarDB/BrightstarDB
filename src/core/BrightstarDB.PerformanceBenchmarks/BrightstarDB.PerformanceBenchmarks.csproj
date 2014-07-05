@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Remotion.Linq, Version=1.13.122.1, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Remotion.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,9 +45,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BenchmarkAssertionException.cs" />
     <Compile Include="BenchmarkBase.cs" />
     <Compile Include="BenchmarkRunner.cs" />
+    <Compile Include="BenchmarkReport.cs" />
+    <Compile Include="EntityFrameworkActorsBenchmark.cs" />
+    <Compile Include="EntityFrameworkAssemblyAttributes.cs" />
     <Compile Include="ExampleBenchmark.cs" />
+    <Compile Include="Models\IFoafPerson.cs" />
+    <Compile Include="Models\MyEntityContext.cs">
+      <DependentUpon>MyEntityContext.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaxonomyDocumentBenchmark.cs" />
   </ItemGroup>
@@ -52,6 +66,15 @@
       <Project>{121a81f3-eb1c-4228-81fb-0d7505a438fb}</Project>
       <Name>BrightstarDB</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Models\MyEntityContext.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MyEntityContext.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,44 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using BrightstarDB.Client;
 
 namespace BrightstarDB.PerformanceBenchmarks
 {
     public abstract class BenchmarkBase
     {
-        private StreamWriter ReportStream { get; set; } 
+        public BenchmarkReport Report { get; private set; }
         protected IBrightstarService Service { get; private set; }
-        protected string StoreName { get; private set; } 
+        protected string StoreName { get; private set; }
+        public int TestScale { get; set; } 
 
-        protected BenchmarkBase(string filename, string connectionString)
+        protected BenchmarkBase()
         {
-            ReportStream = new StreamWriter(new FileStream(filename, FileMode.Create));
-            Service = BrightstarService.GetClient(connectionString);
-            
-            StoreName = Guid.NewGuid().ToString();
-            Service.CreateStore(StoreName);
-
-            // write xml header
-            ReportStream.WriteLine("<benchmarkreport>");
+            Report = new BenchmarkReport();
         }
 
-        private const string OperationTemplate = @"<operation><name>{0}</name><desc>{1}</desc><duration>{2}</duration><exception>{3}<exception>";
 
-        protected void LogOperation(string name, string description, string duration, string exception)
+        /// <summary>
+        /// Initialize is called before any other methods. The base implementation 
+        /// creates a client connection using the provided connection string and
+        /// initializes a new store using the name returned by <see cref="MakeStoreName"/>.
+        /// </summary>
+        /// <param name="connectionString">The connection string to use</param>
+        /// <param name="testScale">The scale parameter passed to the test framework</param>
+        public virtual void Initialize(string connectionString, int testScale)
         {
-            ReportStream.WriteLine(OperationTemplate, name, description, duration, exception);
+            Service = BrightstarService.GetClient(connectionString);
+            StoreName = MakeStoreName();
+            Service.CreateStore(StoreName);
+            TestScale = testScale;
         }
 
         /// <summary>
-        /// Setup is used to create internal data structures and 
+        /// Setup is used to create the target store, internal data structures and 
         /// populate the store with initial data.
-        /// The setup operation should write to the results file using the
-        /// same structure as for the mixin operations.
         /// </summary>
         public abstract void Setup();
+
+        public virtual string MakeStoreName()
+        {
+            // Return a name for the store where the benchmark will be run
+            return GetType().Name + DateTime.Now.ToString("_yyyyMMdd_HHmmss");
+        }
 
         /// <summary>
         /// Run mix is used to execute different mix patterns. Each specialisation
@@ -60,10 +63,6 @@ namespace BrightstarDB.PerformanceBenchmarks
         /// <summary>
         /// Cleanup is used to tidy up any temporary files and store data
         /// </summary>
-        public virtual void CleanUp()
-        {
-            ReportStream.WriteLine("</benchmarkreport>");
-            ReportStream.Close();
-        }
+        public abstract void CleanUp();
     }
 }

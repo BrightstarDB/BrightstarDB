@@ -14,21 +14,17 @@ namespace BrightstarDB.PerformanceBenchmarks
 {
     public class TaxonomyDocumentBenchmark : BenchmarkBase
     {
-        public TaxonomyDocumentBenchmark(string filename, string connectionString) : base(filename, connectionString)
-        {            
-        }
-
         public override void Setup()
         {
             var start = DateTime.UtcNow;
             int tripleCount = CreateTaxonomy();
             var end = DateTime.UtcNow;
-            LogOperation("created-taxonomy", string.Format("Created {0} triples", tripleCount), end.Subtract(start).TotalMilliseconds.ToString(), null);
+            Report.LogOperationCompleted("Create Taxonomy", string.Format("Created {0} triples", tripleCount), tripleCount, end.Subtract(start).TotalMilliseconds);
 
             start = DateTime.UtcNow;
             tripleCount = CreateDocumentsInBatches(10, 10000);
             end = DateTime.UtcNow;
-            LogOperation("created-documents", string.Format("created {0} triples",  tripleCount), end.Subtract(start).TotalMilliseconds.ToString(), null);
+            Report.LogOperationCompleted("Create Documents", string.Format("created {0} triples",  tripleCount), tripleCount, end.Subtract(start).TotalMilliseconds);
 
             CheckConsistency();
         }
@@ -168,67 +164,89 @@ namespace BrightstarDB.PerformanceBenchmarks
             // get document metadata
             Random rnd = new Random(565979575);
 
+            int cycleCount = 10000;
             var start = DateTime.UtcNow;
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < cycleCount; i++)
             {
                 var docId = rnd.Next(400000);
                 var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));
             }
             var end = DateTime.UtcNow;
-            LogOperation("completed-document-metadata-lookup-random-small-sample", string.Format("Fetched metadata for {0} documents", 1000), end.Subtract(start).TotalMilliseconds.ToString(), null);
+            Report.LogOperationCompleted("random-lookup-by-docid",
+                                         string.Format(
+                                             "Fetched all properties for {0} randomly selected documents documents",
+                                             cycleCount),
+                                         cycleCount,
+                                         end.Subtract(start).TotalMilliseconds);
 
             start = DateTime.UtcNow;
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < cycleCount; i++)
             {
                 var docId = 60000;
                 var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));
             }
             end = DateTime.UtcNow;
-            LogOperation("completed-document-metadata-lookup-repeated-document", string.Format("Fetched metadata for 1 document"), end.Subtract(start).TotalMilliseconds.ToString(), null);
+            Report.LogOperationCompleted("repeated-lookup-by-docid",
+                                         string.Format("Fetched all properties of the same document repeatedly"),
+                                         cycleCount,
+                                         end.Subtract(start).TotalMilliseconds);
 
+            cycleCount = 400000;
             start = DateTime.UtcNow;
-            for (int i = 0; i < 400000; i++)
+            for (int i = 0; i < cycleCount; i++)
             {
                 var docId = rnd.Next(400000);
                 var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));
             } 
             end = DateTime.UtcNow;
-            LogOperation("completed-document-metadata-lookup", string.Format("Fetched metadata for {0} documents", 400000), end.Subtract(start).TotalMilliseconds.ToString(), null);
+            Report.LogOperationCompleted("document-metadata-lookup",
+                                         string.Format("Fetched metadata for {0} documents", cycleCount),
+                                         cycleCount,
+                                         end.Subtract(start).TotalMilliseconds);
 
             // run threaded document lookup
             start = DateTime.UtcNow;
             Parallel.Invoke(() =>
                                 {
                                     Random rnd1 = new Random(1);
-                                    GetDocumentMetadata(rnd);
+                                    GetDocumentMetadata(rnd, cycleCount/4);
                                  },  // close
 
                                  () =>
                                  {
                                     Random rnd2 = new Random(2);
-                                    GetDocumentMetadata(rnd);
+                                    GetDocumentMetadata(rnd, cycleCount / 4);
                                  }, //close 
 
                                 () =>
                                 {
                                     Random rnd3 = new Random(3);
-                                    GetDocumentMetadata(rnd);
+                                    GetDocumentMetadata(rnd, cycleCount / 4);
                                 }, //close 
 
                                 () =>
                                 {
                                     Random rnd4 = new Random(4);
-                                    GetDocumentMetadata(rnd);
+                                    GetDocumentMetadata(rnd, cycleCount / 4);
                                 } 
                          ); //close parallel.invoke
 
             end = DateTime.UtcNow;
-            LogOperation("completed-parallel-document-metadata-lookup", string.Format("Fetched metadata for {0} documents using {1} parallel tasks", 400000, 4), end.Subtract(start).TotalMilliseconds.ToString(), null);
+            Report.LogOperationCompleted("parallel-document-metadata-lookup",
+                                         string.Format("Fetched metadata for {0} documents using {1} parallel tasks",
+                                                       cycleCount, 4),
+                                         cycleCount,
+                                         end.Subtract(start).TotalMilliseconds);
         }
 
-        private void GetDocumentMetadata(Random rnd)
+        public override void CleanUp()
         {
-            for (int i = 0; i < 100000; i++)
+            
+        }
+
+        private void GetDocumentMetadata(Random rnd, int cycleCount)
+        {
+            for (int i = 0; i < cycleCount; i++)
             {
                 var docId = rnd.Next(400000);
                 var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));                
