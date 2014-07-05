@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using BrightstarDB.PerformanceBenchmarks.Models;
+using BrightstarDB.Client;
 
 namespace BrightstarDB.PerformanceBenchmarks
 {
@@ -31,24 +33,28 @@ namespace BrightstarDB.PerformanceBenchmarks
             }
             var end = DateTime.UtcNow;
             Report.LogOperationCompleted("populate",
-                                         String.Format("Created {0} person records with 10 foaf:knows links each",
+                                         String.Format("Create {0} person records with 10 foaf:knows links each",
                                                        _personCount),
                                          cycleCount, end.Subtract(start).TotalMilliseconds);
         }
 
         public override void RunMix()
         {
-            // TODO: Run some linq queries and equivalent SPARQL queries for comparison
             TryOperation(LinqFindById, "linq-find-by-id", "Retrieve a single entity by its ID using a LINQ query.");
             TryOperation(SparqlFindById, "sparql-find-by-id",
                          "Retreive all properties of a single entity using a SPARQL query.");
+            TryOperation(LinqFindByName, "linq-find-by-name",
+                         "Retrieve all entities with a particular GivenName property value.");
         }
 
-        public void TryOperation(Action a, string name, string description)
+        public void TryOperation(Func<int> a, string name, string description)
         {
             try
             {
-                a();
+                DateTime start = DateTime.UtcNow;
+                var cycleCount = a();
+                var end = DateTime.UtcNow;
+                Report.LogOperationCompleted(name, description, cycleCount, end.Subtract(start).TotalMilliseconds);
             }
             catch (Exception e)
             {
@@ -100,13 +106,12 @@ namespace BrightstarDB.PerformanceBenchmarks
         }
 
         #region Query Operations
-        private void LinqFindById()
+        private int LinqFindById()
         {
             using (var context = new MyEntityContext(_storeConnectionString))
             {
-                var cycles = 100;
+                const int cycles = 1000;
                 var rng = new Random();
-                var start = DateTime.UtcNow;
                 for (int i = 0; i < cycles; i++)
                 {
                     var personId = rng.Next(_personCount);
@@ -116,28 +121,49 @@ namespace BrightstarDB.PerformanceBenchmarks
                         throw new BenchmarkAssertionException("Expected LINQ query to return a non-null result.");
                     }
                 }
-                var end = DateTime.UtcNow;
-                Report.LogOperationCompleted("linq-find-by-id",
-                                             "Retrieve a single entity by its ID using a LINQ query.",
-                                             cycles, end.Subtract(start).TotalMilliseconds);
+                return cycles;
             }
+            
         }
 
-        private void SparqlFindById()
+        private int SparqlFindById()
         {
-            const int cycles = 100;
+            const int cycles = 1000;
             const string queryTemplate = "select * WHERE {{ <http://www.brightstardb.com/people/{0}> ?p ?o }}";
             var rng = new Random();
-            var start = DateTime.UtcNow;
             for (var i = 0; i < cycles; i++)
             {
-                var results = this.Service.ExecuteQuery(StoreName, String.Format(queryTemplate, rng.Next(_personCount)));
+                var results = Service.ExecuteQuery(StoreName, String.Format(queryTemplate, rng.Next(_personCount)));
+                XDocument resultsDoc = XDocument.Load(results);
+                if (!resultsDoc.SparqlResultRows().Any())
+                {
+                    throw new BenchmarkAssertionException("Expected SPARQL query to return some rows.");
+                }
             }
-            var end = DateTime.UtcNow;
-            Report.LogOperationCompleted("sparql-find-by-id",
-                                         "Retreive all properties of a single entity using a SPARQL query.",
-                                         cycles, end.Subtract(start).TotalMilliseconds);
+            return cycles;
         }
+
+        private int LinqFindByName()
+        {
+            const int cycles = 1000;
+            var rng = new Random();
+            using (var context = new MyEntityContext(_storeConnectionString))
+            {
+                for (var i = 0; i < cycles; i++)
+                {
+                    var targetName = Firstnames[rng.Next(Firstnames.Count)];
+                    var results = context.FoafPersons.Where(p => p.GivenName.Equals(targetName)).ToList();
+                    if (results.Count == 0)
+                    {
+                        throw new BenchmarkAssertionException(
+                            "Expected at least one result from LINQ query on GivenName");
+                    }
+                }
+            }
+            return cycles;
+        }
+
+
         #endregion
 
         #region Names
