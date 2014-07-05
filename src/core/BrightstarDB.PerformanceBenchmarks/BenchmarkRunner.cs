@@ -34,11 +34,18 @@ namespace BrightstarDB.PerformanceBenchmarks
 
             foreach (var benchmark in GetBenchmarks())
             {
-                benchmark.Initialize(connectionString, scale);
-                benchmark.Setup();
-                benchmark.RunMix();
-                benchmark.CleanUp();
-                WriteReport(reportFolder, runName, benchmark);
+                try
+                {
+                    benchmark.Initialize(connectionString, scale);
+                    benchmark.Setup();
+                    benchmark.RunMix();
+                    benchmark.CleanUp();
+                    WriteReport(reportFolder, runName, benchmark);
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Log exception
+                }
             }
         }
 

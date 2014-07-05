@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using BrightstarDB.Client;
 using System.Xml.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrightstarDB.PerformanceBenchmarks
 {
     public class TaxonomyDocumentBenchmark : BenchmarkBase
     {
+        private int _numDocs;
+
         public override void Setup()
         {
             var start = DateTime.UtcNow;
@@ -21,8 +19,10 @@ namespace BrightstarDB.PerformanceBenchmarks
             var end = DateTime.UtcNow;
             Report.LogOperationCompleted("Create Taxonomy", string.Format("Created {0} triples", tripleCount), tripleCount, end.Subtract(start).TotalMilliseconds);
 
+            _numDocs = TestScale*20000; // 20k to 100k depending on scale
+
             start = DateTime.UtcNow;
-            tripleCount = CreateDocumentsInBatches(10, 10000);
+            tripleCount = CreateDocumentsInBatches(10, _numDocs/10);
             end = DateTime.UtcNow;
             Report.LogOperationCompleted("Create Documents", string.Format("created {0} triples",  tripleCount), tripleCount, end.Subtract(start).TotalMilliseconds);
 
@@ -36,9 +36,9 @@ namespace BrightstarDB.PerformanceBenchmarks
         {
             var docUri = "http://example.org/taxonomybenchmark/documents/400";
             var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <" + docUri + "> ?p ?o }"));
-            if (result.SparqlResultRows().Count() == 0)
+            if (!result.SparqlResultRows().Any())
             {
-                throw new Exception("Bad data - document resource not found.");
+                throw new BenchmarkAssertionException("Bad data - document resource not found.");
             }
 
             var taxterm = "http://example.org/taxonomybenchmark/classification/l1-0-l2-87-l3-69";
@@ -53,7 +53,7 @@ namespace BrightstarDB.PerformanceBenchmarks
             }
             
             if (!hasParent) {
-                throw new Exception("Bad data - resource not connected to a taxonomy term.");
+                throw new BenchmarkAssertionException("Bad data - resource not connected to a taxonomy term.");
             }
         }
 
@@ -164,11 +164,13 @@ namespace BrightstarDB.PerformanceBenchmarks
             // get document metadata
             Random rnd = new Random(565979575);
 
-            int cycleCount = 10000;
+            int cycleCount = 1000;
+            int docId;
+
             var start = DateTime.UtcNow;
             for (int i = 0; i < cycleCount; i++)
             {
-                var docId = rnd.Next(400000);
+                docId = rnd.Next(_numDocs);
                 var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));
             }
             var end = DateTime.UtcNow;
@@ -179,10 +181,10 @@ namespace BrightstarDB.PerformanceBenchmarks
                                          cycleCount,
                                          end.Subtract(start).TotalMilliseconds);
 
+            docId = rnd.Next(_numDocs);
             start = DateTime.UtcNow;
             for (int i = 0; i < cycleCount; i++)
             {
-                var docId = 60000;
                 var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));
             }
             end = DateTime.UtcNow;
@@ -191,64 +193,43 @@ namespace BrightstarDB.PerformanceBenchmarks
                                          cycleCount,
                                          end.Subtract(start).TotalMilliseconds);
 
-            cycleCount = 400000;
+            // Single-threaded retrieval
+            cycleCount = 40000;
             start = DateTime.UtcNow;
             for (int i = 0; i < cycleCount; i++)
             {
-                var docId = rnd.Next(400000);
+                docId = rnd.Next(_numDocs);
                 var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));
             } 
             end = DateTime.UtcNow;
-            Report.LogOperationCompleted("document-metadata-lookup",
-                                         string.Format("Fetched metadata for {0} documents", cycleCount),
+            Report.LogOperationCompleted("single-thread-metadata-lookup",
+                                         string.Format("Single thread retrieving all properties of a randomly selected document", cycleCount),
                                          cycleCount,
                                          end.Subtract(start).TotalMilliseconds);
 
             // run threaded document lookup
             start = DateTime.UtcNow;
-            Parallel.Invoke(() =>
-                                {
-                                    Random rnd1 = new Random(1);
-                                    GetDocumentMetadata(rnd, cycleCount/4);
-                                 },  // close
-
-                                 () =>
-                                 {
-                                    Random rnd2 = new Random(2);
-                                    GetDocumentMetadata(rnd, cycleCount / 4);
-                                 }, //close 
-
-                                () =>
-                                {
-                                    Random rnd3 = new Random(3);
-                                    GetDocumentMetadata(rnd, cycleCount / 4);
-                                }, //close 
-
-                                () =>
-                                {
-                                    Random rnd4 = new Random(4);
-                                    GetDocumentMetadata(rnd, cycleCount / 4);
-                                } 
-                         ); //close parallel.invoke
-
+            Parallel.Invoke(() => GetDocumentMetadata(new Random(1), cycleCount/4),
+                            () => GetDocumentMetadata(new Random(2), cycleCount/4),
+                            () => GetDocumentMetadata(new Random(3), cycleCount/4),
+                            () => GetDocumentMetadata(new Random(4), cycleCount/4));
             end = DateTime.UtcNow;
             Report.LogOperationCompleted("parallel-document-metadata-lookup",
-                                         string.Format("Fetched metadata for {0} documents using {1} parallel tasks",
-                                                       cycleCount, 4),
+                                         "4 parallel tasks retrieving all properties of randomly selected documents",
                                          cycleCount,
                                          end.Subtract(start).TotalMilliseconds);
         }
 
         public override void CleanUp()
         {
-            
+            // Nothing to do            
         }
 
         private void GetDocumentMetadata(Random rnd, int cycleCount)
         {
             for (int i = 0; i < cycleCount; i++)
             {
-                var docId = rnd.Next(400000);
+                var docId = rnd.Next(_numDocs);
                 var result = XDocument.Load(Service.ExecuteQuery(StoreName, "select * where { <http://example.org/taxonomybenchmark/documents/" + docId + "> ?p ?o }"));                
             }   
         }
