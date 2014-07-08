@@ -447,11 +447,7 @@ namespace BrightstarDB.Client
                                                                updateTransaction.InsertData,
                                                                updateTransaction.DefaultGraphUri, label);
                     JobExecutionStatus status = _serverCore.GetJobStatus(storeName, jobId.ToString());
-                    while (status.JobStatus != JobStatus.CompletedOk && status.JobStatus != JobStatus.TransactionError)
-                    {
-                        Thread.Sleep(50);
-                        status = _serverCore.GetJobStatus(storeName, jobId.ToString());
-                    }
+                    status.WaitEvent.WaitOne();
                     return new JobInfoObject(status);
                 }
             }
@@ -499,12 +495,8 @@ namespace BrightstarDB.Client
                 } else
                 {
                     var jobId = _serverCore.ExecuteUpdate(storeName, updateExpression);
-                    JobExecutionStatus status = _serverCore.GetJobStatus(storeName, jobId.ToString());
-                    while (status.JobStatus != JobStatus.CompletedOk && status.JobStatus != JobStatus.TransactionError)
-                    {
-                        Thread.Sleep(50);
-                        status = _serverCore.GetJobStatus(storeName, jobId.ToString());
-                    }
+                    var status = _serverCore.GetJobStatus(storeName, jobId.ToString());
+                    status.WaitEvent.WaitOne();
                     return new JobInfoObject(status);
                 }
             }
