@@ -29,9 +29,16 @@ namespace BrightstarDB.Portable.Compatibility
 
         public static void ConstrainedCopy(System.Array source, int srcOffset, System.Array destination, int destOffset, int count)
         {
-            for (int i = 0; i < count; i++)
+            System.Array sav = new byte[count];
+            System.Array.Copy(destination, destOffset, sav, 0, count);
+            try
             {
-                destination.SetValue(source.GetValue(srcOffset + i), destOffset + i);
+                System.Array.Copy(source, srcOffset, destination, destOffset, count);
+            }
+            catch (Exception)
+            {
+                System.Array.Copy(sav, 0, destination, destOffset, count);
+                throw;
             }
         }
 
