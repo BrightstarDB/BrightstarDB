@@ -139,9 +139,10 @@ namespace BrightstarDB.Server
         {
             lock (_stores)
             {
-                if (_stores.ContainsKey(_baseLocation + "\\" + storeName))
+                StoreWorker result = null;
+                if (_stores.TryGetValue(_baseLocation + "\\" + storeName, out result))
                 {
-                    return _stores[_baseLocation + "\\" + storeName];
+                    return result;
                 }
                 if (!DoesStoreExist(storeName))
                 {

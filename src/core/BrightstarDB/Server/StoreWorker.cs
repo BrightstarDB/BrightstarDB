@@ -155,6 +155,7 @@ namespace BrightstarDB.Server
                                 jobExecutionStatus.Information = "Job Completed";
                                 jobExecutionStatus.Ended = DateTime.UtcNow;
                                 jobExecutionStatus.JobStatus = JobStatus.CompletedOk;
+                                jobExecutionStatus.WaitEvent.Set();
                             }
                             catch (Exception ex)
                             {
@@ -165,6 +166,7 @@ namespace BrightstarDB.Server
                                 jobExecutionStatus.Ended = DateTime.UtcNow;
                                 jobExecutionStatus.ExceptionDetail = GetExceptionDetail(ex);
                                 jobExecutionStatus.JobStatus = JobStatus.TransactionError;
+                                jobExecutionStatus.WaitEvent.Set();
                             }
                             finally
                             {
@@ -306,7 +308,8 @@ namespace BrightstarDB.Server
                                 JobId = job.JobId,
                                 JobStatus = JobStatus.Pending,
                                 Queued = DateTime.UtcNow,
-                                Label = job.Label
+                                Label = job.Label,
+                                WaitEvent = new AutoResetEvent(false)
                             }))
                 {
                     _jobs.Enqueue(job);
@@ -360,7 +363,8 @@ namespace BrightstarDB.Server
                                                JobStatus = JobStatus.Started,
                                                Queued = DateTime.UtcNow,
                                                Started = DateTime.UtcNow,
-                                               Label = jobLabel
+                                               Label = jobLabel,
+                                               WaitEvent = new AutoResetEvent(false)
                                            });
             exportJob.Run((id, ex) =>
                               {
@@ -371,6 +375,7 @@ namespace BrightstarDB.Server
                                       jobExecutionStatus.ExceptionDetail = GetExceptionDetail(ex);
                                       jobExecutionStatus.JobStatus = JobStatus.TransactionError;
                                       jobExecutionStatus.Ended = DateTime.UtcNow;
+                                      jobExecutionStatus.WaitEvent.Set();
                                   }
                               },
                           id =>
@@ -381,6 +386,7 @@ namespace BrightstarDB.Server
                                       jobExecutionStatus.Information = "Export completed";
                                       jobExecutionStatus.JobStatus = JobStatus.CompletedOk;
                                       jobExecutionStatus.Ended = DateTime.UtcNow;
+                                      jobExecutionStatus.WaitEvent.Set();
                                   }
                               });
             return jobId;

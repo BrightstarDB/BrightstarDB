@@ -155,14 +155,15 @@ namespace BrightstarDB.Client
                 nePreconditionsData.ToString(),
                 deleteData.ToString(), addData.ToString(), UpdateGraphUri);
             var status = _serverCore.GetJobStatus(_storeName, jobId.ToString());
-            while (!(status.JobStatus == JobStatus.CompletedOk || status.JobStatus == JobStatus.TransactionError))
-            {
-                // wait for completion.
-#if !PORTABLE
-                Thread.Sleep(5);
-#endif
-                status = _serverCore.GetJobStatus(_storeName, jobId.ToString());
-            }
+            status.WaitEvent.WaitOne();
+//            while (!(status.JobStatus == JobStatus.CompletedOk || status.JobStatus == JobStatus.TransactionError))
+//            {
+//                // wait for completion.
+//#if !PORTABLE
+//                Thread.Sleep(5);
+//#endif
+//                status = _serverCore.GetJobStatus(_storeName, jobId.ToString());
+//            }
 
             if (status.JobStatus == JobStatus.TransactionError)
             {
@@ -172,6 +173,10 @@ namespace BrightstarDB.Client
                     throw TransactionPreconditionsFailedException.FromExceptionDetail(status.ExceptionDetail);
                 }
                 throw new BrightstarClientException(status.ExceptionDetail != null  && !String.IsNullOrEmpty(status.ExceptionDetail.Message) ? status.ExceptionDetail.Message : "The transaction encountered an error");
+            }
+            if (status.JobStatus != JobStatus.CompletedOk)
+            {
+                throw new BrightstarClientException("Unexpected job status on completion: " + status.JobStatus + ". Last message was: " + status.Information);
             }
 
             // reset changes
