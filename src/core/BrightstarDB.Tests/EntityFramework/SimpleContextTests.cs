@@ -1871,7 +1871,9 @@ where {
                 
                 context.SaveChanges();
 
+                Assert.AreEqual(4, dept.Persons.Count);
                 context.DeleteObject(bob);
+                Assert.AreEqual(3, dept.Persons.Count);
                 context.SaveChanges();
 
                 Assert.AreEqual(3, dept.Persons.Count);
