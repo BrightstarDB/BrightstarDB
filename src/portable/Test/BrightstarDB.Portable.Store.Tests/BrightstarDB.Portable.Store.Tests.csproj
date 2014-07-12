@@ -113,7 +113,9 @@
     <SDKReference Include="TestPlatform, Version=11.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RewriteableStoreTests.cs" />
     <Compile Include="StoreTests.cs" />
+    <Compile Include="StoreTestsBase.cs" />
     <Compile Include="TestConfiguration.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="TestPersistenceManagerOperations.cs" />
