@@ -22,7 +22,7 @@ namespace BrightstarDB.Portable.Tests
         public void TestCreateStore(PersistenceType persistenceType)
         {
             var client = GetEmbeddedClient();
-            var storeName = "TestCreateStore_"  + persistenceType + "_" + _runId;
+            var storeName = MakeStoreName("TestCreateStore", persistenceType);
             var storePath = Path.Combine(TestConfiguration.StoreLocation, storeName);
             var dataPath = Path.Combine(storePath, "data.bs");
             client.CreateStore(storeName, persistenceType);
@@ -38,9 +38,9 @@ namespace BrightstarDB.Portable.Tests
             Task.Delay(50).Wait(); // Wait to allow store to shutdown
 
             Assert.IsTrue(_pm.DirectoryExists(TestConfiguration.StoreLocation));
-            Assert.IsFalse(_pm.DirectoryExists(storePath));
-            Assert.IsFalse(_pm.FileExists(dataPath));
-            Assert.IsFalse(client.DoesStoreExist(storeName));
+            Assert.IsFalse(_pm.FileExists(dataPath), "Expected data file to be deleted, but it was still found at {0}", dataPath);
+            Assert.IsFalse(_pm.DirectoryExists(storePath), "Expected store directory to be deleted, but it was still found at {0}", storePath);
+            Assert.IsFalse(client.DoesStoreExist(storeName), "Expected client to report that store not longer exists after deletion");
         }
 
         [DataTestMethod]
@@ -49,7 +49,7 @@ namespace BrightstarDB.Portable.Tests
         public void TestRdfImportExport(PersistenceType persistenceType)
         {
             var client = GetEmbeddedClient();
-            var storeName = "TestRdfImportExport_" + persistenceType + "_" + _runId;
+            var storeName = MakeStoreName("TestRdfImportExport", persistenceType);
             var importPath = Path.Combine(TestConfiguration.StoreLocation, "import");
 
             TestHelper.CopyFile("TestData\\simple.txt", importPath, "simple.txt");
@@ -73,7 +73,7 @@ namespace BrightstarDB.Portable.Tests
         public void TestExecuteTransaction(PersistenceType persistenceType)
         {
             var client = GetEmbeddedClient();
-            var storeName = "TestExecuteTransaction_"  + persistenceType + "_" + _runId;
+            var storeName = MakeStoreName("TestExecuteTransaction", persistenceType);
             
             client.CreateStore(storeName, persistenceType);
 
@@ -120,7 +120,7 @@ namespace BrightstarDB.Portable.Tests
         public void TestQuery(PersistenceType persistenceType)
         {
             var client = GetEmbeddedClient();
-            var storeName = "TestQuery_" + persistenceType + "_" + _runId;
+            var storeName = MakeStoreName("TestQuery", persistenceType);
             client.CreateStore(storeName, persistenceType);
 
             var insertData = new StringBuilder();

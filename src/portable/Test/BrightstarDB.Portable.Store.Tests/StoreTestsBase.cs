@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestPlatform.UnitTestFramework;
 
 namespace BrightstarDB.Portable.Tests
 {
-    public class StoreTestsBase
+    public class StoreTestsBase : TestsBase
     {
         protected void AssertJobSuccessful(IBrightstarService client,string storeName, IJobInfo job)
         {
