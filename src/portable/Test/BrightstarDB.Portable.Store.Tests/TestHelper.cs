@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Storage;
 
@@ -7,7 +8,7 @@ namespace BrightstarDB.Portable.Tests
 {
     internal static class TestHelper
     {
-        public static async void CopyFile(string fromPath, string targetFolderPath, string targetFileName)
+        public static async Task CopyFileAsync(string fromPath, string targetFolderPath, string targetFileName)
         {
             var file = await Package.Current.InstalledLocation.GetFileAsync(fromPath);
             IStorageFolder folder;
@@ -26,6 +27,12 @@ namespace BrightstarDB.Portable.Tests
             }
 
             await file.CopyAsync(folder, targetFileName, NameCollisionOption.ReplaceExisting);
+        }
+
+        public static void CopyFile(string fromPath, string targetFolderPath, string targetFileName)
+        {
+            var task = CopyFileAsync(fromPath, targetFolderPath, targetFileName);
+            task.Wait();
         }
     }
 }

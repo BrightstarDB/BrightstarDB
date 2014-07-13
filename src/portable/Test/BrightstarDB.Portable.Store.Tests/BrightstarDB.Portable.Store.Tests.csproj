@@ -113,17 +113,57 @@
     <SDKReference Include="TestPlatform, Version=11.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EntityFramework\DataObjectStoreTestsBase.cs" />
+    <Compile Include="EntityFramework\Model\EntityFrameworkAssemblyAttributes.cs" />
+    <Compile Include="EntityFramework\Model\IAnimal.cs" />
+    <Compile Include="EntityFramework\Model\IArticle.cs" />
+    <Compile Include="EntityFramework\Model\IBaseEntity.cs" />
+    <Compile Include="EntityFramework\Model\IChildKeyEntity.cs" />
+    <Compile Include="EntityFramework\Model\ICompany.cs" />
+    <Compile Include="EntityFramework\Model\ICompositeKeyEntity.cs" />
+    <Compile Include="EntityFramework\Model\IConcept.cs" />
+    <Compile Include="EntityFramework\Model\IDBPediaPerson.cs" />
+    <Compile Include="EntityFramework\Model\IDepartment.cs" />
+    <Compile Include="EntityFramework\Model\IDerivedEntity.cs" />
+    <Compile Include="EntityFramework\Model\IEntity.cs" />
+    <Compile Include="EntityFramework\Model\IFoafAgent.cs" />
+    <Compile Include="EntityFramework\Model\IFoafPerson.cs" />
+    <Compile Include="EntityFramework\Model\IHierarchicalKeyEntity.cs" />
+    <Compile Include="EntityFramework\Model\IIdentityClashTest.cs" />
+    <Compile Include="EntityFramework\Model\IJobRole.cs" />
+    <Compile Include="EntityFramework\Model\ILowerKeyEntity.cs" />
+    <Compile Include="EntityFramework\Model\IMarket.cs" />
+    <Compile Include="EntityFramework\Model\IPerson.cs" />
+    <Compile Include="EntityFramework\Model\ISession.cs" />
+    <Compile Include="EntityFramework\Model\ISkill.cs" />
+    <Compile Include="EntityFramework\Model\IStringKeyEntity.cs" />
+    <Compile Include="EntityFramework\Model\ITrackable.cs" />
+    <Compile Include="EntityFramework\Model\LowercaseKeyConverter.cs" />
+    <Compile Include="EntityFramework\Model\MyEntityContext.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MyEntityContext.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EntityFramework\SimpleContextTests.cs" />
+    <Compile Include="EntityFramework\StressTests.cs" />
     <Compile Include="StoreTests.cs" />
+    <Compile Include="StoreTestsBase.cs" />
     <Compile Include="TestConfiguration.cs" />
+    <Compile Include="TestDataLists.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="TestPersistenceManagerOperations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestsBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="BrightstarDB.Portable.Store.Tests_TemporaryKey.pfx" />
+    <None Include="EntityFramework\Model\MyEntityContext.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MyEntityContext.cs</LastGenOutput>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +201,10 @@
       <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
   </PropertyGroup>
@@ -173,4 +217,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="BeforeBuild">
+    <Copy SourceFiles="..\..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="EntityFramework\MyEntityContext.tt" />
+  </Target>
 </Project>
