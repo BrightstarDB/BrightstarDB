@@ -35,7 +35,7 @@ namespace BrightstarDB.Portable.Tests
 
             client.DeleteStore(storeName);
 
-            Task.Delay(50).Wait(); // Wait to allow store to shutdown
+            Task.Delay(1000).Wait(); // Wait to allow store to shutdown
 
             Assert.IsTrue(_pm.DirectoryExists(TestConfiguration.StoreLocation));
             Assert.IsFalse(_pm.FileExists(dataPath), "Expected data file to be deleted, but it was still found at {0}", dataPath);
