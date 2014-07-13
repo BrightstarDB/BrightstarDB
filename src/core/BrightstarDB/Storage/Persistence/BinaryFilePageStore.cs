@@ -355,7 +355,10 @@ namespace BrightstarDB.Storage.Persistence
 
         private void EnsureOutputStream()
         {
-            _outputStream = _persistenceManager.GetOutputStream(_filePath, FileMode.Open);
+            if (_outputStream == null)
+            {
+                _outputStream = _persistenceManager.GetOutputStream(_filePath, FileMode.Open);
+            }
         }
     }
 }
