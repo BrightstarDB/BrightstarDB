@@ -113,6 +113,7 @@
     <SDKReference Include="TestPlatform, Version=11.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EntityFramework\DataObjectStoreTestsBase.cs" />
     <Compile Include="EntityFramework\Model\EntityFrameworkAssemblyAttributes.cs" />
     <Compile Include="EntityFramework\Model\IAnimal.cs" />
     <Compile Include="EntityFramework\Model\IArticle.cs" />
@@ -144,9 +145,11 @@
       <DependentUpon>MyEntityContext.tt</DependentUpon>
     </Compile>
     <Compile Include="EntityFramework\SimpleContextTests.cs" />
+    <Compile Include="EntityFramework\StressTests.cs" />
     <Compile Include="StoreTests.cs" />
     <Compile Include="StoreTestsBase.cs" />
     <Compile Include="TestConfiguration.cs" />
+    <Compile Include="TestDataLists.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="TestPersistenceManagerOperations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

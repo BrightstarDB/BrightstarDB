@@ -14,16 +14,8 @@ using System.ComponentModel.DataAnnotations;
 namespace BrightstarDB.Portable.Tests.EntityFramework
 {
     [TestClass]
-    public class SimpleContextTests : TestsBase
+    public class SimpleContextTests : DataObjectStoreTestsBase
     {
-        private readonly IDataObjectContext _dataObjectContext;
-
-        public SimpleContextTests()
-        {
-            var connectionString = new ConnectionString("type=embedded;storesDirectory=" + TestConfiguration.StoreLocation);
-            _dataObjectContext = new EmbeddedDataObjectContext(connectionString);
-        }
-
         [TestMethod]
         public void TestCreateAndRetrieve()
         {
@@ -1927,16 +1919,5 @@ where {
                 }
             }
         }
-
-        IDataObjectStore CreateStore(string storeName, PersistenceType persistenceType, bool withOptimisticLocking = false)
-        {
-            return _dataObjectContext.CreateStore(storeName, null, withOptimisticLocking, persistenceType);
-        }
-
-        IDataObjectStore OpenStore(string storeName, bool withOptimisticLocking = false)
-        {
-            return _dataObjectContext.OpenStore(storeName, null, withOptimisticLocking);
-        }
-
     }
 }
