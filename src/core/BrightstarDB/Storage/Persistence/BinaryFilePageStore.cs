@@ -28,6 +28,7 @@ namespace BrightstarDB.Storage.Persistence
         private Stream _outputStream;
         private readonly Dictionary<ulong, Tuple<BinaryFilePage, ulong>> _modifiedPages;
         private readonly object _pageCacheLock = new object();
+        private readonly object _streamLock = new object();
         private ulong _nextPageId;
 
         /// <summary>
@@ -92,9 +93,28 @@ namespace BrightstarDB.Storage.Persistence
             {
                 if (disposing)
                 {
-                    if (_inputStream != null)
+                    lock (_streamLock)
                     {
-                        _inputStream.Close();
+                        if (_inputStream != null)
+                        {
+                            _inputStream.Close();
+                        }
+                        if (_outputStream != null)
+                        {
+                            if (_outputStream.CanWrite)
+                            {
+                                try
+                                {
+                                    _outputStream.Close();
+                                }
+                                catch (Exception)
+                                {
+                                    // Ignore unhandled exceptions
+                                }
+                            }
+                            _outputStream.Dispose();
+                            _outputStream = null;
+                        }
                     }
                 }
                 // Clean up any unmanaged stuff here
@@ -155,30 +175,39 @@ namespace BrightstarDB.Storage.Persistence
         public void Commit(ulong commitId, BrightstarProfiler profiler)
         {
             EnsureOutputStream();
-            using (profiler.Step("PageStore.Commit"))
+            try
             {
-                try
+                using (profiler.Step("PageStore.Commit"))
                 {
-                    foreach (var entry in _modifiedPages.OrderBy(e => e.Key))
+                    try
                     {
-                        // TODO: Ensure we are writing the correct commit
-                        entry.Value.Item1.Write(_outputStream, commitId);
-                        lock (_pageCacheLock)
+                        foreach (var entry in _modifiedPages.OrderBy(e => e.Key))
                         {
-                            PageCache.Instance.InsertOrUpdate(_filePath, entry.Value.Item1);
+                            // TODO: Ensure we are writing the correct commit
+                            entry.Value.Item1.Write(_outputStream, commitId);
+                            lock (_pageCacheLock)
+                            {
+                                PageCache.Instance.InsertOrUpdate(_filePath, entry.Value.Item1);
+                            }
                         }
+                        _modifiedPages.Clear();
                     }
-                    _modifiedPages.Clear();
+                    catch (Exception)
+                    {
+                        _modifiedPages.Clear();
+                        throw;
+                    }
+                    CurrentTransactionId = commitId;
                 }
-                catch (Exception)
+            }
+            finally
+            {
+                lock (_streamLock)
                 {
-                    _modifiedPages.Clear();
-                    throw;
+                    _outputStream.Flush();
+                    _outputStream.Close();
+                    _outputStream = null;
                 }
-                CurrentTransactionId = commitId;
-                _outputStream.Flush();
-                _outputStream.Close();
-                _outputStream = null;
             }
         }
 
@@ -279,7 +308,7 @@ namespace BrightstarDB.Storage.Persistence
         /// </summary>
         public void Close()
         {
-            lock (this)
+            lock (_streamLock)
             {
                 if (_inputStream != null)
                 {
@@ -355,9 +384,12 @@ namespace BrightstarDB.Storage.Persistence
 
         private void EnsureOutputStream()
         {
-            if (_outputStream == null)
+            lock (_streamLock)
             {
-                _outputStream = _persistenceManager.GetOutputStream(_filePath, FileMode.Open);
+                if (_outputStream == null)
+                {
+                    _outputStream = _persistenceManager.GetOutputStream(_filePath, FileMode.Open);
+                }
             }
         }
     }
