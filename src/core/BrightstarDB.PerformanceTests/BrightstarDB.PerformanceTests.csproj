@@ -43,6 +43,7 @@
       <HintPath>..\..\lib\Remotion.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -53,6 +54,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RewriteStorageStressTest.cs" />
     <Compile Include="Model\IArticle.cs" />
     <Compile Include="Model\IDepartment.cs" />
     <Compile Include="Model\IJobRole.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="PerformanceTestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LinqQueryPerformance.cs" />
+    <Compile Include="TestConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
