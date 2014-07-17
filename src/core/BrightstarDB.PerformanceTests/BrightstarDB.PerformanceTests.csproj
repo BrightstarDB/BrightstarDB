@@ -54,6 +54,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppendOnlyStorageStressTest.cs" />
     <Compile Include="RewriteStorageStressTest.cs" />
     <Compile Include="Model\IArticle.cs" />
     <Compile Include="Model\IDepartment.cs" />
@@ -69,6 +70,7 @@
     <Compile Include="PerformanceTestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LinqQueryPerformance.cs" />
+    <Compile Include="StorageStressTestBase.cs" />
     <Compile Include="TestConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>

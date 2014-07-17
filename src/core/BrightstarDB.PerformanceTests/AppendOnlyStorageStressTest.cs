@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BrightstarDB.Storage;
 using NUnit.Framework;
 
 namespace BrightstarDB.PerformanceTests
 {
     [TestFixture]
-    public class RewriteStorageStressTest : StorageStressTestBase
+    public class AppendOnlyStorageStressTest : StorageStressTestBase
     {
         // Test insert of half a million records in different batch sizes
         [TestCase(500, 1000)]
@@ -17,7 +14,7 @@ namespace BrightstarDB.PerformanceTests
         public void TestEntityFrameworkInserts(int numBatches, int numPerBatch)
         {
             var defaultPersistenceType = Configuration.PersistenceType;
-            Configuration.PersistenceType = PersistenceType.Rewrite;
+            Configuration.PersistenceType = PersistenceType.AppendOnly;
             try
             {
                 var storeName = String.Format("RewriteStorageStressTest.TestEntityFrameworkInserts_{0}_{1}_{2}",
@@ -36,8 +33,8 @@ namespace BrightstarDB.PerformanceTests
         public void TestSmallPageCacheEntityFrameworkInserts(int numBatches, int numPerBatch)
         {
             var defaultPersistenceType = Configuration.PersistenceType;
-            Configuration.PersistenceType = PersistenceType.Rewrite;
-            Configuration.PageCacheSize = 2;
+            Configuration.PersistenceType = PersistenceType.AppendOnly;
+            Configuration.PageCacheSize = 1;
             try
             {
                 var storeName = String.Format("RewriteStorageStressTest.TestSmallPageCacheEntityFrameworkInserts{0}_{1}_{2}",
@@ -49,5 +46,6 @@ namespace BrightstarDB.PerformanceTests
                 Configuration.PersistenceType = defaultPersistenceType;
             }
         }
+
     }
 }
