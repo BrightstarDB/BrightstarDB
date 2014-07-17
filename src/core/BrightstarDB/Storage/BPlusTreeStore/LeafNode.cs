@@ -167,7 +167,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                             Math.Min(value.Length, _config.ValueSize));
                         return;
                     }
-                    throw new DuplicateKeyException();
+                    throw new DuplicateKeyException(this.PageId);
                 }
                 EnsureWriteable(txnId);
                 insertIndex = ~insertIndex;
