@@ -119,11 +119,20 @@ namespace BrightstarDB.Storage.Persistence
                         if (newPage != null) return newPage;
                     }
                 }
-                var page = PageCache.Instance.Lookup(_path, pageId) as FilePage;
+                var page = PageCache.Instance.Lookup(_path, pageId) as IPage;
                 if (page != null)
                 {
                     profiler.Incr("PageCache Hit");
                     return page;
+                }
+                if (_backgroundPageWriter != null)
+                {
+                    // See if the page is currently queued for background write
+                    if (_backgroundPageWriter.TryGetPage(pageId, out page))
+                    {
+                        profiler.Incr("BackgroundWriter Queue Hit");
+                        return page;
+                    }
                 }
                 using (profiler.Step("Load Page"))
                 {

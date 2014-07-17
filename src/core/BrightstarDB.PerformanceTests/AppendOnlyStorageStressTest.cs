@@ -35,6 +35,8 @@ namespace BrightstarDB.PerformanceTests
             var defaultPersistenceType = Configuration.PersistenceType;
             Configuration.PersistenceType = PersistenceType.AppendOnly;
             Configuration.PageCacheSize = 1;
+            StoreConfiguration.DefaultStoreConfiguration.DisableBackgroundWrites = true;
+            
             try
             {
                 var storeName = String.Format("RewriteStorageStressTest.TestSmallPageCacheEntityFrameworkInserts{0}_{1}_{2}",
