@@ -41,6 +41,83 @@ namespace BrightstarDB.Storage.Persistence
             SecondBuffer = new byte[nominalPageSize-8];
         }
 
+        public byte[] GetCurrentBuffer(ulong currentTransactionId)
+        {
+            if (FirstTransactionId > currentTransactionId && SecondTransactionId > currentTransactionId)
+            {
+                // This is an error condition that can happen if a store is kept open while two successive writes are committed
+                throw new ReadWriteStoreModifiedException();
+            }
+
+            // Current buffer is the one with the highest transaction id that is less than or equal to currentTransactionId
+            if (FirstTransactionId > SecondTransactionId)
+            {
+                if (FirstTransactionId <= currentTransactionId)
+                {
+                    return FirstBuffer;
+                }
+                return SecondBuffer;
+            }
+            if (SecondTransactionId <= currentTransactionId)
+            {
+                return SecondBuffer;
+            }
+            return FirstBuffer;
+        }
+
+        public void MakeWriteable(ulong writeTransactionId)
+        {
+            var readTransactionId = writeTransactionId - 1;
+            byte[] srcBuffer, destBuffer;
+            if (FirstTransactionId > readTransactionId && SecondTransactionId > readTransactionId)
+            {
+                // This is an error condition that can happen if a store is kept open while two successive writes are committed
+                throw new ReadWriteStoreModifiedException();                
+            }
+
+            // Figure out which buffer we will write to and update its transaction id
+            // Normally it will be the one with the lower txn id UNLESS the other
+            // buffer's transaction ID is greater than or equal to the write transaction id
+            // If that is the case we assume that the other buffer is left from a previous failed
+            // transaction and overwrite it.
+            if (FirstTransactionId < SecondTransactionId)
+            {
+                if (SecondTransactionId >= writeTransactionId)
+                {
+                    SecondTransactionId = writeTransactionId;
+                }
+                else
+                {
+                    FirstTransactionId = writeTransactionId;
+                }
+            }
+            else
+            {
+                if (FirstTransactionId >= writeTransactionId)
+                {
+                    FirstTransactionId = writeTransactionId;
+                }
+                else
+                {
+                    SecondTransactionId = writeTransactionId;
+                }
+            }
+            
+            // Figure out which way round to do the copy
+            if (FirstTransactionId == writeTransactionId)
+            {
+                srcBuffer = SecondBuffer;
+                destBuffer = FirstBuffer;
+            }
+            else
+            {
+                srcBuffer = FirstBuffer;
+                destBuffer = SecondBuffer;
+            }
+            // Copy the read buffer for the immediately preceding transaction id to the other buffer for use in the write transaction
+            Array.Copy(srcBuffer, destBuffer, _nominalPageSize);
+        }
+
         public byte[] GetReadBuffer(ulong currentTransactionId)
         {
             if (FirstTransactionId > currentTransactionId && SecondTransactionId > currentTransactionId)
