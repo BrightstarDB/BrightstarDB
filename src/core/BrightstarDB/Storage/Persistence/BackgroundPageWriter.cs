@@ -20,6 +20,7 @@ namespace BrightstarDB.Storage.Persistence
         private readonly ConcurrentDictionary<ulong, long> _writeTimestamps;
         private readonly Stream _outputStream;
         private readonly ManualResetEvent _shutdownCompleted;
+        private WriteTask _writing;
 
         public BackgroundPageWriter(Stream outputStream)
         {
@@ -50,7 +51,7 @@ namespace BrightstarDB.Storage.Persistence
 
         public void Flush()
         {
-            while(!_writeTasks.IsEmpty)
+            while(!_writeQueue.IsEmpty)
             {
                 _shutdownCompleted.WaitOne(10); // Spin until the queue is empty
             }
@@ -64,6 +65,14 @@ namespace BrightstarDB.Storage.Persistence
             {
                 page = writeTask.PageToWrite;
                 return true;
+            }
+            lock (this)
+            {
+                if (_writing != null && _writing.PageToWrite.Id == pageId)
+                {
+                    page = _writing.PageToWrite;
+                    return true;
+                }
             }
             page = null;
             return false;
@@ -79,20 +88,32 @@ namespace BrightstarDB.Storage.Persistence
 #if DEBUG_PAGESTORE
                     Logging.LogDebug("BackgroundWriter: Next page id in queue: {0}", writePageId);
 #endif
+                    // Retrieve the page write information from the _writeTasks dictionary
                     WriteTask writeTask;
                     if (_writeTasks.TryRemove(writePageId, out writeTask))
                     {
+                        lock (this)
+                        {
+                            _writing = writeTask;
+                        }
 #if DEBUG_PAGESTORE
                     Logging.LogDebug("BackgroundWriter: Page {0} found in task dictionary.", writePageId);
 #endif
                         try
                         {
-                            writeTask.PageToWrite.Write(_outputStream, writeTask.TransactionId);
+                            _writing.PageToWrite.Write(_outputStream, _writing.TransactionId);
                         }
                         catch (Exception ex)
                         {
                             Logging.LogError(BrightstarEventId.StoreBackgroundWriteError,
-                                             "Error in BackgroundPageWriter: {0}", ex);
+                                "Error in BackgroundPageWriter: {0}", ex);
+                        }
+                        finally
+                        {
+                            lock (this)
+                            {
+                                _writing = null;
+                            }
                         }
                     }
                     else

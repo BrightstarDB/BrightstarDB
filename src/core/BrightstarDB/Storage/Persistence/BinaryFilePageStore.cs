@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading;
 using BrightstarDB.Profiling;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
@@ -34,6 +31,8 @@ namespace BrightstarDB.Storage.Persistence
         /// </summary>
         private readonly string _filePath;
 
+        private readonly string _partitionId;
+
         /// <summary>
         /// The ID of the current read transaction for this store. The
         /// write transaction will be this value + 1
@@ -53,7 +52,15 @@ namespace BrightstarDB.Storage.Persistence
         /// <summary>
         /// Tracks the IDs of pages we have modified on disk during the present transaction
         /// </summary>
-        private ConcurrentDictionary<ulong, bool>_modifiedPages ;
+        private readonly ConcurrentDictionary<ulong, bool> _modifiedPages;
+
+        /// <summary>
+        /// Boolean flag that is set to true when this object is disposed
+        /// </summary>
+        private bool _disposed;
+
+        
+        private readonly object _restartLock = new object();
 
         public BinaryFilePageStore(IPersistenceManager persistenceManager, string filePath, int pageSize, bool readOnly,
             ulong currentTransactionId)
@@ -73,6 +80,7 @@ namespace BrightstarDB.Storage.Persistence
                 PageCache.Instance.BeforeEvict += BeforePageCacheEvict;
             }
             _modifiedPages = new ConcurrentDictionary<ulong, bool>();
+            _partitionId = filePath + "." + (readOnly ? currentTransactionId : currentTransactionId + 1);
         }
 
         /// <summary>
@@ -83,25 +91,48 @@ namespace BrightstarDB.Storage.Persistence
         /// <summary>
         /// Get a boolean flag indicating if the store is readable
         /// </summary>
-        public bool CanRead { get { return true; } }
+        public bool CanRead
+        {
+            get { return true; }
+        }
 
         /// <summary>
         /// Get a boolean flag indicating if the store is writeable
         /// </summary>
         public bool CanWrite { get; private set; }
 
-#region Implementation of IPageStore
+        #region Implementation of IPageStore
 
         public IPage Retrieve(ulong pageId, BrightstarProfiler profiler)
         {
-            var binaryFilePage = GetBinaryFilePage(pageId, profiler);
-            if (_modifiedPages.ContainsKey(pageId))
+            using (profiler.Step("BinaryFilePageStore.GetPage"))
             {
-                // The page was modified in this transaction so wrap it as a writeable page
-                return new BinaryPageAdapter(binaryFilePage, _currentReadTxnId + 1, false, true);
+                // Look in the page cache
+                IPage page = PageCache.Instance.Lookup(_partitionId, pageId) as BinaryFilePage;
+                if (page != null)
+                {
+                    profiler.Incr("PageCache Hit");
+                    return page;
+                }
+               
+                // See if the page is queued for writing
+                if (_backgroundPageWriter != null && _backgroundPageWriter.TryGetPage(pageId, out page))
+                {
+                    profiler.Incr("BackgroundWriter Queue Hit");
+                    return page;
+                }
+
+                // Not found in memory, so go to the disk
+                profiler.Incr("PageCache Miss");
+                using (profiler.Step("Load Page"))
+                {
+                    page = _modifiedPages.ContainsKey(pageId)
+                        ? new BinaryFilePage(_inputStream, pageId, _nominalPageSize, _currentReadTxnId + 1, true)
+                        : new BinaryFilePage(_inputStream, pageId, _nominalPageSize, _currentReadTxnId, false);
+                    PageCache.Instance.InsertOrUpdate(_partitionId, page);
+                    return page;
+                }
             }
-            // Page has not yet been modified so wrap it as a readonly page
-            return new BinaryPageAdapter(binaryFilePage, _currentReadTxnId, false, false);
         }
 
         public IPage Create(ulong commitId)
@@ -110,20 +141,33 @@ namespace BrightstarDB.Storage.Persistence
             {
                 throw new InvalidOperationException("Cannot create new pages in a read-only store.");
             }
-            var page = new BinaryFilePage(_nextPageId++, _nominalPageSize, _currentReadTxnId+1);
+            var page = new BinaryFilePage(_nextPageId++, _nominalPageSize, _currentReadTxnId + 1);
             _modifiedPages.AddOrUpdate(page.Id, true, (k, v) => true);
-            return new BinaryPageAdapter(page, _currentReadTxnId + 1, true, true);
+            PageCache.Instance.InsertOrUpdate(_partitionId, page);
+            return page;
         }
 
         public void Commit(ulong commitId, BrightstarProfiler profiler)
         {
-            if (_backgroundPageWriter != null)
+            if (CanWrite)
             {
+                foreach (var pageId in _modifiedPages.Keys)
+                {
+                    var page = PageCache.Instance.Lookup(_partitionId, pageId) as BinaryFilePage;
+                    if (page != null && page.IsDirty)
+                    {
+                        _backgroundPageWriter.QueueWrite(page, _currentReadTxnId + 1);
+                    }
+                }
                 _backgroundPageWriter.Flush();
-                _modifiedPages.Clear();
-                _backgroundPageWriter.Shutdown();
-                _backgroundPageWriter.Dispose();
-                _backgroundPageWriter = null;
+                lock (_restartLock)
+                {
+                    _backgroundPageWriter.Shutdown();
+                    _backgroundPageWriter.Dispose();
+                    PageCache.Instance.Clear(_partitionId);
+                    _backgroundPageWriter =
+                        new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open));
+                }
             }
             else
             {
@@ -141,82 +185,131 @@ namespace BrightstarDB.Storage.Persistence
 
         public bool IsWriteable(IPage page)
         {
-            if (page is BinaryPageAdapter)
+            if (page is BinaryFilePage)
             {
-                if ((page as BinaryPageAdapter).TransactionId == _currentReadTxnId + 1)
-                {
-                    return true;
-                }
+                return (page as BinaryFilePage).IsWriteable;
             }
             return false;
         }
 
         public IPage GetWriteablePage(ulong commitId, IPage page)
         {
-            var p = page as BinaryPageAdapter;
-            if (p != null && p.TransactionId == _currentReadTxnId + 1)
+            if (!CanWrite) throw new InvalidOperationException("Attempt to retrieve a writeable page from a read-only store");
+            var p = page as BinaryFilePage;
+            if (p == null)
             {
-                return page;
+                throw new ArgumentException("Expected a BinaryFilePage instance. Received a " + page.GetType().FullName);
             }
-            return GetWriteablePage(commitId, page.Id);
-        }
-
-        private IPage GetWriteablePage(ulong commitId, ulong pageId)
-        {
-            var binaryPage = GetBinaryFilePage(pageId, null);
-            if (!_modifiedPages.ContainsKey(binaryPage.Id))
+            if (p.IsWriteable)
             {
-                // Page has not yet been modified in this transaction
-                binaryPage.MakeWriteable(_currentReadTxnId + 1);
+                return p;
             }
-            return new BinaryPageAdapter(binaryPage, _currentReadTxnId + 1, false, true);
+            p.MakeWriteable(_currentReadTxnId + 1);
+            return p;
         }
 
         public void Close()
         {
-            throw new NotImplementedException();
+            if (_inputStream != null)
+            {
+                _inputStream.Close();
+                _inputStream.Dispose();
+                _inputStream = null;
+            }
+
+            if (_backgroundPageWriter != null)
+            {
+                _backgroundPageWriter.Shutdown();
+                _backgroundPageWriter.Dispose();
+                _backgroundPageWriter = null;
+            }
+
+        }
+
+        internal void OnPageModified(BinaryFilePage page)
+        {
+            _modifiedPages.AddOrUpdate(page.Id, true, (k, v) => true);
+            _backgroundPageWriter.QueueWrite(page, _currentReadTxnId+1);
         }
 
         public void MarkDirty(ulong commitId, ulong pageId)
         {
-            _modifiedPages.AddOrUpdate(pageId, true, (k, v) => true);
-            var page = GetWriteablePage(_currentReadTxnId + 1, pageId);
-            _backgroundPageWriter.QueueWrite(page, _currentReadTxnId + 1);
+            var page = Retrieve(pageId, null) as BinaryFilePage;
+            page.IsDirty = true;
+            if (page != null)
+            {
+                OnPageModified(page);
+            }
         }
 
         public int Preload(int numPages, BrightstarProfiler profiler)
         {
-            throw new NotImplementedException();
+            // TODO: This is a bit unsatisfactory, it would be better to scan through the tree loading the internal nodes in a breadth-first manner
+            var maxPage = Math.Min((ulong)numPages / 2, _nextPageId - 1);
+            int loadCount = 0;
+            for (ulong pageId = 0; pageId < maxPage; pageId++)
+            {
+                Retrieve(pageId, profiler);
+                loadCount++;
+            }
+            return loadCount;
         }
 
-#endregion
+        #endregion
 
-#region Implementation of IDisposable
+        #region Implementation of IDisposable
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-#endregion
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    Close();
+                    if (_backgroundPageWriter != null)
+                    {
+                        _backgroundPageWriter.Dispose();
+                        _backgroundPageWriter = null;
+                    }
+                }
+                _disposed = true;
+            }
+        }
 
-#region PageCache event handler
+        ~BinaryFilePageStore()
+        {
+            Dispose(false);
+        }
+
+        #endregion
+
+        #region PageCache event handler
 
         private void BeforePageCacheEvict(object sender, EvictionEventArgs args)
         {
-            if (_modifiedPages.ContainsKey(args.PageId))
+            lock (_restartLock) // Ensure we don't try to process page evictions while restarting the background writer
             {
-                var page = PageCache.Instance.Lookup(_filePath, args.PageId) as BinaryFilePage;
-                if (page != null)
+                if (_modifiedPages.ContainsKey(args.PageId))
                 {
-                    _backgroundPageWriter.QueueWrite(new BinaryPageAdapter(page, _currentReadTxnId + 1, true, true),
-                        _currentReadTxnId + 1);
+                    var page = PageCache.Instance.Lookup(_filePath, args.PageId) as BinaryFilePage;
+                    if (page != null)
+                    {
+                        _backgroundPageWriter.QueueWrite(page, _currentReadTxnId + 1);
+                    }
                 }
+                // Unmodified pages can just be evicted
             }
         }
 
         #endregion
-#region Private methods
+
+        #region Private methods
 
         private void OpenInputStream()
         {
@@ -240,41 +333,9 @@ namespace BrightstarDB.Storage.Persistence
             _inputStream = _persistenceManager.GetInputStream(_filePath);
         }
 
-        private BinaryFilePage GetBinaryFilePage(ulong pageId, BrightstarProfiler profiler)
-        {
-            using (profiler.Step("BinaryFilePageStore.GetBinaryFilePage"))
-            {
-                BinaryFilePage page = PageCache.Instance.Lookup(_filePath, pageId) as BinaryFilePage;
-                if (page != null)
-                {
-                    profiler.Incr("PageCache Hit");
-                    return page;
-                }
-                IPage p;
-                if (_backgroundPageWriter.TryGetPage(pageId, out p) && (p is BinaryPageAdapter))
-                {
-                    var adapatedPage = p as BinaryPageAdapter;
-                    profiler.Incr("BackgroundWriter Queue Hit");
-                    return adapatedPage.
-                }
-                page = _backgroundPageWriter.Lookup(pageId) as BinaryFilePage;
-                if (page != null)
-                {
-                    profiler.Incr("BackgroundWriter Cache Hit");
-                    return page;
-                }
-                profiler.Incr("PageCache Miss");
-                using (profiler.Step("Load Page"))
-                {
-                    page = new BinaryFilePage(_inputStream, pageId, _nominalPageSize);
-                    PageCache.Instance.InsertOrUpdate(_filePath, page);
-                    return page;
-                }
-            }
-        }
-#endregion
+        #endregion
     }
-
+}
 
 
 //    internal class __BinaryFilePageStore : IPageStore

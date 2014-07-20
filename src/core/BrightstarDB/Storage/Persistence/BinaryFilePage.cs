@@ -1,26 +1,27 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using BrightstarDB.Client;
+using VDS.RDF.Query.Datasets;
 
 namespace BrightstarDB.Storage.Persistence
 {
-    internal class BinaryFilePage : IPageCacheItem
+    internal class BinaryFilePage : IPage
     {
         public ulong Id { get; private set; }
         public ulong FirstTransactionId { get; private set; }
         public ulong SecondTransactionId { get; private set; }
         public byte[] FirstBuffer { get; private set; }
         public byte[] SecondBuffer { get; private set; }
+        public bool IsWriteable { get; private set; }
         private readonly int _nominalPageSize;
 
-        public BinaryFilePage(Stream inputStream, ulong pageId, int nominalPageSize)
+        public BinaryFilePage(Stream inputStream, ulong pageId, int nominalPageSize, ulong currentTxnId, bool isWriteable)
         {
             _nominalPageSize = nominalPageSize;
             Id = pageId;
             long startOffset = nominalPageSize*2*((long) pageId - 1);
             long seekOffset = startOffset - inputStream.Position;
             inputStream.Seek(seekOffset, SeekOrigin.Current);
-            //inputStream.Seek(nominalPageSize * 2 * ((long)pageId - 1), SeekOrigin.Begin);
             var pages = new byte[nominalPageSize*2];
             inputStream.Read(pages, 0, nominalPageSize*2);
             FirstTransactionId = BitConverter.ToUInt64(pages, 0);
@@ -29,16 +30,20 @@ namespace BrightstarDB.Storage.Persistence
             Array.Copy(pages, 8, FirstBuffer, 0, nominalPageSize-8);
             SecondBuffer = new byte[nominalPageSize-8];
             Array.Copy(pages, nominalPageSize + 8, SecondBuffer, 0, nominalPageSize - 8);
+            Data = GetCurrentBuffer(currentTxnId);
+            IsWriteable = isWriteable;
         }
 
-        public BinaryFilePage(ulong pageId, int nominalPageSize, ulong currentTransactionId)
+        public BinaryFilePage(ulong pageId, int nominalPageSize, ulong currentTxnId)
         {
             _nominalPageSize = nominalPageSize;
             Id = pageId;
-            FirstTransactionId = ulong.MaxValue;// This ensures we should always write to FirstBuffer for a new page
+            FirstTransactionId = currentTxnId;
             FirstBuffer = new byte[nominalPageSize-8];
             SecondTransactionId = 0;
             SecondBuffer = new byte[nominalPageSize-8];
+            Data = FirstBuffer;
+            IsWriteable = true;
         }
 
         public byte[] GetCurrentBuffer(ulong currentTransactionId)
@@ -67,6 +72,7 @@ namespace BrightstarDB.Storage.Persistence
 
         public void MakeWriteable(ulong writeTransactionId)
         {
+            if (IsWriteable) return;
             var readTransactionId = writeTransactionId - 1;
             byte[] srcBuffer, destBuffer;
             if (FirstTransactionId > readTransactionId && SecondTransactionId > readTransactionId)
@@ -115,86 +121,48 @@ namespace BrightstarDB.Storage.Persistence
                 destBuffer = SecondBuffer;
             }
             // Copy the read buffer for the immediately preceding transaction id to the other buffer for use in the write transaction
-            Array.Copy(srcBuffer, destBuffer, _nominalPageSize);
+            lock (this)
+            {
+                Array.Copy(srcBuffer, destBuffer, _nominalPageSize - 8);
+                Data = destBuffer;
+                IsWriteable = true;
+            }
         }
 
-        public byte[] GetReadBuffer(ulong currentTransactionId)
-        {
-            if (FirstTransactionId > currentTransactionId && SecondTransactionId > currentTransactionId)
-            {
-                // This is an error condition that would happen if a store is kept open while two successive writes are committed
-                throw new ReadWriteStoreModifiedException();
-            }
-            if (FirstTransactionId > SecondTransactionId)
-            {
-                // Normally if first transaction id is higher than second, we read from first buffer
-                // BUT if first transaction id is higher than the current transaction id, then
-                // the first buffer is from a failed transaction, so we read from the second one.
-                return FirstTransactionId <= currentTransactionId ? FirstBuffer : SecondBuffer;
-            }
-            return SecondTransactionId <= currentTransactionId ? SecondBuffer : FirstBuffer;
-        }
+        public byte[] Data { get; private set; }
+        public bool IsDirty { get; internal set; }
+        public long Modified { get; private set; }
+        public bool Deleted { get; private set; }
 
-        public byte[] GetWriteBuffer(ulong currentTransactionId)
+        public void SetData(byte[] data, int srcOffset = 0, int pageOffset = 0, int len = -1)
         {
-            if (FirstTransactionId < SecondTransactionId)
+            lock (this)
             {
-                // Normally if first transaction id is lower, we write to first buffer
-                // BUT if second transaction id is equal to or higher than current transaction id, 
-                // the second buffer is from this transaction or from a failed transaction, 
-                // so it is the one that should be overwritten
-                return SecondTransactionId >= currentTransactionId ? SecondBuffer : FirstBuffer;
+                if (!IsWriteable) throw new InvalidOperationException("Attempt to write to a read-only page");
+                Array.ConstrainedCopy(data, srcOffset, Data, pageOffset, len < 0 ? data.Length : len);
+                IsDirty = true;
             }
-            return FirstTransactionId > currentTransactionId ? FirstBuffer : SecondBuffer;
         }
 
         public long Write(Stream outputStream, ulong currentTransactionId)
         {
-            if (FirstTransactionId < SecondTransactionId)
+            lock (this)
             {
-                if (SecondTransactionId >= currentTransactionId)
-                {
-                    WriteSecondBuffer(outputStream, currentTransactionId);
-                }
-                else
-                {
-                    WriteFirstBuffer(outputStream, currentTransactionId);
-                }
+                var offset = _nominalPageSize*2*((long) Id - 1);
+                outputStream.Seek(offset, SeekOrigin.Begin);
+                outputStream.Write(BitConverter.GetBytes(FirstTransactionId), 0, 8);
+                outputStream.Write(FirstBuffer, 0, _nominalPageSize - 8);
+                outputStream.Write(BitConverter.GetBytes(SecondTransactionId), 0, 8);
+                outputStream.Write(SecondBuffer, 0, _nominalPageSize - 8);
+                IsDirty = false;
+                return 0L;
             }
-            else
-            {
-                if (FirstTransactionId >= currentTransactionId)
-                {
-                    WriteFirstBuffer(outputStream, currentTransactionId);
-                }
-                else
-                {
-                    WriteSecondBuffer(outputStream, currentTransactionId);
-                }
-            }
-            return 0L;
         }
 
-        private void WriteFirstBuffer(Stream outputStream, ulong transactionId)
+        public long WriteIfModifiedSince(long writeTimestamp, Stream outputStream, ulong transactionId)
         {
-            outputStream.Seek(_nominalPageSize*2*((long) Id - 1), SeekOrigin.Begin);
-            outputStream.Write(BitConverter.GetBytes(transactionId), 0, 8);
-            outputStream.Write(FirstBuffer, 0, _nominalPageSize-8);
-            if (outputStream.Length < _nominalPageSize * 2*(long)Id)
-            {
-                // Ensure file has reserved space for the second half of the page
-                outputStream.Write(BitConverter.GetBytes(0ul), 0, 8);
-                outputStream.Write(SecondBuffer, 0, _nominalPageSize-8);
-            }
-            FirstTransactionId = transactionId;
+            throw new NotImplementedException();
         }
 
-        private void WriteSecondBuffer(Stream outputStream, ulong transactionId)
-        {
-            outputStream.Seek((_nominalPageSize*2*((long) Id - 1)) + _nominalPageSize, SeekOrigin.Begin);
-            outputStream.Write(BitConverter.GetBytes(transactionId), 0, 8);
-            outputStream.Write(SecondBuffer, 0, _nominalPageSize-8);
-            SecondTransactionId = transactionId;
-        }
     }
 }

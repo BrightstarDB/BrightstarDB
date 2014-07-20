@@ -7,55 +7,55 @@ using Array = BrightstarDB.Portable.Compatibility.Array;
 namespace BrightstarDB.Storage.Persistence
 {
 
-    internal sealed class BinaryPageAdapter : IPage
-    {
-        private readonly BinaryFilePage _binaryFilePage;
+    //internal sealed class BinaryPageAdapter : IPage
+    //{
+    //    private readonly BinaryFilePage _binaryFilePage;
 
-        public ulong Id { get; private set; }
-        public ulong TransactionId { get; private set; }
-        public byte[] Data { get; private set; }
-        public bool IsDirty { get; private set; }
-        public long Modified { get { return 0; } }
-        public bool Deleted { get; set; }
-        public bool IsWriteable { get; private set; }
+    //    public ulong Id { get; private set; }
+    //    public ulong TransactionId { get; private set; }
+    //    public byte[] Data { get; private set; }
+    //    public bool IsDirty { get; private set; }
+    //    public long Modified { get { return 0; } }
+    //    public bool Deleted { get; set; }
+    //    public bool IsWriteable { get; private set; }
 
-        public BinaryPageAdapter(BinaryFilePage page, ulong transactionId, bool isModified, bool isWriteable)
-        {
-            _binaryFilePage = page;
-            TransactionId = transactionId;
-            Id = page.Id;
-            Data = page.GetCurrentBuffer(TransactionId);
-            IsDirty = isModified;
-            IsWriteable = isWriteable;
-        }
+    //    public BinaryPageAdapter(BinaryFilePage page, ulong transactionId, bool isModified, bool isWriteable)
+    //    {
+    //        _binaryFilePage = page;
+    //        TransactionId = transactionId;
+    //        Id = page.Id;
+    //        Data = page.GetCurrentBuffer(TransactionId);
+    //        IsDirty = isModified;
+    //        IsWriteable = isWriteable;
+    //    }
 
-        public void SetData(byte[] data, int srcOffset = 0, int pageOffset = 0, int len = -1)
-        {
-            AssertWriteable();
-            Array.ConstrainedCopy(data, srcOffset, Data, pageOffset, len < 0 ? data.Length : len);
-            IsDirty = true;
-        }
+    //    public void SetData(byte[] data, int srcOffset = 0, int pageOffset = 0, int len = -1)
+    //    {
+    //        AssertWriteable();
+    //        Array.ConstrainedCopy(data, srcOffset, Data, pageOffset, len < 0 ? data.Length : len);
+    //        IsDirty = true;
+    //    }
 
-        public long Write(Stream outputStream, ulong transactionId)
-        {
-            AssertWriteable();
-            return _binaryFilePage.Write(outputStream, transactionId);
-        }
+    //    public long Write(Stream outputStream, ulong transactionId)
+    //    {
+    //        AssertWriteable();
+    //        return _binaryFilePage.Write(outputStream, transactionId);
+    //    }
 
-        public long WriteIfModifiedSince(long writeTimestamp, Stream outputStream, ulong transactionId)
-        {
-            AssertWriteable();
-            return _binaryFilePage.Write(outputStream, transactionId);
-        }
+    //    public long WriteIfModifiedSince(long writeTimestamp, Stream outputStream, ulong transactionId)
+    //    {
+    //        AssertWriteable();
+    //        return _binaryFilePage.Write(outputStream, transactionId);
+    //    }
 
-        private void AssertWriteable()
-        {
-            if (!IsWriteable)
-            {
-                throw new InvalidOperationException("Attempt to write to a read-only page");
-            }            
-        }
-    }
+    //    private void AssertWriteable()
+    //    {
+    //        if (!IsWriteable)
+    //        {
+    //            throw new InvalidOperationException("Attempt to write to a read-only page");
+    //        }            
+    //    }
+    //}
 
     //internal class __BinaryPageAdapter : IPage
     //{
