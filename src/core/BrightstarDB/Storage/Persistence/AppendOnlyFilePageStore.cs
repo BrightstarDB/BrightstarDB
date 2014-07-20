@@ -139,18 +139,14 @@ namespace BrightstarDB.Storage.Persistence
                     profiler.Incr("PageCache Miss");
                     using (profiler.Step("Create FilePage"))
                     {
-                        // Lock on stream to prevent attempts to concurrently load a page
-                        lock (_stream)
+                        page = new FilePage(_stream, pageId, _pageSize);
+                        if (_backgroundPageWriter != null)
                         {
-                            page = new FilePage(_stream, pageId, _pageSize);
-                            if (_backgroundPageWriter != null)
-                            {
-                                _backgroundPageWriter.ResetTimestamp(pageId);
-                            }
-#if DEBUG_PAGESTORE
-                            Logging.LogDebug("Load {0} {1}", pageId, BitConverter.ToInt32(page.Data, 0));
-#endif
+                            _backgroundPageWriter.ResetTimestamp(pageId);
                         }
+#if DEBUG_PAGESTORE
+                        Logging.LogDebug("Load {0} {1}", pageId, BitConverter.ToInt32(page.Data, 0));
+#endif
                     }
                     using (profiler.Step("Add FilePage To Cache"))
                     {
