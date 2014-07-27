@@ -293,6 +293,9 @@ namespace BrightstarDB.Storage.Persistence
 
         private void BeforePageCacheEvict(object sender, EvictionEventArgs args)
         {
+            args.CancelEviction = _modifiedPages.ContainsKey(args.PageId);
+            return;
+            /*
             lock (_restartLock) // Ensure we don't try to process page evictions while restarting the background writer
             {
                 if (_modifiedPages.ContainsKey(args.PageId))
@@ -305,6 +308,7 @@ namespace BrightstarDB.Storage.Persistence
                 }
                 // Unmodified pages can just be evicted
             }
+             */
         }
 
         #endregion
