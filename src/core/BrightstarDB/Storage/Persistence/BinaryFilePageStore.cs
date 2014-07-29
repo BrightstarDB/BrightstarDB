@@ -141,7 +141,7 @@ namespace BrightstarDB.Storage.Persistence
             {
                 throw new InvalidOperationException("Cannot create new pages in a read-only store.");
             }
-            var page = new BinaryFilePage(_nextPageId++, _nominalPageSize, _currentReadTxnId + 1);
+            var page = new BinaryFilePage(_nextPageId++, _nominalPageSize, commitId);
             _modifiedPages.AddOrUpdate(page.Id, true, (k, v) => true);
             PageCache.Instance.InsertOrUpdate(_partitionId, page);
             return page;
@@ -156,7 +156,7 @@ namespace BrightstarDB.Storage.Persistence
                     var page = PageCache.Instance.Lookup(_partitionId, pageId) as BinaryFilePage;
                     if (page != null && page.IsDirty)
                     {
-                        _backgroundPageWriter.QueueWrite(page, _currentReadTxnId + 1);
+                        _backgroundPageWriter.QueueWrite(page, commitId);
                     }
                 }
                 _backgroundPageWriter.Flush();
@@ -204,7 +204,7 @@ namespace BrightstarDB.Storage.Persistence
             {
                 return p;
             }
-            p.MakeWriteable(_currentReadTxnId + 1);
+            p.MakeWriteable(commitId);
             return p;
         }
 
