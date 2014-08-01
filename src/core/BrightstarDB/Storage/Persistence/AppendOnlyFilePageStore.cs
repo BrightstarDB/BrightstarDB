@@ -119,29 +119,34 @@ namespace BrightstarDB.Storage.Persistence
                         if (newPage != null) return newPage;
                     }
                 }
-                var page = PageCache.Instance.Lookup(_path, pageId) as FilePage;
+                var page = PageCache.Instance.Lookup(_path, pageId) as IPage;
                 if (page != null)
                 {
                     profiler.Incr("PageCache Hit");
                     return page;
+                }
+                if (_backgroundPageWriter != null)
+                {
+                    // See if the page is currently queued for background write
+                    if (_backgroundPageWriter.TryGetPage(pageId, out page))
+                    {
+                        profiler.Incr("BackgroundWriter Queue Hit");
+                        return page;
+                    }
                 }
                 using (profiler.Step("Load Page"))
                 {
                     profiler.Incr("PageCache Miss");
                     using (profiler.Step("Create FilePage"))
                     {
-                        // Lock on stream to prevent attempts to concurrently load a page
-                        lock (_stream)
+                        page = new FilePage(_stream, pageId, _pageSize);
+                        if (_backgroundPageWriter != null)
                         {
-                            page = new FilePage(_stream, pageId, _pageSize);
-                            if (_backgroundPageWriter != null)
-                            {
-                                _backgroundPageWriter.ResetTimestamp(pageId);
-                            }
-#if DEBUG_PAGESTORE
-                            Logging.LogDebug("Load {0} {1}", pageId, BitConverter.ToInt32(page.Data, 0));
-#endif
+                            _backgroundPageWriter.ResetTimestamp(pageId);
                         }
+#if DEBUG_PAGESTORE
+                        Logging.LogDebug("Load {0} {1}", pageId, BitConverter.ToInt32(page.Data, 0));
+#endif
                     }
                     using (profiler.Step("Add FilePage To Cache"))
                     {

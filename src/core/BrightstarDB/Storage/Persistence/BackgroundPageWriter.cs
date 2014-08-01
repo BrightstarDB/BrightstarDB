@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 #if PORTABLE
@@ -14,16 +13,19 @@ namespace BrightstarDB.Storage.Persistence
 {
     internal class BackgroundPageWriter : IDisposable
     {
-        private readonly ConcurrentQueue<WriteTask> _writeTasks;
+        private readonly ConcurrentQueue<ulong> _writeQueue; 
+        private readonly ConcurrentDictionary<ulong, WriteTask> _writeTasks;
         private bool _shutdownRequested;
         private readonly ConcurrentDictionary<ulong, long> _writeTimestamps;
         private readonly Stream _outputStream;
         private readonly ManualResetEvent _shutdownCompleted;
+        private WriteTask _writing;
 
         public BackgroundPageWriter(Stream outputStream)
         {
             _outputStream = outputStream;
-            _writeTasks = new ConcurrentQueue<WriteTask>();
+            _writeQueue = new ConcurrentQueue<ulong>();
+            _writeTasks = new ConcurrentDictionary<ulong, WriteTask>();
             _shutdownRequested = false;
             _shutdownCompleted = new ManualResetEvent(false);
             _writeTimestamps = new ConcurrentDictionary<ulong, long>();
@@ -41,36 +43,83 @@ namespace BrightstarDB.Storage.Persistence
 #if DEBUG_PAGESTORE
             Logging.LogDebug("Queue {0}", pageToWrite.Id);
 #endif
-            _writeTasks.Enqueue(new WriteTask{PageToWrite = pageToWrite, TransactionId = transactionId});
+            var writeTask = new WriteTask {PageToWrite = pageToWrite, TransactionId = transactionId};
+            _writeTasks.AddOrUpdate(pageToWrite.Id, writeTask, (pageId, task) => writeTask);
+            _writeQueue.Enqueue(pageToWrite.Id);
         }
 
         public void Flush()
         {
-            while(!_writeTasks.IsEmpty)
+            while(!_writeQueue.IsEmpty)
             {
                 _shutdownCompleted.WaitOne(10); // Spin until the queue is empty
             }
             _outputStream.Flush();
         }
 
+        public bool TryGetPage(ulong pageId, out IPage page)
+        {
+            WriteTask writeTask;
+            if (_writeTasks.TryGetValue(pageId, out writeTask))
+            {
+                page = writeTask.PageToWrite;
+                return true;
+            }
+            lock (this)
+            {
+                if (_writing != null && _writing.PageToWrite.Id == pageId)
+                {
+                    page = _writing.PageToWrite;
+                    return true;
+                }
+            }
+            page = null;
+            return false;
+        }
+
         private void Run(object state)
         {
             while (!_shutdownRequested)
             {
-                WriteTask writeTask;
-                if (_writeTasks.TryDequeue(out writeTask))
+                ulong writePageId;
+                if (_writeQueue.TryDequeue(out writePageId))
                 {
-                    try
+#if DEBUG_PAGESTORE
+                    Logging.LogDebug("BackgroundWriter: Next page id in queue: {0}", writePageId);
+#endif
+                    // Retrieve the page write information from the _writeTasks dictionary
+                    WriteTask writeTask;
+                    if (_writeTasks.TryRemove(writePageId, out writeTask))
                     {
-                        long writeTimestamp;
-                        _writeTimestamps.TryGetValue(writeTask.PageToWrite.Id, out writeTimestamp);
-                        _writeTimestamps[writeTask.PageToWrite.Id] =
-                            writeTask.PageToWrite.WriteIfModifiedSince(writeTimestamp, _outputStream,
-                                                                       writeTask.TransactionId);
+                        lock (this)
+                        {
+                            _writing = writeTask;
+                        }
+#if DEBUG_PAGESTORE
+                    Logging.LogDebug("BackgroundWriter: Page {0} found in task dictionary.", writePageId);
+#endif
+                        try
+                        {
+                            _writing.PageToWrite.Write(_outputStream, _writing.TransactionId);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logging.LogError(BrightstarEventId.StoreBackgroundWriteError,
+                                "Error in BackgroundPageWriter: {0}", ex);
+                        }
+                        finally
+                        {
+                            lock (this)
+                            {
+                                _writing = null;
+                            }
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Logging.LogError(BrightstarEventId.StoreBackgroundWriteError, "Error in BackgroundPageWriter: {0}", ex);
+#if DEBUG_PAGESTORE
+                        Logging.LogDebug("BackgroundWriter: Page {0} no longer in task dictionary. Skipping.", writePageId);
+#endif
                     }
                 }
                 else

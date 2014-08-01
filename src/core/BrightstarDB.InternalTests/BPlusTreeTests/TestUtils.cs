@@ -55,7 +55,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                     {
                         return new AppendOnlyFilePageStore(PersistenceManager, fileName, 4096, false, false);
                     }
-                    return new BinaryFilePageStore(PersistenceManager, fileName, 4096, false, 1);
+                    return new BinaryFilePageStore(PersistenceManager, fileName, 4096, false, 1, 2);
                 }
             }
         }
@@ -68,7 +68,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 {
                     return new AppendOnlyFilePageStore(PersistenceManager, fileName, 4096, readOnly, false);
                 }
-                return new BinaryFilePageStore(PersistenceManager, fileName, 4096, readOnly, txnId);
+                return new BinaryFilePageStore(PersistenceManager, fileName, 4096, readOnly, txnId, txnId+1);
             }
         }
 
