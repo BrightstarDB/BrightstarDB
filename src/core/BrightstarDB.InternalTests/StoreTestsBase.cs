@@ -9,6 +9,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
+using BrightstarDB.Storage.Persistence;
 using NUnit.Framework;
 
 namespace BrightstarDB.InternalTests
@@ -974,7 +975,7 @@ namespace BrightstarDB.InternalTests
             var sid = Guid.NewGuid().ToString();
             using (var store = StoreManager.CreateStore(Configuration.StoreLocation + "\\" + sid))
             {
-
+                Assert.AreEqual(1, store.GetCommitPoints().First().CommitNumber);
                 var t = new Triple
                             {
                                 Subject = "http://www.networkedplanet.com/people/10",
@@ -997,6 +998,8 @@ namespace BrightstarDB.InternalTests
 
                 store.Commit(Guid.Empty);
 
+                Assert.AreEqual(2, store.GetCommitPoints().First().CommitNumber);
+
                 t = new Triple
                         {
                             Subject = "http://www.networkedplanet.com/people/10",
@@ -1008,12 +1011,15 @@ namespace BrightstarDB.InternalTests
 
                 store.InsertTriple(t);
                 store.Commit(Guid.Empty);
+                Assert.AreEqual(3, store.GetCommitPoints().First().CommitNumber);
             }
             var storePath = Path.Combine(Configuration.StoreLocation, sid);
             var masterFilePath = Path.Combine(Configuration.StoreLocation, sid, MasterFile.MasterFileName);
 
+
             using (var store = StoreManager.OpenStore(storePath))
             {
+                Assert.AreEqual(3, store.GetCommitPoints().First().CommitNumber);
                 Assert.AreEqual(3, store.GetResourceStatements("http://www.networkedplanet.com/people/10").Count());
             }
 
@@ -1028,6 +1034,7 @@ namespace BrightstarDB.InternalTests
             // open it and should still be at the third commit point (using second copy)
             using (var store = StoreManager.OpenStore(storePath))
             {
+                Assert.AreEqual(3, store.GetCommitPoints().First().CommitNumber);
                 var triples = store.GetResourceStatements("http://www.networkedplanet.com/people/10");
                 Assert.AreEqual(3, triples.Count());
 
@@ -1043,9 +1050,12 @@ namespace BrightstarDB.InternalTests
             }
 
             // Open it now and we will be back to the second commit point
+            // Need to clear the page cache to ensure that in this simple test we don't get an old cached version of the page
+            PageCache.Instance.Clear();
             using (var store = StoreManager.OpenStore(storePath))
             {
-                var triples = store.GetResourceStatements("http://www.networkedplanet.com/people/10");
+                Assert.AreEqual(2, store.GetCommitPoints().First().CommitNumber);
+                var triples = store.GetResourceStatements("http://www.networkedplanet.com/people/10").ToList();
                 Assert.AreEqual(2, triples.Count());
             }
         }

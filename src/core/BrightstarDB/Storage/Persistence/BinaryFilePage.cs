@@ -31,7 +31,11 @@ namespace BrightstarDB.Storage.Persistence
             SecondBuffer = new byte[nominalPageSize-8];
             Array.Copy(pages, nominalPageSize + 8, SecondBuffer, 0, nominalPageSize - 8);
             Data = GetCurrentBuffer(currentTxnId);
-            IsWriteable = isWriteable;
+            Logging.LogDebug("BinaryFilePage: Load {0} [{1}|{2}] @ txn {3}", Id, FirstTransactionId, SecondTransactionId, currentTxnId);
+            if (isWriteable)
+            {
+                MakeWriteable(currentTxnId);
+            }
         }
 
         public BinaryFilePage(ulong pageId, int nominalPageSize, ulong currentTxnId)
@@ -44,6 +48,7 @@ namespace BrightstarDB.Storage.Persistence
             SecondBuffer = new byte[nominalPageSize-8];
             Data = FirstBuffer;
             IsWriteable = true;
+            Logging.LogDebug("BinaryFilePage: Create {0} [{1}|{2}] @ txn {3}", Id, FirstTransactionId, SecondTransactionId, currentTxnId);
         }
 
         public byte[] GetCurrentBuffer(ulong currentTransactionId)
@@ -127,6 +132,8 @@ namespace BrightstarDB.Storage.Persistence
                 Data = destBuffer;
                 IsWriteable = true;
             }
+
+            Logging.LogDebug("BinaryFilePage: MakeWriteable {0} [{1}|{2}] @ writeTxn {3}", Id, FirstTransactionId, SecondTransactionId, writeTransactionId);
         }
 
         public byte[] Data { get; private set; }
@@ -155,6 +162,7 @@ namespace BrightstarDB.Storage.Persistence
                 outputStream.Write(BitConverter.GetBytes(SecondTransactionId), 0, 8);
                 outputStream.Write(SecondBuffer, 0, _nominalPageSize - 8);
                 IsDirty = false;
+                Logging.LogDebug("BinaryFilePage: Write {0} [{1}|{2}] @ txn {3}", Id, FirstTransactionId, SecondTransactionId, currentTransactionId);
                 return 0L;
             }
         }

@@ -31,13 +31,20 @@ namespace BrightstarDB.Storage.Persistence
         /// </summary>
         private readonly string _filePath;
 
-        private readonly string _partitionId;
+        /// <summary>
+        /// The parition in the page cache that holds the pages for this store
+        /// </summary>
+        private string _partitionId;
 
         /// <summary>
-        /// The ID of the current read transaction for this store. The
-        /// write transaction will be this value + 1
+        /// The ID of the current read transaction for this store. 
         /// </summary>
-        private readonly ulong _currentReadTxnId;
+        private ulong _readTxnId;
+
+        /// <summary>
+        /// The ID of the next transaction for this store.
+        /// </summary>
+        private ulong _writeTxnId;
 
         /// <summary>
         /// The stream to use when reading from disk
@@ -63,12 +70,13 @@ namespace BrightstarDB.Storage.Persistence
         private readonly object _restartLock = new object();
 
         public BinaryFilePageStore(IPersistenceManager persistenceManager, string filePath, int pageSize, bool readOnly,
-            ulong currentTransactionId)
+            ulong transactionId, ulong nextTransactionId)
         {
             _persistenceManager = persistenceManager;
             _nominalPageSize = pageSize;
             _filePath = filePath;
-            _currentReadTxnId = currentTransactionId;
+            _readTxnId = transactionId;
+            _writeTxnId = nextTransactionId;
             PageSize = _nominalPageSize - 8;
             CanWrite = !readOnly;
             OpenInputStream();
@@ -80,7 +88,7 @@ namespace BrightstarDB.Storage.Persistence
                 PageCache.Instance.BeforeEvict += BeforePageCacheEvict;
             }
             _modifiedPages = new ConcurrentDictionary<ulong, bool>();
-            _partitionId = filePath + "." + (readOnly ? currentTransactionId : currentTransactionId + 1);
+            UpdatePartitionId();
         }
 
         /// <summary>
@@ -127,8 +135,8 @@ namespace BrightstarDB.Storage.Persistence
                 using (profiler.Step("Load Page"))
                 {
                     page = _modifiedPages.ContainsKey(pageId)
-                        ? new BinaryFilePage(_inputStream, pageId, _nominalPageSize, _currentReadTxnId + 1, true)
-                        : new BinaryFilePage(_inputStream, pageId, _nominalPageSize, _currentReadTxnId, false);
+                        ? new BinaryFilePage(_inputStream, pageId, _nominalPageSize, _writeTxnId, true)
+                        : new BinaryFilePage(_inputStream, pageId, _nominalPageSize, _readTxnId, false);
                     PageCache.Instance.InsertOrUpdate(_partitionId, page);
                     return page;
                 }
@@ -141,7 +149,7 @@ namespace BrightstarDB.Storage.Persistence
             {
                 throw new InvalidOperationException("Cannot create new pages in a read-only store.");
             }
-            var page = new BinaryFilePage(_nextPageId++, _nominalPageSize, commitId);
+            var page = new BinaryFilePage(_nextPageId++, _nominalPageSize, _writeTxnId);
             _modifiedPages.AddOrUpdate(page.Id, true, (k, v) => true);
             PageCache.Instance.InsertOrUpdate(_partitionId, page);
             return page;
@@ -165,6 +173,9 @@ namespace BrightstarDB.Storage.Persistence
                     _backgroundPageWriter.Shutdown();
                     _backgroundPageWriter.Dispose();
                     PageCache.Instance.Clear(_partitionId);
+                    UpdatePartitionId();
+                    _readTxnId = _writeTxnId;
+                    _writeTxnId++;
                     _backgroundPageWriter =
                         new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open));
                 }
@@ -229,7 +240,7 @@ namespace BrightstarDB.Storage.Persistence
         internal void OnPageModified(BinaryFilePage page)
         {
             _modifiedPages.AddOrUpdate(page.Id, true, (k, v) => true);
-            _backgroundPageWriter.QueueWrite(page, _currentReadTxnId+1);
+            _backgroundPageWriter.QueueWrite(page, _writeTxnId);
         }
 
         public void MarkDirty(ulong commitId, ulong pageId)
@@ -314,6 +325,11 @@ namespace BrightstarDB.Storage.Persistence
         #endregion
 
         #region Private methods
+
+        private void UpdatePartitionId()
+        {
+            _partitionId = _filePath + "." + (CanWrite ? _writeTxnId : _readTxnId);
+        }
 
         private void OpenInputStream()
         {
