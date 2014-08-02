@@ -25,6 +25,7 @@ namespace BrightstarDB.EntityFramework
         private readonly IDataObject _propertyType;
         private readonly bool _isInverse;
         private readonly string _propertyTypeUri;
+        private readonly string _itemTypeUri;
 
         /// <summary>
         /// Get the URI identifier of the parent of the collection
@@ -55,6 +56,7 @@ namespace BrightstarDB.EntityFramework
             _parent = parent;
             _propertyTypeUri = propertyType;
             _propertyType = _context.GetDataObject(new Uri(propertyType), false);
+            _itemTypeUri = context.MapTypeToUri(typeof (T));
             _isInverse = isInverse;
         }
 
@@ -277,6 +279,7 @@ namespace BrightstarDB.EntityFramework
             var dataObjects = _isInverse
                                   ? _parent.DataObject.GetInverseOf(_propertyType)
                                   : _parent.DataObject.GetPropertyValues(_propertyType).OfType<IDataObject>();
+            dataObjects = dataObjects.Where(x => x.GetTypes().Contains(_itemTypeUri));
             SetLoadedObjects(dataObjects.Select(_context.Bind<T>).Cast<BrightstarEntityObject>());
         }
 

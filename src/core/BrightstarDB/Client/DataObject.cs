@@ -154,7 +154,8 @@ namespace BrightstarDB.Client
         /// <returns>A list of uri types</returns>
         public IList<string> GetTypes()
         {
-            return this.Triples.Where(t => t.Predicate == TypeDataObject.Identity).Select(t => t.Object).ToList();
+            CheckLoaded();
+            return Triples.Where(t => t.Predicate == TypeDataObject.Identity).Select(t => t.Object).ToList();
         }
 
 

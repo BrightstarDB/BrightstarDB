@@ -120,6 +120,12 @@
     <Compile Include="EntityFramework\DataTypeTests.cs" />
     <Compile Include="EntityFramework\Entity.cs" />
     <Compile Include="EntityFramework\ExtendedContextTests.cs" />
+    <Compile Include="EntityFramework\InversePropertyTests.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IPerformance.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IPhoto.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IProduction.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IProductionMember.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IProductionPerson.cs" />
     <Compile Include="EntityFramework\IStringKeyEntity.cs" />
     <Compile Include="EntityFramework\IBaseEntity.cs" />
     <Compile Include="EntityFramework\IChildKeyEntity.cs" />

@@ -931,11 +931,25 @@ namespace BrightstarDB.EntityFramework
                         {
                             destObject.UpdatePropertyCollection(destProperty.Name, subj, null);
                         }
+                            /* ISSUE #125 - Don't force type coercion when setting inverse properties
+                             * Only update if the data object can be bound to the type of the inverse property
                         else
                         {
                             destObject.UpdatePropertyCollection(destProperty.Name,
                                                                 Bind(subj.DataObject, itemType) as
                                                                 BrightstarEntityObject, null);
+                        }
+                             */
+                        else
+                        {
+                            var itemTypeUri = MapTypeToUri(itemType);
+                            if (subj.DataObject.GetTypes().Contains(itemTypeUri))
+                            {
+                                destObject.UpdatePropertyCollection(
+                                    destProperty.Name,
+                                    Bind(subj.DataObject, itemType) as BrightstarEntityObject,
+                                    null);
+                            }
                         }
                     }
                     else
@@ -946,11 +960,24 @@ namespace BrightstarDB.EntityFramework
                         {
                             destObject.UpdateProperty(destProperty.Name, subj);
                         }
+                            /* ISSUE #125 - Don't force type coercion when setting inverse properties
+                             * Only update if the data object can be bound to the type of the inverse property
                         else
                         {
                             destObject.UpdateProperty(destProperty.Name,
                                                       Bind(subj.DataObject, destProperty.PropertyType) as
                                                       BrightstarEntityObject);
+                        }
+                             */
+                        else
+                        {
+                            var itemTypeUri = MapTypeToUri(destProperty.PropertyType);
+                            if (subj.DataObject.GetTypes().Contains(itemTypeUri))
+                            {
+                                destObject.UpdateProperty(
+                                    destProperty.Name,
+                                    Bind(subj.DataObject, destProperty.PropertyType) as BrightstarEntityObject);
+                            }
                         }
                     }
                 }
