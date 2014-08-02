@@ -51,7 +51,7 @@ namespace BrightstarDB.Rdf
         private static void AppendEscapedLiteral(StringBuilder line, IEnumerable<char> unescapedLiteral, string dataType, string languageCode)
         {
             line.Append("\"");
-            char highSurrogate = '\ud800';
+            //char highSurrogate = '\ud800';
 
             foreach (var c in unescapedLiteral)
             {

@@ -61,10 +61,12 @@ namespace BrightstarDB.Tests
             var storeName = "TestAddQuads_" + DateTime.Now.Ticks;
             var client = BrightstarService.GetClient("type=embedded;storesDirectory=C:\\brightstar");
             client.CreateStore(storeName);
-            var job = client.ExecuteTransaction(storeName, null, null,
-                                      @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .
+            var job = client.ExecuteTransaction(storeName, new UpdateTransactionData
+                {
+                    InsertData = @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .
 <http://np.com/s> <http://np.com/p> <http://np.com/o> .
-");
+"
+                });
             TestHelper.AssertJobCompletesSuccessfully(client, storeName, job);
 
             var result = client.ExecuteQuery(storeName,
@@ -208,10 +210,12 @@ namespace BrightstarDB.Tests
             var storeName = "TestDeleteFromGraph_" + DateTime.Now.Ticks;
             var client = BrightstarService.GetClient("type=embedded;storesDirectory=C:\\brightstar");
             client.CreateStore(storeName);
-            var job = client.ExecuteTransaction(storeName, null, null,
-                                      @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .
+            var job = client.ExecuteTransaction(storeName, new UpdateTransactionData
+                {
+                    InsertData = @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .
 <http://np.com/s> <http://np.com/p> <http://np.com/o> .
-");
+"
+                });
             TestHelper.AssertJobCompletesSuccessfully(client, storeName, job);
 
             var result = client.ExecuteQuery(storeName,
@@ -222,9 +226,12 @@ namespace BrightstarDB.Tests
             var resultRow = resultDoc.SparqlResultRows().First();
             Assert.AreEqual(new Uri("http://np.com/o2"), resultRow.GetColumnValue("o"));
 
-            job = client.ExecuteTransaction(storeName, @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .",
-                                      @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .",
-                                      null);
+            job = client.ExecuteTransaction(storeName, new UpdateTransactionData
+                {
+                    ExistencePreconditions =
+                        @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> .",
+                    DeletePatterns = @"<http://np.com/s> <http://np.com/p> <http://np.com/o2> <http://np.com/g1> ."
+                });
             TestHelper.AssertJobCompletesSuccessfully(client, storeName, job);
             result = client.ExecuteQuery(storeName,
                                 "SELECT ?o FROM <http://np.com/g1> WHERE { <http://np.com/s> <http://np.com/p> ?o }");
