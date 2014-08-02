@@ -187,20 +187,20 @@ namespace BrightstarDB.Server.IntegrationTests
         {
             var client = GetClient();
             var storeName = "ListJobs_" + DateTime.Now.Ticks;
-            var batch1 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource1> .";
-            var batch2 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource2> .";
-            var batch3 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource3> .";
+            const string batch1 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource1> .";
+            const string batch2 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource2> .";
+            const string batch3 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource3> .";
 
 
             // Prepare store with three consecutive commits
             client.CreateStore(storeName);
-            var jobInfo = client.ExecuteTransaction(storeName, null, null, batch1);
+            var jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = batch1});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.That(jobInfo.JobCompletedOk);
-            jobInfo = client.ExecuteTransaction(storeName, null, null, batch2);
+            jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = batch2});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.That(jobInfo.JobCompletedOk);
-            jobInfo = client.ExecuteTransaction(storeName, null, null, batch3);
+            jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = batch3});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.That(jobInfo.JobCompletedOk);
 
@@ -222,20 +222,20 @@ namespace BrightstarDB.Server.IntegrationTests
         {
             var client = GetClient();
             var storeName = "QueryCommitPoint_" + DateTime.Now.Ticks;
-            var batch1 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource1> .";
-            var batch2 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource2> .";
-            var batch3 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource3> .";
+            const string batch1 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource1> .";
+            const string batch2 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource2> .";
+            const string batch3 = @"<http://example.org/resource> <http://example.org/property> <http://example.org/resource3> .";
 
 
             // Prepare store with three consecutive commits
             client.CreateStore(storeName);
-            var jobInfo = client.ExecuteTransaction(storeName, null, null, batch1);
+            var jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = batch1});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.That(jobInfo.JobCompletedOk);
-            jobInfo = client.ExecuteTransaction(storeName, null, null, batch2);
+            jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = batch2});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.That(jobInfo.JobCompletedOk);
-            jobInfo = client.ExecuteTransaction(storeName, null, null, batch3);
+            jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = batch3});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.That(jobInfo.JobCompletedOk);
 
@@ -262,7 +262,7 @@ namespace BrightstarDB.Server.IntegrationTests
         {
             foreach (var insertBatch in insertBatches)
             {
-                var jobInfo = client.ExecuteTransaction(storeName, null, null, insertBatch);
+                var jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = insertBatch});
                 jobInfo = WaitForJob(jobInfo, client, storeName);
                 Assert.That(jobInfo.JobCompletedOk);
             }
@@ -365,10 +365,9 @@ namespace BrightstarDB.Server.IntegrationTests
             var bc = GetClient();
             var storeName = Guid.NewGuid().ToString();
             bc.CreateStore(storeName);
-            var triplesToAdd =
-                @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2> .";
+            const string triplesToAdd = @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2> .";
 
-            var jobInfo = bc.ExecuteTransaction(storeName,"", "", triplesToAdd);
+            var jobInfo = bc.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = triplesToAdd});
 
             Assert.IsNotNull(jobInfo);
 
@@ -386,10 +385,9 @@ namespace BrightstarDB.Server.IntegrationTests
             var bc = GetClient();
             var storeName = Guid.NewGuid().ToString();
             bc.CreateStore(storeName);
-            var triplesToAdd =
-                    @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2>.";
-            
-            var jobInfo = bc.ExecuteTransaction(storeName,"", "", triplesToAdd);
+            const string triplesToAdd = @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2>.";
+
+            var jobInfo = bc.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = triplesToAdd});
 
             Assert.IsNotNull(jobInfo);
 
@@ -401,9 +399,9 @@ namespace BrightstarDB.Server.IntegrationTests
 
             AssertTriplePatternInDefaultGraph(bc, storeName, triplesToAdd);
 
-            var deletePatterns = @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2>.";
+            const string deletePatterns = @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2>.";
 
-            jobInfo = bc.ExecuteTransaction(storeName, "", deletePatterns, "");
+            jobInfo = bc.ExecuteTransaction(storeName, new UpdateTransactionData{DeletePatterns = deletePatterns});
 
             while (!jobInfo.JobCompletedOk && !jobInfo.JobCompletedWithErrors)
             {
@@ -420,10 +418,9 @@ namespace BrightstarDB.Server.IntegrationTests
             var bc = GetClient();
             var storeName = Guid.NewGuid().ToString();
             bc.CreateStore(storeName);
-            var triplesToAdd =
-                    @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2>.";
+            const string triplesToAdd = @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2>.";
 
-            var jobInfo = bc.ExecuteTransaction(storeName, "", "", triplesToAdd);
+            var jobInfo = bc.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = triplesToAdd});
 
             Assert.IsNotNull(jobInfo);
 
@@ -455,7 +452,7 @@ namespace BrightstarDB.Server.IntegrationTests
             triplesToAdd.AppendLine(
                 @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource3> <http://example.org/graph1> .");
 
-            var jobInfo = client.ExecuteTransaction(storeName, "", "", triplesToAdd.ToString());
+            var jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = triplesToAdd.ToString()});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.IsNotNull(jobInfo);
             Assert.IsTrue(jobInfo.JobCompletedOk);
@@ -489,7 +486,8 @@ namespace BrightstarDB.Server.IntegrationTests
             triplesToAdd.AppendLine(
                 @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource4> <http://example.org/graph2> .");
 
-            var jobInfo = client.ExecuteTransaction(storeName, "", "", triplesToAdd.ToString());
+            var jobInfo = client.ExecuteTransaction(storeName,
+                                                    new UpdateTransactionData {InsertData = triplesToAdd.ToString()});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.IsNotNull(jobInfo);
             Assert.IsTrue(jobInfo.JobCompletedOk);
@@ -518,11 +516,10 @@ namespace BrightstarDB.Server.IntegrationTests
             var bc = GetClient();
             var storeName = Guid.NewGuid().ToString();
             bc.CreateStore(storeName);
-            var triplesToAdd =
-                    @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2> .
+            const string triplesToAdd = @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2> .
                       <http://example.org/resource14> <http://example.org/property1> ""30""^^<http://www.w3.org/2001/XMLSchema#integer> . ";
 
-            var jobInfo = bc.ExecuteTransaction(storeName, "", "", triplesToAdd);
+            var jobInfo = bc.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = triplesToAdd});
             jobInfo = WaitForJob(jobInfo, bc, storeName);
             Assert.IsNotNull(jobInfo);
             Assert.IsTrue(jobInfo.JobCompletedOk);
@@ -536,7 +533,7 @@ namespace BrightstarDB.Server.IntegrationTests
             var result = bc.ExecuteQuery(storeName, "select ?p ?o where { <http://example.org/resource13> ?p ?o }");
 
             var doc = XDocument.Load(result);
-            var resultRows = doc.SparqlResultRows();
+            var resultRows = doc.SparqlResultRows().ToList();
 
             Assert.AreEqual(1, resultRows.Count());
 
@@ -554,7 +551,7 @@ namespace BrightstarDB.Server.IntegrationTests
 
             result = bc.ExecuteQuery(storeName, "select ?p ?o where { <http://example.org/resource14> ?p ?o }");
             doc = XDocument.Load(result);
-            resultRows = doc.SparqlResultRows();
+            resultRows = doc.SparqlResultRows().ToList();
 
             Assert.AreEqual(1, resultRows.Count());
 
@@ -585,7 +582,7 @@ INSERT { ?s ?p 'bar' }
 WHERE { ?s ?p 'foo' }";
 
             client.CreateStore(storeName);
-            var jobInfo = client.ExecuteTransaction(storeName, null, null, initialTriples);
+            var jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData=initialTriples});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.That(jobInfo.JobCompletedOk);
 
@@ -611,10 +608,15 @@ WHERE { ?s ?p 'foo' }";
             var bc = GetClient();
             var storeName = Guid.NewGuid().ToString();
             bc.CreateStore(storeName);
-            var triplesToAdd =
-                @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2>.";
+            const string triplesToAdd = @"<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2>.";
 
-            var jobInfo = bc.ExecuteTransaction(storeName, "", null, triplesToAdd);
+            var jobInfo = bc.ExecuteTransaction(storeName,
+                                                new UpdateTransactionData
+                                                    {
+                                                        ExistencePreconditions = "",
+                                                        DeletePatterns = null,
+                                                        InsertData = triplesToAdd
+                                                    });
 
             Assert.IsNotNull(jobInfo);
 
@@ -634,11 +636,10 @@ WHERE { ?s ?p 'foo' }";
         [Test]
         public void TestBadDataGetsUsefulErrorMessage()
         {
-            string sid = null;
             try
             {
                 var bc = GetClient();
-                sid = Guid.NewGuid().ToString();
+                var sid = Guid.NewGuid().ToString();
                 bc.CreateStore(sid);
                 bc.CreateStore(sid);
             } catch (BrightstarClientException ex)
@@ -651,7 +652,7 @@ WHERE { ?s ?p 'foo' }";
         [Test]
         public void TestExportWhileWriting()
         {
-            int firstBatchSize = 50000;
+            const int firstBatchSize = 50000;
             var storeName = Guid.NewGuid().ToString();
             var client = GetClient();
             client.CreateStore(storeName);
@@ -666,14 +667,25 @@ WHERE { ?s ?p 'foo' }";
             p.Parse(new StringReader(batch1), counterSink, Constants.DefaultGraphUri);
             Assert.AreEqual(firstBatchSize, counterSink.Count);
 
-            var jobInfo = client.ExecuteTransaction(storeName, String.Empty, String.Empty, batch1);
+            var jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData
+                {
+                    ExistencePreconditions = String.Empty,
+                    DeletePatterns = String.Empty,
+                    InsertData = batch1
+                });
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
 
             // Second export with parallel store writes
             var exportJobInfo = client.StartExport(storeName, storeName + "_export.nt");
 
-            jobInfo = client.ExecuteTransaction(storeName, null, null, batch2);
+            jobInfo = client.ExecuteTransaction(storeName,
+                                                new UpdateTransactionData
+                                                    {
+                                                        ExistencePreconditions = null,
+                                                        DeletePatterns = null,
+                                                        InsertData = batch2
+                                                    });
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
 
@@ -687,11 +699,11 @@ WHERE { ?s ?p 'foo' }";
                 Assert.Inconclusive("Export job completed before end of first concurrent import job.");
             }
             
-            jobInfo = client.ExecuteTransaction(storeName, null, null, batch3);
+            jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData= batch3});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
 
-            jobInfo = client.ExecuteTransaction(storeName, null, null, batch4);
+            jobInfo = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = batch4});
             jobInfo = WaitForJob(jobInfo, client, storeName);
             Assert.AreEqual(true, jobInfo.JobCompletedOk);
 
@@ -700,14 +712,13 @@ WHERE { ?s ?p 'foo' }";
 
             var exportFile = new FileInfo("c:\\brightstar\\import\\" + storeName + "_export.nt");
             Assert.IsTrue(exportFile.Exists);
-            var lineCount = File.ReadAllLines(exportFile.FullName).Where(x => !String.IsNullOrEmpty(x)).Count();
+            var lineCount = File.ReadAllLines(exportFile.FullName).Count(x => !String.IsNullOrEmpty(x));
             Assert.AreEqual(firstBatchSize, lineCount);
         }
 
         public class CounterTripleSink : ITripleSink
         {
-            private int _count = 0;
-            public int Count { get { return _count; } }
+            public int Count { get; private set; }
 
             #region Implementation of ITripleSink
 
@@ -726,7 +737,7 @@ WHERE { ?s ?p 'foo' }";
             /// <param name="graphUri">The graph URI for the statement</param>
             public void Triple(string subject, bool subjectIsBNode, string predicate, bool predicateIsBNode, string obj, bool objIsBNode, bool objIsLiteral, string dataType, string langCode, string graphUri)
             {
-                _count++;
+                Count++;
             }
 
             /// <summary>
@@ -740,10 +751,10 @@ WHERE { ?s ?p 'foo' }";
             #endregion
         }
 
-        private string MakeTriples(int startId, int endId)
+        private static string MakeTriples(int startId, int endId)
         {
-            StringBuilder triples = new StringBuilder();
-            for(int i = startId; i < endId; i++ )
+            var triples = new StringBuilder();
+            for(var i = startId; i < endId; i++ )
             {
                 triples.AppendFormat("<http://www.example.org/resource/{0}> <http://example.org/value> \"{0}\" .\n",i);
             }
@@ -794,7 +805,7 @@ WHERE { ?s ?p 'foo' }";
 
                 var propValues = testDo.GetPropertyValues("http://xmlns.com/foaf/0.1/name").OfType<PlainLiteral>();
                 Assert.IsNotNull(propValues);
-                Assert.IsTrue(propValues.Count() > 0);
+                Assert.IsTrue(propValues.Any());
 
             }
         }
@@ -837,15 +848,15 @@ WHERE { ?s ?p 'foo' }";
             const string addSet2 = "<http://example.org/people/bob> <http://www.w3.org/2000/01/rdf-schema#label> \"Bob\".";
             const string addSet3 = "<http://example.org/people/carol> <http://www.w3.org/2000/01/rdf-schema#label> \"Carol\".";
             
-            var result = client.ExecuteTransaction(storeName, null, null, addSet1);
+            var result = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = addSet1});
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
             
-            result = client.ExecuteTransaction(storeName, null, null, addSet2);
+            result = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData= addSet2});
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
-            result = client.ExecuteTransaction(storeName, null, null, addSet3);
+            result = client.ExecuteTransaction(storeName, new UpdateTransactionData { InsertData = addSet3 });
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -874,15 +885,15 @@ WHERE { ?s ?p 'foo' }";
             const string addSet1 = "<http://example.org/people/alice> <http://www.w3.org/2000/01/rdf-schema#label> \"Alice\".";
             const string addSet2 = "<http://example.org/people/bob> <http://www.w3.org/2000/01/rdf-schema#label> \"Bob\".";
             const string addSet3 = "<http://example.org/people/carol> <http://www.w3.org/2000/01/rdf-schema#label> \"Carol\".";
-            var result = client.ExecuteTransaction(storeName, null, null, addSet1);
+            var result = client.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = addSet1});
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
-            result = client.ExecuteTransaction(storeName, null, null, addSet2);
+            result = client.ExecuteTransaction(storeName, new UpdateTransactionData { InsertData = addSet2 });
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
-            
-            result = client.ExecuteTransaction(storeName, null, null, addSet3);
+
+            result = client.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = addSet3});
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -915,7 +926,7 @@ WHERE { ?s ?p 'foo' }";
             const string txn1Adds =
                 @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .
 <http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .";
-            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds);
+            var result = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = txn1Adds});
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -934,7 +945,12 @@ WHERE { ?s ?p 'foo' }";
             const string txn1Adds =
     @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .
 <http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .";
-            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds, "http://example.org/graphs/bob");
+            var result = client.ExecuteTransaction(storeName,
+                                                   new UpdateTransactionData
+                                                       {
+                                                           InsertData = txn1Adds,
+                                                           DefaultGraphUri = "http://example.org/graphs/bob"
+                                                       });
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -955,7 +971,8 @@ WHERE { ?s ?p 'foo' }";
             txn1Adds.AppendLine(
                 @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .");
             txn1Adds.AppendLine(@"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
-            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
+            var result = client.ExecuteTransaction(storeName,
+                                                   new UpdateTransactionData {InsertData = txn1Adds.ToString()});
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -967,7 +984,12 @@ WHERE { ?s ?p 'foo' }";
             txn2Adds.AppendLine(@"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice Arnold"" <http://example.org/graphs/alice> .");
             txn2Adds.AppendLine(@"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins"" .");
 
-            result = client.ExecuteTransaction(storeName, txn1Adds.ToString(), txn1Adds.ToString(), txn2Adds.ToString());
+            result = client.ExecuteTransaction(storeName, new UpdateTransactionData
+                {
+                    ExistencePreconditions = txn1Adds.ToString(),
+                    DeletePatterns = txn1Adds.ToString(),
+                    InsertData = txn2Adds.ToString()
+                });
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -988,7 +1010,12 @@ WHERE { ?s ?p 'foo' }";
             const string txn1Adds =
                 @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"" <http://example.org/graphs/alice> .
 <http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .";
-            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds, "http://example.org/graphs/bob");
+            var result = client.ExecuteTransaction(storeName,
+                                                   new UpdateTransactionData
+                                                       {
+                                                           InsertData = txn1Adds,
+                                                           DefaultGraphUri = "http://example.org/graphs/bob"
+                                                       });
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -1002,8 +1029,14 @@ WHERE { ?s ?p 'foo' }";
             const string txn2Adds =
                 @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice Arnold"" <http://example.org/graphs/alice> .
 <http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins"" .";
-            
-            result = client.ExecuteTransaction(storeName, txn1Adds, txn1Adds, txn2Adds, "http://example.org/graphs/bob");
+
+            result = client.ExecuteTransaction(storeName, new UpdateTransactionData
+                {
+                    ExistencePreconditions = txn1Adds,
+                    DeletePatterns = txn1Adds,
+                    InsertData = txn2Adds,
+                    DefaultGraphUri = "http://example.org/graphs/bob"
+                });
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -1013,7 +1046,6 @@ WHERE { ?s ?p 'foo' }";
             AssertTriplePatternInGraph(client, storeName,
                                        @"<http://example.org/people/bob> <http://xmlns.com/foaf/0.1/name> ""Bob Bobbins""",
                                        "http://example.org/graphs/bob");
-
         }
 
 
@@ -1031,7 +1063,7 @@ WHERE { ?s ?p 'foo' }";
             txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
             txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/mbox> ""bob@example.org"" .");
 
-            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
+            var result = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData= txn1Adds.ToString()});
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -1043,7 +1075,8 @@ WHERE { ?s ?p 'foo' }";
 
             var txn2Deletes = new StringBuilder();
             txn2Deletes.AppendFormat(@"<{0}> <http://xmlns.com/foaf/0.1/name> <{0}> <{0}> .", Constants.WildcardUri);
-            result = client.ExecuteTransaction(storeName, null, txn2Deletes.ToString(), null);
+            result = client.ExecuteTransaction(storeName,
+                                               new UpdateTransactionData {DeletePatterns = txn2Deletes.ToString()});
             result = WaitForJob(result, client, storeName);
             Assert.That(result.JobCompletedOk);
 
@@ -1069,7 +1102,8 @@ WHERE { ?s ?p 'foo' }";
             txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/name> ""Bob"" .");
             txn1Adds.AppendLine(@"<http://example.org/bob> <http://xmlns.com/foaf/0.1/mbox> ""bob@example.org"" .");
 
-            var result = client.ExecuteTransaction(storeName, null, null, txn1Adds.ToString());
+            var result = client.ExecuteTransaction(storeName,
+                                                   new UpdateTransactionData {InsertData = txn1Adds.ToString()});
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -1099,15 +1133,15 @@ WHERE { ?s ?p 'foo' }";
             const string addSet1 = "<http://example.org/people/alice> <http://www.w3.org/2000/01/rdf-schema#label> \"Alice\".";
             const string addSet2 = "<http://example.org/people/bob> <http://www.w3.org/2000/01/rdf-schema#label> \"Bob\".";
             const string addSet3 = "<http://example.org/people/carol> <http://www.w3.org/2000/01/rdf-schema#label> \"Carol\".";
-            var result = client.ExecuteTransaction(storeName, null, null, addSet1);
+            var result = client.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = addSet1});
+            result = WaitForJob(result, client, storeName);
+            Assert.IsTrue(result.JobCompletedOk);
+
+            result = client.ExecuteTransaction(storeName, new UpdateTransactionData { InsertData = addSet2 });
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
             
-            result = client.ExecuteTransaction(storeName, null, null, addSet2);
-            result = WaitForJob(result, client, storeName);
-            Assert.IsTrue(result.JobCompletedOk);
-            
-            result = client.ExecuteTransaction(storeName, null, null, addSet3);
+            result = client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = addSet3});
             result = WaitForJob(result, client, storeName);
             Assert.IsTrue(result.JobCompletedOk);
 
@@ -1166,8 +1200,10 @@ WHERE { ?s ?p 'foo' }";
             Assert.That(initialCommitPoints[0], Has.Property("CommitTime"));
             Assert.That(initialCommitPoints[0], Has.Property("JobId"));
 
-            var job = client.ExecuteTransaction(storeName, null, null,
-                                      "<http://example.com/s> <http://example.com/p> <http://example.com/o>");
+            var job = client.ExecuteTransaction(storeName, new UpdateTransactionData
+                {
+                    InsertData = "<http://example.com/s> <http://example.com/p> <http://example.com/o>"
+                });
             job = WaitForJob(job, client, storeName);
             Assert.That(job.JobCompletedOk);
 

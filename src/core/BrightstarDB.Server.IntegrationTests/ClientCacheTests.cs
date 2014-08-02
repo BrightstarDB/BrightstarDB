@@ -50,8 +50,12 @@ namespace BrightstarDB.Server.IntegrationTests
 
             Thread.Sleep(1000); // Allow for resolution of Last-Modified header
 
-            client.ExecuteTransaction(storeName, null, null,
-                                      "<http://example.org/s> <http://example.org/p> <http://example.org/o> .");
+            client.ExecuteTransaction(storeName,
+                                      new UpdateTransactionData
+                                          {
+                                              InsertData =
+                                                  "<http://example.org/s> <http://example.org/p> <http://example.org/o> ."
+                                          });
 
             resultStream = client.ExecuteQuery(storeName, query);
             using (var resultReader = new StreamReader(resultStream))
