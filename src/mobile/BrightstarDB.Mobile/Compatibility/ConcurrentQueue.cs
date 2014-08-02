@@ -24,17 +24,21 @@ namespace BrightstarDB.Mobile.Compatibility
         {
             lock (_queue)
             {
-                try
+                if (_queue != null && _queue.Count > 0)
                 {
-                    item = _queue.Dequeue();
-                    return true;
-                }
-                catch (InvalidOperationException)
-                {
-                    item = default(T);
-                    return false;
+                    try
+                    {
+                        item = _queue.Dequeue();
+                        return true;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // Suppress
+                    }
                 }
             }
+            item = default(T);
+            return false;
         }
 
         public bool IsEmpty
