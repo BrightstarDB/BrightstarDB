@@ -4,6 +4,8 @@ using BrightstarDB.Profiling;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 using Array = BrightstarDB.Portable.Compatibility.Array;
+#elif WINDOWS_PHONE
+using BrightstarDB.Mobile.Compatibility;
 #else
 using System.Collections.Concurrent;
 #endif
@@ -344,7 +346,7 @@ namespace BrightstarDB.Storage.Persistence
                 else
                 {
                     // File not found
-#if PORTABLE
+#if PORTABLE || WINDOWS_PHONE
                     throw new FileNotFoundException(String.Format("Could not find file at {0}", _filePath));
 #else
                     throw new FileNotFoundException("Could not find requested file", _filePath);
