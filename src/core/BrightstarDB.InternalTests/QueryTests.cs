@@ -192,7 +192,12 @@ SELECT ?entry ?sector WHERE {
 
             string nTriples = initialData.ToString();
             //insert the dummy data      
-            client.ExecuteTransaction(storeName, null, null, nTriples, Constants.DefaultGraphUri);
+            client.ExecuteTransaction(storeName,
+                                      new UpdateTransactionData
+                                          {
+                                              InsertData = nTriples,
+                                              DefaultGraphUri = Constants.DefaultGraphUri
+                                          });
 
             //select number of employees with job role = administration
             var result = XDocument.Load(client.ExecuteQuery(storeName, "SELECT count(?employee) as ?ugh WHERE {?employeerecord <http://www.examplevocab.com/schema/departmentEmployeeRole> <http://www.example.com/jobRole/administration> . ?employeerecord <http://www.examplevocab.com/schema/departmentEmployee> ?employee  }  "));

@@ -65,9 +65,9 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                 {
                     var litNode = t.Object as LiteralNode;
                     ntWriter.Triple(
-                        GetNodeString(t.Subject, importId),
+                        GetNodeString(t.Subject),
                         false,
-                        GetNodeString(t.Predicate, importId),
+                        GetNodeString(t.Predicate),
                         false,
                         litNode.Value,
                         false,
@@ -80,11 +80,11 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                 else
                 {
                     ntWriter.Triple(
-                        GetNodeString(t.Subject, importId),
+                        GetNodeString(t.Subject),
                         false,
-                        GetNodeString(t.Predicate, importId),
+                        GetNodeString(t.Predicate),
                         false,
-                        GetNodeString(t.Object, importId),
+                        GetNodeString(t.Object),
                         false,
                         false,
                         null,
@@ -93,11 +93,11 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                         );
                 }
             }
-            _service.ExecuteTransaction(_storeName, null, null, sw.ToString());
+            _service.ExecuteTransaction(_storeName, new UpdateTransactionData{InsertData= sw.ToString()});
             //_store.Commit(Guid.NewGuid());
         }
 
-        private string GetNodeString(INode node, Guid importId)
+        private string GetNodeString(INode node)
         {
             if (node.NodeType == NodeType.Uri)
             {
@@ -116,8 +116,6 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                     _bnodeMappings[bnode.InternalID] = skolemizedUri;
                     return skolemizedUri;
                 }
-
-                //return "_:bnode-" + importId + "-" + (node as BlankNode).InternalID;                
             }
             Assert.Fail("Unexpected node type in GetNodeString: {0}", node.NodeType);
             return null;
