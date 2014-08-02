@@ -21,6 +21,17 @@ namespace BrightstarDB.Portable.Compatibility
             _dict = new Dictionary<TKey, TValue>();
         }
 
+        public IEnumerable<TKey> Keys
+        {
+            get
+            {
+                lock (_dict)
+                {
+                    return _dict.Keys.ToArray();
+                }
+            }
+        }
+ 
         public IEnumerable<TValue> Values
         {
             get

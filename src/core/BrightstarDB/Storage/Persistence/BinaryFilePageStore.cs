@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.IO;
 using BrightstarDB.Profiling;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 using Array = BrightstarDB.Portable.Compatibility.Array;
+#else
+using System.Collections.Concurrent;
 #endif
 
 namespace BrightstarDB.Storage.Persistence
@@ -344,7 +345,7 @@ namespace BrightstarDB.Storage.Persistence
                 {
                     // File not found
 #if PORTABLE
-                    throw new FileNotFoundException(String.Format("Could not find file at {0}", filePath));
+                    throw new FileNotFoundException(String.Format("Could not find file at {0}", _filePath));
 #else
                     throw new FileNotFoundException("Could not find requested file", _filePath);
 #endif
