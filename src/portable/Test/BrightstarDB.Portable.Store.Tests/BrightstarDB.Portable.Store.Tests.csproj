@@ -219,6 +219,6 @@
   </Target>
   -->
   <Target Name="BeforeBuild">
-    <Copy SourceFiles="..\..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="EntityFramework\MyEntityContext.tt" />
+    <Copy SourceFiles="..\..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="EntityFramework\Model\MyEntityContext.tt" />
   </Target>
 </Project>

@@ -1880,6 +1880,51 @@ where {
             }
         }
 
+        [Test]
+        public void TestEntitySetsHelper()
+        {
+            var storeName = "TestEntitySetsHelper" + DateTime.Now.Ticks;
+            string pid;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var p = context.Persons.Create();
+                var b = context.BaseEntities.Create();
+                var d = context.DerivedEntities.Create();
+                context.SaveChanges();
+
+                // Test that we can use the returned entity set for query
+                var personSet = context.EntitySet<IPerson>();
+                Assert.That(personSet, Is.Not.Null);
+                Assert.That(personSet.FirstOrDefault(x=>x.Id.Equals(p.Id)), Is.Not.Null);
+                Assert.That(personSet.FirstOrDefault(x=>x.Id.Equals(b.Id)), Is.Null);
+                Assert.That(personSet.FirstOrDefault(x => x.Id.Equals(d.Id)), Is.Null);
+
+                var baseEntitySet = context.EntitySet<IBaseEntity>();
+                Assert.That(baseEntitySet, Is.Not.Null);
+                Assert.That(baseEntitySet.FirstOrDefault(x => x.Id.Equals(p.Id)), Is.Null);
+                Assert.That(baseEntitySet.FirstOrDefault(x => x.Id.Equals(b.Id)), Is.Not.Null);
+                Assert.That(baseEntitySet.FirstOrDefault(x => x.Id.Equals(d.Id)), Is.Not.Null);
+
+                var derivedEntitySet = context.EntitySet<IDerivedEntity>();
+                Assert.That(derivedEntitySet, Is.Not.Null);
+                Assert.That(derivedEntitySet.FirstOrDefault(x => x.Id.Equals(p.Id)), Is.Null);
+                Assert.That(derivedEntitySet.FirstOrDefault(x => x.Id.Equals(b.Id)), Is.Null);
+                Assert.That(derivedEntitySet.FirstOrDefault(x => x.Id.Equals(d.Id)), Is.Not.Null);
+
+                // Test that we can use the returned entity set for update
+                var p2 = context.EntitySet<IPerson>().Create();
+                p2.Name = "Bob";
+                context.SaveChanges();
+                pid = p2.Id;
+            }
+            using (var context = CreateEntityContext(storeName))
+            {
+                var bob  = context.EntitySet<IPerson>().FirstOrDefault(x => x.Id.Equals(pid));
+                Assert.That(bob, Is.Not.Null);
+                Assert.That(bob.Name, Is.EqualTo("Bob"));
+            }
+        }
+
         MyEntityContext CreateEntityContext(string storeName)
         {
             return new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName);

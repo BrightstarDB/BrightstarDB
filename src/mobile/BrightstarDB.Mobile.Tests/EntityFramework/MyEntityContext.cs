@@ -104,7 +104,7 @@ namespace BrightstarDB.Mobile.Tests.EntityFramework
     
     public partial class Note : BrightstarEntityObject, INote 
     {
-    	public Note(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Note(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Note() : base() { }
     	#region Implementation of BrightstarDB.Mobile.Tests.EntityFramework.INote
     

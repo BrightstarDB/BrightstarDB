@@ -348,7 +348,109 @@ namespace BrightstarDB.Tests.EntityFramework
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IAnimal))) {
+                return (IEntitySet<T>)this.Animals;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IArticle))) {
+                return (IEntitySet<T>)this.Articles;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IBaseEntity))) {
+                return (IEntitySet<T>)this.BaseEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IChildKeyEntity))) {
+                return (IEntitySet<T>)this.ChildKeyEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ICompany))) {
+                return (IEntitySet<T>)this.Companies;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity))) {
+                return (IEntitySet<T>)this.CompositeKeyEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IConcept))) {
+                return (IEntitySet<T>)this.Concepts;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IDBPediaPerson))) {
+                return (IEntitySet<T>)this.DBPediaPersons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IDepartment))) {
+                return (IEntitySet<T>)this.Departments;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IDerivedEntity))) {
+                return (IEntitySet<T>)this.DerivedEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IEntity))) {
+                return (IEntitySet<T>)this.Entities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IFoafAgent))) {
+                return (IEntitySet<T>)this.FoafAgents;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IFoafPerson))) {
+                return (IEntitySet<T>)this.FoafPersons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity))) {
+                return (IEntitySet<T>)this.HierarchicalKeyEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTest))) {
+                return (IEntitySet<T>)this.IdentityClashTests;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1))) {
+                return (IEntitySet<T>)this.IdentityClashTestLevel1s;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2))) {
+                return (IEntitySet<T>)this.IdentityClashTestLevel2s;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IJobRole))) {
+                return (IEntitySet<T>)this.JobRoles;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ILowerKeyEntity))) {
+                return (IEntitySet<T>)this.LowerKeyEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IMarket))) {
+                return (IEntitySet<T>)this.Markets;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IPerformance))) {
+                return (IEntitySet<T>)this.Performances;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IPhoto))) {
+                return (IEntitySet<T>)this.Photos;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IProduction))) {
+                return (IEntitySet<T>)this.Productions;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionMember))) {
+                return (IEntitySet<T>)this.ProductionMembers;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionPerson))) {
+                return (IEntitySet<T>)this.ProductionPersons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IPerson))) {
+                return (IEntitySet<T>)this.Persons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ISession))) {
+                return (IEntitySet<T>)this.Sessions;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IEveningSession))) {
+                return (IEntitySet<T>)this.EveningSessions;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession))) {
+                return (IEntitySet<T>)this.TechnicalEveningSessions;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ISkill))) {
+                return (IEntitySet<T>)this.Skills;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IStringKeyEntity))) {
+                return (IEntitySet<T>)this.StringKeyEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ITrackable))) {
+                return (IEntitySet<T>)this.Trackables;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class MyEntityContext
+        
 }
 namespace BrightstarDB.Tests.EntityFramework 
 {

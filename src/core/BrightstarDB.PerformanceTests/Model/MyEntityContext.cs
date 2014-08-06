@@ -137,14 +137,38 @@ namespace BrightstarDB.PerformanceTests.Model
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.PerformanceTests.Model.IArticle))) {
+                return (IEntitySet<T>)this.Articles;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.PerformanceTests.Model.IDepartment))) {
+                return (IEntitySet<T>)this.Departments;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.PerformanceTests.Model.IJobRole))) {
+                return (IEntitySet<T>)this.JobRoles;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.PerformanceTests.Model.IPerson))) {
+                return (IEntitySet<T>)this.Persons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.PerformanceTests.Model.ISkill))) {
+                return (IEntitySet<T>)this.Skills;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.PerformanceTests.Model.IWebsite))) {
+                return (IEntitySet<T>)this.Websites;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class MyEntityContext
+        
 }
 namespace BrightstarDB.PerformanceTests.Model 
 {
     
     public partial class Article : BrightstarEntityObject, IArticle 
     {
-    	public Article(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Article(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Article() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IArticle
@@ -186,7 +210,7 @@ namespace BrightstarDB.PerformanceTests.Model
     
     public partial class Department : BrightstarEntityObject, IDepartment 
     {
-    	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Department(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IDepartment
@@ -215,7 +239,7 @@ namespace BrightstarDB.PerformanceTests.Model
     
     public partial class JobRole : BrightstarEntityObject, IJobRole 
     {
-    	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public JobRole(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IJobRole
@@ -238,7 +262,7 @@ namespace BrightstarDB.PerformanceTests.Model
     
     public partial class Person : BrightstarEntityObject, IPerson 
     {
-    	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Person(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IPerson
@@ -302,7 +326,7 @@ namespace BrightstarDB.PerformanceTests.Model
     
     public partial class Skill : BrightstarEntityObject, ISkill 
     {
-    	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Skill(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.ISkill
@@ -331,7 +355,7 @@ namespace BrightstarDB.PerformanceTests.Model
     
     public partial class Website : BrightstarEntityObject, IWebsite 
     {
-    	public Website(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Website(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Website() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.PerformanceTests.Model.IWebsite

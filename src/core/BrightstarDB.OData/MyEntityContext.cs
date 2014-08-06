@@ -113,14 +113,29 @@ namespace BrightstarDB.OData
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.IDepartment))) {
+                return (IEntitySet<T>)this.Departments;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.IPerson))) {
+                return (IEntitySet<T>)this.Persons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.ISkill))) {
+                return (IEntitySet<T>)this.Skills;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class MyEntityContext
+        
 }
 namespace BrightstarDB.OData 
 {
     
     public partial class Department : BrightstarEntityObject, IDepartment 
     {
-    	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Department(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.IDepartment
@@ -143,7 +158,7 @@ namespace BrightstarDB.OData
     
     public partial class Person : BrightstarEntityObject, IPerson 
     {
-    	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Person(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.IPerson
@@ -195,7 +210,7 @@ namespace BrightstarDB.OData
     
     public partial class Skill : BrightstarEntityObject, ISkill 
     {
-    	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Skill(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.ISkill

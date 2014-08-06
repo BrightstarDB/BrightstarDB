@@ -147,14 +147,41 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.Server.IntegrationTests.Context.IAnimal))) {
+                return (IEntitySet<T>)this.Animals;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Server.IntegrationTests.Context.IDepartment))) {
+                return (IEntitySet<T>)this.Departments;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Server.IntegrationTests.Context.IFoafAgent))) {
+                return (IEntitySet<T>)this.FoafAgents;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Server.IntegrationTests.Context.IFoafPerson))) {
+                return (IEntitySet<T>)this.FoafPersons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Server.IntegrationTests.Context.IJobRole))) {
+                return (IEntitySet<T>)this.JobRoles;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Server.IntegrationTests.Context.IPerson))) {
+                return (IEntitySet<T>)this.Persons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Server.IntegrationTests.Context.ISkill))) {
+                return (IEntitySet<T>)this.Skills;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class MyEntityContext
+        
 }
 namespace BrightstarDB.Server.IntegrationTests.Context 
 {
     
     public partial class Animal : BrightstarEntityObject, IAnimal 
     {
-    	public Animal(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Animal(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Animal() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IAnimal
@@ -178,7 +205,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     
     public partial class Department : BrightstarEntityObject, IDepartment 
     {
-    	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Department(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IDepartment
@@ -207,7 +234,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     
     public partial class FoafAgent : BrightstarEntityObject, IFoafAgent 
     {
-    	public FoafAgent(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public FoafAgent(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public FoafAgent() : base() { }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IFoafAgent
     	public System.Collections.Generic.ICollection<System.String> MboxSums
@@ -223,7 +250,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     [DisplayName("Person")]
     public partial class FoafPerson : BrightstarEntityObject, IFoafPerson 
     {
-    	public FoafPerson(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public FoafPerson(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public FoafPerson() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IFoafPerson
@@ -286,7 +313,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     
     public partial class JobRole : BrightstarEntityObject, IJobRole 
     {
-    	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public JobRole(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IJobRole
@@ -309,7 +336,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     
     public partial class Person : BrightstarEntityObject, IPerson 
     {
-    	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Person(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.IPerson
@@ -402,7 +429,7 @@ namespace BrightstarDB.Server.IntegrationTests.Context
     
     public partial class Skill : BrightstarEntityObject, ISkill 
     {
-    	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Skill(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Server.IntegrationTests.Context.ISkill

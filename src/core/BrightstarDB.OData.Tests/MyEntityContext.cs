@@ -153,14 +153,44 @@ namespace BrightstarDB.OData.Tests
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.Tests.IArticle))) {
+                return (IEntitySet<T>)this.Articles;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.Tests.ICompany))) {
+                return (IEntitySet<T>)this.Companies;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.Tests.IDataTypeTestEntity))) {
+                return (IEntitySet<T>)this.DataTypeTestEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.Tests.IDepartment))) {
+                return (IEntitySet<T>)this.Departments;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.Tests.IJobRole))) {
+                return (IEntitySet<T>)this.JobRoles;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.Tests.IPerson))) {
+                return (IEntitySet<T>)this.Persons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.Tests.IProject))) {
+                return (IEntitySet<T>)this.Projects;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.OData.Tests.ISkill))) {
+                return (IEntitySet<T>)this.Skills;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class MyEntityContext
+        
 }
 namespace BrightstarDB.OData.Tests 
 {
     
     public partial class Article : BrightstarEntityObject, IArticle 
     {
-    	public Article(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Article(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Article() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IArticle
@@ -190,7 +220,7 @@ namespace BrightstarDB.OData.Tests
     
     public partial class Company : BrightstarEntityObject, ICompany 
     {
-    	public Company(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Company(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Company() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.ICompany
@@ -237,7 +267,7 @@ namespace BrightstarDB.OData.Tests
     
     public partial class DataTypeTestEntity : BrightstarEntityObject, IDataTypeTestEntity 
     {
-    	public DataTypeTestEntity(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public DataTypeTestEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public DataTypeTestEntity() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IDataTypeTestEntity
@@ -451,7 +481,7 @@ namespace BrightstarDB.OData.Tests
     
     public partial class Department : BrightstarEntityObject, IDepartment 
     {
-    	public Department(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Department(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Department() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IDepartment
@@ -486,7 +516,7 @@ namespace BrightstarDB.OData.Tests
     
     public partial class JobRole : BrightstarEntityObject, IJobRole 
     {
-    	public JobRole(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public JobRole(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public JobRole() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IJobRole
@@ -509,7 +539,7 @@ namespace BrightstarDB.OData.Tests
     
     public partial class Person : BrightstarEntityObject, IPerson 
     {
-    	public Person(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Person(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Person() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IPerson
@@ -578,7 +608,7 @@ namespace BrightstarDB.OData.Tests
     
     public partial class Project : BrightstarEntityObject, IProject 
     {
-    	public Project(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Project(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Project() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.IProject
@@ -620,7 +650,7 @@ namespace BrightstarDB.OData.Tests
     
     public partial class Skill : BrightstarEntityObject, ISkill 
     {
-    	public Skill(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+    	public Skill(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     	public Skill() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.OData.Tests.ISkill
