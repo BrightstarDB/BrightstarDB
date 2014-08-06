@@ -25,7 +25,7 @@
         <dependency id="dotNetRDF" version="[1.0.4.3225]" />
       </group>
       <group targetFramework="wp71">
-        <dependency id="dotNetRDF" version="[1.0.4.3225] />
+        <dependency id="dotNetRDF" version="[1.0.4.3225]" />
         <dependency id="SharpSerializer" version="2.18" /> 
       </group>
       <group targetFramework="portable-net45+wp80+win8">
