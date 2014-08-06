@@ -169,7 +169,22 @@ public partial class <#=code.Escape(contextClassName) #> : BrightstarEntityConte
 <#+
 	}
 #>
-}
+    public IEntitySet<T> EntitySet<T>() where T : class {
+        var itemType = typeof(T);
+<#+
+        foreach(var i in helper.GetDecoratedInterfaces()) {
+#>
+        if (typeof(T).Equals(typeof(<#=i.InterfaceFullName#>))) {
+            return (IEntitySet<T>)this.<#= code.Escape(i.PluralizedName) #>;
+        }
+<#+
+        }
+#>
+        throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+    }
+
+    } // end class <#=code.Escape(contextClassName)#>
+    
 <#+
 }
 

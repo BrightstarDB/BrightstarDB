@@ -105,7 +105,19 @@ namespace BrightstarDB.Samples.EntityFramework.ChangeTracking
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.EntityFramework.ChangeTracking.IArticle))) {
+                return (IEntitySet<T>)this.Articles;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.EntityFramework.ChangeTracking.ITrackable))) {
+                return (IEntitySet<T>)this.Trackables;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class MyEntityContext
+        
 }
 namespace BrightstarDB.Samples.EntityFramework.ChangeTracking 
 {

@@ -115,7 +115,19 @@ namespace GettingStarted.DataModel
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(GettingStarted.DataModel.ICategory))) {
+                return (IEntitySet<T>)this.Categories;
+            }
+            if (typeof(T).Equals(typeof(GettingStarted.DataModel.INote))) {
+                return (IEntitySet<T>)this.Notes;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class NotesContext
+        
 }
 namespace GettingStarted.DataModel 
 {

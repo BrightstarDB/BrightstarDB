@@ -105,7 +105,19 @@ namespace BrightstarNotes.DataModel
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarNotes.DataModel.INote))) {
+                return (IEntitySet<T>)this.Notes;
+            }
+            if (typeof(T).Equals(typeof(BrightstarNotes.DataModel.INoteCategory))) {
+                return (IEntitySet<T>)this.NoteCategories;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class NotesContext
+        
 }
 namespace BrightstarNotes.DataModel 
 {

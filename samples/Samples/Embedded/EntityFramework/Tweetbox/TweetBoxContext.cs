@@ -121,7 +121,25 @@ namespace BrightstarDB.Samples.EntityFramework.TweetBox
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.EntityFramework.TweetBox.IHashTag))) {
+                return (IEntitySet<T>)this.HashTags;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.EntityFramework.TweetBox.ISocialNetworkAccount))) {
+                return (IEntitySet<T>)this.SocialNetworkAccounts;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.EntityFramework.TweetBox.ITweet))) {
+                return (IEntitySet<T>)this.Tweets;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.EntityFramework.TweetBox.IUser))) {
+                return (IEntitySet<T>)this.Users;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class TweetBoxContext
+        
 }
 namespace BrightstarDB.Samples.EntityFramework.TweetBox 
 {

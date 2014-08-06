@@ -114,7 +114,22 @@ namespace BrightstarDB.Samples.NerdDinner.Models
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.NerdDinner.Models.IDinner))) {
+                return (IEntitySet<T>)this.Dinners;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.NerdDinner.Models.INerdDinnerLogin))) {
+                return (IEntitySet<T>)this.NerdDinnerLogins;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.NerdDinner.Models.IRSVP))) {
+                return (IEntitySet<T>)this.RSVPs;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class NerdDinnerContext
+        
 }
 namespace BrightstarDB.Samples.NerdDinner.Models 
 {

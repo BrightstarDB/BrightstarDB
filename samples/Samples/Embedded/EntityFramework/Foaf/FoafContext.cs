@@ -97,7 +97,16 @@ namespace BrightstarDB.Samples.EntityFramework.Foaf
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.EntityFramework.Foaf.IPerson))) {
+                return (IEntitySet<T>)this.Persons;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class FoafContext
+        
 }
 namespace BrightstarDB.Samples.EntityFramework.Foaf 
 {

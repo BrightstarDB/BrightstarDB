@@ -105,7 +105,19 @@ namespace BrightstarDB.Samples.EntityFramework.GettingStarted
     		get; private set;
     	}
     	
-    }
+        public IEntitySet<T> EntitySet<T>() where T : class {
+            var itemType = typeof(T);
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.EntityFramework.GettingStarted.IActor))) {
+                return (IEntitySet<T>)this.Actors;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Samples.EntityFramework.GettingStarted.IFilm))) {
+                return (IEntitySet<T>)this.Films;
+            }
+            throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+        }
+    
+        } // end class MyEntityContext
+        
 }
 namespace BrightstarDB.Samples.EntityFramework.GettingStarted 
 {
