@@ -339,28 +339,38 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// </summary>
         /// <param name="jobId"></param>
         public void Consolidate(Guid jobId)
+        
         {
             var storeManager = StoreManagerFactory.GetStoreManager();
             var consolidatePageStore = storeManager.CreateConsolidationStore(DirectoryPath);
             ulong txnId = _currentTxnId + 1;
-            var graphIndexId = _graphIndex.Write(consolidatePageStore, txnId, null);
-            var prefixManagerId = _prefixManager.Write(consolidatePageStore, txnId, null);
-            var resourceIndexId = _resourceIndex.Write(consolidatePageStore, txnId, null);
-            var subjectRelatedResourceIndexId = _subjectRelatedResourceIndex.Write(consolidatePageStore, txnId, null);
-            var objectRelatedResourceIndexId = _objectRelatedResourceIndex.Write(consolidatePageStore, txnId, null);
-            var buff = CreateStoreHeader(graphIndexId, prefixManagerId, resourceIndexId, subjectRelatedResourceIndexId,
-                                         objectRelatedResourceIndexId);
-            var storePage = consolidatePageStore.Create(txnId);
-            storePage.SetData(buff);
-            storePage.SetData(buff, 0, 128);
-            consolidatePageStore.Commit(txnId, null);
-            // Close the stores to allow the rename to happen
-            Close();
-            consolidatePageStore.Close();
-            
+            ulong storePageId;
+            try
+            {
+                var graphIndexId = _graphIndex.Write(consolidatePageStore, txnId, null);
+                var prefixManagerId = _prefixManager.Write(consolidatePageStore, txnId, null);
+                var resourceIndexId = _resourceIndex.Write(consolidatePageStore, txnId, null);
+                var subjectRelatedResourceIndexId = _subjectRelatedResourceIndex.Write(consolidatePageStore, txnId, null);
+                var objectRelatedResourceIndexId = _objectRelatedResourceIndex.Write(consolidatePageStore, txnId, null);
+                var buff = CreateStoreHeader(graphIndexId, prefixManagerId, resourceIndexId,
+                                             subjectRelatedResourceIndexId,
+                                             objectRelatedResourceIndexId);
+                var storePage = consolidatePageStore.Create(txnId);
+                storePage.SetData(buff);
+                storePage.SetData(buff, 0, 128);
+                storePageId = storePage.Id;
+                consolidatePageStore.Commit(txnId, null);
+                // Close the stores to allow the rename to happen
+                Close();
+            }
+            finally
+            {
+                // Ensure we close the store even if an exception was raised occurred 
+                consolidatePageStore.Close();
+            }
             storeManager.ActivateConsolidationStore(DirectoryPath);
             storeManager.GetMasterFile(DirectoryPath).AppendCommitPoint(
-                new CommitPoint(storePage.Id, txnId, DateTime.UtcNow, jobId), true);
+                new CommitPoint(storePageId, txnId, DateTime.UtcNow, jobId), true);
         }
 
         /// <summary>
