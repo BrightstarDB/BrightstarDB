@@ -14,9 +14,8 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX.
 
 ****************************
- BrightstarDB Develop Branch
+ BrightstarDB 1.7 Release
 ****************************
-The following changes are committed to the develop branch to be included in the next release.
 
     - NEW: Added support for non-existence preconditions on transactional updates. This precondition
            fails if one or more of the specified triples already exists in the store prior to executing
@@ -26,6 +25,33 @@ The following changes are committed to the develop branch to be included in the 
            This includes a new type-based unique constraint check for entities with generated or composite keys.
 
     - NEW: RDF/XML is now supported as an export format.
+    
+    - NEW: It is now possible to retrieve an IEntitySet from the Entity Framework context using the EntitySet<T>()
+           method on the context object. Thanks to NZ_Dig for the contribution.
+           
+    - FIX: Fixed the way that the BrightstarDB Entity Framework handles the case where the same RDF property has
+           a domain or range of multiple classes. The collections provided by Entity Framework now filter to 
+           exclude resources which are not of the expected type rather than trying to coerce the resources into
+           the expected type. This leads to more consistent OO behaviour. Thanks to NZ_Dig for the bug report.
+           
+    - FIX: Added guard statements to PCL implementation of ConcurrentQueue<T> to avoid InvalidOperationExceptions
+           being raised and then immediately handled in the case of an empty queue being accessed.
+           
+    - FIX: Major overhaul of the BinaryFilePageStore (the basis of the rewrite store type). This fixes a number of
+           issues found under the PCL build and also introduces support for background writing of page updates
+           to improve update performance. Thanks to CyborgDE for the bug report.
+           
+    - FIX: Replaced polling loop with proper synchronized handling of job status changes in the embedded store
+           implementation. Thanks to CyborgDE for the fix.
+    
+    - FIX: A number of fixes to the JS used in the browser interface to the BrightstarDB server.
+    
+    - FIX: Reinstated logging for the BrightstarDB service.
+    
+    - FIX: Removed dependency on external System.Threading.Tasks DLL
+    
+    - NEW: Jobs are now given a default name if one is not specified when they are created.
+    
     
 ***************************
  BrightstarDB 1.6.2 Release

@@ -199,7 +199,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
         {
             using (profiler.Step("RelatedResourceIndex.Write"))
             {
-                var indexBuilder = new BPlusTreeBuilder(pageStore, Configuration);
+                var targetConfiguration = new BPlusTreeConfiguration(pageStore, Configuration.KeySize,
+                                                                     Configuration.ValueSize, Configuration.PageSize);
+                var indexBuilder = new BPlusTreeBuilder(pageStore, targetConfiguration);
                 return indexBuilder.Build(transactionId, WritePredicateIndexes(pageStore, transactionId, profiler),
                                           profiler);
             }
@@ -210,7 +212,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
             foreach (var entry in EnumeratePredicateIndexes(profiler))
             {
                 var predicateId = entry.Key;
-                var builder = new BPlusTreeBuilder(pageStore, entry.Value.Configuration);
+                var targetConfiguration = new BPlusTreeConfiguration(pageStore, entry.Value.Configuration.KeySize,
+                                                                     entry.Value.Configuration.ValueSize,
+                                                                     entry.Value.Configuration.PageSize);
+                var builder = new BPlusTreeBuilder(pageStore, targetConfiguration);
                 ulong newPredicateIndexId = builder.Build(transactionId, entry.Value.Scan(profiler), profiler);
                 yield return new KeyValuePair<byte[], byte[]>(BitConverter.GetBytes(predicateId), BitConverter.GetBytes(newPredicateIndexId));
             }

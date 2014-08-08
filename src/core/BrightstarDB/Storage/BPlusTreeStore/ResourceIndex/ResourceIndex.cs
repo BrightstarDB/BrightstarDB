@@ -202,7 +202,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore.ResourceIndex
 
         public ulong Write(IPageStore pageStore, ulong  transactionId, BrightstarProfiler profiler)
         {
-            var builder = new BPlusTreeBuilder(pageStore, Configuration);
+            var targetConfiguration = new BPlusTreeConfiguration(pageStore, Configuration.KeySize,
+                                                                 Configuration.ValueSize, Configuration.PageSize);
+            var builder = new BPlusTreeBuilder(pageStore, targetConfiguration);
             return builder.Build(transactionId, Scan(profiler), profiler);
         }
 
