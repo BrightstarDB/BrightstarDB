@@ -27,6 +27,7 @@ namespace BrightstarDB
         public static int StatsUpdateTransactionCount { get { return Instance.StatsUpdateTransactionCount; } set { Instance.StatsUpdateTransactionCount = value; } }
         public static int TransactionFlushTripleCount { get { return Instance.TransactionFlushTripleCount; } set { Instance.TransactionFlushTripleCount = value; } }
         public static PageCachePreloadConfiguration PreloadConfiguration { get { return Instance.PreloadConfiguration; } set { Instance.PreloadConfiguration = value; } }
+        public static bool EnableVirtualizedQueries { get { return Instance.EnableVirtualizedQueries; } set { Instance.EnableVirtualizedQueries = value; } }
     }
 
     public interface IConfigurationProvider
@@ -43,5 +44,7 @@ namespace BrightstarDB
         int TransactionFlushTripleCount { get; set; }
 
         PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+
+        bool EnableVirtualizedQueries { get; set; }
     }
 }

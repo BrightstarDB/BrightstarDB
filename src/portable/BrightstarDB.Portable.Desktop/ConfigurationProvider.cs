@@ -17,6 +17,7 @@ namespace BrightstarDB
         public int StatsUpdateTransactionCount { get; set; }
         public int TransactionFlushTripleCount { get; set; }
         public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public bool EnableVirtualizedQueries { get; set; }
 
         #region AppSetting Property Names
         private const string PageCacheSizePropertyName = "BrightstarDB.PageCacheSize";

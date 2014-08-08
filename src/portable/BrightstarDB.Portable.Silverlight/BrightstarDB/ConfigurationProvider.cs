@@ -15,6 +15,7 @@ namespace BrightstarDB
         public int StatsUpdateTransactionCount { get; set; }
         public int TransactionFlushTripleCount { get; set; }
         public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public bool EnableVirtualizedQueries { get; set; }
 
         private const int DefaultPageCacheSize = 4; // in MB
         private const int DefaultResourceCacheLimit = 1000;

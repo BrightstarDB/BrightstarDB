@@ -29,7 +29,6 @@ namespace BrightstarDB.Tests.EntityFramework
                     "type=sparql;query=http://example.org/sparql;update=http://example.org/update");
             Assert.IsNotNull(doContext);
         }
-#endif
 
         [Test]
         public void TestDeleteWildcards()
@@ -54,5 +53,7 @@ namespace BrightstarDB.Tests.EntityFramework
             mockQueryProcessor.VerifyAll();
             mockUpdateProcessor.VerifyAll();
         }
+#endif
+
     }
 }

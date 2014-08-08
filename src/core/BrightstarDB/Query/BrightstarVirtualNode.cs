@@ -1,5 +1,7 @@
 ﻿using System;
+#if !PORTABLE
 using System.Runtime.Serialization;
+#endif
 using System.Xml;
 using System.Xml.Schema;
 using VDS.RDF;
@@ -486,6 +488,7 @@ namespace BrightstarDB.Query
             return false;
         }
 
+#if !PORTABLE
         /// <summary>
         /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
         /// </summary>
@@ -494,6 +497,7 @@ namespace BrightstarDB.Query
         {
             throw new NotImplementedException();
         }
+#endif
 
         public NodeType NodeType
         {

@@ -17,6 +17,7 @@ namespace BrightstarDB
         public int StatsUpdateTransactionCount { get; set; }
         public int TransactionFlushTripleCount { get; set; }
         public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public bool EnableVirtualizedQueries { get; set; }
 
         private const string TxnFlushTriggerPropertyName = "BrightstarDB.TxnFlushTripleCount";
         private const string ResourceCacheLimitName = "BrightstarDB.ResourceCacheLimit";

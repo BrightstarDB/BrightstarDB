@@ -62,12 +62,6 @@
     <Compile Include="BrightstarDB\Storage\PersistenceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\BrightstarDB.Portable.Profile154\BrightstarDB.Portable_154.csproj">
-      <Project>{f039a0ef-580c-43e7-a7bd-2a733837a8c0}</Project>
-      <Name>BrightstarDB.Portable_154</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
