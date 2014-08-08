@@ -22,37 +22,28 @@
     <!-- delete dlls -->
     <ItemGroup>
       <Net40DllsToDelete Include="SDK\net40\*.dll" />
-      <MobileDllsToDelete Include="SDK\WP71\*.dll"/>
       <Net40DllsToCopy Include="..\installer\InstallerTmp\SDK\Net40\*.dll"/>
-      <MobileDllsToCopy Include="..\installer\InstallerTmp\SDK\WP71\*.dll"/>
     </ItemGroup>
     <Delete Files="@(Net40DllsToDelete)" />
-    <Delete Files="@(MobileDllsToDelete)" />
     <Copy SourceFiles="@(Net40DllsToCopy)" DestinationFolder="SDK\Net40"/>
-    <Copy SourceFiles="@(MobileDllsToCopy)" DestinationFolder="SDK\WP71"/>
   </Target>
   
   <Target Name="CopySdkFiles" DependsOnTargets="BuildSDK">
-    <MakeDir Directories="SDK;SDK\net40;SDK\WP71"/>
+    <MakeDir Directories="SDK;SDK\net40"/>
     
     <!-- delete dlls -->
     <ItemGroup>
       <Net40DllsToDelete Include="SDK\net40\*.dll" />
-      <MobileDllsToDelete Include="SDK\WP71\*.dll"/>
       <TTFile Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt" />
     </ItemGroup>
     <Delete Files="@(Net40DllsToDelete)" />
-    <Delete Files="@(MobileDllsToDelete)" />
 
     <ItemGroup>
       <Net40Dlls Include="$(Net40DllFolder)*.dll"/>
-      <MobileDlls Include="$(MobileDllFolder)*.dll"/>
     </ItemGroup>
 
     <!-- copy dlls -->
     <Copy SourceFiles="@(Net40Dlls)"  DestinationFolder="SDK\net40"  />
-
-	<Copy SourceFiles="@(MobileDlls)" DestinationFolder="SDK\WP71" />
   </Target>
   
   <Target Name="CopyTTFiles">
@@ -97,8 +88,6 @@
 	<MSBuild Projects="samples\Embedded\RDF\RdfClientSamples.sln" Properties="Configuration=$(Configuration)"/>  	
     <MSBuild Projects="samples\Embedded\StoreAdmin\StoreAdministrationSamples.sln" Properties="Configuration=$(Configuration)"/>  
 	<MSBuild Projects="samples\Server\NerdDinner\BrightstarDB.Samples.NerdDinner.sln" Properties="Configuration=$(Configuration)"/>  
-	<MSBuild Projects="samples\WP7\WindowsPhone7Samples.sln" Properties="Configuration=$(Configuration)"/>
-	<MSBuild Projects="samples\WP8\WindowsPhone8Samples.sln" Properties="Configuration=$(Configuration)"/>
   </Target>
 
   <Target Name="Package">
