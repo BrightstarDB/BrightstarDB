@@ -14,16 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <MobileSamples Include="..\samples\Samples\WP*\**\*.*" 
-                   Exclude="..\samples\**\.svn\**\*.*;
-			..\samples\**\bin\**\*.*;
-			..\samples\**\obj\**\*.*;
-			..\samples\**\_ReSharper.*\**\*.*;
-			..\samples\**\*.suo;
-			..\samples\**\*.user;
-			..\samples\**\OData\**\*.*;
-			..\samples\Samples\**\Debug*.*"/>
-    
     <EmbeddedSamples Include="..\samples\Samples\Embedded\**\*.*"
                     Exclude="..\samples\**\.svn\**\*.*;
 			..\samples\**\bin\**\*.*;
@@ -49,11 +39,6 @@
 	<MSBuild Projects="..\src\core\core.sln"
 			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
 			 Targets="Clean;Build"/>
-  </Target>
-
-  <Target Name="BuildWP71">
-    <MSBuild Projects="..\src\mobile\BrightstarDB.Mobile\BrightstarDB.Mobile.csproj" 
-	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" Targets="Clean;Build"/>
   </Target>
 
   <Target Name="BuildDocs" Condition=" '$(NoDocs)' == 'False' ">
@@ -83,7 +68,7 @@
     <Copy SourceFiles="@(SdkFiles)" DestinationFolder="..\samples\SDK\%(RecursiveDir)"/>
   </Target>
   
-  <Target Name="Prepare" DependsOnTargets="Version;BuildNet40;BuildWP71;BuildVisualStudio;BuildPolaris;BuildDocs">
+  <Target Name="Prepare" DependsOnTargets="Version;BuildNet40;BuildVisualStudio;BuildPolaris;BuildDocs">
     <ItemGroup>
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <Net40Dep Include="..\src\lib\unused_dependencies\*.dll;..\src\lib\Remotion.Linq.dll" />
@@ -109,6 +94,8 @@
       
       <Samples Include="..\samples\Samples\**\*.*"
                Exclude="..\samples\**\.svn\**\*.*;
+               ..\samples\Samples\WP7\**\*.*;
+               ..\samples\Samples\WP8\**\*.*;
 			..\samples\**\bin\**\*.*;
 			..\samples\**\obj\**\*.*;
 			..\samples\**\_ReSharper.*\**\*.*;
@@ -122,7 +109,6 @@
 
     <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\SDK\NET40"/>
     <Copy SourceFiles="@(Net40Dep)" DestinationFolder="InstallerTmp\SDK\NET40"/>
-    <Copy SourceFiles="@(WP71Sdk)" DestinationFolder="InstallerTmp\SDK\WP71"/>
     <Copy SourceFiles="@(Docs)" DestinationFolder="InstallerTmp\Docs"/>
     <Copy SourceFiles="@(VisualStudio)" DestinationFolder="InstallerTmp\VisualStudio"/>
     <Copy SourceFiles="@(Root)" DestinationFolder="InstallerTmp"/>
@@ -139,13 +125,12 @@
     <Copy SourceFiles="@(AspNetServerConfig)" DestinationFolder="InstallerTmp\Webapp" />
   </Target>
 
-  <Target Name="PrepareSdk" DependsOnTargets="Version;BuildNet40;BuildWP71">
+  <Target Name="PrepareSdk" DependsOnTargets="Version;BuildNet40">
     <ItemGroup>
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <WP71Sdk Include="..\src\mobile\BrightstarDB.Mobile\bin\$(Configuration)\*.dll"/>
     </ItemGroup>
     <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\SDK\NET40"/>
-    <Copy SourceFiles="@(WP71Sdk)" DestinationFolder="InstallerTmp\SDK\WP71"/>
   </Target>
 
   <Target Name="CleanInstallerTmp">
@@ -234,11 +219,8 @@
         <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
 		<PlatformNuspecTemplate Include="nuget\BrightstarDB.Platform.nuspec.template"/>
         <Net40Libs Include="InstallerTmp\SDK\Net40\BrightstarDB.dll;InstallerTmp\SDK\Net40\Remotion.Linq.dll" />
-        <WP71Libs Include="InstallerTmp\SDK\WP71\BrightstarDB.Mobile.dll" />
-		<WP8Libs Include="InstallerTmp\SDK\WP71\BrightstarDB.Mobile.dll" />
         <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
 		<Portable158Libs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\BrightstarDB.Portable.dll" />
-		<Portable154Libs Include="..\src\portable\BrightstarDB.Portable.Profile154\bin\$(Configuration)\BrightstarDB.Portable.dll" />
 		<PortableDesktop Include="..\src\portable\BrightstarDB.Portable.Desktop\bin\$(Configuration)\BrightstarDB.Portable.Desktop.dll" />
 		<PortablePhone Include="..\src\portable\BrightstarDB.Portable.Phone\bin\$(Configuration)\BrightstarDB.Portable.Phone.dll"/>
 		<PortableSilverlight Include="..\src\portable\BrightstarDB.Portable.Silverlight\bin\$(Configuration)\BrightstarDB.Portable.Silverlight.dll"/>
@@ -279,9 +261,6 @@
 
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net45"/>
-    <Copy SourceFiles="@(WP71Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\wp71"/>
-	<Copy SourceFiles="@(WP8Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\windowsphone8" />
-	<Copy SourceFiles="@(Portable154Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+wp80+sl4+win8" />
     <Copy SourceFiles="@(Portable158Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+wp80+sl5+win8+MonoAndroid10+MonoTouch10" />
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs" />
     
@@ -291,7 +270,6 @@
 	<Copy SourceFiles="@(PortableDesktop)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\net45" />
 	<Copy SourceFiles="@(PortablePhone)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\wp80" />
 	<Copy SourceFiles="@(PortableSilverlight)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl5" />
-    <Copy SourceFiles="@(PortableSilverlight4)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl4" />
 	<Copy SourceFiles="@(PortableStore)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\win8" />
     <Copy SourceFiles="@(PortableAndroid)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoAndroid" />
 	
