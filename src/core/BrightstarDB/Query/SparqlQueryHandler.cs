@@ -7,6 +7,7 @@ using BrightstarDB.Update;
 using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
+using VDS.RDF.Query.Datasets;
 
 namespace BrightstarDB.Query
 {
@@ -47,13 +48,22 @@ namespace BrightstarDB.Query
             }
         }
 
+        private static ISparqlDataset MakeDataset(IStore store)
+        {
+            if (Configuration.EnableVirtualizedQueries)
+            {
+                return new VirtualizingSparqlDataset(store);
+            }
+            return new StoreSparqlDataset(store);
+        }
+
         public BrightstarSparqlResultsType ExecuteSparql(SparqlQuery query, IStore store, TextWriter resultsWriter)
         {
             try
             {
                 EnsureValidResultFormat(query);
 
-                var dataset = new StoreSparqlDataset(store);
+                var dataset = MakeDataset(store);
                 if (_defaultGraphUris != null)
                 {
                     dataset.SetDefaultGraph(_defaultGraphUris);
@@ -142,7 +152,7 @@ namespace BrightstarDB.Query
             try
             {
                 var query = ParseSparql(sparqlQuery);
-                var dataset = new StoreSparqlDataset(store);
+                var dataset = MakeDataset(store);
                 if (_defaultGraphUris != null)
                 {
                     dataset.SetDefaultGraph(_defaultGraphUris);
@@ -164,7 +174,7 @@ namespace BrightstarDB.Query
         {
             try
             {
-                var dataset = new StoreSparqlDataset(store);
+                var dataset = MakeDataset(store);
                 if (_defaultGraphUris != null)
                 {
                     dataset.SetDefaultGraph(_defaultGraphUris);

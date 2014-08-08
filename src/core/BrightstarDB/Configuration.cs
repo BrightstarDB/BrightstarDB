@@ -284,6 +284,12 @@ namespace BrightstarDB
         /// </summary>
         public static PageCachePreloadConfiguration PreloadConfiguration { get; set; }
 
+        /// <summary>
+        /// Set this property to true to enable the use of virtual nodes in SPARQL
+        /// queries. This an experimental option that may improve query performance.
+        /// </summary>
+        public static bool EnableVirtualizedQueries { get; set; }
+
 #if !PORTABLE
         private static ICache GetQueryCache()
         {
