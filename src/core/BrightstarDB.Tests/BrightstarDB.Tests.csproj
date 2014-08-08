@@ -168,6 +168,7 @@
     <Compile Include="EntityFramework\StringComparisonTests.cs" />
     <Compile Include="EntityFramework\UniqueKeyConstraintTests.cs" />
     <Compile Include="NamespaceDeclarationTests.cs" />
+    <Compile Include="RdfDatatypesTests.cs" />
     <Compile Include="SparqlQueryHelperTests.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="GraphTests.cs" />
