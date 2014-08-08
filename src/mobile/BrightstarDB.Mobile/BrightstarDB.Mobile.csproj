@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1ACF579F-514E-42FF-96FD-7F7DA260B5A9}</ProjectGuid>
+    <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BrightstarDB</RootNamespace>
+    <AssemblyName>BrightstarDB.Mobile</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <TargetFrameworkProfile>WindowsPhone71</TargetFrameworkProfile>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightApplication>false</SilverlightApplication>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT;WINDOWS_PHONE</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="dotNetRDF, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\sl4-wp\dotNetRDF.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Phone" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Polenter.SharpSerializer.Silverlight, Version=2.18.0.0, Culture=neutral, PublicKeyToken=8f4f20011571ee5f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\SharpSerializer.2.18\lib\sl4-windowsphone71\Polenter.SharpSerializer.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Net" />
+    <Reference Include="mscorlib.extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="VDS.Common, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\VDS.Common.1.2.0\lib\sl4-wp\VDS.Common.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\core\BrightstarDB\Strings.Designer.cs">
+      <Link>BrightstarDB\Strings.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="BrightstarDB\MobileInternals.cs" />
+    <Compile Include="BrightstarDB\SmartAssembly.Attributes.cs" />
+    <Compile Include="Compatibility\ConcurrentDictionary.cs" />
+    <Compile Include="Compatibility\ConcurrentQueue.cs" />
+    <Compile Include="MD5.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BrightstarDB\SilverlightCollectionExtensions.cs" />
+    <Compile Include="BrightstarDB\Tuple.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\core\BrightStarDB\**\*.cs" Exclude="..\..\core\BrightStarDB\OData\**\*.cs;..\..\core\BrightstarDB\Client\BrightstarRestClient.cs;..\..\core\BrightstarDB\Client\Rest*.cs;..\..\core\BrightstarDB\Test\**\*.cs;..\..\core\BrightstarDB\Server\HttpServer.cs;..\..\core\BrightstarDB\Storage\FileStoreManager.cs;..\..\core\BrightstarDB\Storage\FileBlockProvider.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Properties\**\*.cs;&#xD;&#xA;        ..\..\core\BrightstarDB\Analysis\**\*.cs;..\..\core\BrightstarDB\Client\RestDataObjectContext.cs;..\..\core\BrightstarDB\Dynamic\**\*.cs;..\..\core\BrightstarDB\Storage\Persistence\BinaryPageStore.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\SingleVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\TwoVarCollapseGroup.cs;&#xD;&#xA;	..\..\core\BrightstarDB\Query\Processor\ThreeVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\AccumulatorBase.cs;..\..\core\BrightstarDB\Query\Processor\Accumulator.cs;..\..\core\BrightstarDB\Query\Processor\VirtualizingAccumulator.cs;..\..\core\BrightstarDB\Strings.Designer.cs">
+      <Link>BrightstarDB\%(recursivedir)\%(filename)</Link>
+    </Compile>
+    <Compile Include="..\relinq\**\*.cs" Exclude="..\relinq\Properties\AssemblyInfo.cs;..\relinq\RelinqCore\Properties\AssemblyInfo.cs">
+      <Link>%(recursivedir)\%(filename)</Link>
+    </Compile>
+    <Compile Include="..\..\..\licensing\BrightstarDB.LicenseValidation\**\*.cs" Exclude="..\..\..\licensing\BrightstarDB.LicenseValidation\Properties\*.cs;..\..\..\licensing\BrightstarDB.LicenseValidation\ActivationClient.cs">
+      <Link>BrightstarDB\Licensing\%(recursivedir)\%(filename)</Link>
+    </Compile>
+    <EmbeddedResource Include="..\..\core\BrightstarDB\Strings.resx">
+      <Link>BrightstarDB\Strings.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <ProjectExtensions />
+  <Import Project="..\..\..\common.proj" />
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
+    <AssemblyTitle>BrightstarDB Mobile Core Assembly</AssemblyTitle>
+  </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <CallTarget Targets="GenerateAssemblyInfo" />
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+</Project>
