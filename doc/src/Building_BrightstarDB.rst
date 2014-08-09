@@ -22,11 +22,6 @@ Before you can build BrightstarDB you need to install the following tools.
         
         *TBD: Check what can be built with VS 2012 Express*
         
-    #.  **Windows Phone SDK**
-		
-        This is required only to build the mobile solution that targets Windows Phone 7 and 8.
-        Get the Windows Phone SDK from htpp://dev.windowsphone.com/
-		
     #.  **MSBuild Community Tasks**
         
         You must install this from the MSI installer which can be found at

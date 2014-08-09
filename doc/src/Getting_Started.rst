@@ -93,12 +93,6 @@ To work programmatically with RDF, SPARQL, and SPARQL see update the
 :ref:`RDF Client API <RDF_Client_API>` and :ref:`SPARQL Endpoint 
 <SPARQL_Endpoint>` sections. 
 
-**Mobile Applications**
-
-If you are building apps for Windows Phone devices, there is 
-some additional information on this in the :ref:`Developing for Windows Phone 
-<Developing_for_Windows_Phone>` section.
-
 **Portable Class Library and Windows Store**
 
 If you are building a Windows Store application you can now make use of the

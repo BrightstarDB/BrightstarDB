@@ -43,7 +43,6 @@ moment to read about Running the BrightstarDB Samples first.
 	Dynamic API <Dynamic_API>
     RDF Client API <RDF_Client_API>
     Admin API <Admin_API>
-	Developing For Windows Phone <Developing_for_Windows_Phone>
 	Developing Portable Apps <Developing_Portable_Apps>
     Connecting to Other Stores <Other_Stores>
     API Documentation <API_Documentation>

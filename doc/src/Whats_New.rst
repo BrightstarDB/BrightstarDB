@@ -17,6 +17,17 @@ marked with FIX.
  BrightstarDB 1.7 Release
 ****************************
 
+    - BREAKING: BrightstarDB no longer supports Windows Phone 7 development. Due to changes in the
+                libraries that we use there is now only a Portable Class Library build available 
+                which targets .NET 4.5, Windows Phone 8, Silverlight 5, Windows Store apps and
+                Android. iOS support is in the pipeline.
+                
+    - NEW: EXPERIMENTAL support has been added for using DotNetRDFs virtual nodes query facility.
+           This feature can improve query performance by reducing the number of times that RDF
+           resource values need to be looked up. There are still some bugs left to be ironed out
+           in this feature so it should not be used in production. To enable this feature set
+           BrightstarDB.Configuration.EnableVirtualizedQueries to true.
+           
     - NEW: Added support for non-existence preconditions on transactional updates. This precondition
            fails if one or more of the specified triples already exists in the store prior to executing
            the update. See :ref:`RDF_Transactional_Update`.
