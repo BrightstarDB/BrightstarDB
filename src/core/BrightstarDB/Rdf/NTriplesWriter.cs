@@ -51,7 +51,9 @@ namespace BrightstarDB.Rdf
         private static void AppendEscapedLiteral(StringBuilder line, IEnumerable<char> unescapedLiteral, string dataType, string languageCode)
         {
             line.Append("\"");
-            char highSurrogate = '\ud800';
+#if !(SILVERLIGHT||PORTABLE)
+            var  highSurrogate = '\ud800';
+#endif
 
             foreach (var c in unescapedLiteral)
             {
@@ -160,6 +162,14 @@ namespace BrightstarDB.Rdf
             }
             line.Append(" .");
             _writer.WriteLine(line.ToString());
+        }
+
+        /// <summary>
+        /// Method invoked to indicate that no more triples remain to be written to the sink.
+        /// </summary>
+        public void Close()
+        {
+            // No op
         }
 
         #endregion

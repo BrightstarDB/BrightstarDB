@@ -135,6 +135,11 @@ namespace BrightstarDB.InternalTests
                 // no op
             }
 
+            public void Close()
+            {
+                // no op
+            }
+
             public void BNode(string bnodeId, string bnodeUri)
             {
                 // no op
@@ -165,7 +170,10 @@ namespace BrightstarDB.InternalTests
                     });
             }
 
-
+            public void Close()
+            {
+                // No-op
+            }
         }
     }
 }

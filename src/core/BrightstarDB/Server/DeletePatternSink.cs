@@ -76,6 +76,11 @@ namespace BrightstarDB.Server
             }
         }
 
+        public void Close()
+        {
+            // No-op
+        }
+
         public void BNode(string bnodeId, string bnodeUri)
         {
             return;

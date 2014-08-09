@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using BrightstarDB.Dto;
 
 namespace BrightstarDB.Server
@@ -22,5 +23,10 @@ namespace BrightstarDB.Server
         /// Get or set the Date/Time when the job completed processing
         /// </summary>
         public DateTime Ended { get; set; }
+
+        /// <summary>
+        /// Used to signal completion of the job
+        /// </summary>
+        public AutoResetEvent WaitEvent { get; set; }
     }
 }

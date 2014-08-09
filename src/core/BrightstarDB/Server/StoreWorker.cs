@@ -155,6 +155,7 @@ namespace BrightstarDB.Server
                                 jobExecutionStatus.Information = "Job Completed";
                                 jobExecutionStatus.Ended = DateTime.UtcNow;
                                 jobExecutionStatus.JobStatus = JobStatus.CompletedOk;
+                                jobExecutionStatus.WaitEvent.Set();
                             }
                             catch (Exception ex)
                             {
@@ -165,6 +166,7 @@ namespace BrightstarDB.Server
                                 jobExecutionStatus.Ended = DateTime.UtcNow;
                                 jobExecutionStatus.ExceptionDetail = GetExceptionDetail(ex);
                                 jobExecutionStatus.JobStatus = JobStatus.TransactionError;
+                                jobExecutionStatus.WaitEvent.Set();
                             }
                             finally
                             {
@@ -299,8 +301,16 @@ namespace BrightstarDB.Server
             while (!queuedJob)
             {
                 if (
-                    _jobExecutionStatus.TryAdd(job.JobId.ToString(),
-                                               new JobExecutionStatus {JobId = job.JobId, JobStatus = JobStatus.Pending, Queued = DateTime.UtcNow, Label = job.Label}))
+                    _jobExecutionStatus.TryAdd(
+                        job.JobId.ToString(),
+                        new JobExecutionStatus
+                            {
+                                JobId = job.JobId,
+                                JobStatus = JobStatus.Pending,
+                                Queued = DateTime.UtcNow,
+                                Label = job.Label,
+                                WaitEvent = new AutoResetEvent(false)
+                            }))
                 {
                     _jobs.Enqueue(job);
                     queuedJob = true;
@@ -309,6 +319,7 @@ namespace BrightstarDB.Server
                 }
             }
         }
+
 
         /// <summary>
         /// Queue a txn job.
@@ -344,7 +355,7 @@ namespace BrightstarDB.Server
         {
             Logging.LogDebug("Export {0}, {1}, {2}", fileName, graphUri, exportFormat.DefaultExtension);
             var jobId = Guid.NewGuid();
-            var exportJob = new ExportJob(jobId, jobLabel, this, fileName, graphUri, RdfFormat.NQuads);
+            var exportJob = new ExportJob(jobId, jobLabel, this, fileName, graphUri, exportFormat);
             _jobExecutionStatus.TryAdd(jobId.ToString(),
                                        new JobExecutionStatus
                                            {
@@ -352,7 +363,8 @@ namespace BrightstarDB.Server
                                                JobStatus = JobStatus.Started,
                                                Queued = DateTime.UtcNow,
                                                Started = DateTime.UtcNow,
-                                               Label = jobLabel
+                                               Label = jobLabel,
+                                               WaitEvent = new AutoResetEvent(false)
                                            });
             exportJob.Run((id, ex) =>
                               {
@@ -363,6 +375,7 @@ namespace BrightstarDB.Server
                                       jobExecutionStatus.ExceptionDetail = GetExceptionDetail(ex);
                                       jobExecutionStatus.JobStatus = JobStatus.TransactionError;
                                       jobExecutionStatus.Ended = DateTime.UtcNow;
+                                      jobExecutionStatus.WaitEvent.Set();
                                   }
                               },
                           id =>
@@ -373,6 +386,7 @@ namespace BrightstarDB.Server
                                       jobExecutionStatus.Information = "Export completed";
                                       jobExecutionStatus.JobStatus = JobStatus.CompletedOk;
                                       jobExecutionStatus.Ended = DateTime.UtcNow;
+                                      jobExecutionStatus.WaitEvent.Set();
                                   }
                               });
             return jobId;
@@ -471,5 +485,19 @@ namespace BrightstarDB.Server
             }
         }
 
+        /// <summary>
+        /// Preload index and resource pages for this store
+        /// </summary>
+        /// <param name="pageCacheRatio">The fractional amount of the number of available cache pages to use in the preload</param>
+        public void WarmupStore(decimal pageCacheRatio)
+        {
+            if (pageCacheRatio > 1.0m) pageCacheRatio = 1.0m;
+#if PORTABLE || WINDOWS_PHONE
+            var pagesToPreload = (int)Math.Floor(PageCache.Instance.FreePages * (float)pageCacheRatio);
+#else
+            var pagesToPreload = (int)Math.Floor(PageCache.Instance.FreePages*pageCacheRatio);
+#endif
+            ReadStore.WarmupPageCache(pagesToPreload);
+        }
     }
 }

@@ -130,5 +130,16 @@ namespace BrightstarDB
             }
             return null;
         }
+
+        /// <summary>
+        /// Returns true, if this instance has at least one media type string that matches
+        /// one of the media type strings of <paramref name="other"/>
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool MatchesMediaType(RdfFormat other)
+        {
+            return this.MediaTypes.Any(x => other.MediaTypes.Contains(x));
+        }
     }
 }

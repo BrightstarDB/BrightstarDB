@@ -60,6 +60,33 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(50L, checkEntity.SomeLong);          
         }
 
+        [Test]
+        public void TestIssue128CannotSetFloatValueBelow1()
+        {
+            // Create an entity
+            var entity = _myEntityContext.Entities.Create();
+            // Set the properties that allow fractional values to values < 1.0
+            entity.SomeDecimal = 0.14m;
+            entity.SomeDouble = 0.14;
+            entity.SomeFloat = 0.14F;
+            // Persist the changes
+            _myEntityContext.SaveChanges();
+            var entityId = entity.Id;
+
+            // Create a new context connection so that we don't get a locally cached value from the context
+            var newContext = new MyEntityContext(_connectionString);
+            // Retrieve the previously created entity
+            var checkEntity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+
+            // Assert that the entity was found and the values we set are set to the values we originally provided
+            Assert.IsNotNull(checkEntity);
+            Assert.IsNotNull(checkEntity.SomeDecimal);
+            Assert.IsNotNull(checkEntity.SomeDouble);
+            Assert.IsNotNull(checkEntity.SomeFloat);
+            Assert.AreEqual(0.14m, checkEntity.SomeDecimal);
+            Assert.AreEqual(0.14, checkEntity.SomeDouble);
+            Assert.AreEqual(0.14F, checkEntity.SomeFloat);
+        }
 
         [Test]
         public void TestCreateAndSetCollections()

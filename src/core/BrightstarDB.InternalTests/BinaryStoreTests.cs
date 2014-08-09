@@ -248,7 +248,6 @@ namespace BrightstarDB.InternalTests
         [Test]
         public override void TestBatchedInsertsRepeatable()
         {
-            Logging.EnableConsoleOutput(true);
             base.TestBatchedInsertsRepeatable();
         }
 

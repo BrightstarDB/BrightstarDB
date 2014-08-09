@@ -266,7 +266,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             var insertIndex = Search(key);
             if (insertIndex >= 0)
             {
-                throw new DuplicateKeyException();
+                throw new DuplicateKeyException(this.PageId);
             }
 
             EnsureWriteable(txnId);

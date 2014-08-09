@@ -60,7 +60,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Compatibility\Converter.cs" />
     <Compile Include="Compatibility\FileMode.cs" />
-    <Compile Include="..\..\mobile\BrightstarDB.Mobile\MD5.cs" />
+    <Compile Include="Compatibility\MD5.cs" />
     <Compile Include="..\..\core\BrightStarDB\**\*.cs" Exclude="..\..\core\BrightstarDB\Strings*.cs;..\..\core\BrightStarDB\OData\**\*.cs;..\..\core\BrightstarDB\Test\**\*.cs;..\..\core\BrightstarDB\Server\HttpServer.cs;..\..\core\BrightstarDB\Client\Http*.cs;..\..\core\BrightstarDB\Client\BrightstarServiceClient.cs;..\..\core\BrightstarDB\Client\BrightstarServiceClientExtensions.cs;..\..\core\BrightstarDB\Storage\FileStoreManager.cs;..\..\core\BrightstarDB\Storage\FileBlockProvider.cs;..\..\core\BrightstarDB\Properties\**\*.cs;..\..\core\BrightstarDB\Analysis\**\*.cs;..\..\core\BrightstarDB\Client\RestJobInfo.cs;..\..\core\BrightstarDB\Dynamic\**\*.cs;..\..\core\BrightstarDB\Storage\Persistence\BinaryPageStore.cs;..\..\core\BrightstarDB\Query\Processor\SingleVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\TwoVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\ThreeVarCollapseGroup.cs;..\..\core\BrightstarDB\Query\Processor\AccumulatorBase.cs;..\..\core\BrightstarDB\Query\Processor\Accumulator.cs;..\..\core\BrightstarDB\Query\Processor\VirtualizingAccumulator.cs;..\..\core\BrightstarDB\Storage\Persistence\FilePersistenceManager.cs;..\..\core\BrightstarDB\Storage\Persistence\IsolatedStoragePersistenceManager.cs">
       <Link>%(recursivedir)\%(filename)</Link>
     </Compile>
@@ -71,28 +71,26 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
       <CustomToolNamespace>BrightstarDB</CustomToolNamespace>
     </EmbeddedResource>
-    <Compile Include="..\..\mobile\BrightstarDB.Mobile\BrightstarDB\Tuple.cs" />
+    <Compile Include="Compatibility\Tuple.cs" />
     <Compile Include="Adaptation\PlatformAdapter.cs" />
     <Compile Include="Adaptation\ProbingAdapterResolver.cs" />
-    <Compile Include="..\..\mobile\relinq\RelinqCore\**\*.cs" Exclude="..\..\mobile\relinq\RelinqCore\Properties\*.cs">
-      <Link>relinq\%(recursivedir)\%(filename)</Link>
-    </Compile>
+    <Compile Include="relinq\RelinqCore\**\*.cs" Exclude="relinq\RelinqCore\Properties\*.cs"/>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="dotNetRDF">
-      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\portable-win+net40+sl4+wp\dotNetRDF.dll</HintPath>
+      <HintPath>..\packages\dotNetRDF.1.0.6.3421\lib\portable-net4+sl4+netcore45+wp8+MonoAndroid1+MonoTouch1\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Polenter.SharpSerializer.PCL">
       <HintPath>..\packages\SharpSerializer.PCL.2.18.5\lib\portable-net4+sl4+wp71+win8\Polenter.SharpSerializer.PCL.dll</HintPath>
     </Reference>
     <Reference Include="Portable.Runtime">
-      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\portable-win+net40+sl4+wp\Portable.Runtime.dll</HintPath>
+      <HintPath>..\packages\dotNetRDF.1.0.6.3421\lib\portable-net4+sl4+netcore45+wp8+MonoAndroid1+MonoTouch1\Portable.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="VDS.Common">
-      <HintPath>..\packages\VDS.Common.1.2.0\lib\portable-win+net40+sl40+wp\VDS.Common.dll</HintPath>
+      <HintPath>..\packages\VDS.Common.1.3.0\lib\portable-net4+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1\VDS.Common.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

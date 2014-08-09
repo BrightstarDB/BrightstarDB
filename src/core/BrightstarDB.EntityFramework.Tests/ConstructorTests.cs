@@ -27,7 +27,7 @@ namespace BrightstarDB.EntityFramework.Tests
             var results = q.ToList();
             AssertQuerySparql(@"SELECT ?v1 ?v2 WHERE {
 ?c a <http://www.networkedplanet.com/schemas/test/Company> .
-<FTSE> <http://www.networkedplanet.com/schemas/test/listing> ?c .
+<id:FTSE> <http://www.networkedplanet.com/schemas/test/listing> ?c .
 ?c <http://www.networkedplanet.com/schemas/test/ticker> ?v1 .
 ?c <http://www.networkedplanet.com/schemas/test/price> ?v2 .}"
                 );

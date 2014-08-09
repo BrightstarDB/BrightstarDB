@@ -51,6 +51,24 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
+        [ExpectedException(typeof(EntityKeyRequiredException))]
+        [Ignore("Behaviour is changed - an entity can be created, but will not be tracked or saved until its identity is set")]
+        public void TestCannotCreateEntityWithKey()
+        {
+            string storeName = "CannotCreateEntityWithKey_" + DateTime.UtcNow.Ticks;
+            using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
+            {
+                using (var context = new MyEntityContext(dataObjectStore))
+                {
+                    // Should throw an exception as the Name property is required to generate the key
+                    context.StringKeyEntities.Create();
+                    context.SaveChanges();
+                }
+            }
+        }
+
+
+        [Test]
         public void TestCustomTriplesQuery()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -1121,7 +1139,7 @@ where {
             }
         }
 
-        [Ignore]
+        //[Ignore]
         [Test]
         public void TestAddGeneratesIdentity()
         {
@@ -1154,10 +1172,11 @@ where {
                     Assert.IsNotNull(foundSkill);
                     Assert.IsNotNull(foundCompany);
 
-                    Assert.IsTrue(foundPerson.Id.StartsWith(Constants.GeneratedUriPrefix));
-                    Assert.IsTrue(foundCompany.Id.StartsWith(Constants.GeneratedUriPrefix));
-                    Guid guid;
-                    Assert.IsTrue(Guid.TryParse(foundSkill.Id, out guid));
+                    // Generated Ids should be GUIDs
+                    Guid g;
+                    Assert.IsTrue(Guid.TryParse(foundPerson.Id, out g));
+                    Assert.IsTrue(Guid.TryParse(foundCompany.Id, out g));
+                    Assert.IsTrue(Guid.TryParse(foundSkill.Id, out g));
                 }
             }
         }
@@ -1852,10 +1871,57 @@ where {
                 
                 context.SaveChanges();
 
+                Assert.AreEqual(4, dept.Persons.Count);
                 context.DeleteObject(bob);
+                Assert.AreEqual(3, dept.Persons.Count);
                 context.SaveChanges();
 
                 Assert.AreEqual(3, dept.Persons.Count);
+            }
+        }
+
+        [Test]
+        public void TestEntitySetsHelper()
+        {
+            var storeName = "TestEntitySetsHelper" + DateTime.Now.Ticks;
+            string pid;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var p = context.Persons.Create();
+                var b = context.BaseEntities.Create();
+                var d = context.DerivedEntities.Create();
+                context.SaveChanges();
+
+                // Test that we can use the returned entity set for query
+                var personSet = context.EntitySet<IPerson>();
+                Assert.That(personSet, Is.Not.Null);
+                Assert.That(personSet.FirstOrDefault(x=>x.Id.Equals(p.Id)), Is.Not.Null);
+                Assert.That(personSet.FirstOrDefault(x=>x.Id.Equals(b.Id)), Is.Null);
+                Assert.That(personSet.FirstOrDefault(x => x.Id.Equals(d.Id)), Is.Null);
+
+                var baseEntitySet = context.EntitySet<IBaseEntity>();
+                Assert.That(baseEntitySet, Is.Not.Null);
+                Assert.That(baseEntitySet.FirstOrDefault(x => x.Id.Equals(p.Id)), Is.Null);
+                Assert.That(baseEntitySet.FirstOrDefault(x => x.Id.Equals(b.Id)), Is.Not.Null);
+                Assert.That(baseEntitySet.FirstOrDefault(x => x.Id.Equals(d.Id)), Is.Not.Null);
+
+                var derivedEntitySet = context.EntitySet<IDerivedEntity>();
+                Assert.That(derivedEntitySet, Is.Not.Null);
+                Assert.That(derivedEntitySet.FirstOrDefault(x => x.Id.Equals(p.Id)), Is.Null);
+                Assert.That(derivedEntitySet.FirstOrDefault(x => x.Id.Equals(b.Id)), Is.Null);
+                Assert.That(derivedEntitySet.FirstOrDefault(x => x.Id.Equals(d.Id)), Is.Not.Null);
+
+                // Test that we can use the returned entity set for update
+                var p2 = context.EntitySet<IPerson>().Create();
+                p2.Name = "Bob";
+                context.SaveChanges();
+                pid = p2.Id;
+            }
+            using (var context = CreateEntityContext(storeName))
+            {
+                var bob  = context.EntitySet<IPerson>().FirstOrDefault(x => x.Id.Equals(pid));
+                Assert.That(bob, Is.Not.Null);
+                Assert.That(bob.Name, Is.EqualTo("Bob"));
             }
         }
 

@@ -108,9 +108,9 @@
                     <td><a href="~/@Model.RequestProperties.StoreName/jobs/@item.JobId">@item.Label</a></td>
                     <td><a href="~/@Model.RequestProperties.StoreName/jobs/@item.JobId">@item.JobId</a></td>
                     <td>@item.JobStatus</td>
-                    <td>@item.QueuedTime</td>
-                    <td>@item.StartTime</td>
-                    <td>@item.EndTime</td>
+                    <td class="time">@item.QueuedTime.ToString("o")</td>
+                    <td class="time">@item.StartTime.ToString("o")</td>
+                    <td class="time">@item.EndTime.ToString("o")</td>
                     <td>@item.StatusMessage</td>
                 </tr>
             }
@@ -142,8 +142,17 @@
         });
     }
 
+    function localizeTimes() {
+        $('.time').each(function (ix) {
+            var str = $(this).text();
+            var time = new Date(str);
+            $(this).text(time.toLocaleDateString() + " " + time.toLocaleTimeString());
+        });
+    }
+    
     $('#jobType').change(displayJobParameters);
-    $(document).ready(displayJobParameters);
+    $(document).ready(function () {
+        localizeTimes(); displayJobParameters(); });
     
     function validateNotNull(inputId, paramName, obj) {
         var val = $('#' + inputId).val();
@@ -208,9 +217,9 @@
                 dataType: 'json'
             }).done(function(data) {
                 $('<tr></tr>').prependTo($('#jobsTable tbody'))
-                    .append('<td>' + data.Label + '</td>')
-                    .append('<td>' + data.JobId + '</td>')
-                    .append('<td>' + data.JobStatus + '</td>')
+                    .append('<td>' + data.label + '</td>')
+                    .append('<td>' + data.jobId + '</td>')
+                    .append('<td>' + data.jobStatus + '</td>')
                     .append('<td></td>')
                     .append('<td></td>')
                     .append('<td></td>')

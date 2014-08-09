@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BrightstarDB.Caching;
+using BrightstarDB.Config;
 using BrightstarDB.Storage;
 
 namespace BrightstarDB.Server
@@ -27,16 +28,21 @@ namespace BrightstarDB.Server
                 {
                     serverCore.Shutdown(completeJobs);
                 }
+                ServerCores.Clear();
             }
         }
 
-        public static ServerCore GetServerCore(string baseLocation)
+        public static ServerCore GetServerCore(string baseLocation, PageCachePreloadConfiguration preloadConfiguration)
         {
             lock (UpdateLock)
             {
                 if (!ServerCores.ContainsKey(baseLocation))
                 {
                     var serverCore = new ServerCore(baseLocation, QueryCache, PersistenceType);
+                    if (preloadConfiguration != null)
+                    {
+                        serverCore.Warmup(preloadConfiguration);
+                    }
                     ServerCores.Add(baseLocation, serverCore);
                 }
                 return ServerCores[baseLocation];

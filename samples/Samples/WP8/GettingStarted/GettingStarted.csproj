@@ -105,9 +105,6 @@
     <Reference Include="dotNetRDF">
       <HintPath>..\..\..\SDK\WP71\dotNetRDF.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\..\..\SDK\WP71\HtmlAgilityPack.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\SDK\WP71\Newtonsoft.Json.dll</HintPath>
     </Reference>

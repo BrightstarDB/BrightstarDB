@@ -33,7 +33,7 @@ namespace BrightstarDB.Tests
         {
             var storeName = "TestBitwiseAnd_" + DateTime.Now.Ticks;
             _client.CreateStore(storeName);
-            var job = _client.ExecuteTransaction(storeName, null, null, _testData);
+            var job = _client.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = _testData});
             TestHelper.AssertJobCompletesSuccessfully(_client, storeName, job);
 
             var results = _client.ExecuteQuery(storeName,
@@ -54,7 +54,7 @@ SELECT ?s WHERE {
         {
             var storeName = "TestBitwiseOr_" + DateTime.Now.Ticks;
             _client.CreateStore(storeName);
-            var job = _client.ExecuteTransaction(storeName, null, null, _testData);
+            var job = _client.ExecuteTransaction(storeName, new UpdateTransactionData {InsertData = _testData});
             TestHelper.AssertJobCompletesSuccessfully(_client, storeName, job);
 
             var results = _client.ExecuteQuery(storeName,

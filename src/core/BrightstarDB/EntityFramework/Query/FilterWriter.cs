@@ -331,7 +331,7 @@ namespace BrightstarDB.EntityFramework.Query
                 return expression;
             }
             if (typeof(IEntityObject).IsAssignableFrom(expression.Type) ||
-                QueryBuilder.Context.Mappings.IsKnownInterface(expression.Type))
+                EntityMappingStore.IsKnownInterface(expression.Type))
             {
                 var obj = expression.Value as IEntityObject;
                 var address = QueryBuilder.Context.GetResourceAddress(obj);
@@ -386,7 +386,7 @@ namespace BrightstarDB.EntityFramework.Query
         {
             if (expression.Method.Name.Equals("Equals"))
             {
-                if(QueryBuilder.Context.Mappings.IsKnownInterface(expression.Object.Type))
+                if(EntityMappingStore.IsKnownInterface(expression.Object.Type))
                 {
                     // Query is testing equality on a property that maps to an entity type
                     if (expression.Arguments[0].NodeType == ExpressionType.Constant)

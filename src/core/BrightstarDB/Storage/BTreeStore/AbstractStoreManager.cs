@@ -345,6 +345,11 @@ namespace BrightstarDB.Storage.BTreeStore
             throw new NotImplementedException();
         }
 
+        public ulong GetDataSize(string storeName)
+        {
+            throw new NotImplementedException();
+        }
+
         public MasterFile GetMasterFile(string storeLocation)
         {
             return MasterFile.Open(_persistenceManager, storeLocation);

@@ -14,21 +14,7 @@ namespace BrightstarDB.EntityFramework
     /// </summary>
     public abstract class EntityContext : IDisposable
     {
-        /// <summary>
-        /// Gets the <see cref="EntityMappingStore"/> for this entity context
-        /// </summary>
-        public EntityMappingStore Mappings { get; private set; }
-
         private bool _disposed;
-
-        /// <summary>
-        /// Constructor for an EntityContext object
-        /// </summary>
-        /// <param name="mappings">The store providing type and property mappings to use in LINQ to SPARQL queries</param>
-        protected EntityContext(EntityMappingStore mappings)
-        {
-            Mappings = mappings;
-        }
 
         /// <summary>
         /// Constructor for an EntityContext object that uses the <see cref="ReflectionMappingProvider"/>
@@ -38,9 +24,8 @@ namespace BrightstarDB.EntityFramework
         /// can be defined with additional properties that provide access to the types of entities that the context manages</remarks>
         protected EntityContext()
         {
-            Mappings = new EntityMappingStore();
             var rmp = new ReflectionMappingProvider();
-            rmp.AddMappingsForContext(Mappings, this);
+            rmp.AddMappingsForContext(EntityMappingStore.Instance, this);
         }
 
         /// <summary>
@@ -97,7 +82,7 @@ namespace BrightstarDB.EntityFramework
         /// <returns>The <see cref="PropertyHint"/> for the property or NULL if the propery has no hint.</returns>
         public PropertyHint GetPropertyHint(PropertyInfo propertyInfo)
         {
-            return Mappings.GetPropertyHint(propertyInfo);
+            return EntityMappingStore.Instance.GetPropertyHint(propertyInfo);
         }
 
         /// <summary>
@@ -108,8 +93,8 @@ namespace BrightstarDB.EntityFramework
         /// <exception cref="MappingNotFoundException">Raised if no mapping is found for <paramref name="type"/></exception>
         public string MapTypeToUri(Type type)
         {
-            if (Mappings.IsMappedImplementation(type)) return Mappings.GetMappedInterfaceTypeUri(type);
-            if (Mappings.IsKnownInterface(type)) return Mappings.GetMappedInterfaceTypeUri(Mappings.GetImplType(type));
+            if (EntityMappingStore.IsMappedImplementation(type)) return EntityMappingStore.GetMappedInterfaceTypeUri(type);
+            if (EntityMappingStore.IsKnownInterface(type)) return EntityMappingStore.GetMappedInterfaceTypeUri(EntityMappingStore.GetImplType(type));
             throw new MappingNotFoundException(type);
         }
 
@@ -120,7 +105,7 @@ namespace BrightstarDB.EntityFramework
         /// <returns>The mapped entity implementation type, or <paramref name="interfaceType"/> if no mapping is found</returns>
         public Type GetImplType(Type interfaceType)
         {
-            return Mappings.GetImplType(interfaceType);
+            return EntityMappingStore.GetImplType(interfaceType);
         }
 
         /// <summary>
@@ -130,7 +115,7 @@ namespace BrightstarDB.EntityFramework
         /// <returns>The entity implementation type</returns>
         public Type GetTypeForUri(string typeUri)
         {
-            return Mappings.GetImplTypeForUri(typeUri);
+            return EntityMappingStore.Instance.GetImplTypeForUri(typeUri);
         }
 
         /// <summary>
@@ -154,7 +139,7 @@ namespace BrightstarDB.EntityFramework
         /// <returns>True if the object is an instance of a known entity implementation type, false otherwise</returns>
         public bool IsOfMappedType(object o)
         {
-            return Mappings.IsKnownInterface(o.GetType()) || Mappings.IsMappedImplementation(o.GetType());
+            return EntityMappingStore.IsKnownInterface(o.GetType()) || EntityMappingStore.IsMappedImplementation(o.GetType());
         }
 
         /// <summary>
@@ -164,7 +149,7 @@ namespace BrightstarDB.EntityFramework
         /// <returns>The entity resource address</returns>
         public string GetResourceAddress(object o)
         {
-            PropertyInfo identityProperty = Mappings.GetIdentityProperty(o.GetType());
+            PropertyInfo identityProperty = EntityMappingStore.Instance.GetIdentityProperty(o.GetType());
             if (identityProperty != null)
             {
                 var identityValue = identityProperty.GetValue(o, new object[0]) as string;

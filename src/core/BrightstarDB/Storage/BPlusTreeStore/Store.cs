@@ -339,28 +339,38 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         /// </summary>
         /// <param name="jobId"></param>
         public void Consolidate(Guid jobId)
+        
         {
             var storeManager = StoreManagerFactory.GetStoreManager();
             var consolidatePageStore = storeManager.CreateConsolidationStore(DirectoryPath);
             ulong txnId = _currentTxnId + 1;
-            var graphIndexId = _graphIndex.Write(consolidatePageStore, txnId, null);
-            var prefixManagerId = _prefixManager.Write(consolidatePageStore, txnId, null);
-            var resourceIndexId = _resourceIndex.Write(consolidatePageStore, txnId, null);
-            var subjectRelatedResourceIndexId = _subjectRelatedResourceIndex.Write(consolidatePageStore, txnId, null);
-            var objectRelatedResourceIndexId = _objectRelatedResourceIndex.Write(consolidatePageStore, txnId, null);
-            var buff = CreateStoreHeader(graphIndexId, prefixManagerId, resourceIndexId, subjectRelatedResourceIndexId,
-                                         objectRelatedResourceIndexId);
-            var storePage = consolidatePageStore.Create(txnId);
-            storePage.SetData(buff);
-            storePage.SetData(buff, 0, 128);
-            consolidatePageStore.Commit(txnId, null);
-            // Close the stores to allow the rename to happen
-            Close();
-            consolidatePageStore.Close();
-            
+            ulong storePageId;
+            try
+            {
+                var graphIndexId = _graphIndex.Write(consolidatePageStore, txnId, null);
+                var prefixManagerId = _prefixManager.Write(consolidatePageStore, txnId, null);
+                var resourceIndexId = _resourceIndex.Write(consolidatePageStore, txnId, null);
+                var subjectRelatedResourceIndexId = _subjectRelatedResourceIndex.Write(consolidatePageStore, txnId, null);
+                var objectRelatedResourceIndexId = _objectRelatedResourceIndex.Write(consolidatePageStore, txnId, null);
+                var buff = CreateStoreHeader(graphIndexId, prefixManagerId, resourceIndexId,
+                                             subjectRelatedResourceIndexId,
+                                             objectRelatedResourceIndexId);
+                var storePage = consolidatePageStore.Create(txnId);
+                storePage.SetData(buff);
+                storePage.SetData(buff, 0, 128);
+                storePageId = storePage.Id;
+                consolidatePageStore.Commit(txnId, null);
+                // Close the stores to allow the rename to happen
+                Close();
+            }
+            finally
+            {
+                // Ensure we close the store even if an exception was raised occurred 
+                consolidatePageStore.Close();
+            }
             storeManager.ActivateConsolidationStore(DirectoryPath);
             storeManager.GetMasterFile(DirectoryPath).AppendCommitPoint(
-                new CommitPoint(storePage.Id, txnId, DateTime.UtcNow, jobId), true);
+                new CommitPoint(storePageId, txnId, DateTime.UtcNow, jobId), true);
         }
 
         /// <summary>
@@ -460,6 +470,14 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             var predicateId = _resourceIndex.GetResourceId(_prefixManager.MakePrefixedUri(predicateUri));
             if (predicateId == StoreConstants.NullUlong) return 0L;
             return _subjectRelatedResourceIndex.CountPredicateRelationships(predicateId, profiler);
+        }
+
+        public void WarmupPageCache(int pagesToPreload, BrightstarProfiler profiler = null)
+        {
+            int totalLoaded = _subjectRelatedResourceIndex.Preload(pagesToPreload/3, profiler);
+            totalLoaded += _objectRelatedResourceIndex.Preload(pagesToPreload - totalLoaded, profiler);
+            totalLoaded += _resourceIndex.Preload(pagesToPreload - totalLoaded, profiler);
+            _resourceTable.Preload(pagesToPreload - totalLoaded, profiler);
         }
 
         #endregion
@@ -630,7 +648,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             };
         }
 
-        private IResource Resolve(ulong resourceId)
+        public IResource Resolve(ulong resourceId)
         {
             var ret = _resourceIndex.GetResource(resourceId);
 #if DEBUG
@@ -640,6 +658,76 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
 #endif
             return ret;
+        }
+
+        public string ResolvePrefixedUri(string prefixedUri)
+        {
+            return _prefixManager.ResolvePrefixedUri(prefixedUri);
+        }
+
+        public ulong LookupResource(string uri)
+        {
+            var curie = _prefixManager.MakePrefixedUri(uri);
+            return _resourceIndex.GetResourceId(curie);
+        }
+
+        public ulong LookupResource(string value, string datatype, string langCode)
+        {
+            return _resourceIndex.GetResourceId(value, true, datatype, langCode);
+        }
+
+        public int LookupGraph(string graphUri)
+        {
+            int graphId;
+            if (_graphIndex.TryFindGraphId(graphUri, out graphId)) return graphId;
+            return -1;
+        }
+
+        public string ResolveGraphUri(int graphId)
+        {
+            return _graphIndex.GetGraphUri(graphId);
+        }
+
+        public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null,
+                                       string langCode = null, string graph = null)
+        {
+            return GetBindings(subject, predicate, obj, isLiteral, dataType, langCode, graph == null ? null : new[] { graph });
+        }
+
+        public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null,
+                                       string langCode = null, IEnumerable<string> graphs = null)
+        {
+            if (langCode != null) langCode = langCode.ToLowerInvariant();
+            ulong sid = FindResourceId(subject);
+            ulong pid = FindResourceId(predicate);
+            ulong oid = FindResourceId(obj, isLiteral, dataType, langCode);
+            var gids = LookupGraphIds(graphs);
+
+            if (sid == StoreConstants.NullUlong && !String.IsNullOrEmpty(subject)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (pid == StoreConstants.NullUlong && !String.IsNullOrEmpty(predicate)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (oid == StoreConstants.NullUlong && !String.IsNullOrEmpty(obj)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (gids.Count == 0) return new Tuple<ulong, ulong, ulong, int>[0];
+
+            return Bind(sid, pid, oid, gids);
+        }
+
+        public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(ulong? subjNodeId, string subjValue, ulong? predNodeId, string predValue, ulong? objNodeId,
+                                       string objValue, bool isLiteral, string dataType, string languageCode, List<string> graphUris)
+        {
+            if (languageCode != null) languageCode = languageCode.ToLowerInvariant();
+            ulong sid = subjNodeId.HasValue ? subjNodeId.Value : FindResourceId(subjValue);
+            ulong pid = predNodeId.HasValue ? predNodeId.Value : FindResourceId(predValue);
+            ulong oid = objNodeId.HasValue
+                            ? objNodeId.Value
+                            : FindResourceId(objValue, isLiteral, dataType, languageCode);
+            var gids = LookupGraphIds(graphUris);
+
+            if (sid == StoreConstants.NullUlong && !String.IsNullOrEmpty(subjValue)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (pid == StoreConstants.NullUlong && !String.IsNullOrEmpty(predValue)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (oid == StoreConstants.NullUlong && !String.IsNullOrEmpty(objValue)) return new Tuple<ulong, ulong, ulong, int>[0];
+            if (gids.Count == 0) return new Tuple<ulong, ulong, ulong, int>[0];
+
+            return Bind(sid, pid, oid, gids);
         }
 
         #region Triple Pattern Binding

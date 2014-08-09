@@ -126,9 +126,9 @@ namespace BrightstarDB.Rdf
         private static readonly RdfDatatype RdfBoolean = new RdfDatatype(Boolean, (o => ((bool) o) ? "true" : "false"), (s,l)=>Convert.ToBoolean(s));
         private static readonly RdfDatatype RdfDateTime = new RdfDatatype(DateTime, (o => ((DateTime)o).ToString("O", CultureInfo.InvariantCulture)), (s, l) => Convert.ToDateTime(s)); 
         private static readonly RdfDatatype RdfDate = new RdfDatatype(Date, (o => ((DateTime)o).ToString("yyyy-MM-dd")), (s,l) => Convert.ToDateTime(s));
-        private static readonly RdfDatatype RdfDouble = new RdfDatatype(Double, (o => ((double) o).ToString(CultureInfo.InvariantCulture)), (s,l)=>Convert.ToDouble(s));
+        private static readonly RdfDatatype RdfDouble = new RdfDatatype(Double, (o => ((double) o).ToString("R", CultureInfo.InvariantCulture)), (s,l)=>Convert.ToDouble(s));
         private static readonly RdfDatatype RdfInteger = new RdfDatatype(Integer, (o => ((int)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToInt32(s));
-        private static readonly RdfDatatype RdfFloat = new RdfDatatype(Float, (o => ((float)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToSingle(s));
+        private static readonly RdfDatatype RdfFloat = new RdfDatatype(Float, (o => ((float)o).ToString("R", CultureInfo.InvariantCulture)), (s, l) => Convert.ToSingle(s));
         private static readonly RdfDatatype RdfLong = new RdfDatatype(Long, (o => ((long)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToInt64(s));
         private static readonly RdfDatatype RdfByte = new RdfDatatype(Byte, (o => ((sbyte)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToSByte(s));
         private static readonly RdfDatatype RdfDecimal = new RdfDatatype(Decimal, (o => ((decimal)o).ToString(CultureInfo.InvariantCulture)), (s, l) => Convert.ToDecimal(s));

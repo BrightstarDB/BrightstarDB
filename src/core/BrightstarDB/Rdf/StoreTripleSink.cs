@@ -86,6 +86,11 @@ namespace BrightstarDB.Rdf
             }
         }
 
+        public void Close()
+        {
+            // No op
+        }
+
         private string AssertBNode(string bnodeId)
         {
             string internalBnodeId;

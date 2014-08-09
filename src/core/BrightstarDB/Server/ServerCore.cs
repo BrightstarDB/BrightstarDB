@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using BrightstarDB.Caching;
 using BrightstarDB.Client;
+using BrightstarDB.Config;
 using BrightstarDB.Query;
 using BrightstarDB.Storage;
 using System.Threading;
@@ -138,9 +139,10 @@ namespace BrightstarDB.Server
         {
             lock (_stores)
             {
-                if (_stores.ContainsKey(_baseLocation + "\\" + storeName))
+                StoreWorker result = null;
+                if (_stores.TryGetValue(_baseLocation + "\\" + storeName, out result))
                 {
-                    return _stores[_baseLocation + "\\" + storeName];
+                    return result;
                 }
                 if (!DoesStoreExist(storeName))
                 {
@@ -451,6 +453,88 @@ namespace BrightstarDB.Server
             parser.ExpressionFactories = expressionFactories;
             var query = parser.ParseFromString(exp);
             return query;
+        }
+
+        public void Warmup(PageCachePreloadConfiguration preloadConfiguration)
+        {
+            if (preloadConfiguration != null && preloadConfiguration.Enabled)
+            {
+                ThreadPool.QueueUserWorkItem(RunServerCoreWarmup, preloadConfiguration);
+            }
+        }
+
+        private void RunServerCoreWarmup(object state)
+        {
+            var preloadConfiguration = state as PageCachePreloadConfiguration;
+            if (preloadConfiguration == null) return;
+
+            var warmupInfos = GetStoreWarmupInfo(preloadConfiguration);
+            warmupInfos.RemoveAll(x => x.DataSize == 0ul || x.CacheRatio == 0.0m);
+            decimal totalRatio = warmupInfos.Sum(x => x.CacheRatio);
+            foreach (var warmupInfo in warmupInfos.OrderBy(x => x.CacheRatio).ThenBy(x => x.DataSize))
+            {
+                var storeWorker = GetStoreWorker(warmupInfo.StoreName);
+                storeWorker.WarmupStore(warmupInfo.CacheRatio/totalRatio);
+                totalRatio -= warmupInfo.CacheRatio;
+                if (totalRatio <= 0) break;
+            }
+        }
+
+        private List<WarmupInfo> GetStoreWarmupInfo(PageCachePreloadConfiguration preloadConfiguration)
+        {
+            var warmupInfos = new List<WarmupInfo>();
+            foreach (var storeName in ListStores())
+            {
+                StorePreloadConfiguration storeConfiguration;
+                string storeLocation = Path.Combine(_baseLocation, storeName);
+                if (preloadConfiguration.StorePreloadConfigurations != null &&
+                    preloadConfiguration.StorePreloadConfigurations.TryGetValue(storeName, out storeConfiguration))
+                {
+                    if (storeConfiguration.CacheRatio > 0)
+                    {
+                        warmupInfos.Add(new WarmupInfo(storeName, storeConfiguration.CacheRatio,
+                                                       GetStoreDataSize(storeLocation)));
+                    }
+                    else if (preloadConfiguration.DefaultCacheRatio > 0)
+                    {
+                        warmupInfos.Add(new WarmupInfo(storeName, preloadConfiguration.DefaultCacheRatio,
+                                                       GetStoreDataSize(storeLocation)));
+                    }
+                }
+                else if (preloadConfiguration.DefaultCacheRatio > 0)
+                {
+                    warmupInfos.Add(new WarmupInfo(storeName, preloadConfiguration.DefaultCacheRatio,
+                                                   GetStoreDataSize(storeLocation)));
+                }
+            }
+            return warmupInfos;
+        }
+
+        private ulong GetStoreDataSize(string storeName)
+        {
+            return _storeManager.GetDataSize(storeName);
+        }
+
+        private class WarmupInfo : IComparable
+        {
+            public WarmupInfo(string storeName, decimal cacheRatio, ulong dataSize)
+            {
+                StoreName = storeName;
+                CacheRatio = cacheRatio;
+                DataSize = dataSize;
+            }
+
+            public string StoreName { get; set; }
+            public decimal CacheRatio { get; set; }
+            public ulong DataSize { get; set; }
+            public int CompareTo(object obj)
+            {
+                var other = obj as WarmupInfo;
+                if (other == null) return 1;
+                int result = this.CacheRatio.CompareTo(other.CacheRatio);
+                if (result == 0) result= this.DataSize.CompareTo(other.DataSize);
+                return result;
+            }
         }
     }
 }

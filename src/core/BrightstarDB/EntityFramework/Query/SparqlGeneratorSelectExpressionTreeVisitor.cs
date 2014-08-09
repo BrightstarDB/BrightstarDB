@@ -144,9 +144,7 @@ namespace BrightstarDB.EntityFramework.Query
                                 }
                                 case PropertyMappingType.Id:
                                 {
-                                    var prefix =
-                                        _queryBuilder.Context.Mappings.GetIdentifierPrefix(
-                                        propertyInfo.DeclaringType);
+                                    var prefix = EntityMappingStore.GetIdentifierPrefix(propertyInfo.DeclaringType);
                                     return new SelectIdentifierVariableNameExpression(sourceVarName, prefix);
                                     //return new SelectVariableNameExpression(sourceVarName, VariableBindingType.Resource, propertyInfo.PropertyType);
                                 }

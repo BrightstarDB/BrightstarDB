@@ -83,5 +83,11 @@ namespace BrightstarDB.EntityFramework
         /// Removes the object from its current context
         /// </summary>
         void Detach();
+
+        /// <summary>
+        /// Returns the unique key part of the URI identifier for this entity
+        /// </summary>
+        /// <returns>The entity key as a string</returns>
+        string GetKey();
     }
 }

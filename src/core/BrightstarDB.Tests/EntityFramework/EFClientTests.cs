@@ -9,12 +9,6 @@ namespace BrightstarDB.Tests.EntityFramework
     [TestFixture]
     public class EFClientTests
     {
-        private static IBrightstarService GetClient()
-        {
-            return BrightstarService.GetClient("type=http;endpoint=http://localhost:8090/brightstar");
-        }
-
-
         [Test]
         public void TestEmbeddedClientMapToRdf()
         {
@@ -30,7 +24,7 @@ namespace BrightstarDB.Tests.EntityFramework
             triples.AppendLine(@"<http://www.networkedplanet.com/people/j.williams> <http://xmlns.com/foaf/0.1/name> ""Jen Williams"" .");
             triples.AppendLine(@"<http://www.networkedplanet.com/people/j.williams> <http://xmlns.com/foaf/0.1/Organization> ""Networked Planet"" .");
 
-            var job = embeddedClient.ExecuteTransaction(storeName,null, null, triples.ToString());
+            var job = embeddedClient.ExecuteTransaction(storeName, new UpdateTransactionData{ InsertData = triples.ToString()});
             TestHelper.AssertJobCompletesSuccessfully(embeddedClient, storeName, job);
 
             //check EF can access all properties
@@ -71,7 +65,7 @@ namespace BrightstarDB.Tests.EntityFramework
             triples.AppendLine(@"<http://www.networkedplanet.com/people/j.williams> <http://dbpedia.org/ontology/birthDate> ""1921-11-28""^^<http://www.w3.org/2001/XMLSchema#date> .");
             
 
-            var job = embeddedClient.ExecuteTransaction(storeName, null, null, triples.ToString());
+            var job = embeddedClient.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = triples.ToString()});
             TestHelper.AssertJobCompletesSuccessfully(embeddedClient, storeName, job);
 
             //check EF can access all properties

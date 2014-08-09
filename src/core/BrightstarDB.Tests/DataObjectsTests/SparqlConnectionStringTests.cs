@@ -7,6 +7,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
     [TestFixture]
     public class SparqlConnectionStringTests
     {
+#if !PORTABLE && !WINDOWS_PHONE // SPARQL Update not supported on these platforms yet
         [Test]
         public void TestReadOnlyConnection()
         {
@@ -25,7 +26,6 @@ namespace BrightstarDB.Tests.DataObjectsTests
             Assert.That(store.IsReadOnly, Is.True);
         }
 
-#if !PORTABLE && !WINDOWS_PHONE // SPARQL Update not supported on these platforms yet
         [Test]
         public void TestReadWriteConnection()
         {
@@ -39,6 +39,6 @@ namespace BrightstarDB.Tests.DataObjectsTests
             Assert.That(store.IsReadOnly, Is.False);
         }
 #endif
-        
+
     }
 }

@@ -142,8 +142,14 @@ namespace BrightstarDB.InternalTests
                  */
             }
 
+            public void Close()
+            {
+                // no-op
+            }
+
             #endregion
         }
+        
         class ValidatorSink : ITripleSink
         {
             private IStore _store;
@@ -179,8 +185,14 @@ namespace BrightstarDB.InternalTests
                 }
             }
 
+            public void Close()
+            {
+                // no-op
+            }
+
             #endregion
         }
+
         [Test]
         public void TestRepeatedSmallUnitsOfWork()
         {
@@ -623,6 +635,11 @@ namespace BrightstarDB.InternalTests
                 {
                     _unmatchedTriples.Add(Stringify(subject, predicate, obj, objIsLiteral, dataType, langCode));
                 }
+            }
+
+            public void Close()
+            {
+                // No-op
             }
 
             #endregion

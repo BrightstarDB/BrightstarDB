@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Authentication;
+using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.Conventions;

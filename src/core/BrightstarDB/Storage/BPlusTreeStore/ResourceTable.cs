@@ -127,6 +127,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
         }
 
+        public int Preload(int numPages, BrightstarProfiler profiler)
+        {
+            return _pageStore.Preload(numPages, profiler);
+        }
+
         #endregion
 
         private void StartNewPage(ulong transactionId, BrightstarProfiler profiler)

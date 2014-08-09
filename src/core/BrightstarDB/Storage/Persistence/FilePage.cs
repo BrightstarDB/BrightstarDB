@@ -102,7 +102,10 @@ namespace BrightstarDB.Storage.Persistence
             lock(_writeLock)
             {
                 long ret = _modified;
-                outputStream.Seek((long)_writeOffset, SeekOrigin.Begin);
+                if (outputStream.Position != (long)_writeOffset)
+                {
+                    outputStream.Seek((long) _writeOffset, SeekOrigin.Begin);
+                }
                 outputStream.Write(_data, 0, _pageSize);
                 // KA: Commented out flush on every page write as this causes massive overhead on the Azure block implementation
                 // If it turns out that flush is needed on the normal filesystem, may need to either make it conditional or rework the azure block impl

@@ -28,7 +28,7 @@ namespace BrightstarDB.EntityFramework.Tests
             var id = dinnerType.GetProperty("Id");
             var hint = Context.GetPropertyHint(id);
             Assert.IsNotNull(hint);
-            Assert.AreEqual(PropertyMappingType.Address, hint.MappingType);
+            Assert.AreEqual(PropertyMappingType.Id, hint.MappingType);
             var title = dinnerType.GetProperty("Title");
             hint = Context.GetPropertyHint(title);
             Assert.IsNotNull(hint);
@@ -57,26 +57,26 @@ namespace BrightstarDB.EntityFramework.Tests
         [Test]
         public void TestGetDinnerById()
         {
-            var q = from p in Context.Dinners where p.Id.Equals("http://www.networkedplanet.com/dinners/1") select p;
+            var q = from p in Context.Dinners where p.Id.Equals("1") select p;
             var results = q.ToList();
             var lastSparql = Context.LastSparqlQuery;
             Assert.IsNotNull(lastSparql);
             Assert.AreEqual(
-                NormalizeSparql("ASK { <http://www.networkedplanet.com/dinners/1> a <http://www.networkedplanet.com/schemas/test/Dinner> . }"),
+                NormalizeSparql("ASK { <id:1> a <http://www.networkedplanet.com/schemas/test/Dinner> . }"),
                 NormalizeSparql(lastSparql));
 
-            var q2 = Context.Dinners.Where(x => x.Id == "http://www.networkedplanet.com/dinners/1").FirstOrDefault();
+            var q2 = Context.Dinners.Where(x => x.Id == "1").FirstOrDefault();
             lastSparql = Context.LastSparqlQuery;
             Assert.IsNotNull(lastSparql);
             Assert.AreEqual(
-                NormalizeSparql("ASK { <http://www.networkedplanet.com/dinners/1> a <http://www.networkedplanet.com/schemas/test/Dinner> . }"),
+                NormalizeSparql("ASK { <id:1> a <http://www.networkedplanet.com/schemas/test/Dinner> . }"),
                 NormalizeSparql(lastSparql));
         }
 
         [Test]
         public void TestGetRsvpByDinnerId()
         {
-            var q = from x in Context.Rsvps where x.Dinner.Id.Equals("http://www.networkedplanet.com/dinners/1") select x;
+            var q = from x in Context.Rsvps where x.Dinner.Id.Equals("1") select x;
             var results = q.ToList();
             var lastSparql = Context.LastSparqlQuery;
             Assert.IsNotNull(lastSparql);
@@ -84,7 +84,7 @@ namespace BrightstarDB.EntityFramework.Tests
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE { 
     ?x a <http://www.networkedplanet.com/schemas/test/Rsvp> .
-    <http://www.networkedplanet.com/dinners/1> <http://www.networkedplanet.com/schemas/test/attendees> ?x.} } }");
+    <id:1> <http://www.networkedplanet.com/schemas/test/attendees> ?x.} } }");
         }
 
         [Test]
@@ -112,8 +112,8 @@ namespace BrightstarDB.EntityFramework.Tests
             Assert.AreEqual(
                 NormalizeSparql(
                     @"SELECT ?v0 WHERE {
-                    <address> a <http://www.networkedplanet.com/schemas/test/Dinner> .
-                    <address> <http://www.networkedplanet.com/schemas/test/attendees> ?v0 . }"),
+                    <id:address> a <http://www.networkedplanet.com/schemas/test/Dinner> .
+                    <id:address> <http://www.networkedplanet.com/schemas/test/attendees> ?v0 . }"),
                 NormalizeSparql(lastSparql));
         }
 
@@ -130,8 +130,8 @@ namespace BrightstarDB.EntityFramework.Tests
             Assert.AreEqual(
                 NormalizeSparql(
                     @"SELECT ?v0 WHERE {
-                    <address> a <http://www.networkedplanet.com/schemas/test/Dinner> .
-                    <address> <http://www.networkedplanet.com/schemas/test/attendees> ?v0 . }"),
+                    <id:address> a <http://www.networkedplanet.com/schemas/test/Dinner> .
+                    <id:address> <http://www.networkedplanet.com/schemas/test/attendees> ?v0 . }"),
                 NormalizeSparql(lastSparql));
         }
 
@@ -151,11 +151,11 @@ namespace BrightstarDB.EntityFramework.Tests
                     @"CONSTRUCT { ?y ?y_p ?y_o. ?y <http://www.brightstardb.com/.well-known/model/selectVariable> ""y"" .} WHERE {
 ?y ?y_p ?y_o . {
     SELECT ?y WHERE {
-    <address> a <http://www.networkedplanet.com/schemas/test/Dinner> .
+    <id:address> a <http://www.networkedplanet.com/schemas/test/Dinner> .
     ?y a <http://www.networkedplanet.com/schemas/test/Dinner> .
     ?y <http://www.networkedplanet.com/schemas/test/date> ?v0 .
-    <address> <http://www.networkedplanet.com/schemas/test/date> ?v1 .
-    FILTER ((?v0=?v1) && (!sameTerm(<address>, ?y)))
+    <id:address> <http://www.networkedplanet.com/schemas/test/date> ?v1 .
+    FILTER ((?v0=?v1) && (!sameTerm(<id:address>, ?y)))
     .} } }"),
                 NormalizeSparql(lastSparql));
         }
@@ -191,7 +191,7 @@ namespace BrightstarDB.EntityFramework.Tests
 ?p ?p_p ?p_o . {
     SELECT ?p WHERE { 
     ?p a <http://www.networkedplanet.com/schemas/test/Person> .
-    ?p <http://www.networkedplanet.com/schemas/test/father> <address> .} } }"), NormalizeSparql(lastSparql));
+    ?p <http://www.networkedplanet.com/schemas/test/father> <id:address> .} } }"), NormalizeSparql(lastSparql));
         }
 
 

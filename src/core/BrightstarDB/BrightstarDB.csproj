@@ -80,9 +80,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dotNetRDF, Version=1.0.3.0, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
+    <Reference Include="dotNetRDF">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\dotNetRDF.1.0.4.3225\lib\net40\dotNetRDF.dll</HintPath>
+      <HintPath>..\packages\dotNetRDF.1.0.6.3421\lib\net40\dotNetRDF.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net40\HtmlAgilityPack.dll</HintPath>
@@ -90,7 +90,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Remotion.Linq, Version=1.13.102.1, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -111,8 +111,9 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="VDS.Common">
-      <HintPath>..\packages\VDS.Common.1.2.0\lib\net40-client\VDS.Common.dll</HintPath>
+    <Reference Include="VDS.Common, Version=1.2.1.0, Culture=neutral, PublicKeyToken=ab5f4eb908061bf0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\VDS.Common.1.3.0\lib\net40-client\VDS.Common.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +149,7 @@
     <Compile Include="Client\DotNetRdfStorageProvidersDataObjectContext.cs" />
     <Compile Include="Client\DotNetRdfStorageServerDataObjectContext.cs" />
     <Compile Include="Client\EmbeddedBrightstarService.cs" />
+    <Compile Include="Client\ClientConfiguration.cs" />
     <Compile Include="Client\IBrightStarService.cs" />
     <Compile Include="Client\ICommitPointInfo.cs" />
     <Compile Include="Client\ICommitPointStats.cs" />
@@ -168,6 +170,10 @@
     <Compile Include="Client\SparqlDataObjectStore.cs" />
     <Compile Include="Client\SparqlUpdatableStore.cs" />
     <Compile Include="Client\UpdateTransaction.cs" />
+    <Compile Include="Config\BrightstarConfiguration.cs" />
+    <Compile Include="Config\BrightstarConfigurationSectionHandler.cs" />
+    <Compile Include="Config\PageCachePreloadConfiguration.cs" />
+    <Compile Include="Config\StorePreloadConfiguration.cs" />
     <Compile Include="Dto\CommitPointInfoObject.cs" />
     <Compile Include="Dto\CommitPointResponseModel.cs" />
     <Compile Include="Dto\CreateStoreRequestObject.cs" />
@@ -182,16 +188,26 @@
     <Compile Include="Dto\TransactionInfoObject.cs" />
     <Compile Include="Dto\TransactionStatus.cs" />
     <Compile Include="Dto\TransactionType.cs" />
+    <Compile Include="EntityFramework\DefaultKeyConverter.cs" />
+    <Compile Include="EntityFramework\EntityKeyChangedException.cs" />
+    <Compile Include="EntityFramework\EntityKeyRequiredException.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
+    <Compile Include="EntityFramework\IdentityInfo.cs" />
+    <Compile Include="EntityFramework\IKeyConverter.cs" />
     <Compile Include="EntityFramework\NamespaceDeclarations.cs" />
     <Compile Include="EntityFramework\Query\SparqlQueryContext.cs" />
+    <Compile Include="EntityFramework\UniqueConstraintViolationException.cs" />
     <Compile Include="FormatInfo.cs" />
     <Compile Include="ISerializationFormat.cs" />
     <Compile Include="NoAcceptableFormatException.cs" />
+    <Compile Include="Query\BrightstarRdfProvider.cs" />
+    <Compile Include="Query\BrightstarVirtualNode.cs" />
+    <Compile Include="Query\VirtualizingSparqlDataset.cs" />
     <Compile Include="RdfFormat.cs" />
     <Compile Include="Rdf\PlainLiteral.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
+    <Compile Include="Rdf\RdfXmlWriter.cs" />
     <Compile Include="SerializableModel.cs" />
     <Compile Include="Server\GuardedUpdateTransaction.cs" />
     <Compile Include="Server\NoSuchStoreException.cs" />

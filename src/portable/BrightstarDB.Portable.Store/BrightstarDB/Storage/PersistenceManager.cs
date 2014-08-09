@@ -19,7 +19,7 @@ namespace BrightstarDB.Storage
                 var result = t.Result;
                 return result != null;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

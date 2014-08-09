@@ -202,4 +202,10 @@ Global
 		{DF96239F-5240-475C-BD33-52F0EE2536C2} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{4EB8BF43-94B1-4264-B2C9-9EE1BAB7F094} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = BrightstarDB.vsmdi
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = BrightstarDB.vsmdi
+	EndGlobalSection
 EndGlobal

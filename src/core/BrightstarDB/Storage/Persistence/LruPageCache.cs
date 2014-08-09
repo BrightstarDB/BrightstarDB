@@ -100,6 +100,19 @@ namespace BrightstarDB.Storage.Persistence
             }
         }
 
+        public void Clear()
+        {
+            _accessList.Clear();
+            _cacheItems.Clear();
+            _count = 0;
+        }
+
+        public int FreePages
+        {
+            get { return _highWaterMark - _count; }
+        }
+
+
         private void EvictItems()
         {
             if (_evictInProgress) return;

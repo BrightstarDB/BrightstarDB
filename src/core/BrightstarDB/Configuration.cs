@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using BrightstarDB.Caching;
+using BrightstarDB.Config;
 using BrightstarDB.Storage;
 using System.Configuration;
 
@@ -119,6 +120,13 @@ namespace BrightstarDB
             // StatsUpdate properties
             StatsUpdateTransactionCount = GetApplicationSetting(StatsUpdateTransactionCountName, 0);
             StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
+
+            // Advanced embedded application settings - read from the brightstar section of the app/web.config
+            var advancedConfiguration = ConfigurationManager.GetSection("brightstar") as BrightstarConfiguration;
+            if (advancedConfiguration != null)
+            {
+                PreloadConfiguration = advancedConfiguration.PreloadConfiguration;
+            }
 
 #endif
 #if !PORTABLE
@@ -270,6 +278,17 @@ namespace BrightstarDB
         /// be updated.</para>
         /// </remarks>
         public static int StatsUpdateTimespan { get; set; }
+
+        /// <summary>
+        /// Get or set the configuration for the page cache warmup
+        /// </summary>
+        public static PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+
+        /// <summary>
+        /// Set this property to true to enable the use of virtual nodes in SPARQL
+        /// queries. This an experimental option that may improve query performance.
+        /// </summary>
+        public static bool EnableVirtualizedQueries { get; set; }
 
 #if !PORTABLE
         private static ICache GetQueryCache()

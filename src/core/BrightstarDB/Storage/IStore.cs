@@ -4,6 +4,7 @@ using System.IO;
 using BrightstarDB.Model;
 using BrightstarDB.Profiling;
 using BrightstarDB.Query;
+using BrightstarDB.Storage.BPlusTreeStore.ResourceIndex;
 using BrightstarDB.Storage.Persistence;
 using VDS.RDF.Query;
 
@@ -139,5 +140,65 @@ namespace BrightstarDB.Storage
         /// <param name="profiler"></param>
         /// <returns>The number of triples matching the specified predicate</returns>
         ulong GetTripleCount(string predicateUri, BrightstarProfiler profiler = null);
+
+        /// <summary>
+        /// Preload data pages used by this store into the cache
+        /// </summary>
+        /// <param name="pagesToPreload">The maximum number of pages to load</param>
+        /// <param name="profiler"></param>
+        void WarmupPageCache(int pagesToPreload, BrightstarProfiler profiler = null);
+
+        #region Methods added to interface to support VirtualizingSparqlDataset
+
+        /// <summary>
+        /// Returns the resource with the specified ID from the internal resource index
+        /// </summary>
+        /// <param name="nodeId"></param>
+        /// <returns></returns>
+        IResource Resolve(ulong nodeId);
+
+        /// <summary>
+        /// Returns the full URI for a CURIE string
+        /// </summary>
+        /// <param name="prefixedUri">The CURIE string to be resolved</param>
+        /// <returns></returns>
+        string ResolvePrefixedUri(string prefixedUri);
+
+        /// <summary>
+        /// Lookup the specified URI resource.
+        /// </summary>
+        /// <param name="uri">The URI resource to lookup</param>
+        /// <returns>The internal ID of the resource node or StoreConstants.NullULong if the resource is not found</returns>
+        ulong LookupResource(string uri);
+
+        /// <summary>
+        /// Lookup the specified literal resource
+        /// </summary>
+        /// <param name="value">The literal value</param>
+        /// <param name="datatype">The literal datatype or null if the literal has no datatype</param>
+        /// <param name="langCode">The literal language code or null if the literal has no language code</param>
+        /// <returns>The internal ID of the literal resource node or StoreConstants.NullULong if the resource is not found</returns>
+        ulong LookupResource(string value, string datatype, string langCode);
+
+        /// <summary>
+        /// Lookup the internal ID of a graph
+        /// </summary>
+        /// <param name="graphUri">The graph URI to lookup</param>
+        /// <returns>The internal ID of the the graph or -1 if not graph with the specified URI exists</returns>
+        int LookupGraph(string graphUri);
+
+        /// <summary>
+        /// Return the URI of the graph with the spcified internal ID
+        /// </summary>
+        /// <param name="graphId"></param>
+        /// <returns></returns>
+        string ResolveGraphUri(int graphId);
+
+        IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null, string langCode = null, string graph = null);
+        IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(string subject, string predicate, string obj, bool isLiteral = false, string dataType = null, string langCode = null, IEnumerable<string> graphs = null);
+        IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(ulong? subjNodeId, string subjValue, ulong? predNodeId, string predValue, ulong? objNodeId, string objValue, bool isLiteral, string dataType, string languageCode, List<string> graphUris);
+
+        #endregion
+
     }
 }

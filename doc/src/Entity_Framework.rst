@@ -202,7 +202,7 @@ to set this configuration property::
 Entity Attribute
 ----------------
 
-The entity attribute is used to indicate that the annotated interface should be included in 
+The ``Entity`` attribute is used to indicate that the annotated interface should be included in 
 the generated model. Optionally, a full URI or a URI postfix can be supplied that defines the 
 identity of the class. The following examples show how to use the attribute. The example with 
 just the value 'Person' uses a default prefix if one is not specified as described above::
@@ -222,6 +222,8 @@ just the value 'Person' uses a default prefix if one is not specified as describ
 Example 3. above can be used to map .NET models onto existing RDF vocabularies. This allows 
 the model to create data in a given vocabulary but it also allows models to be mapped onto 
 existing RDF data.
+
+.. _Identity_Property:
 
 Identity Property
 -----------------
@@ -262,6 +264,10 @@ where {prefix} is a namespace prefix defined by the Namespace Declaration Attrib
   }
   // NOTE: For the above to work there must be an assembly attribute declared like this:
   [assembly:NamespaceDeclaration("ex", "http://example.org/")]
+  
+The ``Identifier`` attribute has additional arguments that enable you to specify a (composite)
+key for the type. For more information please refer to the section :ref:`Key_Properties_In_EF`.
+
 
 Property Inclusion
 ------------------
@@ -624,6 +630,171 @@ declaration::
 The new partial class implements the additional method declaration and has access to all the 
 data properties in the generated class.  
 
+.. _Key_Properties_in_EF:
+
+Key Properties and Composite Keys
+=================================
+
+The :ref:`Identity_Property` provides a simple means of accessing the key value of an entity,
+this key value is concatenated with the base URI string for the entity type to generate the full
+URI identifier of the RDF resource that is created for the entity. In many applications the exact
+key used is immaterial, and the default strategy of generating a GUID-based key works well. However
+in some cases it is desirable to have more control over the key assigned to an entity. For this
+purpose we provide a number of additional arguments on the ``Identifier`` attribute. These arguments
+allow you to specify that the key for an entity type is generated from one or more of its properties
+
+Specifying Key Properties
+-------------------------
+
+The ``KeyProperties`` argument accepts an array of strings that name
+the properties of the entity that should be combined to create a key value for the entity.
+The value of the named properties will be concatenated in the order that they are named
+in the ``KeyProperties`` array, with a slash ('/') between values::
+
+    // An entity with a key generated from one of its properties.
+    [Entity]
+    public interface IBook {
+        [Identifier("http://example.org/books/", 
+                    KeyProperties=new [] {"Isbn"}]
+        public string Id { get; }
+        public string Isbn {get;set;}
+    }
+    
+    // An entity with a composite key
+    [Entity]
+    public interface IWidget {
+        [Identifier("http://widgets.org/", 
+            KeyProperties=new [] {"Manufacturer", "ProductCode"}]
+        public string Id { get; }
+        public string Manufacturer {get;set;}
+        public string ProductCode  {get;set;}
+    }
+
+    // In use...
+    var book = context.Books.Create();
+    book.Isbn = "1234567890";
+    // book URI identifier will be http://example.org/books/1234567890
+    
+    var widget = context.Widgets.Create();
+    widget.Manufacturer = "Acme";
+    widget.ProductCode = "Grommet"
+    // widget identifier will be http://widgets.org/Acme/Grommet
+    
+Key Separator
+-------------
+
+The ``KeySeparator`` argument of the ``Identifier`` attribute allows you to change the string
+used to concatenate multiple values into a single key::
+
+    // An entity with a composite key
+    [Entity]
+    public interface IWidget {
+        [Identifier("http://widgets.org/", 
+            KeyProperties=new [] {"Manufacturer", "ProductCode"},
+            KeySeparator="_"]
+        public string Id { get; }
+        public string Manufacturer {get;set;}
+        public string ProductCode  {get;set;}
+    }
+
+    var widget = context.Widgets.Create();
+    widget.Manufacturer = "Acme";
+    widget.ProductCode = "Grommet"
+    // widget identifier will be http://widgets.org/Acme_Grommet
+    
+Key Converter
+-------------
+
+The values of the key properties are converted to a string by a class that implements the
+``BrightstarDB.EntityFramework.IKeyConverter`` interface. The default implementation implements
+the following rules:
+
+    * Integer and decimal values are converted using the InvariantCulture (to eliminate culture-specific separators)
+    * Properties whose value is another entity will yield the key of that entity. That is the 
+      part of the URI identifier that follows the base URI string.
+    * Properties whose value is NULL are ignored.
+    * If all key properties are NULL, a NULL key will be generated, which will result in a 
+      ``BrightstarDB.EntityFramework.EntityKeyRequiredException`` being raised.
+    * The converted string value is URI-escaped using the .NET method ``Uri.EscapeUriString(string)``.
+    * Multiple non-null values are concatenated using the separator specified by the KeySeparator property.
+
+You can create your own key conversion rules by implementing the ``IKeyConverter`` interface and specifying
+the implementation type in the ``KeyConverterType`` argument of the ``Identifier`` attribute.
+
+Hierarchical Key Pattern
+------------------------
+
+Using the default key conversion rules it is possible to construct hierarchical identifier schemes::
+
+    [Entity]
+    public interface IHierarchicalKeyEntity
+    {
+        [Identifier(BaseAddress = "http://example.org/", 
+         KeyProperties = new[]{"Parent", "Code"})]
+        string Id { get; }
+
+        IHierarchicalKeyEntity Parent { get; set; }
+        string Code { get; set; }
+    }
+
+    // Example:
+    var parent = context.HierarchicalKeyEntities.Create();
+    parent.Code = "parent"; // URI will be http://example.org/parent
+    
+    var child = context.HierarchicalKeyEntities.Create();
+    child.Parent = parent;
+    child.Code = "child"; // URI will be http://example.org/parent/child
+    
+.. note::
+    Although this example uses the same type of entity for both parent and child
+    object, it is equally valid to use different types of entity for parent and child.
+    
+.. _Key_Constraints:
+
+Key Constraints
+---------------
+
+When using the Entity Framework with the BrightstarDB back-end, entities with key properties 
+are treated as having a "class-unique key constraint". This means that it is not allowed to
+create an RDF resource with the same URI identifier and the same RDF type. This form of
+constraint means that it is possible for one resource to have multiple types, but it still
+ensures that for any given type all of its identifiers are unique.
+
+The constraint is checked as part of the update transaction and if it fails a ``BrightstarDB.EntityFramework.UniqueConstraintViolationException``
+will be raised. The constraint is also checked when creating new entities, but in this case
+the check is only against the entities currently loaded into the context - this allows your
+code to "fail fast" if a uniqueness violation occurs in the collection of entities loaded
+in the context.
+
+.. warning::
+    Key constraints are not checked when using the Entity Framework with a DotNetRDF or
+    generic SPARQL back-end, as the SPARQL UPDATE protocol does not allow for such transaction
+    pre-conditions to be checked.
+
+Changing Identifiers
+--------------------
+
+With release 1.7 of BrightstarDB, it is now possible to alter the URI identifier of 
+an entity. Currently this is only supported on entities that have generated keys and
+is achieved by modifying any of the properties that contribute to the key.
+
+A change of identifier is handled by the Entity Framework as a deletion of all triples
+where the old identifier is the subject or object of the triple, followed by the creation
+of a new set of triples equivalent to the deleted set but with the old identifier replaced
+by the new identifier. Because the triples where the identifier is used as the object
+are updated, all "links" in the data set will be properly maintained when an identifier
+is modified in this way.
+
+.. warning::
+    When using another entity ID as part of the composite key for an entity please
+    be aware that currently the entity framework code does not automatically change
+    the identifiers of all dependencies when a dependent ID property is changed. This
+    is done to avoid a large amount of overhead in checking for ID dependencies in the
+    data store when changes are saved. The supported use case is that the dependency ID
+    (e.g. the ID of the parent entity) is not modified once it is used to construct other
+    identifiers.
+    
+    
 .. _Optimistic_Locking_in_EF:
 
 Optimistic Locking

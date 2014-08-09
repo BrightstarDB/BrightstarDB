@@ -82,5 +82,13 @@ namespace BrightstarDB.Storage.Persistence
         /// <param name="commitId">The ID of the update transaction that modified the page</param>
         /// <param name="pageId">The ID of the page modified</param>
         void MarkDirty(ulong commitId, ulong pageId);
+
+        /// <summary>
+        /// Sequentially load a number of pages from the start of the store into the in-memory page cache
+        /// </summary>
+        /// <param name="numPages">The maximum number of pages to load</param>
+        /// <param name="profiler">OPTIONAL: Profiling object for this operation</param>
+        /// <returns>The number of pages actually loaded into the in-memory page cache</returns>
+        int Preload(int numPages, BrightstarProfiler profiler);
     }
 }

@@ -58,16 +58,17 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             var builder = new BPlusTreeBuilder(pageStore, config);
             var treeRoot = builder.Build(1, _testOrderedValues.Take(keyCount));
             var treeBeforeSave = new BPlusTree(pageStore, treeRoot);
-            treeBeforeSave.Save(1, null);
+            treeBeforeSave.Save(2, null);
+            //treeBeforeSave.DumpStructure();
             //ValidateScan(treeBeforeSave.Scan(null), keyCount, pageStoreName + " before save");
-            pageStore.Commit(1, null);
+            pageStore.Commit(2, null);
             pageStore.Close();
             
            
-            using(var ps = TestUtils.OpenPageStore(pageStoreName, true, persistenceType, 1))
+            using(var ps = TestUtils.OpenPageStore(pageStoreName, true, persistenceType, 2))
             {
                 var tree = new BPlusTree(ps, treeRoot);
-                tree.DumpStructure();
+                //tree.DumpStructure();
                 ValidateScan(tree.Scan(null), keyCount, pageStoreName + " after save");
                 ValidateSearch(tree, keyCount, pageStoreName + "after save");
             }

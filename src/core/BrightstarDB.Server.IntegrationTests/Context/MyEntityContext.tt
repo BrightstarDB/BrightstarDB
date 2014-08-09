@@ -70,29 +70,27 @@ public void EndNamespace(string namespaceName) {
 private void WriteContextClass(CodeGenerationTools code, Helper helper, string contextClassName) {
 #>
 public partial class <#=code.Escape(contextClassName) #> : BrightstarEntityContext {
-	private static readonly EntityMappingStore TypeMappings;
 	
 	static <#= code.Escape(contextClassName) #>() 
 	{
-		TypeMappings = new EntityMappingStore();
 		var provider = new ReflectionMappingProvider();
 <#+
 	foreach(var i in helper.GetDecoratedInterfaces()) 
 	{
 #>
-		provider.AddMappingsForType(TypeMappings, typeof(<#=i.InterfaceFullName#>));
-		TypeMappings.AddImplMapping<<#=i.InterfaceFullName#>, <#=code.CreateFullName(i.InterfaceNamespaceName, i.ClassName)#>>();
+		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(<#=i.InterfaceFullName#>));
+		EntityMappingStore.Instance.SetImplMapping<<#=i.InterfaceFullName#>, <#=code.CreateFullName(i.InterfaceNamespaceName, i.ClassName)#>>();
 <#+
 	}
 #>
 	}
 	
 	/// <summary>
-	/// Initialize a new entity context using the specified Brightstar
+	/// Initialize a new entity context using the specified BrightstarDB
 	/// Data Object Store connection
 	/// </summary>
-	/// <param name="dataObjectStore">The connection to the Brightstar Data Object Store that will provide the entity objects</param>
-	public <#= code.Escape(contextClassName) #>(IDataObjectStore dataObjectStore) : base(TypeMappings, dataObjectStore)
+	/// <param name="dataObjectStore">The connection to the BrightstarDB Data Object Store that will provide the entity objects</param>
+	public <#= code.Escape(contextClassName) #>(IDataObjectStore dataObjectStore) : base(dataObjectStore)
 	{
 		InitializeContext();
 	}
@@ -114,7 +112,7 @@ public partial class <#=code.Escape(contextClassName) #> : BrightstarEntityConte
 		string updateGraphUri = null,
 		IEnumerable<string> datasetGraphUris = null,
 		string versionGraphUri = null
-    ) : base(TypeMappings, connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+    ) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
 	{
 		InitializeContext();
 	}
@@ -123,7 +121,7 @@ public partial class <#=code.Escape(contextClassName) #> : BrightstarEntityConte
 	/// Initialize a new entity context using the specified Brightstar
 	/// connection string retrieved from the configuration.
 	/// </summary>
-	public <#= code.Escape(contextClassName) #>() : base(TypeMappings)
+	public <#= code.Escape(contextClassName) #>() : base()
 	{
 		InitializeContext();
 	}
@@ -143,7 +141,7 @@ public partial class <#=code.Escape(contextClassName) #> : BrightstarEntityConte
 		string updateGraphUri,
 		IEnumerable<string> datasetGraphUris,
 		string versionGraphUri
-	) : base(TypeMappings, updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
+	) : base(updateGraphUri:updateGraphUri, datasetGraphUris:datasetGraphUris, versionGraphUri:versionGraphUri)
 	{
 		InitializeContext();
 	}
@@ -171,7 +169,22 @@ public partial class <#=code.Escape(contextClassName) #> : BrightstarEntityConte
 <#+
 	}
 #>
-}
+    public IEntitySet<T> EntitySet<T>() where T : class {
+        var itemType = typeof(T);
+<#+
+        foreach(var i in helper.GetDecoratedInterfaces()) {
+#>
+        if (typeof(T).Equals(typeof(<#=i.InterfaceFullName#>))) {
+            return (IEntitySet<T>)this.<#= code.Escape(i.PluralizedName) #>;
+        }
+<#+
+        }
+#>
+        throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
+    }
+
+    } // end class <#=code.Escape(contextClassName)#>
+    
 <#+
 }
 
@@ -184,14 +197,14 @@ private void WriteEntityClass(CodeGenerationTools code, Helper helper, ResourceI
 
 <#= code.SpaceAfter(iface.EntitySetAccessLevel)#>partial class <#= iface.ClassName #> : BrightstarEntityObject, <#= iface.InterfaceName #> 
 {
-	public <#= iface.ClassName#>(BrightstarEntityContext context, IDataObject dataObject) : base(context, dataObject) { }
+	public <#= iface.ClassName#>(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
 	public <#= iface.ClassName#>() : base() { }
 <#+
 	if (identityProperty != null) 
 	{
 		ValidateIdentityProperty(identityProperty);
 #>
-	public <#= ((CodeProperty)identityProperty).Type.AsFullName #> <#= identityProperty.Name #> { get {return GetIdentity(); } set { SetIdentity(value); } }
+	public <#= ((CodeProperty)identityProperty).Type.AsFullName #> <#= identityProperty.Name #> { get {return GetKey(); } set { SetKey(value); } }
 <#+
 	}
 	
@@ -237,14 +250,14 @@ private void WriteInterfaceImplementation(CodeGenerationTools code, Helper helpe
 						{
 							#>
 		get { return GetRelatedObjects<<#=t#>>(<#= code.CreateLiteral(p.Name) #>); }
-		set { SetRelatedObjects(<#= code.CreateLiteral(p.Name)#>, value); }
+		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects(<#= code.CreateLiteral(p.Name)#>, value); }
 							<#+
 						} 
 						else 
 						{
 							#>
 		get { return GetRelatedLiteralPropertiesCollection<<#=t#>>(<#= code.CreateLiteral(p.Name) #>); }
-		set { SetRelatedLiteralPropertiesCollection<<#=t#>>(<#= code.CreateLiteral(p.Name)#>, value); }
+		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<<#=t#>>(<#= code.CreateLiteral(p.Name)#>, value); }
 <#+
 						}
 #>

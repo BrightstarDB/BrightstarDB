@@ -48,5 +48,11 @@ namespace BrightstarDB
         /// </summary>
         public const string StoreNameRegex = @"^[a-zA-Z0-9-_\.\+,\(\)]{1,1024}$";
 
+        /// <summary>
+        /// The default composite key separator
+        /// </summary>
+        public const string DefaultKeySeparator = "/";
+
+
     }
 }

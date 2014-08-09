@@ -25,5 +25,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         void Insert(ulong transactionId, string resource, out ulong pageId, out byte segment, BrightstarProfiler profiler);
 
         void Commit(ulong transactionId, BrightstarProfiler profiler);
+
+        /// <summary>
+        /// Load a number of pages from persistent storage into the local page cache.
+        /// </summary>
+        /// <param name="numPages"></param>
+        /// <param name="profiler"></param>
+        /// <returns>The actual number of pages loaded</returns>
+        int Preload(int numPages, BrightstarProfiler profiler);
     }
 }

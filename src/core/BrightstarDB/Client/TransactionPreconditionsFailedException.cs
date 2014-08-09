@@ -12,7 +12,13 @@ namespace BrightstarDB.Client
     /// </summary>
     public class TransactionPreconditionsFailedException : BrightstarException, ITripleSink
     {
-        private readonly List<string> _invalidSubjects;
+#if WINDOWS_PHONE
+        private readonly Dictionary<string, bool> _invalidSubjects;
+        private readonly Dictionary<string, bool> _invalidNonExistenceSubjects;
+#else
+        private readonly HashSet<string> _invalidSubjects;
+        private readonly HashSet<string> _invalidNonExistenceSubjects;
+#endif
 
         /// <summary>
         /// Returns the failed precondition triples in NTriples format
@@ -20,10 +26,37 @@ namespace BrightstarDB.Client
         public string FailedPreconditions { get; private set; }
 
         /// <summary>
+        /// Returns the triples that failed the non-existence precondition tests
+        /// </summary>
+        public string FailedNonExistencePreconditions { get; private set; }
+
+#if WINDOWS_PHONE
+        /// <summary>
+        /// Returns an enumeration over the subject resource URIs for all preconditions reported
+        /// as not being met.
+        /// </summary>
+        public IEnumerable<string> InvalidSubjects { get { return _invalidSubjects.Keys; } }
+
+        /// <summary>
+        /// Returns an enumeration over the subject resource URIs for all triples that failed
+        /// the non-existence precondition.
+        /// </summary>
+        public IEnumerable<string> InvalidNonExistenceSubjects { get { return _invalidNonExistenceSubjects.Keys; } }
+#else
+        /// <summary>
         /// Returns an enumeration over the subject resource URIs for all preconditions reported
         /// as not being met.
         /// </summary>
         public IEnumerable<string> InvalidSubjects { get { return _invalidSubjects; } }
+
+        /// <summary>
+        /// Returns an enumeration over the subject resource URIs for all triples that failed
+        /// the non-existence precondition.
+        /// </summary>
+        public IEnumerable<string> InvalidNonExistenceSubjects { get { return _invalidNonExistenceSubjects; } }
+#endif
+        private bool _parsingNonexistenceFailures;
+
 
         internal TransactionPreconditionsFailedException(string existenceFailures, string nonexistenceFailures)
             : base("Transaction preconditions were not met.")
@@ -33,8 +66,13 @@ namespace BrightstarDB.Client
             {
                 try
                 {
-                    _invalidSubjects = new List<string>();
+#if WINDOWS_PHONE
+                    _invalidSubjects = new Dictionary<string, bool>();
+#else
+                    _invalidSubjects = new HashSet<string>();
+#endif
                     var p = new NTriplesParser();
+                    this._parsingNonexistenceFailures = false;
                     using (var rdr = new StringReader(existenceFailures))
                     {
                         p.Parse(rdr, this, Constants.DefaultGraphUri);
@@ -43,6 +81,29 @@ namespace BrightstarDB.Client
                 catch
                 {
                     // Ignore any errors when trying to parse the failed preconditions
+                }
+            }
+
+            FailedNonExistencePreconditions = nonexistenceFailures;
+            if (nonexistenceFailures != null)
+            {
+                try
+                {
+#if WINDOWS_PHONE
+                    _invalidNonExistenceSubjects = new Dictionary<string, bool>();
+#else
+                    _invalidNonExistenceSubjects = new HashSet<string>();
+#endif
+                    this._parsingNonexistenceFailures = true;
+                    var p = new NTriplesParser();
+                    using (var rdr = new StringReader(nonexistenceFailures))
+                    {
+                        p.Parse(rdr, this, Constants.DefaultGraphUri);
+                    }
+                }
+                catch
+                {
+                    // Ignore errors when trying to parse the failed preconditions
                 }
             }
         }
@@ -64,7 +125,33 @@ namespace BrightstarDB.Client
         /// <param name="graphUri">The graph URI for the statement</param>
         public void Triple(string subject, bool subjectIsBNode, string predicate, bool predicateIsBNode, string obj, bool objIsBNode, bool objIsLiteral, string dataType, string langCode, string graphUri)
         {
-            _invalidSubjects.Add(subject);
+#if WINDOWS_PHONE
+            if (_parsingNonexistenceFailures)
+            {
+                _invalidNonExistenceSubjects[subject] = true;
+            }
+            else
+            {
+                _invalidSubjects[subject] = true;
+            }
+#else
+            if (_parsingNonexistenceFailures)
+            {
+                _invalidNonExistenceSubjects.Add(subject);
+            }
+            else
+            {
+                _invalidSubjects.Add(subject);
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Method invoked to indicate that no more triples remain to be written to the sink.
+        /// </summary>
+        public void Close()
+        {
+            // No-op
         }
 
         #endregion

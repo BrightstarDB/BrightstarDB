@@ -637,6 +637,41 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             Delete(txnId, BitConverter.GetBytes(key), profiler);
         }
 
+        public int PreloadTree(int numPages, BrightstarProfiler profiler)
+        {
+            if (numPages == 0) return 0;
+            var pageQueue = new Queue<ulong>(numPages);
+            pageQueue.Enqueue(_rootId);
+
+            var numLoaded = 0;
+            while (numLoaded < numPages)
+            {
+                ulong pageId;
+                try
+                {
+                    pageId = pageQueue.Dequeue();
+                }
+                catch (InvalidOperationException)
+                {
+                    // Raised when the queue is empty
+                    return numLoaded;
+                }
+                var node = GetNode(pageId, profiler);
+                numLoaded++;
+                if (node is IInternalNode)
+                {
+                    var internalNode = node as IInternalNode;
+                    foreach (var childPageId in internalNode.Scan())
+                    {
+                        pageQueue.Enqueue(childPageId);
+                    }
+                }
+            }
+            return numLoaded;
+        }
+
+        
+
         #region Node factory methods
 
         private ILeafNode MakeLeafNode(ulong txnId)

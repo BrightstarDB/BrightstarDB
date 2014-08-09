@@ -56,6 +56,19 @@ namespace BrightstarDB.Storage.Persistence
             }
         }
 
+        public void Clear()
+        {
+            foreach (var k in _pages.Keys.ToList())
+            {
+                _pages.Remove(k);
+            }
+        }
+
+        public int FreePages
+        {
+            get { return _pages.FreePages; }
+        }
+
         #endregion
 
         private int AssertPartitionId(string partition)

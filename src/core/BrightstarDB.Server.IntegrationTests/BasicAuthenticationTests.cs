@@ -143,7 +143,7 @@ namespace BrightstarDB.Server.IntegrationTests
                 aliceClient.CreateStore("foo");
                 Assert.Fail("Expected a BrightstarClientException when alice tries to create her own stor.");
             }
-            catch (BrightstarClientException ex)
+            catch (BrightstarClientException)
             {
                 // Expected
                 
