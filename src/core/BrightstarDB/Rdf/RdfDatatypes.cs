@@ -200,17 +200,25 @@ namespace BrightstarDB.Rdf
             Char, 
             o=>((char)o).ToString(), 
             (s,l)=>s.ToCharArray().FirstOrDefault());
+
+        private static readonly RdfDatatype RdfByteArray = new RdfDatatype(
+            Base64Binary,
+            o => Convert.ToBase64String((byte[]) o),
+            (s, l) => Convert.FromBase64String(s));
+
 #else
         private static readonly RdfDatatype RdfChar = new RdfDatatype(
             Char, 
             o => ((char)o).ToString(CultureInfo.InvariantCulture), 
             (s,l) => s.FirstOrDefault());
-#endif
 
         private static readonly RdfDatatype RdfByteArray = new RdfDatatype(
             Base64Binary,
             o => Convert.ToBase64String((byte[]) o, Base64FormattingOptions.None),
             (s, l) => Convert.FromBase64String(s));
+
+#endif
+
 
         private static readonly Dictionary<Type, RdfDatatype> SystemTypeToRdfType =
             new Dictionary<Type, RdfDatatype>
