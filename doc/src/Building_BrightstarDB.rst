@@ -115,7 +115,7 @@ The script uses the following properties:
 	
 	NUnitPath
 		The path to your NUnit bin directory. This is used when running the unit tests. Defaults to
-		C:\Program Files (x86)\NUnit 2.6.2\bin
+		`C:\Program Files (x86)\NUnit 2.6.2\bin`
 		
 You can either override these properties on the command-line using /p:{Property}={Value} switches
 or you can edit the build.proj file (the properties are defined at the top of the file).
@@ -250,16 +250,16 @@ The MSBuild script has the following targets:
 ******************************************
 
     An MSBuild project is provided to compile and build a complete release package
-    for BrightstarDB. This project can be found at ``installer\\installers.proj``.
+    for BrightstarDB. This project can be found at ``installer\installers.proj``.
     The project will build all of the libraries and documentation and then make
     MSI and NuGet packages.
 	
-	..note:
+..note::
 	
-		Building the full installer solution requires all the pre-requisites listed
-		above to be installed. It also requires that you have first restored NuGet
-		dependencies in both the core solution and the tools solution as described
-		in the sections above.
+    Building the full installer solution requires all the pre-requisites listed
+    above to be installed. It also requires that you have first restored NuGet
+    dependencies in both the core solution and the tools solution as described
+    in the sections above.
     
 *********************
  Building Under Mono
