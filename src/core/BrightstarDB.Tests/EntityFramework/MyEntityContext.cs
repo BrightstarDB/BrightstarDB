@@ -351,7 +351,7 @@ namespace BrightstarDB.Tests.EntityFramework
     	
         public IEntitySet<T> EntitySet<T>() where T : class {
             var itemType = typeof(T);
-            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IAnimal))) {
+            if (typeof(T) == typeof(BrightstarDB.Tests.EntityFramework.IAnimal)) {
                 return (IEntitySet<T>)this.Animals;
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IArticle))) {
