@@ -46,6 +46,7 @@
     <Reference Include="Mono.Android" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigurationProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PathSeparatorProvider.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
