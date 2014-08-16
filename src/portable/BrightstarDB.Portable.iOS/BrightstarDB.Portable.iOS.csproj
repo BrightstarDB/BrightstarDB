@@ -34,6 +34,7 @@
     <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ConfigurationProvider.cs" />
     <Compile Include="PathSeparatorProvider.cs" />
     <Compile Include="PersistenceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
