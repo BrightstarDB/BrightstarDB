@@ -87,6 +87,7 @@
     <Compile Include="JobInfoExtensions.cs" />
     <Compile Include="Model\CommitPointsRequestModel.cs" />
     <Compile Include="Model\IPagedResultModel.cs" />
+    <Compile Include="Model\ISparqlResultModel.cs" />
     <Compile Include="Model\JobRequestModel.cs" />
     <Compile Include="Model\JobsRequestModel.cs" />
     <Compile Include="Model\PagedResultModel.cs" />
@@ -123,7 +124,6 @@
     <Compile Include="SparqlQueryResponse.cs" />
     <Compile Include="SparqlModule.cs" />
     <Compile Include="SparqlProcessor.cs" />
-    <Compile Include="Model\SparqlResultModel.cs" />
     <Compile Include="SparqlUpdateModule.cs" />
     <Compile Include="StatisticsModule.cs" />
     <Compile Include="StoreModule.cs" />

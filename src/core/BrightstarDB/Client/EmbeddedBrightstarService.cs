@@ -211,6 +211,7 @@ namespace BrightstarDB.Client
         {
             if (storeName == null) throw new ArgumentNullException("storeName");
             if (queryExpression == null) throw new ArgumentNullException("queryExpression");
+            if (resultsFormat == null && graphFormat == null) throw new ArgumentException("Either resultsFormat or graphFormat must be non-NULL");
 
             try
             {

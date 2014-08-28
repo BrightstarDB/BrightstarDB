@@ -377,6 +377,18 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
         }
 
+        [Test]
+        public void TestHtmlGetWithNoQueryReturnsAForm()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+
+            // Execute
+            var response = app.Get("/foo/sparql", with => with.Accept(MediaRange.FromString("text/html")));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Body.AsString().Contains("<form method=\"POST\">"));
+        }
+
         #region Helper Methods
         private static BrowserResponse TestGetFails(
             HttpStatusCode expectedStatusCode,
