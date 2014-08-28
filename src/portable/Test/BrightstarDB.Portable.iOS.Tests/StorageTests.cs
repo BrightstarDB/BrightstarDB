@@ -14,12 +14,11 @@ namespace BrightstarDB.Portable.iOS.Tests
     public class StorageTests
     {
         private readonly IPersistenceManager _pm = new PersistenceManager();
-        private const string StoragePath = "Library";
 
         [Test]
         public void TestCreateAndDeleteDirectory()
         {
-            string dirName = Path.Combine(StoragePath, "CreateDirectory_" + DateTime.Now.Ticks);
+            string dirName = Path.Combine(TestConfiguration.StoreLocation, "CreateDirectory_" + DateTime.Now.Ticks);
             Assert.False(_pm.DirectoryExists(dirName), "Directory exists before it is created");
             _pm.CreateDirectory(dirName);
             Assert.True(_pm.DirectoryExists(dirName), "Directory does not exist after creation");
@@ -30,7 +29,7 @@ namespace BrightstarDB.Portable.iOS.Tests
         [Test]
         public void TestCreateAndDeleteFile()
         {
-            string fname = Path.Combine(StoragePath, "CreateFile_" + DateTime.Now.Ticks);
+            string fname = Path.Combine(TestConfiguration.StoreLocation, "CreateFile_" + DateTime.Now.Ticks);
             Assert.False(_pm.FileExists(fname), "File exists before creation");
             _pm.CreateFile(fname);
             Assert.True(_pm.FileExists(fname), "File does not exist after creation");
@@ -42,7 +41,7 @@ namespace BrightstarDB.Portable.iOS.Tests
         [Test]
         public void TestCreateSubdirectory()
         {
-            string parent = Path.Combine(StoragePath, "Parent_" + DateTime.Now.Ticks);
+            string parent = Path.Combine(TestConfiguration.StoreLocation, "Parent_" + DateTime.Now.Ticks);
             string child = "Child1";
 
             _pm.CreateDirectory(Path.Combine(parent, child));
