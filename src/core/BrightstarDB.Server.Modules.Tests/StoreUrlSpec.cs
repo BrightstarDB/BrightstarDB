@@ -54,6 +54,7 @@ namespace BrightstarDB.Server.Modules.Tests
         public void TestHeadExistingStoreReturnsOk()
         {
             // Setup
+            Nancy.StaticConfiguration.DisableErrorTraces = true; // NOTE: If error tracing is disabled Nancy throws a NullReferenceException on a HEAD request
             var mockCommitPoint = new Mock<ICommitPointInfo>();
             mockCommitPoint.Setup(m => m.CommitTime).Returns(DateTime.UtcNow);
             var brightstar = new Mock<IBrightstarService>();
@@ -64,6 +65,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Head("/foo");
             var responseContent = response.Body.AsString();
+            Nancy.StaticConfiguration.DisableErrorTraces = false;
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Response status code was: {0}\nResponse body was: {1}",
