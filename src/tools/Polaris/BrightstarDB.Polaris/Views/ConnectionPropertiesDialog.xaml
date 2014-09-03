@@ -1,7 +1,7 @@
 ﻿<Window x:Class="BrightstarDB.Polaris.Views.ConnectionPropertiesDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+        xmlns:Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Connection Properties" Width="401" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:converters="clr-namespace:BrightstarDB.Polaris.Converters" d:DesignHeight="300" SizeToContent="Height" >
     <Window.Resources>
