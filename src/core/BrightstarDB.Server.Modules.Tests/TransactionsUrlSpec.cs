@@ -114,7 +114,7 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(transaction, Has.Property("Id").EqualTo(123));
             Assert.That(transaction, Has.Property("JobId").EqualTo(Guid.Parse("{6100E798-EDB4-457B-AE33-640EF64BFA18}")));
             Assert.That(transaction, Has.Property("StoreName").EqualTo("foo"));
-            Assert.That(transaction, Has.Property("StartTime").EqualTo(new DateTime(2013, 09, 29, 11, 38, 00, DateTimeKind.Utc)));
+            Assert.That(transaction, Has.Property("StartTime").EqualTo(new DateTime(2013, 09, 29, 11, 38, 00, DateTimeKind.Utc)).Using<DateTime>((x,y)=> x.ToUniversalTime().CompareTo(y.ToUniversalTime())));
             Assert.That(transaction, Has.Property("TransactionType").EqualTo("ImportJob"));
             Assert.That(transaction, Has.Property("Status").EqualTo("CompletedOk"));
         }
