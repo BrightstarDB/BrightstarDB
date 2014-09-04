@@ -8,7 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{cb03b7c8-ca92-41f5-b9a5-0230892b04f4}</ProjectGuid>
-    <SHFBSchemaVersion>1.9.5.0</SHFBSchemaVersion>
+    <SHFBSchemaVersion>1.9.9.0</SHFBSchemaVersion>
     <!-- AssemblyName, Name, and RootNamespace are not used by SHFB but Visual
          Studio adds them anyway -->
     <AssemblyName>Documentation</AssemblyName>
@@ -33,25 +33,26 @@
     </FeedbackEMailLinkText>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="(global)" isDocumented="True">BrightstarDB API Documentation.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB" isDocumented="True">The root namespace for the BrightstarDB API.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.Analysis" isDocumented="False" />
-<NamespaceSummaryItem name="BrightstarDB.Client" isDocumented="True">BrightstarDB Client API. Used to connect to a BrightstarDB instance and perform query and update operations.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.EntityFramework" isDocumented="True">Core classes for binding .NET objects to a BrightstarDB store</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.EntityFramework.Query" isDocumented="True">Core classes for processing LINQ queries against a BrightstarDB Entity Framework context as SPARQL queries against the underlying BrightstarDB store</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.OData" isDocumented="True">The BrightstarDB OData service API. Contains classes for creating an OData service context.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.Storage" isDocumented="False" />
-<NamespaceSummaryItem name="BrightstarDB.Rdf" isDocumented="True">Provides RDF parsing and serialization facilities for BrightstarDB</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.Query" isDocumented="False" />
-<NamespaceSummaryItem name="BrightstarDB.Caching" isDocumented="True">Provides services for in-memory and disk caching in BrightstarDB.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.Dynamic" isDocumented="True">Extensions for using Dynamic Objects with the BrightstarDB client API</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.Storage.Persistence" isDocumented="False">Provides persistent configuration for BrightstarDB</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.Licensing" isDocumented="False">Provides classes for controlling the licensing of embedded and mobile applications.
+      <NamespaceSummaryItem name="BrightstarDB" isDocumented="True">The root namespace for the BrightstarDB API.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.Analysis" isDocumented="False" />
+      <NamespaceSummaryItem name="BrightstarDB.Client" isDocumented="True">BrightstarDB Client API. Used to connect to a BrightstarDB instance and perform query and update operations.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.EntityFramework" isDocumented="True">Core classes for binding .NET objects to a BrightstarDB store</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.EntityFramework.Query" isDocumented="True">Core classes for processing LINQ queries against a BrightstarDB Entity Framework context as SPARQL queries against the underlying BrightstarDB store</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.OData" isDocumented="True">The BrightstarDB OData service API. Contains classes for creating an OData service context.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.Storage" isDocumented="False" />
+      <NamespaceSummaryItem name="BrightstarDB.Rdf" isDocumented="True">Provides RDF parsing and serialization facilities for BrightstarDB</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.Query" isDocumented="False" />
+      <NamespaceSummaryItem name="BrightstarDB.Caching" isDocumented="True">Provides services for in-memory and disk caching in BrightstarDB.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.Dynamic" isDocumented="True">Extensions for using Dynamic Objects with the BrightstarDB client API</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.Storage.Persistence" isDocumented="False">Provides persistent configuration for BrightstarDB</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.Licensing" isDocumented="False">Provides classes for controlling the licensing of embedded and mobile applications.
 
 For embedded and mobile applications, the BrightstarDB.Licensing.License class must be initialized by a call to its Validate() method prior to attempting to open a BrightstarDB database. 
 
 For applications that connect to a BrightstarDB server over HTTP, TCP or NamedPipes connections, this step is not necessary as it is the server that must be licensed, not the client application.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.Client.RestSecurity" isDocumented="True">Contains an extensible framework for authenticating calls made to the BrightstarDB REST server.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="BrightstarDB.Dto" isDocumented="True">Contains the data transfer object models for the BrightstarDB REST service interface.</NamespaceSummaryItem></NamespaceSummaries>
+      <NamespaceSummaryItem name="BrightstarDB.Client.RestSecurity" isDocumented="True">Contains an extensible framework for authenticating calls made to the BrightstarDB REST server.</NamespaceSummaryItem>
+      <NamespaceSummaryItem name="BrightstarDB.Dto" isDocumented="True">Contains the data transfer object models for the BrightstarDB REST service interface.</NamespaceSummaryItem>
+    </NamespaceSummaries>
     <RootNamespaceContainer>True</RootNamespaceContainer>
     <RootNamespaceTitle>BrightstarDB API</RootNamespaceTitle>
     <SyntaxFilters>Standard</SyntaxFilters>
@@ -61,59 +62,61 @@ For applications that connect to a BrightstarDB server over HTTP, TCP or NamedPi
     <NamingMethod>Guid</NamingMethod>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <ComponentConfigurations>
-      <ComponentConfig id="Cached Framework Comments Index Data" enabled="True" xmlns="">
-        <component id="Cached Framework Comments Index Data" type="SandcastleBuilder.Components.CachedCopyFromIndexComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll">
-          <index name="comments" value="/doc/members/member" key="@name" cache="100">
-				{@CachedFrameworkCommentList}
-				{@CommentFileList}
-			</index>
-          <copy name="comments" source="*" target="/document/comments" />
-        </component>
+      <ComponentConfig id="Resolve Reference Links (ESENT Cache)" enabled="True">
+        <component id="Resolve Reference Links (ESENT Cache)">
+  <locale value="{@Locale}" />
+  <linkTarget value="{@SdkLinkTarget}" />
+  <helpOutput format="HtmlHelp1">
+    <msdnContentIdCache path="{@LocalDataFolder}Cache\MsdnContentId.cache" cachePath="{@LocalDataFolder}Cache\ESentMsdnContentIdCache" localCacheSize="2500" />
+    <targets base="{@SHFBFolder}Data\Reflection" recurse="true" files="*.xml" type="{@HtmlSdkLinkType}" id="FrameworkTargets" cachePath="{@LocalDataFolder}Cache\ESentFrameworkTargetCache" localCacheSize="2500">
+		{@ReferenceLinkNamespaceFiles}
+	</targets>
+    <targets files="reflection.xml" type="Local" id="ProjectTargets" cachePath="" localCacheSize="2500" noReload="true" />
+  </helpOutput>
+  <helpOutput format="MSHelp2">
+    <msdnContentIdCache path="{@LocalDataFolder}Cache\MsdnContentId.cache" cachePath="{@LocalDataFolder}Cache\ESentMsdnContentIdCache" localCacheSize="2500" />
+    <targets base="{@SHFBFolder}Data\Reflection" recurse="true" files="*.xml" type="{@MSHelp2SdkLinkType}" id="FrameworkTargets" cachePath="{@LocalDataFolder}Cache\ESentFrameworkTargetCache" localCacheSize="2500">
+		{@ReferenceLinkNamespaceFiles}
+	</targets>
+    <targets files="reflection.xml" type="Index" id="ProjectTargets" cachePath="" localCacheSize="2500" noReload="true" />
+  </helpOutput>
+  <helpOutput format="MSHelpViewer">
+    <msdnContentIdCache path="{@LocalDataFolder}Cache\MsdnContentId.cache" cachePath="{@LocalDataFolder}Cache\ESentMsdnContentIdCache" localCacheSize="2500" />
+    <targets base="{@SHFBFolder}Data\Reflection" recurse="true" files="*.xml" type="{@MSHelpViewerSdkLinkType}" id="FrameworkTargets" cachePath="{@LocalDataFolder}Cache\ESentFrameworkTargetCache" localCacheSize="2500">
+		{@ReferenceLinkNamespaceFiles}
+	</targets>
+    <targets files="reflection.xml" type="Id" id="ProjectTargets" cachePath="" localCacheSize="2500" noReload="true" />
+  </helpOutput>
+  <helpOutput format="Website">
+    <msdnContentIdCache path="{@LocalDataFolder}Cache\MsdnContentId.cache" cachePath="{@LocalDataFolder}Cache\ESentMsdnContentIdCache" localCacheSize="2500" />
+    <targets base="{@SHFBFolder}Data\Reflection" recurse="true" files="*.xml" type="{@WebsiteSdkLinkType}" id="FrameworkTargets" cachePath="{@LocalDataFolder}Cache\ESentFrameworkTargetCache" localCacheSize="2500">
+		{@ReferenceLinkNamespaceFiles}
+	</targets>
+    <targets files="reflection.xml" type="Local" id="ProjectTargets" cachePath="" localCacheSize="2500" noReload="true" />
+  </helpOutput>
+</component>
       </ComponentConfig>
-      <ComponentConfig id="Cached MSDN URL References" enabled="True" xmlns="">
-        <component id="Cached MSDN URL References" type="SandcastleBuilder.Components.CachedResolveReferenceLinksComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll" locale="{@Locale}" linkTarget="{@SdkLinkTarget}">
-          <helpOutput format="HtmlHelp1">
-            <cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
-            <targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@HtmlSdkLinkType}" />
-            <targets files="reflection.xml" type="Local" />
-          </helpOutput>
-          <helpOutput format="MSHelp2">
-            <cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
-            <targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@MSHelp2SdkLinkType}" />
-            <targets files="reflection.xml" type="Index" />
-          </helpOutput>
-          <helpOutput format="MSHelpViewer">
-            <cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
-            <targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@MSHelpViewerSdkLinkType}" />
-            <targets files="reflection.xml" type="Id" />
-          </helpOutput>
-          <helpOutput format="Website">
-            <cache filename="{@LocalDataFolder}Cache\MsdnUrl.cache" />
-            <targets base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" type="{@WebsiteSdkLinkType}" />
-            <targets files="reflection.xml" type="Local" />
-          </helpOutput>
-        </component>
-      </ComponentConfig>
-      <ComponentConfig id="Cached Reflection Index Data" enabled="True" xmlns="">
-        <component id="Cached Reflection Index Data" type="SandcastleBuilder.Components.CachedCopyFromIndexComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll">
-          <index name="reflection" value="/reflection/apis/api" key="@id" cache="10">
-            <cache base="{@SandcastlePath}Data\Reflection" recurse="true" files="*.xml" cacheFile="{@LocalDataFolder}Cache\Reflection.cache" />
-            <data files="reflection.xml" />
-          </index>
-          <copy name="reflection" source="*" target="/document/reference" />
-        </component>
-      </ComponentConfig>
-      <ComponentConfig id="IntelliSense Component" enabled="True" xmlns="">
-        <component id="IntelliSense Component" type="SandcastleBuilder.Components.IntelliSenseComponent" assembly="{@SHFBFolder}SandcastleBuilder.Components.dll">
-          <!-- Output options (optional)
-					 Attributes:
-							Include Namespaces (false by default)
-							Namespaces filename ("Namespaces" if not specified or empty)
-							Directory (current folder if not specified or empty) -->
-          <output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" />
-        </component>
-      </ComponentConfig>
-    </ComponentConfigurations>
+<ComponentConfig id="Reflection Index Data (ESENT Cache)" enabled="True"><component id="Reflection Index Data (ESENT Cache)">
+  <index name="reflection" value="/reflection/apis/api" key="@id" cache="15" localCacheSize="2500" frameworkCachePath="{@LocalDataFolder}Cache\ReflectionIndexCache" projectCachePath="">
+    <data base="{@SHFBFolder}Data\Reflection" recurse="true" files="*.xml" duplicateWarning="false" groupId="ReflectionIndexCache">
+		{@ReferenceLinkNamespaceFiles}
+	</data>
+    <data files="reflection.xml" groupId="Project_Ref_{@UniqueID}" />
+  </index>
+  <copy name="reflection" source="*" target="/document/reference" />
+</component></ComponentConfig>
+<ComponentConfig id="Comments Index Data (ESENT Cache)" enabled="True"><component id="Comments Index Data (ESENT Cache)">
+  <index name="comments" value="/doc/members/member" key="@name" cache="30" localCacheSize="2500" frameworkCachePath="{@LocalDataFolder}Cache\CommentsIndexCache" projectCachePath="">
+	{@FrameworkCommentList}
+	{@CommentFileList}
+</index>
+  <copy name="comments" source="*" target="/document/comments" />
+</component></ComponentConfig>
+<ComponentConfig id="IntelliSense Component" enabled="True"><component id="IntelliSense Component"><!-- Output options (optional)
+  Attributes:
+    Include namespaces (false by default)
+    Namespaces comments filename ("Namespaces" if not specified or empty)
+    Output folder (current folder if not specified or empty) --><output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" /></component></ComponentConfig></ComponentConfigurations>
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <IndentHtml>False</IndentHtml>
     <FrameworkVersion>.NET Framework 4.5</FrameworkVersion>
