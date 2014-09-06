@@ -114,12 +114,13 @@ namespace BrightstarDB.Server.Modules
             //        ? RdfFormat.RdfXml
             //        : (RdfFormat.GetResultsFormat(requestObject.Format) ?? RdfFormat.RdfXml);
 
-            var model = new SparqlResultModel(storeName, _brightstar, requestObject,
-                                              //requestedFormat, graphFormat);
-                                              null, null);
+            //var model = new SparqlResultModel(storeName, _brightstar, requestObject,
+            //                                  //requestedFormat, graphFormat);
+            //                                  null, null);
 
             return Negotiate
-                .WithMediaRangeModel(MediaRange.FromString("text/html"), model).WithView("SparqlResult")
+                //.WithMediaRangeModel(MediaRange.FromString("text/html"), model)
+                .WithView("SparqlResult")
                 .WithModel(new SparqlQueryProcessingModel(storeName, _brightstar, requestObject));
         }
     }

@@ -29,20 +29,3 @@ you are already comfortable with RDF and SPARQL you may wish to start with the l
 If you are the kind of person that just likes to dive straight into sample code, please take a 
 moment to read about Running the BrightstarDB Samples first.
 
-
-.. toctree::
-    
-    Developer Quick Start <Developer_Quick_Start>
-    Connection Strings <Connection_Strings>
-    Store Persistence Types <Store_Persistence_Types>
-    Running the BrightstarDB Samples <Running_The_Samples>
-    BrightstarDB Entity Framework <Entity_Framework>
-    Entity Framework Samples <Entity_Framework_Samples>
-    Advanced Entity Framework <Advanced_Entity_Framework>
-    Data Object Layer <Data_Object_Layer>
-	Dynamic API <Dynamic_API>
-    RDF Client API <RDF_Client_API>
-    Admin API <Admin_API>
-	Developing Portable Apps <Developing_Portable_Apps>
-    Connecting to Other Stores <Other_Stores>
-    API Documentation <API_Documentation>

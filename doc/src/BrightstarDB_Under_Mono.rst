@@ -30,14 +30,6 @@ of Mono (3.2.4 at the time of writing). It will probably not work under older ve
 of Mono.
 
 
-**********************************
- Running a BrightstarDB Server
-**********************************
-
-TBD: Document how to run the BrightstarDB server from the command line under Mono
-
-TBD: Document how to run the BrightstarDB server in Apache using mod_mono
-
 .. _mono_build:
 
 **********************************
@@ -72,12 +64,36 @@ At the time of writing the build script builds the following items:
 
     * ``BrightstarDB.dll`` : the core BrightstarDB library
     * ``BrightstarDB.Server.Modules.dll``: the core BrightstarDB server library
-    * ``server`` : a directory containing the BrightstarDB server runner and all of its dependencies
+    * ``service`` : a directory containing the BrightstarDB server runner and all of its dependencies
     
-.. warning::
-    The build will result in a default BrightstarService.exe.config file that 
-    contains an MSDOS path in the configuration for the BrightstarDB connection
-    string. You will need to edit this to a suitable UNIX path before running the service.
+
+**********************************
+ Running a BrightstarDB Server
+**********************************
+
+Self-Hosted
+===========
+
+Assuming that you have built BrightstarDB from source as described above, the server can be run
+from within ``mono/build/service``.
+
+.. warning:: 
+
+    Before you run the service for the first time you must edit the `BrightstarService.exe.config`
+    file in ``mono/build/service`` as this file is copied out of the Windows build and so contains DOS path names.
+    You need to edit the path for the log file (in the `system.diagnostics` section) and the `storesDirectory` 
+    path in the connection string specified in the `brightstarService` section.
+
+To start the server simply run the following::
+
+    mono BrightstarService.exe
+    
+The service will start listening on port 8090 at the path /brightstar. So from a local machine you can
+access the service from a browser pointed at http://localhost:8090/brightstar.
+
+TBD: Document how to run the BrightstarDB server in Apache using mod_mono
+
+TBD: Document how to secure the BrightstarDB server under Mono
 
 ************************************
  Unit Tests
@@ -86,19 +102,3 @@ At the time of writing the build script builds the following items:
 The unit tests for Mono can be run using the ``test.sh`` script in to
 ``mono`` directory. At present these tests do not successfully run
 to completion, but this is being worked on.
-
-************************************
- iOS and Android Support
-************************************
-
-The ultimate goal for getting a working build of BrightstarDB under
-Mono is to support development of applications using `Xamarin's <http://xamarin.com>`
-Xamarin.iOS and Xamarin.Android libraries.
-
-At the time of writing, this work is postponed, waiting on Xamarin to provide
-the project with the necessary licenses for testing. The work done thus far
-can be found in the feature/xamarin branch in our GitHub repository.
-
-We would welcome support for any developers familiar with either of these
-platforms and with plans to make use of a NoSQL / RDF data store in their
-applications.

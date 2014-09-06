@@ -77,8 +77,10 @@ namespace BrightstarDB.Portable.Adaptation
 
         private Assembly ProbeForPlatformSpecificAssembly(string platformName)
         {
-            var assemblyName = new AssemblyName(GetType().Assembly.FullName);
-            assemblyName.Name = "BrightstarDB.Portable." + platformName;
+            var assemblyName = new AssemblyName(GetType().Assembly.FullName)
+            {
+                Name = "BrightstarDB.Portable." + platformName
+            };
             try
             {
                 return _assemblyLoader(assemblyName.FullName);

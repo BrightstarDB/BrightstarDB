@@ -27,7 +27,7 @@ namespace BrightstarDB.Server.Modules
                     var graphFormat =
                         processingModel.SparqlRequest.Format.Select(RdfFormat.GetResultsFormat)
                                        .FirstOrDefault();
-                    processingModel.OverrideSparqlFormat = sparqlFormat;
+                    processingModel.OverrideResultsFormat = sparqlFormat;
                     processingModel.OverrideGraphFormat = graphFormat;
                     if (sparqlFormat != null || graphFormat != null)
                     {
@@ -73,12 +73,13 @@ namespace BrightstarDB.Server.Modules
         public Response Process(MediaRange requestedMediaRange, dynamic model, NancyContext context)
         {
             var queryModel = model as SparqlQueryProcessingModel;
-            var format = queryModel.OverrideSparqlFormat ??
-                         SparqlResultsFormat.AllFormats.FirstOrDefault(
-                             f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)));
+            var format = (queryModel.OverrideResultsFormat ?? 
+                SparqlResultsFormat.AllFormats.FirstOrDefault(f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)))) ?? 
+                SparqlResultsFormat.Xml;
             var graphFormat =
-                queryModel.OverrideGraphFormat ??
-                RdfFormat.AllFormats.FirstOrDefault(f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)));
+                (queryModel.OverrideGraphFormat ??
+                RdfFormat.AllFormats.FirstOrDefault(f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)))) ??
+                RdfFormat.RdfXml;
             
             return new SparqlQueryResponse(queryModel, context.Request.Headers.IfModifiedSince, format, graphFormat);
         }

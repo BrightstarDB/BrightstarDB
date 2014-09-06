@@ -16,11 +16,11 @@ This section will take you through the steps necessary to build BrightstarDB fro
 
 Before you can build BrightstarDB you need to install the following tools.
 
-    1.  **Visual Studio 2012**
+    1.  **Visual Studio 2013**
     
         You can use the Professional or Ultimate editions to build everything.
         
-        *TBD: Check what can be built with VS 2012 Express*
+        *TBD: Check what can be built with VS 2013 Express*
         
     #.  **MSBuild Community Tasks**
         
@@ -37,10 +37,11 @@ Before you can build BrightstarDB you need to install the following tools.
         recommended to build with the latest version of WiX (3.7 at the time 
         of writing).
         
-    #. **OPTIONAL: Xamarin.Android**
+    #. **OPTIONAL: Xamarin.Android, Xamarin.iOS**
     
         Xamarin.Android is required only if you plan to build the Android package
-        for BrightstarDB. Please read :ref:`BrightstarDB_Android` first!
+        for BrightstarDB, and Xamarin.iOS is needed to build the iOS package. 
+        Please read :ref:`Developing_Portable_Apps` first!
         
 .. note:
     Please note that you will require an internet connection when first building
@@ -110,48 +111,48 @@ script. This script is found in the top-level directory of the BrightstarDB sour
 
 The script uses the following properties:
 
-	Configuration
-		The project configuration to be built. Can be either 'Debug' or 'Release'. Defaults to 'Debug'.
-	
-	NUnitPath
-		The path to your NUnit bin directory. This is used when running the unit tests. Defaults to
-		C:\Program Files (x86)\NUnit 2.6.2\bin
-		
+    Configuration
+        The project configuration to be built. Can be either 'Debug' or 'Release'. Defaults to 'Debug'.
+    
+    NUnitPath
+        The path to your NUnit bin directory. This is used when running the unit tests. Defaults to
+        `C:\Program Files (x86)\NUnit 2.6.2\bin`
+        
 You can either override these properties on the command-line using /p:{Property}={Value} switches
 or you can edit the build.proj file (the properties are defined at the top of the file).
 
 The MSBuild script has the following targets:
 
-	BuildAndTest
-		Build Core, Mobile, Portable and Tools and run the unit tests. This is the default target
-		that will be run if you don't specify a /t:{Target} switch on the command-line.
-		
-	BuildCore
-		Performs a clean build of the core .NET 4.0 library only.
-		
-	BuildMobile
-		Performs a clean build of the Windows Phone library only.
-		
-	BuildTools
-		Performs a clean build of the Polaris tool.
-		
-	Test
-		Run Core and Portable unit tests
-		
-	TestCore
-		Run Core unit tests only
-		
-	TestPortable
-		Run Portable unit tests only
+    BuildAndTest
+        Build Core, Mobile, Portable and Tools and run the unit tests. This is the default target
+        that will be run if you don't specify a /t:{Target} switch on the command-line.
+        
+    BuildCore
+        Performs a clean build of the core .NET 4.0 library only.
+        
+    BuildMobile
+        Performs a clean build of the Windows Phone library only.
+        
+    BuildTools
+        Performs a clean build of the Polaris tool.
+        
+    Test
+        Run Core and Portable unit tests
+        
+    TestCore
+        Run Core unit tests only
+        
+    TestPortable
+        Run Portable unit tests only
 
 
 .. note::
-	The ``build.proj`` script is provided to make it easy to locally build and test 
-	BrightstarDB. It does not contain targets for building release packages. The
-	process for building a full release is a little more involved and requires
-	more pre-requisites to be installed. This is documented below.
-	
-	
+    The ``build.proj`` script is provided to make it easy to locally build and test 
+    BrightstarDB. It does not contain targets for building release packages. The
+    process for building a full release is a little more involved and requires
+    more pre-requisites to be installed. This is documented below.
+    
+    
 .. _Build_BuildingTheCore:
 
 ****************************
@@ -192,16 +193,37 @@ The MSBuild script has the following targets:
  Building the Portable Class Libraries
 ***************************************
 
-	The portable class library solution can be found at ``src\portable\portable.sln``.
-	As with the core solution, the portable class library solution has some NuGet 
-	dependencies which need to be downloaded. Follow the same steps outlined above
-	for the core solution to download and install the dependencies before trying
-	to build this solution from the command line.
-	
-	This solution also requires that you have a Windows 8 developer license installed.
-	You should be prompted by to retrieve and install this license if 
-	necessary when you first open the solution file in Visual Studio.
-	
+    The source code for the Portable Class Library and the platform-specific assemblies are all
+    contained in ``src\portable``. There are three separate solution files.
+    
+    * portable.sln - this builds the core PCL assembly and the Desktop, Windows Phone, 
+      Silverlight and Windows Store platform assemblies.
+    
+    * android.sln - this solution builds the core PCL assembly and the Android platform assembly only.
+    
+    * ios.sln - this solution builds the core PCL assembly and the iOS platform assembly only.
+
+    All three solutions are intended for use in Visual Studio 2013. It has not been possible to make
+    these solutions build under MonoDevelop / Xamarin Studio due to some of the features used in the
+    .csproj files.
+
+    To build the Android libraries from source you will require an installation of Xamarin.Android at Indie level
+    or above. Unfortunately once BrightstarDB is included the built application size will
+    exceed the maximum supported by the Free version of Xamarin.Android.
+
+    To build the iOS libraries from source you will require an installation of Xamarin.iOS. This
+    configuration has not been tested in the free version of Xamarin.iOS.
+    
+    As with the core solution, the portable class library solution has some NuGet 
+    dependencies which need to be downloaded. Follow the same steps outlined above
+    for the core solution to download and install the dependencies before trying
+    to build this solution from the command line.
+    
+    This solution also requires that you have a Windows 8 developer license installed.
+    You should be prompted by to retrieve and install this license if 
+    necessary when you first open the solution file in Visual Studio.
+    
+    
 .. _Build_BuildingTheTools:
 
 *********************
@@ -222,27 +244,27 @@ The MSBuild script has the following targets:
  Building The Documentation
 ****************************
 
-	Documentation for BrightstarDB is in two separate parts. 
-	
+    Documentation for BrightstarDB is in two separate parts. 
+    
 **Developers Guide / User Manual**
 
-	The developer and
-	user manual (this document) is maintained as RestructuredText files and
-	uses Sphinx to build.
-	
-	Details on getting and using Sphinx can be found at http://sphinx-doc.org/.
-	Sphinx is a Python based tool so it also requires a Python installation on
-	your machine. You may just find it easier to get the pre-built documentation
-	from http://brightstardb.readthedocs.org/
-	
+    The developer and
+    user manual (this document) is maintained as RestructuredText files and
+    uses Sphinx to build.
+    
+    Details on getting and using Sphinx can be found at http://sphinx-doc.org/.
+    Sphinx is a Python based tool so it also requires a Python installation on
+    your machine. You may just find it easier to get the pre-built documentation
+    from http://brightstardb.readthedocs.org/
+    
 **API Documentation**
 
-	The API documentation is generated using Sandcastle Help File Builder. You can
-	get the installer for SHFB from http://shfb.codeplex.com/. The .shfbproj file
-	for the documentation is at ``doc/api/BrightstarDB.shfbproj``. To build the
-	documentation using this project file you must first build the Core in the
-	Debug configuration.
-	
+    The API documentation is generated using Sandcastle Help File Builder. You can
+    get the installer for SHFB from http://shfb.codeplex.com/. The .shfbproj file
+    for the documentation is at ``doc/api/BrightstarDB.shfbproj``. To build the
+    documentation using this project file you must first build the Core in the
+    Debug configuration.
+    
 .. _Build_BuildingThePackages:
 
 ******************************************
@@ -250,16 +272,15 @@ The MSBuild script has the following targets:
 ******************************************
 
     An MSBuild project is provided to compile and build a complete release package
-    for BrightstarDB. This project can be found at ``installer\\installers.proj``.
+    for BrightstarDB. This project can be found at ``installer\installers.proj``.
     The project will build all of the libraries and documentation and then make
     MSI and NuGet packages.
-	
-	..note:
-	
-		Building the full installer solution requires all the pre-requisites listed
-		above to be installed. It also requires that you have first restored NuGet
-		dependencies in both the core solution and the tools solution as described
-		in the sections above.
+    
+.. note::
+    Building the full installer solution requires all the pre-requisites listed
+    above to be installed. It also requires that you have first restored NuGet
+    dependencies in both the core solution and the tools solution as described
+    in the sections above.
     
 *********************
  Building Under Mono

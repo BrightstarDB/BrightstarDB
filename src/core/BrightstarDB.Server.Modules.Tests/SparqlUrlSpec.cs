@@ -150,6 +150,24 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         [Test]
+        public void TestGetQueryWithFormatOverrideFromBrowser()
+        {
+            const string mockResponse = "OK";
+            var brightstar = new Mock<IBrightstarService>();
+            ISerializationFormat format = SparqlResultsFormat.Json;
+            brightstar.Setup(
+                s =>
+                s.ExecuteQuery("foo", SparqlQueryString, null, null, It.IsAny<SparqlResultsFormat>(), It.IsAny<RdfFormat>(), out format))
+                      .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
+            var response = TestGetSucceeds(brightstar, "foo", SparqlQueryString,
+                                           formats: new string[] { format.MediaTypes[0] },
+                                           accept: "text/html");
+            Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
+            Assert.That(MediaRange.FromString(format.MediaTypes[0]).Matches(MediaRange.FromString(response.ContentType)),
+                "Expected content type: {0}. Got: {1}", format.MediaTypes[0], response.ContentType);
+        }
+
+        [Test]
         public void TestFormPostQuery()
         {
             TestFormPostSucceeds("foo", SparqlQueryString, null, null, SparqlXml,
@@ -357,6 +375,18 @@ namespace BrightstarDB.Server.Modules.Tests
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        }
+
+        [Test]
+        public void TestHtmlGetWithNoQueryReturnsAForm()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+
+            // Execute
+            var response = app.Get("/foo/sparql", with => with.Accept(MediaRange.FromString("text/html")));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Body.AsString().Contains("<form method=\"POST\">"));
         }
 
         #region Helper Methods

@@ -546,7 +546,7 @@ Equally you can use other switchValue settings to reduce the amount of logging p
 BrightstarDB.
 
 
-.. _Preloading_Stores
+.. _Preloading_Stores:
 
 ******************
  Preloading Stores

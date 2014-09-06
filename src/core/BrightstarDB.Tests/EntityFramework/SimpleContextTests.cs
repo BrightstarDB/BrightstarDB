@@ -1925,9 +1925,75 @@ where {
             }
         }
 
+        [Test]
+        public void TestRepositoryPattern()
+        {
+            var storeName = "TestRepositoryPattern" + DateTime.Now.Ticks;
+            string id;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var uow = new UnitOfWork(context);
+                var repo = new Repository<IDerivedEntity>(uow);
+                var derived = repo.Create();
+                derived.BaseStringValue = "Party!";
+                derived.DateTimeProperty= new DateTime(1999, 12, 31, 23, 58, 00);
+                context.SaveChanges();
+                id = derived.Id;
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                var uow = new UnitOfWork(context);
+                var repo = new Repository<IDerivedEntity>(uow);
+                var derived = repo.GetById(id);
+                Assert.That(derived, Is.Not.Null);
+                Assert.That(derived.Id, Is.EqualTo(id));
+                Assert.That(derived.BaseStringValue, Is.EqualTo("Party!"));
+                Assert.That(derived.DateTimeProperty, Is.EqualTo(new DateTime(1999, 12, 31, 23, 58, 00)));
+            }
+
+        }
+
+
         MyEntityContext CreateEntityContext(string storeName)
         {
             return new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName);
+        }
+    }
+
+    public class UnitOfWork
+    {
+        public MyEntityContext Context { get; private set; }
+
+        public UnitOfWork(MyEntityContext context)
+        {
+            Context = context;
+        }
+
+        public void Save()
+        {
+            Context.SaveChanges();
+        }
+    }
+
+    public class Repository<T> where T : class, IBaseEntity
+    {
+        private readonly UnitOfWork _unitOfWork;
+
+        public Repository(UnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public T Create()
+        {
+            return _unitOfWork.Context.EntitySet<T>().Create();
+        }
+
+       
+        public T GetById(string id)
+        {
+            return _unitOfWork.Context.EntitySet<T>().FirstOrDefault(x => x.Id == id);
         }
     }
 }
