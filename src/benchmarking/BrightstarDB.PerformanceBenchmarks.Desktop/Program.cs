@@ -44,7 +44,8 @@ namespace BrightstarDB.PerformanceBenchmarks
                 }
                 catch (Exception ex)
                 {
-                    // TODO: Log exception
+                    Console.Error.WriteLine("Unhandled exception while running benchmark {0}. Details follow.\n{1}",
+                        benchmark.GetType().FullName, ex);
                 }
             }
         }
@@ -65,14 +66,14 @@ namespace BrightstarDB.PerformanceBenchmarks
                             ret.Add(instance);
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        // TODO: Log failure to create benchmark instance
+                        Console.Error.WriteLine("Failed to create instance of benchmark class {0}. Cause: {1}", t.FullName, ex);
                     }
                 }
                 else
                 {
-                    // TODO: Log failure to find appropriate constructor
+                    Console.Error.WriteLine("Could not find a no-args constructor for benchmark class {0}", t.FullName);
                 }
             }
             return ret;
@@ -90,11 +91,6 @@ namespace BrightstarDB.PerformanceBenchmarks
         static void Usage()
         {
             Console.WriteLine(@"Usage: BenchmarkRunner.exe [storeFolderPath] [reportPath] [benchmark scale (1-5)]");
-        }
-
-        private void RunBenchmark(BenchmarkBase benchmark)
-        {
-
         }
     }
 }
