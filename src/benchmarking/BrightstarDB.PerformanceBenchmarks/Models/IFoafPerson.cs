@@ -8,6 +8,7 @@ namespace BrightstarDB.PerformanceBenchmarks.Models
     [Entity("http://xmlns.com/foaf/0.1/Person")]
     public interface IFoafPerson
     {
+        [Identifier("http://www.brightstardb.com/people/")]
         string Id { get; }
 
         [PropertyType("http://xmlns.com/foaf/0.1/name")]
