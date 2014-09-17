@@ -11,6 +11,7 @@ namespace BrightstarDB.PerformanceBenchmarks
     public class EntityFrameworkFoafBenchmark : BenchmarkBase
     {
         private const int BatchSize = 1000;
+        private const int CycleCount = 100;
         private IFoafPerson[] _last10 = new IFoafPerson[10];
         private string _storeConnectionString;
         private int _personCount;
@@ -110,9 +111,8 @@ namespace BrightstarDB.PerformanceBenchmarks
         {
             using (var context = new MyEntityContext(_storeConnectionString))
             {
-                const int cycles = 1000;
                 var rng = new Random();
-                for (int i = 0; i < cycles; i++)
+                for (int i = 0; i < CycleCount; i++)
                 {
                     var personId = rng.Next(_personCount);
                     var person = context.FoafPersons.FirstOrDefault(p => p.Id.Equals(personId.ToString()));
@@ -121,17 +121,16 @@ namespace BrightstarDB.PerformanceBenchmarks
                         throw new BenchmarkAssertionException("Expected LINQ query to return a non-null result.");
                     }
                 }
-                return cycles;
+                return CycleCount;
             }
             
         }
 
         private int SparqlFindById()
         {
-            const int cycles = 1000;
             const string queryTemplate = "select * WHERE {{ <http://www.brightstardb.com/people/{0}> ?p ?o }}";
             var rng = new Random();
-            for (var i = 0; i < cycles; i++)
+            for (var i = 0; i < CycleCount; i++)
             {
                 var results = Service.ExecuteQuery(StoreName, String.Format(queryTemplate, rng.Next(_personCount)));
                 XDocument resultsDoc = XDocument.Load(results);
@@ -140,16 +139,15 @@ namespace BrightstarDB.PerformanceBenchmarks
                     throw new BenchmarkAssertionException("Expected SPARQL query to return some rows.");
                 }
             }
-            return cycles;
+            return CycleCount;
         }
 
         private int LinqFindByName()
         {
-            const int cycles = 1000;
             var rng = new Random();
             using (var context = new MyEntityContext(_storeConnectionString))
             {
-                for (var i = 0; i < cycles; i++)
+                for (var i = 0; i < CycleCount; i++)
                 {
                     var targetName = Firstnames[rng.Next(Firstnames.Count)];
                     var results = context.FoafPersons.Where(p => p.GivenName.Equals(targetName)).ToList();
@@ -160,7 +158,7 @@ namespace BrightstarDB.PerformanceBenchmarks
                     }
                 }
             }
-            return cycles;
+            return CycleCount;
         }
 
 
