@@ -11,6 +11,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <OutputPath>packages</OutputPath>
     <TempDir>InstallerTmp</TempDir>
+    <BuildIOS Condition=" '$(BuildIOS)' == '' ">True</BuildIOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -167,6 +168,9 @@
 	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
     <MSBuild Projects="..\src\portable\BrightstarDB.Portable.Android\BrightstarDB.Portable.Android.csproj"
              Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" />
+    <MSBuild Projects="..\src\portable\BrightstarDB.Portable.iOS\BrightstarDB.Portable.iOS.csproj"
+             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" 
+             Condition="$(BuildIOS)"/>
   </Target>
   
   <!-- ============================================================ -->
@@ -273,7 +277,8 @@
 	<Copy SourceFiles="@(PortableSilverlight)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl5" />
 	<Copy SourceFiles="@(PortableStore)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\win8" />
     <Copy SourceFiles="@(PortableAndroid)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoAndroid" />
-    <Copy SourceFiles="@(PortableIOS)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoTouch" />
+    <Copy SourceFiles="@(PortableIOS)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoTouch" Condition="$(BuildIOS)" />
+    <Warning Text="The iOS platform assembly is not included in this build." Condition="!$(BuildIOS)"/>
 	
     <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" />
     <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec" />
