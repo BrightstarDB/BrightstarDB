@@ -21,31 +21,36 @@ namespace BrightstarDB.PerformanceBenchmarks
             base.Initialize(connectionString, testScale);
             _storeConnectionString = connectionString + ";storeName=" + StoreName;
         }
+
         public override void Setup()
         {
             // Create IFoafPerson entities in batches of 1000
             // Create 10,000 entities per unit of test scale
             var start = DateTime.UtcNow;
             int cycleCount = TestScale*10;
-            _personCount = cycleCount * BatchSize;
+            _personCount = cycleCount*BatchSize;
             for (var i = 0; i < cycleCount; i++)
             {
                 CreateBatch(i);
             }
             var end = DateTime.UtcNow;
             Report.LogOperationCompleted("populate",
-                                         String.Format("Create {0} person records with 10 foaf:knows links each",
-                                                       _personCount),
-                                         cycleCount, end.Subtract(start).TotalMilliseconds);
+                String.Format("Create {0} person records with 10 foaf:knows links each",
+                    _personCount),
+                cycleCount, end.Subtract(start).TotalMilliseconds);
         }
 
         public override void RunMix()
         {
             TryOperation(LinqFindById, "linq-find-by-id", "Retrieve a single entity by its ID using a LINQ query.");
             TryOperation(SparqlFindById, "sparql-find-by-id",
-                         "Retreive all properties of a single entity using a SPARQL query.");
+                "Retreive all properties of a single entity using a SPARQL query.");
             TryOperation(LinqFindByName, "linq-find-by-name",
-                         "Retrieve all entities with a particular GivenName property value.");
+                "Retrieve all entities with a particular GivenName property value.");
+            TryOperation(SparqlFindByName, "sparql-find-by-name",
+                "Retrieve all properties of all entities with a particular foaf:givenName using a SPARQL query with a triple pattern.");
+            TryOperation(SparqlFilterByName, "sparql-filter-by-name",
+                "Retrieve all properties of all entities with a particular foaf:givenName using a SPARQL query with a FILTER.");
         }
 
         public void TryOperation(Func<int> a, string name, string description)
@@ -86,14 +91,14 @@ namespace BrightstarDB.PerformanceBenchmarks
             var givenName = Firstnames[personNumber%Firstnames.Count];
             var familyName = Surnames[(personNumber/Firstnames.Count)%Surnames.Count];
             var p = new FoafPerson
-                {
-                    Id = personNumber.ToString(),
-                    Name = givenName + " " + familyName,
-                    GivenName = givenName,
-                    FamilyName = familyName,
-                    Organisation = Organizations[personNumber%Organizations.Count],
-                    Age = 18 + (personNumber%60),
-                };
+            {
+                Id = personNumber.ToString(),
+                Name = givenName + " " + familyName,
+                GivenName = givenName,
+                FamilyName = familyName,
+                Organisation = Organizations[personNumber%Organizations.Count],
+                Age = 18 + (personNumber%60),
+            };
             context.FoafPersons.Add(p);
             foreach (var friend in _last10)
             {
@@ -107,6 +112,7 @@ namespace BrightstarDB.PerformanceBenchmarks
         }
 
         #region Query Operations
+
         private int LinqFindById()
         {
             using (var context = new MyEntityContext(_storeConnectionString))
@@ -123,7 +129,7 @@ namespace BrightstarDB.PerformanceBenchmarks
                 }
                 return CycleCount;
             }
-            
+
         }
 
         private int SparqlFindById()
@@ -161,6 +167,46 @@ namespace BrightstarDB.PerformanceBenchmarks
             return CycleCount;
         }
 
+        private int SparqlFindByName()
+        {
+            const string queryTemplate = @"PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT * WHERE {{
+?s ?p ?o .
+?s a foaf:Person .
+?s foaf:givenName ""{0}""^^xsd:string
+}}";
+            var rng = new Random();
+            for (var i = 0; i < CycleCount; i++)
+            {
+                var targetName = Firstnames[rng.Next(Firstnames.Count)];
+                var results = Service.ExecuteQuery(StoreName, String.Format(queryTemplate, targetName));
+                XDocument resultsDoc = XDocument.Load(results);
+                if (!resultsDoc.SparqlResultRows().Any())
+                {
+                    throw new BenchmarkAssertionException("Expected SPARQL query to return some rows");
+                }
+            }
+            return CycleCount;
+        }
+
+        private int SparqlFilterByName()
+        {
+            const string queryTemplate =
+                "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?s ?p ?o WHERE {{ ?s ?p ?o . ?s a foaf:Person . ?s foaf:givenName ?v1 . FILTER (?v1 = \"{0}\") }}";
+            var rng = new Random();
+            for (var i = 0; i < CycleCount; i++)
+            {
+                var targetName = Firstnames[rng.Next(Firstnames.Count)];
+                var results = Service.ExecuteQuery(StoreName, String.Format(queryTemplate, targetName));
+                XDocument resultsDoc = XDocument.Load(results);
+                if (!resultsDoc.SparqlResultRows().Any())
+                {
+                    throw new BenchmarkAssertionException("Expected SPARQL query to return some rows");
+                }
+            }
+            return CycleCount;
+        }
 
         #endregion
 
