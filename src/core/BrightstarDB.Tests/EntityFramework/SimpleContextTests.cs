@@ -80,7 +80,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         [Test]
         [ExpectedException(typeof(EntityKeyRequiredException))]
-        [Ignore("Behaviour is changed - an entity can be created, but will not be tracked or saved until its identity is set")]
+        [NUnit.Framework.Ignore("Behaviour is changed - an entity can be created, but will not be tracked or saved until its identity is set")]
         public void TestCannotCreateEntityWithKey()
         {
             string storeName = "CannotCreateEntityWithKey_" + DateTime.UtcNow.Ticks;
