@@ -143,6 +143,32 @@ allowing the calls to be chained::
 Adding and removing properties and changing the type simply adds and removes triples from the set of 
 locally managed triples for the data object. 
 
+To retrieve property values use either the ``GetPropertyValues()`` 
+method to retrieve an enumerator over all of the property values for a specific property type; or use
+the ``GetPropertyValue()`` method that returns just the first value of a specific type. These methods
+both take either an ``IDataObject`` instance or a string to identify the property type::
+
+    // Get a data object for the property type we are intersted in
+    var name = store.MakeDataObject("http://xmlns.com/foaf/0.1/name");
+    // Write all names of fred
+    foreach (var n in fred.GetPropertyValues(name)) {
+        Console.WriteLine(n);
+    }
+    // Write just one mbox of fred
+    Console.WriteLine(fred.GetProperty("http://xmlns.com/foaf/0.1/mbox));
+
+To determine what properties a data object has, use the ``GetPropertyTypes()`` method to enumerate 
+over the distinct types of property that a data object has. This can be useful for grouping together
+properties by type or for exploring / displaying data with an unknown schema behind it::
+
+    Console.WriteLine("Properties of Fred:");
+    foreach(var propertyType in fred.GetPropertyTypes()) {
+        Console.WriteLine("\t" + propertyType.Identity + ":");
+        foreach(var propertyValue in fred.GetPropertyValues(propertyType)) {
+            Console.WriteLine("\t\t" + propertyValue);
+        }
+    }
+    
 A data object can be deleted using the ``Delete()`` method on the data object itself::
 
   var fred = store.GetDataObject("http://example.org/people/fred");

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using BrightstarDB.Client;
 using NUnit.Framework;
@@ -8,9 +9,9 @@ using NUnit.Framework;
 namespace BrightstarDB.Tests.DataObjectsTests
 {
     [TestFixture("type=embedded;storesDirectory={1};storeName={2}", true)]
-    [TestFixture(
+    /*[TestFixture(
         "type=dotnetrdf;configuration={0}dataObjectStoreConfig.ttl;storeName=http://www.brightstardb.com/tests#empty"
-        , false)]
+        , false)]*/
     public class BasicDataObjectsTests
     {
         private readonly string _connectionString;
@@ -64,6 +65,24 @@ namespace BrightstarDB.Tests.DataObjectsTests
             Assert.That(_store.GetDataObject("p:kal"), Is.Not.Null);
             Assert.That(_store.GetDataObject("foaf:name"), Is.Not.Null);
             Assert.That(_store.GetDataObject("foaf:person"), Is.Not.Null);
+        }
+
+        [Test]
+        public void TestEnumerateDistinctPropertyTypes()
+        {
+            var alice = _store.MakeDataObject("p:Alice");
+            alice.AddProperty("foaf:name", "Alice");
+            alice.AddProperty("foaf:mbox", "alice@example.org");
+            alice.AddProperty("foaf:mbox", "alice.example@gmail.com");
+            alice.AddProperty("foaf:nick", "Call Me Al");
+            _store.SaveChanges();
+
+            var retrieved = _store.GetDataObject("p:Alice");
+            var propertyTypes = retrieved.GetPropertyTypes().ToList();
+            Assert.That(propertyTypes.Count, Is.EqualTo(3));
+            Assert.That(propertyTypes.Contains(_store.GetDataObject("foaf:name")));
+            Assert.That(propertyTypes.Contains(_store.GetDataObject("foaf:mbox")));
+            Assert.That(propertyTypes.Contains(_store.GetDataObject("foaf:nick")));
         }
     }
 }
