@@ -380,6 +380,12 @@ namespace BrightstarDB.Client
             return _triples.Where(t => t.Predicate.Equals(type.Identity)).Select(CreateTypedObject);
         }
 
+        public IEnumerable<IDataObject> GetPropertyTypes()
+        {
+            CheckLoaded();
+            return _triples.Select(t => t.Predicate).Distinct().Select(x => _store.MakeDataObject(x));
+        } 
+
         ///<summary>
         /// Returns all data objects that have a property of the specified type where
         /// the property value is this data object

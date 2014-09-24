@@ -154,6 +154,13 @@ namespace BrightstarDB.Client
         /// <returns>An enumeration of the values of all properties of the specified type.</returns>
         IEnumerable<object> GetPropertyValues(IDataObject type);
 
+        /// <summary>
+        /// Returns an enumerator over the distinct property types of the properties
+        /// that this data object has.
+        /// </summary>
+        /// <returns>An enumeration of IDataObject instances representing the distinct property types of all properties of this object.</returns>
+        IEnumerable<IDataObject> GetPropertyTypes();
+
         ///<summary>
         /// Returns all data objects that have a property of the specified type where
         /// the property value is this data object
@@ -184,5 +191,6 @@ namespace BrightstarDB.Client
         /// <param name="enforceClassUniqueConstraint">Add an update precondition to ensure that the update will fail if the store already
         /// contains an RDF resource with the same rdf:type(s) as this data object.</param>
         IDataObject UpdateIdentity(string newIdentity, bool enforceClassUniqueConstraint);
+
     }
 }
