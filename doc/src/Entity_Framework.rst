@@ -291,6 +291,33 @@ attribute annotation is required for this::
     string Name { get; set; }
   }
 
+Property Exclusion
+------------------
+
+If you want BrightstarDB to ignore a property you can simply decorate it with an ``[Ignore]``
+attribute::
+
+  [Entity("Person")]
+  public interface IPerson {
+    string Id {get; }
+    string Name { get; set; }
+    
+    [Ignore]
+    int Salary {get;}
+  }
+
+.. note::
+  
+  Properties that are ignored in this way are not implemented in the partial class that BrightstarDB
+  generates, so you will need to ensure that they are implemented in a partial class that you create.
+
+.. note::
+
+  The ``[Ignore]`` attribute is not supported or required on *methods* defined in the interface as
+  BrightstarDB does not implement interface methods - you are always required to provide method
+  implementations in your own partial class.
+  
+
 Inverse Property Attribute
 --------------------------
 

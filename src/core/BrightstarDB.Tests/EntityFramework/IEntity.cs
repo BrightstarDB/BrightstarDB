@@ -75,6 +75,9 @@ namespace BrightstarDB.Tests.EntityFramework
         ICollection<float> CollectionOfFloats { get; set; }
         ICollection<int> CollectionOfInts { get; set; }
         ICollection<long> CollectionOfLong { get; set; }
+
+        [Ignore]
+        string AnIgnoredProperty { get; set; }
     }
 
     enum TestEnumeration
