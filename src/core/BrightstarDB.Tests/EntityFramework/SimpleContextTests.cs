@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
@@ -47,6 +48,33 @@ namespace BrightstarDB.Tests.EntityFramework
                     var person = context.Persons.FirstOrDefault(p => p.Id == personId);
                     Assert.IsNotNull(person);
                 }
+            }
+        }
+
+        [Test]
+        public void TestShortcutCreate()
+        {
+            string storeName = "TestShortcutCreate" + DateTime.Now.Ticks;
+            string aliceId;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var sales = new Department(context) {Name = "Sales", DeptId = 1};
+                var bob = new Person(context) {Name = "Bob"};
+                var alice = new Person(context) {Name = "Alice", Age = 54, Department = sales, Friends = new Collection<IPerson>{bob}};
+                context.SaveChanges();
+                aliceId = alice.Id;
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                var alice = context.Persons.FirstOrDefault(x => x.Id == aliceId);
+                Assert.IsNotNull(alice);
+                Assert.AreEqual("Alice", alice.Name);
+                Assert.AreEqual(54, alice.Age);
+                Assert.IsNotNull(alice.Department);
+                Assert.AreEqual("Sales", alice.Department.Name);
+                Assert.AreEqual(1, alice.Friends.Count);
+                Assert.AreEqual("Bob", alice.Friends.First().Name);
             }
         }
 

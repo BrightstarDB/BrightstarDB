@@ -198,6 +198,7 @@ private void WriteEntityClass(CodeGenerationTools code, Helper helper, ResourceI
 <#= code.SpaceAfter(iface.EntitySetAccessLevel)#>partial class <#= iface.ClassName #> : BrightstarEntityObject, <#= iface.InterfaceName #> 
 {
 	public <#= iface.ClassName#>(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+    public <#= iface.ClassName#>(BrightstarEntityContext context) : base(context, typeof(<#= iface.ClassName #>)) { }
 	public <#= iface.ClassName#>() : base() { }
 <#+
 	if (identityProperty != null) 

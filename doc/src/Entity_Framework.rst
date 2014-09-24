@@ -140,8 +140,8 @@ Once an entity has been retrieved it can be modified or related entities can be 
   brightstardb.Name = "BrightstarDB";
 
 
-New entities can be created either via the main collection or by using the ``new`` keyword 
-and attaching the object to the context::
+New entities can be created either via the main collection; by using the ``new`` keyword 
+and attaching the object to the context; or by passing the context into the constructor::
 
   // creating a new entity via the context collection
   var bob = dataContext.Persons.Create();
@@ -152,6 +152,8 @@ and attaching the object to the context::
   var bob = new Person() { Name = "Bob" };
   dataContext.Persons.Add(bob);
 
+  // or created using new and passing the context into the constructor
+  var bob = new Person(dataContext) { Name = "Bob" };
 
 
 Once a new object has been created it can be used in relationships with other objects. The 
@@ -169,6 +171,13 @@ have been created by setting the ``Employer`` property on the person::
   bob.Name = "bob";
   bob.Employer = brightstardb;
 
+  // You can also create relationships to previously constructed
+  // or retrieved objects in the constructor
+  var brightstardb = new Company(dataContext) { Name = "BrightstarDB" };
+  var bob = new Person(dataContext) { 
+                    Name = "Bob; 
+                    Employer = brightstardb 
+            };
 
 Saving the changes that have occurred is easily done by calling a method on the context::
 
