@@ -781,13 +781,27 @@ namespace BrightstarDB.EntityFramework
         ///<returns>The new object</returns>
         public T CreateObject<T>() where T : class
         {
-            //string prefix = EntityMappingStore.GetIdentifierPrefix(typeof (T));
-            var identifierInfo = EntityMappingStore.GetIdentityInfo(typeof(T));
+            var dataObject = CreateDataObject(typeof(T));
+            var bindType = GetImplType(typeof (T));
+
+            return ((T)Activator.CreateInstance(bindType, this, dataObject));
+        }
+
+        /// <summary>
+        /// Creates a new DataObject backing object for a context object of a specific type
+        /// </summary>
+        /// <param name="domainObjectType">The type of domain context object that the data object backs</param>
+        /// <returns>The new data object</returns>
+        internal IDataObject CreateDataObject(Type domainObjectType)
+        {
+            var identifierInfo = EntityMappingStore.GetIdentityInfo(domainObjectType);
             string prefix = identifierInfo == null ? null : identifierInfo.BaseUri;
-            var dataObject = identifierInfo != null && identifierInfo.KeyProperties != null ? null : _store.MakeNewDataObject(prefix);
+            var dataObject = identifierInfo != null && identifierInfo.KeyProperties != null
+                ? null
+                : _store.MakeNewDataObject(prefix);
             if (dataObject != null)
             {
-                IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(typeof (T));
+                IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(domainObjectType);
                 foreach (var typeId in typeIds)
                 {
                     if (!String.IsNullOrEmpty(typeId))
@@ -797,12 +811,10 @@ namespace BrightstarDB.EntityFramework
                     }
                 }
             }
-            var bindType = GetImplType(typeof (T));
-
-            return ((T)Activator.CreateInstance(bindType, this, dataObject));
+            return dataObject;
         }
 
-        
+
         private object Bind(IDataObject dataObject, Type t)
         {
             if (dataObject == null) return null;
