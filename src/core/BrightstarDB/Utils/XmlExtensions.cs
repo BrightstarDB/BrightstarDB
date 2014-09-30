@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Linq;
 
 namespace BrightstarDB.Utils
@@ -12,13 +8,7 @@ namespace BrightstarDB.Utils
     /// </summary>
     public static class XmlExtensions
     {
-        static bool IsRunningOnMono
-        {
-            get
-            {
-                return Type.GetType("Mono.Runtime") != null;
-            }
-        }
+        
 
 #if !PORTABLE && !WINDOWS_PHONE
         /// <summary>
@@ -29,7 +19,7 @@ namespace BrightstarDB.Utils
         public static XmlDocument AsXmlDocument(this XDocument document)
         {
             var xmlDoc = new XmlDocument();
-            if (IsRunningOnMono)
+            if (Configuration.IsRunningOnMono)
             {
                 xmlDoc.LoadXml(document.ToString());
             }
