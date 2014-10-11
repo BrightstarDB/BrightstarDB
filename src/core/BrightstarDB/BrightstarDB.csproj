@@ -144,6 +144,7 @@
     <Compile Include="Client\BrightstarStoreIsReadOnlyException.cs" />
     <Compile Include="Client\CachedQueryResult.cs" />
     <Compile Include="Client\DataObjectStoreBase.cs" />
+    <Compile Include="Client\DataObjectStoreChangeEventArgs.cs" />
     <Compile Include="Client\DotNetRdfConfigurationHelper.cs" />
     <Compile Include="Client\DotNetRdfConfigurationPathResolver.cs" />
     <Compile Include="Client\DotNetRdfDataObjectContext.cs" />
@@ -202,6 +203,7 @@
     <Compile Include="EntityFramework\UniqueConstraintViolationException.cs" />
     <Compile Include="FormatInfo.cs" />
     <Compile Include="ISerializationFormat.cs" />
+    <Compile Include="Model\ITriple.cs" />
     <Compile Include="NoAcceptableFormatException.cs" />
     <Compile Include="Query\BrightstarRdfProvider.cs" />
     <Compile Include="Query\BrightstarVirtualNode.cs" />

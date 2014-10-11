@@ -64,7 +64,7 @@ namespace BrightstarDB.Client
         /// <summary>
         /// The state of this data object is represented as a collection of triples
         /// </summary>
-        private List<Triple> _triples;
+        private List<ITriple> _triples;
 
         /// <summary>
         /// Indicates if this entity is new
@@ -75,7 +75,7 @@ namespace BrightstarDB.Client
         {
             _store = store;
             _identity = Constants.GeneratedUriPrefix + Guid.NewGuid();
-            _triples = new List<Triple>();
+            _triples = new List<ITriple>();
             _isLoaded = true;
             _isNew = true;
         }
@@ -83,7 +83,7 @@ namespace BrightstarDB.Client
         internal DataObject(IInternalDataObjectStore store, string identity, bool isNew = false)
         {
             _store = store;
-            _triples = new List<Triple>();
+            _triples = new List<ITriple>();
             _identity = identity;
             _isLoaded = isNew;
             _isNew = isNew;
@@ -121,7 +121,7 @@ namespace BrightstarDB.Client
         /// <summary>
         /// The current state of this dataobject
         /// </summary>
-        public IEnumerable<Triple> Triples
+        public IEnumerable<ITriple> Triples
         {
             get { return _triples; }
         }
@@ -355,7 +355,7 @@ namespace BrightstarDB.Client
         public object GetPropertyValue(IDataObject type)
         {
             CheckLoaded();
-            Triple triple = _triples.FirstOrDefault(t => t.Predicate.Equals(type.Identity.ToString()));
+            ITriple triple = _triples.FirstOrDefault(t => t.Predicate.Equals(type.Identity.ToString()));
             return triple != null ? CreateTypedObject(triple) : null;
         }
 
@@ -467,7 +467,7 @@ namespace BrightstarDB.Client
 
         #endregion
 
-        private Triple ReplaceIdentity(Triple t, string newIdentity)
+        private Triple ReplaceIdentity(ITriple t, string newIdentity)
         {
             return new Triple
                 {
@@ -515,7 +515,7 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="triple"></param>
         /// <returns></returns>
-        private object CreateTypedObject(Triple triple)
+        private object CreateTypedObject(ITriple triple)
         {
             if (triple.IsLiteral)
             {
@@ -780,7 +780,7 @@ namespace BrightstarDB.Client
         /// <param name="asNewTriples">Also add the triples to the list of new triples on the context store</param>
         /// <param name="enforceClassUniqueConstraint">Add update preconditions to ensure that the update fails if the store already contains
         /// a resource with the same identity and the same rdf:type(s) as this data object.</param>
-        internal bool BindTriples(IEnumerable<Triple> triples, bool asNewTriples = false, bool enforceClassUniqueConstraint = false)
+        internal bool BindTriples(IEnumerable<ITriple> triples, bool asNewTriples = false, bool enforceClassUniqueConstraint = false)
         {
             if (_isLoaded)
             {

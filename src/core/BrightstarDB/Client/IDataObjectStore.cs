@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using BrightstarDB.EntityFramework.Query;
-using BrightstarDB.Model;
 
 namespace BrightstarDB.Client
 {
@@ -15,7 +15,7 @@ namespace BrightstarDB.Client
         /// Occurs when changes are being saved to the Brightstar store
         /// </summary>
         /// <remarks>The <see cref="SavingChanges"/> event is raised before changes are saved to the Brightstar store as a result of calling the <see cref="SaveChanges"/> method.</remarks>
-        EventHandler SavingChanges { get; set;  }
+        EventHandler<DataObjectStoreChangeEventArgs> SavingChanges { get; set;  }
 
         /// <summary>
         /// Creates a new data object with generated identity.

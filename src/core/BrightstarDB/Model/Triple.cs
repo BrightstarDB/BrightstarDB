@@ -1,6 +1,6 @@
 ﻿namespace BrightstarDB.Model
 {
-    internal class Triple
+    internal class Triple : ITriple
     {
         public Triple()
         {
@@ -21,7 +21,7 @@
         /// </summary>
         /// <param name="other">The other triple to match with</param>
         /// <returns>True if there is a match in the non-null parts of both triples, false otherwise</returns>
-        public bool Matches(Triple other)
+        public bool Matches(ITriple other)
         {
             return NullOrMatch(Graph, other.Graph) &&
                    NullOrMatch(Subject, other.Subject) &&

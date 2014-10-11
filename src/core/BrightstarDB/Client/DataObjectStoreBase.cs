@@ -28,26 +28,26 @@ namespace BrightstarDB.Client
         /// <summary>
         /// Collection of triple deletions to send to the server on save
         /// </summary>
-        private List<Triple> _deletePatterns;
+        private List<ITriple> _deletePatterns;
 
         /// <summary>
         /// Collection of triple insertions to send to server on save
         /// </summary>
-        private List<Triple> _addTriples;
+        private List<ITriple> _addTriples;
 
         /// <summary>
         /// Collection of triples that must be present before the transaction can be executed.
         /// </summary>
-        private List<Triple> _preconditions;
+        private List<ITriple> _preconditions;
 
         /// <summary>
         /// Collection of triples that must no be present before the transaction can be executed.
         /// </summary>
-        private List<Triple> _nonExistencePreconditions;
+        private List<ITriple> _nonExistencePreconditions;
 
-        private bool _isReadOnly;
+        private readonly bool _isReadOnly;
 
-        private EventHandler _savingChanges;
+        private EventHandler<DataObjectStoreChangeEventArgs> _savingChanges;
 
         private readonly string _updateGraphUri;
         private readonly string[] _datasetGraphUris;
@@ -160,7 +160,7 @@ namespace BrightstarDB.Client
 
         public bool IsReadOnly { get { return _isReadOnly; } }
 
-        public EventHandler SavingChanges
+        public EventHandler<DataObjectStoreChangeEventArgs> SavingChanges
         {
             get { return _savingChanges; }
             set { _savingChanges = value; }
@@ -235,7 +235,7 @@ namespace BrightstarDB.Client
 
         public SparqlResult ExecuteSparql(string sparqlQuery)
         {
-            return this.ExecuteSparql(new SparqlQueryContext(sparqlQuery));
+            return ExecuteSparql(new SparqlQueryContext(sparqlQuery));
         }
         public abstract SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext);
 
@@ -245,7 +245,14 @@ namespace BrightstarDB.Client
         public void SaveChanges()
         {
             if (_isReadOnly) throw new BrightstarStoreIsReadOnlyException();
-            if (_savingChanges != null) _savingChanges(this, new EventArgs());
+            if (_savingChanges != null)
+            {
+                _savingChanges(this, new DataObjectStoreChangeEventArgs(
+                    _addTriples,
+                    _deletePatterns,
+                    _preconditions,
+                    _addTriples));
+            }
             DoSaveChanges();
         }
 
@@ -353,19 +360,19 @@ namespace BrightstarDB.Client
         /// <summary>
         /// The current transaction delete patterns
         /// </summary>
-        public List<Triple> DeletePatterns { get { return _deletePatterns; } }
+        public List<ITriple> DeletePatterns { get { return _deletePatterns; } }
 
         /// <summary>
         /// The current transaction triples to add
         /// </summary>
-        public List<Triple> AddTriples { get { return _addTriples; } }
+        public List<ITriple> AddTriples { get { return _addTriples; } }
 
         /// <summary>
         /// The current transaction preconditions
         /// </summary>
-        public List<Triple> Preconditions { get { return _preconditions; } }
+        public List<ITriple> Preconditions { get { return _preconditions; } }
 
-        public List<Triple> NonExistencePreconditions { get { return _nonExistencePreconditions; } }
+        public List<ITriple> NonExistencePreconditions { get { return _nonExistencePreconditions; } }
         /// <summary>
         /// Returns an enumeration of all data objects that are the subject
         /// of a triple that binds a predicate of type <paramref name="pred"/>
@@ -440,10 +447,10 @@ namespace BrightstarDB.Client
             {
                 managedProxy.IsNew = false;
             }
-            _deletePatterns = new List<Triple>();
-            _addTriples = new List<Triple>();
-            _preconditions = new List<Triple>();
-            _nonExistencePreconditions = new List<Triple>();
+            _deletePatterns = new List<ITriple>();
+            _addTriples = new List<ITriple>();
+            _preconditions = new List<ITriple>();
+            _nonExistencePreconditions = new List<ITriple>();
         }
 
         private static void UpdateVersionFromSparqlResult(SparqlResult sparqlResult, IDataObject dataObject)

@@ -8,7 +8,7 @@ using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 using VDS.RDF.Update;
 using VDS.RDF.Writing;
-using Triple = BrightstarDB.Model.Triple;
+using ITriple = BrightstarDB.Model.ITriple;
 
 namespace BrightstarDB.Client
 {
@@ -48,8 +48,8 @@ namespace BrightstarDB.Client
             //return new MemoryStream(Encoding.UTF8.GetBytes(buff.ToString()), false);
         }
 
-        public void ApplyTransaction(IList<Triple> existencePreconditions, IList<Triple> nonexistencePreconditions,
-                                     IList<Triple> deletePatterns, IList<Triple> inserts,
+        public void ApplyTransaction(IList<ITriple> existencePreconditions, IList<ITriple> nonexistencePreconditions,
+                                     IList<ITriple> deletePatterns, IList<ITriple> inserts,
                                      string updateGraphUri)
         {
             if (existencePreconditions.Count > 0)
@@ -71,7 +71,7 @@ namespace BrightstarDB.Client
             _updateProcessor.ProcessCommandSet(cmds);
         }
 
-        private string FormatDeletePatterns(IList<Triple> deletePatterns, string updateGraphUri)
+        private string FormatDeletePatterns(IList<ITriple> deletePatterns, string updateGraphUri)
         {
             var deleteCmds = new StringBuilder();
             int propId = 0;
@@ -131,7 +131,7 @@ namespace BrightstarDB.Client
             return deleteCmds.ToString();
         }
 
-        private static string FormatDeletePattern(Triple p, ref int propId)
+        private static string FormatDeletePattern(ITriple p, ref int propId)
         {
             return String.Format(" {0} {1} {2} .",
                                  FormatDeletePatternItem(p.Subject, ref propId),
@@ -190,7 +190,7 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="t">The triple to check</param>
         /// <returns></returns>
-        private static bool IsGraphTargeted(Triple t)
+        private static bool IsGraphTargeted(ITriple t)
         {
             return t.Graph != null && t.Graph != Constants.WildcardUri;
         }
@@ -201,7 +201,7 @@ namespace BrightstarDB.Client
         /// </summary>
         /// <param name="t">The triple to check</param>
         /// <returns></returns>
-        private static bool IsGrounded(Triple t)
+        private static bool IsGrounded(ITriple t)
         {
             return (t.Predicate != Constants.WildcardUri) && (t.Object != Constants.WildcardUri);
         }
@@ -239,7 +239,7 @@ namespace BrightstarDB.Client
         //    return deleteOp.ToString();
         //}
 
-        private void AppendTriplePattern(Triple triple, StringBuilder builder)
+        private void AppendTriplePattern(ITriple triple, StringBuilder builder)
         {
             builder.AppendFormat("  <{0}> <{1}> ", triple.Subject, triple.Predicate);
             if (triple.IsLiteral)
@@ -264,7 +264,7 @@ namespace BrightstarDB.Client
         }
 
 
-        private string FormatInserts(IEnumerable<Triple> inserts, string defaultGraphUri)
+        private string FormatInserts(IEnumerable<ITriple> inserts, string defaultGraphUri)
         {
             var op = new StringBuilder();
             op.AppendLine("INSERT DATA {");

@@ -14,7 +14,7 @@ namespace BrightstarDB.Rdf
             _sink = rdfTripleSink;
         }
 
-        public void Triple(Triple t)
+        public void Triple(ITriple t)
         {
             string dt = null;
             if (t.IsLiteral && t.DataType != null) dt = t.DataType.ToString();
