@@ -198,6 +198,7 @@ private void WriteEntityClass(CodeGenerationTools code, Helper helper, ResourceI
 <#= code.SpaceAfter(iface.EntitySetAccessLevel)#>partial class <#= iface.ClassName #> : BrightstarEntityObject, <#= iface.InterfaceName #> 
 {
 	public <#= iface.ClassName#>(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+    public <#= iface.ClassName#>(BrightstarEntityContext context) : base(context, typeof(<#= iface.ClassName #>)) { }
 	public <#= iface.ClassName#>() : base() { }
 <#+
 	if (identityProperty != null) 
@@ -224,6 +225,9 @@ private void WriteInterfaceImplementation(CodeGenerationTools code, Helper helpe
 	#region Implementation of <#= iface.InterfaceFullName #>
 <#+
 	foreach(var p in iface.Properties) {
+        if (IsIgnoredProperty(p)) {
+            continue;
+        }
 		if (!p.Equals(iface.IdentityProperty)) 
 		{
 			bool isCollectionProperty;
@@ -458,6 +462,12 @@ private void ValidateIdentityProperty(CodeProperty property) {
 	}
 }
 
+private bool IsIgnoredProperty(CodeProperty property) {
+  var ignore = property.Attributes.OfType<CodeAttribute>().FirstOrDefault(
+    attr => attr.FullName.Equals(Constants.IgnorePropertyAttributeName));
+  return ignore != null;
+}
+
 private bool ValidateProperty(CodeProperty property, Helper helper, out bool isCollection) 
 {
 	var propertyTypeName = property.Type.AsFullName;
@@ -518,6 +528,8 @@ static class Constants {
 	public const string IdentityAttributeShortName = "Identifier";
 	public const string EntityAttributeName =   "BrightstarDB.EntityFramework.EntityAttribute";
 	public const string InversePropertyAttributeName = "BrightstarDB.EntityFramework.InversePropertyAttribute";
+    public const string IgnorePropertyAttributeName = "BrightstarDB.EntityFramework.IgnoreAttribute";
+    
 	/// <summary>
 	/// The property types that are supported entity property types
 	/// </summary>
