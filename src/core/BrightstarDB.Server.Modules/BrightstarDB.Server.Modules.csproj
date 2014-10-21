@@ -178,13 +178,6 @@
     <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
     <AssemblyTitle>BrightstarDB Server Core Assembly</AssemblyTitle>
   </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>
-if $(ConfigurationName) == Debug (
-xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.23.2\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll" "$(ProjectDir)bin\"
-xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.0.23.2\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\"
-)</PostBuildEvent>
-  </PropertyGroup>
   <Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
   <Target Name="AfterBuild" DependsOnTargets="CopyRazorAssemblies" />
   <Target Name="CopyRazorAssemblies" Condition="'$(Configuration)' == 'Debug'">
