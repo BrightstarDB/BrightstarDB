@@ -20,17 +20,21 @@ RUN mozroots --import --machine --sync \
     && yes | certmgr -ssl -m https://nugetgallery.blob.core.windows.net \
     && yes | certmgr -ssl -m https://nuget.org
 
-RUN git clone https://github.com/BrightstarDB/BrightstarDB.git /BrightstarDB \
-    && cd /BrightstarDB \
+RUN git clone https://github.com/BrightstarDB/BrightstarDB.git /bssrc \
+    && cd /bssrc \
     && git checkout develop \
     && cd mono \
-    && ./build.sh
+    && ./build.sh \
+    && mkdir /BrightstarDB \
+    && mkdir /BrightstarDB/service \
+    && cp -r /bssrc/mono/build/service/* /BrightstarDB/service \
+    && rm -rf /bssrc
 
 EXPOSE 8090
 
-ADD BrightstarService.exe.config /BrightstarDB/mono/build/service/BrightstarService.exe.config
+ADD BrightstarService.exe.config /BrightstarDB/service/BrightstarService.exe.config
 
-WORKDIR /BrightstarDB/mono/build/service
+WORKDIR /BrightstarDB/service
 CMD ["/usr/bin/mono", "BrightstarService.exe" ]
 
 
