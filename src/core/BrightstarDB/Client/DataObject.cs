@@ -4,13 +4,14 @@ using System.Linq;
 using BrightstarDB.EntityFramework;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
-
 #if SILVERLIGHT || PORTABLE
 using VDS=VDS.RDF;
 #endif
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
+using VDS.RDF;
+using Triple = BrightstarDB.Model.Triple;
 
 namespace BrightstarDB.Client
 {
@@ -106,8 +107,7 @@ namespace BrightstarDB.Client
         {
             get
             {
-                return _store.AddTriples.Any(x => x.Subject.Equals(Identity)) ||
-                       _store.DeletePatterns.Any(x => x.Subject.Equals(Identity));
+                return _store.AddTriples.ContainsSubject(Identity) || _store.DeletePatterns.ContainsSubject(Identity);
             }
         }
         /// <summary>
@@ -300,7 +300,8 @@ namespace BrightstarDB.Client
             // remove matching triples
             //IEnumerable<Triple> matchingTriples = _triples.Where(t => t.Predicate.Equals(type.Identity));
             //_store.DeletePatterns.AddRange(matchingTriples);
-            if (!_store.DeletePatterns.Any(t=>t.Subject.Equals(Identity) && t.Predicate.Equals(type.Identity) && t.Object.Equals(Constants.WildcardUri)))
+
+            if (!_store.DeletePatterns.GetMatches(Identity, type.Identity, Constants.WildcardUri).Any())
             {
                 AddDeleteTriples(new Triple
                     {
@@ -310,7 +311,7 @@ namespace BrightstarDB.Client
                     });
             }
             _triples.RemoveAll(t => t.Predicate.Equals(type.Identity));
-            _store.AddTriples.RemoveAll(t => t.Predicate.Equals(type.Identity) && t.Subject.Equals(Identity));
+            _store.AddTriples.RemoveBySubjectPredicate(Identity, type.Identity);
             return this;
         }
 
@@ -333,7 +334,7 @@ namespace BrightstarDB.Client
         {
             CheckLoaded();
             AddDeleteTriples(new Triple{Subject = Constants.WildcardUri, Predicate = type.Identity, Object = Identity, IsLiteral = false});
-            _store.AddTriples.RemoveAll(t => t.Predicate.Equals(type.Identity) && t.Object.Equals(Identity));
+            _store.AddTriples.RemoveByPredicateObject(type.Identity, Identity);
             return this;
         }
 
@@ -418,8 +419,8 @@ namespace BrightstarDB.Client
             _store.DeletePatterns.AddRange(_triples);
 
             // remove all add triples for this DataObject or references to it.
-            _store.AddTriples.RemoveAll(t => t.Subject.Equals(Identity));
-            _store.AddTriples.RemoveAll(t => t.Object.Equals(Identity));
+            _store.AddTriples.RemoveBySubject(Identity);
+            _store.AddTriples.RemoveByObject(Identity);
             
             // delete triples where this DataObject is the object
             AddDeleteTriples(new Triple {Subject = Constants.WildcardUri, Predicate = Constants.WildcardUri, Object = Identity});
@@ -579,11 +580,11 @@ namespace BrightstarDB.Client
                 _triples.RemoveAll(t => t.Predicate.Equals(triple.Predicate));
 
                 // remove any existing property triple in the add triples collection
-                _store.AddTriples.RemoveAll(t => t.Subject.Equals(triple.Subject) && t.Predicate.Equals(triple.Predicate));
+                _store.AddTriples.RemoveBySubjectPredicate(triple.Subject, triple.Predicate);
             }
 
             // Because this is a set, we use a wildcard to delete any existing properties with the same predicate
-            if (!_isNew && !_store.DeletePatterns.Any(t=>t.Subject.Equals(triple.Subject) && t.Predicate.Equals(triple.Predicate) && t.Object.Equals(Constants.WildcardUri)))
+            if (!_isNew && !_store.DeletePatterns.GetMatches(triple.Subject, triple.Predicate, Constants.WildcardUri).Any())
             {
                 AddDeleteTriples(new Triple
                     {
@@ -610,11 +611,11 @@ namespace BrightstarDB.Client
                 _triples.RemoveAll(t => t.Predicate.Equals(triple.Predicate));
 
                 // remove any existing property triple in the add triples collection
-                _store.AddTriples.RemoveAll(t => t.Subject.Equals(triple.Subject) && t.Predicate.Equals(triple.Predicate));
+                _store.AddTriples.RemoveBySubjectPredicate(triple.Subject, triple.Predicate);
             }
 
             // Because this is a set, we use a wildcard to delete any existing properties with the same predicate
-            if (!_isNew && !_store.DeletePatterns.Any(t => t.Subject.Equals(triple.Subject) && t.Predicate.Equals(triple.Predicate) && t.Object.Equals(Constants.WildcardUri)))
+            if (!_isNew && !_store.DeletePatterns.GetMatches(triple.Subject, triple.Predicate, Constants.WildcardUri).Any())
             {
                 _store.DeletePatterns.Add(new Triple
                 {
@@ -693,7 +694,7 @@ namespace BrightstarDB.Client
             }
 
             // remove any matches from the list of triples to be added
-            _store.AddTriples.RemoveAll(t => t.Subject.Equals(Identity) && t.Predicate.Equals(type.Identity) && t.Object.Equals(value.Identity));
+            _store.AddTriples.RemoveBySubjectPredicateObject(Identity, type.Identity, value.Identity);
         }
 
         private void RemoveLiteralProperty(IDataObject type, string value, string dataType, string langCode = null)
@@ -716,7 +717,7 @@ namespace BrightstarDB.Client
             }
 
             // remove from add txn
-            _store.AddTriples.RemoveAll(t => t.Subject.Equals(Identity) && t.Predicate.Equals(type.Identity) && t.Object.Equals(value) && t.DataType.Equals(dataType) && (t.LangCode == null || t.LangCode.Equals(langCode)));
+            _store.AddTriples.RemoveBySubjectPredicateLiteral(Identity, type.Identity, value, dataType, langCode);
         }
 
         /// <summary>

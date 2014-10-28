@@ -159,6 +159,7 @@
     <Compile Include="Client\IJobInfo.cs" />
     <Compile Include="Client\IStoreStatistics.cs" />
     <Compile Include="Client\ITransactionInfo.cs" />
+    <Compile Include="Client\ITripleCollection.cs" />
     <Compile Include="Client\IUpdateableStore.cs" />
     <Compile Include="Client\RefreshMode.cs" />
     <Compile Include="Client\RestClientHelper.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="Client\SparqlDataObjectContext.cs" />
     <Compile Include="Client\SparqlDataObjectStore.cs" />
     <Compile Include="Client\SparqlUpdatableStore.cs" />
+    <Compile Include="Client\TripleCollection.cs" />
     <Compile Include="Client\UpdateTransaction.cs" />
     <Compile Include="Config\BrightstarConfiguration.cs" />
     <Compile Include="Config\BrightstarConfigurationSectionHandler.cs" />

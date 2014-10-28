@@ -117,6 +117,7 @@
     <Compile Include="StoreTestsBase.cs" />
     <Compile Include="StoreWorkerTests.cs" />
     <Compile Include="StreamTests.cs" />
+    <Compile Include="TripleCollectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BrightstarDB.Tests\BrightstarDB.Tests.csproj">

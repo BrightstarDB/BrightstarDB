@@ -48,22 +48,20 @@ namespace BrightstarDB.Client
             //return new MemoryStream(Encoding.UTF8.GetBytes(buff.ToString()), false);
         }
 
-        public void ApplyTransaction(IList<ITriple> existencePreconditions, IList<ITriple> nonexistencePreconditions,
-                                     IList<ITriple> deletePatterns, IList<ITriple> inserts,
-                                     string updateGraphUri)
+        public void ApplyTransaction(IEnumerable<ITriple> existencePreconditions, IEnumerable<ITriple> nonexistencePreconditions, IEnumerable<ITriple> deletePatterns, IEnumerable<ITriple> inserts, string updateGraphUri)
         {
-            if (existencePreconditions.Count > 0)
+            if (existencePreconditions.Any())
             {
                 throw new NotSupportedException("SparqlDataObjectStore does not support conditional updates");
             }
-            if (nonexistencePreconditions.Count > 0)
+            if (nonexistencePreconditions.Any())
             {
                 // NOTE: At the moment this is ignored because if you use key properties, 
                 // non-existence preconditions will get generated and we want to support
                 // using key properties with SPARQL update endpoints.
             }
 
-            var deleteOp = FormatDeletePatterns(deletePatterns, updateGraphUri);
+            var deleteOp = FormatDeletePatterns(deletePatterns.ToList(), updateGraphUri);
             var insertOp = FormatInserts(inserts, updateGraphUri);
 
             var parser = new SparqlUpdateParser();

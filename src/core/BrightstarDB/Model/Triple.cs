@@ -48,5 +48,31 @@
             }
             return string.Format("<{0}> <{1}> <{2}>", Subject, Predicate, Object);
         }
+
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
+        }
+
+        /// <summary>
+        /// Equality comparison. Unlike the Match operation, the Equals operation requires direct value equality.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            var other = obj as Triple;
+            if (other == null) return false;
+            return (Subject == null && other.Subject == null || Subject != null && Subject.Equals(other.Subject)) &&
+                   (Predicate == null && other.Predicate == null ||
+                    Predicate != null && Predicate.Equals(other.Predicate)) &&
+                   IsLiteral.Equals(other.IsLiteral) &&
+                   (Object == null && other.Object == null || Object != null && Object.Equals(other.Object)) &&
+                   (Graph == null && other.Graph == null || Graph != null && Graph.Equals(other.Graph)) && 
+                   (DataType == null && other.DataType == null ||
+                    DataType != null && DataType.Equals(other.DataType)) &&
+                   (LangCode == null && other.LangCode == null ||
+                    LangCode != null && LangCode.Equals(other.LangCode));
+        }
     }
 }
