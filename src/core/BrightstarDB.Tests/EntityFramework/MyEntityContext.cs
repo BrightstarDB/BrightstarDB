@@ -949,6 +949,18 @@ namespace BrightstarDB.Tests.EntityFramework
             		set { SetRelatedProperty("SomeByteArray", value); }
     	}
     
+    	public System.Guid SomeGuid
+    	{
+            		get { return GetRelatedProperty<System.Guid>("SomeGuid"); }
+            		set { SetRelatedProperty("SomeGuid", value); }
+    	}
+    
+    	public System.Nullable<System.Guid> SomeNullableGuid
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.Guid>>("SomeNullableGuid"); }
+            		set { SetRelatedProperty("SomeNullableGuid", value); }
+    	}
+    
     	public BrightstarDB.Tests.EntityFramework.TestEnumeration SomeEnumeration
     	{
             		get { return GetRelatedProperty<BrightstarDB.Tests.EntityFramework.TestEnumeration>("SomeEnumeration"); }

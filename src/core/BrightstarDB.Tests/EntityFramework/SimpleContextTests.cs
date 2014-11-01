@@ -1533,6 +1533,65 @@ where {
         }
 
         [Test]
+        public void TestSetGuid()
+        {
+            var storeName = "SetGuid_" + DateTime.Now.Ticks;
+            var testGuid = new Guid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+            using (var doStore = _dataObjectContext.CreateStore(storeName))
+            {
+                using (var context = new MyEntityContext(doStore))
+                {
+                    var testEntity = context.Entities.Create();
+                    testEntity.SomeGuid = testGuid;
+                    context.SaveChanges();
+                }
+            }
+            using (var doStore = _dataObjectContext.OpenStore(storeName))
+            {
+                using (var context = new MyEntityContext(doStore))
+                {
+                    var testEntity = context.Entities.FirstOrDefault();
+                    Assert.IsNotNull(testEntity);
+                    var testEntityId = testEntity.Id;
+                    Assert.AreEqual(testGuid, testEntity.SomeGuid);
+
+                    // Verify we can use a Guid value in a search
+                    testEntity = context.Entities.FirstOrDefault(e => e.SomeGuid.Equals(testGuid));
+                    Assert.IsNotNull(testEntity);
+                    Assert.AreEqual(testEntityId, testEntity.Id);
+                    Assert.IsNull(context.Entities.FirstOrDefault(e=>e.SomeGuid.Equals(Guid.Empty)));
+                }
+            }
+        }
+
+        [Test]
+        public void TestGuidAndNullableGuidDefaults()
+        {
+            var storeName = "TestGuidAndNullableGuidDefaults_" + DateTime.Now.Ticks;
+            string testEntityId;
+            using (var doStore = _dataObjectContext.CreateStore(storeName))
+            {
+                using (var context = new MyEntityContext(doStore))
+                {
+                    var testEntity = context.Entities.Create();
+                    testEntityId = testEntity.Id;
+                    context.SaveChanges();
+                }
+            }
+            using (var doStore = _dataObjectContext.OpenStore(storeName))
+            {
+                using (var context = new MyEntityContext(doStore))
+                {
+                    var testEntity = context.Entities.FirstOrDefault(x => x.Id.Equals(testEntityId));
+                    Assert.IsNotNull(testEntity);
+                    Assert.IsNotNull(testEntity.SomeGuid);
+                    Assert.AreEqual(Guid.Empty, testEntity.SomeGuid);
+                    Assert.IsFalse(testEntity.SomeNullableGuid.HasValue);
+                }
+            }
+        }
+
+        [Test]
         public void TestSetEnumeration()
         {
             var storeName = "SetEnumeration_" + DateTime.Now.Ticks;

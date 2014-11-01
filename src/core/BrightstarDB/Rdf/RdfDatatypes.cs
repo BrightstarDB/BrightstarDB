@@ -26,6 +26,11 @@ namespace BrightstarDB.Rdf
         public const string NetworkedPlanetXsdNamespace = "http://www.networkedplanet.com/namespaces/datatypes#";
 
         /// <summary>
+        /// The XML namespace for WSDL datatypes
+        /// </summary>
+        public const string MicrosoftWdslTypesNamespace = "http://microsoft.com/wsdl/types/";
+
+        /// <summary>
         /// The datatype URI for an RDF plain literal
         /// </summary>
         public const string PlainLiteral = RdfSchemaNamespace + "PlainLiteral";
@@ -116,6 +121,11 @@ namespace BrightstarDB.Rdf
         /// The NP XML Schema char datatype URI
         /// </summary>
         public const string Char = NetworkedPlanetXsdNamespace + "char";
+
+        /// <summary>
+        /// The WSDL-defined datatype URI for GUID
+        /// </summary>
+        public const string Guid = MicrosoftWdslTypesNamespace + "guid";
 
         #region Rdf Datatype Definitions
         private static readonly RdfDatatype RdfString = new RdfDatatype(String, (o => o as string), ((s,l)=>s));
@@ -217,6 +227,15 @@ namespace BrightstarDB.Rdf
             o => Convert.ToBase64String((byte[]) o, Base64FormattingOptions.None),
             (s, l) => Convert.FromBase64String(s));
 
+        /// <summary>
+        /// WSDL serialization for GUID is XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX => "D" format specifier
+        /// We ensure that format on serialization but accept the other formats on deserialization.
+        /// </summary>
+        private static readonly RdfDatatype RdfGuid = new RdfDatatype(
+            Guid,
+            o=>((Guid)o).ToString("D"),
+            (s,l)=>System.Guid.Parse(s));
+
 #endif
 
 
@@ -240,6 +259,7 @@ namespace BrightstarDB.Rdf
                     {typeof (byte), RdfUnsignedByte},
                     {typeof (char), RdfChar},
                     {typeof (byte[]), RdfByteArray},
+                    {typeof (Guid), RdfGuid}
                 };
 
         private static readonly Dictionary<string, RdfDatatype> DatatypeUriToRdfType =
@@ -262,7 +282,8 @@ namespace BrightstarDB.Rdf
                     {UnsignedShort, RdfUnsignedShort},
                     {UnsignedByte, RdfUnsignedByte},
                     {Char, RdfChar},
-                    {Base64Binary, RdfByteArray}
+                    {Base64Binary, RdfByteArray},
+                    {Guid, RdfGuid}
                 };
 
         #endregion

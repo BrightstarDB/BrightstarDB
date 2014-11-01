@@ -62,6 +62,10 @@ namespace BrightstarDB.Tests.EntityFramework
 
         Byte[] SomeByteArray { get; set; }
 
+        Guid SomeGuid { get; set; }
+
+        Guid? SomeNullableGuid { get; set; }
+
         TestEnumeration SomeEnumeration { get; set; }
         TestEnumeration? SomeNullableEnumeration { get; set; }
         TestFlagsEnumeration SomeFlagsEnumeration { get; set; }

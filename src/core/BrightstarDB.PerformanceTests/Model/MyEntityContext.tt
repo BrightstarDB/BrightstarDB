@@ -551,6 +551,7 @@ static class Constants {
 		"System.Byte",
 		"System.Char",
 		"System.SByte",
+        "System.Guid",
 		"BrightstarDB.Rdf.PlainLiteral",
 		"System.Nullable<System.Boolean>",
 		"System.Nullable<System.Int16>",
@@ -566,6 +567,7 @@ static class Constants {
 		"System.Nullable<System.Byte>",
 		"System.Nullable<System.Char>",
 		"System.Nullable<System.SByte>",
+        "System.Nullable<System.Guid>",
 	};
 	
 	/// <summary>
