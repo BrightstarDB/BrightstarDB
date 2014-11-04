@@ -1,6 +1,12 @@
 ﻿using System;
+using System.Linq;
+using System.Xml.Linq;
+using BrightstarDB.Client;
+using BrightstarDB.Query;
+using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
 using NUnit.Framework;
+using VDS.RDF.Query.Optimisation;
 
 namespace BrightstarDB.InternalTests
 {
@@ -32,6 +38,13 @@ namespace BrightstarDB.InternalTests
             for (int i = 0; i < 1000000; i++)
             {
                 store.InsertTriple("http://www.bs.com/doc/" + i,
+                    "http://www.bs.com/name",
+                    "Document " + i,
+                    true,
+                    RdfDatatypes.PlainLiteral,
+                    null,
+                    Constants.DefaultGraphUri);
+                store.InsertTriple("http://www.bs.com/doc/" + i,
                     "http://www.bs.com/tag",
                     "http://www.bs.com/category/" + rand.Next(50), false, null, null, Constants.DefaultGraphUri);
                 store.InsertTriple("http://www.bs.com/doc/" + i,
@@ -43,10 +56,20 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
-        public void TestVariableEqualsOptimiser()
+        public void TestVariableEqualsOptimisedQuery()
         {
-            const string sparql = @"SELECT ?d WHERE { ?d <http://www.bs.com/name> ?v . FILTER (?v = 'Foo') . }";
-            _docTagStore.ExecuteSparqlQuery(sparql, SparqlResultsFormat.Xml);
+            string sparql = @"SELECT ?d WHERE { ?d <http://www.bs.com/name> ?v . FILTER (?v = 'Document 5') . }";
+            XDocument results = XDocument.Parse(_docTagStore.ExecuteSparqlQuery(sparql, SparqlResultsFormat.Xml));
+            Assert.AreEqual(1, results.SparqlResultRows().Count());
+
+            sparql = @"SELECT ?d ?v WHERE { ?d <http://www.bs.com/name> ?v . FILTER (?v = 'Document 5') . }";
+            results = XDocument.Parse(_docTagStore.ExecuteSparqlQuery(sparql, SparqlResultsFormat.Xml));
+            Console.WriteLine(results.ToString());
+            Assert.AreEqual(1, results.SparqlResultRows().Count());
+            var v = results.SparqlResultRows().First().GetColumnValue("v") as PlainLiteral;
+            Assert.IsNotNull(v);
+            Assert.AreEqual("Document 5", v.Value);
         }
+
     }
 }
