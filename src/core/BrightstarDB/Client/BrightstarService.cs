@@ -23,7 +23,11 @@ namespace BrightstarDB.Client
         /// running job is allowed to conclude and all other queued jobs are lost.</param>
         public static void Shutdown(bool allowJobsToConclude=true)
         {
-            ServerCoreManager.Shutdown(allowJobsToConclude);                    
+            ServerCoreManager.Shutdown(allowJobsToConclude);
+#if PORTABLE
+            // Ensure the background log file writer is shutdown cleanly
+            Logging.Shutdown();
+#endif
         }
 
         ///<summary>

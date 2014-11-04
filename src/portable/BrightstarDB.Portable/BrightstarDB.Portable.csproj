@@ -74,7 +74,7 @@
     <Compile Include="Compatibility\Tuple.cs" />
     <Compile Include="Adaptation\PlatformAdapter.cs" />
     <Compile Include="Adaptation\ProbingAdapterResolver.cs" />
-    <Compile Include="relinq\RelinqCore\**\*.cs" Exclude="relinq\RelinqCore\Properties\*.cs"/>
+    <Compile Include="relinq\RelinqCore\**\*.cs" Exclude="relinq\RelinqCore\Properties\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="dotNetRDF">
