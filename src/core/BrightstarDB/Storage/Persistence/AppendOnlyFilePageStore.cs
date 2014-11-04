@@ -191,7 +191,6 @@ namespace BrightstarDB.Storage.Persistence
                     }
                     _backgroundPageWriter.Flush();
                     RestartBackgroundWriter();
-                    PageCache.Instance.Clear(_path);
                 }
                 else
                 {
@@ -208,6 +207,7 @@ namespace BrightstarDB.Storage.Persistence
                 }
                 _newPages.Clear();
                 _newPageOffset = _nextPageId;
+                PageCache.Instance.Clear(_path);
             }
             
         }
