@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using BrightstarDB.Rdf;
 using VDS.RDF;
 using VDS.RDF.Nodes;
 using VDS.RDF.Parsing.Contexts;
@@ -61,12 +62,14 @@ namespace BrightstarDB.Query.Processor
         /// <param name="filter">The Filter algebra to optimise</param>
         /// <param name="optimisedAlgebra">Receives the optimised algebra if optimisation was performed or the input algebra otherwise</param>
         /// <returns>True if an optimisation was performed, false otherwise</returns>
-        /// <remarks>This implementation currently handles the simple case of a Filter applied to a BGP where the filter
+        /// <remarks>
+        /// <para>This implementation currently handles the simple case of a Filter applied to a BGP where the filter
         /// expression is either a single EqualsExpression or SameTermExpression or an AndExpression containing one or more
         /// EqualsExpression or SameTermExpression arguments. The implementation ensures that the replaced variable is still
         /// available to the outer algebra by inserting a BindPattern into the BGP. If the filter expression is a single 
         /// EqualsExpression or SameTermExpression, the optimiser will also strip this out of the algebra, but with an
-        /// AndExpression it will leave the full filter expression untouched.
+        /// AndExpression it will leave the full filter expression untouched.</para>
+        /// <para>The implementation will replace only URI and PlainLiteral types</para>
         /// TODO: It should be possible to remove EqualsExpression and SameTermExpression instances from the AndExpression arguments and then either strip it out (if it has no remaining arguments), or optimise it to a single expression (if it has one remaining argument)
         /// </remarks>
         private bool OptimiseFilter(IFilter filter, out ISparqlAlgebra optimisedAlgebra)
@@ -88,15 +91,18 @@ namespace BrightstarDB.Query.Processor
             // or an AND of expressions
             if (IsIdentityExpression(filterExpression, out var, out term, out equals))
             {
-                replacementTerms.Add(var, term);
+                if (CanOptimize(term))
+                {
+                    replacementTerms.Add(var, term);
+                }
             }
             else if (filterExpression is AndExpression)
             {
                 foreach (var arg in filterExpression.Arguments)
                 {
-                    if (IsIdentityExpression(arg, out var, out term, out equals))
+                    if (IsIdentityExpression(arg, out var, out term, out equals) && CanOptimize(term))
                     {
-                        replacementTerms.Add(var, term);
+                            replacementTerms.Add(var, term);
                     }
                     else
                     {
@@ -144,6 +150,15 @@ namespace BrightstarDB.Query.Processor
             }
             optimisedAlgebra = filter;
             return false;
+        }
+
+        private static bool CanOptimize(INode term)
+        {
+            var vnode = term.AsValuedNode();
+            return (term.NodeType == NodeType.Uri ||
+                    vnode.EffectiveType.Equals(RdfDatatypes.PlainLiteral) || 
+                    vnode.EffectiveType.Equals(String.Empty) ||
+                    vnode.EffectiveType.Equals(RdfDatatypes.String));
         }
 
         private bool OptimiseBgp(Bgp bgp, out ISparqlAlgebra optimisedAlgebra)
@@ -280,4 +295,12 @@ namespace BrightstarDB.Query.Processor
         }       
     }
 
+
+    static class ValueNodeHelper
+{
+        public static bool IsPlainLiteral(this IValuedNode valuedNode)
+        {
+            return valuedNode.EffectiveType.Equals(RdfDatatypes.PlainLiteral);
+        }
+}
 }
