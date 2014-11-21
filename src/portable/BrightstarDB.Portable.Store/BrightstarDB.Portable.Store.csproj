@@ -109,6 +109,7 @@
     <Compile Include="BrightstarDB\Compatibilty\PathSeparatorProvider.cs" />
     <Compile Include="BrightstarDB\ConfigurationProvider.cs" />
     <Compile Include="BrightstarDB\Storage\PersistenceManager.cs" />
+    <Compile Include="BrightstarDB\Storage\PoliteReaderStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">

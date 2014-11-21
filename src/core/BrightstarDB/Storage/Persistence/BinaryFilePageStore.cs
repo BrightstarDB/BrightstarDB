@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using BrightstarDB.Profiling;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
@@ -73,7 +74,7 @@ namespace BrightstarDB.Storage.Persistence
         private readonly object _restartLock = new object();
 
         public BinaryFilePageStore(IPersistenceManager persistenceManager, string filePath, int pageSize, bool readOnly,
-            ulong transactionId, ulong nextTransactionId)
+            ulong transactionId, ulong nextTransactionId, bool disableBackgroundWrites)
         {
             _persistenceManager = persistenceManager;
             _nominalPageSize = pageSize;
@@ -84,7 +85,7 @@ namespace BrightstarDB.Storage.Persistence
             CanWrite = !readOnly;
             OpenInputStream();
             _nextPageId = (ulong) _inputStream.Length/((uint) _nominalPageSize*2) + 1;
-            if (CanWrite)
+            if (CanWrite && !disableBackgroundWrites)
             {
                 _backgroundPageWriter =
                     new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open));
@@ -162,25 +163,47 @@ namespace BrightstarDB.Storage.Persistence
         {
             if (CanWrite)
             {
-                foreach (var pageId in _modifiedPages.Keys)
+                if (_backgroundPageWriter != null)
                 {
-                    var page = PageCache.Instance.Lookup(_partitionId, pageId) as BinaryFilePage;
-                    if (page != null && page.IsDirty)
+                    foreach (var pageId in _modifiedPages.Keys)
                     {
-                        _backgroundPageWriter.QueueWrite(page, commitId);
+                        var page = PageCache.Instance.Lookup(_partitionId, pageId) as BinaryFilePage;
+                        if (page != null && page.IsDirty)
+                        {
+                            _backgroundPageWriter.QueueWrite(page, commitId);
+                        }
+                    }
+                    _backgroundPageWriter.Flush();
+                    lock (_restartLock)
+                    {
+                        _backgroundPageWriter.Shutdown();
+                        _backgroundPageWriter.Dispose();
+                        PageCache.Instance.Clear(_partitionId);
+                        UpdatePartitionId();
+                        _readTxnId = _writeTxnId;
+                        _writeTxnId++;
+                        _backgroundPageWriter =
+                            new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open));
                     }
                 }
-                _backgroundPageWriter.Flush();
-                lock (_restartLock)
+                else
                 {
-                    _backgroundPageWriter.Shutdown();
-                    _backgroundPageWriter.Dispose();
+                    using (var outputStream = _persistenceManager.GetOutputStream(_filePath, FileMode.Open))
+                    {
+                        foreach (var pageId in _modifiedPages.Keys.OrderBy(x=>x))
+                        {
+                            var page = PageCache.Instance.Lookup(_partitionId, pageId) as BinaryFilePage;
+                            if (page != null && page.IsDirty)
+                            {
+                                page.Write(outputStream, commitId);
+                            }
+                        }
+                        outputStream.Flush();
+                    }
                     PageCache.Instance.Clear(_partitionId);
                     UpdatePartitionId();
                     _readTxnId = _writeTxnId;
                     _writeTxnId++;
-                    _backgroundPageWriter =
-                        new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open));
                 }
             }
             else
@@ -243,7 +266,10 @@ namespace BrightstarDB.Storage.Persistence
         internal void OnPageModified(BinaryFilePage page)
         {
             _modifiedPages.AddOrUpdate(page.Id, true, (k, v) => true);
-            _backgroundPageWriter.QueueWrite(page, _writeTxnId);
+            if (_backgroundPageWriter != null)
+            {
+                _backgroundPageWriter.QueueWrite(page, _writeTxnId);
+            }
         }
 
         public void MarkDirty(ulong commitId, ulong pageId)
