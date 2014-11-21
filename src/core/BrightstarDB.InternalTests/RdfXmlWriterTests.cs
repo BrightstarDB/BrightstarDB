@@ -5,7 +5,6 @@ using System.Xml;
 using System.Xml.Linq;
 using BrightstarDB.Rdf;
 using NUnit.Framework;
-using VDS.RDF;
 
 namespace BrightstarDB.InternalTests
 {
