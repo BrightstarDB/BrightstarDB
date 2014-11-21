@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using BrightstarDB.Rdf;
 using NUnit.Framework;
+using VDS.RDF;
 
 namespace BrightstarDB.InternalTests
 {
@@ -205,5 +206,6 @@ namespace BrightstarDB.InternalTests
             var descriptions = doc.Root.Elements(RdfNS + "Description");
             Assert.That(descriptions.Count(), Is.EqualTo(3));
         }
+
     }
 }
