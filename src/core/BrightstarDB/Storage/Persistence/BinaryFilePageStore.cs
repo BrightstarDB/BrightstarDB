@@ -85,10 +85,13 @@ namespace BrightstarDB.Storage.Persistence
             CanWrite = !readOnly;
             OpenInputStream();
             _nextPageId = (ulong) _inputStream.Length/((uint) _nominalPageSize*2) + 1;
-            if (CanWrite && !disableBackgroundWrites)
+            if (CanWrite)
             {
-                _backgroundPageWriter =
-                    new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open));
+                if (!disableBackgroundWrites)
+                {
+                    _backgroundPageWriter =
+                        new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open));
+                }
                 PageCache.Instance.BeforeEvict += BeforePageCacheEvict;
             }
             _modifiedPages = new ConcurrentDictionary<ulong, bool>();
