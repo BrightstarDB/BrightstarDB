@@ -79,19 +79,26 @@ namespace BrightstarDB.Storage
         }
 
 
-        private const Int32 ERROR_OPLOCK_HANDLE_CLOSED = unchecked ((Int32) 0x80070323);
+        private const Int32 ErrorOplockHandleClosed = unchecked ((Int32) 0x80070323);
+
         private void WrapOplockViolations(Action action)
         {
+            var currentPosition = 0L;
             while (true)
             {
-                if (_stream == null) _stream = _file.OpenStreamForReadAsync().Result;
+                if (_stream == null)
+                {
+                    _stream = _file.OpenStreamForReadAsync().Result;
+                    _stream.Seek(currentPosition, SeekOrigin.Begin);
+                }
                 try
                 {
+                    currentPosition = _stream.Position;
                     action();
                 }
                 catch (Exception ex)
                 {
-                    if (ex.HResult != ERROR_OPLOCK_HANDLE_CLOSED) throw;
+                    if (ex.HResult != ErrorOplockHandleClosed) throw;
                     _stream = null;
                 }
             }
@@ -99,21 +106,25 @@ namespace BrightstarDB.Storage
 
         private T WrapOplockViolations<T>(Func<T> function)
         {
+            var currentPosition = 0L;
             while (true)
             {
                 if (_stream == null)
                 {
-                    _stream = _file.OpenAsync(FileAccessMode.Read).AsTask().Result.AsStreamForRead();
+                    _stream = _file.OpenStreamForReadAsync().Result;
+                    _stream.Seek(currentPosition, SeekOrigin.Begin);
                 }
                 try
                 {
+                    // Record the current stream position in case we need to reopen the stream
+                    currentPosition = _stream.Position;
                     return function();
                 }
                 catch (Exception ex)
                 {
-                    if (ex.HResult != ERROR_OPLOCK_HANDLE_CLOSED)
+                    if (ex.HResult != ErrorOplockHandleClosed)
                     {
-                        if (ex.InnerException == null || ex.InnerException.HResult != ERROR_OPLOCK_HANDLE_CLOSED)
+                        if (ex.InnerException == null || ex.InnerException.HResult != ErrorOplockHandleClosed)
                         {
                             throw;
                         }
@@ -123,14 +134,6 @@ namespace BrightstarDB.Storage
             }
         }
 
-
-        private void EnsureStream()
-        {
-            if (_stream == null)
-            {
-                _stream = _file.OpenStreamForReadAsync().Result;
-            }
-        }
 
     }
 }
