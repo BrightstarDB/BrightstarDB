@@ -981,6 +981,54 @@ namespace BrightstarDB.Tests
         }
 
         [Test]
+        public void TestExecuteTransaction()
+        {
+            var client = GetClient();
+            var storeName = "TestExecuteTransaction_" + DateTime.Now.Ticks;
+
+            client.CreateStore(storeName);
+
+            // Test a simple addition of triples
+            var insertData = new StringBuilder();
+            insertData.AppendLine(@"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"".");
+            insertData.AppendLine(
+                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"".");
+            var job = client.ExecuteTransaction(storeName,
+                                                new UpdateTransactionData { InsertData = insertData.ToString() });
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+
+            //var resultStream = client.ExecuteQuery(storeName, "SELECT * WHERE { ?s <http://xmlns.com/foaf/0.1/mbox> ?p }");
+            //var resultDoc = XDocument.Load(resultStream);
+            //var resultRows = resultDoc.SparqlResultRows().ToList();
+            //Assert.AreEqual(1, resultRows.Count);
+
+            // Test an update with a precondition which is met
+            const string tripleToDelete = @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"".";
+            const string tripleToInsert = @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox_sha1sum> ""FAKESHA1""";
+            job = client.ExecuteTransaction(storeName,
+                                            new UpdateTransactionData
+                                            {
+                                                ExistencePreconditions = tripleToDelete,
+                                                DeletePatterns = tripleToDelete,
+                                                InsertData = tripleToInsert
+                                            });
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+
+            // Test an update with a precondition which is not met
+            job = client.ExecuteTransaction(storeName,
+                                            new UpdateTransactionData
+                                            {
+                                                ExistencePreconditions = tripleToDelete,
+                                                DeletePatterns = tripleToDelete,
+                                                InsertData = tripleToInsert
+                                            });
+            WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedWithErrors);
+        }
+
+        [Test]
         public void TestCreateSnapshot()
         {
             var storeName = "CreateSnapshot_" + DateTime.Now.Ticks;

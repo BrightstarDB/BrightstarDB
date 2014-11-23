@@ -111,7 +111,7 @@ namespace BrightstarDB.InternalTests
                 Assert.AreEqual(8192L, fs.Length);
             }
 
-            using (var pageStore = new BinaryFilePageStore(_pm, "TestCreateAndUpdatePage.dat", 4096, false, 1, 2))
+            using (var pageStore = new BinaryFilePageStore(_pm, "TestCreateAndUpdatePage.dat", 4096, false, 1, 2, false))
             {
                 var page = pageStore.Retrieve(1ul, null);
                 Assert.IsFalse(pageStore.IsWriteable(page));
@@ -133,7 +133,7 @@ namespace BrightstarDB.InternalTests
                 pageStore.Commit(2, null);
             }
 
-            using (var pageStore = new BinaryFilePageStore(_pm, "TestCreateAndUpdatePage.dat", 4096, true, 2, 3))
+            using (var pageStore = new BinaryFilePageStore(_pm, "TestCreateAndUpdatePage.dat", 4096, true, 2, 3, false))
             {
                 var page = pageStore.Retrieve(1ul, null);
                 Assert.AreEqual(0, _testBuffer2.Compare(page.Data));
@@ -151,7 +151,7 @@ namespace BrightstarDB.InternalTests
             {
                 Thread.Sleep(100);
             }
-            return new BinaryFilePageStore(_pm, fileName, 4096, false, 0, 1);
+            return new BinaryFilePageStore(_pm, fileName, 4096, false, 0, 1, false);
         }
     }
 }

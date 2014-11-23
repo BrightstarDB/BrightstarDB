@@ -4,7 +4,7 @@ using BrightstarDB.EntityFramework;
 
 namespace BrightstarDB.Portable.iOS.Tests.EntityFramework
 {
-    [Entity]
+    [Entity("http://www.example.org/schema/Person")]
     public interface IPerson
     {
         string Id { get; }

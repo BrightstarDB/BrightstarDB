@@ -55,11 +55,16 @@ namespace BrightstarDB.Tests
 #endif
         }
 
+        private IBrightstarService GetEmbeddedClient()
+        {
+            return BrightstarService.GetClient("type=embedded;storesDirectory=" + Configuration.StoreLocation);
+        }
+
         [Test]
         public void TestAddQuads()
         {
             var storeName = "TestAddQuads_" + DateTime.Now.Ticks;
-            var client = BrightstarService.GetClient("type=embedded;storesDirectory=C:\\brightstar");
+            var client = GetEmbeddedClient();
             client.CreateStore(storeName);
             var job = client.ExecuteTransaction(storeName, new UpdateTransactionData
                 {
@@ -103,10 +108,8 @@ namespace BrightstarDB.Tests
         public void TestImportIntoGraph()
         {
             var storeName = "TestImportIntoGraph_" + DateTime.Now.Ticks;
-            var client = BrightstarService.GetClient("type=embedded;storesdirectory=" + Configuration.StoreLocation);
+            var client = GetEmbeddedClient();
             client.CreateStore(storeName);
-
-
 
             var job = client.StartImport(storeName, "graph_triples.nt", "http://np.com/g2");
             while (!job.JobCompletedOk && !job.JobCompletedWithErrors)
@@ -142,7 +145,7 @@ namespace BrightstarDB.Tests
         public void TestExportGraphs()
         {
             var storeName = "TestExportGraphs_" + DateTime.Now.Ticks;
-            var client = BrightstarService.GetClient("type=embedded;storesDirectory=C:\\brightstar");
+            var client = GetEmbeddedClient();
             client.CreateStore(storeName);
 
 
@@ -153,7 +156,7 @@ namespace BrightstarDB.Tests
                 job = client.GetJobInfo(storeName, job.JobId);
             }
 
-            var exportFileName = "C:\\brightstar\\import\\graph_triples_out.nt";
+            var exportFileName = Path.Combine(Configuration.StoreLocation, "import", "graph_triples_out.nt");
             EnsureFileDoesNotExist(exportFileName);
 
             job = client.StartExport(storeName, "graph_triples_out.nt");
@@ -174,7 +177,7 @@ namespace BrightstarDB.Tests
                 sr.Close();
             }
 
-            exportFileName = "C:\\brightstar\\import\\graph_triples_out_2.nt";
+            exportFileName = Path.Combine(Configuration.StoreLocation, "import", "graph_triples_out_2.nt");
             EnsureFileDoesNotExist(exportFileName);
             job = client.StartExport(storeName, "graph_triples_out_2.nt", "http://np.com/g1");
             while (!job.JobCompletedOk && !job.JobCompletedWithErrors)
@@ -208,7 +211,7 @@ namespace BrightstarDB.Tests
         public void TestDeleteFromGraph()
         {
             var storeName = "TestDeleteFromGraph_" + DateTime.Now.Ticks;
-            var client = BrightstarService.GetClient("type=embedded;storesDirectory=C:\\brightstar");
+            var client = GetEmbeddedClient();
             client.CreateStore(storeName);
             var job = client.ExecuteTransaction(storeName, new UpdateTransactionData
                 {
