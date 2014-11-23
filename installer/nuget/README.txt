@@ -7,17 +7,16 @@ into the main documentation.
 
 Version
 -------
-1.7.0
+1.8.0
 
 We welcome feedback, comments, feature requests and bug reports. Please use
 our issue tracker at https://github.com/BrightstarDB/BrightstarDB/issues 
-or join us on our Google Group at 
-https://groups.google.com/forum/?fromgroups#!forum/brightstardb-users
+or join us on our Codeplex discussion group at http://brightstardb.codeplex.com/discussions
 
 Documentation
 -------------
 Our developer and user guide is available at http://brightstardb.readthedocs.org/
-The API documentation for this release is available at http://brightstardb.com/api/1.4/
+The API documentation for this release is available at http://brightstardb.com/api/1.8/
 
 Change Log
 ----------
