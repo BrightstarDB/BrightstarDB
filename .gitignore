@@ -136,3 +136,4 @@ src/core/UpgradeLog.htm
 src/core/UpgradeLog2.htm
 src/core/UpgradeLog3.htm
 src/mobile/BrightstarDB.Mobile/Properties/AssemblyInfo.cs
+src/portable/BrightstarDB.Portable.iOS/Properties/AssemblyInfo.cs

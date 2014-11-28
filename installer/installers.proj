@@ -168,8 +168,8 @@
 	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
     <MSBuild Projects="..\src\portable\BrightstarDB.Portable.Android\BrightstarDB.Portable.Android.csproj"
              Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" />
-    <MSBuild Projects="..\src\portable\BrightstarDB.Portable.iOS\BrightstarDB.Portable.iOS.csproj"
-             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" 
+    <MSBuild Projects="..\src\portable\ios.sln"
+             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" 
              Condition="$(BuildIOS)"/>
   </Target>
   
@@ -199,7 +199,14 @@
 	<MSBuild Projects="..\src\portable\portable.sln"
 	         Targets="Clean"
 			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+	<MSBuild Projects="..\src\portable\android.sln"
+	         Targets="Clean"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+	<MSBuild Projects="..\src\portable\ios.sln"
+	         Targets="Clean"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
   </Target>
+
   <Target Name="Clean" DependsOnTargets="CleanInstallerTmp;CleanOutput;CleanPortable">
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
 	     Targets="Clean"
