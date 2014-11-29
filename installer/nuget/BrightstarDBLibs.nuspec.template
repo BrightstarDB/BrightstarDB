@@ -15,22 +15,13 @@
     <copyright>Copyright 2014 Khalil Ahmed, Graham Moore, and other contributors</copyright>
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
     <dependencies>
-      <group>
-        <dependency id="dotNetRDF" version="1.0.7" />
-      </group>
       <group targetFramework="net40">
         <dependency id="dotNetRDF" version="1.0.7" />
       </group>
       <group targetFramework="net45">
         <dependency id="dotNetRDF" version="1.0.7" />
       </group>
-      <group targetFramework="portable-net45+wp80+win8">
-        <dependency id="dotNetRDF" version="1.0.7" />
-        <dependency id="SharpSerializer.PCL" version="2.18.6" />
-      </group>
-      <group targetFramework="portable-net45+wp80+sl5+win8+MonoAndroid10+MonoTouch10">
-        <dependency id="dotNetRDF" version="1.0.7" />
-        <dependency id="SharpSerializer.PCL" version="2.18.6" />
+      <group targetFramework="portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10">
       </group>
     </dependencies>
   </metadata>
