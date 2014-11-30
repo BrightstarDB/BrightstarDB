@@ -364,7 +364,7 @@ namespace BrightstarDB.Polaris.ViewModel
             {
                 throw exception;
             }
-            ExtractSyntaxError(exception);
+            ExtractSyntaxError(exception.InnerException);
         }
 
         public IEnumerable<CommitPointViewModel> GetCommitPoints(Store store, int skip, int take)

@@ -95,6 +95,18 @@ Where ``options`` are:
     
     For a step-by-step guide please refer to :ref:`BrightstarDB_In_IIS`
     
+********************************
+ Running BrightstarDB in Docker
+********************************
+
+From the 1.8 release we now provide pre-built `Docker <http://www.docker.com>`_ images to run the BrightstarDB service. 
+Docker is an open platform for developers and sysadmins to build, ship and run distributed applications, whether on 
+laptops, data center VMs, or the cloud.
+
+The BrightstarDB Docker images are built on the most recent Ubuntu LTS and the most recent Mono stable
+release. The Dockerfile and other configuration files can be found in `our Docker repository on GitHub <https://github.com/BrightstarDB/Docker>`_
+where you will also find important information about how to configure and run the Docker images.
+
 ***********************************
  BrightstarDB Service Configuration 
 ***********************************

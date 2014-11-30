@@ -11,7 +11,7 @@ namespace BrightstarDB.Storage.Persistence
     internal class AppendOnlyFilePageStore : IPageStore
     {
         private readonly string _path;
-        private readonly Stream _stream;
+        private Stream _stream;
         private readonly int _pageSize;
         private readonly int _bitShift;
         private ulong _nextPageId;
@@ -191,7 +191,6 @@ namespace BrightstarDB.Storage.Persistence
                     }
                     _backgroundPageWriter.Flush();
                     RestartBackgroundWriter();
-                    PageCache.Instance.Clear(_path);
                 }
                 else
                 {
@@ -208,6 +207,7 @@ namespace BrightstarDB.Storage.Persistence
                 }
                 _newPages.Clear();
                 _newPageOffset = _nextPageId;
+                PageCache.Instance.Clear(_path);
             }
             
         }
@@ -289,6 +289,7 @@ namespace BrightstarDB.Storage.Persistence
                 if (_stream != null)
                 {
                     _stream.Close();
+                    _stream = null;
                 }
                 if (_backgroundPageWriter != null)
                 {

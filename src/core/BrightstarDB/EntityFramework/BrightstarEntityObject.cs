@@ -34,6 +34,19 @@ namespace BrightstarDB.EntityFramework
         }
 
         /// <summary>
+        /// Creates a domain object bound to a specific type
+        /// </summary>
+        /// <param name="context">The context that the new domain object will be attached to</param>
+        /// <param name="entityType">The implementation class for the domain object</param>
+        public BrightstarEntityObject(BrightstarEntityContext context, Type entityType)
+        {
+            _context = context;
+            DataObject = context.CreateDataObject(entityType);
+            _context.TrackObject(this);
+            TriggerCreatedEvent(context);
+        }
+
+        /// <summary>
         /// Creates an entity object that is attached to a <see cref="BrightstarEntityContext"/>
         /// and bound to a resource
         /// </summary>

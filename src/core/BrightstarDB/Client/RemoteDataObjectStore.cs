@@ -94,9 +94,8 @@ namespace BrightstarDB.Client
             {
                 // get subject entity and see if there is a version triple
                 var subjects =
-                    AddTriples.Select(x => x.Subject)
-                              .Distinct()
-                              .Union(DeletePatterns.Select(x => x.Subject).Distinct())
+                    AddTriples.Subjects
+                              .Union(DeletePatterns.Subjects)
                               .Except(new[] {Constants.WildcardUri})
                               .ToList();
                 foreach (var subject in subjects)
@@ -131,7 +130,12 @@ namespace BrightstarDB.Client
 
             try
             {
-                Client.ApplyTransaction(Preconditions, NonExistencePreconditions, DeletePatterns, AddTriples, UpdateGraphUri);
+                Client.ApplyTransaction(
+                    Preconditions.Items,
+                    NonExistencePreconditions.Items,
+                    DeletePatterns.Items,
+                    AddTriples.Items,
+                    UpdateGraphUri);
             }
             catch (TransactionPreconditionsFailedException)
             {

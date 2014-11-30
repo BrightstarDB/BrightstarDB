@@ -14,7 +14,7 @@ namespace BrightstarDB.Samples
         /// OPTIONAL: If you would like the samples to store their data in a different folder, replace
         /// the value of this property with the path to use (the directory will be created if it does not exist)
         /// </summary>
-        public static string StoresDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\BrightstarSamplesData";
+        public static string StoresDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BrightstarSamplesData");
 
         public static void Register()
         {

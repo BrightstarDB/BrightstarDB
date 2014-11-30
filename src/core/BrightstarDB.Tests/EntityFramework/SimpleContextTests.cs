@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
@@ -51,8 +52,35 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
+        public void TestShortcutCreate()
+        {
+            string storeName = "TestShortcutCreate" + DateTime.Now.Ticks;
+            string aliceId;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var sales = new Department(context) {Name = "Sales", DeptId = 1};
+                var bob = new Person(context) {Name = "Bob"};
+                var alice = new Person(context) {Name = "Alice", Age = 54, Department = sales, Friends = new Collection<IPerson>{bob}};
+                context.SaveChanges();
+                aliceId = alice.Id;
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                var alice = context.Persons.FirstOrDefault(x => x.Id == aliceId);
+                Assert.IsNotNull(alice);
+                Assert.AreEqual("Alice", alice.Name);
+                Assert.AreEqual(54, alice.Age);
+                Assert.IsNotNull(alice.Department);
+                Assert.AreEqual("Sales", alice.Department.Name);
+                Assert.AreEqual(1, alice.Friends.Count);
+                Assert.AreEqual("Bob", alice.Friends.First().Name);
+            }
+        }
+
+        [Test]
         [ExpectedException(typeof(EntityKeyRequiredException))]
-        [Ignore("Behaviour is changed - an entity can be created, but will not be tracked or saved until its identity is set")]
+        [NUnit.Framework.Ignore("Behaviour is changed - an entity can be created, but will not be tracked or saved until its identity is set")]
         public void TestCannotCreateEntityWithKey()
         {
             string storeName = "CannotCreateEntityWithKey_" + DateTime.UtcNow.Ticks;
@@ -1500,6 +1528,65 @@ where {
                 for (byte i = 0; i < 5; i++)
                 {
                     Assert.AreEqual(i, e.SomeByteArray[i]);
+                }
+            }
+        }
+
+        [Test]
+        public void TestSetGuid()
+        {
+            var storeName = "SetGuid_" + DateTime.Now.Ticks;
+            var testGuid = new Guid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+            using (var doStore = _dataObjectContext.CreateStore(storeName))
+            {
+                using (var context = new MyEntityContext(doStore))
+                {
+                    var testEntity = context.Entities.Create();
+                    testEntity.SomeGuid = testGuid;
+                    context.SaveChanges();
+                }
+            }
+            using (var doStore = _dataObjectContext.OpenStore(storeName))
+            {
+                using (var context = new MyEntityContext(doStore))
+                {
+                    var testEntity = context.Entities.FirstOrDefault();
+                    Assert.IsNotNull(testEntity);
+                    var testEntityId = testEntity.Id;
+                    Assert.AreEqual(testGuid, testEntity.SomeGuid);
+
+                    // Verify we can use a Guid value in a search
+                    testEntity = context.Entities.FirstOrDefault(e => e.SomeGuid.Equals(testGuid));
+                    Assert.IsNotNull(testEntity);
+                    Assert.AreEqual(testEntityId, testEntity.Id);
+                    Assert.IsNull(context.Entities.FirstOrDefault(e=>e.SomeGuid.Equals(Guid.Empty)));
+                }
+            }
+        }
+
+        [Test]
+        public void TestGuidAndNullableGuidDefaults()
+        {
+            var storeName = "TestGuidAndNullableGuidDefaults_" + DateTime.Now.Ticks;
+            string testEntityId;
+            using (var doStore = _dataObjectContext.CreateStore(storeName))
+            {
+                using (var context = new MyEntityContext(doStore))
+                {
+                    var testEntity = context.Entities.Create();
+                    testEntityId = testEntity.Id;
+                    context.SaveChanges();
+                }
+            }
+            using (var doStore = _dataObjectContext.OpenStore(storeName))
+            {
+                using (var context = new MyEntityContext(doStore))
+                {
+                    var testEntity = context.Entities.FirstOrDefault(x => x.Id.Equals(testEntityId));
+                    Assert.IsNotNull(testEntity);
+                    Assert.IsNotNull(testEntity.SomeGuid);
+                    Assert.AreEqual(Guid.Empty, testEntity.SomeGuid);
+                    Assert.IsFalse(testEntity.SomeNullableGuid.HasValue);
                 }
             }
         }

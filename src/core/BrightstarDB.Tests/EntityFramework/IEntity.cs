@@ -62,6 +62,10 @@ namespace BrightstarDB.Tests.EntityFramework
 
         Byte[] SomeByteArray { get; set; }
 
+        Guid SomeGuid { get; set; }
+
+        Guid? SomeNullableGuid { get; set; }
+
         TestEnumeration SomeEnumeration { get; set; }
         TestEnumeration? SomeNullableEnumeration { get; set; }
         TestFlagsEnumeration SomeFlagsEnumeration { get; set; }
@@ -75,6 +79,9 @@ namespace BrightstarDB.Tests.EntityFramework
         ICollection<float> CollectionOfFloats { get; set; }
         ICollection<int> CollectionOfInts { get; set; }
         ICollection<long> CollectionOfLong { get; set; }
+
+        [Ignore]
+        string AnIgnoredProperty { get; set; }
     }
 
     enum TestEnumeration

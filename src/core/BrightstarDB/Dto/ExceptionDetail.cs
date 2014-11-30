@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace BrightstarDB.Dto
 {
@@ -74,5 +76,50 @@ namespace BrightstarDB.Dto
         /// Get or set the <see cref="ExceptionDetailObject"/> that represents the inner exception.
         /// </summary>
         public ExceptionDetailObject InnerException { get; set; }
+
+        /// <summary>
+        /// Get a string representation of the exception detail and inner exception detail (if any)
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            this.BuildString(sb, 0);
+            return sb.ToString();
+        }
+
+        private const string SectionSeparator = "----------";
+        private void BuildString(StringBuilder sb, int indentLevel)
+        {
+            var prefix = indentLevel == 0 ? String.Empty : new string('\t', indentLevel);
+            sb.Append(prefix);
+            sb.Append(Type);
+            sb.Append(": ");
+            sb.AppendLine(Message);
+            if (!String.IsNullOrEmpty(StackTrace))
+            {
+                sb.Append(prefix);
+                sb.AppendLine(StackTrace);
+            }
+            if (Data.Count > 0)
+            {
+                sb.AppendLine(SectionSeparator);
+                sb.Append(prefix);
+                sb.AppendLine("Data:");
+                foreach (var kv in Data.OrderBy(x => x.Key))
+                {
+                    sb.Append(prefix);
+                    sb.Append(kv.Key);
+                    sb.Append(" = ");
+                    sb.AppendLine(kv.Value);
+                }
+                sb.AppendLine(SectionSeparator);
+            }
+            if (InnerException != null)
+            {
+                sb.AppendLine(SectionSeparator);
+                InnerException.BuildString(sb, indentLevel+1);
+            }
+        }
     }
 }

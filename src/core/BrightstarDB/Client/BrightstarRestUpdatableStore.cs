@@ -26,8 +26,8 @@ namespace BrightstarDB.Client
             return _client.ExecuteQuery(_storeName, queryExpression, datasetGraphUris);
         }
 
-        public void ApplyTransaction(IList<Triple> existencePreconditions, IList<Triple> nonexistencePreconditions, 
-            IList<Triple> deletePatterns, IList<Triple> inserts, string updateGraphUri)
+        public void ApplyTransaction(IEnumerable<ITriple> existencePreconditions, IEnumerable<ITriple> nonexistencePreconditions, 
+            IEnumerable<ITriple> deletePatterns, IEnumerable<ITriple> inserts, string updateGraphUri)
         {
             var existencePreconditionsData = SerializeTriples(existencePreconditions);
             var nonexistencePreconditionsData = SerializeTriples(nonexistencePreconditions);
@@ -38,7 +38,7 @@ namespace BrightstarDB.Client
                             updateGraphUri);
         }
 
-        private static string SerializeTriples(IEnumerable<Triple> triples)
+        private static string SerializeTriples(IEnumerable<ITriple> triples)
         {
             if (triples == null) return string.Empty;
             using (var writer = new StringWriter())

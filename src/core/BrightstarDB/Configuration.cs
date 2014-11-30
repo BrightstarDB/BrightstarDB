@@ -59,6 +59,7 @@ namespace BrightstarDB
 
         static Configuration()
         {
+            IsRunningOnMono = (Type.GetType("Mono.Runtime") != null);
 #if WINDOWS_PHONE
             var store = IsolatedStorageFile.GetUserStoreForApplication();
             if (!store.DirectoryExists("brightstar"))
@@ -289,6 +290,11 @@ namespace BrightstarDB
         /// queries. This an experimental option that may improve query performance.
         /// </summary>
         public static bool EnableVirtualizedQueries { get; set; }
+
+        /// <summary>
+        /// Boolean flag that is set to true when the Mono runtime is detected.
+        /// </summary>
+        public static bool IsRunningOnMono { get; private set; }
 
 #if !PORTABLE
         private static ICache GetQueryCache()

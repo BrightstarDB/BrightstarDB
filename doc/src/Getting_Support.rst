@@ -4,11 +4,11 @@
  Getting Support
 ################
 
-.. _Google Group: https://groups.google.com/forum/#!forum/brightstardb-users
+.. _Codeplex Discussion Forum: https://brightstardb.codeplex.com/discussions/
 .. _email NetworkedPlanet Limited: mailto:contact@networkedplanet.com
 
 If you need support while working with BrightstarDB there are two primary channels for asking for help. 
-All BrightstarDB users are invited to join our `Google Group`_. On this group you can ask questions and see 
+All BrightstarDB users are invited to join our `Codeplex Discussion Forum`_. In this forum you can ask questions and see 
 the latest postings from the BrightstarDB team. 
 
 You can also optionally purchase a support contract from NetworkedPlanet Limited. Support contracts last for a 

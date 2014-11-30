@@ -965,7 +965,7 @@ namespace BrightstarDB.InternalTests.SparqlTestSuite {
 		}
 
         [Test]
-        [Ignore("Known to fail")]
+        //[Ignore("Known to fail")]
         public void DawgOptionalFilter005Simplified()
         {
 	
@@ -979,6 +979,7 @@ namespace BrightstarDB.InternalTests.SparqlTestSuite {
 		}
 
         [Test]
+        [Ignore("Implementation passes the DawgOptionalFilter005Simplified test")]
         public void DawgOptionalFilter005NotSimplified()
         {
 	

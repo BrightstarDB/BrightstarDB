@@ -1,0 +1,2677 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>VDS.Common</name>
+    </assembly>
+    <members>
+        <member name="T:VDS.Common.Collections.ImmutableView`1">
+            <summary>
+            An implementation of <see cref="T:System.Collections.Generic.ICollection`1"/> which is an immutable view over some enumerable
+            </summary>
+            <typeparam name="T">Type</typeparam>
+        </member>
+        <member name="F:VDS.Common.Collections.ImmutableView`1._items">
+            <summary>
+            The enumerable being wrapped
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.#ctor">
+            <summary>
+            Creates a new immutable view over an empty collection
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.#ctor(System.String)">
+            <summary>
+            Creates a new immutable view over an empty collection
+            </summary>
+            <param name="message">Error message to throw when mutation actions are attempted</param>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.String)">
+            <summary>
+            Creates a new immutable view
+            </summary>
+            <param name="items">Enumerable to provide view over</param>
+            <param name="message">Error message to throw when mutation actions are attempted</param>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Creates a new immutable view
+            </summary>
+            <param name="items">Enumerable to provide view over</param>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.Add(`0)">
+            <summary>
+            Throws an error as this collection is immutable
+            </summary>
+            <param name="item">Item</param>
+            <exception cref="T:System.NotSupportedException">Thrown because the collection is immutable</exception>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.Clear">
+            <summary>
+            Throws an error as this collection is immutable
+            </summary>
+            <exception cref="T:System.NotSupportedException">Thrown because the collection is immutable</exception>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.Contains(`0)">
+            <summary>
+            Checks whether the collection contains a given item
+            </summary>
+            <param name="item">Item</param>
+            <returns>True if the item is contained in the collection, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.CopyTo(`0[],System.Int32)">
+            <summary>
+            Copies the collection into an array
+            </summary>
+            <param name="array">Array</param>
+            <param name="arrayIndex">Index to start the copying at</param>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.Remove(`0)">
+            <summary>
+            Throws an error as this collection is immutable
+            </summary>
+            <param name="item">Item</param>
+            <exception cref="T:System.NotSupportedException">Thrown because the collection is immutable</exception>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.GetEnumerator">
+            <summary>
+            Gets an enumerator for the collection
+            </summary>
+            <returns>Enumerator over the collection</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.ImmutableView`1.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets an enumerator for the collection
+            </summary>
+            <returns>Enumerator over the collection</returns>
+        </member>
+        <member name="P:VDS.Common.Collections.ImmutableView`1.Count">
+            <summary>
+            Gets the count of items in the collection
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Collections.ImmutableView`1.IsReadOnly">
+            <summary>
+            Returns that the collection is read-only
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Collections.MaterializedImmutableView`1">
+            <summary>
+            A version of <see cref="T:VDS.Common.Collections.ImmutableView`1"/> where the enumerable is materialized as a list internally
+            </summary>
+            <typeparam name="T">Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Collections.MaterializedImmutableView`1.#ctor">
+            <summary>
+            Creates a new immutable view over an empty collection
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.MaterializedImmutableView`1.#ctor(System.String)">
+            <summary>
+            Creates a new immutable view over an empty collection
+            </summary>
+            <param name="message">Error message to throw when mutation actions are attempted</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MaterializedImmutableView`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.String)">
+            <summary>
+            Creates a new immutable view
+            </summary>
+            <param name="items">Enumerable to provide view over</param>
+            <param name="message">Error message to throw when mutation actions are attempted</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MaterializedImmutableView`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Creates a new immutable view
+            </summary>
+            <param name="items">Enumerable to provide view over</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MaterializedImmutableView`1.Contains(`0)">
+            <summary>
+            Checks whether the collection contains a given item
+            </summary>
+            <param name="item">Item</param>
+            <returns>True if the item is contained in the collection, false otherwise</returns>
+        </member>
+        <member name="P:VDS.Common.Collections.MaterializedImmutableView`1.Count">
+            <summary>
+            Gets the count of items in the collection
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Collections.MultiDictionaryMode">
+            <summary>
+            Possible modes to use for the binary search tree based buckets of the <see cref="T:VDS.Common.Collections.MultiDictionary`2"/>
+            </summary>
+        </member>
+        <member name="F:VDS.Common.Collections.MultiDictionaryMode.Unbalanced">
+            <summary>
+            Use unbalanced trees, best when you expect minimal key collisions and are willing to trade faster insert performance for slower lookup performance
+            </summary>
+        </member>
+        <member name="F:VDS.Common.Collections.MultiDictionaryMode.Scapegoat">
+            <summary>
+            Use Scapegoat trees, good when there are a few key collisions and key comparisons are inexpensive.  Provides amortized O(log n) performance but ocassional operations may be O(n)
+            </summary>
+        </member>
+        <member name="F:VDS.Common.Collections.MultiDictionaryMode.AVL">
+            <summary>
+            Use AVL trees, likely gives the best overall performance
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Collections.MultiDictionary`2">
+            <summary>
+            An advanced dictionary implementation
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+            <remarks>
+            <para>
+            A multi-dictionary is essentially just a dictionary which deals more efficiently with key collisions, with a normal .Net dictionary colliding hash codes cause performance degradation which makes them less than ideal for certain use cases such as indexes.  A multi-dictionary can also handle null keys provided that the hash function in use can cope with these.
+            </para>
+            <para>
+            With this implementation the keys are used to split the values into buckets and then each bucket uses a binary search tree to maintain full information about the keys and values.  This means that all keys and values are properly preserved and keys cannot interfer with each other in most cases.  In the case where keys have the same hash code and compare to be equal then they will interfere with each other but that is the correct behaviour.  The implementation is designed to be flexible in that it allows you to specify the hash function, the comparer used and the form of tree used for the buckets.
+            </para>
+            <para>
+            This means the multi-dictionary gives slightly worse performance than a dictionary for well distributed data with minimal key collisions but provides order of magnitude better performance for data with lots of hash collisions.  This makes it ideal as a use for an indexing structure since you can index using partial properties of the keys (thus giving hash code collisions) while still preserving all the keys.
+            </para>
+            <h3>Null Key Handling</h3>
+            <para>
+            A MultiDictionary is capable of handling null keys when the key type is a nullable type provided that the hash function used supports them.  To determine this it will attempt to apply the hash function to <em>default(TKey)</em> in the constructor, if the hash function supports null keys or the key type is non-nullable this will succeed and it will allow null keys.  If a <see cref="T:System.NullReferenceException"/> is thrown it will ignore the error and use the default behaviour of forbidding null keys, any attempt to use a null key in this case will result in an <see cref="T:System.ArgumentNullException"/>
+            </para>
+            </remarks>
+        </member>
+        <member name="F:VDS.Common.Collections.MultiDictionary`2.DefaultMode">
+            <summary>
+            Default Mode for Multi-Dictionaries
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.#ctor">
+            <summary>
+            Creates a new multi-dictionary
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.#ctor(VDS.Common.Collections.MultiDictionaryMode)">
+            <summary>
+            Creates a new multi-dictionary
+            </summary>
+            <param name="mode">Mode to use for the buckets</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.#ctor(System.Func{`0,System.Int32})">
+            <summary>
+            Creates a new multi-dictionary
+            </summary>
+            <param name="hashFunction">Hash Function to split the keys into the buckets</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.#ctor(System.Func{`0,System.Int32},System.Boolean)">
+            <summary>
+            Creates a new multi-dictionary
+            </summary>
+            <param name="hashFunction">Hash Function to split the keys into the buckets</param>
+            <param name="allowNullKeys">Whether to allow null keys</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.#ctor(System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Creates a new multi-dictionary
+            </summary>
+            <param name="comparer">Comparer used for keys within the binary search trees</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.#ctor(System.Func{`0,System.Int32},VDS.Common.Collections.MultiDictionaryMode)">
+            <summary>
+            Creates a new multi-dictionary
+            </summary>
+            <param name="hashFunction">Hash Function to split the keys into the buckets</param>
+            <param name="mode">Mode to use for the buckets</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.#ctor(System.Func{`0,System.Int32},System.Boolean,VDS.Common.Collections.MultiDictionaryMode)">
+            <summary>
+            Creates a new multi-dictionary
+            </summary>
+            <param name="hashFunction">Hash Function to split the keys into the buckets</param>
+            <param name="allowNullKeys">Whether to allow null keys</param>
+            <param name="mode">Mode to use for the buckets</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.#ctor(System.Collections.Generic.IComparer{`0},VDS.Common.Collections.MultiDictionaryMode)">
+            <summary>
+            Creates a new multi-dictionary
+            </summary>
+            <param name="comparer">Comparer used for keys within the binary search trees</param>
+            <param name="mode">Mode to use for the buckets</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.#ctor(System.Func{`0,System.Int32},System.Boolean,System.Collections.Generic.IComparer{`0},VDS.Common.Collections.MultiDictionaryMode)">
+            <summary>
+            Creates a new multi-dictionary
+            </summary>
+            <param name="hashFunction">Hash Function to splut the keys into the buckets</param>
+            <param name="allowNullKeys">Whether null keys are allowed</param>
+            <param name="comparer">Comparer used for keys within the binary search trees</param>
+            <param name="mode">Mode to use for the buckets</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.CreateTree">
+            <summary>
+            Creates a new Tree to be used as a key/value bucket
+            </summary>
+            <returns>Tree to use as the bucket</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.Add(`0,`1)">
+            <summary>
+            Adds a key value pair to the dictionary
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.ContainsKey(`0)">
+            <summary>
+            Gets whether the dictionary contains the given key
+            </summary>
+            <param name="key">Key</param>
+            <returns>True if the given key exists in the dictionary, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.Remove(`0)">
+            <summary>
+            Removes a key value pair from the dictionary based on the key
+            </summary>
+            <param name="key">Key</param>
+            <returns>True if a key value pair was removed, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.TryGetValue(`0,`1@)">
+            <summary>
+            Tries to get the value associated with a key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns>True if the key exists in the dictionary and a value can be returned, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.TryGetKey(`0,`0@)">
+            <summary>
+            Tries to get the actual key instance stored for a given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="actualKey">Actual Key</param>
+            <returns>True if the key exists in the dictionary and the instance was returned, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.Add(System.Collections.Generic.KeyValuePair{`0,`1})">
+            <summary>
+            Adds a key value pair to the dictionary
+            </summary>
+            <param name="item">Key value pair</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.Clear">
+            <summary>
+            Clears the dictionary
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.Contains(System.Collections.Generic.KeyValuePair{`0,`1})">
+            <summary>
+            Gets whether the dictionary contains a given key value pair
+            </summary>
+            <param name="item">Key value pair</param>
+            <returns>True if the given key value pair exists in the dictionary</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.CopyTo(System.Collections.Generic.KeyValuePair{`0,`1}[],System.Int32)">
+            <summary>
+            Copies the dictionary into an array
+            </summary>
+            <param name="array">Array</param>
+            <param name="arrayIndex">Index to start copying at</param>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.Remove(System.Collections.Generic.KeyValuePair{`0,`1})">
+            <summary>
+            Removes a key value pair from the dictionary
+            </summary>
+            <param name="item">Key value pair</param>
+            <returns>True if the key value pair was removed from the dictionary</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.GetEnumerator">
+            <summary>
+            Gets an enumerator for the key value pairs in the dictionary
+            </summary>
+            <returns>Enumerator over key value pairs</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets the enumerator for the dictionary
+            </summary>
+            <returns>Enumerator</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.MultiDictionary`2.System#Collections#Generic#IEnumerable{TValue}#GetEnumerator">
+            <summary>
+            Gets the enumeration of values in the dictionary
+            </summary>
+            <returns>Enumerator over values</returns>
+        </member>
+        <member name="P:VDS.Common.Collections.MultiDictionary`2.Keys">
+            <summary>
+            Gets the keys of the dictionary
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Collections.MultiDictionary`2.Values">
+            <summary>
+            Gets the values in the dictionary
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Collections.MultiDictionary`2.Item(`0)">
+            <summary>
+            Gets/Sets a Value in the dictionary
+            </summary>
+            <param name="key">Key</param>
+            <returns>The value associated with the given key</returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if the given key does not exist in the dictionary</exception>
+        </member>
+        <member name="P:VDS.Common.Collections.MultiDictionary`2.Count">
+            <summary>
+            Gets the number of values in the dictionary
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Collections.MultiDictionary`2.IsReadOnly">
+            <summary>
+            Returns false because this dictionary is read/write
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Collections.TreeSortedDictionary`2">
+            <summary>
+            An implementation of a dictionary where the sort order of keys is preserved using a binary tree behind the scenes.  This makes all operations on the dictionary O(log n)
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.#ctor">
+            <summary>
+            Creates a new dictionary using the default comparer for the key type
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.#ctor(System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Creates a new dictionary using the given comparer for the keys
+            </summary>
+            <param name="comparer">Comparer</param>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.Add(`0,`1)">
+            <summary>
+            Adds a key value pair to the dictionary
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.ContainsKey(`0)">
+            <summary>
+            Checks whether the dictionary contains the given key
+            </summary>
+            <param name="key">Key</param>
+            <returns>True if the dictionary contains the key, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.Remove(`0)">
+            <summary>
+            Removes a key from the dictionary
+            </summary>
+            <param name="key">Key to remove</param>
+            <returns>True if a key was removed, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.TryGetValue(`0,`1@)">
+            <summary>
+            Tries to get the value associated with the given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns>True if a value has been returned</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.Add(System.Collections.Generic.KeyValuePair{`0,`1})">
+            <summary>
+            Adds a key value pair to the dictionary
+            </summary>
+            <param name="item">Key Value pair</param>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.Clear">
+            <summary>
+            Clears the dictionary
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.Contains(System.Collections.Generic.KeyValuePair{`0,`1})">
+            <summary>
+            Checks whether the dictionary contains the given key value pair
+            </summary>
+            <param name="item">Key Value pair</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.CopyTo(System.Collections.Generic.KeyValuePair{`0,`1}[],System.Int32)">
+            <summary>
+            Copies the contents of the dictionary to an array
+            </summary>
+            <param name="array">Array</param>
+            <param name="arrayIndex">Index to start copying elements at</param>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.Remove(System.Collections.Generic.KeyValuePair{`0,`1})">
+            <summary>
+            Removes a key value pair from the dictionary
+            </summary>
+            <param name="item">Key Value pair</param>
+            <returns>True if a key value pair was removed, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.GetEnumerator">
+            <summary>
+            Gets the enumerator of key value pairs
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets the enumerator of values
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Collections.TreeSortedDictionary`2.System#Collections#Generic#IEnumerable{TValue}#GetEnumerator">
+            <summary>
+            Gets the enumerator of values
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:VDS.Common.Collections.TreeSortedDictionary`2.Keys">
+            <summary>
+            Gets the collection of keys
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Collections.TreeSortedDictionary`2.Values">
+            <summary>
+            Gets the collection of values in the dictionary
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Collections.TreeSortedDictionary`2.Item(`0)">
+            <summary>
+            Gets/Sets the value associated with a key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Value</returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if the given key does not exist in the dictionary</exception>
+        </member>
+        <member name="P:VDS.Common.Collections.TreeSortedDictionary`2.Count">
+            <summary>
+            Gets the number of key value pairs in the dictionary
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Collections.TreeSortedDictionary`2.IsReadOnly">
+            <summary>
+            Gets whether the dictionary is read-only
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Extensions">
+            <summary>
+            Internal use extension methods
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Extensions.AsEnumerable``1(``0)">
+            <summary>
+            Turns a single item into an enumerable
+            </summary>
+            <typeparam name="T">Type</typeparam>
+            <param name="item">Item</param>
+            <returns>Enumerable containing the single item</returns>
+        </member>
+        <member name="M:VDS.Common.Extensions.ToSafeString(System.Object)">
+            <summary>
+            Gets the safe string representation of an object which is the ToString() result for non-null objects and String.Empty otherwise
+            </summary>
+            <param name="obj">Object</param>
+            <returns></returns>
+        </member>
+        <member name="T:VDS.Common.References.NestedReference`1">
+            <summary>
+            Represents a reference whose value may change based on nesting level
+            </summary>
+            <typeparam name="T">Reference Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.References.NestedReference`1.#ctor">
+            <summary>
+            Creates a new Nested Reference with an initial null value
+            </summary>
+        </member>
+        <member name="M:VDS.Common.References.NestedReference`1.#ctor(`0)">
+            <summary>
+            Creates a new nested reference with an initial value
+            </summary>
+            <param name="initValue">Initial Value</param>
+        </member>
+        <member name="M:VDS.Common.References.NestedReference`1.IncrementNesting">
+            <summary>
+            Increments the nesting level
+            </summary>
+        </member>
+        <member name="M:VDS.Common.References.NestedReference`1.DecrementNesting">
+            <summary>
+            Decrements the nesting level
+            </summary>
+        </member>
+        <member name="P:VDS.Common.References.NestedReference`1.Value">
+            <summary>
+            Gets/Sets the value based on the current nesting level
+            </summary>
+        </member>
+        <member name="T:VDS.Common.References.ThreadIsolatedReference`1">
+            <summary>
+            Provides a thread isolated reference to some reference type
+            </summary>
+            <typeparam name="T">Reference Type</typeparam>
+            <remarks>
+            <para>
+            Essentially the ThreadIsolatedReference guarantees that each thread that accesses it sees a thread-specific view of the reference.  The initial value of the reference for each Thread is generated either by an initialiser function passed to the constructor when the ThreadSafeReference is created or otherwise is null.  This is essentially what the <see cref="!:ThreadLocal&lt;T&gt;"/> introduced in .Net 4.0 does but we continue to use this our own wrapper because we need backwards compatibility with .Net 3.5 and ThreadLocal does not play quite right with some of our usage patterns
+            </para>
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.References.ThreadIsolatedReference`1.#ctor">
+            <summary>
+            Creates a new ThreadSafeReference where the initial value of the reference on each thread is null
+            </summary>
+        </member>
+        <member name="M:VDS.Common.References.ThreadIsolatedReference`1.#ctor(System.Func{`0})">
+            <summary>
+            Creates a new ThreadSafeReference where the initial value of the reference on each thread is generated by the given initialiser function
+            </summary>
+            <param name="init">Initialiser Function</param>
+        </member>
+        <member name="M:VDS.Common.References.ThreadIsolatedReference`1.Dispose">
+            <summary>
+            Disposes of a Thread Safe reference
+            </summary>
+            <remarks>
+            Does not take any dispose actions on the references it holds, it will drop those so the GC can collect them as desired.  This also avoids any unintended consequences of a dispose on one thread causing strange behaviour on another
+            </remarks>
+        </member>
+        <member name="P:VDS.Common.References.ThreadIsolatedReference`1.Initialiser">
+            <summary>
+            Gets the initialiser function
+            </summary>
+        </member>
+        <member name="P:VDS.Common.References.ThreadIsolatedReference`1.Value">
+            <summary>
+            Gets/Sets the value for the current thread
+            </summary>
+        </member>
+        <member name="T:VDS.Common.References.ThreadIsolatedValue`1">
+            <summary>
+            Provides a thread isolated reference to some value type
+            </summary>
+            <typeparam name="T">Reference Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.References.ThreadIsolatedValue`1.#ctor">
+            <summary>
+            Creates a new ThreadSafeValue where the initial value of the struct on each thread is default
+            </summary>
+        </member>
+        <member name="M:VDS.Common.References.ThreadIsolatedValue`1.#ctor(System.Func{`0})">
+            <summary>
+            Creates a new ThreadSafeValue where the initial value of the struct on each thread is generated by the given initialiser function
+            </summary>
+            <param name="init">Initialiser Function</param>
+        </member>
+        <member name="M:VDS.Common.References.ThreadIsolatedValue`1.Dispose">
+            <summary>
+            Disposes of the value
+            </summary>
+        </member>
+        <member name="P:VDS.Common.References.ThreadIsolatedValue`1.Initialiser">
+            <summary>
+            Gets the initialiser function
+            </summary>
+        </member>
+        <member name="P:VDS.Common.References.ThreadIsolatedValue`1.Value">
+            <summary>
+            Gets/Sets the value for the current thread
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Trees.AVLTree`2">
+            <summary>
+            An AVL tree implementation
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Valye Type</typeparam>
+            <remarks>
+            <para>
+            Code based in part on various examples from around the web including (but not limited to) <a href="http://www.vcskicks.com/AVL-tree.php">VCSKicks</a> and <a href="http://en.wikipedia.org/wiki/AVL_tree">Wikipedia</a>
+            </para>
+            </remarks>
+        </member>
+        <member name="T:VDS.Common.Trees.BinaryTree`3">
+            <summary>
+            Abstract base implementation of an unbalanced binary search tree
+            </summary>
+            <typeparam name="TNode">Tree Node Type</typeparam>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="T:VDS.Common.Trees.ITree`3">
+            <summary>
+            Interface for Trees
+            </summary>
+            <typeparam name="TNode">Node Type</typeparam>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+            <remarks>
+            A Tree is a mapping from keys to values stored in a tree structure, individual implementations control how the tree is stored and navigated
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Trees.ITree`3.Add(`1,`2)">
+            <summary>
+            Adds a Key Value pair to the tree or replaces the existing value associated with a key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns>True if a new node was created, false otherwise.</returns>
+            <exception cref="T:System.ArgumentException">Thrown if a duplicate key is added</exception>
+        </member>
+        <member name="M:VDS.Common.Trees.ITree`3.Find(`1)">
+            <summary>
+            Finds a Node based on the key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Node associated with the given Key or null if the key is not present in the tree</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.ITree`3.MoveToNode(`1,System.Boolean@)">
+            <summary>
+            Moves to a Node based on the key inserting a new Node if necessary
+            </summary>
+            <param name="key">Key</param>
+            <param name="created">Whether a new node was inserted</param>
+            <returns>Node associated with the given Key which may be newly inserted</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.ITree`3.Remove(`1)">
+            <summary>
+            Removes a Node based on the Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>True if a Node was removed</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.ITree`3.ContainsKey(`1)">
+            <summary>
+            Determines whether a given Key exists in the Tree
+            </summary>
+            <param name="key">Key</param>
+            <returns>True if the key exists in the Tree</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.ITree`3.TryGetValue(`1,`2@)">
+            <summary>
+            Tries to get a value based on a key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value or default for the value type if the key is not present</param>
+            <returns>True if there is a value associated with the key</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.ITree`3.Clear">
+            <summary>
+            Empty the tree
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.ITree`3.Root">
+            <summary>
+            Gets the root of the tree
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.ITree`3.Item(`1)">
+            <summary>
+            Gets/Sets the value for a key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Returns the value associated with the key</returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if the key doesn't exist</exception>
+        </member>
+        <member name="P:VDS.Common.Trees.ITree`3.Nodes">
+            <summary>
+            Gets the Nodes of the tree
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.ITree`3.Keys">
+            <summary>
+            Gets the keys in the tree
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.ITree`3.Values">
+            <summary>
+            Gets the values in the tree
+            </summary>
+        </member>
+        <member name="F:VDS.Common.Trees.BinaryTree`3._comparer">
+            <summary>
+            Key Comparer
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.#ctor">
+            <summary>
+            Creates a new unbalanced Binary Tree
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.#ctor(System.Collections.Generic.IComparer{`1})">
+            <summary>
+            Creates a new unbalanced Binary Tree
+            </summary>
+            <param name="comparer">Comparer for keys</param>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.Add(`1,`2)">
+            <summary>
+            Adds a Key Value pair to the tree, replaces an existing value if the key already exists in the tree
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException">Thrown if a duplicate key is used</exception>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.CreateNode(VDS.Common.Trees.IBinaryTreeNode{`1,`2},`1,`2)">
+            <summary>
+            Creates a new node for the tree
+            </summary>
+            <param name="parent">Parent node</param>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.Find(`1)">
+            <summary>
+            Finds a Node based on the key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Node associated with the given Key or null if the key is not present in the tree</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.MoveToNode(`1,System.Boolean@)">
+            <summary>
+            Moves to the node with the given key inserting a new node if necessary
+            </summary>
+            <param name="key">Key</param>
+            <param name="created">Whether a new node was inserted</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.AfterLeftInsert(VDS.Common.Trees.IBinaryTreeNode{`1,`2},VDS.Common.Trees.IBinaryTreeNode{`1,`2})">
+            <summary>
+            Virtual method that can be used by derived implementations to perform tree balances after an insert
+            </summary>
+            <param name="parent">Parent</param>
+            <param name="node">Newly inserted node</param>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.AfterRightInsert(VDS.Common.Trees.IBinaryTreeNode{`1,`2},VDS.Common.Trees.IBinaryTreeNode{`1,`2})">
+            <summary>
+            Virtual method that can be used by derived implementations to perform tree balances after an insert
+            </summary>
+            <param name="parent">Parent</param>
+            <param name="node">Newly inserted node</param>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.Remove(`1)">
+            <summary>
+            Removes a Node based on the Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>True if a Node was removed</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.FindLeftmostChild(`0)">
+            <summary>
+            Finds the leftmost child of the given node
+            </summary>
+            <param name="node">Node</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.FindRightmostChild(`0)">
+            <summary>
+            Finds the rightmost child of the given node
+            </summary>
+            <param name="node">Node</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.AfterDelete(`0)">
+            <summary>
+            Virtual method that can be used by derived implementations to perform tree balances after a delete
+            </summary>
+            <param name="node">Node at which the deletion happened</param>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.ContainsKey(`1)">
+            <summary>
+            Determines whether a given Key exists in the Tree
+            </summary>
+            <param name="key">Key</param>
+            <returns>True if the key exists in the Tree</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.TryGetValue(`1,`2@)">
+            <summary>
+            Tries to get a value based on a key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value or default for the value type if the key is not present</param>
+            <returns>True if there is a value associated with the key</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.Clear">
+            <summary>
+            Clears the tree
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTree`3.AfterClear">
+            <summary>
+            Virtual method that can be used by derived implementations to perform clean up after a clear
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTree`3.Root">
+            <summary>
+            Gets/Sets the Root of the Tree
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTree`3.Item(`1)">
+            <summary>
+            Gets/Sets the value for a key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Returns the value associated with the key</returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if the key doesn't exist</exception>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTree`3.Nodes">
+            <summary>
+            Gets the Nodes of the Tree
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTree`3.Keys">
+            <summary>
+            Gets the Keys of the Tree
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTree`3.Values">
+            <summary>
+            Gets the Values of the Tree
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.#ctor">
+            <summary>
+            Creates a new AVL Tree
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.#ctor(System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Creates a new AVL Tree using the given key comparer
+            </summary>
+            <param name="comparer">Key Comparer</param>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.CreateNode(VDS.Common.Trees.IBinaryTreeNode{`0,`1},`0,`1)">
+            <summary>
+            Creates a new node
+            </summary>
+            <param name="parent">Parent Node</param>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.AfterLeftInsert(VDS.Common.Trees.IBinaryTreeNode{`0,`1},VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies rebalances after inserts
+            </summary>
+            <param name="parent">Parent</param>
+            <param name="node">Newly isnerted node</param>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.AfterRightInsert(VDS.Common.Trees.IBinaryTreeNode{`0,`1},VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies rebalances after inserts
+            </summary>
+            <param name="parent">Parent</param>
+            <param name="node">Newly isnerted node</param>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.RebalanceAfterInsert(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies rebalances after inserts
+            </summary>
+            <param name="node">Newly isnerted node</param>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.AfterDelete(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies rebalances after deletes
+            </summary>
+            <param name="node">Node at which the delete occurred</param>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.Rebalance(VDS.Common.Trees.IBinaryTreeNode{`0,`1},System.Int64)">
+            <summary>
+            Applies tree rebalances
+            </summary>
+            <param name="node">Node</param>
+            <param name="balance">Balance at the Node</param>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.RotateLeft(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies left rotation
+            </summary>
+            <param name="node">Node</param>
+        </member>
+        <member name="M:VDS.Common.Trees.AVLTree`2.RotateRight(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies right rotation
+            </summary>
+            <param name="node">Node</param>
+        </member>
+        <member name="T:VDS.Common.Trees.BinaryTreeNode`2">
+            <summary>
+            Binary Tree node implementation
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="T:VDS.Common.Trees.IBinaryTreeNode`2">
+            <summary>
+            Interface for Binary Tree Nodes
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="T:VDS.Common.Trees.ITreeNode`2">
+            <summary>
+            Interface for Tree Nodes
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="P:VDS.Common.Trees.ITreeNode`2.Key">
+            <summary>
+            Gets/Sets the key associated with the node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.ITreeNode`2.Value">
+            <summary>
+            Gets/Sets the value associated with the node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.ITreeNode`2.HasChildren">
+            <summary>
+            Gets whether the node has children
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.ITreeNode`2.ChildCount">
+            <summary>
+            Gets whether the number of child nodes
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.IBinaryTreeNode`2.RecalculateHeight">
+            <summary>
+            Indicates that the node should recauclate the height of the subtree it represents
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.IBinaryTreeNode`2.LeftChild">
+            <summary>
+            Gets the left child of this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.IBinaryTreeNode`2.RightChild">
+            <summary>
+            Gets the right child of this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.IBinaryTreeNode`2.Parent">
+            <summary>
+            Gets the parent of the node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.IBinaryTreeNode`2.Nodes">
+            <summary>
+            Gets the nodes present for the entire subtree (including this node)
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.IBinaryTreeNode`2.Height">
+            <summary>
+            Gets the Height of the subtree this node represents
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTreeNode`2.#ctor(VDS.Common.Trees.IBinaryTreeNode{`0,`1},`0,`1)">
+            <summary>
+            Creates a new Binary Tree Node
+            </summary>
+            <param name="parent">Parent</param>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTreeNode`2.RecalculateHeight">
+            <summary>
+            Recalculates the height of the subtree
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.BinaryTreeNode`2.ToString">
+            <summary>
+            Gets a String representation of the node
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTreeNode`2.Parent">
+            <summary>
+            Gets/Sets the Parent Node (if any)
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTreeNode`2.LeftChild">
+            <summary>
+            Gets/Sets the Left Child (if any)
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTreeNode`2.RightChild">
+            <summary>
+            Gets/Sets the Right Child (if any)
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTreeNode`2.Key">
+            <summary>
+            Gets/Sets the Key
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTreeNode`2.Value">
+            <summary>
+            Gets/Sets the Value
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTreeNode`2.HasChildren">
+            <summary>
+            Gets whether this Node has children
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTreeNode`2.ChildCount">
+            <summary>
+            Gets the number of child nodes present (0, 1 or 2)
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTreeNode`2.Height">
+            <summary>
+            Gets the height of the subtree
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Trees.BinaryTreeNode`2.Nodes">
+            <summary>
+            Gets the nodes of the subtree including this node
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Trees.NodesEnumerable`3">
+            <summary>
+            An enumerable over a binary tree which ensures that each time it is enumeraeted the latest state of the tree is enumerated
+            </summary>
+            <typeparam name="TNode">Node type</typeparam>
+            <typeparam name="TKey">Key type</typeparam>
+            <typeparam name="TValue">Value type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Trees.NodesEnumerable`3.#ctor(VDS.Common.Trees.BinaryTree{`0,`1,`2})">
+            <summary>
+            Creates a new nodes enumerable for a binary tree
+            </summary>
+            <param name="tree">Binary Tree</param>
+        </member>
+        <member name="M:VDS.Common.Trees.NodesEnumerable`3.GetEnumerator">
+            <summary>
+            Gets an enumerator over the current state of the tree
+            </summary>
+            <returns>Enumerator over nodes</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.NodesEnumerable`3.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets an enumerator over the current state of the tree
+            </summary>
+            <returns>Enumerator over nodes</returns>
+        </member>
+        <member name="T:VDS.Common.Trees.ChildNodesEnumerable`2">
+            <summary>
+            An enumerable over a binary tree nodes children which ensures that each time it is enumerated the latest state of the tree is enumerated
+            </summary>
+            <typeparam name="TKey">Key type</typeparam>
+            <typeparam name="TValue">Value type</typeparam>
+        </member>
+        <member name="F:VDS.Common.Trees.ChildNodesEnumerable`2._parent">
+            <summary>
+            Parent node
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.ChildNodesEnumerable`2.#ctor(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Creates a new enumerable
+            </summary>
+            <param name="parent">Parent node</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ChildNodesEnumerable`2.GetEnumerator">
+            <summary>
+            Gets an enumerator over the current state of one of the nodes children
+            </summary>
+            <returns>Enumerator over nodes</returns>
+        </member>
+        <member name="M:VDS.Common.Trees.ChildNodesEnumerable`2.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets an enumerator over the current state of one of the nodes children
+            </summary>
+            <returns>Enumerator over nodes</returns>
+        </member>
+        <member name="P:VDS.Common.Trees.ChildNodesEnumerable`2.Child">
+            <summary>
+            Get the child whose nodes we want to enumerate
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Trees.LeftChildNodeEnumerable`2">
+            <summary>
+            An enumerable over the left child of a binary tree node which ensures that each time it is enumerated the latest state of the tree is enumerated
+            </summary>
+            <typeparam name="TKey">Key type</typeparam>
+            <typeparam name="TValue">Value type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Trees.LeftChildNodeEnumerable`2.#ctor(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Creates a new enumerable
+            </summary>
+            <param name="parent">Parent node</param>
+        </member>
+        <member name="P:VDS.Common.Trees.LeftChildNodeEnumerable`2.Child">
+            <summary>
+            Gets the left child
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Trees.RightChildNodeEnumerable`2">
+            <summary>
+            An enumerable over the right child of a binary tree node which ensures that each time it is enumerated the latest state of the tree is enumerated
+            </summary>
+            <typeparam name="TKey">Key type</typeparam>
+            <typeparam name="TValue">Value type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Trees.RightChildNodeEnumerable`2.#ctor(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Creates a new enumerable
+            </summary>
+            <param name="parent">Parent node</param>
+        </member>
+        <member name="P:VDS.Common.Trees.RightChildNodeEnumerable`2.Child">
+            <summary>
+            Gets the right child
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Trees.ScapegoatTree`2">
+            <summary>
+            A scapegoat tree implementation
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Valye Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.#ctor">
+            <summary>
+            Creates a new Scapegoat Tree
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.#ctor(System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Creates a new Scapegoat Tree
+            </summary>
+            <param name="comparer">Key Comparer</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.#ctor(System.Double)">
+            <summary>
+            Creates a new Scapegoat Tree
+            </summary>
+            <param name="balanceFactor">Balance Factor</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.#ctor(System.Collections.Generic.IComparer{`0},System.Double)">
+            <summary>
+            Creates a new Scapegoat Tree
+            </summary>
+            <param name="comparer">Key Comparer</param>
+            <param name="balanceFactor">Balance Factor</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.CreateNode(VDS.Common.Trees.IBinaryTreeNode{`0,`1},`0,`1)">
+            <summary>
+            Creates a new Node
+            </summary>
+            <param name="parent">Parent</param>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.AfterLeftInsert(VDS.Common.Trees.IBinaryTreeNode{`0,`1},VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies rebalances after left inserts
+            </summary>
+            <param name="parent">Parent</param>
+            <param name="node">Newly inserted nodes</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.AfterRightInsert(VDS.Common.Trees.IBinaryTreeNode{`0,`1},VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies rebalances after right inserts
+            </summary>
+            <param name="parent">Parent</param>
+            <param name="node">Newly inserted nodes</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.RebalanceAfterInsert(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies rebalances after inserts
+            </summary>
+            <param name="node">Newly inserted node</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.RebalanceAfterDelete(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies rebalances after deletes
+            </summary>
+            <param name="node">Node the delete occurred at</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.Rebalance(VDS.Common.Trees.IBinaryTreeNode{`0,`1},System.Int64)">
+            <summary>
+            Applies rebalances
+            </summary>
+            <param name="node">Node</param>
+            <param name="selfSize">Size of the subtree the node represents</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.RebalanceLeftSubtree(VDS.Common.Trees.IBinaryTreeNode{`0,`1}[],System.Int32,System.Int32)">
+            <summary>
+            Rebalances a left subtree
+            </summary>
+            <param name="nodes">Nodes</param>
+            <param name="start">Range start</param>
+            <param name="end">Range end</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.RebalanceRightSubtree(VDS.Common.Trees.IBinaryTreeNode{`0,`1}[],System.Int32,System.Int32)">
+            <summary>
+            Rebalances a right subtree
+            </summary>
+            <param name="nodes">Nodes</param>
+            <param name="start">Range start</param>
+            <param name="end">Range end</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.AfterDelete(VDS.Common.Trees.IBinaryTreeNode{`0,`1})">
+            <summary>
+            Applies rebalances after deletes
+            </summary>
+            <param name="node">Node the delete occurred at</param>
+        </member>
+        <member name="M:VDS.Common.Trees.ScapegoatTree`2.AfterClear">
+            <summary>
+            Resets node counts after a clear
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Trees.TreeExtensions">
+            <summary>
+            Useful extensions for working with Trees
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.TreeExtensions.GetDepth``2(VDS.Common.Trees.IBinaryTreeNode{``0,``1})">
+            <summary>
+            Gets the depth of the given node in the Tree
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+            <param name="node">Node</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.TreeExtensions.GetHeight``2(VDS.Common.Trees.IBinaryTreeNode{``0,``1})">
+            <summary>
+            Gets the Height of the given node in the Tree
+            </summary>
+            <typeparam name="TKey">Key</typeparam>
+            <typeparam name="TValue">Value</typeparam>
+            <param name="node">Node</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.TreeExtensions.GetBalance``2(VDS.Common.Trees.IBinaryTreeNode{``0,``1})">
+            <summary>
+            Gets the balance of the given node in the Tree
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+            <param name="node">Node</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.TreeExtensions.GetSibling``2(VDS.Common.Trees.IBinaryTreeNode{``0,``1})">
+            <summary>
+            Gets the sibling of a binary tree node (if any)
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+            <param name="node">Node</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.TreeExtensions.GetSize``2(VDS.Common.Trees.IBinaryTreeNode{``0,``1})">
+            <summary>
+            Gets the size of the subtree rooted at the given node
+            </summary>
+            <typeparam name="TKey">Key</typeparam>
+            <typeparam name="TValue">Valye</typeparam>
+            <param name="node">Node</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Trees.TreeExtensions.Isolate``2(VDS.Common.Trees.IBinaryTreeNode{``0,``1})">
+            <summary>
+            Isolates a Node from the tree by setting its parent and child links to be null
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Valye Type</typeparam>
+            <param name="node">Node</param>
+            <returns></returns>
+        </member>
+        <member name="T:VDS.Common.Trees.UnbalancedBinaryTree`2">
+            <summary>
+            An unbalanced binary tree
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Trees.UnbalancedBinaryTree`2.#ctor">
+            <summary>
+            Creates a new unbalanced tree
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Trees.UnbalancedBinaryTree`2.#ctor(System.Collections.Generic.IComparer{`0})">
+            <summary>
+            Creates a new unbalanced tree
+            </summary>
+            <param name="comparer">Key Comparer</param>
+        </member>
+        <member name="M:VDS.Common.Trees.UnbalancedBinaryTree`2.CreateNode(VDS.Common.Trees.IBinaryTreeNode{`0,`1},`0,`1)">
+            <summary>
+            Creates a new node
+            </summary>
+            <param name="parent">Parent</param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="T:VDS.Common.Tries.StringTrie`1">
+            <summary>
+            Represents the classic use case of a Trie data structure, keys are strings with a character stored at each Node
+            </summary>
+            <typeparam name="T">Type of values to be stored</typeparam>
+        </member>
+        <member name="T:VDS.Common.Tries.Trie`3">
+            <summary>
+            Standard implementation of a Trie data structure
+            </summary>
+            <typeparam name="TKey">Type of keys</typeparam>
+            <typeparam name="TKeyBit">Type of key bits</typeparam>
+            <typeparam name="TValue">Type of values</typeparam>
+            <remarks>
+            </remarks>
+        </member>
+        <member name="T:VDS.Common.Tries.AbstractTrie`3">
+            <summary>
+            An abstract implementation of a Trie
+            </summary>
+            <typeparam name="TKey">Type of keys</typeparam>
+            <typeparam name="TKeyBit">Type of key bits</typeparam>
+            <typeparam name="TValue">Type of values</typeparam>
+            <remarks>
+            <para>
+            Keys are converted into a sequence of key bits using a user provided function
+            </para>
+            <para>
+            The original code that inspired this was taken from <a href="http://code.google.com/p/typocalypse/source/browse/#hg/Trie">Typocolypse</a> but has been heavily rewritten to be much more abstract, generic and LINQ friendly
+            </para>
+            </remarks>
+        </member>
+        <member name="T:VDS.Common.Tries.ITrie`3">
+            <summary>
+            Interface for Tries, this is a data structure which maps decomposable keys to values
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TKeyBit">Key Bit Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.Add(`0,`2)">
+            <summary>
+            Adds a new key value pair, overwriting the existing value if the given key is already in use
+            </summary>
+            <param name="key">Key to search for value by</param>
+            <param name="value">Value associated with key</param>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.Clear">
+            <summary>
+            Clears the Trie
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.Contains(`0,`2)">
+            <summary>
+            Gets whether the Trie contains the given key value pair
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns>True if the key value pair exists, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.ContainsKey(`0)">
+            <summary>
+            Gets whether the Trie contains a specific key and has a value associated with that key
+            </summary>
+            <param name="key">Key</param>
+            <returns>True if the Trie contains a specific key and has a value associated with it, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.ContainsKey(`0,System.Boolean)">
+            <summary>
+            Gets whether the Trie contains a specific key
+            </summary>
+            <param name="key">Key</param>
+            <param name="requireValue">Whether the key is required to have a value associated with it in order to be considered as being contained</param>
+            <returns>True if the Trie contains the given key and meets the value requirement</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.Find(System.Collections.Generic.IEnumerable{`1})">
+            <summary>
+            Finds and returns a Node for the given sequence of Key Bits
+            </summary>
+            <param name="bs">Key Bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a specific seqeunce of key bits may be useful for custom lookups where you don't necessarily have a value of the <strong>TKey</strong> type but do have values of the <strong>TKeyBit</strong> type
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.Find(`0)">
+            <summary>
+            Finds and returns a Node for the given Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Null if the Key does not map to a Node</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.Find(`0,System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Finds and returns a Node for the given Key using the given Key to Key Bit mapping function
+            </summary>
+            <param name="key">Key</param>
+            <param name="keyMapper">Function to map keys to key bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a custom mapping function allows you to do custom lookups into the Trie.  For example you might want to only match some portion of the key rather than the entire key
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.FindPredecessor(System.Collections.Generic.IEnumerable{`1})">
+            <summary>
+            Finds and returns a Node that has the longest prefix match for the given sequence of Key Bits
+            </summary>
+            <param name="bs">Key Bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a specific seqeunce of key bits may be useful for custom lookups where you don't necessarily have a value of the <strong>TKey</strong> type but do have values of the <strong>TKeyBit</strong> type
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.FindPredecessor(`0)">
+            <summary>
+            Finds and returns a Node that has the longest prefix match for the given Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Null if the Key does not map to a Node</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.FindPredecessor(`0,System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Finds and returns a Node that has the longest prefix match for the given Key using the given Key to Key Bit mapping function
+            </summary>
+            <param name="key">Key</param>
+            <param name="keyMapper">Function to map keys to key bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a custom mapping function allows you to do custom lookups into the Trie.  For example you might want to only match some portion of the key rather than the entire key
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.FindSuccessor(`0)">
+            <summary>
+            Finds and returns a Node that has the shortest prefix match greater than or equal to the given Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Null if the Key does not map to a Node</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.FindSuccessor(`0,System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Finds and returns a Node that has the shortest prefix match greater than or equal to the given Key using the given Key to Key Bit mapping function
+            </summary>
+            <param name="key">Key</param>
+            <param name="keyMapper">Function to map keys to key bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a custom mapping function allows you to do custom lookups into the Trie.  For example you might want to only match some portion of the key rather than the entire key
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.FindSuccessor(System.Collections.Generic.IEnumerable{`1})">
+            <summary>
+            Finds and returns a Node that has the shortest prefix match greater than or equal to the given sequence of Key Bits
+            </summary>
+            <param name="bs">Key Bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a specific seqeunce of key bits may be useful for custom lookups where you don't necessarily have a value of the <strong>TKey</strong> type but do have values of the <strong>TKeyBit</strong> type
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.MoveToNode(`0)">
+            <summary>
+            Moves to the Node associated with the given Key creating new nodes if necessary
+            </summary>
+            <param name="key">Key</param>
+            <returns>Trie Node</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.Remove(`0)">
+            <summary>
+            Remove the value that a key leads to and any redundant nodes which result from this action
+            </summary>
+            <param name="key">Key of the value to remove</param>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrie`3.TryGetValue(`0,`2@)">
+            <summary>
+            Tries to get the Value associated with a given Key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value, may be null if the key exists but has no value associated with it</param>
+            <returns>True if the Key exists in the Trie, False if it does not</returns>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrie`3.Count">
+            <summary>
+            Gets the Count of all Nodes in the Trie
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrie`3.Root">
+            <summary>
+            Gets the Root Node of the Trie
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrie`3.Item(`0)">
+            <summary>
+            Gets/Sets the Value associated with a given Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Value associated with the given Key, may be null if no value is associated</returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if you try to get a value for a key that is not in the Trie</exception>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrie`3.Values">
+            <summary>
+            Gets all the Values in the Trie
+            </summary>
+        </member>
+        <member name="F:VDS.Common.Tries.AbstractTrie`3._keyMapper">
+            <summary>
+            Key Mapper function
+            </summary>
+        </member>
+        <member name="F:VDS.Common.Tries.AbstractTrie`3._root">
+            <summary>
+            Root of the Trie
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Create an empty trie with an empty root node.
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.CreateRoot(`1)">
+            <summary>
+            Method which creates a new child node
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.Add(`0,`2)">
+            <summary>
+            Adds a new key value pair, overwriting the existing value if the given key is already in use
+            </summary>
+            <param name="key">Key to search for value by</param>
+            <param name="value">Value associated with key</param>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.Remove(`0)">
+            <summary>
+            Remove the value that a key leads to and any redundant nodes which result from this action
+            </summary>
+            <param name="key">Key of the value to remove</param>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.Contains(`0,`2)">
+            <summary>
+            Gets whether the Trie contains the given key value pair
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns>True if the key value pair exists, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.ContainsKey(`0)">
+            <summary>
+            Gets whether the Trie contains a specific key and has a value associated with that key
+            </summary>
+            <param name="key">Key</param>
+            <returns>True if the Trie contains a specific key and has a value associated with it, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.ContainsKey(`0,System.Boolean)">
+            <summary>
+            Gets whether the Trie contains a specific key
+            </summary>
+            <param name="key">Key</param>
+            <param name="requireValue">Whether the key is required to have a value associated with it in order to be considered as being contained</param>
+            <returns>True if the Trie contains the given key and meets the value requirement</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.Find(`0)">
+            <summary>
+            Finds and returns a Node for the given Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Null if the Key does not map to a Node</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.Find(`0,System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Finds and returns a Node for the given Key using the given Key to Key Bit mapping function
+            </summary>
+            <param name="key">Key</param>
+            <param name="keyMapper">Function to map keys to key bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a custom mapping function allows you to do custom lookups into the Trie.  For example you might want to only match some portion of the key rather than the entire key
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.Find(System.Collections.Generic.IEnumerable{`1})">
+            <summary>
+            Finds and returns a Node for the given sequence of Key Bits
+            </summary>
+            <param name="bs">Key Bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a specific seqeunce of key bits may be useful for custom lookups where you don't necessarily have a value of the <strong>TKey</strong> type but do have values of the <strong>TKeyBit</strong> type
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.FindPredecessor(`0)">
+            <summary>
+            Finds and returns a Node that has the longest prefix match for the given sequence of Key Bits
+            </summary>
+            <param name="bs">Key Bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a specific seqeunce of key bits may be useful for custom lookups where you don't necessarily have a value of the <strong>TKey</strong> type but do have values of the <strong>TKeyBit</strong> type
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.FindPredecessor(`0,System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Finds and returns a Node that has the longest prefix match for the given Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Null if the Key does not map to a Node</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.FindPredecessor(System.Collections.Generic.IEnumerable{`1})">
+            <summary>
+            Finds and returns a Node that has the longest prefix match for the given Key using the given Key to Key Bit mapping function
+            </summary>
+            <param name="key">Key</param>
+            <param name="keyMapper">Function to map keys to key bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a custom mapping function allows you to do custom lookups into the Trie.  For example you might want to only match some portion of the key rather than the entire key
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.FindSuccessor(`0)">
+            <summary>
+            Finds and returns a Node that has the shortest prefix match greater than or equal to the given sequence of Key Bits
+            </summary>
+            <param name="bs">Key Bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a specific seqeunce of key bits may be useful for custom lookups where you don't necessarily have a value of the <strong>TKey</strong> type but do have values of the <strong>TKeyBit</strong> type
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.FindSuccessor(`0,System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Finds and returns a Node that has the shortest prefix match greater than or equal to the given Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Null if the Key does not map to a Node</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.FindSuccessor(System.Collections.Generic.IEnumerable{`1})">
+            <summary>
+            Finds and returns a Node that has the shortest prefix match greater than or equal to the given Key using the given Key to Key Bit mapping function
+            </summary>
+            <param name="key">Key</param>
+            <param name="keyMapper">Function to map keys to key bits</param>
+            <returns>Null if the Key does not map to a Node</returns>
+            <remarks>
+            The ability to provide a custom mapping function allows you to do custom lookups into the Trie.  For example you might want to only match some portion of the key rather than the entire key
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.MoveToNode(`0)">
+            <summary>
+            Moves to the Node associated with the given Key creating new nodes if necessary
+            </summary>
+            <param name="key">Key</param>
+            <returns>Trie Node</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.TryGetValue(`0,`2@)">
+            <summary>
+            Tries to get the Value associated with a given Key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value, will be null if the key does not exist or has no value associated with it</param>
+            <returns>True if the Key exists in the Trie and has a value associated with it, False if it does not</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractTrie`3.Clear">
+            <summary>
+            Clears the Trie
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractTrie`3.Root">
+            <summary>
+            Gets the Root Node of the Trie
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractTrie`3.KeyBitComparer">
+            <summary>
+            Key comparer used for ordered operations like FindSuccessor
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractTrie`3.Item(`0)">
+            <summary>
+            Gets/Sets the Value associated with a given Key
+            </summary>
+            <param name="key">Key</param>
+            <returns>Value associated with the given Key, may be null if no value is associated</returns>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if you try to get a value for a key that is not in the Trie</exception>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractTrie`3.Count">
+            <summary>
+            Gets the Count of all Nodes in the Trie
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractTrie`3.Values">
+            <summary>
+            Gets all the Values in the Trie
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.Trie`3.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Create an empty trie with an empty root node.
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.Trie`3.CreateRoot(`1)">
+            <summary>
+            Method which creates a new child node
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Tries.StringTrie`1.#ctor">
+            <summary>
+            Creates a new String Trie
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.StringTrie`1.KeyMapper(System.String)">
+            <summary>
+            Key Mapper function for String Trie
+            </summary>
+            <param name="key">Key</param>
+            <returns>Array of characters</returns>
+        </member>
+        <member name="T:VDS.Common.Tries.SparseStringTrie`1">
+            <summary>
+            Represents the classic use case of a Trie data structure, keys are strings with a character stored at each Node
+            </summary>
+            <typeparam name="T">Type of values to be stored</typeparam>
+            <remarks>
+            This is a sparse implementation so should be more memory efficient than the <see cref="T:VDS.Common.Tries.StringTrie`1"/> for many use cases
+            </remarks>
+        </member>
+        <member name="T:VDS.Common.Tries.SparseCharacterTrie`2">
+            <summary>
+            Sparse Implementation of a Trie data structure optimized for the common case of the key bits being characters
+            </summary>
+            <typeparam name="TKey">Type of keys</typeparam>
+            <typeparam name="TValue">Type of values</typeparam>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseCharacterTrie`2.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{System.Char}})">
+            <summary>
+            Creates a new sparse character trie
+            </summary>
+            <param name="keyMapper">Key Mapper</param>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseCharacterTrie`2.CreateRoot(System.Char)">
+            <summary>
+            Creates the root node of the trie
+            </summary>
+            <param name="key">Key</param>
+            <returns>Root Node</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseStringTrie`1.#ctor">
+            <summary>
+            Creates a new sparse String Trie
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Tries.TrieNode`2">
+            <summary>
+            Node of a Trie
+            </summary>
+            <typeparam name="TKeyBit">Key Bit Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+            <remarks>
+            <para>
+            Original code taken from <a href="http://code.google.com/p/typocalypse/source/browse/#hg/Trie">Typocolypse</a> but has been heavily rewritten to be much more generic and LINQ friendly
+            </para>
+            </remarks>
+        </member>
+        <member name="T:VDS.Common.Tries.ITrieNode`2">
+            <summary>
+            Interface for Trie nodes, this is the node in a <see cref="T:VDS.Common.Tries.ITrie`3"/>
+            </summary>
+            <typeparam name="TKeyBit">Key Bit Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrieNode`2.Clear">
+            <summary>
+            Clears the Value (if any) stored at this node and removes all child nodes
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrieNode`2.ClearValue">
+            <summary>
+            Clears the Value (if any) stored at this node
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrieNode`2.MoveToChild(`0)">
+            <summary>
+            Add a child node associated with a key to this node and return the node.
+            </summary>
+            <param name="key">Key to associated with the child node.</param>
+            <returns>If given key already exists then return the existing child node, else return the new child node.</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrieNode`2.TryGetChild(`0,VDS.Common.Tries.ITrieNode{`0,`1}@)">
+            <summary>
+            Tries to get a child of this node which is associated with a key bit
+            </summary>
+            <param name="key">Key</param>
+            <param name="child">Child</param>
+            <returns>True if a child was found, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrieNode`2.RemoveChild(`0)">
+            <summary>
+            Remove the child of a node associated with a key along with all its descendents.
+            </summary>
+            <param name="key">The key associated with the child to remove.</param>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrieNode`2.Trim">
+            <summary>
+            Removes all child nodes
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.ITrieNode`2.Trim(System.Int32)">
+            <summary>
+            Removes all descendant nodes which are at the given depth below the current node
+            </summary>
+            <param name="depth">Depth</param>
+            <exception cref="T:System.ArgumentException">Thrown if depth is less than zero</exception>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.Descendants">
+            <summary>
+            Gets all descendants of this Node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.Children">
+            <summary>
+            Gets the immediate children of this Node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.Count">
+            <summary>
+            Gets the number of immediate child nodes this node has
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.CountAll">
+            <summary>
+            Gets the number of descendant nodes this node has
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.HasValue">
+            <summary>
+            Check whether or not this node has a value associated with it
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.IsLeaf">
+            <summary>
+            Check whether or not this node has any children
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.IsRoot">
+            <summary>
+            Check whether this Node is the Root Node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.KeyBit">
+            <summary>
+            Gets the key bit that is associated with this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.Parent">
+            <summary>
+            Get the parent of this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.Value">
+            <summary>
+            Gets/Sets value stored by this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.ITrieNode`2.Values">
+            <summary>
+            Get an enumerable of values contained in this node and all its descendants
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.#ctor(VDS.Common.Tries.ITrieNode{`0,`1},`0)">
+            <summary>
+            Create an empty node with no children and null value
+            </summary>
+            <param name="parent">Parent node of this node</param>
+            <param name="key">Key Bit</param>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.GetChild(`0)">
+            <summary>
+            Get a child of this node which is associated with a key bit
+            </summary>
+            <param name="key">Key associated with the child of interest</param>
+            <returns>The child or null if no child is associated with the given key</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.TryGetChild(`0,VDS.Common.Tries.ITrieNode{`0,`1}@)">
+            <summary>
+            Tries to get a child of this node which is associated with a key bit
+            </summary>
+            <param name="key">Key</param>
+            <param name="child">Child</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.ContainsKey(`0)">
+            <summary>
+            Check whether or not one of the children of this node uses the given key bit
+            </summary>
+            <param name="key">The key bit to check for</param>
+            <returns>True if a child with given key exists, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.ClearValue">
+            <summary>
+            Clears the Value (if any) stored at this node
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.Clear">
+            <summary>
+            Clears the Value (if any) stored at this node and removes all child nodes
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.Trim">
+            <summary>
+            Removes all child nodes
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.Trim(System.Int32)">
+            <summary>
+            Removes all descendant nodes which are at the given depth below the current node
+            </summary>
+            <param name="depth">Depth</param>
+            <exception cref="T:System.ArgumentException">Thrown if depth is less than zero</exception>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.MoveToChild(`0)">
+            <summary>
+            Add a child node associated with a key to this node and return the node.
+            </summary>
+            <param name="key">Key to associated with the child node.</param>
+            <returns>If given key already exists then return the existing child node, else return the new child node.</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieNode`2.RemoveChild(`0)">
+            <summary>
+            Remove the child of a node associated with a key along with all its descendents.
+            </summary>
+            <param name="key">The key associated with the child to remove.</param>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.Value">
+            <summary>
+            Gets/Sets value stored by this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.KeyBit">
+            <summary>
+            Gets the key bit that is associated with this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.Parent">
+            <summary>
+            Get the parent of this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.IsRoot">
+            <summary>
+            Check whether this Node is the Root Node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.HasValue">
+            <summary>
+            Check whether or not this node has a value associated with it
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.Count">
+            <summary>
+            Gets the number of immediate child nodes this node has
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.CountAll">
+            <summary>
+            Gets the number of descendant nodes this node has
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.IsLeaf">
+            <summary>
+            Check whether or not this node has any children.
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.Children">
+            <summary>
+            Gets the immediate children of this Node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.Descendants">
+            <summary>
+            Gets all descended children of this Node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.TrieNode`2.Values">
+            <summary>
+            Get an enumerable of values contained in this node and all its descendants
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Tries.AbstractSparseTrieNode`2">
+            <summary>
+            Node of a Sparse Trie
+            </summary>
+            <typeparam name="TKeyBit">Key Bit Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+            <remarks>
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.#ctor(VDS.Common.Tries.ITrieNode{`0,`1},`0)">
+            <summary>
+            Create an empty node with no children and null value
+            </summary>
+            <param name="parent">Parent node of this node</param>
+            <param name="key">Key Bit</param>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.MatchesSingleton(`0)">
+            <summary>
+            Gets whether the given key bit matches the current singleton
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns>True if it matches, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.CreateNewChild(`0)">
+            <summary>
+            Creates a new child
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.ClearSingleton">
+            <summary>
+            Clears the singelton
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.TryGetChild(`0,VDS.Common.Tries.ITrieNode{`0,`1}@)">
+            <summary>
+            Tries to get a child of this node which is associated with a key bit
+            </summary>
+            <param name="key">Key</param>
+            <param name="child">Child</param>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.ClearValue">
+            <summary>
+            Clears the Value (if any) stored at this node
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.Clear">
+            <summary>
+            Clears the Value (if any) stored at this node and removes all child nodes
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.Trim">
+            <summary>
+            Removes all child nodes
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.Trim(System.Int32)">
+            <summary>
+            Removes all descendant nodes which are at the given depth below the current node
+            </summary>
+            <param name="depth">Depth</param>
+            <exception cref="T:System.ArgumentException">Thrown if depth is less than zero</exception>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.MoveToChild(`0)">
+            <summary>
+            Add a child node associated with a key to this node and return the node.
+            </summary>
+            <param name="key">Key to associated with the child node.</param>
+            <returns>If given key already exists then return the existing child node, else return the new child node.</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.AbstractSparseTrieNode`2.RemoveChild(`0)">
+            <summary>
+            Remove the child of a node associated with a key along with all its descendents.
+            </summary>
+            <param name="key">The key associated with the child to remove.</param>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.SingletonChild">
+            <summary>
+            Gets/Sets the singleton child node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.Value">
+            <summary>
+            Gets/Sets value stored by this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.KeyBit">
+            <summary>
+            Gets the key bit that is associated with this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.Parent">
+            <summary>
+            Get the parent of this node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.IsRoot">
+            <summary>
+            Check whether this Node is the Root Node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.HasValue">
+            <summary>
+            Check whether or not this node has a value associated with it
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.Count">
+            <summary>
+            Gets the number of immediate child nodes this node has
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.CountAll">
+            <summary>
+            Gets the number of descendant nodes this node has
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.IsLeaf">
+            <summary>
+            Check whether or not this node has any children.
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.Children">
+            <summary>
+            Gets the immediate children of this Node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.Descendants">
+            <summary>
+            Gets all descended children of this Node
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Tries.AbstractSparseTrieNode`2.Values">
+            <summary>
+            Get an enumerable of values contained in this node and all its descendants
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Tries.SparseValueTrie`3">
+            <summary>
+            Sparse implementation of a Trie data structure
+            </summary>
+            <typeparam name="TKey">Type of keys</typeparam>
+            <typeparam name="TKeyBit">Type of key bits</typeparam>
+            <typeparam name="TValue">Type of values</typeparam>
+            <remarks>
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseValueTrie`3.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Create an empty trie with an empty root node.
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseValueTrie`3.CreateRoot(`1)">
+            <summary>
+            Method which creates a new child node
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns></returns>
+        </member>
+        <member name="T:VDS.Common.Tries.SparseReferenceTrie`3">
+            <summary>
+            Sparse implementation of a Trie data structure
+            </summary>
+            <typeparam name="TKey">Type of keys</typeparam>
+            <typeparam name="TKeyBit">Type of key bits</typeparam>
+            <typeparam name="TValue">Type of values</typeparam>
+            <remarks>
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseReferenceTrie`3.#ctor(System.Func{`0,System.Collections.Generic.IEnumerable{`1}})">
+            <summary>
+            Create an empty trie with an empty root node.
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseReferenceTrie`3.CreateRoot(`1)">
+            <summary>
+            Method which creates a new child node
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns></returns>
+        </member>
+        <member name="T:VDS.Common.Tries.SparseValueTrieNode`2">
+            <summary>
+            Sparse Node of a Trie
+            </summary>
+            <typeparam name="TKeyBit">Key Bit Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseValueTrieNode`2.#ctor(VDS.Common.Tries.ITrieNode{`0,`1},`0)">
+            <summary>
+            Create an empty node with no children and null value
+            </summary>
+            <param name="parent">Parent node of this node</param>
+            <param name="key">Key Bit</param>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseValueTrieNode`2.MatchesSingleton(`0)">
+            <summary>
+            Gets whether the given key bit matches the current singleton
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns>True if it matches, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseValueTrieNode`2.ClearSingleton">
+            <summary>
+            Clears the singleton
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseValueTrieNode`2.CreateNewChild(`0)">
+            <summary>
+            Creates a new child in the trie
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns>New Child</returns>
+        </member>
+        <member name="P:VDS.Common.Tries.SparseValueTrieNode`2.SingletonChild">
+            <summary>
+            Gets/Sets the singleton child node
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Tries.SparseReferenceTrieNode`2">
+            <summary>
+            Sparse Node of a Trie
+            </summary>
+            <typeparam name="TKeyBit">Key Bit Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseReferenceTrieNode`2.#ctor(VDS.Common.Tries.ITrieNode{`0,`1},`0)">
+            <summary>
+            Create an empty node with no children and null value
+            </summary>
+            <param name="parent">Parent node of this node</param>
+            <param name="key">Key Bit</param>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseReferenceTrieNode`2.MatchesSingleton(`0)">
+            <summary>
+            Gets whether the key matches the singleton
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns>True if it matches, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseReferenceTrieNode`2.ClearSingleton">
+            <summary>
+            Clears the singleton
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseReferenceTrieNode`2.CreateNewChild(`0)">
+            <summary>
+            Creates a new child node
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns>New Child</returns>
+        </member>
+        <member name="P:VDS.Common.Tries.SparseReferenceTrieNode`2.SingletonChild">
+            <summary>
+            Gets/Sets the singleton child
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Tries.SparseCharacterTrieNode`1">
+            <summary>
+            Sparse Node of a Trie
+            </summary>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseCharacterTrieNode`1.#ctor(VDS.Common.Tries.ITrieNode{System.Char,`0},System.Char)">
+            <summary>
+            Creates a new Sparse Character Trie Node
+            </summary>
+            <param name="parent">Parent Node</param>
+            <param name="key">Key Bit</param>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseCharacterTrieNode`1.MatchesSingleton(System.Char)">
+            <summary>
+            Gets whether the given key matches the singleton
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns>True if it matches, false otherwise</returns>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseCharacterTrieNode`1.ClearSingleton">
+            <summary>
+            Clears the singleton
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Tries.SparseCharacterTrieNode`1.CreateNewChild(System.Char)">
+            <summary>
+            Creates a new child
+            </summary>
+            <param name="key">Key Bit</param>
+            <returns>New Child</returns>
+        </member>
+        <member name="P:VDS.Common.Tries.SparseCharacterTrieNode`1.SingletonChild">
+            <summary>
+            Gets/Sets the singleton child
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Tries.DescendantNodesEnumerable`2">
+            <summary>
+            An enumerable over a Trie which ensures every time it is enumerated the latest state of the Trie is seen
+            </summary>
+            <typeparam name="TKeyBit">Key Bit Type</typeparam>
+            <typeparam name="TValue">Valye Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Tries.DescendantNodesEnumerable`2.#ctor(VDS.Common.Tries.ITrieNode{`0,`1})">
+            <summary>
+            Creates a descendant nodes enumable
+            </summary>
+            <param name="node">Node</param>
+        </member>
+        <member name="M:VDS.Common.Tries.DescendantNodesEnumerable`2.GetEnumerator">
+            <summary>
+            Gets the enumerator over the descendants
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Tries.DescendantNodesEnumerable`2.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets the enumerator over the descendants
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:VDS.Common.Tries.TrieValuesEnumerable`2">
+            <summary>
+            An enumerable over the values of a Trie which ensures that the latest state of the Trie is always enumerated
+            </summary>
+            <typeparam name="TKeyBit">Key Bit Type</typeparam>
+            <typeparam name="TValue">Valye Type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieValuesEnumerable`2.#ctor(VDS.Common.Tries.ITrieNode{`0,`1})">
+            <summary>
+            Creates a new values enumerator
+            </summary>
+            <param name="node">Node to start enumeration from</param>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieValuesEnumerable`2.GetEnumerator">
+            <summary>
+            Gets an enumerator over the values in the Trie
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:VDS.Common.Tries.TrieValuesEnumerable`2.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets an enumerator over the values in the Trie
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:VDS.Common.Collections.AbstractListBackedBoundedList`1">
+            <summary>
+            Abstract implementation of a bounded list backed by a standard <see cref="T:System.Collections.Generic.IList`1"/>
+            </summary>
+            <typeparam name="T">Element type</typeparam>
+        </member>
+        <member name="T:VDS.Common.Collections.IBoundedList`1">
+            <summary>
+            Interface for bounded lists which are extensions to the standard list contract with some additional constraints
+            </summary>
+            <remarks>
+            <para>
+            The primary constraint on a bounded list is that it is guaranteed to never grow beyond it's configured maximum capacity.  Implementations may internally grow the data structures used to store the elements up to/above that limit using whatever strategy they desire but they <strong>must</strong> never allow the size of the list to grow beyond the maximum capacity.
+            </para>
+            <para>
+            The second constraint on a bounded list is with regards to its behaviour when a user attempts to assert more elements than the list has capacity for.  The behaviour in this regard is declared via the <see cref="P:VDS.Common.Collections.IBoundedList`1.OverflowPolicy"/> property, depending on the policy declared different behaviours may occur.
+            </para>
+            </remarks>
+            <typeparam name="T">Element type</typeparam>
+        </member>
+        <member name="P:VDS.Common.Collections.IBoundedList`1.OverflowPolicy">
+            <summary>
+            Gets the overflow policy that applies when attempting to add more elements to the list than there is capacity for
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Collections.IBoundedList`1.MaxCapacity">
+            <summary>
+            Gets the maximum capacity of the bounded list i.e. the maximum number of elements it holds
+            </summary>
+        </member>
+        <member name="F:VDS.Common.Collections.AbstractListBackedBoundedList`1._list">
+            <summary>
+            Underlying list
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.AbstractListBackedBoundedList`1.#ctor(System.Collections.Generic.IList{`0})">
+            <summary>
+            Creates a new list backed bounded list using the given list
+            </summary>
+            <param name="list">List</param>
+        </member>
+        <member name="M:VDS.Common.Collections.AbstractListBackedBoundedList`1.SelectInitialCapacity(System.Int32)">
+            <summary>
+            Helper method for selecting an initial capacity for the backing list to avoid preemptively allocating the full capacity needed to hold the maximum number of permitted elements
+            </summary>
+            <param name="capacity">MaxCapacity</param>
+            <returns>Initial capacity</returns>
+        </member>
+        <member name="P:VDS.Common.Collections.AbstractListBackedBoundedList`1.OverflowPolicy">
+            <summary>
+            Gets the overflow policy that is in-use
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Collections.AbstractListBackedBoundedList`1.MaxCapacity">
+            <summary>
+            Gets the maximum capacity of the list
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Collections.BoundedListOverflowPolicy">
+            <summary>
+            Possible overflow policies for bounded lists
+            </summary>
+        </member>
+        <member name="F:VDS.Common.Collections.BoundedListOverflowPolicy.Error">
+            <summary>
+            When this policy is used attempting to add more items to a bounded list than there is capacity for <strong>must</strong> result in an <see cref="T:System.InvalidOperationException"/>
+            </summary>
+        </member>
+        <member name="F:VDS.Common.Collections.BoundedListOverflowPolicy.Discard">
+            <summary>
+            When this policy is used attempting to add more items to a bounded list than there is capacity for <strong>must</strong> result in the excess items being silenty discarded.  When attempting to insert items then the behaviour will depend on where you are inserting. If inserting prior to the end of the list then inserting should cause items at the end of the list to be discarded if the capacity would be exceeded.  If inserting at the end of a list that is at capacity then the item to be inserted is itself discarded.
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Collections.DiscardingBoundedList`1">
+            <summary>
+            A simple bounded list implementation that discards items that would exceed the lists capacity
+            </summary>
+            <typeparam name="T">Item type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Collections.DiscardingBoundedList`1.#ctor(System.Int32)">
+            <summary>
+            Creates a new bounded list with the given capacity
+            </summary>
+            <param name="capacity">MaxCapacity</param>
+        </member>
+        <member name="M:VDS.Common.Collections.DiscardingBoundedList`1.#ctor(System.Int32,System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Creates a new bounded list with the given capacity and items
+            </summary>
+            <param name="capacity">MaxCapacity</param>
+            <param name="items">Items</param>
+            <remarks>
+            If the number of items provided exceeds the declared capacity then excess items are discarded
+            </remarks>
+        </member>
+        <member name="P:VDS.Common.Collections.DiscardingBoundedList`1.OverflowPolicy">
+            <summary>
+            Gets the overflow policy for this bounded list which is <see cref="F:VDS.Common.Collections.BoundedListOverflowPolicy.Discard"/>
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Collections.CappedBoundedList`1">
+            <summary>
+            A simple bounded list implementation that errors if users attempt to add more items than there is capacity for
+            </summary>
+            <typeparam name="T">Element type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Collections.CappedBoundedList`1.#ctor(System.Int32)">
+            <summary>
+            Creates a new bounded list with the given capacity
+            </summary>
+            <param name="capacity">MaxCapacity</param>
+        </member>
+        <member name="M:VDS.Common.Collections.CappedBoundedList`1.#ctor(System.Int32,System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Creates a new bounded list with the given capacity and items
+            </summary>
+            <param name="capacity">MaxCapacity</param>
+            <param name="items">Items</param>
+            <remarks>
+            If the number of items provided exceeds the declared capacity then an error will be thrown from the constructor
+            </remarks>
+        </member>
+        <member name="P:VDS.Common.Collections.CappedBoundedList`1.OverflowPolicy">
+            <summary>
+            Gets the overflow policy for this bounded list which is <see cref="F:VDS.Common.Collections.BoundedListOverflowPolicy.Error"/>
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Collections.BinarySparseArray`1">
+            <summary>
+            A sparse array implementation backed by a binary tree
+            </summary>
+            <remarks>
+            This implementation provides a trade off between look up time and memory usage and so provides a compromise between the <see cref="T:VDS.Common.Collections.BlockSparseArray`1"/> and <see cref="T:VDS.Common.Collections.LinkedSparseArray`1"/>
+            </remarks>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:VDS.Common.Collections.ISparseArray`1">
+            <summary>
+            Interface for sparse arrays which are memory efficient implementations of arrays
+            </summary>
+            <typeparam name="T">Value type</typeparam>
+        </member>
+        <member name="P:VDS.Common.Collections.ISparseArray`1.Item(System.Int32)">
+            <summary>
+            Gets/Sets the element at the specified index
+            </summary>
+            <param name="index">Index</param>
+            <returns>Element at the given index</returns>
+            <exception cref="T:System.IndexOutOfRangeException">Thrown if the given index is out of range</exception>
+        </member>
+        <member name="P:VDS.Common.Collections.ISparseArray`1.Length">
+            <summary>
+            Gets the length of the array
+            </summary>
+        </member>
+        <member name="T:VDS.Common.Collections.BlockSparseArray`1">
+            <summary>
+            A memory efficient sparse array implemented as a sequence of blocks
+            </summary>
+            <remarks>
+            <para>
+            This sparse array is implemented as a series of potentially empty blocks such that only blocks which contain values have any memory allocated to them.  This means it is extremely memory efficient for sparsely populated arrays.  The block size may be tweaked to limit the amount of memory that might be newly allocated by setting a value since setting a value in an as yet unpopulated block requires allocating the memory for that block.  Since at minimum the sequence of blocks must be maintained this implementation can be less memory efficient than the <see cref="T:VDS.Common.Collections.LinkedSparseArray`1"/> for some usages.
+            </para>
+            <para>
+            Since the sequence of blocks and the contents of each block are implemented using standard arrays an element may be accessed by index in linear time regardless of how empty/full the sparse array is.
+            </para>
+            </remarks>
+            <typeparam name="T">Value type</typeparam>
+        </member>
+        <member name="F:VDS.Common.Collections.BlockSparseArray`1.DefaultBlockSize">
+            <summary>
+            Default block size used if one is not explicitly specified
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Collections.BlockSparseArray`1.#ctor(System.Int32)">
+            <summary>
+            Creates a new sparse array with the default block size
+            </summary>
+            <param name="length">Length of the array</param>
+        </member>
+        <member name="M:VDS.Common.Collections.BlockSparseArray`1.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Creates a new sparse array
+            </summary>
+            <param name="length">Length</param>
+            <param name="blockSize">Block Size</param>
+        </member>
+        <member name="T:VDS.Common.Collections.LinkedSparseArray`1">
+            <summary>
+            A memory efficient sparse array backed by a <see cref="T:System.Collections.Generic.LinkedList`1"/> thus it trades lookup performance off against memory.  
+            </summary>
+            <remarks>
+            <para>
+            This implementation is extremely memory efficient for sparse arrays since it only stores entries where the value has been set.  However the use of a linked list means lookup of a specific index is a worse case O(n) operation where n is the length of the list.
+            </para>
+            <para>
+            If fast access is preferred over memory efficiency then the <see cref="T:VDS.Common.Collections.BlockSparseArray`1"/> may be a better option
+            </para>
+            </remarks>
+            <typeparam name="T">Value type</typeparam>
+        </member>
+        <member name="M:VDS.Common.Collections.LinkedSparseArray`1.#ctor(System.Int32)">
+            <summary>
+            Creates a new sparse array with the given length
+            </summary>
+            <param name="length">Length</param>
+        </member>
+        <member name="T:VDS.Common.Filters.BaseBloomFilter`1">
+            <summary>
+            Abstract implementation of a bloom filter
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:VDS.Common.Filters.IBloomFilter`1">
+            <summary>
+            Interface for bloom filters which are a probabilistic data structure for detecting whether items have already been seen
+            </summary>
+            <typeparam name="T">Item type</typeparam>
+            <remarks>
+            A bloom filter is a data structure that can be used to determine whether an item may have previously been seen in a memory efficient way that does not require storing the actual items.  The trade off is that it may yield false positives however it is guaranteed to never yield false negatives.  This makes it an ideal data structure for implementings things like distinctness where it doesn't matter if a few non-distinct items are discarded.
+            </remarks>
+        </member>
+        <member name="M:VDS.Common.Filters.IBloomFilter`1.Add(`0)">
+            <summary>
+            Adds an item to the filter
+            </summary>
+            <param name="item">Item</param>
+            <returns>True if the item was added to the filter, false if item may already have been present and was not added</returns>
+        </member>
+        <member name="M:VDS.Common.Filters.IBloomFilter`1.MayContain(`0)">
+            <summary>
+            Gets whether the filter may have already seen the given item
+            </summary>
+            <param name="item">Item</param>
+            <returns>True if the item may have been seen, false otherwise</returns>
+            <remarks>
+            Bloom filters may return false positives hence why this method is named <strong>MayContain</strong> but they are guaranteed to never return false negatives
+            </remarks>
+        </member>
+        <member name="P:VDS.Common.Filters.IBloomFilter`1.NumberOfBits">
+            <summary>
+            Gets the number of bits used for the filter
+            </summary>
+        </member>
+        <member name="P:VDS.Common.Filters.IBloomFilter`1.NumberOfHashFunctions">
+            <summary>
+            Gets the number of hash functions used for the filter
+            </summary>
+        </member>
+        <member name="M:VDS.Common.Filters.BaseBloomFilter`1.#ctor(System.Int32,System.Collections.Generic.IEnumerable{System.Func{`0,System.Int32}})">
+            <summary>
+            Creates a new filter
+            </summary>
+            <param name="bits">Number of Bits</param>
+            <param name="hashFunctions">Hash Functions</param>
+        </member>
+        <member name="M:VDS.Common.Filters.BaseBloomFilter`1.GetBitIndices(`0)">
+            <summary>
+            Converts an item into a number of bit indexes
+            </summary>
+            <param name="item">Item</param>
+            <returns>Bit Indices</returns>
+        </member>
+        <member name="M:VDS.Common.Filters.BaseBloomFilter`1.IsBitSet(System.Int32)">
+            <summary>
+            Gets whether the given bit is set
+            </summary>
+            <param name="index">Index</param>
+            <returns>True if the bit is set, false if not</returns>
+        </member>
+        <member name="M:VDS.Common.Filters.BaseBloomFilter`1.SetBit(System.Int32)">
+            <summary>
+            Sets the given bit
+            </summary>
+            <param name="index">Index</param>
+        </member>
+        <member name="T:VDS.Common.Filters.BloomFilter`1">
+            <summary>
+            A bloom filter backed by an array
+            </summary>
+            <typeparam name="T">Item type</typeparam>
+        </member>
+        <member name="T:VDS.Common.Filters.SparseBloomFilter`1">
+            <summary>
+            Bloom filter implementation backed by a <see cref="T:VDS.Common.Collections.ISparseArray`1"/>
+            </summary>
+            <typeparam name="T">Item type</typeparam>
+        </member>
+    </members>
+</doc>

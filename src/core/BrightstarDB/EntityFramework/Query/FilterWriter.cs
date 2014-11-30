@@ -248,7 +248,7 @@ namespace BrightstarDB.EntityFramework.Query
 
             // Determine the effective expression type (removing Nullable<T> wrapper)
             var expressionType = expression.Type;
-            if (expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition().Equals(typeof(System.Nullable<>)))
+            if (expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 expressionType = expression.Type.GetGenericArguments()[0];
             }
@@ -272,22 +272,26 @@ namespace BrightstarDB.EntityFramework.Query
                 }
                 return expression;
             }
-            if (expressionType.Equals(typeof(bool)))
+            if (expressionType == typeof(bool))
             {
                 _filterExpressionBuilder.Append(((bool) expression.Value) ? "true" : "false");
-                /*var dt = GetDatatype(typeof (bool));
-                if (!String.IsNullOrEmpty(dt))
-                {
-                    _filterExpressionBuilder.AppendFormat("^^<{0}>", dt);
-                }
-                 */
                 return expression;
             }
-            if (expressionType.Equals(typeof(DateTime)))
+            if (expressionType == typeof(DateTime))
             {
 
                 _filterExpressionBuilder.Append(MakeSparqlStringConstant(((DateTime) expression.Value).ToString("O")));
                 var dt = GetDatatype(typeof(DateTime));
+                if (!String.IsNullOrEmpty(dt))
+                {
+                    _filterExpressionBuilder.AppendFormat("^^<{0}>", dt);
+                }
+                return expression;
+            }
+            if (expressionType == typeof (Guid))
+            {
+                _filterExpressionBuilder.Append(MakeSparqlStringConstant(((Guid) expression.Value).ToString("D")));
+                var dt = GetDatatype(typeof (Guid));
                 if (!String.IsNullOrEmpty(dt))
                 {
                     _filterExpressionBuilder.AppendFormat("^^<{0}>", dt);

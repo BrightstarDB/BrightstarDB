@@ -51,7 +51,7 @@ else if (Model.HasFormattedResults)
                 <tr>
                     @foreach (var item in row)
                     {
-                        <td>@item.ToString()</td>
+                        <td>@if (item != null) {@item.ToString()}</td>
                     }
                 </tr>
             }

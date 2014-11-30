@@ -14,6 +14,33 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX.
 
 ****************************
+ BrightstarDB 1.8 Release
+****************************
+
+    - NEW: EntityFramework now supports GUID properties.
+    
+    - NEW: EntityFramework now has an [Ignore] attribute which can be used to decorate interface properties
+           that are not to be implemented by the generated EF class. See the :ref:`guide to EF Annotations <Annotations_Guide>` for
+           more information.
+           
+    - NEW: Added a constructor option to generated EF entity classes that allows property initialisation in the constructor. Thanks to CyborgDE for
+           the suggestion.
+        
+    - NEW: Added some basic logging support for Android and iOS PCL builds. These builds now log diagnostic messages when built in Debug configuration,
+           and the BrightstarDB logging subsystem can be initialized with a local file name to generate persistent log files in Release configuration.
+           
+    - NEW: It is now possible to iterate the distinct predicates of a data object using the GetPropertyTypes method.
+    
+    - FIX: Fix for Polaris crash when attempting to process a query containing a syntax error.
+    
+    - FIX: Fixed NuGet packaging to remove an obsolete reference to Windows Phone 8. WP8 (and 8.1) are still both supported but as PCL profiles.
+    
+    - FIX: Performance fix for full cache scenarios. When an attempt to evict items out of a full cache results in no items being evicted, the eviction
+           process will not be repeated again for another minute to allow for any current update transactions that have locked pages in the cache to complete.
+           This can avoid a lot of unnecessary cache scans when a large update transaction is being processed. Thanks to CyborgDE for the bug report.
+           
+
+****************************
  BrightstarDB 1.7 Release
 ****************************
 

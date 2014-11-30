@@ -30,12 +30,12 @@ namespace BrightstarDB.Client
         /// <summary>
         /// The current transaction delete patterns
         /// </summary>
-        List<Triple> DeletePatterns { get; }
+        ITripleCollection DeletePatterns { get; }
 
         /// <summary>
         /// The current transaction triples to add
         /// </summary>
-        List<Triple> AddTriples { get; }
+        ITripleCollection AddTriples { get; }
 
         /// <summary>
         /// Returns an enumeration of all data objects that are the subject

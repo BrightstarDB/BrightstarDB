@@ -458,6 +458,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Animal : BrightstarEntityObject, IAnimal 
     {
     	public Animal(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Animal(BrightstarEntityContext context) : base(context, typeof(Animal)) { }
     	public Animal() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IAnimal
@@ -482,6 +483,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Article : BrightstarEntityObject, IArticle 
     {
     	public Article(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Article(BrightstarEntityContext context) : base(context, typeof(Article)) { }
     	public Article() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IArticle
@@ -526,6 +528,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class BaseEntity : BrightstarEntityObject, IBaseEntity 
     {
     	public BaseEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public BaseEntity(BrightstarEntityContext context) : base(context, typeof(BaseEntity)) { }
     	public BaseEntity() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IBaseEntity
@@ -544,6 +547,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class ChildKeyEntity : BrightstarEntityObject, IChildKeyEntity 
     {
     	public ChildKeyEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public ChildKeyEntity(BrightstarEntityContext context) : base(context, typeof(ChildKeyEntity)) { }
     	public ChildKeyEntity() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IChildKeyEntity
@@ -568,6 +572,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Company : BrightstarEntityObject, ICompany 
     {
     	public Company(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Company(BrightstarEntityContext context) : base(context, typeof(Company)) { }
     	public Company() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ICompany
@@ -616,6 +621,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class CompositeKeyEntity : BrightstarEntityObject, ICompositeKeyEntity 
     {
     	public CompositeKeyEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public CompositeKeyEntity(BrightstarEntityContext context) : base(context, typeof(CompositeKeyEntity)) { }
     	public CompositeKeyEntity() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity
@@ -640,6 +646,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Concept : BrightstarEntityObject, IConcept 
     {
     	public Concept(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Concept(BrightstarEntityContext context) : base(context, typeof(Concept)) { }
     	public Concept() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IConcept
@@ -657,6 +664,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class DBPediaPerson : BrightstarEntityObject, IDBPediaPerson 
     {
     	public DBPediaPerson(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public DBPediaPerson(BrightstarEntityContext context) : base(context, typeof(DBPediaPerson)) { }
     	public DBPediaPerson() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IDBPediaPerson
@@ -693,6 +701,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Department : BrightstarEntityObject, IDepartment 
     {
     	public Department(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Department(BrightstarEntityContext context) : base(context, typeof(Department)) { }
     	public Department() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IDepartment
@@ -722,6 +731,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class DerivedEntity : BrightstarEntityObject, IDerivedEntity 
     {
     	public DerivedEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public DerivedEntity(BrightstarEntityContext context) : base(context, typeof(DerivedEntity)) { }
     	public DerivedEntity() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IDerivedEntity
@@ -753,6 +763,7 @@ namespace BrightstarDB.Tests.EntityFramework
     internal partial class Entity : BrightstarEntityObject, IEntity 
     {
     	public Entity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Entity(BrightstarEntityContext context) : base(context, typeof(Entity)) { }
     	public Entity() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IEntity
@@ -937,6 +948,18 @@ namespace BrightstarDB.Tests.EntityFramework
             		set { SetRelatedProperty("SomeByteArray", value); }
     	}
     
+    	public System.Guid SomeGuid
+    	{
+            		get { return GetRelatedProperty<System.Guid>("SomeGuid"); }
+            		set { SetRelatedProperty("SomeGuid", value); }
+    	}
+    
+    	public System.Nullable<System.Guid> SomeNullableGuid
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.Guid>>("SomeNullableGuid"); }
+            		set { SetRelatedProperty("SomeNullableGuid", value); }
+    	}
+    
     	public BrightstarDB.Tests.EntityFramework.TestEnumeration SomeEnumeration
     	{
             		get { return GetRelatedProperty<BrightstarDB.Tests.EntityFramework.TestEnumeration>("SomeEnumeration"); }
@@ -1009,6 +1032,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class FoafAgent : BrightstarEntityObject, IFoafAgent 
     {
     	public FoafAgent(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public FoafAgent(BrightstarEntityContext context) : base(context, typeof(FoafAgent)) { }
     	public FoafAgent() : base() { }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IFoafAgent
     	public System.Collections.Generic.ICollection<System.String> MboxSums
@@ -1025,6 +1049,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class FoafPerson : BrightstarEntityObject, IFoafPerson 
     {
     	public FoafPerson(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public FoafPerson(BrightstarEntityContext context) : base(context, typeof(FoafPerson)) { }
     	public FoafPerson() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IFoafPerson
@@ -1085,6 +1110,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class HierarchicalKeyEntity : BrightstarEntityObject, IHierarchicalKeyEntity 
     {
     	public HierarchicalKeyEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public HierarchicalKeyEntity(BrightstarEntityContext context) : base(context, typeof(HierarchicalKeyEntity)) { }
     	public HierarchicalKeyEntity() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity
@@ -1109,6 +1135,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class IdentityClashTest : BrightstarEntityObject, IIdentityClashTest 
     {
     	public IdentityClashTest(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public IdentityClashTest(BrightstarEntityContext context) : base(context, typeof(IdentityClashTest)) { }
     	public IdentityClashTest() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTest
@@ -1121,6 +1148,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class IdentityClashTestLevel1 : BrightstarEntityObject, IIdentityClashTestLevel1 
     {
     	public IdentityClashTestLevel1(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public IdentityClashTestLevel1(BrightstarEntityContext context) : base(context, typeof(IdentityClashTestLevel1)) { }
     	public IdentityClashTestLevel1() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1
@@ -1135,6 +1163,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class IdentityClashTestLevel2 : BrightstarEntityObject, IIdentityClashTestLevel2 
     {
     	public IdentityClashTestLevel2(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public IdentityClashTestLevel2(BrightstarEntityContext context) : base(context, typeof(IdentityClashTestLevel2)) { }
     	public IdentityClashTestLevel2() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2
@@ -1151,6 +1180,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class JobRole : BrightstarEntityObject, IJobRole 
     {
     	public JobRole(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public JobRole(BrightstarEntityContext context) : base(context, typeof(JobRole)) { }
     	public JobRole() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IJobRole
@@ -1174,6 +1204,7 @@ namespace BrightstarDB.Tests.EntityFramework
     internal partial class LowerKeyEntity : BrightstarEntityObject, ILowerKeyEntity 
     {
     	public LowerKeyEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public LowerKeyEntity(BrightstarEntityContext context) : base(context, typeof(LowerKeyEntity)) { }
     	public LowerKeyEntity() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ILowerKeyEntity
@@ -1192,6 +1223,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Market : BrightstarEntityObject, IMarket 
     {
     	public Market(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Market(BrightstarEntityContext context) : base(context, typeof(Market)) { }
     	public Market() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IMarket
@@ -1215,6 +1247,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
     public partial class Performance : BrightstarEntityObject, IPerformance 
     {
     	public Performance(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Performance(BrightstarEntityContext context) : base(context, typeof(Performance)) { }
     	public Performance() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.InverseProperty.IPerformance
@@ -1233,6 +1266,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
     public partial class Photo : BrightstarEntityObject, IPhoto 
     {
     	public Photo(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Photo(BrightstarEntityContext context) : base(context, typeof(Photo)) { }
     	public Photo() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.InverseProperty.IPhoto
@@ -1251,6 +1285,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
     public partial class Production : BrightstarEntityObject, IProduction 
     {
     	public Production(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Production(BrightstarEntityContext context) : base(context, typeof(Production)) { }
     	public Production() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.InverseProperty.IProduction
@@ -1284,6 +1319,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
     public partial class ProductionMember : BrightstarEntityObject, IProductionMember 
     {
     	public ProductionMember(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public ProductionMember(BrightstarEntityContext context) : base(context, typeof(ProductionMember)) { }
     	public ProductionMember() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionMember
@@ -1308,6 +1344,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
     public partial class ProductionPerson : BrightstarEntityObject, IProductionPerson 
     {
     	public ProductionPerson(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public ProductionPerson(BrightstarEntityContext context) : base(context, typeof(ProductionPerson)) { }
     	public ProductionPerson() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionPerson
@@ -1326,6 +1363,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Person : BrightstarEntityObject, IPerson 
     {
     	public Person(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Person(BrightstarEntityContext context) : base(context, typeof(Person)) { }
     	public Person() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IPerson
@@ -1419,6 +1457,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Session : BrightstarEntityObject, ISession 
     {
     	public Session(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Session(BrightstarEntityContext context) : base(context, typeof(Session)) { }
     	public Session() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ISession
@@ -1437,6 +1476,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class EveningSession : BrightstarEntityObject, IEveningSession 
     {
     	public EveningSession(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public EveningSession(BrightstarEntityContext context) : base(context, typeof(EveningSession)) { }
     	public EveningSession() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IEveningSession
@@ -1469,6 +1509,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class TechnicalEveningSession : BrightstarEntityObject, ITechnicalEveningSession 
     {
     	public TechnicalEveningSession(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public TechnicalEveningSession(BrightstarEntityContext context) : base(context, typeof(TechnicalEveningSession)) { }
     	public TechnicalEveningSession() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession
@@ -1509,6 +1550,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Skill : BrightstarEntityObject, ISkill 
     {
     	public Skill(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Skill(BrightstarEntityContext context) : base(context, typeof(Skill)) { }
     	public Skill() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ISkill
@@ -1549,6 +1591,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class StringKeyEntity : BrightstarEntityObject, IStringKeyEntity 
     {
     	public StringKeyEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public StringKeyEntity(BrightstarEntityContext context) : base(context, typeof(StringKeyEntity)) { }
     	public StringKeyEntity() : base() { }
     	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.IStringKeyEntity
@@ -1573,6 +1616,7 @@ namespace BrightstarDB.Tests.EntityFramework
     public partial class Trackable : BrightstarEntityObject, ITrackable 
     {
     	public Trackable(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public Trackable(BrightstarEntityContext context) : base(context, typeof(Trackable)) { }
     	public Trackable() : base() { }
     	#region Implementation of BrightstarDB.Tests.EntityFramework.ITrackable
     

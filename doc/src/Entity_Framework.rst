@@ -140,8 +140,8 @@ Once an entity has been retrieved it can be modified or related entities can be 
   brightstardb.Name = "BrightstarDB";
 
 
-New entities can be created either via the main collection or by using the ``new`` keyword 
-and attaching the object to the context::
+New entities can be created either via the main collection; by using the ``new`` keyword 
+and attaching the object to the context; or by passing the context into the constructor::
 
   // creating a new entity via the context collection
   var bob = dataContext.Persons.Create();
@@ -152,6 +152,8 @@ and attaching the object to the context::
   var bob = new Person() { Name = "Bob" };
   dataContext.Persons.Add(bob);
 
+  // or created using new and passing the context into the constructor
+  var bob = new Person(dataContext) { Name = "Bob" };
 
 
 Once a new object has been created it can be used in relationships with other objects. The 
@@ -169,6 +171,13 @@ have been created by setting the ``Employer`` property on the person::
   bob.Name = "bob";
   bob.Employer = brightstardb;
 
+  // You can also create relationships to previously constructed
+  // or retrieved objects in the constructor
+  var brightstardb = new Company(dataContext) { Name = "BrightstarDB" };
+  var bob = new Person(dataContext) { 
+                    Name = "Bob; 
+                    Employer = brightstardb 
+            };
 
 Saving the changes that have occurred is easily done by calling a method on the context::
 
@@ -281,6 +290,33 @@ attribute annotation is required for this::
     string Id { get; }
     string Name { get; set; }
   }
+
+Property Exclusion
+------------------
+
+If you want BrightstarDB to ignore a property you can simply decorate it with an ``[Ignore]``
+attribute::
+
+  [Entity("Person")]
+  public interface IPerson {
+    string Id {get; }
+    string Name { get; set; }
+    
+    [Ignore]
+    int Salary {get;}
+  }
+
+.. note::
+  
+  Properties that are ignored in this way are not implemented in the partial class that BrightstarDB
+  generates, so you will need to ensure that they are implemented in a partial class that you create.
+
+.. note::
+
+  The ``[Ignore]`` attribute is not supported or required on *methods* defined in the interface as
+  BrightstarDB does not implement interface methods - you are always required to provide method
+  implementations in your own partial class.
+  
 
 Inverse Property Attribute
 --------------------------

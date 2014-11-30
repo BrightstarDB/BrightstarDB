@@ -22,5 +22,8 @@ namespace BrightstarDB.Tests.EntityFramework
         {
             OnCreatedWasCalled = true;
         }
+
+        // Implement the property we asked B* to ignore
+        public string AnIgnoredProperty { get; set; }
     }
 }

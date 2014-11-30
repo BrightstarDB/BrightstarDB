@@ -34,12 +34,12 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             using (
                 var readStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
                                                         "TestStoreModifiedExceptionThrown.data",
-                                                        BPlusTreeStoreManager.PageSize, true, 2, 3))
+                                                        BPlusTreeStoreManager.PageSize, true, 2, 3, false))
             {
                 using (
                     var writeStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
                                                              "TestStoreModifiedExceptionThrown.data",
-                                                             BPlusTreeStoreManager.PageSize, false, 2, 3))
+                                                             BPlusTreeStoreManager.PageSize, false, 2, 3, false))
                 {
                     var writePage = writeStore.Retrieve(pageId, null);
                     Assert.IsFalse(writeStore.IsWriteable(writePage));
@@ -52,7 +52,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 using (
                     var writeStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
                                                              "TestStoreModifiedExceptionThrown.data",
-                                                             BPlusTreeStoreManager.PageSize, false, 3, 4))
+                                                             BPlusTreeStoreManager.PageSize, false, 3, 4, false))
                 {
                     var writePage = writeStore.Retrieve(pageId, null);
                     writePage = writeStore.GetWriteablePage(4, writePage);
@@ -88,14 +88,14 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
 
             var readStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
                                                     "TestStoreModifiedExceptionThrown.data",
-                                                    BPlusTreeStoreManager.PageSize, true, 2, 3);
+                                                    BPlusTreeStoreManager.PageSize, true, 2, 3, false);
             try
             {
         
                 using (
                     var writeStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
                                                              "TestStoreModifiedExceptionThrown.data",
-                                                             BPlusTreeStoreManager.PageSize, false, 2, 3))
+                                                             BPlusTreeStoreManager.PageSize, false, 2, 3, false))
                 {
                     var writePage = writeStore.Retrieve(pageId, null);
                     writePage = writeStore.GetWriteablePage(3, writePage);
@@ -110,7 +110,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 using (
                     var writeStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
                                                              "TestStoreModifiedExceptionThrown.data",
-                                                             BPlusTreeStoreManager.PageSize, false, 3, 4))
+                                                             BPlusTreeStoreManager.PageSize, false, 3, 4, false))
                 {
                     var writePage = writeStore.Retrieve(pageId, null);
                     writePage = writeStore.GetWriteablePage(4, writePage);
@@ -131,7 +131,7 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                     readStore = null;
                     readStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
                                                         "TestStoreModifiedExceptionThrown.data",
-                                                        BPlusTreeStoreManager.PageSize, true, 4, 5);
+                                                        BPlusTreeStoreManager.PageSize, true, 4, 5, false);
                     var page = readStore.Retrieve(pageId, null);
                     Assert.AreEqual(3, page.Data[0]);
                 }
