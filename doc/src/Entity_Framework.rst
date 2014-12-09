@@ -334,7 +334,7 @@ on the referencing type to be specified::
   }
 
   [Entity("Company")] 
-  public interface IPerson {
+  public interface ICompany {
     string Id { get; }
     [InverseProperty("Employer")]
     ICollection<IPerson> Employees { get; set; }
