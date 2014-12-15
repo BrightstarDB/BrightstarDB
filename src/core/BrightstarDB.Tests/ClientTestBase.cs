@@ -1,4 +1,6 @@
-﻿#if !PORTABLE
+﻿using System.Xml.Linq;
+using NUnit.Framework;
+#if !PORTABLE
 using System;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules;
@@ -49,6 +51,38 @@ namespace BrightstarDB.Tests
                 }
 #endif
             }
+        }
+
+        protected static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
+            string graphUri)
+        {
+            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
+        }
+
+        protected static void AssertTriplePatternInDefaultGraph(IBrightstarService client, string storeName,
+            string triplePattern)
+        {
+            var sparql = "ASK {{" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
+        }
+
+        protected static void AssertTriplePatternNotInGraph(IBrightstarService client, string storeName, string triplePattern,
+            string graphUri)
+        {
+            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
+        }
+
+        protected static void AssertTriplePatternNotInDefaultGraph(IBrightstarService client, string storeName,
+            string triplePattern)
+        {
+            var sparql = "ASK {{" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
         }
     }
 }

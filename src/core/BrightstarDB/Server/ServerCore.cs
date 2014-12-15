@@ -536,5 +536,11 @@ namespace BrightstarDB.Server
                 return result;
             }
         }
+
+        public IEnumerable<string> ListNamedGraphs(string storeName)
+        {
+            var storeWorker = GetStoreWorker(storeName);
+            return storeWorker.ListNamedGraphs();
+        }
     }
 }

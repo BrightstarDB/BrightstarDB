@@ -70,6 +70,8 @@
     <Compile Include="ConfigurationSectionHandlerSpec.cs" />
     <Compile Include="CreateStoreRequestObjectSpec.cs" />
     <Compile Include="FakeNancyBootstrapper.cs" />
+    <Compile Include="GraphListModelSpec.cs" />
+    <Compile Include="GraphsUrlSpec.cs" />
     <Compile Include="JobRequestObjectSpec.cs" />
     <Compile Include="JobResponseObjectSpec.cs" />
     <Compile Include="JobsUrlSpec.cs" />

@@ -135,6 +135,29 @@ namespace BrightstarDB.Client
         }
 
         /// <summary>
+        /// List the URIs of the named graphs contained in the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store</param>
+        /// <returns>An enumeration of the URI identifiers of the named graphs in the store.</returns>
+        public IEnumerable<string> ListNamedGraphs(string storeName)
+        {
+            if (storeName == null)
+                throw new ArgumentNullException("storeName", Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
+            if (String.IsNullOrEmpty(storeName))
+                throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString,
+                                            "storeName");
+            try
+            {
+                return _serverCore.ListNamedGraphs(storeName);
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error listing named graphs for store {0}.", storeName);
+                throw new BrightstarClientException("Error listing named graphs for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
         /// Query the store using a SPARQL query
         /// </summary>
         /// <param name="storeName">The name of the store to query</param>

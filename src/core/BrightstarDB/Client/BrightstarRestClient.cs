@@ -5,8 +5,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.ServiceModel.Security.Tokens;
 using System.Text;
 using System.Threading;
+using BrightstarDB.Server;
+using BrightstarDB.Storage.BPlusTreeStore;
+using Newtonsoft.Json;
+using VDS.RDF;
+using VDS.RDF.Query;
 #if !PORTABLE && !WINDOWS_PHONE
 using System.Web.Script.Serialization;
 #endif
@@ -209,6 +215,49 @@ namespace BrightstarDB.Client
                 }
                 LogWebException("HEAD", storeName, wex);
                 throw new BrightstarClientException("Could not verify existence of store.", wex);
+            }
+        }
+
+        /// <summary>
+        /// List the URIs of the named graphs contained in the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store</param>
+        /// <returns>An enumeration of the URI identifiers of the named graphs in the store.</returns>
+        public IEnumerable<string> ListNamedGraphs(string storeName)
+        {
+            ValidateStoreName(storeName);
+            try
+            {
+                var response = AuthenticatedGet(storeName + "/graphs");
+                var responseStream = response.GetResponseStream();
+                using (var reader = new StreamReader(responseStream))
+                {
+                    var p = new VDS.RDF.Parsing.SparqlJsonParser();
+                    var rs = new SparqlResultSet();
+                    p.Load(rs, reader);
+                    return rs.Results.Where(row => row.HasValue("graphUri"))
+                        .Select(row => row["graphUri"])
+                        .OfType<IUriNode>()
+                        .Select(n => n.Uri.ToString());
+                }
+            }
+            catch (BrightstarClientException ex)
+            {
+                if (InnerExceptionHasStatusCode(ex, HttpStatusCode.NotFound))
+                {
+                    throw new NoSuchStoreException(storeName);
+                }
+                throw;
+            }
+            catch (WebException wex)
+            {
+                var response = wex.Response as HttpWebResponse;
+                if (response != null && response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    throw new NoSuchStoreException(storeName);
+                }
+                LogWebException("GET", storeName + "/graphs", wex);
+                throw new BrightstarClientException("Could not retrieve named graphs for store " + storeName + ".", wex);
             }
         }
 

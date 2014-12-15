@@ -50,6 +50,13 @@ namespace BrightstarDB.Client
         bool DoesStoreExist(string storeName);
 
         /// <summary>
+        /// List the URIs of the named graphs contained in the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store</param>
+        /// <returns>An enumeration of the URI identifiers of the named graphs in the store.</returns>
+        IEnumerable<string> ListNamedGraphs(string storeName);
+
+        /// <summary>
         /// Query a specific commit point of a store
         /// </summary>
         /// <param name="storeName">The name of the store to query</param>

@@ -1229,40 +1229,6 @@ namespace BrightstarDB.Tests
             // TODO: Validate expected content
 
         }
-
-
-        private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
-                                              string graphUri)
-        {
-            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
-        }
-
-        private static void AssertTriplePatternInDefaultGraph(IBrightstarService client, string storeName,
-                                                              string triplePattern)
-        {
-            var sparql = "ASK {{" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
-        }
-
-        private static void AssertTriplePatternNotInGraph(IBrightstarService client, string storeName, string triplePattern,
-                                      string graphUri)
-        {
-            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
-        }
-
-        private static void AssertTriplePatternNotInDefaultGraph(IBrightstarService client, string storeName,
-                                                              string triplePattern)
-        {
-            var sparql = "ASK {{" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
-        }
-
     }
 }
 
