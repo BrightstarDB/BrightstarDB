@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.ServiceModel.Security.Tokens;
 using System.Text;
 using System.Threading;
 using BrightstarDB.Server;
@@ -14,6 +13,7 @@ using Newtonsoft.Json;
 using VDS.RDF;
 using VDS.RDF.Query;
 #if !PORTABLE && !WINDOWS_PHONE
+using System.ServiceModel.Security.Tokens;
 using System.Web.Script.Serialization;
 #endif
 #if PORTABLE || WINDOWS_PHONE
