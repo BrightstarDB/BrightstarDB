@@ -14,6 +14,12 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX.
 
 ****************************
+ Develop Branch
+****************************
+
+    - NEW: The W3C SPARQL 1.1 Graph Store Protocol is now implemented by the BrightstarDB service. See :ref:`SPARQL_Endpoint` for more information.
+    
+****************************
  BrightstarDB 1.8 Release
 ****************************
 
