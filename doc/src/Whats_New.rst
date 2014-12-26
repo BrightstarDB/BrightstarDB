@@ -19,6 +19,8 @@ marked with FIX.
 
     - NEW: The W3C SPARQL 1.1 Graph Store Protocol is now implemented by the BrightstarDB service. See :ref:`SPARQL_Endpoint` for more information.
     
+    - NEW: The Polaris UI now allows the default graph IRI to be specified for import operations. Thanks to Daniel Bryars for this contribution.
+    
 ****************************
  BrightstarDB 1.8 Release
 ****************************
