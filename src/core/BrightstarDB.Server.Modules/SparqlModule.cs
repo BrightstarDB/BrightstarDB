@@ -9,6 +9,7 @@ using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
 using VDS.RDF.Parsing;
+using VDS.RDF.Query.Expressions.Functions.XPath.String;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -28,9 +29,11 @@ namespace BrightstarDB.Server.Modules
                         var requestObject = BindSparqlRequestObject();
                         return ProcessQuery(parameters["storeName"], requestObject);
                     }
-                    catch (RdfParseException)
+                    catch (RdfParseException rdfParseException)
                     {
-                        return HttpStatusCode.BadRequest;
+                        var r = (Response) rdfParseException.Message;
+                        r.StatusCode = HttpStatusCode.BadRequest;
+                        return r;
                     }
                 };
             Post["/{storeName}/sparql"] = parameters =>
@@ -40,9 +43,11 @@ namespace BrightstarDB.Server.Modules
                         var requestObject = BindSparqlRequestObject();
                         return ProcessQuery(parameters["storeName"], requestObject);
                     }
-                    catch (RdfParseException)
+                    catch (RdfParseException rdfParseException)
                     {
-                        return HttpStatusCode.BadRequest;
+                        var r = (Response)rdfParseException.Message;
+                        r.StatusCode = HttpStatusCode.BadRequest;
+                        return r;
                     }
                 };
             Get["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
