@@ -294,7 +294,12 @@ To run a Remote import:
      Job from the popup menu.
 
   #. In the interface that is displayed, change the Import Method radio 
-     button selection to Remote and enter the name of the file to be imported. 
+     button selection to Remote.
+
+  #. OPTIONAL: To have the data imported into a specific named graph in the
+     store, enter the full IRI of the target graph in the field labelled Graph Name.
+     
+  #. Enter the name of the file to be imported in the field labelled Import File.
      Do not specify the path to the file, just the file name - the server will 
      only look for this file in its Import directory.
 
@@ -304,6 +309,13 @@ To run a Remote import:
      but you can at any time exit Polaris and the job will continue to run on 
      the server.
 
+.. note::
+
+    The IRI entered in the Graph Name field is used only to provide a default graph
+    if the data itself does not specify a graph. When importing from formats that 
+    include graph information (e.g. N-Quads), the graph information contained in the
+    file will always override the graph specified in the Polaris UI.
+    
 .. image:: Images/polaris04.png
 
 To run a Local import:
@@ -312,7 +324,12 @@ To run a Local import:
      store the data is to be imported into and clicking Store > New > Import Job.
 
   #. In the interface that is displayed, ensure the Import Method is set to 
-     Local and enter the full path to the file to be imported - you can use the 
+     Local.
+
+  #. OPTIONAL: To have the data imported into a specific named graph in the
+     store, enter the full IRI of the target graph in the field labelled Graph Name.
+     
+  #. Enter the full path to the file to be imported. Alternatively, you can use the 
      .. button to launch a file browser to locate the file.
 
   #. Click on the Start button.
@@ -327,7 +344,7 @@ To run a Local import:
 .. note::
 
   Local import is not recommended for large data files. If the file you try 
-  to import exceeds 50MB in size a warning will be displayed - you may still 
+  to import exceeds 50MB in size a warning will be displayed. You may still 
   continue with the import, but you may experience better performance if you 
   copy the data file to the server's import folder and use a Remote import 
   instead. This even applies to the case where the server connection type is 
