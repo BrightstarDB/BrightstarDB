@@ -672,3 +672,76 @@ storeC     0              0M
 storeD     0              0M
 ========== ============== =================
 
+.. _Controlling_Transaction_Logging:
+
+********************
+ Transaction Logging
+********************
+
+BrightstarDB provides a persistent text log of the transactions applied to a store. This log is contained in the file
+``transactions.bs`` and is indexed by the file ``transactionheaders.bs``. The purpose of these files is to enable a 
+transaction or set of transactions to be replayed at any time either against the same store or against another 
+store as a form of data synchronization. The BrightstarDB API provides methods for accessing the index; retrieving
+the data for specific transactions from the log files; and replaying transactions.
+
+Disabling Transaction Logging
+=============================
+
+The ``transaction.bs`` file lists the RDF quads inserted and deleted by
+each transaction executed against the store, and so over time this file can grow to be quite large. For this
+reason, from release 1.9 of BrightstarDB it is now possible to control whether a store logs these transactions 
+or not and it is possible for a BrightstarDB server (or embedded application) to control the default setting
+for this configuration.
+
+Disabling Store Logging
+-----------------------
+
+Transaction logging for an individual store is controlled by the existence of the ``transactionheaders.bs`` file
+in the directory for the store. If this file exists when a job is processed, then the data for that job will be logged
+to the ``transactions.bs`` file and an index entry appended to the ``transactionheaders.bs`` file. If the file does not 
+exist when a job is processed, then no data will be logged for that job.
+
+This makes it easy to disable logging on a store - simply delete (or rename) the ``transactionheaders.bs`` and ``transactions.bs``
+files from the store's directory. In either case it is recommended to delete or rename the ``transactionheaders.bs`` file 
+first.
+
+Equally it is easy to enable logging on a store - simply create an empty file named ``transactionheaders.bs`` in the
+store's directory. The ``transactions.bs`` file will be automatically created if it does not exist (if it does exist,
+new transaction data will be logged to the end of the existing file).
+
+Specifying the Server Default
+-----------------------------
+
+For regular Windows/Mono applications or web applications (i.e. those applications that can read from an ``app.config`` or
+``web.config`` file), the default transaction logging configuration can be specified in the ``brightstar`` configuration section::
+
+  <?xml version="1.0"?>
+  <configuration>
+    <configSections>
+      <section name="brightstar" type="BrightstarDB.Config.BrightstarConfigurationSectionHandler, BrightstarDB" />
+    </configSections>
+
+    <appSettings>
+
+        <!-- Other server configuration options can be specified here -->
+    
+    <brightstar>
+    
+      <!-- Disable transaction logging -->
+      <transactionLogging enabled="false" />
+    
+    </brightstar>
+    
+  </configuration>
+  
+
+Alternatively (and for those platforms where there is no support for ``app.config files``), the configuration can be specified
+programatically when creating the client by creating an instance of ``BrightstarDB.Config.EmbeddedServiceConfiguration`` and
+passing that as the optional second parameter to the ``BrightstarService.GetClient()`` method::
+
+    var client = BrightstarService.GetClient(myConnectionString,
+        new EmbeddedServiceConfiguration(enableTransactionLoggingOnNewStores: false));
+
+Note: These options merely set the default logging setting for newly created stores. In effect we are controlling whether or
+not the `transactionheaders.bs` file is created when the store is first created. Logging for an individual store can still
+be enabled or disabled by managing the `transactionheaders.bs` file as described in the section above.

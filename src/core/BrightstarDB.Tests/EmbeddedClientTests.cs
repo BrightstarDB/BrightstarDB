@@ -27,6 +27,7 @@ namespace BrightstarDB.Tests
         [TearDown]
         public void Cleanup()
         {
+            // Ensure a complete shutdown between tests to prevent reuse of the embedded client configuration
             BrightstarService.Shutdown();
         }
         

@@ -23,6 +23,11 @@ marked with FIX.
     
     - NEW: The REST API implementation now reports parser error messages back to the client along with the 400 status code. Polaris has also been
            updated to display these messages to the end-user. Thanks to Daniel Bryars for this contribution.
+           
+    - NEW: It is now possible to configure an embedded BrightstarDB client to not log transaction data. As this transaction data can be quite large,
+           the default for mobile and windows store configurations is now for transaction logging to be disabled. For all other platforms, transaction
+           logging is enabled by default but this default can be overridden either by app settings or programmatically. For more information please
+           refer to :ref:`Controlling_Transaction_Logging`
     
 ****************************
  BrightstarDB 1.8 Release
