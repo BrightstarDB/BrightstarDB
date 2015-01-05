@@ -222,9 +222,27 @@ namespace BrightstarDB
             }
         }
 
+        internal static void LogDebug(string msg)
+        {
+            if (BrightstarTraceSource.Switch.ShouldTrace(TraceEventType.Verbose))
+            {
+                BrightstarTraceSource.TraceInformation(msg);
+            }
+        }
+
+        internal static void LogInfo(string msg)
+        {
+            BrightstarTraceSource.TraceInformation(msg);
+        }
+
         internal static void LogInfo(string msg, params object[] args)
         {
             BrightstarTraceSource.TraceInformation(msg, args);
+        }
+
+        internal static void LogWarning(BrightstarEventId eventId, string msg)
+        {
+            BrightstarTraceSource.TraceEvent(TraceEventType.Warning, (int)eventId, msg);
         }
 
         internal static void LogWarning(BrightstarEventId eventId, string msg, params object[] args)
@@ -232,6 +250,10 @@ namespace BrightstarDB
             BrightstarTraceSource.TraceEvent(TraceEventType.Warning, (int)eventId, msg, args);
         }
 
+        internal static void LogError(BrightstarEventId eventId, string msg)
+        {
+            BrightstarTraceSource.TraceEvent(TraceEventType.Error, (int)eventId, msg);
+        }
 
         internal static void LogError(BrightstarEventId eventId, string msg, params object[] args)
         {
