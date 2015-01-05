@@ -123,11 +123,8 @@ namespace BrightstarDB
             StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
 
             // Advanced embedded application settings - read from the brightstar section of the app/web.config
-            var advancedConfiguration = ConfigurationManager.GetSection("brightstar") as EmbeddedServiceConfiguration;
-            if (advancedConfiguration != null)
-            {
-                EmbeddedServiceConfiguration = advancedConfiguration;
-            }
+            EmbeddedServiceConfiguration = ConfigurationManager.GetSection("brightstar") as EmbeddedServiceConfiguration ??
+                                           new EmbeddedServiceConfiguration();
 
 #endif
 #if !PORTABLE
