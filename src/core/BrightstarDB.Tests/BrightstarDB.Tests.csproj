@@ -112,6 +112,7 @@
     <Compile Include="DataObjectsTests\SparqlConnectionStringTests.cs" />
     <Compile Include="DataObjectsTests\StoreCallbackTests.cs" />
     <Compile Include="DynamicObjectTests.cs" />
+    <Compile Include="EmbeddedClientTests.cs" />
     <Compile Include="EntityFrameworkAssemblyAttributes.cs" />
     <Compile Include="EntityFramework\ContextCallbackTests.cs" />
     <Compile Include="EntityFramework\DotNetRdfContextTests.cs" />

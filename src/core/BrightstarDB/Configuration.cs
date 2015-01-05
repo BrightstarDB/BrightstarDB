@@ -123,10 +123,10 @@ namespace BrightstarDB
             StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
 
             // Advanced embedded application settings - read from the brightstar section of the app/web.config
-            var advancedConfiguration = ConfigurationManager.GetSection("brightstar") as BrightstarConfiguration;
+            var advancedConfiguration = ConfigurationManager.GetSection("brightstar") as EmbeddedServiceConfiguration;
             if (advancedConfiguration != null)
             {
-                PreloadConfiguration = advancedConfiguration.PreloadConfiguration;
+                EmbeddedServiceConfiguration = advancedConfiguration;
             }
 
 #endif
@@ -281,9 +281,9 @@ namespace BrightstarDB
         public static int StatsUpdateTimespan { get; set; }
 
         /// <summary>
-        /// Get or set the configuration for the page cache warmup
+        /// Get or set the additional configuration options for running an embedded service
         /// </summary>
-        public static PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public static EmbeddedServiceConfiguration EmbeddedServiceConfiguration { get; set; }
 
         /// <summary>
         /// Set this property to true to enable the use of virtual nodes in SPARQL

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Threading;
 using BrightstarDB.Client;
 using BrightstarDB.Config;
@@ -36,13 +32,13 @@ namespace BrightstarDB.InternalTests
             PageCache.Instance.Clear();
             Assert.That(PageCache.Instance.Lookup(dataPartition, 1ul), Is.Null);
             client = BrightstarService.GetClient("type=embedded;storesDirectory=" + Path.GetFullPath("preload_test"),
-                                        new ClientConfiguration
-                                            {
-                                                PreloadConfiguration =
-                                                    new PageCachePreloadConfiguration {Enabled = true, DefaultCacheRatio = 1.0m}
-                                            });
+                new EmbeddedServiceConfiguration(new PageCachePreloadConfiguration
+                {
+                    Enabled = true,
+                    DefaultCacheRatio = 1.0m
+                }));
             // Preload runs in the background so give it a bit of time
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
             Assert.That(PageCache.Instance.Lookup(dataPartition, 1ul), Is.Not.Null);
         }
 
@@ -61,13 +57,11 @@ namespace BrightstarDB.InternalTests
             Assert.That(PageCache.Instance.Lookup(dataPartitionB, 1ul), Is.Null);
             Assert.That(PageCache.Instance.Lookup(dataPartitionC, 1ul), Is.Null);
             client = BrightstarService.GetClient("type=embedded;storesDirectory=" + Path.GetFullPath("preload_test"),
-                                        new ClientConfiguration
-                                        {
-                                            PreloadConfiguration =
-                                                new PageCachePreloadConfiguration { Enabled = true, DefaultCacheRatio = 1.0m }
-                                        });
+                new EmbeddedServiceConfiguration(
+                    new PageCachePreloadConfiguration {Enabled = true, DefaultCacheRatio = 1.0m}
+                    ));
             // Preload runs in the background so give it a bit of time
-            Thread.Sleep(500);
+            Thread.Sleep(1000);
             Assert.That(PageCache.Instance.Lookup(dataPartitionB, 1ul), Is.Not.Null);
             Assert.That(PageCache.Instance.Lookup(dataPartitionC, 1ul), Is.Not.Null);
             

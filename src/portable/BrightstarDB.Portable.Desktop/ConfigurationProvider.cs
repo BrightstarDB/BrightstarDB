@@ -16,7 +16,7 @@ namespace BrightstarDB
         public int StatsUpdateTimespan { get; set; }
         public int StatsUpdateTransactionCount { get; set; }
         public int TransactionFlushTripleCount { get; set; }
-        public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public EmbeddedServiceConfiguration EmbeddedServiceConfiguration{ get; set; }
         public bool EnableVirtualizedQueries { get; set; }
 
         #region AppSetting Property Names
@@ -33,6 +33,7 @@ namespace BrightstarDB
         private const string StatsUpdateTimeSpanName = "BrightstarDB.StatsUpdate.TimeSpan";
         private const string CachePreloadRatioName = "BrightstarDB.PageCachePreload.Ratio";
         private const string CachePreloadEnabledName = "BrightstarDB.PageCachePreload.Enabled";
+        private const string TransactionLoggingEnabledName = "BrightstarDB.TransactionLogging.Enabled";
         #endregion
 
         #region Default Values and constants
@@ -97,11 +98,14 @@ namespace BrightstarDB
             TransactionFlushTripleCount = GetApplicationSetting(TxnFlushTriggerPropertyName, DefaultTransactionFlushTripleCount);
 
             // Cache Preload Configuration
-            PreloadConfiguration = new PageCachePreloadConfiguration
+            var preload = new PageCachePreloadConfiguration
             {
                 DefaultCacheRatio = GetApplicationSetting(CachePreloadRatioName, 0.5m),
                 Enabled = GetApplicationSetting(CachePreloadEnabledName, false)
             };
+
+            var transactionLoggingEnabled = GetApplicationSetting(TransactionLoggingEnabledName, true);
+            EmbeddedServiceConfiguration = new EmbeddedServiceConfiguration(preload, transactionLoggingEnabled);
 
         }
 

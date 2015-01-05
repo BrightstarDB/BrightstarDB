@@ -32,16 +32,16 @@ namespace BrightstarDB.Server
             }
         }
 
-        public static ServerCore GetServerCore(string baseLocation, PageCachePreloadConfiguration preloadConfiguration)
+        public static ServerCore GetServerCore(string baseLocation, EmbeddedServiceConfiguration serviceConfiguration)
         {
             lock (UpdateLock)
             {
                 if (!ServerCores.ContainsKey(baseLocation))
                 {
-                    var serverCore = new ServerCore(baseLocation, QueryCache, PersistenceType);
-                    if (preloadConfiguration != null)
+                    var serverCore = new ServerCore(baseLocation, QueryCache, PersistenceType, serviceConfiguration.EnableTransactionLoggingOnNewStores);
+                    if (serviceConfiguration != null && serviceConfiguration.PreloadConfiguration != null)
                     {
-                        serverCore.Warmup(preloadConfiguration);
+                        serverCore.Warmup(serviceConfiguration.PreloadConfiguration);
                     }
                     ServerCores.Add(baseLocation, serverCore);
                 }

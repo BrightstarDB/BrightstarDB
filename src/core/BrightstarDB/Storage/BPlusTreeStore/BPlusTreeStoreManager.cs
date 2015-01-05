@@ -49,12 +49,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
         }
 
-        public IStore CreateStore(string storeLocation, bool readOnly)
+        public IStore CreateStore(string storeLocation, bool readOnly, bool withTransactionLogging)
         {
-            return CreateStore(storeLocation, _storeConfiguration.PersistenceType, readOnly);
+            return CreateStore(storeLocation, _storeConfiguration.PersistenceType, readOnly, withTransactionLogging);
         }
 
-        public IStore CreateStore(string storeLocation, PersistenceType storePersistenceType, bool readOnly)
+        public IStore CreateStore(string storeLocation, PersistenceType storePersistenceType, bool readOnly, bool withTransactionLogging)
         {
             Logging.LogInfo("Create Store {0} with persistence type {1}", storeLocation, storePersistenceType);
             if (_persistenceManager.DirectoryExists(storeLocation))
@@ -83,11 +83,18 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     dataPageStore = new BinaryFilePageStore(_persistenceManager, dataFilePath, PageSize, false, 0, 1, _storeConfiguration.DisableBackgroundWrites);
                     break;
             }
+
             IPageStore resourcePageStore = new AppendOnlyFilePageStore(_persistenceManager, resourceFilePath, PageSize, false, _storeConfiguration.DisableBackgroundWrites);
             var resourceTable = new ResourceTable(resourcePageStore);
             using (var store = new Store(storeLocation, dataPageStore, resourceTable))
             {
                 store.Commit(Guid.Empty);
+            }
+
+            if (withTransactionLogging)
+            {
+                _persistenceManager.CreateFile(Path.Combine(storeLocation, "transactionheaders.bs"));
+                _persistenceManager.CreateFile(Path.Combine(storeLocation, "transactions.bs"));
             }
 
             Logging.LogInfo("Store created at {0}", storeLocation);
@@ -179,6 +186,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public virtual ITransactionLog GetTransactionLog(string storeLocation)
         {
+            
             return new PersistentTransactionLog(_persistenceManager, storeLocation);
         }
 
