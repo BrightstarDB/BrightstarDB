@@ -21,6 +21,9 @@ marked with FIX.
     
     - NEW: The Polaris UI now allows the default graph IRI to be specified for import operations. Thanks to Daniel Bryars for this contribution.
     
+    - NEW: The REST API implementation now reports parser error messages back to the client along with the 400 status code. Polaris has also been
+           updated to display these messages to the end-user. Thanks to Daniel Bryars for this contribution.
+    
 ****************************
  BrightstarDB 1.8 Release
 ****************************
