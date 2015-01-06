@@ -28,6 +28,10 @@ marked with FIX.
            the default for mobile and windows store configurations is now for transaction logging to be disabled. For all other platforms, transaction
            logging is enabled by default but this default can be overridden either by app settings or programmatically. For more information please
            refer to :ref:`Controlling_Transaction_Logging`
+           
+    - NEW: The Entity Framework now allows the creation of Id properties whose value is the full IRI of the underlying RDF resource (without any
+           predefined prefix). This is achieved by using the Identifier decorator with an empty string for the BaseAddress parameters ([Identifier("")]).
+           For more information please refer to :ref:`Identifier_Attribute` in the Entity Framework :ref:`Annotations_Guide`.
     
 ****************************
  BrightstarDB 1.8 Release

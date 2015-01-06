@@ -150,6 +150,7 @@
     <Compile Include="EntityFramework\IMarket.cs" />
     <Compile Include="EntityFramework\ISession.cs" />
     <Compile Include="EntityFramework\ITrackable.cs" />
+    <Compile Include="EntityFramework\IUriEntity.cs" />
     <Compile Include="EntityFramework\LinqTests.cs" />
     <Compile Include="EntityFramework\IAnimal.cs" />
     <Compile Include="EntityFramework\IPerson.cs" />

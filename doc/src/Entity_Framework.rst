@@ -249,6 +249,8 @@ The following example shows how this is defined::
 No annotation is required. It is also acceptable for the property to be called ``ID``, ``{Type}Id`` or 
 ``{Type}ID`` where ``{Type}`` is the name of the type. E.g: ``PersonId`` or ``PersonID``.
 
+.. _Identifier_Attribute:
+
 Identifier Attribute
 --------------------
 
@@ -276,6 +278,32 @@ where {prefix} is a namespace prefix defined by the Namespace Declaration Attrib
   
 The ``Identifier`` attribute has additional arguments that enable you to specify a (composite)
 key for the type. For more information please refer to the section :ref:`Key_Properties_In_EF`.
+
+From BrightstarDB release 1.9 it is possible to specify an empty string as the identifier prefix.
+When this is done, the value assigned to the Id property MUST be a absolute URI as it is used
+unaltered in the generated RDF triples. This gives your application complete control over the 
+URIs used in the RDF data, but it also requires that your application manages the generation
+of those URIs::
+
+  [Entity]
+  public interface ICompany {
+    [Identifier("")]
+    string Id {get;}
+  }
+  
+**NOTE**: When using an empty string identifier prefix like this, the ``Create()`` method on the
+context collection will automatically generate a URI with the prefix ``http://www.brightstardb.com/.well-known/genid/``.
+To avoid this, you should instead create the entity directly using the constructor and
+add it to the context. There are several ways in which this can be done::
+
+    var co1 = context.Companies.Create();                           // This will get a BrightstarDB genid URI
+    
+    var co2 = new Company { Id = "http://contoso.com/" };           // Create an entity with the URI http://contoso.com
+    context.Companies.Add(co2);                                     // ...then add it to the context
+    
+    var co3 = new Company(context) { Id = "http://example.com" };   // Create and add in a single line
+    context.Companies.Add(
+        new Company { Id = "http://networkedplanet.com" } );        // Alternate single-line approach
 
 
 Property Inclusion

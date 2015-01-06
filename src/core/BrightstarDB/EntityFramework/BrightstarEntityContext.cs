@@ -798,7 +798,7 @@ namespace BrightstarDB.EntityFramework
             string prefix = identifierInfo == null ? null : identifierInfo.BaseUri;
             var dataObject = identifierInfo != null && identifierInfo.KeyProperties != null
                 ? null
-                : _store.MakeNewDataObject(prefix);
+                : _store.MakeNewDataObject( String.Empty.Equals(prefix) ? Constants.GeneratedUriPrefix : prefix);
             if (dataObject != null)
             {
                 IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(domainObjectType);

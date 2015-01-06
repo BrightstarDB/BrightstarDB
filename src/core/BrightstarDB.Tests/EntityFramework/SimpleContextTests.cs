@@ -1235,6 +1235,60 @@ where {
         }
 
         [Test]
+        public void TestEmptyStringIdentifierPrefix()
+        {
+            var dataStoreName = "TestEmptyStringIdentifierPrefix_" + DateTime.UtcNow.Ticks;
+            using (var dataStore = _dataObjectContext.CreateStore(dataStoreName))
+            {
+                using (var context = new MyEntityContext(dataStore))
+                {
+                    var fido = new UriEntity {Id = "http://brightstardb.com/instances/Animals/fido", Label = "Fido"};
+                    context.UriEntities.Add(fido);
+                    var bob = new UriEntity(context) { Id = "http://example.org/people/bob", Label = "Bob" };
+                    context.SaveChanges();
+                }
+                var fidoDo =
+                    dataStore.BindDataObjectsWithSparql(
+                        "SELECT ?f WHERE { ?f <http://www.w3.org/2000/01/rdf-schema#label> \"Fido\"^^<http://www.w3.org/2001/XMLSchema#string> }").FirstOrDefault();
+                Assert.IsNotNull(fidoDo);
+                Assert.AreEqual(fidoDo.Identity, "http://brightstardb.com/instances/Animals/fido");
+                using (var context = new MyEntityContext(dataStore))
+                {
+                    var fido =
+                        context.UriEntities.FirstOrDefault(
+                            x => x.Id.Equals("http://brightstardb.com/instances/Animals/fido"));
+                    Assert.NotNull(fido);
+                    Assert.That(fido.Label, Is.EqualTo("Fido"));
+
+                    var bob = context.UriEntities.FirstOrDefault(x => x.Label.Equals("Bob"));
+                    Assert.NotNull(bob);
+                    Assert.That(bob.Id, Is.EqualTo("http://example.org/people/bob"));
+                }
+            }
+        }
+
+        [Test]
+        public void TestCreateMethodGeneratesValidUriForEmptyIdentifierPrefix()
+        {
+            var dataStoreName = "TestEmptyStringIdentifierPrefix_" + DateTime.UtcNow.Ticks;
+            using (var dataStore = _dataObjectContext.CreateStore(dataStoreName))
+            {
+                using (var context = new MyEntityContext(dataStore))
+                {
+                    var test = context.UriEntities.Create();
+                    test.Label = "Test";
+                    context.SaveChanges();
+                }
+                var testDo =
+                    dataStore.BindDataObjectsWithSparql(
+                        "SELECT ?f WHERE { ?f <http://www.w3.org/2000/01/rdf-schema#label> \"Test\"^^<http://www.w3.org/2001/XMLSchema#string> }")
+                        .FirstOrDefault();
+                Assert.IsNotNull(testDo);
+                Assert.IsTrue(testDo.Identity.StartsWith(Constants.GeneratedUriPrefix), "Unexpected identity: {0}. Expected a URI with the prefix {1}", testDo.Identity, Constants.GeneratedUriPrefix);
+            }
+        }
+
+        [Test]
         public void TestSkipAndTake()
         {
             string storeName = Guid.NewGuid().ToString();
