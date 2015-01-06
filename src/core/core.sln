@@ -1,16 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E88178BE-AB2F-46BF-96FD-991A29B58A11}"
-	ProjectSection(SolutionItems) = preProject
-		BrightstarDB.vsmdi = BrightstarDB.vsmdi
-		Local.testsettings = Local.testsettings
-		MemoryProfiling.psess = MemoryProfiling.psess
-		Performance.testsettings = Performance.testsettings
-		Performance1.psess = Performance1.psess
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
-EndProject
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB", "BrightstarDB\BrightstarDB.csproj", "{121A81F3-EB1C-4228-81FB-0D7505A438FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Tests", "BrightstarDB.Tests\BrightstarDB.Tests.csproj", "{4EB8BF43-94B1-4264-B2C9-9EE1BAB7F094}"
@@ -47,9 +39,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.AspNet.Secured", "BrightstarDB.Server.AspNet.Secured\BrightstarDB.Server.AspNet.Secured.csproj", "{47A553A3-2214-40B7-A6C5-EC2609B53B3F}"
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = BrightstarDB.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -194,13 +183,16 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{4EB8BF43-94B1-4264-B2C9-9EE1BAB7F094} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{AD5F5943-9756-4582-91CB-7F4456A87175} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{A49EA4CE-01D4-4DFF-BF28-603850AB810D} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{AF58BD97-6900-49EB-A41C-7D8168AF052C} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{B7BB84F3-3CB8-4D9D-B1C1-2CF4EEAE5A22} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{523BB67E-CEB7-4144-AACB-AB5937F8872E} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{DF96239F-5240-475C-BD33-52F0EE2536C2} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
-		{4EB8BF43-94B1-4264-B2C9-9EE1BAB7F094} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = BrightstarDB.vsmdi
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = BrightstarDB.vsmdi
