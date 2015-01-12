@@ -14,7 +14,7 @@ namespace BrightstarDB
         public int StatsUpdateTimespan { get; set; }
         public int StatsUpdateTransactionCount { get; set; }
         public int TransactionFlushTripleCount { get; set; }
-        public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public EmbeddedServiceConfiguration EmbeddedServiceConfiguration { get; set; }
         public bool EnableVirtualizedQueries { get; set; }
 
 
@@ -55,12 +55,12 @@ namespace BrightstarDB
             StatsUpdateTimespan = DefaultStatsUpdateTimespan;
 
             // Cache Preload Configuration
-            PreloadConfiguration = new PageCachePreloadConfiguration
+            var preloadConfig = new PageCachePreloadConfiguration
             {
                 DefaultCacheRatio = DefaultPreloadCacheRatio,
                 Enabled = DefaultPreloadCacheEnabled
             };
-
+            EmbeddedServiceConfiguration = new EmbeddedServiceConfiguration(preloadConfig, false);
 
         }
 
