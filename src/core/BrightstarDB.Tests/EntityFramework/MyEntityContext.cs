@@ -90,6 +90,8 @@ namespace BrightstarDB.Tests.EntityFramework
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IStringKeyEntity, BrightstarDB.Tests.EntityFramework.StringKeyEntity>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ITrackable));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ITrackable, BrightstarDB.Tests.EntityFramework.Trackable>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IUriEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IUriEntity, BrightstarDB.Tests.EntityFramework.UriEntity>();
     	}
     	
     	/// <summary>
@@ -187,6 +189,7 @@ namespace BrightstarDB.Tests.EntityFramework
     		Skills = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ISkill>(this);
     		StringKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IStringKeyEntity>(this);
     		Trackables = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ITrackable>(this);
+    		UriEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IUriEntity>(this);
     	}
     	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.IAnimal> Animals
@@ -349,6 +352,11 @@ namespace BrightstarDB.Tests.EntityFramework
     		get; private set;
     	}
     	
+    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IUriEntity> UriEntities
+    	{
+    		get; private set;
+    	}
+    	
         public IEntitySet<T> EntitySet<T>() where T : class {
             var itemType = typeof(T);
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IAnimal))) {
@@ -446,6 +454,9 @@ namespace BrightstarDB.Tests.EntityFramework
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ITrackable))) {
                 return (IEntitySet<T>)this.Trackables;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IUriEntity))) {
+                return (IEntitySet<T>)this.UriEntities;
             }
             throw new InvalidOperationException(typeof(T).FullName + " is not a recognized entity interface type.");
         }
@@ -1634,6 +1645,25 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
             		get { return GetRelatedProperty<System.DateTime>("LastModified"); }
             		set { SetRelatedProperty("LastModified", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
+    public partial class UriEntity : BrightstarEntityObject, IUriEntity 
+    {
+    	public UriEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public UriEntity(BrightstarEntityContext context) : base(context, typeof(UriEntity)) { }
+    	public UriEntity() : base() { }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.IUriEntity
+    
+    	public System.String Label
+    	{
+            		get { return GetRelatedProperty<System.String>("Label"); }
+            		set { SetRelatedProperty("Label", value); }
     	}
     	#endregion
     }

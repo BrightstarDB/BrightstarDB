@@ -22,6 +22,7 @@ namespace BrightstarDB.Polaris.ViewModel
         public delegate void ImportJobDelegate();
         private Dispatcher _dispatcher;
         private string _importFileName;
+        private string _importGraphName;
         private string _progressText;
         private bool _isValid;
         private bool _isLocalImport = true;
@@ -59,6 +60,7 @@ namespace BrightstarDB.Polaris.ViewModel
             }
         }
 
+        public string ImportGraphName { get { return _importGraphName; } set { _importGraphName = value; RaisePropertyChanged("ImportGraphName"); } }
         public string ProgressText { get { return _progressText; } set { _progressText = value; RaisePropertyChanged("ProgressText"); } }
         public bool IsValid { get { return _isValid; } set { _isValid = value; RaisePropertyChanged("IsValid"); } }
         public RelayCommand LocalImportCheckedCommand { get; private set; }
@@ -174,7 +176,12 @@ namespace BrightstarDB.Polaris.ViewModel
                         }
                     }
                     var client = BrightstarService.GetClient(Store.Source.ConnectionString);
-                    _transactionJob = client.ExecuteTransaction(Store.Location, String.Empty, String.Empty, lines, waitForCompletion:false);
+
+                    String graphUri = !String.IsNullOrWhiteSpace(ImportGraphName)
+                        ? ImportGraphName 
+                        : Constants.DefaultGraphUri;
+
+                    _transactionJob = client.ExecuteTransaction(Store.Location, String.Empty, String.Empty, lines, waitForCompletion: false, defaultGraphUri: graphUri);
                     _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle,
                                             new TransactionViewModel.JobMonitorDelegate(CheckJobStatus));
                 }

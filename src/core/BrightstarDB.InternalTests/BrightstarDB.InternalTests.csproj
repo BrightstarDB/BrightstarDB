@@ -95,6 +95,7 @@
     <Compile Include="BrokenStoreTests.cs" />
     <Compile Include="BTreeStoreTests.cs" />
     <Compile Include="BTreeTests.cs" />
+    <Compile Include="ConfigurationSectionHandlerTests.cs" />
     <Compile Include="DotNetRdfStoreTests.cs" />
     <Compile Include="PreloadTests.cs" />
     <Compile Include="RdfXmlWriterTests.cs" />

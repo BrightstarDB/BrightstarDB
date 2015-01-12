@@ -26,7 +26,7 @@ namespace BrightstarDB
         public static int StatsUpdateTimespan { get { return Instance.StatsUpdateTimespan; } set { Instance.StatsUpdateTimespan = value; } }
         public static int StatsUpdateTransactionCount { get { return Instance.StatsUpdateTransactionCount; } set { Instance.StatsUpdateTransactionCount = value; } }
         public static int TransactionFlushTripleCount { get { return Instance.TransactionFlushTripleCount; } set { Instance.TransactionFlushTripleCount = value; } }
-        public static PageCachePreloadConfiguration PreloadConfiguration { get { return Instance.PreloadConfiguration; } set { Instance.PreloadConfiguration = value; } }
+        public static EmbeddedServiceConfiguration EmbeddedServiceConfiguration { get { return Instance.EmbeddedServiceConfiguration; } set { Instance.EmbeddedServiceConfiguration = value; } }
         public static bool EnableVirtualizedQueries { get { return Instance.EnableVirtualizedQueries; } set { Instance.EnableVirtualizedQueries = value; } }
     }
 
@@ -43,7 +43,7 @@ namespace BrightstarDB
 
         int TransactionFlushTripleCount { get; set; }
 
-        PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        EmbeddedServiceConfiguration EmbeddedServiceConfiguration{ get; set; }
 
         bool EnableVirtualizedQueries { get; set; }
     }

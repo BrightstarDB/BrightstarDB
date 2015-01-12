@@ -14,6 +14,31 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX.
 
 ****************************
+ BrightstarDB 1.9 Release
+****************************
+
+    - NEW: The W3C SPARQL 1.1 Graph Store Protocol is now implemented by the BrightstarDB service. See :ref:`SPARQL_Endpoint` for more information.
+    
+    - NEW: The Polaris UI now allows the default graph IRI to be specified for import operations. Thanks to Daniel Bryars for this contribution.
+    
+    - NEW: The REST API implementation now reports parser error messages back to the client along with the 400 status code. Polaris has also been
+           updated to display these messages to the end-user. Thanks to Daniel Bryars for this contribution.
+           
+    - NEW: It is now possible to configure an embedded BrightstarDB client to not log transaction data. As this transaction data can be quite large,
+           the default for mobile and windows store configurations is now for transaction logging to be disabled. For all other platforms, transaction
+           logging is enabled by default but this default can be overridden either by app settings or programmatically. For more information please
+           refer to :ref:`Controlling_Transaction_Logging`
+           
+    - **BREAKING**: There is a minor API change to the BrightstarDB.Configuration API. The PreloadConfiguration property has been replaced with the
+            EmbeddedServiceConfiguration property (the PreloadConfiguration can be found as a property of the EmbeddedServiceConfiguration). This 
+            change will only affect applications which programmatically set the page cache preload configuration. Applications which use the app.config
+            or web.config file to configure page cache preload should not be affected by this change.
+           
+    - NEW: The Entity Framework now allows the creation of Id properties whose value is the full IRI of the underlying RDF resource (without any
+           predefined prefix). This is achieved by using the Identifier decorator with an empty string for the BaseAddress parameters ([Identifier("")]).
+           For more information please refer to :ref:`Identifier_Attribute` in the Entity Framework :ref:`Annotations_Guide`.
+    
+****************************
  BrightstarDB 1.8 Release
 ****************************
 

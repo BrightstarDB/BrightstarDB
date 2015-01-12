@@ -79,6 +79,7 @@
       <DependentUpon>MyEntityContext.tt</DependentUpon>
     </Compile>
     <Compile Include="DataObjectTests.cs" />
+    <Compile Include="GraphStoreProtocolTests.cs" />
     <Compile Include="OptimisticLockingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteProxyTests.cs" />

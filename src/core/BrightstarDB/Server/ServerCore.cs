@@ -32,7 +32,9 @@ namespace BrightstarDB.Server
 
         private readonly ICache _queryCache;
 
-        public ServerCore(string baseLocation, ICache queryCache, PersistenceType persistenceType)
+        private readonly bool _enableTransactionLogging;
+
+        public ServerCore(string baseLocation, ICache queryCache, PersistenceType persistenceType, bool enableTransactionLoggingOnNewStores)
         {
             Logging.LogInfo("ServerCore Initialised {0}", baseLocation);
             _baseLocation = baseLocation;
@@ -40,6 +42,7 @@ namespace BrightstarDB.Server
             var configuration = new StoreConfiguration {PersistenceType = persistenceType};
             _storeManager = StoreManagerFactory.GetStoreManager(configuration);
             _queryCache = queryCache;
+            _enableTransactionLogging = enableTransactionLoggingOnNewStores;
         }
 
         /// <summary>
@@ -76,7 +79,7 @@ namespace BrightstarDB.Server
         {
             Logging.LogInfo("Create Store");
             var sid = Guid.NewGuid().ToString();
-            _storeManager.CreateStore(Path.Combine(_baseLocation, sid), true);
+            _storeManager.CreateStore(Path.Combine(_baseLocation, sid), true, _enableTransactionLogging);
             Logging.LogInfo("Store id is {0}", sid);
             return sid;
         }
@@ -84,7 +87,7 @@ namespace BrightstarDB.Server
         public string CreateStore(string storeName, PersistenceType persistenceType)
         {
             Logging.LogInfo("Create Store");
-            var store = _storeManager.CreateStore(Path.Combine(_baseLocation, storeName), persistenceType, true);
+            var store = _storeManager.CreateStore(Path.Combine(_baseLocation, storeName), persistenceType, true, _enableTransactionLogging);
             store.Close();
             Logging.LogInfo("Store id is {0}", storeName);
             return storeName;
@@ -535,6 +538,12 @@ namespace BrightstarDB.Server
                 if (result == 0) result= this.DataSize.CompareTo(other.DataSize);
                 return result;
             }
+        }
+
+        public IEnumerable<string> ListNamedGraphs(string storeName)
+        {
+            var storeWorker = GetStoreWorker(storeName);
+            return storeWorker.ListNamedGraphs();
         }
     }
 }

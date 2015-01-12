@@ -204,7 +204,7 @@ namespace BrightstarDB.EntityFramework
         private static IdentityInfo GetIdentityInfo(AssemblyMappingInfo assemblyMappingInfo, Type entityType,
             PropertyInfo identityProperty, IdentifierAttribute identifierAttr)
         {
-            string baseUri = identifierAttr == null || String.IsNullOrWhiteSpace(identifierAttr.BaseAddress)
+            string baseUri = identifierAttr == null || identifierAttr.BaseAddress == null
                                  ? Constants.GeneratedUriPrefix
                                  : assemblyMappingInfo.ResolveIdentifier(identifierAttr.BaseAddress);
             if (identifierAttr != null && identifierAttr.KeyProperties != null && identifierAttr.KeyProperties.Length > 0)
@@ -379,6 +379,8 @@ namespace BrightstarDB.EntityFramework
 
             public string ResolveIdentifier(string identifier)
             {
+                // An explicit empty string identifier always ignores the global base URI
+                if (String.Empty.Equals(identifier)) return String.Empty;
                 var ix = identifier.IndexOf(':');
                 if (ix > 0 && ix < identifier.Length - 1)
                 {

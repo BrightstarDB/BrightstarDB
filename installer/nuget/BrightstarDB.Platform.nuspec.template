@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This package contains the platform-specific assemblies for running BrightstarDB using Portable Class Library.</description>
 	<releaseNotes>$releaseNotes$</releaseNotes>
-    <copyright>Copyright 2014 Khalil Ahmed, Graham Moore, and other contributors</copyright>
+    <copyright>Copyright 2015 Khalil Ahmed, Graham Moore, and other contributors</copyright>
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
     <dependencies>
       <dependency id="BrightstarDBLibs" version="[$version$]" />

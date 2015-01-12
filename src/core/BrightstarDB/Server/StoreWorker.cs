@@ -499,5 +499,14 @@ namespace BrightstarDB.Server
 #endif
             ReadStore.WarmupPageCache(pagesToPreload);
         }
+
+        /// <summary>
+        /// Get the identifiers of the named graphs in the store
+        /// </summary>
+        /// <returns>An enumeration of the identifiers of the named graphs in the store</returns>
+        public IEnumerable<string> ListNamedGraphs()
+        {
+            return ReadStore.GetGraphUris().Where(x => x != Constants.DefaultGraphUri);
+        }
     }
 }

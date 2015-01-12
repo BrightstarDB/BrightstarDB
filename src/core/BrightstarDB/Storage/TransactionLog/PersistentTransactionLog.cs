@@ -18,6 +18,12 @@ namespace BrightstarDB.Storage.TransactionLog
         {
             _persistenceManager = persistenceManager;
             _storeLocation = storeLocation;
+            CheckEnabled();
+        }
+
+        private void CheckEnabled()
+        {
+            IsEnabled = _persistenceManager.FileExists(GetTransactionLogHeaderFile());
         }
 
         #region Implementation of ITransactionLog
@@ -28,12 +34,17 @@ namespace BrightstarDB.Storage.TransactionLog
         /// </summary>
         private ulong _currentTransactionDataStartPosition;
 
+        public bool IsEnabled { get; private set; }
+
         /// <summary>
         /// Logs the transaction data to the file and remembers the start position.
         /// </summary>
         /// <param name="itemToLog"></param>
         public void LogStartTransaction(ILoggable itemToLog)
         {
+            CheckEnabled();
+            if (!IsEnabled) return;
+
             // get the start position
             _currentTransactionDataStartPosition = (ulong) _persistenceManager.GetFileLength(GetTransactionLogFile());
 
@@ -50,6 +61,8 @@ namespace BrightstarDB.Storage.TransactionLog
         /// <param name="itemToLog"></param>
         public void LogEndSuccessfulTransaction(ILoggable itemToLog)
         {
+            if (!IsEnabled) return;
+
             var endPosition = (ulong) _persistenceManager.GetFileLength(GetTransactionLogFile());
             var contentLength = endPosition - _currentTransactionDataStartPosition;
 
@@ -68,6 +81,7 @@ namespace BrightstarDB.Storage.TransactionLog
 
         public void LogEndFailedTransaction(ILoggable itemToLog)
         {
+            if (!IsEnabled) return;
             var endPosition = (ulong) _persistenceManager.GetFileLength(GetTransactionLogFile());
             var contentLength = endPosition - _currentTransactionDataStartPosition;
 

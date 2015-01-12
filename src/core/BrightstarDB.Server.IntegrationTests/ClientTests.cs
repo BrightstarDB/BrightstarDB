@@ -16,6 +16,9 @@ namespace BrightstarDB.Server.IntegrationTests
     public class ClientTests : ClientTestBase
     {
         private readonly string _storeLocation;
+
+        private const string Triple1 = "<http://example.org/s> <http://example.org/p> <http://example.org/o> .";
+        private const string Triple2 = "<http://example.org/s> <http://example.org/p> \"o\" .";
         public ClientTests()
         {
 #if PORTABLE
@@ -149,6 +152,29 @@ namespace BrightstarDB.Server.IntegrationTests
             var bc = GetClient();
             var stores = bc.ListStores();
             Assert.IsTrue(stores.Count() > 0);
+        }
+
+        [Test]
+        public void TestListNamedGraphs()
+        {
+            var client = GetClient();
+            var storeName = "Client.TestListNamedGraphs_" + DateTime.Now.Ticks;
+            client.CreateStore(storeName);
+            AssertUpdateTransaction(client, storeName, new UpdateTransactionData
+            {
+                DefaultGraphUri = "http://example.org/g1",
+                InsertData = Triple1
+            });
+            AssertUpdateTransaction(client, storeName, new UpdateTransactionData
+            {
+                DefaultGraphUri = "http://example.org/g2",
+                InsertData = Triple2
+            });
+
+            var namedGraphs = client.ListNamedGraphs(storeName).ToList();
+            Assert.That(namedGraphs.Count, Is.EqualTo(2));
+            CollectionAssert.Contains(namedGraphs, "http://example.org/g1");
+            CollectionAssert.Contains(namedGraphs, "http://example.org/g2");
         }
 
         [Test]
@@ -822,22 +848,7 @@ WHERE { ?s ?p 'foo' }";
             Assert.IsTrue(job.JobCompletedOk, "Job did not complete successfully: {0} : {1}", job.StatusMessage, job.ExceptionInfo);
         }
 
-        private static IJobInfo WaitForJob(IJobInfo job, IBrightstarService client, string storeName)
-        {
-            var cycleCount = 0;
-            while (!job.JobCompletedOk && !job.JobCompletedWithErrors && cycleCount < 100)
-            {
-                Thread.Sleep(500);
-                cycleCount++;
-                job = client.GetJobInfo(storeName, job.JobId);
-            }
-            if (!job.JobCompletedOk && !job.JobCompletedWithErrors)
-            {
-                Assert.Fail("Job did not complete in time.");
-            }
-            return job;
-        }
-
+        
         [Test]
         public void TestConsolidatePopulatedStore()
         {
@@ -1223,37 +1234,7 @@ WHERE { ?s ?p 'foo' }";
             Assert.That(updatedCommitPoints, Has.Count.EqualTo(2));
         }
 
-        private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
-                                              string graphUri)
-        {
-            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
-        }
 
-        private static void AssertTriplePatternInDefaultGraph(IBrightstarService client, string storeName,
-                                                              string triplePattern)
-        {
-            var sparql = "ASK {{" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
-        }
-
-        private static void AssertTriplePatternNotInGraph(IBrightstarService client, string storeName, string triplePattern,
-                                      string graphUri)
-        {
-            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
-        }
-
-        private static void AssertTriplePatternNotInDefaultGraph(IBrightstarService client, string storeName,
-                                                              string triplePattern)
-        {
-            var sparql = "ASK {{" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
-        }
 
 //        private IJobInfo PollToCompletion(IBrightstarService client, string storeName, IJobInfo job)
 //        {

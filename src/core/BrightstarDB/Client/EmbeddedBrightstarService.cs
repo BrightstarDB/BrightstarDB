@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 #if !PORTABLE && !WINDOWS_PHONE
 #endif
+using BrightstarDB.Config;
 using BrightstarDB.Dto;
 using BrightstarDB.Storage;
 using BrightstarDB.Server;
@@ -23,19 +24,35 @@ namespace BrightstarDB.Client
         /// </summary>
         public DateTime? LastResponseTimestamp { get { return null; } }
 
+
         /// <summary>
         /// Create a new instance of the service that attaches to the specified directory location
         /// </summary>
         /// <param name="baseLocation">The full path to the location of the directory that contains one or more Brightstar stores</param>
-        /// <param name="clientConfiguration">An optional configuration for the client.</param>
+        /// <remarks>The embedded server is thread-safe but doesn't support concurrent access to the same base location by multiple
+        /// instances. You should ensure in your code that only one EmbeddedBrightstarService instance is connected to any given base location
+        /// at a given time. For additional control over the service internals, it is recommended to use the overload of this constructor
+        /// that accepts a <see cref="EmbeddedServiceConfiguration"/></remarks>
+        /// 
+        public EmbeddedBrightstarService(string baseLocation)
+            : this(baseLocation, Configuration.EmbeddedServiceConfiguration)
+        {
+            
+        }
+        
+        /// <summary>
+        /// Create a new instance of the service that attaches to the specified directory location
+        /// </summary>
+        /// <param name="baseLocation">The full path to the location of the directory that contains one or more Brightstar stores</param>
+        /// <param name="serviceConfigurationOptions">OPTIONAL: Additional configuration options that apply only when creating an embedded service instance.</param>
         /// <remarks>The embedded server is thread-safe but doesn't support concurrent access to the same base location by multiple
         /// instances. You should ensure in your code that only one EmbeddedBrightstarService instance is connected to any given base location
         /// at a given time.</remarks>
-        public EmbeddedBrightstarService(string baseLocation, ClientConfiguration clientConfiguration = null)
+        public EmbeddedBrightstarService(string baseLocation, EmbeddedServiceConfiguration serviceConfigurationOptions)
         {
             _serverCore = ServerCoreManager.GetServerCore(
-                baseLocation, 
-                clientConfiguration == null ? null : clientConfiguration.PreloadConfiguration);
+                baseLocation,
+                serviceConfigurationOptions ?? Configuration.EmbeddedServiceConfiguration);
         }
 
         #region Implementation of IBrightstarService
@@ -131,6 +148,29 @@ namespace BrightstarDB.Client
             {
                 Logging.LogError(BrightstarEventId.ServerCoreException, "Error checking if store exists. Store {0}", storeName);
                 throw new BrightstarClientException("Error checking if store exists store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// List the URIs of the named graphs contained in the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store</param>
+        /// <returns>An enumeration of the URI identifiers of the named graphs in the store.</returns>
+        public IEnumerable<string> ListNamedGraphs(string storeName)
+        {
+            if (storeName == null)
+                throw new ArgumentNullException("storeName", Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
+            if (String.IsNullOrEmpty(storeName))
+                throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString,
+                                            "storeName");
+            try
+            {
+                return _serverCore.ListNamedGraphs(storeName);
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error listing named graphs for store {0}.", storeName);
+                throw new BrightstarClientException("Error listing named graphs for store " + storeName + ". " + ex.Message, ex);
             }
         }
 

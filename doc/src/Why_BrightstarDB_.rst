@@ -126,7 +126,7 @@ web based applications is simple and fun with BrightstarDB.
 
 Objects are composed of properties, each property is either a literal value 
 or a reference to another object. This creates a graph or related things with 
-properties. ORM systems requires that tables are organised is specific ways 
+properties. ORM systems require that tables are organised in specific ways 
 to facilitate storing object state. Changes to either the object model or the 
 relational schema often require a reciprocal change. RDF on the other hand 
 can ideally be used to store both literal properties and object relationships 
