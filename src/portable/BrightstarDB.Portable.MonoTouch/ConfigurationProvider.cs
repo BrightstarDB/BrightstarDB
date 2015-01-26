@@ -2,8 +2,7 @@ using System;
 using BrightstarDB.Caching;
 using BrightstarDB.Config;
 using BrightstarDB.Storage;
-using Foundation;
-
+using MonoTouch.Foundation;
 
 namespace BrightstarDB
 {

@@ -1,9 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using BrightstarDB.Storage;
+using MonoTouch.Foundation;
+using MonoTouch.UIKit;
 using NUnit.Framework;
 
-namespace BrightstarDB.Portable.iOS.Tests
+namespace BrightstarDB.Portable.MonoTouch.Tests
 {
     [TestFixture]
     public class StorageTests

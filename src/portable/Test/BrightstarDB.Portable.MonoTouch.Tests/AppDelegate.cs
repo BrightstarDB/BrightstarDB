@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Foundation;
-using UIKit;
+using MonoTouch.Foundation;
+using MonoTouch.UIKit;
 using MonoTouch.NUnit.UI;
 
-namespace BrightstarDB.Portable.iOS.Tests
+namespace BrightstarDB.Portable.MonoTouch.Tests
 {
     // The UIApplicationDelegate for the application. This class is responsible for launching the 
     // User Interface of the application, as well as listening (and optionally responding) to 
