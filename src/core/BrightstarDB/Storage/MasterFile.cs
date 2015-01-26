@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +8,8 @@ using BrightstarDB.Client;
 #if PORTABLE 
 using BrightstarDB.Portable.Compatibility;
 using Array = BrightstarDB.Portable.Compatibility.Array;
+#else
+using System.Collections.Concurrent;
 #endif
 
 namespace BrightstarDB.Storage
@@ -67,7 +68,7 @@ namespace BrightstarDB.Storage
         public Guid StoreId { get; private set; }
 
 
-        private ConcurrentDictionary<long, CommitPoint> _commitPoints; 
+        private readonly ConcurrentDictionary<long, CommitPoint> _commitPoints; 
 
         public static MasterFile Create(IPersistenceManager persistenceManager, string directoryPath,
                                         StoreConfiguration storeConfiguration, Guid storeSetId)

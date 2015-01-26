@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +7,8 @@ using BrightstarDB.Storage.Statistics;
 using BrightstarDB.Storage.TransactionLog;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
+#else
+using System.Collections.Concurrent;
 #endif
 
 namespace BrightstarDB.Storage.BPlusTreeStore
