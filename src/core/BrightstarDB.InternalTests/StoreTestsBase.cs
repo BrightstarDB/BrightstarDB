@@ -9,6 +9,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
+using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
 using NUnit.Framework;
 
@@ -1052,6 +1053,8 @@ namespace BrightstarDB.InternalTests
             // Open it now and we will be back to the second commit point
             // Need to clear the page cache to ensure that in this simple test we don't get an old cached version of the page
             PageCache.Instance.Clear();
+            BPlusTreeStoreManager.MasterFileCache.Clear();
+
             using (var store = StoreManager.OpenStore(storePath))
             {
                 Assert.AreEqual(2, store.GetCommitPoints().First().CommitNumber);

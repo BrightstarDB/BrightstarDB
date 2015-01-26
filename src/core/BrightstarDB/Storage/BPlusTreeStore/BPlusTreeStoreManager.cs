@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,10 +25,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         internal const int PageSize = 4096; // 4kB pages
 
+        internal static readonly ConcurrentDictionary<string, MasterFile> MasterFileCache= new ConcurrentDictionary<string, MasterFile>();
+
         public BPlusTreeStoreManager(StoreConfiguration configuration, IPersistenceManager persistenceManager)
         {
             _storeConfiguration = configuration;
             _persistenceManager = persistenceManager;
+            
         }
 
         #region Implementation of IStoreManager
@@ -104,7 +108,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         public IStore OpenStore(string storeLocation, bool readOnly)
         {
             Logging.LogInfo("Open Store {0}", storeLocation);
-            var masterFile = MasterFile.Open(_persistenceManager, storeLocation);
+            var masterFile = GetMasterFile(storeLocation);
             var latestCommitPoint = masterFile.GetLatestCommitPoint();
             var dataFilePath = Path.Combine(storeLocation, DataFileName);
             var resourceFilePath = Path.Combine(storeLocation, ResourceFileName);
@@ -197,7 +201,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public MasterFile GetMasterFile(string storeLocation)
         {
-            return MasterFile.Open(_persistenceManager, storeLocation);
+            MasterFile masterFile;
+            if (!MasterFileCache.TryGetValue(storeLocation, out masterFile))
+            {
+                masterFile = MasterFile.Open(_persistenceManager, storeLocation);
+                MasterFileCache.TryAdd(storeLocation, masterFile);
+            }
+            return masterFile;
         }
 
         public IPageStore CreateConsolidationStore(string storeLocation)
