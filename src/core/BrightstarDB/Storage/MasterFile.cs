@@ -84,15 +84,18 @@ namespace BrightstarDB.Storage
         public static MasterFile Open(IPersistenceManager persistenceManager, string directoryPath)
         {
             var masterFilePath = Path.Combine(directoryPath, MasterFileName);
-            if (!persistenceManager.FileExists(masterFilePath))
-            {
-                throw new StoreManagerException(directoryPath, "Master file not found");
-            }
             var mf = new MasterFile(persistenceManager, directoryPath, masterFilePath,
                                     StoreConfiguration.DefaultStoreConfiguration, Guid.Empty);
-            using (var mfStream = persistenceManager.GetInputStream(masterFilePath))
+            try
             {
-                mf.Load(mfStream);
+                using (var mfStream = persistenceManager.GetInputStream(masterFilePath))
+                {
+                    mf.Load(mfStream);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new StoreManagerException(directoryPath, "Error opening master file. " + ex.Message);
             }
             return mf;
         }
