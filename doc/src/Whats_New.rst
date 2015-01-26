@@ -19,6 +19,8 @@ marked with FIX.
 
     - FIX: Making changes the the properties of BrightstarDB.Configuration that configure the server-side query caching will now cause the cache to be
            deleted and recreated with the new settings on the next request for the cache handle.
+    
+    - FIX: Added caching of master file data structures to improve performance in applications that perform large numbers of reads per write.
            
 ****************************
  BrightstarDB 1.9 Release

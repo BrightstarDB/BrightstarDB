@@ -23,7 +23,7 @@ namespace BrightstarDB.InternalTests
         #endregion
 
         [Test]
-        [ExpectedException(typeof (StoreManagerException), ExpectedMessage="Master file not found")]
+        [ExpectedException(typeof (StoreManagerException))]
         public override void TestOpenStoreFailure()
         {
             base.TestOpenStoreFailure();
