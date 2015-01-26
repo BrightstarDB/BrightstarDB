@@ -14,6 +14,13 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX.
 
 ****************************
+ Develop Branch
+****************************
+
+    - FIX: Making changes the the properties of BrightstarDB.Configuration that configure the server-side query caching will now cause the cache to be
+           deleted and recreated with the new settings on the next request for the cache handle.
+           
+****************************
  BrightstarDB 1.9 Release
 ****************************
 
