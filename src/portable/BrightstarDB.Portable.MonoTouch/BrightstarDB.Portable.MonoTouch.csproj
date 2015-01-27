@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>BrightstarDB</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>BrightstarDBPortableMonoTouch</AssemblyName>
+    <AssemblyName>BrightstarDB.Portable.MonoTouch</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
