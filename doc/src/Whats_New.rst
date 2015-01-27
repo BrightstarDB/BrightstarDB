@@ -21,6 +21,9 @@ marked with FIX.
            deleted and recreated with the new settings on the next request for the cache handle.
     
     - FIX: Added caching of master file data structures to improve performance in applications that perform large numbers of reads per write.
+    
+    - NEW: The PCL platform libraries now includes support for the Xamarin.iOS, Version=1.0 PCL framework. This enables BrightstarDB to be used
+           in Xamarin.Forms PCL applications across Android, Windows Phone and iOS.
            
 ****************************
  BrightstarDB 1.9 Release
