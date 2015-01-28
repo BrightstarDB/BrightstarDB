@@ -8,13 +8,14 @@ using NUnit.Framework;
 
 namespace BrightstarDB.Tests.DataObjectsTests
 {
-    [TestFixture("type=embedded;storesDirectory={1};storeName={2}", true)]
+    [TestFixture("type=embedded;storesDirectory={0}", true)]
+    [TestFixture("type=rest;endpoint=http://localhost:8090/brightstar", true)]
     /*[TestFixture(
-        "type=dotnetrdf;configuration={0}dataObjectStoreConfig.ttl;storeName=http://www.brightstardb.com/tests#empty"
+        "type=dotnetrdf;configuration={1}dataObjectStoreConfig.ttl;storeName=http://www.brightstardb.com/tests#empty"
         , false)]*/
-    public class BasicDataObjectsTests
+    public class BasicDataObjectsTests : ClientTestBase
     {
-        private readonly string _connectionString;
+        private readonly ConnectionString _connectionString;
         private readonly bool _isPersistent;
 
         private IDataObjectContext _context;
@@ -28,31 +29,48 @@ namespace BrightstarDB.Tests.DataObjectsTests
 
         public BasicDataObjectsTests(string connectionString, bool isPersistent)
         {
-            _connectionString = connectionString;
+            var cs = String.Format(connectionString, Path.GetFullPath(Configuration.StoreLocation),
+                Path.GetFullPath(Configuration.DataLocation));
+            _connectionString = new ConnectionString(cs);
             _isPersistent = isPersistent;
+        }
+
+        [TestFixtureSetUp]
+        public void TestFixtureSetUp()
+        {
+            if (_connectionString.Type == ConnectionType.Rest)
+            {
+                StartService();
+            }
+        }
+
+        [TestFixtureTearDown]
+        public void TestFixtureTearDown()
+        {
+            if (_connectionString.Type == ConnectionType.Rest)
+            {
+                CloseService();
+            }
         }
 
         [SetUp]
         public void SetUp()
         {
             var storeName = "BasicDataObjectTests_" + DateTime.Now.Ticks;
-            var connectionString = new ConnectionString(String.Format(_connectionString,
-                Path.GetFullPath(Configuration.DataLocation),
-                Path.GetFullPath(Configuration.StoreLocation),
-                storeName));
+            var storeConnectionString = new ConnectionString(_connectionString + ";storeName=" + storeName);
 
             if (_isPersistent)
             {
-                var client = BrightstarService.GetClient(connectionString);
-                if (client.DoesStoreExist(connectionString.StoreName))
+                var client = BrightstarService.GetClient(_connectionString);
+                if (client.DoesStoreExist(storeName))
                 {
-                    client.DeleteStore(connectionString.StoreName);
+                    client.DeleteStore(storeName);
                     Thread.Sleep(500);
                 }
-                client.CreateStore(connectionString.StoreName);
+                client.CreateStore(storeName);
             }
-            _context = BrightstarService.GetDataObjectContext(connectionString);
-            _store = _context.OpenStore(connectionString.StoreName, NamespaceMappings);
+            _context = BrightstarService.GetDataObjectContext(_connectionString);
+            _store = _context.OpenStore(storeName, NamespaceMappings);
         }
 
         [Test]
@@ -83,6 +101,19 @@ namespace BrightstarDB.Tests.DataObjectsTests
             Assert.That(propertyTypes.Contains(_store.GetDataObject("foaf:name")));
             Assert.That(propertyTypes.Contains(_store.GetDataObject("foaf:mbox")));
             Assert.That(propertyTypes.Contains(_store.GetDataObject("foaf:nick")));
+        }
+
+        [Test]
+        [SetUICulture("en-US")]
+        public void TestDateTimeRoundtripWithUSLocale()
+        {
+            var alice = _store.MakeDataObject("p:Alice");
+            alice.AddProperty("foaf:dateOfBirth", new DateTime(1970, 01, 02));
+            _store.SaveChanges();
+
+            var retrieved = _store.GetDataObject("p:Alice");
+            var dob = (DateTime)retrieved.GetPropertyValue("foaf:dateOfBirth");
+            Assert.AreEqual(new DateTime(1970, 01, 02), dob);
         }
     }
 }
