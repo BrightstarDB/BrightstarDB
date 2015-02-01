@@ -178,7 +178,8 @@ namespace BrightstarDB.Client
                     {
                         triple.LangCode = langCode;
                     }
-                    triple.Object = sparqlResultRow.GetColumnValue("o").ToString().Trim();
+                    triple.Object = sparqlResultRow.GetLiteralString("o");
+                    //triple.Object = sparqlResultRow.GetColumnValue("o").ToString().Trim();
                     triple.IsLiteral = true;
                 }
                 else

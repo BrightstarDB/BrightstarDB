@@ -57,8 +57,6 @@ namespace BrightstarDB.Tests.DataObjectsTests
         public void SetUp()
         {
             var storeName = "BasicDataObjectTests_" + DateTime.Now.Ticks;
-            var storeConnectionString = new ConnectionString(_connectionString + ";storeName=" + storeName);
-
             if (_isPersistent)
             {
                 var client = BrightstarService.GetClient(_connectionString);
@@ -114,6 +112,32 @@ namespace BrightstarDB.Tests.DataObjectsTests
             var retrieved = _store.GetDataObject("p:Alice");
             var dob = (DateTime)retrieved.GetPropertyValue("foaf:dateOfBirth");
             Assert.AreEqual(new DateTime(1970, 01, 02), dob);
+        }
+
+        [Test]
+        public void TestDateTimeRoundtripUTC()
+        {
+            var alice = _store.MakeDataObject("p:Alice");
+            alice.AddProperty("foaf:dateOfBirth", new DateTime(1970, 01, 02, 23, 58, 0, DateTimeKind.Utc));
+            _store.SaveChanges();
+
+            var retrieved = _store.GetDataObject("p:Alice");
+            var dob = (DateTime) retrieved.GetPropertyValue("foaf:dateOfBirth");
+            Assert.AreEqual(DateTimeKind.Utc, dob.Kind);
+            Assert.AreEqual(new DateTime(1970, 01, 02, 23, 58, 0, DateTimeKind.Utc), dob);
+        }
+
+        [Test]
+        public void TestDateTimeRoundtripLocal()
+        {
+            var alice = _store.MakeDataObject("p:Alice");
+            alice.AddProperty("foaf:dateOfBirth", new DateTime(1970, 01, 02, 23, 58, 0, DateTimeKind.Local));
+            _store.SaveChanges();
+
+            var retrieved = _store.GetDataObject("p:Alice");
+            var dob = (DateTime)retrieved.GetPropertyValue("foaf:dateOfBirth");
+            Assert.AreEqual(DateTimeKind.Local, dob.Kind);
+            Assert.AreEqual(new DateTime(1970, 01, 02, 23, 58, 0, DateTimeKind.Local), dob);
         }
     }
 }
