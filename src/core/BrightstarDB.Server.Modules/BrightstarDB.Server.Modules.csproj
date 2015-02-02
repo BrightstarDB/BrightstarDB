@@ -42,17 +42,17 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net40\HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy, Version=0.23.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.0.23.2\lib\net40\Nancy.dll</HintPath>
+      <HintPath>..\packages\Nancy.1.0.0\lib\net40\Nancy.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.Authentication.Basic, Version=0.23.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy.Authentication.Basic, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Authentication.Basic.0.23.2\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
+      <HintPath>..\packages\Nancy.Authentication.Basic.1.0.0\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.ViewEngines.Razor, Version=0.23.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy.ViewEngines.Razor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Viewengines.Razor.0.23.2\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
+      <HintPath>..\packages\Nancy.Viewengines.Razor.1.0.0\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -171,7 +171,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <RazorAssemblies Include="$(SolutionDir)packages\Nancy.Viewengines.Razor.0.23.2\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll;$(SolutionDir)packages\Nancy.Viewengines.Razor.0.23.2\lib\net40\Nancy.ViewEngines.Razor.dll" />
+    <RazorAssemblies Include="$(SolutionDir)packages\Nancy.Viewengines.Razor.1.0.0\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll;$(SolutionDir)packages\Nancy.Viewengines.Razor.1.0.0\lib\net40\Nancy.ViewEngines.Razor.dll" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
