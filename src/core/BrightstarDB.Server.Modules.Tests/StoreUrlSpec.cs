@@ -22,7 +22,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Get("/foo", with => with.Accept(MediaRange.FromString("application/json")));
+            var response = app.Get("/foo", with => with.Accept(new MediaRange("application/json")));
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -44,7 +44,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Get("/foo", with => with.Accept(MediaRange.FromString("application/json")));
+            var response = app.Get("/foo", with => with.Accept(new MediaRange("application/json")));
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -125,7 +125,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s=>s.DeleteStore("foo")).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Delete("/foo", c=>c.Accept(MediaRange.FromString("application/json")));
+            var response = app.Delete("/foo", c=>c.Accept(new MediaRange("application/json")));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             brightstar.Verify();
@@ -139,7 +139,7 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s => s.DeleteStore("foo")).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Delete("/foo", c => c.Accept(MediaRange.FromString("text/html")));
+            var response = app.Delete("/foo", c => c.Accept(new MediaRange("text/html")));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Body.AsString(), Contains.Substring("Store 'foo' deleted successfully."));

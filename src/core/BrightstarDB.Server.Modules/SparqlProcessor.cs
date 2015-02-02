@@ -5,7 +5,6 @@ using BrightstarDB.Server.Modules.Model;
 using Nancy;
 using Nancy.Responses;
 using Nancy.Responses.Negotiation;
-using VDS.RDF.Query;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -19,9 +18,9 @@ namespace BrightstarDB.Server.Modules
 
         public ProcessorMatch CanProcess(MediaRange requestedMediaRange, dynamic model, NancyContext context)
         {
-            if (model is SparqlQueryProcessingModel)
+            var processingModel = model as SparqlQueryProcessingModel;
+            if (processingModel != null)
             {
-                var processingModel = model as SparqlQueryProcessingModel;
                 if (processingModel.SparqlRequest.Format != null)
                 {
                     var sparqlFormat =
@@ -43,7 +42,7 @@ namespace BrightstarDB.Server.Modules
                 }
 
                 if ((processingModel.ResultModel == SerializableModel.SparqlResultSet) &&
-                    (SparqlResultsFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(MediaRange.FromString(m)))))
+                    (SparqlResultsFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(new MediaRange(m)))))
                 {
                     return new ProcessorMatch
                         {
@@ -52,7 +51,7 @@ namespace BrightstarDB.Server.Modules
                         };
                 }
                 if ((processingModel.ResultModel == SerializableModel.RdfGraph) &&
-                    (RdfFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(MediaRange.FromString(m)))))
+                    (RdfFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(new MediaRange(m)))))
                 {
                     return new ProcessorMatch
                         {
@@ -86,33 +85,30 @@ namespace BrightstarDB.Server.Modules
 
         public Response Process(MediaRange requestedMediaRange, dynamic model, NancyContext context)
         {
-            if (model is SparqlQueryProcessingModel)
+            var processingModel = model as SparqlQueryProcessingModel;
+            if (processingModel != null)
             {
-                var queryModel = model as SparqlQueryProcessingModel;
-                var format = (queryModel.OverrideResultsFormat ??
+                var format = (processingModel.OverrideResultsFormat ??
                               SparqlResultsFormat.AllFormats.FirstOrDefault(
                                   f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)))) ??
                              SparqlResultsFormat.Xml;
                 var graphFormat =
-                    (queryModel.OverrideGraphFormat ??
+                    (processingModel.OverrideGraphFormat ??
                      RdfFormat.AllFormats.FirstOrDefault(f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)))) ??
                     RdfFormat.RdfXml;
 
-                return new SparqlQueryResponse(queryModel, context.Request.Headers.IfModifiedSince, format, graphFormat);
+                return new SparqlQueryResponse(processingModel, context.Request.Headers.IfModifiedSince, format, graphFormat);
             }
-            if (model is GraphListModel)
+            var graphList = model as GraphListModel;
+            if (graphList != null)
             {
-                var graphList = model as GraphListModel;
                 var format =
                     SparqlResultsFormat.AllFormats.FirstOrDefault(
                         f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m))) ?? SparqlResultsFormat.Xml;
                 return new TextResponse(
                     graphList.AsString(format), format.MediaTypes[0]);
             }
-            else
-            {
-                throw new ArgumentException("Unexpected model type: " + model.GetType());
-            }
+            throw new ArgumentException("Unexpected model type: " + model.GetType());
         }
 
         public IEnumerable<Tuple<string, MediaRange>> ExtensionMappings { get { return SparqlExtensionMappings; } }

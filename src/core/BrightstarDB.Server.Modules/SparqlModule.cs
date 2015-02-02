@@ -9,12 +9,13 @@ using Nancy;
 using Nancy.ModelBinding;
 using Nancy.Responses.Negotiation;
 using VDS.RDF.Parsing;
-using VDS.RDF.Query.Expressions.Functions.XPath.String;
 
 namespace BrightstarDB.Server.Modules
 {
     public class SparqlModule : NancyModule
     {
+        private static readonly MediaRange SparqlQueryMediaRange = new MediaRange("application/sparql-query");
+        private static readonly MediaRange FormMediaRange = new MediaRange("application/x-www-form-urlencoded");
         private readonly IBrightstarService _brightstar;
 
         public SparqlModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider permissionsProvider)
@@ -72,7 +73,7 @@ namespace BrightstarDB.Server.Modules
             var requestObject = this.Bind<SparqlRequestObject>();
             dynamic defaultGraphUri;
             if (Request.Method.Equals("POST", StringComparison.InvariantCultureIgnoreCase)
-                && (MediaRange.FromString("application/sparql-query").Matches(Request.Headers.ContentType)))
+                && (SparqlQueryMediaRange.Matches(Request.Headers.ContentType)))
             {
                 using (var streamReader = new StreamReader(Request.Body))
                 {
@@ -81,7 +82,7 @@ namespace BrightstarDB.Server.Modules
             }
 
             if (Request.Method.Equals("POST", StringComparison.InvariantCultureIgnoreCase)
-                && (MediaRange.FromString("application/x-www-form-urlencoded").Matches(Request.Headers.ContentType)))
+                && (FormMediaRange.Matches(Request.Headers.ContentType)))
             {
                 // Bind graph parameters from form
                 defaultGraphUri = Request.Form["default-graph-uri"];
@@ -93,14 +94,19 @@ namespace BrightstarDB.Server.Modules
             }
             if (defaultGraphUri.HasValue)
             {
-                if (defaultGraphUri.Value is string)
+                var singleValue = defaultGraphUri.Value as string;
+                if (singleValue != null)
                 {
                     requestObject.DefaultGraphUri =
-                        (defaultGraphUri.Value as string).Split(',').Select(s => s.Trim()).ToArray();
+                        singleValue.Split(',').Select(s => s.Trim()).ToArray();
                 }
-                else if (defaultGraphUri.Value is IEnumerable<string>)
+                else
                 {
-                    requestObject.DefaultGraphUri = (defaultGraphUri.Value as IEnumerable<string>).ToArray();
+                    var valueCollection = defaultGraphUri.Value as IEnumerable<string>;
+                    if (valueCollection != null)
+                    {
+                        requestObject.DefaultGraphUri = valueCollection.ToArray();
+                    }
                 }
             }
             return requestObject;
@@ -108,23 +114,7 @@ namespace BrightstarDB.Server.Modules
 
         private Negotiator ProcessQuery(string storeName, SparqlRequestObject requestObject)
         {
-            //SparqlResultsFormat requestedFormat =
-            //    String.IsNullOrEmpty(requestObject.Format)
-            //        ? SparqlResultsFormat.Xml
-            //        : (
-            //              SparqlResultsFormat.GetResultsFormat(requestObject.Format) ??
-            //              SparqlResultsFormat.Xml);
-            //RdfFormat graphFormat =
-            //    String.IsNullOrEmpty(requestObject.Format)
-            //        ? RdfFormat.RdfXml
-            //        : (RdfFormat.GetResultsFormat(requestObject.Format) ?? RdfFormat.RdfXml);
-
-            //var model = new SparqlResultModel(storeName, _brightstar, requestObject,
-            //                                  //requestedFormat, graphFormat);
-            //                                  null, null);
-
             return Negotiate
-                //.WithMediaRangeModel(MediaRange.FromString("text/html"), model)
                 .WithView("SparqlResult")
                 .WithModel(new SparqlQueryProcessingModel(storeName, _brightstar, requestObject));
         }

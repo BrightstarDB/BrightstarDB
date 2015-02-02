@@ -27,7 +27,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                           new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
                                           new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
 
-            var response = app.Get("/", c=>c.Accept(MediaRange.FromString("application/json")));
+            var response = app.Get("/", c=>c.Accept(new MediaRange("application/json")));
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
@@ -54,7 +54,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All), systemPermissions.Object));
 
             // Execute
-            var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
+            var response = app.Get("/", c => c.Accept(new MediaRange("application/json")));
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -73,7 +73,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                                       new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
 
             // Execute
-            var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
+            var response = app.Get("/", c => c.Accept(new MediaRange("application/json")));
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -100,7 +100,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
                 {
-                    with.Accept(MediaRange.FromString("application/json"));
+                    with.Accept(new MediaRange("application/json"));
                     with.JsonBody(new CreateStoreRequestObject("foo", PersistenceType.AppendOnly));
                     with.AjaxRequest();
                 });
@@ -130,7 +130,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject("foo", PersistenceType.AppendOnly));
                 with.AjaxRequest();
             });
@@ -151,7 +151,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject());
                 with.AjaxRequest();
             });
@@ -173,7 +173,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject("/invalid/store_name"));
                 with.AjaxRequest();
             });
@@ -196,7 +196,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject("foo"));
                 with.AjaxRequest();
             });
@@ -223,7 +223,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject("foo"));
                 with.AjaxRequest();
             });

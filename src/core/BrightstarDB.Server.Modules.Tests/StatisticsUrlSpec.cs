@@ -13,7 +13,7 @@ namespace BrightstarDB.Server.Modules.Tests
 {
     public class StatisticsUrlSpecBase
     {
-        protected static readonly MediaRange Json = MediaRange.FromString("application/json");
+        protected static readonly MediaRange Json = new MediaRange("application/json");
         protected IEnumerable<IStoreStatistics> MockStatistics(int count)
         {
             var ret = new List<IStoreStatistics>();

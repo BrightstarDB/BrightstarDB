@@ -10,7 +10,8 @@ namespace BrightstarDB.Server.Modules
 {
     public class SparqlUpdateModule : NancyModule
     {
-        private static readonly MediaRange SparqlRequest = MediaRange.FromString("application/sparql-update");
+        private static readonly MediaRange SparqlRequest = new MediaRange("application/sparql-update");
+        private static readonly MediaRange Html = new MediaRange("text/html");
 
         public SparqlUpdateModule(IBrightstarService brightstarService, AbstractStorePermissionsProvider permissionsProvider)
         {
@@ -20,7 +21,7 @@ namespace BrightstarDB.Server.Modules
                 {
                     var requestObject = this.Bind<SparqlUpdateRequestObject>();
                     return
-                        Negotiate.WithAllowedMediaRange(MediaRange.FromString("text/html"))
+                        Negotiate.WithAllowedMediaRange(Html)
                                  .WithModel(requestObject)
                                  .WithView("SparqlUpdate");
                 };

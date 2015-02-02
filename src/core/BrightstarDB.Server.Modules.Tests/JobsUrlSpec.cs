@@ -15,7 +15,7 @@ namespace BrightstarDB.Server.Modules.Tests
     [TestFixture]
     public class JobsUrlSpec
     {
-        private static readonly MediaRange Json = MediaRange.FromString("application/json");
+        private static readonly MediaRange Json = new MediaRange("application/json");
 
         #region Consolidate Job
         [Test]
@@ -33,7 +33,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/jobs", with =>
                 {
-                    with.Accept(MediaRange.FromString("application/json"));
+                    with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
                 });
 
@@ -64,7 +64,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("foo/jobs", with =>
                 {
-                    with.Accept(MediaRange.FromString("application/json"));
+                    with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
                 });
 
@@ -87,7 +87,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("foo/jobs", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
             });
 
@@ -120,7 +120,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/jobs", with =>
                 {
-                    with.Accept(MediaRange.FromString("application/json"));
+                    with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
                 });
 
@@ -143,7 +143,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/jobs", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
             });
 
@@ -177,7 +177,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/jobs", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
             });
 
@@ -243,7 +243,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/jobs", with =>
                 {
-                    with.Accept(MediaRange.FromString("application/json"));
+                    with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
                 });
 
@@ -286,7 +286,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/jobs", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(requestObject);
             });
 
@@ -535,7 +535,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/foo/jobs", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(jobRequest);
             });
 
@@ -551,7 +551,7 @@ namespace BrightstarDB.Server.Modules.Tests
 
             var response = app.Post(toUrl, with =>
                 {
-                    with.Accept(MediaRange.FromString("application/json"));
+                    with.Accept(new MediaRange("application/json"));
                     with.Body(jsonString);
                     with.Header("Content-Type", "application/json");
                 });
@@ -571,7 +571,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post(toUrl, with =>
                 {
-                    with.Accept(MediaRange.FromString("application/json"));
+                    with.Accept(new MediaRange("application/json"));
                     with.JsonBody(requestObject);
                 });
 
@@ -592,7 +592,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post(toUrl, with =>
                 {
-                    with.Accept(MediaRange.FromString("application/json"));
+                    with.Accept(new MediaRange("application/json"));
                     with.Body(jsonString);
                     with.Header("Content-Type", "application/json");
                 });
