@@ -995,6 +995,18 @@ namespace BrightstarDB.Tests.EntityFramework
             		get { return GetRelatedProperty<System.Nullable<BrightstarDB.Tests.EntityFramework.TestFlagsEnumeration>>("SomeNullableFlagsEnumeration"); }
             		set { SetRelatedProperty("SomeNullableFlagsEnumeration", value); }
     	}
+    
+    	public System.DayOfWeek SomeSystemEnumeration
+    	{
+            		get { return GetRelatedProperty<System.DayOfWeek>("SomeSystemEnumeration"); }
+            		set { SetRelatedProperty("SomeSystemEnumeration", value); }
+    	}
+    
+    	public System.Nullable<System.DayOfWeek> SomeNullableSystemEnumeration
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.DayOfWeek>>("SomeNullableSystemEnumeration"); }
+            		set { SetRelatedProperty("SomeNullableSystemEnumeration", value); }
+    	}
     	public System.Collections.Generic.ICollection<System.String> CollectionOfStrings
     	{
     		get { return GetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings"); }

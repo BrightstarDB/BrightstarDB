@@ -384,7 +384,7 @@ private bool IsValidLiteralType(Helper helper, CodeTypeRef t)
 	string genericName, typeName;
 	if (Helper.TryParseGenericTypeName(t.AsFullName, out genericName, out typeName)
 		&& genericName.Equals("System.Nullable")
-		&& helper.GetEnums().Any(e=>e.FullName.Equals(typeName))) {
+		&& (helper.GetEnums().Any(e=>e.FullName.Equals(typeName)) || Helper.IsExternalEnum(typeName)) ) {
 		return true;
 	}
 	
@@ -690,6 +690,14 @@ class Helper {
 					yield return child;
 				}
 			}
+		}
+	}
+
+	public static bool IsExternalEnum(string typeName){
+		try {
+			return Type.GetType(typeName, true, false).IsEnum;
+		} catch(Exception){
+			return false;
 		}
 	}
 	

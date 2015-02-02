@@ -353,6 +353,8 @@ namespace BrightstarDB.Tests.EntityFramework
             entity1.SomeNullableEnumeration = TestEnumeration.Third;
             entity1.SomeFlagsEnumeration = TestFlagsEnumeration.FlagA | TestFlagsEnumeration.FlagB;
             entity1.SomeNullableFlagsEnumeration = TestFlagsEnumeration.FlagB | TestFlagsEnumeration.FlagC;
+            entity1.SomeSystemEnumeration = DayOfWeek.Friday;
+            entity1.SomeNullableSystemEnumeration = DayOfWeek.Friday;
             var entity2 = _myEntityContext.Entities.Create();
             _myEntityContext.SaveChanges();
 
@@ -368,11 +370,15 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(TestEnumeration.Third, entity1.SomeNullableEnumeration);
             Assert.AreEqual(TestFlagsEnumeration.FlagB|TestFlagsEnumeration.FlagA, entity1.SomeFlagsEnumeration);
             Assert.AreEqual(TestFlagsEnumeration.FlagC|TestFlagsEnumeration.FlagB, entity1.SomeNullableFlagsEnumeration);
+            Assert.AreEqual(DayOfWeek.Friday, entity1.SomeSystemEnumeration);
+            Assert.AreEqual(DayOfWeek.Friday, entity1.SomeNullableSystemEnumeration);
 
             Assert.AreEqual(TestEnumeration.First, entity2.SomeEnumeration);
             Assert.IsNull(entity2.SomeNullableEnumeration);
             Assert.AreEqual(TestFlagsEnumeration.NoFlags, entity2.SomeFlagsEnumeration);
             Assert.IsNull(entity2.SomeNullableFlagsEnumeration);
+            Assert.AreEqual(DayOfWeek.Sunday, entity2.SomeSystemEnumeration);
+            Assert.IsNull(entity2.SomeNullableSystemEnumeration);
         }
         //note Test for SetByteArray and SetEnumeration are in SimpleContextTests.cs
 

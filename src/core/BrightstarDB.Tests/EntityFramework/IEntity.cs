@@ -70,7 +70,8 @@ namespace BrightstarDB.Tests.EntityFramework
         TestEnumeration? SomeNullableEnumeration { get; set; }
         TestFlagsEnumeration SomeFlagsEnumeration { get; set; }
         TestFlagsEnumeration? SomeNullableFlagsEnumeration { get; set; }
-
+        DayOfWeek SomeSystemEnumeration { get; set; }
+        DayOfWeek? SomeNullableSystemEnumeration { get; set; }
         ICollection<string> CollectionOfStrings { get; set; }
         ICollection<DateTime> CollectionOfDateTimes { get; set; }
         ICollection<bool> CollectionOfBools { get; set; }
