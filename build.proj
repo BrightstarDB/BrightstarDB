@@ -1,62 +1,93 @@
-<Project ToolsVersion="4.0" DefaultTargets="BuildAndTest" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <NoXamarin Condition=" '$(NoXamarin)' == '' ">False</NoXamarin>
+        <NoiOS Condition=" '$(NoiOS)' == '' ">False</NoiOS>
         <NUnitPath Condition=" '$(NUnitPath)' == '' ">C:\Program Files (x86)\NUnit 2.6.2\bin</NUnitPath>
     </PropertyGroup>
     
     <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+
+    <!-- Main Build Targets -->
     
-    <Target Name="BuildAndTest" DependsOnTargets="Build;Test">
-    </Target>
+    <Target Name="Build" DependsOnTargets="BuildCore;BuildPortable;BuildXamarin;BuildiOS;BuildTools"/>
+    
+    <Target Name="Test" DependsOnTargets="TestCore;TestPortable" />
 
-    <!-- Build Targets -->
-    <Target Name="Build" DependsOnTargets="BuildCore;BuildMobile;BuildPortable;BuildXamarin;BuildTools">
-    </Target>
+    <Target Name="Clean" DependsOnTargets="CleanCore;CleanPortable;CleanXamarin;CleaniOS;CleanTools"/>
 
+    <!-- Sub-targets -->
     <Target Name="BuildCore">
         <MSBuild Projects="src\core\core.sln"
                  Properties="Configuration=$(Configuration)"
-                 Targets="Clean;Build"/>
+                 Targets="Build"/>
     </Target>
-    
-    <Target Name="BuildMobile">
-        <MSBuild Projects="src\mobile\mobile.sln"
+
+    <Target Name="CleanCore">
+        <MSBuild Projects="src\core\core.sln"
                  Properties="Configuration=$(Configuration)"
-                 Targets="Clean;Build"/>
+                 Targets="Clean"/>
     </Target>
-    
+   
     <Target Name="BuildPortable">
         <MSBuild Projects="src\portable\portable.sln"
                  Properties="Configuration=$(Configuration)"
-                 Targets="Clean;Build"/>
+                 Targets="Build"/>
+    </Target>
+
+    <Target Name="CleanPortable">
+        <MSBuild Projects="src\portable\portable.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean"/>
     </Target>
 
     <Target Name="BuildXamarin" Condition="!$(NoXamarin) AND Exists('$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets')">
         <MSBuild Projects="src\portable\xamarin.sln"
                  Properties="Configuration=$(Configuration)"
-                 Targets="Clean;Build"/>
+                 Targets="Build"/>
+    </Target>
+
+    <Target Name="CleanXamarin" Condition="!$(NoXamarin) AND Exists('$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets')">
+        <MSBuild Projects="src\portable\xamarin.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean"/>
+    </Target>
+    
+    <Target Name="BuildiOS" Condition="!$(NoXamarin) AND !$(NoiOS) AND Exists('$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets')">
+        <MSBuild Projects="src\portable\ios.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Build" />
+    </Target>
+
+    <Target Name="CleaniOS" Condition="!$(NoXamarin) AND !$(NoiOS) AND Exists('$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets')">
+        <MSBuild Projects="src\portable\ios.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean" />
     </Target>
     
     <Target Name="BuildTools">
         <MSBuild Projects="src\tools\Polaris\Polaris.sln"
                  Properties="Configuration=$(Configuration)"
-                 Targets="Clean;Build"/>        
+                 Targets="Build"/>        
     </Target>
     
+    <Target Name="CleanTools">
+        <MSBuild Projects="src\tools\Polaris\Polaris.sln"
+                 Properties="Configuration=$(Configuration)"
+                 Targets="Clean"/>        
+    </Target>
 
     <!-- Test Targets -->
     <Target Name="ResultsDir">
         <MakeDir Directories="TestResults"/>
     </Target>
 
-	<Target Name="Test" DependsOnTargets="TestCore;TestPortable" />
 	
-    <Target Name="TestCore">
+    <Target Name="TestCore" DependsOnTargets="BuildCore">
         <CallTarget Targets="_TestInternal;_TestCore;_TestEntityFramework;_TestOData" RunEachTargetSeparately="True"/>
 	</Target>
 	
-	<Target Name="TestPortable">
+	<Target Name="TestPortable" DependsOnTargets="BuildPortable">
         <CallTarget Targets="_TestPortableDesktop" RunEachTargetSeparately="True"/>
     </Target>
     

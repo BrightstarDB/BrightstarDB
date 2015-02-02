@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BrightstarDB.Client;
+
 #if PORTABLE 
 using BrightstarDB.Portable.Compatibility;
 using Array = BrightstarDB.Portable.Compatibility.Array;
+#else
+using System.Collections.Concurrent;
 #endif
 
 namespace BrightstarDB.Storage
@@ -63,6 +67,9 @@ namespace BrightstarDB.Storage
         /// <remarks>Each store has a unique store identifier generated when the store is created</remarks>
         public Guid StoreId { get; private set; }
 
+
+        private readonly ConcurrentDictionary<long, CommitPoint> _commitPoints; 
+
         public static MasterFile Create(IPersistenceManager persistenceManager, string directoryPath,
                                         StoreConfiguration storeConfiguration, Guid storeSetId)
         {
@@ -84,47 +91,22 @@ namespace BrightstarDB.Storage
         public static MasterFile Open(IPersistenceManager persistenceManager, string directoryPath)
         {
             var masterFilePath = Path.Combine(directoryPath, MasterFileName);
-            if (!persistenceManager.FileExists(masterFilePath))
-            {
-                throw new StoreManagerException(directoryPath, "Master file not found");
-            }
             var mf = new MasterFile(persistenceManager, directoryPath, masterFilePath,
                                     StoreConfiguration.DefaultStoreConfiguration, Guid.Empty);
-            using (var mfStream = persistenceManager.GetInputStream(masterFilePath))
+            try
             {
-                mf.Load(mfStream);
+                using (var mfStream = persistenceManager.GetInputStream(masterFilePath))
+                {
+                    mf.Load(mfStream);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new StoreManagerException(directoryPath, "Error opening master file. " + ex.Message);
             }
             return mf;
         }
 
-        /*
-        public MasterFile(IPersistenceManager persistenceManager, string directoryPath)
-        {
-            _persistenceManager = persistenceManager;
-            _directoryPath = directoryPath;
-            _masterFilePath = Path.Combine(directoryPath, MasterFileName);
-            if (!File.Exists(_masterFilePath))
-            {
-                throw new StoreManagerException(directoryPath, "Master file not found");
-            }
-            try
-            {
-                using (var stream = _persistenceManager.GetInputStream(_masterFilePath))
-                {
-                    Load(stream);
-                }
-            }
-            catch (StoreManagerException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new StoreManagerException(directoryPath,
-                                                String.Format("Cannot read master file. Cause: {0}", ex.Message));
-            }
-        }
-         */
 
         private MasterFile(IPersistenceManager persistenceManager, string directoryPath, string masterFilePath,
                            StoreConfiguration storeConfiguration, Guid storeSetId)
@@ -137,6 +119,7 @@ namespace BrightstarDB.Storage
             StoreFormatVersion = CurrentStoreFormatVersion;
             StoreSetId = storeSetId;
             StoreId = Guid.NewGuid();
+            _commitPoints = new ConcurrentDictionary<long, CommitPoint>();
         }
 
         private void Save(Stream outputStream)
@@ -209,11 +192,37 @@ namespace BrightstarDB.Storage
             {
                 throw new ArgumentException("Invalid commit point offset", "commitPointLocation");
             }
-            using (var inputStream = _persistenceManager.GetInputStream(_masterFilePath))
+            Stream inputStream = null;
+            try
             {
-                inputStream.Seek((long) commitPointLocation, SeekOrigin.Begin);
-                return CommitPoint.Load(inputStream);
+                return _GetCommitPoint((long) commitPointLocation,
+                    () => (inputStream = _persistenceManager.GetInputStream(_masterFilePath)));
             }
+            finally
+            {
+                if (inputStream != null) inputStream.Close();
+            }
+        }
+
+        private CommitPoint _GetCommitPoint(long commitPointLocation, Func<Stream> getStream )
+        {
+            CommitPoint ret;
+            if (_commitPoints.TryGetValue(commitPointLocation, out ret)) return ret;
+            var stream = getStream();
+            stream.Seek(commitPointLocation, SeekOrigin.Begin);
+            ret = CommitPoint.Load(stream);
+            _commitPoints.TryAdd(commitPointLocation, ret);
+            return ret;
+        }
+
+        private CommitPoint _GetCommitPoint(long commitPointLocation, Stream stream)
+        {
+            CommitPoint ret;
+            if (_commitPoints.TryGetValue(commitPointLocation, out ret)) return ret;
+            stream.Seek(commitPointLocation, SeekOrigin.Begin);
+            ret = CommitPoint.Load(stream);
+            _commitPoints.TryAdd(commitPointLocation, ret);
+            return ret;
         }
 
         public CommitPoint GetLatestCommitPoint(int skipRecords = 0)
@@ -241,16 +250,8 @@ namespace BrightstarDB.Storage
                     {
                         recordStart = stream.Length-((skipRecords + 1)*CommitPoint.RecordSize);
                     }
-                    stream.Seek(recordStart, SeekOrigin.Begin);
-                    var commitPoint = CommitPoint.Load(stream);
-                    if (skipRecords > 0)
-                    {
-                        // We skipped over one or more invalid records, so we record a higher next transaction id number in the commit point we return
-                        commitPoint.NextCommitNumber = commitPoint.NextCommitNumber + (ulong) skipRecords;
-                        // Master file is not truncated here like in the old implementation, 
-                        // because this could potentially interfere with a master file write operation for a store commit
-                        // instead we will need to just always skip corrupt transactions.
-                    }
+                    var commitPoint = _GetCommitPoint(recordStart, stream);
+                    commitPoint.NextCommitNumber = commitPoint.CommitNumber + (ulong)skipRecords + 1;
                     return commitPoint;
                 }
             }
@@ -271,6 +272,7 @@ namespace BrightstarDB.Storage
                 Logging.LogDebug("AppendCommitPoint: Overwrite requested. Deleting existing master file at '{0}'",
                                  _masterFilePath);
                 _persistenceManager.DeleteFile(_masterFilePath);
+                _commitPoints.Clear();
             }
             if (!_persistenceManager.FileExists(_masterFilePath))
             {
@@ -285,6 +287,7 @@ namespace BrightstarDB.Storage
             {
                 stream.Seek(0, SeekOrigin.End);
                 newCommitPoint.Save(stream);
+                _commitPoints.TryAdd(stream.Length - CommitPoint.RecordSize, newCommitPoint);
                 return newCommitPoint.CommitNumber;
             }
         }

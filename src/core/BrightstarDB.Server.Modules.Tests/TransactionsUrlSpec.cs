@@ -16,7 +16,7 @@ namespace BrightstarDB.Server.Modules.Tests
     [TestFixture]
     public class TransactionsUrlSpec
     {
-        private static readonly MediaRange Json = MediaRange.FromString("application/json");
+        private static readonly MediaRange Json = new MediaRange("application/json");
 
         [Test]
         public void TestGetTransactions()

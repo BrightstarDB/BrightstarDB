@@ -15,7 +15,7 @@ namespace BrightstarDB.Server.Modules.Tests
     [TestFixture]
     public class CommitPointsUrlSpec
     {
-        private static readonly MediaRange Json = MediaRange.FromString("application/json");
+        private static readonly MediaRange Json = new MediaRange("application/json");
 
         [Test]
         [Description("Retrieving commit points requires ViewHistory privileges")]

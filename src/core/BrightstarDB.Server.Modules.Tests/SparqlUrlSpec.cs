@@ -15,7 +15,7 @@ namespace BrightstarDB.Server.Modules.Tests
     [TestFixture]
     public class SparqlUrlSpec
     {
-        private static readonly MediaRange SparqlXml = MediaRange.FromString("application/sparql-results+xml");
+        private static readonly MediaRange SparqlXml = new MediaRange("application/sparql-results+xml");
         private const string SparqlQueryString = "SELECT DISTINCT ?t WHERE { ?x a ?t }";
         private const string DescribeQueryString = "DESCRIBE ?t WHERE { ?x a ?t }";
 
@@ -50,7 +50,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                     SparqlResultsFormat.Json, It.IsAny<RdfFormat>(), out format))
                     .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
             var response = TestGetSucceeds(brightstar, "foo", SparqlQueryString,
-                                           accept: MediaRange.FromString("application/sparql-results+json"));
+                                           accept: new MediaRange("application/sparql-results+json"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
 
@@ -65,7 +65,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                     SparqlResultsFormat.Csv, It.IsAny<RdfFormat>(), out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
             var response = TestGetSucceeds(brightstar, "foo", SparqlQueryString,
-                                           accept: MediaRange.FromString("text/csv"));
+                                           accept: new MediaRange("text/csv"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
 
@@ -79,7 +79,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                                  SparqlResultsFormat.Tsv, It.IsAny<RdfFormat>(), out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
             var response = TestGetSucceeds(brightstar,
-                "foo", SparqlQueryString, accept:MediaRange.FromString("text/tab-separated-values"));
+                "foo", SparqlQueryString, accept:new MediaRange("text/tab-separated-values"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
 
@@ -93,7 +93,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                                  It.IsAny<SparqlResultsFormat>(), RdfFormat.RdfXml, out format))
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
             var response = TestGetSucceeds(brightstar, "foo", DescribeQueryString,
-                                           accept: MediaRange.FromString("application/rdf+xml"));
+                                           accept: new MediaRange("application/rdf+xml"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
 
@@ -110,7 +110,7 @@ namespace BrightstarDB.Server.Modules.Tests
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
             var response = TestGetSucceeds(brightstar, "bar", SparqlQueryString,
                                            defaultGraphUris: new[] {"http://some/graph/uri"},
-                                           accept: MediaRange.FromString("application/sparql-results+xml"));
+                                           accept: new MediaRange("application/sparql-results+xml"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
 
@@ -127,7 +127,7 @@ namespace BrightstarDB.Server.Modules.Tests
                       .Returns(new MemoryStream(Encoding.UTF8.GetBytes(mockResponse)));
             var response = TestGetSucceeds(brightstar, "bar", SparqlQueryString,
                                            defaultGraphUris: new[] {"http://some/graph/uri", "http://some/other/graph"},
-                                           accept: MediaRange.FromString("application/sparql-results+xml"));
+                                           accept: new MediaRange("application/sparql-results+xml"));
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
         }
 
@@ -145,7 +145,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                            formats: new string[] {format.MediaTypes[0]},
                                            accept: "application/xml");
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
-            Assert.That(MediaRange.FromString(format.MediaTypes[0]).Matches(MediaRange.FromString(response.ContentType)),
+            Assert.That(new MediaRange(format.MediaTypes[0]).Matches(new MediaRange(response.ContentType)),
                 "Expected content type: {0}. Got: {1}", format.MediaTypes[0], response.ContentType);
         }
 
@@ -163,7 +163,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                            formats: new string[] { format.MediaTypes[0] },
                                            accept: "text/html");
             Assert.That(response.Body.AsString(), Is.EqualTo(mockResponse));
-            Assert.That(MediaRange.FromString(format.MediaTypes[0]).Matches(MediaRange.FromString(response.ContentType)),
+            Assert.That(new MediaRange(format.MediaTypes[0]).Matches(new MediaRange(response.ContentType)),
                 "Expected content type: {0}. Got: {1}", format.MediaTypes[0], response.ContentType);
         }
 
@@ -173,9 +173,9 @@ namespace BrightstarDB.Server.Modules.Tests
             TestFormPostSucceeds("foo", SparqlQueryString, null, null, SparqlXml,
                                  SparqlResultsFormat.Xml, null);
             TestFormPostSucceeds("foo", SparqlQueryString, new[] {"http://some/graph/uri"}, null,
-                                 MediaRange.FromString("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
+                                 new MediaRange("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
             TestFormPostSucceeds("foo", SparqlQueryString, new[] { "http://some/graph/uri", "http://some/other/uri" }, null,
-                                 MediaRange.FromString("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
+                                 new MediaRange("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
         }
 
         [Test]
@@ -184,9 +184,9 @@ namespace BrightstarDB.Server.Modules.Tests
             TestSparqlPostSucceeds("foo", SparqlQueryString, null, null, SparqlXml,
                                  SparqlResultsFormat.Xml, null);
             TestSparqlPostSucceeds("foo", SparqlQueryString, new[] { "http://some/graph/uri" }, null,
-                                 MediaRange.FromString("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
+                                 new MediaRange("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
             TestSparqlPostSucceeds("foo",SparqlQueryString, new[] { "http://some/graph/uri", "http://some/other/uri" }, null,
-                                 MediaRange.FromString("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
+                                 new MediaRange("application/sparql-results+xml"), SparqlResultsFormat.Xml, null);
         }
 
         [Test]
@@ -384,7 +384,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
             // Execute
-            var response = app.Get("/foo/sparql", with => with.Accept(MediaRange.FromString("text/html")));
+            var response = app.Get("/foo/sparql", with => with.Accept(new MediaRange("text/html")));
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response.Body.AsString().Contains("<form method=\"POST\">"));
         }
@@ -401,7 +401,7 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             // Setup
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            if (accept == null) accept = MediaRange.FromString("application/sparql-results+xml");
+            if (accept == null) accept = new MediaRange("application/sparql-results+xml");
             // Execute
             var response = app.Get("/" + storeName + "/sparql", with =>
             {
@@ -446,7 +446,7 @@ namespace BrightstarDB.Server.Modules.Tests
         {
             // Setup
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
-            if (accept == null) accept = MediaRange.FromString("application/sparql-results+xml");
+            if (accept == null) accept = new MediaRange("application/sparql-results+xml");
             // Execute
             var response = app.Get("/" + storeName + "/sparql", with =>
                 {
@@ -478,7 +478,7 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             if (formats == null)
             {
-                Assert.That(accept.Matches(MediaRange.FromString(response.ContentType)));
+                Assert.That(accept.Matches(new MediaRange(response.ContentType)));
             }
             brightstar.Verify();
             return response;
@@ -517,7 +517,7 @@ namespace BrightstarDB.Server.Modules.Tests
                 });
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(accept.Matches(MediaRange.FromString(response.ContentType)));
+            Assert.That(accept.Matches(new MediaRange(response.ContentType)));
             Assert.That(response.Body.AsString(), Is.EqualTo("Mock Results"));
             brightstar.Verify();
         }
@@ -556,7 +556,7 @@ namespace BrightstarDB.Server.Modules.Tests
             });
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(accept.Matches(MediaRange.FromString(response.ContentType)));
+            Assert.That(accept.Matches(new MediaRange(response.ContentType)));
             Assert.That(response.Body.AsString(), Is.EqualTo("Mock Results"));
             brightstar.Verify();
         }

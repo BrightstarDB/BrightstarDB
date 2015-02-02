@@ -14,6 +14,33 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX.
 
 ****************************
+ BrightstarDB 1.9.1
+****************************
+
+    This is primarily a bug-fix release with some important updates for applications using date/time values in the BrightstarDB Entity Framework.
+    In addition this release adds support for the Xamarin.iOS PCL profile. This enables BrightstarDB to be used in Xamarin.Forms PCL applications 
+    across Android, Windows Phone and iOS. There are no changes to the store file format, and no breaking API changes. This is a recommended update 
+    for all users.
+
+    - NEW: The PCL platform libraries now includes support for the Xamarin.iOS, Version=1.0 PCL framework. 
+
+    - FIX: Making changes the the properties of BrightstarDB.Configuration that configure the server-side query caching will now cause the cache to be
+           deleted and recreated with the new settings on the next request for the cache handle.
+    
+    - FIX: Added caching of master file data structures to improve performance in applications that perform large numbers of reads per write.
+    
+    - FIX: UTC date/time values now keep their status as UTC values. Thanks to kentcb for the bug report.
+    
+    - FIX: Fix for round-tripping date/time values in US locale.
+    
+    - FIX: Fixed an issue in the text template code generation for EF that would report an error on properties using a nullable enumeration type.
+           Thanks to kentcb for the bug report on this one too!
+    
+    - NEW: Added caching of master file status which should improve performance in applications which perform large numbers of read/query operations
+           from the same commit point.
+          
+           
+****************************
  BrightstarDB 1.9 Release
 ****************************
 

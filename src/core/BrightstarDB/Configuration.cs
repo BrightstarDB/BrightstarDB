@@ -17,6 +17,11 @@ namespace BrightstarDB
     /// </summary>
     public class Configuration
     {
+        private static bool _enableQueryCache;
+        private static string _queryCacheDirectory;
+        private static int _queryCacheMemory;
+        private static int _queryCacheDiskSpace;
+        private static ICache _queryCache;
         private const string StoreLocationPropertyName = "BrightstarDB.StoreLocation";
         private const string TxnFlushTriggerPropertyName = "BrightstarDB.TxnFlushTripleCount";
         private const string ConnectionStringPropertyName = "BrightstarDB.ConnectionString";
@@ -222,27 +227,67 @@ namespace BrightstarDB
         /// <summary>
         /// Enable or disable server-side SPARQL query cache
         /// </summary>
-        public static bool EnableQueryCache { get; set; }
+        public static bool EnableQueryCache
+        {
+            get { return _enableQueryCache; }
+            set
+            {
+                if (value == _enableQueryCache) return;
+                _enableQueryCache = value;
+                QueryCache = null;
+            }
+        }
 
         /// <summary>
         /// The path to the directory to use for the server-side SPARQL query disk cache
         /// </summary>
-        public static string QueryCacheDirectory { get; set; }
+        public static string QueryCacheDirectory
+        {
+            get { return _queryCacheDirectory; }
+            set
+            {
+                if (value == _queryCacheDirectory) return;
+                _queryCacheDirectory = value;
+                QueryCache = null;
+            }
+        }
 
         /// <summary>
         /// Maximum size of server-side SPARQL query memory cache in MB
         /// </summary>
-        public static int QueryCacheMemory { get; set; }
+        public static int QueryCacheMemory
+        {
+            get { return _queryCacheMemory; }
+            set
+            {
+                if (value == _queryCacheMemory) return;
+                _queryCacheMemory = value;
+                QueryCache = null;
+            }
+        }
 
         /// <summary>
         /// Maximum size of the server-side SPARQL query disk cache in MB
         /// </summary>
-        public static int QueryCacheDiskSpace { get; set; }
+        public static int QueryCacheDiskSpace
+        {
+            get { return _queryCacheDiskSpace; }
+            set
+            {
+                if (value == _queryCacheDiskSpace) return;
+                _queryCacheDiskSpace = value;
+                QueryCache = null;
+            }
+        }
 
         /// <summary>
         /// Retrieves the SPARQL query cache
         /// </summary>
-        public static ICache QueryCache { get; private set; }
+        public static ICache QueryCache
+        {
+            get { return _queryCache ?? (_queryCache = GetQueryCache()); }
+            private set { _queryCache = value; }
+        }
 
 
         /// <summary>

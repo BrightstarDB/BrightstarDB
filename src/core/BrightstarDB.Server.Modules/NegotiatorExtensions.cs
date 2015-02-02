@@ -65,7 +65,7 @@ namespace BrightstarDB.Server.Modules
             {
                 pagedView = pagedView.Substring(0, pagedView.Length - 5);
             }
-            return negotiate.WithMediaRangeModel(MediaRange.FromString("text/html"),
+            return negotiate.WithMediaRangeModel(new MediaRange("text/html"), 
                 new PagedResultModel<T>(first, prev, next, returnList, requestObject))
                                           .WithView(pagedView)
                      .WithMediaRangeModel("application/json", returnList);

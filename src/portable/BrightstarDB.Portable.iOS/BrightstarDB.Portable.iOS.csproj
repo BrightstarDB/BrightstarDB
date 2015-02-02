@@ -5,10 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C5AF0D3B-A7F5-4678-B41E-14EE3C3124EC}</ProjectGuid>
-    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{8E7B2582-CEF4-48AC-83CC-290E44E98724}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <RootNamespace>BrightstarDB.Portable.iOS</RootNamespace>
+    <RootNamespace>BrightstarDB</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
     <AssemblyName>BrightstarDB.Portable.iOS</AssemblyName>
   </PropertyGroup>
@@ -49,16 +49,7 @@
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="monotouch" />
+    <Reference Include="Xamarin.iOS" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets" />
-  <Import Project="..\..\..\common.proj" />
-  <PropertyGroup>
-    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
-    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
-    <AssemblyTitle>BrightstarDB Portable Class Library iOS Assembly</AssemblyTitle>
-  </PropertyGroup>
-  <Target Name="BeforeBuild">
-    <CallTarget Targets="GenerateAssemblyInfo" />
-  </Target>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

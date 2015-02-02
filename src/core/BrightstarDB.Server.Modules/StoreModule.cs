@@ -44,7 +44,7 @@ namespace BrightstarDB.Server.Modules
                     {
                         brightstarService.DeleteStore(storeName);
                     }
-                    return Negotiate.WithMediaRangeModel(MediaRange.FromString("text/html"),
+                    return Negotiate.WithMediaRangeModel(new MediaRange("text/html"), 
                                                          new StoreDeletedModel {StoreName = storeName});
                 };
         }

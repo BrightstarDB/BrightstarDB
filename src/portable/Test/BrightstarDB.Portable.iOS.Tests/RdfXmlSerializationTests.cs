@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Security.AccessControl;
-using System.Text;
 using System.Xml.Linq;
 using NUnit.Framework;
 using VDS.RDF;
 using VDS.RDF.Writing;
+using StringWriter = System.IO.StringWriter;
 
 namespace BrightstarDB.Portable.iOS.Tests
 {
@@ -22,7 +20,7 @@ namespace BrightstarDB.Portable.iOS.Tests
             //g.Assert(g.CreateUriNode(new Uri("http://example.org/s")),
             //    g.CreateUriNode(new Uri("http://example.org/ns2/p")),
             //    g.CreateLiteralNode("Another o"));
-            using (var stringWriter = new System.IO.StringWriter())
+            using (var stringWriter = new StringWriter())
             {
                 var writer = new RdfXmlWriter();
                 writer.Save(g, stringWriter);
