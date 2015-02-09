@@ -1450,6 +1450,38 @@ where {
         }
 
         [Test]
+        public void TestSetCollectionWithManyToOneInverse()
+        {
+            var storeName = "TestSetCollectionWithManyToOneInverse_" + DateTime.Now.Ticks;
+            string marketId;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var market = new Market
+                {
+                    ListedCompanies = new[]
+                    {
+                        new Company {Name = "CompanyA"},
+                        new Company {Name = "CompanyB"},
+                        new Company {Name = "CompanyC"},
+                    }
+                };
+                context.Markets.Add(market);
+                context.SaveChanges();
+                marketId = market.Id;
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                var market = context.Markets.FirstOrDefault(x => x.Id.Equals(marketId));
+                Assert.IsNotNull(market);
+                Assert.AreEqual(3, market.ListedCompanies.Count);
+                Assert.IsTrue(market.ListedCompanies.Any(x => x.Name.Equals("CompanyA")));
+                Assert.IsTrue(market.ListedCompanies.Any(x => x.Name.Equals("CompanyB")));
+                Assert.IsTrue(market.ListedCompanies.Any(x => x.Name.Equals("CompanyC")));
+            }
+        }
+
+        [Test]
         public void TestQueryOnPrefixedIdentifier()
         {
             var storeName = Guid.NewGuid().ToString();

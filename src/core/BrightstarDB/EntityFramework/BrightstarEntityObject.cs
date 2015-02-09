@@ -758,6 +758,7 @@ namespace BrightstarDB.EntityFramework
                     {
                         if (!i.IsAttached)
                         {
+                            i.AssertIdentity();
                             i.Attach(_context);
                         }
                         DataObject.AddProperty(propertyHint.SchemaTypeUri, i.DataObject);
