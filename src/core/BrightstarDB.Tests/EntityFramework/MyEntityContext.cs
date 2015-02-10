@@ -46,6 +46,8 @@ namespace BrightstarDB.Tests.EntityFramework
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IArticle, BrightstarDB.Tests.EntityFramework.Article>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IBaseEntity));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IBaseEntity, BrightstarDB.Tests.EntityFramework.BaseEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IChildEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IChildEntity, BrightstarDB.Tests.EntityFramework.ChildEntity>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IChildKeyEntity));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IChildKeyEntity, BrightstarDB.Tests.EntityFramework.ChildKeyEntity>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ICompany));
@@ -90,6 +92,8 @@ namespace BrightstarDB.Tests.EntityFramework
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionMember, BrightstarDB.Tests.EntityFramework.InverseProperty.ProductionMember>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionPerson));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionPerson, BrightstarDB.Tests.EntityFramework.InverseProperty.ProductionPerson>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IParentEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IParentEntity, BrightstarDB.Tests.EntityFramework.ParentEntity>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IPerson));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IPerson, BrightstarDB.Tests.EntityFramework.Person>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ISession));
@@ -174,6 +178,7 @@ namespace BrightstarDB.Tests.EntityFramework
     		Animals = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IAnimal>(this);
     		Articles = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IArticle>(this);
     		BaseEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IBaseEntity>(this);
+    		ChildEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IChildEntity>(this);
     		ChildKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IChildKeyEntity>(this);
     		Companies = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ICompany>(this);
     		CompositeKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity>(this);
@@ -196,6 +201,7 @@ namespace BrightstarDB.Tests.EntityFramework
     		Productions = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProduction>(this);
     		ProductionMembers = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionMember>(this);
     		ProductionPersons = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionPerson>(this);
+    		ParentEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IParentEntity>(this);
     		Persons = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IPerson>(this);
     		Sessions = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ISession>(this);
     		EveningSessions = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IEveningSession>(this);
@@ -217,6 +223,11 @@ namespace BrightstarDB.Tests.EntityFramework
     	}
     	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.IBaseEntity> BaseEntities
+    	{
+    		get; private set;
+    	}
+    	
+    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IChildEntity> ChildEntities
     	{
     		get; private set;
     	}
@@ -331,6 +342,11 @@ namespace BrightstarDB.Tests.EntityFramework
     		get; private set;
     	}
     	
+    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IParentEntity> ParentEntities
+    	{
+    		get; private set;
+    	}
+    	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.IPerson> Persons
     	{
     		get; private set;
@@ -381,6 +397,9 @@ namespace BrightstarDB.Tests.EntityFramework
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IBaseEntity))) {
                 return (IEntitySet<T>)this.BaseEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IChildEntity))) {
+                return (IEntitySet<T>)this.ChildEntities;
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IChildKeyEntity))) {
                 return (IEntitySet<T>)this.ChildKeyEntities;
@@ -447,6 +466,9 @@ namespace BrightstarDB.Tests.EntityFramework
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionPerson))) {
                 return (IEntitySet<T>)this.ProductionPersons;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IParentEntity))) {
+                return (IEntitySet<T>)this.ParentEntities;
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IPerson))) {
                 return (IEntitySet<T>)this.Persons;
@@ -563,6 +585,37 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
             		get { return GetRelatedProperty<System.String>("BaseStringValue"); }
             		set { SetRelatedProperty("BaseStringValue", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
+    public partial class ChildEntity : BrightstarEntityObject, IChildEntity 
+    {
+    	public ChildEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public ChildEntity(BrightstarEntityContext context) : base(context, typeof(ChildEntity)) { }
+    	public ChildEntity() : base() { }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.IChildEntity
+    
+    	public System.String Code
+    	{
+            		get { return GetRelatedProperty<System.String>("Code"); }
+            		set { SetRelatedProperty("Code", value); }
+    	}
+    
+    	public System.String Description
+    	{
+            		get { return GetRelatedProperty<System.String>("Description"); }
+            		set { SetRelatedProperty("Description", value); }
+    	}
+    
+    	public BrightstarDB.Tests.EntityFramework.IParentEntity Parent
+    	{
+            get { return GetRelatedObject<BrightstarDB.Tests.EntityFramework.IParentEntity>("Parent"); }
+            set { SetRelatedObject<BrightstarDB.Tests.EntityFramework.IParentEntity>("Parent", value); }
     	}
     	#endregion
     }
@@ -1395,6 +1448,24 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
             		get { return GetRelatedProperty<System.String>("Name"); }
             		set { SetRelatedProperty("Name", value); }
     	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
+    public partial class ParentEntity : BrightstarEntityObject, IParentEntity 
+    {
+    	public ParentEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public ParentEntity(BrightstarEntityContext context) : base(context, typeof(ParentEntity)) { }
+    	public ParentEntity() : base() { }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.IParentEntity
+    	public System.Collections.Generic.ICollection<BrightstarDB.Tests.EntityFramework.IChildEntity> Children
+    	{
+    		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.IChildEntity>("Children"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("Children", value); }
+    								}
     	#endregion
     }
 }
