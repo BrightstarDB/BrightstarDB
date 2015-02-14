@@ -418,17 +418,21 @@ namespace BrightstarDB.Client
 
         public IEnumerable<Triple> GetReferencingTriples(IDataObject obj)
         {
-            var queryResults = ExecuteSparql(String.Format(AllInverseOfSparql, obj.Identity));
-            return queryResults.ResultDocument.SparqlResultRows().Select(row => new Triple
-                {
-                    Subject = row.GetColumnValue("s").ToString(),
-                    Predicate = row.GetColumnValue("p").ToString(),
-                    Object = obj.Identity,
-                    IsLiteral = false,
-                    Graph = row.GetColumnValue("g").ToString()
-                });
+            return GetReferencingTriples(obj.Identity);
         }
 
+        public IEnumerable<Triple> GetReferencingTriples(string identity)
+        {
+            var queryResults = ExecuteSparql(String.Format(AllInverseOfSparql, identity));
+            return queryResults.ResultDocument.SparqlResultRows().Select(row => new Triple
+            {
+                Subject = row.GetColumnValue("s").ToString(),
+                Predicate = row.GetColumnValue("p").ToString(),
+                Object = identity,
+                IsLiteral = false,
+                Graph = row.GetColumnValue("g").ToString()
+            });
+        } 
 
         /// <summary>
         /// Adds preconditions to validate that there is no existing resource with the URI
@@ -441,6 +445,50 @@ namespace BrightstarDB.Client
             _nonExistencePreconditions.RemoveBySubjectPredicate(identity, DataObject.TypeDataObject.Identity);
             _nonExistencePreconditions.AddRange(
                 types.Select(x=>new Triple{Subject = identity, Predicate = DataObject.TypeDataObject.Identity, Object = x, Graph = Constants.WildcardUri}));
+        }
+
+        public void ReplaceIdentity(string oldIdentity, string newIdentity)
+        {
+            // Replace any references in the AddTriples collection
+            foreach (var addTriple in AddTriples.GetMatches(new Triple{Subject=null, Predicate=null, Object=oldIdentity, IsLiteral = false}).ToList())
+            {
+                AddTriples.Add(new Triple
+                {
+                    Subject = addTriple.Subject,
+                    Predicate = addTriple.Predicate,
+                    Object = newIdentity,
+                    Graph = addTriple.Graph
+                });
+            }
+            AddTriples.RemoveByObject(oldIdentity);
+
+            DataObject dataObject;
+            var isNew = _managedProxies.TryGetValue(oldIdentity, out dataObject) && dataObject.IsNew;
+            if (!isNew)
+            {
+                // There may be some references in the store that are not currently materialised on the client
+                // So query for those and ensure an update
+                foreach (var refTriple in GetReferencingTriples(oldIdentity))
+                {
+                    AddTriples.Add(new Triple
+                    {
+                        Subject = refTriple.Subject,
+                        Predicate = refTriple.Predicate,
+                        Object = newIdentity,
+                        Graph = refTriple.Graph
+                    });
+                }
+                DeletePatterns.Add(new Triple
+                {
+                    Subject = Constants.WildcardUri,
+                    Predicate = Constants.WildcardUri,
+                    Object = oldIdentity,
+                    Graph = _updateGraphUri
+                });
+            }
+
+            // Remove class unique constraints for the old identiy (if any)
+            _nonExistencePreconditions.RemoveBySubjectPredicate(oldIdentity, DataObject.TypeDataObject.Identity);
         }
 
         #endregion

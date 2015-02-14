@@ -36,6 +36,13 @@ namespace BrightstarDB.Client
         void AddRange(IEnumerable<ITriple> triples);
 
         /// <summary>
+        /// Removes a triple from the collection
+        /// </summary>
+        /// <param name="triple">The triple to be removed</param>
+        /// <exception cref="ArgumentNullException">Raised if <paramref name="triple"/> is NULL</exception>
+        void Remove(ITriple triple);
+
+        /// <summary>
         ///     Removes all triples in the collection that have a specific subject URI
         /// </summary>
         /// <param name="subject">The subject URI of the triples to be removed from the collection</param>
