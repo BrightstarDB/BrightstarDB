@@ -788,6 +788,7 @@ namespace BrightstarDB.EntityFramework
                 }
             }
             _context = context as BrightstarEntityContext;
+            if (_identity == null) AssertIdentity();
             if (DataObject == null && _identity != null)
             {
                 DataObject = _context.GetDataObject(new Uri(_identity), false);

@@ -18,6 +18,7 @@ using System.Text;
 using System.ComponentModel;
 using BrightstarDB.Rdf;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BrightstarDB.Tests.EntityFramework 
 {
@@ -82,6 +83,8 @@ namespace BrightstarDB.Tests.EntityFramework
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ILowerKeyEntity, BrightstarDB.Tests.EntityFramework.LowerKeyEntity>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IMarket));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IMarket, BrightstarDB.Tests.EntityFramework.Market>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.INoId));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.INoId, BrightstarDB.Tests.EntityFramework.NoId>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IPerformance));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.InverseProperty.IPerformance, BrightstarDB.Tests.EntityFramework.InverseProperty.Performance>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IPhoto));
@@ -196,6 +199,7 @@ namespace BrightstarDB.Tests.EntityFramework
     		JobRoles = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IJobRole>(this);
     		LowerKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ILowerKeyEntity>(this);
     		Markets = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IMarket>(this);
+    		NoIds = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.INoId>(this);
     		Performances = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IPerformance>(this);
     		Photos = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IPhoto>(this);
     		Productions = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProduction>(this);
@@ -313,6 +317,11 @@ namespace BrightstarDB.Tests.EntityFramework
     	}
     	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.IMarket> Markets
+    	{
+    		get; private set;
+    	}
+    	
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.INoId> NoIds
     	{
     		get; private set;
     	}
@@ -451,6 +460,9 @@ namespace BrightstarDB.Tests.EntityFramework
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IMarket))) {
                 return (IEntitySet<T>)this.Markets;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.INoId))) {
+                return (IEntitySet<T>)this.NoIds;
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.InverseProperty.IPerformance))) {
                 return (IEntitySet<T>)this.Performances;
@@ -1332,6 +1344,30 @@ namespace BrightstarDB.Tests.EntityFramework
     		get { return GetRelatedObjects<BrightstarDB.Tests.EntityFramework.ICompany>("ListedCompanies"); }
     		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedObjects("ListedCompanies", value); }
     								}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
+    internal partial class NoId : BrightstarEntityObject, INoId 
+    {
+    	public NoId(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public NoId(BrightstarEntityContext context) : base(context, typeof(NoId)) { }
+    	public NoId() : base() { }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.INoId
+    
+    	public System.String Name
+    	{
+            		get { return GetRelatedProperty<System.String>("Name"); }
+            		set { SetRelatedProperty("Name", value); }
+    	}
+    
+    	public BrightstarDB.Tests.EntityFramework.IPerson Owner
+    	{
+            get { return GetRelatedObject<BrightstarDB.Tests.EntityFramework.IPerson>("Owner"); }
+            set { SetRelatedObject<BrightstarDB.Tests.EntityFramework.IPerson>("Owner", value); }
+    	}
     	#endregion
     }
 }

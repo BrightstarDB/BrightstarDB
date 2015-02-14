@@ -125,6 +125,7 @@
     <Compile Include="EntityFramework\Entity.cs" />
     <Compile Include="EntityFramework\ExtendedContextTests.cs" />
     <Compile Include="EntityFramework\IChildEntity.cs" />
+    <Compile Include="EntityFramework\INoId.cs" />
     <Compile Include="EntityFramework\InversePropertyTests.cs" />
     <Compile Include="EntityFramework\InverseProperty\IPerformance.cs" />
     <Compile Include="EntityFramework\InverseProperty\IPhoto.cs" />
@@ -164,6 +165,7 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Include="EntityFramework\NoIdPropertyTests.cs" />
     <Compile Include="EntityFramework\OptimisticLockingTestsBase.cs" />
     <Compile Include="EntityFramework\PlainLiteralTests.cs" />
     <Compile Include="EntityFramework\PropertyChangeNotificationTests.cs" />
