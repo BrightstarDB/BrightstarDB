@@ -250,7 +250,10 @@ namespace BrightstarDB.EntityFramework
                 }
                 var key = identityInfo.KeyConverter.GenerateKey(propertyValues, identityInfo.KeySeparator, item.GetType());
                 if (key == null) throw new EntityKeyRequiredException();
-                if (!key.Equals(item.GetKey())) throw new EntityKeyChangedException();
+                if (!key.Equals(item.GetKey()))
+                {
+                    throw new EntityKeyChangedException();
+                }
             }
         }
 
