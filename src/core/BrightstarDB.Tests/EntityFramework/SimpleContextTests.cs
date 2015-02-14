@@ -2099,6 +2099,15 @@ where {
         }
 
         [Test]
+        public void TestRetrieveUnsetId()
+        {
+            MyEntityContext.InitializeEntityMappingStore();
+            var entity = new Person();
+            var id = entity.Id;
+            Assert.That(id, Is.EqualTo(null));
+        }
+
+        [Test]
         public void TestRepositoryPattern()
         {
             var storeName = "TestRepositoryPattern" + DateTime.Now.Ticks;
