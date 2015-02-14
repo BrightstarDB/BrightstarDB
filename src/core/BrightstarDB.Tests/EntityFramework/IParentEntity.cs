@@ -12,7 +12,6 @@ namespace BrightstarDB.Tests.EntityFramework
         [Identifier("http://example.org/repro/")]
         string Id { get; }
 
-        [InverseProperty("Parent")]
         ICollection<IChildEntity> Children { get; set; } 
     }
 }

@@ -183,8 +183,6 @@ namespace BrightstarDB.Tests.EntityFramework
                 child.Code = "child";
                 child.Description = "Some description";
                 child.Parent = parent;
-                context.ChildEntities.Add(child);
-
                 context.SaveChanges();
             }
 
@@ -192,9 +190,7 @@ namespace BrightstarDB.Tests.EntityFramework
             {
                 var parent = context.ParentEntities.First();
                 var child = context.ChildEntities.First();
-
                 child.Description = "Update description";
-
                 context.SaveChanges();
             }
         }

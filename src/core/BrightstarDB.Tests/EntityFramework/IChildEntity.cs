@@ -9,6 +9,7 @@ namespace BrightstarDB.Tests.EntityFramework
         string Id { get; }
         string Code { get; set; }
         string Description { get; set; }
+        [InverseProperty("Children")]
         IParentEntity Parent { get; set; }
     }
 }
