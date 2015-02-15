@@ -13,6 +13,7 @@ namespace BrightstarDB.PerformanceTests
 {
     [TestFixture(true)]
     [TestFixture(false)]
+    [Category("LongRunning")]
     public class SparqlPerformance
     {
         private readonly bool _useVirtualNodes;

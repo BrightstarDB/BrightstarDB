@@ -5,6 +5,7 @@ using NUnit.Framework;
 namespace BrightstarDB.PerformanceTests
 {
     [TestFixture]
+    [Category("LongRunning")]
     public class AppendOnlyStorageStressTest : StorageStressTestBase
     {
         // Test insert of half a million records in different batch sizes
