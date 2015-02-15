@@ -203,10 +203,6 @@ namespace BrightstarDB.Tests.EntityFramework
 
         }
         
-        public void TestLinqCast()
-        {
-        }
-
         [Test]
         public void TestLinqContainsString()
         {
@@ -2030,6 +2026,23 @@ namespace BrightstarDB.Tests.EntityFramework
 
             var count2 = context.Persons.Count(e => null == e.Name);
             Assert.AreEqual(1, count2);
+        }
+
+        [Test]
+        public void TestLinqRetrieveId()
+        {
+            var connectionString = GetConnectionString("TestLinqRetrieveId");
+            using (var context = new MyEntityContext(connectionString))
+            {
+                var alice = new Person {Id = "alice", Name = "Alice"};
+                context.Persons.Add(alice);
+                context.SaveChanges();
+            
+                var entity = context.Persons.First();
+                Assert.That(entity.Id, Is.EqualTo("alice"));
+                var id = context.Persons.Select(x=>x.Id).First();
+                Assert.That(id, Is.EqualTo("alice"));
+            }
         }
 
     }

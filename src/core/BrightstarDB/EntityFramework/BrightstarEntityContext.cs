@@ -451,6 +451,7 @@ namespace BrightstarDB.EntityFramework
             foreach (var row in resultDoc.SparqlResultRows())
             {
                 var value = row.GetColumnValue(0);
+                if (value == null) yield return default(T);
                 if (value.GetType() == typeof(T))
                 {
                     yield return (T)value;
