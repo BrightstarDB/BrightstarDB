@@ -22,10 +22,12 @@ namespace BrightstarDB.EntityFramework.Tests
             var q = Context.Concepts.Where(c => c.PrefLabel.Equals(new PlainLiteral("Test", "en"))).Select(c => c.Id);
             var results = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?c WHERE {
+                @"SELECT ?v1 WHERE {
 ?c a <http://www.networkedplanet.com/schemas/test/Concept> .
 ?c <http://www.networkedplanet.com/schemas/test/prefLabel> ?v0 .
-FILTER(?v0 = 'Test'@en) . }");
+FILTER(?v0 = 'Test'@en) . 
+BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}");
         }
 
         [Test]
@@ -37,12 +39,14 @@ FILTER(?v0 = 'Test'@en) . }");
                        .Select(c => c.Id);
             var results = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?c WHERE {
+                @"SELECT ?v1 WHERE {
 ?c a <http://www.networkedplanet.com/schemas/test/Concept> .
 FILTER EXISTS {
     ?c <http://www.networkedplanet.com/schemas/test/altLabel> ?alt .
     FILTER (?alt = 'Another Test'@en-gb) . 
-} }");
+} 
+BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}");
         }
 
         [Test]
@@ -52,12 +56,14 @@ FILTER EXISTS {
                            .Select(c => c.Id);
             var results = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?c WHERE {
+                @"SELECT ?v1 WHERE {
 ?c a <http://www.networkedplanet.com/schemas/test/Concept> .
 FILTER EXISTS {
     ?c <http://www.networkedplanet.com/schemas/test/altLabel> ?alt .
     FILTER ((LANG(?alt)) = 'en-gb') .
-} }");
+} 
+BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}");
         }
 
         [Test]
@@ -69,12 +75,14 @@ FILTER EXISTS {
                        .Select(c => c.Id);
             var results = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?c WHERE {
+                @"SELECT ?v1 WHERE {
     ?c a <http://www.networkedplanet.com/schemas/test/Concept> .
     FILTER EXISTS {
         ?c <http://www.networkedplanet.com/schemas/test/altLabel> ?alt .
         FILTER ((STRSTARTS((STR(?alt)), 'Networked')) && ((LANG(?alt)) = 'en-gb')) .
-    } }");
+    } 
+    BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}");
         }
 
         [Test]

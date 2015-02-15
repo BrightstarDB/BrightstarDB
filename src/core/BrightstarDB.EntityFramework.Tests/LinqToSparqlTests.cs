@@ -656,25 +656,29 @@ FILTER(sameTerm(?m,?v0)) .
                     where d.Rsvps.Any(r => r.AttendeeEmail.Equals("kal@networkedplanet.com"))
                     select d.Id;
             var result = q.ToList();
-            AssertQuerySparql(@"SELECT ?d WHERE {
+            AssertQuerySparql(@"SELECT ?v2 WHERE {
     ?d a <http://www.networkedplanet.com/schemas/test/Dinner> .
     FILTER EXISTS {
         ?d <http://www.networkedplanet.com/schemas/test/attendees> ?r .
         ?r <http://www.networkedplanet.com/schemas/test/email> ?v1 .
         FILTER (?v1 = 'kal@networkedplanet.com') .
-    } }");
+    }
+    BIND(STRAFTER(STR(?d), 'http://www.brightstardb.com/.well-known/genid/') AS ?v2)
+}");
 
             var q2 = from m in Context.Markets
                      where m.ListedCompanies.Any(c => c.CurrentSharePrice > 10.0m)
                      select m.Id;
             var r2 = q2.ToList();
-            AssertQuerySparql(@"SELECT ?m WHERE {
+            AssertQuerySparql(@"SELECT ?v2 WHERE {
     ?m a <http://www.networkedplanet.com/schemas/test/Market> .
     FILTER EXISTS {
         ?m <http://www.networkedplanet.com/schemas/test/listing> ?c .
         ?c <http://www.networkedplanet.com/schemas/test/price> ?v1 .
         FILTER (?v1 > '10.00'^^<http://www.w3.org/2001/XMLSchema#decimal>) .
-    } }");
+    } 
+    BIND(STRAFTER(STR(?m), 'http://www.brightstardb.com/.well-known/genid/') AS ?v2)
+}");
         }
 
         [Test]
