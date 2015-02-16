@@ -231,6 +231,7 @@
 		<PlatformNuspecTemplate Include="nuget\BrightstarDB.Platform.nuspec.template"/>
         <Net40Libs Include="InstallerTmp\SDK\Net40\BrightstarDB.dll;InstallerTmp\SDK\Net40\Remotion.Linq.dll" />
         <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
+        <ForceReference Include="nuget\BrightstarDBForceReference.cs.pp" />
 		<PortableLibs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\BrightstarDB.Portable.dll" />
         <!-- Temporary workaround for DNR packaging issues -->
         <PortableLibs Include="..\src\portable\lib\**\*.*" />
@@ -295,6 +296,7 @@
     <Copy SourceFiles="@(PortableAndroid)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoAndroid10" />
     <Copy SourceFiles="@(PortableMonoTouch)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoTouch10" Condition="$(BuildIOS)" />
     <Copy SourceFiles="@(PortableIOS)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\Xamarin.iOS10" Condition="$(BuildIOS)" />
+    <Copy SourceFiles="@(ForceReference)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\content"/>
     <Warning Text="The iOS platform assembly is not included in this build." Condition="!$(BuildIOS)"/>
 	
     <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" />
