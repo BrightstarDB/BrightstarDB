@@ -22,6 +22,7 @@
         <dependency id="dotNetRDF" version="1.0.7" />
       </group>
       <group targetFramework="portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10">
+        <dependency id="Newtonsoft.Json" />
       </group>
     </dependencies>
   </metadata>

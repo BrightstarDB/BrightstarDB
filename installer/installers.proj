@@ -234,7 +234,7 @@
         <ForceReference Include="nuget\BrightstarDBForceReference.cs.pp" />
 		<PortableLibs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\BrightstarDB.Portable.dll" />
         <!-- Temporary workaround for DNR packaging issues -->
-        <PortableLibs Include="..\src\portable\lib\**\*.*" />
+        <PortableLibs Include="..\src\portable\lib\**\*.*" Exclude="..\src\portable\lib\**\Newtonsoft*.*" />
         <!-- End temporary workaround -->
 		<PortableDesktop Include="..\src\portable\BrightstarDB.Portable.Desktop\bin\$(Configuration)\BrightstarDB.Portable.Desktop.dll" />
 		<PortablePhone Include="..\src\portable\BrightstarDB.Portable.Phone\bin\$(Configuration)\BrightstarDB.Portable.Phone.dll"/>
