@@ -74,6 +74,12 @@ namespace BrightstarDB.EntityFramework.Tests
         }
 
         [Test]
+        public void TestIdEscaping(){
+            var q = Context.Dinners.FirstOrDefault(x => x.Id == "foo bar");
+            AssertQuerySparql("ASK { <id:foo%20bar> a <http://www.networkedplanet.com/schemas/test/Dinner> . }");
+        }
+
+        [Test]
         public void TestGetRsvpByDinnerId()
         {
             var q = from x in Context.Rsvps where x.Dinner.Id.Equals("1") select x;
@@ -759,6 +765,7 @@ FILTER(sameTerm(?m,?v0)) .
     } 
 }");
         }
+
 
     }
 

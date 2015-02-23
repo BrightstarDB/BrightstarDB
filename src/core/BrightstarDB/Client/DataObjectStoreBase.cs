@@ -224,7 +224,8 @@ namespace BrightstarDB.Client
             var validUri = Uri.TryCreate(identity, UriKind.Absolute, out uri);
             if(validUri)
             {
-                return RegisterDataObject(new DataObject(this, identity));
+                // Use uri.ToString() to allow for correct unescaping of identity
+                return RegisterDataObject(new DataObject(this, uri.ToString()));
             }
             
             throw new ArgumentException(Strings.InvalidDataObjectIdentity, "identity");

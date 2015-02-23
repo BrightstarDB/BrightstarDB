@@ -2133,9 +2133,25 @@ where {
                 Assert.That(derived.BaseStringValue, Is.EqualTo("Party!"));
                 Assert.That(derived.DateTimeProperty, Is.EqualTo(new DateTime(1999, 12, 31, 23, 58, 00)));
             }
-
         }
 
+        [Test]
+        public void TestRetrieveEntityWithSpaceInId()
+        {
+            var storeName = "TestRetrieveEntityWithSpaceInId_" + DateTime.Now.Ticks;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var entity = new Entity {Id = "some entity", SomeString = "Some Entity"};
+                context.Entities.Add(entity);
+                context.SaveChanges();
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                var entity = context.Entities.FirstOrDefault(x => x.Id.Equals("some entity"));
+                Assert.That(entity, Is.Not.Null);
+            }
+        }
 
         MyEntityContext CreateEntityContext(string storeName)
         {

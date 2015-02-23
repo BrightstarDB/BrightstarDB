@@ -725,7 +725,7 @@ namespace BrightstarDB.EntityFramework
         {
             var entityType = identifierProperty.DeclaringType;
             var prefix = EntityMappingStore.GetIdentifierPrefix(entityType);
-            return prefix + id;
+            return prefix + Uri.EscapeUriString(id);
         }
 
         /// <summary>
