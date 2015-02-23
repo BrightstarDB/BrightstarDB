@@ -209,6 +209,7 @@
     <Compile Include="NoAcceptableFormatException.cs" />
     <Compile Include="Query\BrightstarRdfProvider.cs" />
     <Compile Include="Query\BrightstarVirtualNode.cs" />
+    <Compile Include="Query\Processor\JoinOptimiser.cs" />
     <Compile Include="Query\VirtualizingSparqlDataset.cs" />
     <Compile Include="RdfFormat.cs" />
     <Compile Include="Rdf\PlainLiteral.cs" />
