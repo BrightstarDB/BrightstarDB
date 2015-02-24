@@ -205,14 +205,14 @@
     </Target>
 
     <Target Name="InstallNUnit"
-        Condition="!Exists($(NUnitPath))">
-        <Exec Command="nuget Install NUnit.Runners -Version $(NUnitVersion)"
-              WorkingDirectory="$(MSBuildProjectDirectory)/tools"/>
-    </Target>
-    
-    <Target Name="InstallNUnit"
-        Condition="Exists($(NUnitPath))">
-        <Message Text="NUnit.Runners version $(NUnitVersion) already installed."/>
+        Condition="!Exists('$(NUnitPath)')">
+      <Message Text="Attempting to install NUnit.Runners via NuGet" />
+        <Exec Command="NuGet Install NUnit.Runners -Version $(NUnitVersion)"
+              WorkingDirectory="$(MSBuildProjectDirectory)/tools"
+	      Condition=" '$(OS)' != 'Unix' "/>
+	<Exec Command="mono NuGet.exe Install NUnit.Runners -Version $(NUnitVersion)"
+	      WorkingDirectory="$(MSBuildProjectDirectory)/tools"
+	      Condition=" '$(OS)' == 'Unix' "/>
     </Target>
     
     <Target Name="RunTests" 
