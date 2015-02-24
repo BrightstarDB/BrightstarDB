@@ -6,7 +6,8 @@
 	<NoPortable Condition=" '$(OS)' == 'Windows_NT' ">False</NoPortable>
         <NoXamarin Condition=" '$(NoXamarin)' == '' ">False</NoXamarin>
         <NoiOS Condition=" '$(NoiOS)' == '' ">False</NoiOS>
-        <NUnitPath Condition=" '$(NUnitPath)' == '' ">$(MSBuildProjectDirectory)\tools\nunit\bin</NUnitPath>
+        <NUnitVersion>2.6.4</NUnitVersion>
+        <NUnitPath Condition=" '$(NUnitPath)' == '' ">$(MSBuildProjectDirectory)\tools\NUnit.Runners.$(NUnitVersion)\tools</NUnitPath>
     </PropertyGroup>
     
     <Import Project="$(MSBuildProjectDirectory)\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
@@ -91,12 +92,15 @@
     <Target Name="BuildPortableiOS"
 	    Condition="!$(NoXamarin) AND !$(NoiOS) AND Exists('$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.Common.targets')">
       <MSBuild Projects="src\portable\BrightstarDB.Portable.iOS\BrightstarDB.Portable.iOS.csproj"
-	       Targets="Build"/>
+	       Targets="Build"
+           Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
     </Target>
 
     <Target Name="BuildPortableMonoTouch"
 	    Condition="!$(NoXamarin) AND !$(NoiOS) AND Exists('$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets')">
-      <MSBuild Projects="src\portable\BrightstarDB.Portable.MonoTouch\BrightstarDB.Portable.MonoTouch.csproj"/>
+      <MSBuild Projects="src\portable\BrightstarDB.Portable.MonoTouch\BrightstarDB.Portable.MonoTouch.csproj"
+               Targets="Build"
+               Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
     </Target>
 
     <Target Name="BuildPortablePhone">
@@ -111,7 +115,7 @@
       <MSBuild Projects="src\portable\BrightstarDB.Portable.Store\BrightstarDB.Portable.Store.csproj"/>
     </Target>
       
-    <Target Name="CleanPortable" Depends="CleanXamarin, CleaniOS">
+    <Target Name="CleanPortable" DependsOnTargets="CleanXamarin, CleaniOS">
         <MSBuild Projects="src\portable\portable.sln"
                  Properties="Configuration=$(Configuration)"
                  Targets="Clean"/>
@@ -177,6 +181,12 @@
 	       Targets="Build"/>
     </Target>
 
+    <Target Name="BuildPerformanceTests"
+            DependsOnTargets="BuildCore">
+        <MSBuild Projects="src/core/BrightstarDB.PerformanceTests/BrightstarDB.PerformanceTests.csproj"
+                 Targets="Build"/>
+    </Target>
+            
     <Target Name="BuildServerIntegrationTests"
 	    DependsOnTargets="BuildServerRunner">
       <MSBuild Projects="src/core/BrightstarDB.Server.IntegrationTests/BrightstarDB.Server.IntegrationTests.csproj"
@@ -194,40 +204,69 @@
       <MSBuild Projects="src/core/BrightstarDB.Tests/BrightstarDB.Tests.csproj"/>
     </Target>
 
-    <Target Name="TestCore" DependsOnTargets="BuildCore;BuildTests">
-        <CallTarget Targets="_TestInternal;_TestCore;_TestEntityFramework;_TestOData" RunEachTargetSeparately="True"/>
-	</Target>
+    <Target Name="InstallNUnit"
+        Condition="!Exists($(NUnitPath))">
+        <Exec Command="nuget Install NUnit.Runners -Version $(NUnitVersion)"
+              WorkingDirectory="$(MSBuildProjectDirectory)/tools"/>
+    </Target>
+    
+    <Target Name="InstallNUnit"
+        Condition="Exists($(NUnitPath))">
+        <Message Text="NUnit.Runners version $(NUnitVersion) already installed."/>
+    </Target>
+    
+    <Target Name="RunTests" 
+            DependsOnTargets="InstallNUnit;
+                              RunEntityFrameworkTests;
+                              RunInternalTests;
+                              RunODataTests;
+                              RunServerIntegrationTests;
+                              RunServerModulesTests;
+                              RunCoreTests"/>
+                              
 	
 	<Target Name="TestPortable" DependsOnTargets="BuildPortable">
         <CallTarget Targets="_TestPortableDesktop" RunEachTargetSeparately="True"/>
     </Target>
     
-    <Target Name="_TestEntityFramework" DependsOnTargets="ResultsDir">
-		<NUnit Assemblies="src\core\BrightstarDB.EntityFramework.Tests\bin\Debug\BrightstarDB.EntityFramework.Tests.dll"
+    <Target Name="RunEntityFrameworkTests" DependsOnTargets="ResultsDir;BuildEntityFrameworkTests">
+		<NUnit Assemblies="src\core\BrightstarDB.EntityFramework.Tests\bin\$(Configuration)\BrightstarDB.EntityFramework.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.EntityFramework.Tests.xml" />
 	</Target>
 
-	<Target Name="_TestInternal" DependsOnTargets="ResultsDir">
-		<NUnit Assemblies="src\core\BrightstarDB.InternalTests\bin\Debug\BrightstarDB.InternalTests.dll"
+	<Target Name="RunInternalTests" DependsOnTargets="ResultsDir;BuildInternalTests">
+		<NUnit Assemblies="src\core\BrightstarDB.InternalTests\bin\$(Configuration)\BrightstarDB.InternalTests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.InternalTests.xml" />
 	</Target>
 
-	<Target Name="_TestOData" DependsOnTargets="ResultsDir">
-		<NUnit Assemblies="src\core\BrightstarDB.OData.Tests\bin\Debug\BrightstarDB.OData.Tests.dll"
+	<Target Name="RunODataTests" DependsOnTargets="ResultsDir;BuildODataTests">
+		<NUnit Assemblies="src\core\BrightstarDB.OData.Tests\bin\$(Configuration)\BrightstarDB.OData.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.OData.Tests.xml" />
 	</Target>
+    
+    <Target Name="RunServerIntegrationTests" DependsOnTargets="ResultsDir;BuildServerIntegrationTests">
+        <NUnit Assemblies="src/core/BrightstarDB.Server.IntegrationTests/bin/$(Configuration)/BrightstarDB.Server.IntegrationTests.dll"
+               ToolPath="$(NUnitPath)"
+               OutputXmlFile="TestResults/BrightstarDB.Server.IntegrationTests.xml"/>
+    </Target>
+    
+    <Target Name="RunServerModulesTests" DependsOnTargets="ResultsDir;BuildServerModulesTests">
+        <NUnit Assemblies="src/core/BrightstarDB.Server.Modules.Tests/bin/$(Configuration)/BrightstarDB.Server.Modules.Tests.dll"
+               ToolPath="$(NUnitPath)"
+               OutputXmlFile="TestResults/BrightstarDB.Server.Modules.Tests.xml"/>
+    </Target>
 
-	<Target Name="_TestCore" DependsOnTargets="ResultsDir">
-		<NUnit Assemblies="src\core\BrightstarDB.Tests\bin\Debug\BrightstarDB.Tests.dll"
+	<Target Name="RunCoreTests" DependsOnTargets="ResultsDir;BuildCoreTests">
+		<NUnit Assemblies="src\core\BrightstarDB.Tests\bin\$(Configuration)\BrightstarDB.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.Tests.xml" />
 	</Target>
 
-    <Target Name="_TestPortableDesktop" DependsOnTargets="ResultsDir">
-		<NUnit Assemblies="src\portable\Test\BrightstarDB.Portable.Desktop.Tests\bin\Debug\BrightstarDB.Portable.Desktop.Tests.dll"
+    <Target Name="RunPortableDesktopTests" DependsOnTargets="ResultsDir">
+		<NUnit Assemblies="src\portable\Test\BrightstarDB.Portable.Desktop.Tests\bin\$(Configuration)\BrightstarDB.Portable.Desktop.Tests.dll"
 			   ToolPath="$(NUnitPath)"
 			   OutputXmlFile="TestResults\BrightstarDB.Portable.Desktop.Tests.xml" />
 	</Target>
