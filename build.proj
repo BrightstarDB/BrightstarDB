@@ -1,16 +1,19 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+	<!-- NoPortable: Set true to disable all PCL builds. Defaults to True on non-Windows platforms -->
+	<NoPortable Condition=" '$(OS)' != 'Windows_NT' ">True</NoPortable>
+	<NoPortable Condition=" '$(OS)' == 'Windows_NT' ">False</NoPortable>
         <NoXamarin Condition=" '$(NoXamarin)' == '' ">False</NoXamarin>
         <NoiOS Condition=" '$(NoiOS)' == '' ">False</NoiOS>
-        <NUnitPath Condition=" '$(NUnitPath)' == '' ">C:\Program Files (x86)\NUnit 2.6.2\bin</NUnitPath>
+        <NUnitPath Condition=" '$(NUnitPath)' == '' ">$(MSBuildProjectDirectory)\tools\nunit\bin</NUnitPath>
     </PropertyGroup>
     
-    <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+    <Import Project="$(MSBuildProjectDirectory)\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
 
     <!-- Main Build Targets -->
     
-    <Target Name="Build" DependsOnTargets="BuildCore;BuildPortable;BuildXamarin;BuildiOS;BuildTools"/>
+    <Target Name="Build" DependsOnTargets="BuildCore;BuildServer;BuildOData;BuildPortable;BuildTools"/>
     
     <Target Name="Test" DependsOnTargets="TestCore;TestPortable" />
 
@@ -18,9 +21,40 @@
 
     <!-- Sub-targets -->
     <Target Name="BuildCore">
-        <MSBuild Projects="src\core\core.sln"
+        <MSBuild Projects="src\core\BrightstarDB\BrightstarDB.csproj"
                  Properties="Configuration=$(Configuration)"
                  Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildServerModules" DependsOnTargets="BuildCore">
+	<MSBuild Projects="src\core\BrightstarDB.Server.Modules\BrightstarDB.Server.Modules.csproj"
+		 Properties="Configuration=$(Configuration)"
+		 Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildServerRunner" DependsOnTargets="BuildServerModules">
+      <MSBuild Projects="src\core\BrightstarDB.Server.Runner\BrightstarDB.Server.Runner.csproj"
+	       Properties="Configuration=$(Configuration)"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildServerAspNet" DependsOnTargets="BuildServerModules">
+      <MSBuild Projects="src\core\BrightstarDB.Server.AspNet\BrightstarDB.Server.AspNet.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildServerAspNetSecured" DependsOnTargets="BuildServerAspNet">
+      <MSBuild Projects="src\core\BrightstarDB.Server.AspNet.Secured\BrightstarDB.Server.AspNet.Secured.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildServer" DependsOnTargets="BuildServerRunner;
+						 BuildServerAspNet;
+						 BuildServerAspNetSecured"/>
+
+    <Target Name="BuildOData" DependsOnTargets="BuildCore">
+      <MSBuild Projects="src\core\BrightstarDB.OData\BrightstarDB.OData.csproj"
+	       Targets="Build"/>
     </Target>
 
     <Target Name="CleanCore">
@@ -29,22 +63,58 @@
                  Targets="Clean"/>
     </Target>
    
-    <Target Name="BuildPortable">
-        <MSBuild Projects="src\portable\portable.sln"
-                 Properties="Configuration=$(Configuration)"
-                 Targets="Build"/>
+    <Target Name="BuildPortable" Condition="!$(NoPortable)"
+	    DependsOnTargets="BuildPortableCore;
+			      BuildPortableAndroid;
+			      BuildPortableDesktop;
+			      BuildPortableiOS;
+			      BuildPortableMonoTouch;
+			      BuildPortablePhone;
+			      BuildPortableSilverlight;
+			      BuildPortableStore"/>
+    <Target Name="BuildPortableCore">
+      <MSBuild Projects="src\portable\BrightstarDB.Portable\BrightstarDB.Portable.csproj"
+	       Targets="Build"/>
     </Target>
 
-    <Target Name="CleanPortable">
+    <Target Name="BuildPortableAndroid"
+	    Condition="!$(NoXamarin) AND Exists('$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets')">
+      <MSBuild Projects="src\portable\BrightstarDB.Portable.Android\BrightstarDB.Portable.Android.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildPortableDesktop">
+      <MSBuild Projects="src\portable\BrightstarDB.Portable.Desktop\BrightstarDB.Portable.Desktop.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildPortableiOS"
+	    Condition="!$(NoXamarin) AND !$(NoiOS) AND Exists('$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.Common.targets')">
+      <MSBuild Projects="src\portable\BrightstarDB.Portable.iOS\BrightstarDB.Portable.iOS.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildPortableMonoTouch"
+	    Condition="!$(NoXamarin) AND !$(NoiOS) AND Exists('$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets')">
+      <MSBuild Projects="src\portable\BrightstarDB.Portable.MonoTouch\BrightstarDB.Portable.MonoTouch.csproj"/>
+    </Target>
+
+    <Target Name="BuildPortablePhone">
+      <MSBuild Projects="src\portable\BrightstarDB.Portable.Phone\BrightstarDB.Portable.Phone.csproj"/>
+    </Target>
+
+    <Target Name="BuildPortableSilverlight">
+      <MSBuild Projects="src\portable\BrightstarDB.Portable.Silverlight\BrightstarDB.Portable.Silverlight.csproj"/>
+    </Target>
+
+    <Target Name="BuildPortableStore">
+      <MSBuild Projects="src\portable\BrightstarDB.Portable.Store\BrightstarDB.Portable.Store.csproj"/>
+    </Target>
+      
+    <Target Name="CleanPortable" Depends="CleanXamarin, CleaniOS">
         <MSBuild Projects="src\portable\portable.sln"
                  Properties="Configuration=$(Configuration)"
                  Targets="Clean"/>
-    </Target>
-
-    <Target Name="BuildXamarin" Condition="!$(NoXamarin) AND Exists('$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets')">
-        <MSBuild Projects="src\portable\xamarin.sln"
-                 Properties="Configuration=$(Configuration)"
-                 Targets="Build"/>
     </Target>
 
     <Target Name="CleanXamarin" Condition="!$(NoXamarin) AND Exists('$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets')">
@@ -53,24 +123,22 @@
                  Targets="Clean"/>
     </Target>
     
-    <Target Name="BuildiOS" Condition="!$(NoXamarin) AND !$(NoiOS) AND Exists('$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets')">
-        <MSBuild Projects="src\portable\ios.sln"
-                 Properties="Configuration=$(Configuration)"
-                 Targets="Build" />
-    </Target>
-
     <Target Name="CleaniOS" Condition="!$(NoXamarin) AND !$(NoiOS) AND Exists('$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets')">
         <MSBuild Projects="src\portable\ios.sln"
                  Properties="Configuration=$(Configuration)"
                  Targets="Clean" />
     </Target>
     
-    <Target Name="BuildTools">
+    <Target Name="BuildTools" DependsOnTargets="BuildPolaris" />
+    
+    <Target Name="BuildPolaris" 
+	    DependsOnTargets="BuildCore"
+	    Condition=" '$(OS)' != 'Unix' ">
         <MSBuild Projects="src\tools\Polaris\Polaris.sln"
                  Properties="Configuration=$(Configuration)"
                  Targets="Build"/>        
     </Target>
-    
+
     <Target Name="CleanTools">
         <MSBuild Projects="src\tools\Polaris\Polaris.sln"
                  Properties="Configuration=$(Configuration)"
@@ -83,7 +151,50 @@
     </Target>
 
 	
-    <Target Name="TestCore" DependsOnTargets="BuildCore">
+    <Target Name="BuildTests" DependsOnTargets="BuildEntityFrameworkTests;
+						BuildInternalTests;
+						BuildODataTests;
+						BuildPerformanceTests;
+						BuildServerIntegrationTests;
+						BuildServerModulesTests;
+						BuildCoreTests"/>
+
+    <Target Name="BuildEntityFrameworkTests"
+	    DependsOnTargets="BuildCore">
+      <MSBuild Projects="src/core/BrightstarDB.EntityFramework.Tests/BrightstarDB.EntityFramework.Tests.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildInternalTests"
+	    DependsOnTargets="BuildCore">
+      <MSBuild Projects="src/core/BrightstarDB.InternalTests/BrightstarDB.InternalTests.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildODataTests"
+	    DependsOnTargets="BuildOData">
+      <MSBuild Projects="src/core/BrightstarDB.OData.Tests/BrightstarDB.OData.Tests.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildServerIntegrationTests"
+	    DependsOnTargets="BuildServerRunner">
+      <MSBuild Projects="src/core/BrightstarDB.Server.IntegrationTests/BrightstarDB.Server.IntegrationTests.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildServerModulesTests"
+	    DependsOnTargets="BuildServerModules">
+      <MSBuild Projects="src/core/BrightstarDB.Server.Modules.Tests/BrightstarDB.Server.Modules.Tests.csproj"
+	       Targets="Build"/>
+    </Target>
+
+    <Target Name="BuildCoreTests"
+	    DependsOnTargets="BuildCore">
+      <MSBuild Projects="src/core/BrightstarDB.Tests/BrightstarDB.Tests.csproj"/>
+    </Target>
+
+    <Target Name="TestCore" DependsOnTargets="BuildCore;BuildTests">
         <CallTarget Targets="_TestInternal;_TestCore;_TestEntityFramework;_TestOData" RunEachTargetSeparately="True"/>
 	</Target>
 	
