@@ -237,40 +237,28 @@
       <Exec Command="$(NUnitConsole) src/core/BrightstarDB.EntityFramework.Tests/bin/$(Configuration)/BrightstarDB.EntityFramework.Tests.dll -xml TestResults\BrightstarDB.EntityFramework.Tests.xml $(NUnitFramework)" />
     </Target>
 
-	<Target Name="RunInternalTests" DependsOnTargets="ResultsDir;BuildInternalTests">
-		<NUnit Assemblies="src\core\BrightstarDB.InternalTests\bin\$(Configuration)\BrightstarDB.InternalTests.dll"
-			   ToolPath="$(NUnitPath)"
-			   OutputXmlFile="TestResults\BrightstarDB.InternalTests.xml" />
-	</Target>
+    <Target Name="RunInternalTests" DependsOnTargets="ResultsDir;BuildInternalTests">
+      <Exec Command="$(NUnitConsole) src\core\BrightstarDB.InternalTests\bin\$(Configuration)\BrightstarDB.InternalTests.dll -xml TestResults\BrightstarDB.InternalTests.xml $(NUnitFramework)" />
+    </Target>
 
-	<Target Name="RunODataTests" DependsOnTargets="ResultsDir;BuildODataTests">
-		<NUnit Assemblies="src\core\BrightstarDB.OData.Tests\bin\$(Configuration)\BrightstarDB.OData.Tests.dll"
-			   ToolPath="$(NUnitPath)"
-			   OutputXmlFile="TestResults\BrightstarDB.OData.Tests.xml" />
-	</Target>
+    <Target Name="RunODataTests" DependsOnTargets="ResultsDir;BuildODataTests">
+      <Exec Command="$(NUnitConsole) src\core\BrightstarDB.OData.Tests\bin\$(Configuration)\BrightstarDB.OData.Tests.dll -xml TestResults\BrightstarDB.OData.Tests.xml $(NUnitFramework)" />
+    </Target>
     
     <Target Name="RunServerIntegrationTests" DependsOnTargets="ResultsDir;BuildServerIntegrationTests">
-        <NUnit Assemblies="src/core/BrightstarDB.Server.IntegrationTests/bin/$(Configuration)/BrightstarDB.Server.IntegrationTests.dll"
-               ToolPath="$(NUnitPath)"
-               OutputXmlFile="TestResults/BrightstarDB.Server.IntegrationTests.xml"/>
+      <Exec Command="$(NUnitConsole) src/core/BrightstarDB.Server.IntegrationTests/bin/$(Configuration)/BrightstarDB.Server.IntegrationTests.dll -xml TestResults/BrightstarDB.Server.IntegrationTests.xml $(NUnitFramework)"/>
     </Target>
     
     <Target Name="RunServerModulesTests" DependsOnTargets="ResultsDir;BuildServerModulesTests">
-        <NUnit Assemblies="src/core/BrightstarDB.Server.Modules.Tests/bin/$(Configuration)/BrightstarDB.Server.Modules.Tests.dll"
-               ToolPath="$(NUnitPath)"
-               OutputXmlFile="TestResults/BrightstarDB.Server.Modules.Tests.xml"/>
+      <Exec Command="$(NUnitConsole) src/core/BrightstarDB.Server.Modules.Tests/bin/$(Configuration)/BrightstarDB.Server.Modules.Tests.dll -xml TestResults/BrightstarDB.Server.Modules.Tests.xml $(NUnitFramework)"/>
     </Target>
 
-	<Target Name="RunCoreTests" DependsOnTargets="ResultsDir;BuildCoreTests">
-		<NUnit Assemblies="src\core\BrightstarDB.Tests\bin\$(Configuration)\BrightstarDB.Tests.dll"
-			   ToolPath="$(NUnitPath)"
-			   OutputXmlFile="TestResults\BrightstarDB.Tests.xml" />
-	</Target>
+    <Target Name="RunCoreTests" DependsOnTargets="ResultsDir;BuildCoreTests">
+      <Exec Command="$(NUnitConsole) src\core\BrightstarDB.Tests\bin\$(Configuration)\BrightstarDB.Tests.dll -xml TestResults\BrightstarDB.Tests.xml $(NUnitFramework)" />
+    </Target>
 
-    <Target Name="RunPortableDesktopTests" DependsOnTargets="ResultsDir">
-		<NUnit Assemblies="src\portable\Test\BrightstarDB.Portable.Desktop.Tests\bin\$(Configuration)\BrightstarDB.Portable.Desktop.Tests.dll"
-			   ToolPath="$(NUnitPath)"
-			   OutputXmlFile="TestResults\BrightstarDB.Portable.Desktop.Tests.xml" />
-	</Target>
+    <Target Name="RunPortableDesktopTests" DependsOnTargets="ResultsDir;BuildPortableDesktopTests">
+      <Exec Command="$(NUnitConsole) src\portable\Test\BrightstarDB.Portable.Desktop.Tests\bin\$(Configuration)\BrightstarDB.Portable.Desktop.Tests.dll -xml TestResults\BrightstarDB.Portable.Desktop.Tests.xml $(NUnitFramework)" />
+    </Target>
 
 </Project>
