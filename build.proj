@@ -8,6 +8,8 @@
         <NoiOS Condition=" '$(NoiOS)' == '' ">False</NoiOS>
         <NUnitVersion>2.6.4</NUnitVersion>
         <NUnitPath Condition=" '$(NUnitPath)' == '' ">$(MSBuildProjectDirectory)\tools\NUnit.Runners.$(NUnitVersion)\tools</NUnitPath>
+	<NUnitConsole Condition=" '$(OS)' == 'Windows_NT' ">$(NUnitPath)\nunit-console.exe</NUnitConsole>
+	<NUnitConsole Condition=" '$(OS)' != 'Windows_NT' ">mono $(NUnitPath)\nunit-console.exe</NUnitConsole>
     </PropertyGroup>
     
     <Import Project="$(MSBuildProjectDirectory)\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
@@ -230,10 +232,8 @@
     </Target>
     
     <Target Name="RunEntityFrameworkTests" DependsOnTargets="ResultsDir;BuildEntityFrameworkTests">
-		<NUnit Assemblies="src\core\BrightstarDB.EntityFramework.Tests\bin\$(Configuration)\BrightstarDB.EntityFramework.Tests.dll"
-			   ToolPath="$(NUnitPath)"
-			   OutputXmlFile="TestResults\BrightstarDB.EntityFramework.Tests.xml" />
-	</Target>
+      <Exec Command="$(NUnitConsole) src/core/BrightstarDB.EntityFramework.Tests/bin/$(Configuration)/BrightstarDB.EntityFramework.Tests.dll -xml TestResults\BrightstarDB.EntityFramework.Tests.xml" />
+    </Target>
 
 	<Target Name="RunInternalTests" DependsOnTargets="ResultsDir;BuildInternalTests">
 		<NUnit Assemblies="src\core\BrightstarDB.InternalTests\bin\$(Configuration)\BrightstarDB.InternalTests.dll"
