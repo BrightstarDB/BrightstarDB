@@ -63,8 +63,6 @@ namespace BrightstarDB.Tests.EntityFramework
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDepartment, BrightstarDB.Tests.EntityFramework.Department>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IDerivedEntity));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IDerivedEntity, BrightstarDB.Tests.EntityFramework.DerivedEntity>();
-    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IEntity));
-    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IEntity, BrightstarDB.Tests.EntityFramework.Entity>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IFoafAgent));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IFoafAgent, BrightstarDB.Tests.EntityFramework.FoafAgent>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IFoafPerson));
@@ -109,6 +107,8 @@ namespace BrightstarDB.Tests.EntityFramework
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ISkill, BrightstarDB.Tests.EntityFramework.Skill>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IStringKeyEntity));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.IStringKeyEntity, BrightstarDB.Tests.EntityFramework.StringKeyEntity>();
+    		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ITestEntity));
+    		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ITestEntity, BrightstarDB.Tests.EntityFramework.TestEntity>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.ITrackable));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Tests.EntityFramework.ITrackable, BrightstarDB.Tests.EntityFramework.Trackable>();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Tests.EntityFramework.IUriEntity));
@@ -189,7 +189,6 @@ namespace BrightstarDB.Tests.EntityFramework
     		DBPediaPersons = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IDBPediaPerson>(this);
     		Departments = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IDepartment>(this);
     		DerivedEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IDerivedEntity>(this);
-    		Entities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IEntity>(this);
     		FoafAgents = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IFoafAgent>(this);
     		FoafPersons = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IFoafPerson>(this);
     		HierarchicalKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity>(this);
@@ -212,6 +211,7 @@ namespace BrightstarDB.Tests.EntityFramework
     		TechnicalEveningSessions = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession>(this);
     		Skills = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ISkill>(this);
     		StringKeyEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IStringKeyEntity>(this);
+    		TestEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ITestEntity>(this);
     		Trackables = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.ITrackable>(this);
     		UriEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IUriEntity>(this);
     	}
@@ -267,11 +267,6 @@ namespace BrightstarDB.Tests.EntityFramework
     	}
     	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.IDerivedEntity> DerivedEntities
-    	{
-    		get; private set;
-    	}
-    	
-    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IEntity> Entities
     	{
     		get; private set;
     	}
@@ -386,6 +381,11 @@ namespace BrightstarDB.Tests.EntityFramework
     		get; private set;
     	}
     	
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.ITestEntity> TestEntities
+    	{
+    		get; private set;
+    	}
+    	
     	public IEntitySet<BrightstarDB.Tests.EntityFramework.ITrackable> Trackables
     	{
     		get; private set;
@@ -430,9 +430,6 @@ namespace BrightstarDB.Tests.EntityFramework
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IDerivedEntity))) {
                 return (IEntitySet<T>)this.DerivedEntities;
-            }
-            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IEntity))) {
-                return (IEntitySet<T>)this.Entities;
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IFoafAgent))) {
                 return (IEntitySet<T>)this.FoafAgents;
@@ -499,6 +496,9 @@ namespace BrightstarDB.Tests.EntityFramework
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.IStringKeyEntity))) {
                 return (IEntitySet<T>)this.StringKeyEntities;
+            }
+            if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ITestEntity))) {
+                return (IEntitySet<T>)this.TestEntities;
             }
             if (typeof(T).Equals(typeof(BrightstarDB.Tests.EntityFramework.ITrackable))) {
                 return (IEntitySet<T>)this.Trackables;
@@ -844,287 +844,6 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
             		get { return GetRelatedProperty<System.String>("BaseStringValue"); }
             		set { SetRelatedProperty("BaseStringValue", value); }
-    	}
-    	#endregion
-    }
-}
-namespace BrightstarDB.Tests.EntityFramework 
-{
-    
-    internal partial class Entity : BrightstarEntityObject, IEntity 
-    {
-    	public Entity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
-        public Entity(BrightstarEntityContext context) : base(context, typeof(Entity)) { }
-    	public Entity() : base() { }
-    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
-    	#region Implementation of BrightstarDB.Tests.EntityFramework.IEntity
-    
-    	public System.String SomeString
-    	{
-            		get { return GetRelatedProperty<System.String>("SomeString"); }
-            		set { SetRelatedProperty("SomeString", value); }
-    	}
-    
-    	public System.DateTime SomeDateTime
-    	{
-            		get { return GetRelatedProperty<System.DateTime>("SomeDateTime"); }
-            		set { SetRelatedProperty("SomeDateTime", value); }
-    	}
-    
-    	public System.Nullable<System.DateTime> SomeNullableDateTime
-    	{
-            		get { return GetRelatedProperty<System.Nullable<System.DateTime>>("SomeNullableDateTime"); }
-            		set { SetRelatedProperty("SomeNullableDateTime", value); }
-    	}
-    
-    	public System.Boolean SomeBool
-    	{
-            		get { return GetRelatedProperty<System.Boolean>("SomeBool"); }
-            		set { SetRelatedProperty("SomeBool", value); }
-    	}
-    
-    	public System.Nullable<System.Boolean> NullableBool
-    	{
-            		get { return GetRelatedProperty<System.Nullable<System.Boolean>>("NullableBool"); }
-            		set { SetRelatedProperty("NullableBool", value); }
-    	}
-    
-    	public System.Byte SomeByte
-    	{
-            		get { return GetRelatedProperty<System.Byte>("SomeByte"); }
-            		set { SetRelatedProperty("SomeByte", value); }
-    	}
-    
-    	public System.Byte AnotherByte
-    	{
-            		get { return GetRelatedProperty<System.Byte>("AnotherByte"); }
-            		set { SetRelatedProperty("AnotherByte", value); }
-    	}
-    
-    	public System.Nullable<System.Byte> NullableByte
-    	{
-            		get { return GetRelatedProperty<System.Nullable<System.Byte>>("NullableByte"); }
-            		set { SetRelatedProperty("NullableByte", value); }
-    	}
-    
-    	public System.Nullable<System.Byte> AnotherNullableByte
-    	{
-            		get { return GetRelatedProperty<System.Nullable<System.Byte>>("AnotherNullableByte"); }
-            		set { SetRelatedProperty("AnotherNullableByte", value); }
-    	}
-    
-    	public System.Char SomeChar
-    	{
-            		get { return GetRelatedProperty<System.Char>("SomeChar"); }
-            		set { SetRelatedProperty("SomeChar", value); }
-    	}
-    
-    	public System.Char AnotherChar
-    	{
-            		get { return GetRelatedProperty<System.Char>("AnotherChar"); }
-            		set { SetRelatedProperty("AnotherChar", value); }
-    	}
-    
-    	public System.Nullable<System.Char> NullableChar
-    	{
-            		get { return GetRelatedProperty<System.Nullable<System.Char>>("NullableChar"); }
-            		set { SetRelatedProperty("NullableChar", value); }
-    	}
-    
-    	public System.Nullable<System.Char> AnotherNullableChar
-    	{
-            		get { return GetRelatedProperty<System.Nullable<System.Char>>("AnotherNullableChar"); }
-            		set { SetRelatedProperty("AnotherNullableChar", value); }
-    	}
-    
-    	public System.Decimal SomeDecimal
-    	{
-            		get { return GetRelatedProperty<System.Decimal>("SomeDecimal"); }
-            		set { SetRelatedProperty("SomeDecimal", value); }
-    	}
-    
-    	public System.Double SomeDouble
-    	{
-            		get { return GetRelatedProperty<System.Double>("SomeDouble"); }
-            		set { SetRelatedProperty("SomeDouble", value); }
-    	}
-    
-    	public System.Single SomeFloat
-    	{
-            		get { return GetRelatedProperty<System.Single>("SomeFloat"); }
-            		set { SetRelatedProperty("SomeFloat", value); }
-    	}
-    
-    	public System.Int32 SomeInt
-    	{
-            		get { return GetRelatedProperty<System.Int32>("SomeInt"); }
-            		set { SetRelatedProperty("SomeInt", value); }
-    	}
-    
-    	public System.Nullable<System.Int32> SomeNullableInt
-    	{
-            		get { return GetRelatedProperty<System.Nullable<System.Int32>>("SomeNullableInt"); }
-            		set { SetRelatedProperty("SomeNullableInt", value); }
-    	}
-    
-    	public System.Int64 SomeLong
-    	{
-            		get { return GetRelatedProperty<System.Int64>("SomeLong"); }
-            		set { SetRelatedProperty("SomeLong", value); }
-    	}
-    
-    	public System.SByte SomeSByte
-    	{
-            		get { return GetRelatedProperty<System.SByte>("SomeSByte"); }
-            		set { SetRelatedProperty("SomeSByte", value); }
-    	}
-    
-    	public System.SByte AnotherSByte
-    	{
-            		get { return GetRelatedProperty<System.SByte>("AnotherSByte"); }
-            		set { SetRelatedProperty("AnotherSByte", value); }
-    	}
-    
-    	public System.Int16 SomeShort
-    	{
-            		get { return GetRelatedProperty<System.Int16>("SomeShort"); }
-            		set { SetRelatedProperty("SomeShort", value); }
-    	}
-    
-    	public System.Int16 AnotherShort
-    	{
-            		get { return GetRelatedProperty<System.Int16>("AnotherShort"); }
-            		set { SetRelatedProperty("AnotherShort", value); }
-    	}
-    
-    	public System.UInt32 SomeUInt
-    	{
-            		get { return GetRelatedProperty<System.UInt32>("SomeUInt"); }
-            		set { SetRelatedProperty("SomeUInt", value); }
-    	}
-    
-    	public System.UInt32 AnotherUInt
-    	{
-            		get { return GetRelatedProperty<System.UInt32>("AnotherUInt"); }
-            		set { SetRelatedProperty("AnotherUInt", value); }
-    	}
-    
-    	public System.UInt64 SomeULong
-    	{
-            		get { return GetRelatedProperty<System.UInt64>("SomeULong"); }
-            		set { SetRelatedProperty("SomeULong", value); }
-    	}
-    
-    	public System.UInt64 AnotherULong
-    	{
-            		get { return GetRelatedProperty<System.UInt64>("AnotherULong"); }
-            		set { SetRelatedProperty("AnotherULong", value); }
-    	}
-    
-    	public System.UInt16 SomeUShort
-    	{
-            		get { return GetRelatedProperty<System.UInt16>("SomeUShort"); }
-            		set { SetRelatedProperty("SomeUShort", value); }
-    	}
-    
-    	public System.UInt16 AnotherUShort
-    	{
-            		get { return GetRelatedProperty<System.UInt16>("AnotherUShort"); }
-            		set { SetRelatedProperty("AnotherUShort", value); }
-    	}
-    
-    	public System.Byte[] SomeByteArray
-    	{
-            		get { return GetRelatedProperty<System.Byte[]>("SomeByteArray"); }
-            		set { SetRelatedProperty("SomeByteArray", value); }
-    	}
-    
-    	public System.Guid SomeGuid
-    	{
-            		get { return GetRelatedProperty<System.Guid>("SomeGuid"); }
-            		set { SetRelatedProperty("SomeGuid", value); }
-    	}
-    
-    	public System.Nullable<System.Guid> SomeNullableGuid
-    	{
-            		get { return GetRelatedProperty<System.Nullable<System.Guid>>("SomeNullableGuid"); }
-            		set { SetRelatedProperty("SomeNullableGuid", value); }
-    	}
-    
-    	public BrightstarDB.Tests.EntityFramework.TestEnumeration SomeEnumeration
-    	{
-            		get { return GetRelatedProperty<BrightstarDB.Tests.EntityFramework.TestEnumeration>("SomeEnumeration"); }
-            		set { SetRelatedProperty("SomeEnumeration", value); }
-    	}
-    
-    	public System.Nullable<BrightstarDB.Tests.EntityFramework.TestEnumeration> SomeNullableEnumeration
-    	{
-            		get { return GetRelatedProperty<System.Nullable<BrightstarDB.Tests.EntityFramework.TestEnumeration>>("SomeNullableEnumeration"); }
-            		set { SetRelatedProperty("SomeNullableEnumeration", value); }
-    	}
-    
-    	public BrightstarDB.Tests.EntityFramework.TestFlagsEnumeration SomeFlagsEnumeration
-    	{
-            		get { return GetRelatedProperty<BrightstarDB.Tests.EntityFramework.TestFlagsEnumeration>("SomeFlagsEnumeration"); }
-            		set { SetRelatedProperty("SomeFlagsEnumeration", value); }
-    	}
-    
-    	public System.Nullable<BrightstarDB.Tests.EntityFramework.TestFlagsEnumeration> SomeNullableFlagsEnumeration
-    	{
-            		get { return GetRelatedProperty<System.Nullable<BrightstarDB.Tests.EntityFramework.TestFlagsEnumeration>>("SomeNullableFlagsEnumeration"); }
-            		set { SetRelatedProperty("SomeNullableFlagsEnumeration", value); }
-    	}
-    
-    	public System.DayOfWeek SomeSystemEnumeration
-    	{
-            		get { return GetRelatedProperty<System.DayOfWeek>("SomeSystemEnumeration"); }
-            		set { SetRelatedProperty("SomeSystemEnumeration", value); }
-    	}
-    
-    	public System.Nullable<System.DayOfWeek> SomeNullableSystemEnumeration
-    	{
-            		get { return GetRelatedProperty<System.Nullable<System.DayOfWeek>>("SomeNullableSystemEnumeration"); }
-            		set { SetRelatedProperty("SomeNullableSystemEnumeration", value); }
-    	}
-    	public System.Collections.Generic.ICollection<System.String> CollectionOfStrings
-    	{
-    		get { return GetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings"); }
-    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
-    	}
-    	public System.Collections.Generic.ICollection<System.DateTime> CollectionOfDateTimes
-    	{
-    		get { return GetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes"); }
-    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes", value); }
-    	}
-    	public System.Collections.Generic.ICollection<System.Boolean> CollectionOfBools
-    	{
-    		get { return GetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools"); }
-    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools", value); }
-    	}
-    	public System.Collections.Generic.ICollection<System.Decimal> CollectionOfDecimals
-    	{
-    		get { return GetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals"); }
-    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals", value); }
-    	}
-    	public System.Collections.Generic.ICollection<System.Double> CollectionOfDoubles
-    	{
-    		get { return GetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles"); }
-    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles", value); }
-    	}
-    	public System.Collections.Generic.ICollection<System.Single> CollectionOfFloats
-    	{
-    		get { return GetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats"); }
-    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats", value); }
-    	}
-    	public System.Collections.Generic.ICollection<System.Int32> CollectionOfInts
-    	{
-    		get { return GetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts"); }
-    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts", value); }
-    	}
-    	public System.Collections.Generic.ICollection<System.Int64> CollectionOfLong
-    	{
-    		get { return GetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong"); }
-    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong", value); }
     	}
     	#endregion
     }
@@ -1754,6 +1473,287 @@ namespace BrightstarDB.Tests.EntityFramework
     	{
             		get { return GetRelatedProperty<System.String>("Description"); }
             		set { SetRelatedProperty("Description", value); }
+    	}
+    	#endregion
+    }
+}
+namespace BrightstarDB.Tests.EntityFramework 
+{
+    
+    internal partial class TestEntity : BrightstarEntityObject, ITestEntity 
+    {
+    	public TestEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+        public TestEntity(BrightstarEntityContext context) : base(context, typeof(TestEntity)) { }
+    	public TestEntity() : base() { }
+    	public System.String Id { get {return GetKey(); } set { SetKey(value); } }
+    	#region Implementation of BrightstarDB.Tests.EntityFramework.ITestEntity
+    
+    	public System.String SomeString
+    	{
+            		get { return GetRelatedProperty<System.String>("SomeString"); }
+            		set { SetRelatedProperty("SomeString", value); }
+    	}
+    
+    	public System.DateTime SomeDateTime
+    	{
+            		get { return GetRelatedProperty<System.DateTime>("SomeDateTime"); }
+            		set { SetRelatedProperty("SomeDateTime", value); }
+    	}
+    
+    	public System.Nullable<System.DateTime> SomeNullableDateTime
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.DateTime>>("SomeNullableDateTime"); }
+            		set { SetRelatedProperty("SomeNullableDateTime", value); }
+    	}
+    
+    	public System.Boolean SomeBool
+    	{
+            		get { return GetRelatedProperty<System.Boolean>("SomeBool"); }
+            		set { SetRelatedProperty("SomeBool", value); }
+    	}
+    
+    	public System.Nullable<System.Boolean> NullableBool
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.Boolean>>("NullableBool"); }
+            		set { SetRelatedProperty("NullableBool", value); }
+    	}
+    
+    	public System.Byte SomeByte
+    	{
+            		get { return GetRelatedProperty<System.Byte>("SomeByte"); }
+            		set { SetRelatedProperty("SomeByte", value); }
+    	}
+    
+    	public System.Byte AnotherByte
+    	{
+            		get { return GetRelatedProperty<System.Byte>("AnotherByte"); }
+            		set { SetRelatedProperty("AnotherByte", value); }
+    	}
+    
+    	public System.Nullable<System.Byte> NullableByte
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.Byte>>("NullableByte"); }
+            		set { SetRelatedProperty("NullableByte", value); }
+    	}
+    
+    	public System.Nullable<System.Byte> AnotherNullableByte
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.Byte>>("AnotherNullableByte"); }
+            		set { SetRelatedProperty("AnotherNullableByte", value); }
+    	}
+    
+    	public System.Char SomeChar
+    	{
+            		get { return GetRelatedProperty<System.Char>("SomeChar"); }
+            		set { SetRelatedProperty("SomeChar", value); }
+    	}
+    
+    	public System.Char AnotherChar
+    	{
+            		get { return GetRelatedProperty<System.Char>("AnotherChar"); }
+            		set { SetRelatedProperty("AnotherChar", value); }
+    	}
+    
+    	public System.Nullable<System.Char> NullableChar
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.Char>>("NullableChar"); }
+            		set { SetRelatedProperty("NullableChar", value); }
+    	}
+    
+    	public System.Nullable<System.Char> AnotherNullableChar
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.Char>>("AnotherNullableChar"); }
+            		set { SetRelatedProperty("AnotherNullableChar", value); }
+    	}
+    
+    	public System.Decimal SomeDecimal
+    	{
+            		get { return GetRelatedProperty<System.Decimal>("SomeDecimal"); }
+            		set { SetRelatedProperty("SomeDecimal", value); }
+    	}
+    
+    	public System.Double SomeDouble
+    	{
+            		get { return GetRelatedProperty<System.Double>("SomeDouble"); }
+            		set { SetRelatedProperty("SomeDouble", value); }
+    	}
+    
+    	public System.Single SomeFloat
+    	{
+            		get { return GetRelatedProperty<System.Single>("SomeFloat"); }
+            		set { SetRelatedProperty("SomeFloat", value); }
+    	}
+    
+    	public System.Int32 SomeInt
+    	{
+            		get { return GetRelatedProperty<System.Int32>("SomeInt"); }
+            		set { SetRelatedProperty("SomeInt", value); }
+    	}
+    
+    	public System.Nullable<System.Int32> SomeNullableInt
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.Int32>>("SomeNullableInt"); }
+            		set { SetRelatedProperty("SomeNullableInt", value); }
+    	}
+    
+    	public System.Int64 SomeLong
+    	{
+            		get { return GetRelatedProperty<System.Int64>("SomeLong"); }
+            		set { SetRelatedProperty("SomeLong", value); }
+    	}
+    
+    	public System.SByte SomeSByte
+    	{
+            		get { return GetRelatedProperty<System.SByte>("SomeSByte"); }
+            		set { SetRelatedProperty("SomeSByte", value); }
+    	}
+    
+    	public System.SByte AnotherSByte
+    	{
+            		get { return GetRelatedProperty<System.SByte>("AnotherSByte"); }
+            		set { SetRelatedProperty("AnotherSByte", value); }
+    	}
+    
+    	public System.Int16 SomeShort
+    	{
+            		get { return GetRelatedProperty<System.Int16>("SomeShort"); }
+            		set { SetRelatedProperty("SomeShort", value); }
+    	}
+    
+    	public System.Int16 AnotherShort
+    	{
+            		get { return GetRelatedProperty<System.Int16>("AnotherShort"); }
+            		set { SetRelatedProperty("AnotherShort", value); }
+    	}
+    
+    	public System.UInt32 SomeUInt
+    	{
+            		get { return GetRelatedProperty<System.UInt32>("SomeUInt"); }
+            		set { SetRelatedProperty("SomeUInt", value); }
+    	}
+    
+    	public System.UInt32 AnotherUInt
+    	{
+            		get { return GetRelatedProperty<System.UInt32>("AnotherUInt"); }
+            		set { SetRelatedProperty("AnotherUInt", value); }
+    	}
+    
+    	public System.UInt64 SomeULong
+    	{
+            		get { return GetRelatedProperty<System.UInt64>("SomeULong"); }
+            		set { SetRelatedProperty("SomeULong", value); }
+    	}
+    
+    	public System.UInt64 AnotherULong
+    	{
+            		get { return GetRelatedProperty<System.UInt64>("AnotherULong"); }
+            		set { SetRelatedProperty("AnotherULong", value); }
+    	}
+    
+    	public System.UInt16 SomeUShort
+    	{
+            		get { return GetRelatedProperty<System.UInt16>("SomeUShort"); }
+            		set { SetRelatedProperty("SomeUShort", value); }
+    	}
+    
+    	public System.UInt16 AnotherUShort
+    	{
+            		get { return GetRelatedProperty<System.UInt16>("AnotherUShort"); }
+            		set { SetRelatedProperty("AnotherUShort", value); }
+    	}
+    
+    	public System.Byte[] SomeByteArray
+    	{
+            		get { return GetRelatedProperty<System.Byte[]>("SomeByteArray"); }
+            		set { SetRelatedProperty("SomeByteArray", value); }
+    	}
+    
+    	public System.Guid SomeGuid
+    	{
+            		get { return GetRelatedProperty<System.Guid>("SomeGuid"); }
+            		set { SetRelatedProperty("SomeGuid", value); }
+    	}
+    
+    	public System.Nullable<System.Guid> SomeNullableGuid
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.Guid>>("SomeNullableGuid"); }
+            		set { SetRelatedProperty("SomeNullableGuid", value); }
+    	}
+    
+    	public BrightstarDB.Tests.EntityFramework.TestEnumeration SomeEnumeration
+    	{
+            		get { return GetRelatedProperty<BrightstarDB.Tests.EntityFramework.TestEnumeration>("SomeEnumeration"); }
+            		set { SetRelatedProperty("SomeEnumeration", value); }
+    	}
+    
+    	public System.Nullable<BrightstarDB.Tests.EntityFramework.TestEnumeration> SomeNullableEnumeration
+    	{
+            		get { return GetRelatedProperty<System.Nullable<BrightstarDB.Tests.EntityFramework.TestEnumeration>>("SomeNullableEnumeration"); }
+            		set { SetRelatedProperty("SomeNullableEnumeration", value); }
+    	}
+    
+    	public BrightstarDB.Tests.EntityFramework.TestFlagsEnumeration SomeFlagsEnumeration
+    	{
+            		get { return GetRelatedProperty<BrightstarDB.Tests.EntityFramework.TestFlagsEnumeration>("SomeFlagsEnumeration"); }
+            		set { SetRelatedProperty("SomeFlagsEnumeration", value); }
+    	}
+    
+    	public System.Nullable<BrightstarDB.Tests.EntityFramework.TestFlagsEnumeration> SomeNullableFlagsEnumeration
+    	{
+            		get { return GetRelatedProperty<System.Nullable<BrightstarDB.Tests.EntityFramework.TestFlagsEnumeration>>("SomeNullableFlagsEnumeration"); }
+            		set { SetRelatedProperty("SomeNullableFlagsEnumeration", value); }
+    	}
+    
+    	public System.DayOfWeek SomeSystemEnumeration
+    	{
+            		get { return GetRelatedProperty<System.DayOfWeek>("SomeSystemEnumeration"); }
+            		set { SetRelatedProperty("SomeSystemEnumeration", value); }
+    	}
+    
+    	public System.Nullable<System.DayOfWeek> SomeNullableSystemEnumeration
+    	{
+            		get { return GetRelatedProperty<System.Nullable<System.DayOfWeek>>("SomeNullableSystemEnumeration"); }
+            		set { SetRelatedProperty("SomeNullableSystemEnumeration", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.String> CollectionOfStrings
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.String>("CollectionOfStrings", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.DateTime> CollectionOfDateTimes
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.DateTime>("CollectionOfDateTimes", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.Boolean> CollectionOfBools
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Boolean>("CollectionOfBools", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.Decimal> CollectionOfDecimals
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Decimal>("CollectionOfDecimals", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.Double> CollectionOfDoubles
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Double>("CollectionOfDoubles", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.Single> CollectionOfFloats
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Single>("CollectionOfFloats", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.Int32> CollectionOfInts
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int32>("CollectionOfInts", value); }
+    	}
+    	public System.Collections.Generic.ICollection<System.Int64> CollectionOfLong
+    	{
+    		get { return GetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong"); }
+    		set { if (value == null) throw new ArgumentNullException("value"); SetRelatedLiteralPropertiesCollection<System.Int64>("CollectionOfLong", value); }
     	}
     	#endregion
     }
