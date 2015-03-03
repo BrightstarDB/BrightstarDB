@@ -1599,7 +1599,7 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var testEntity = context.Entities.Create();
+                var testEntity = context.TestEntities.Create();
                 testEntity.SomeByteArray = new byte[] {0, 1, 2, 3, 4};
                 context.SaveChanges();
             }
@@ -1607,7 +1607,7 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var e = context.Entities.FirstOrDefault();
+                var e = context.TestEntities.FirstOrDefault();
                 Assert.IsNotNull(e);
                 Assert.IsNotNull(e.SomeByteArray);
                 Assert.AreEqual(5, e.SomeByteArray.Count());
@@ -1627,7 +1627,7 @@ where {
             {
                 using (var context = new MyEntityContext(doStore))
                 {
-                    var testEntity = context.Entities.Create();
+                    var testEntity = context.TestEntities.Create();
                     testEntity.SomeGuid = testGuid;
                     context.SaveChanges();
                 }
@@ -1636,16 +1636,16 @@ where {
             {
                 using (var context = new MyEntityContext(doStore))
                 {
-                    var testEntity = context.Entities.FirstOrDefault();
+                    var testEntity = context.TestEntities.FirstOrDefault();
                     Assert.IsNotNull(testEntity);
                     var testEntityId = testEntity.Id;
                     Assert.AreEqual(testGuid, testEntity.SomeGuid);
 
                     // Verify we can use a Guid value in a search
-                    testEntity = context.Entities.FirstOrDefault(e => e.SomeGuid.Equals(testGuid));
+                    testEntity = context.TestEntities.FirstOrDefault(e => e.SomeGuid.Equals(testGuid));
                     Assert.IsNotNull(testEntity);
                     Assert.AreEqual(testEntityId, testEntity.Id);
-                    Assert.IsNull(context.Entities.FirstOrDefault(e=>e.SomeGuid.Equals(Guid.Empty)));
+                    Assert.IsNull(context.TestEntities.FirstOrDefault(e=>e.SomeGuid.Equals(Guid.Empty)));
                 }
             }
         }
@@ -1659,7 +1659,7 @@ where {
             {
                 using (var context = new MyEntityContext(doStore))
                 {
-                    var testEntity = context.Entities.Create();
+                    var testEntity = context.TestEntities.Create();
                     testEntityId = testEntity.Id;
                     context.SaveChanges();
                 }
@@ -1668,7 +1668,7 @@ where {
             {
                 using (var context = new MyEntityContext(doStore))
                 {
-                    var testEntity = context.Entities.FirstOrDefault(x => x.Id.Equals(testEntityId));
+                    var testEntity = context.TestEntities.FirstOrDefault(x => x.Id.Equals(testEntityId));
                     Assert.IsNotNull(testEntity);
                     Assert.IsNotNull(testEntity.SomeGuid);
                     Assert.AreEqual(Guid.Empty, testEntity.SomeGuid);
@@ -1685,7 +1685,7 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var testEntity = context.Entities.Create();
+                var testEntity = context.TestEntities.Create();
                 testEntity.SomeEnumeration = TestEnumeration.Third;
                 context.SaveChanges();
             }
@@ -1693,7 +1693,7 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var e = context.Entities.FirstOrDefault();
+                var e = context.TestEntities.FirstOrDefault();
                 Assert.IsNotNull(e);
                 Assert.AreEqual(TestEnumeration.Third, e.SomeEnumeration);
             }
@@ -1707,9 +1707,9 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var entity1 = context.Entities.Create();
-                var entity2 = context.Entities.Create();
-                var entity3 = context.Entities.Create();
+                var entity1 = context.TestEntities.Create();
+                var entity2 = context.TestEntities.Create();
+                var entity3 = context.TestEntities.Create();
                 entity1.SomeString = "Entity1";
                 entity1.SomeEnumeration = TestEnumeration.First;
                 entity2.SomeString = "Entity2";
@@ -1719,11 +1719,11 @@ where {
                 context.SaveChanges();
 
                 Assert.AreEqual(1,
-                                context.Entities.Count(e => e.SomeEnumeration == TestEnumeration.First));
+                                context.TestEntities.Count(e => e.SomeEnumeration == TestEnumeration.First));
                 Assert.AreEqual(2,
-                                context.Entities.Count(e => e.SomeEnumeration == TestEnumeration.Second));
+                                context.TestEntities.Count(e => e.SomeEnumeration == TestEnumeration.Second));
                 Assert.AreEqual(0,
-                                context.Entities.Count(e => e.SomeEnumeration == TestEnumeration.Third));
+                                context.TestEntities.Count(e => e.SomeEnumeration == TestEnumeration.Third));
             }
         }
 
@@ -2141,14 +2141,14 @@ where {
             var storeName = "TestRetrieveEntityWithSpaceInId_" + DateTime.Now.Ticks;
             using (var context = CreateEntityContext(storeName))
             {
-                var entity = new Entity {Id = "some entity", SomeString = "Some Entity"};
-                context.Entities.Add(entity);
+                var entity = new TestEntity {Id = "some entity", SomeString = "Some Entity"};
+                context.TestEntities.Add(entity);
                 context.SaveChanges();
             }
 
             using (var context = CreateEntityContext(storeName))
             {
-                var entity = context.Entities.FirstOrDefault(x => x.Id.Equals("some entity"));
+                var entity = context.TestEntities.FirstOrDefault(x => x.Id.Equals("some entity"));
                 Assert.That(entity, Is.Not.Null);
             }
         }
