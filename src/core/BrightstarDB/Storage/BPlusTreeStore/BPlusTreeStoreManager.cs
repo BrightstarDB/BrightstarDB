@@ -94,6 +94,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             using (var store = new Store(storeLocation, dataPageStore, resourceTable))
             {
                 store.Commit(Guid.Empty);
+                store.Close();
             }
 
             if (withTransactionLogging)

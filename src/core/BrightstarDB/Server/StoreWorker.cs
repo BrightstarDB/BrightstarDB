@@ -77,8 +77,10 @@ namespace BrightstarDB.Server
         /// <summary>
         /// Called after we shutdown all jobs and close all file handles.
         /// </summary>
-        private ShutdownContinuation _shutdownContinuation; 
+        private ShutdownContinuation _shutdownContinuation;
 
+        private List<WeakReference> _invalidatedReadStores;
+ 
         /// <summary>
         /// Creates a new server core 
         /// </summary>
@@ -98,6 +100,7 @@ namespace BrightstarDB.Server
             _statsMonitor = new StatsMonitor();
             InitializeStatsMonitor();
             _shutdownCompleted = new ManualResetEvent(false);
+            _invalidatedReadStores = new List<WeakReference>();
         }
 
         /// <summary>
@@ -249,6 +252,7 @@ namespace BrightstarDB.Server
                 //    _readStore.Close();
                 //}
 
+                _invalidatedReadStores.Add(new WeakReference(_readStore));
                 _readStore = null;
             }
         }
@@ -264,9 +268,16 @@ namespace BrightstarDB.Server
             }
         }
 
+        private readonly object _writeStoreLock = new object();
         internal IStore WriteStore
         {
-            get { return _writeStore ?? (_writeStore = _storeManager.OpenStore(_storeLocation)); }
+            get
+            {
+                lock (_writeStoreLock)
+                {
+                    return _writeStore ?? (_writeStore = _storeManager.OpenStore(_storeLocation));
+                }
+            }
         }
 
         public BrightstarSparqlResultsType Query(ulong commitPointId, SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, string[] defaultGraphUris)
@@ -441,6 +452,19 @@ namespace BrightstarDB.Server
                     _readStore.Dispose();
                     _readStore = null;
                 }
+
+                foreach (var invalidatedReadStoreReference in _invalidatedReadStores)
+                {
+                    if (invalidatedReadStoreReference.IsAlive)
+                    {
+                        var readStore = invalidatedReadStoreReference.Target as IStore;
+                        if (readStore != null)
+                        {
+                            readStore.Dispose();
+                        }
+                    }
+                }
+                _invalidatedReadStores.Clear();
 
                 if (_writeStore != null)
                 {
