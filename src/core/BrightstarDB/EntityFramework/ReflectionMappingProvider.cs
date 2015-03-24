@@ -109,6 +109,12 @@ namespace BrightstarDB.EntityFramework
                     mappingStore.SetIdentityInfo(mappedType, identityInfo);
                     mappingStore.SetPropertyHint(identityProperty, new PropertyHint(PropertyMappingType.Id));
                 }
+                else
+                {
+                    // Entity has no explicit Id property so use the defaults
+                    var identityInfo = GetIdentityInfo(assemblyMappingInfo, mappedType, null, null);
+                    mappingStore.SetIdentityInfo(mappedType, identityInfo);
+                }
 
                 foreach (var p in mappedType.GetProperties())
                 {

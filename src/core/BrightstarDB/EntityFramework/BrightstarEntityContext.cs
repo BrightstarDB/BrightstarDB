@@ -250,7 +250,10 @@ namespace BrightstarDB.EntityFramework
                 }
                 var key = identityInfo.KeyConverter.GenerateKey(propertyValues, identityInfo.KeySeparator, item.GetType());
                 if (key == null) throw new EntityKeyRequiredException();
-                if (!key.Equals(item.GetKey())) throw new EntityKeyChangedException();
+                if (!key.Equals(item.GetKey()))
+                {
+                    throw new EntityKeyChangedException();
+                }
             }
         }
 
@@ -448,6 +451,7 @@ namespace BrightstarDB.EntityFramework
             foreach (var row in resultDoc.SparqlResultRows())
             {
                 var value = row.GetColumnValue(0);
+                if (value == null) yield return default(T);
                 if (value.GetType() == typeof(T))
                 {
                     yield return (T)value;
@@ -721,7 +725,7 @@ namespace BrightstarDB.EntityFramework
         {
             var entityType = identifierProperty.DeclaringType;
             var prefix = EntityMappingStore.GetIdentifierPrefix(entityType);
-            return prefix + id;
+            return prefix + Uri.EscapeUriString(id);
         }
 
         /// <summary>

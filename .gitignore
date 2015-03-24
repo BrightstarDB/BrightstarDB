@@ -138,3 +138,6 @@ src/core/UpgradeLog3.htm
 src/core/coverage
 src/mobile/BrightstarDB.Mobile/Properties/AssemblyInfo.cs
 src/portable/BrightstarDB.Portable.iOS/Properties/AssemblyInfo.cs
+tools/NUnit.Runners.*/
+
+src/portable/BrightstarDB.Portable.MonoTouch/Properties/AssemblyInfo.cs

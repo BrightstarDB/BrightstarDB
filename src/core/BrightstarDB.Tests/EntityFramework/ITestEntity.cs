@@ -9,7 +9,7 @@ namespace BrightstarDB.Tests.EntityFramework
     /// The commented out properties are datatypes that are not currently supported
     /// </summary>
     [Entity]
-    interface IEntity
+    interface ITestEntity
     {
         string Id { get; }
 

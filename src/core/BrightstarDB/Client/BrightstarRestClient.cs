@@ -8,16 +8,11 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using BrightstarDB.Server;
-using BrightstarDB.Storage.BPlusTreeStore;
-using Newtonsoft.Json;
 using VDS.RDF;
 using VDS.RDF.Query;
 #if !PORTABLE && !WINDOWS_PHONE
 using System.ServiceModel.Security.Tokens;
 using System.Web.Script.Serialization;
-#endif
-#if PORTABLE || WINDOWS_PHONE
-using VDS.RDF;
 #endif
 using BrightstarDB.Caching;
 using BrightstarDB.Client.RestSecurity;

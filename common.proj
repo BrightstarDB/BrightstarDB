@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- Import CommunityTasks -->
-  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
+  <Import Project="tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
 
   <!-- Common targets for Brightstar projects -->
   <PropertyGroup>
@@ -17,8 +17,8 @@
        with the MSBuild Community Tasks Version task under monodevelop  -->
   <PropertyGroup>
     <Major>1</Major>
-    <Minor>9</Minor>
-    <Build>1</Build>
+    <Minor>10</Minor>
+    <Build>0</Build>
     <Revision>0</Revision>
   </PropertyGroup>
   

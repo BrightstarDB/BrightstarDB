@@ -52,4 +52,13 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+    <Import Project="..\..\..\common.proj" />
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
+    <AssemblyTitle>BrightstarDB Portable Class Library iOS Assembly</AssemblyTitle>
+  </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <CallTarget Targets="GenerateAssemblyInfo" />
+  </Target>
 </Project>

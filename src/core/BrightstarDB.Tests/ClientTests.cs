@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
+using BrightstarDB.Tests.EntityFramework;
 using NUnit.Framework;
 using VDS.RDF;
 using VDS.RDF.Parsing;
@@ -1228,6 +1229,13 @@ namespace BrightstarDB.Tests
 
             // TODO: Validate expected content
 
+        }
+
+        [Test]
+        public void TestCreateEntityWithNoContext()
+        {
+            MyEntityContext.InitializeEntityMappingStore();
+            var entity = new BaseEntity {Id = "foo"};
         }
     }
 }
