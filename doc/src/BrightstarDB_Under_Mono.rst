@@ -8,15 +8,6 @@ This section covers how to use the BrightstarDB libraries and server
 in a Mono environment as well as how to build BrightstarDB from 
 source using Mono.
 
-.. warning::
-    The use of BrightstarDB under Mono should be considered to be
-    in alpha status. It is certainly not yet ready for production
-    use. 
-    
-We would welcome any bug reports and especially reproducible
-errors in BrightstarDB under Mono to help us improve the stability
-of the code on this platform.
-
 *********************************
  Using BrightstarDB Libraries
 *********************************
@@ -26,8 +17,8 @@ is to retrieve the packages via NuGet. There are details about
 using NuGet under mono in the `NuGet FAQ <http://docs.nuget.org/docs/start-here/nuget-faq>`_.
 
 The .NET 4.0 version of BrightstarDB should work correctly under the latest version
-of Mono (3.2.4 at the time of writing). It will probably not work under older versions
-of Mono.
+of Mono (3.12.1 at the time of writing). It will probably not work under versions
+of Mono older than 3.2.4.
 
 
 .. _mono_build:
@@ -36,36 +27,11 @@ of Mono.
  Building From Source
 **********************************
 
-You can also build the core BrightstarDB libraries under Mono. Refer to
-:ref:`Build_GettingTheSource` for information about getting hold of 
-BrighstarDB source code.
-
-.. note::
-    You will need to build from the source code for release 1.5 or
-    from the develop branch in order to have the Mono build scripts.
-    
-The build scripts for mono are contained in the ``mono`` directory
-at the top level of the project. The build scripts use NuGet
-to retrieve dependency package and a version of NuGet.exe is included
-in the BrightstarDB repository to assist in that. However, NuGet
-requires some SSL certificates to be registered otherwise download
-will fail. Before trying to build under Linux please execute the following
-commands::
-
-    sudo mozroots --import --machine --sync
-    sudo certmgr -ssl -m https://go.microsoft.com
-    sudo certmgr -ssl -m https://nugetgallery.blob.core.windows.net
-    sudo certmgr -ssl -m https://nuget.org 
-
-Once this is completed, it should be possible to build BrightstarDB
-simply by executing the ``build.sh`` script from within the ``mono``
-directory. The resulting binaries can then be found in ``mono/build``.
-At the time of writing the build script builds the following items:
-
-    * ``BrightstarDB.dll`` : the core BrightstarDB library
-    * ``BrightstarDB.Server.Modules.dll``: the core BrightstarDB server library
-    * ``service`` : a directory containing the BrightstarDB server runner and all of its dependencies
-    
+If you plan only to use BrighstarDB as an embedded database inside an application
+we recommend using the NuGet package. However if you want to run a BrighstarDB 
+server or just want to live on the bleeding edge of the develop branch you will
+need to build BrighstarDB from source. All the details can be found in the 
+section  :ref:`Building_BrightstarDB`.
 
 **********************************
  Running a BrightstarDB Server
@@ -74,13 +40,15 @@ At the time of writing the build script builds the following items:
 Self-Hosted
 ===========
 
-Assuming that you have built BrightstarDB from source as described above, the server can be run
-from within ``mono/build/service``.
+After building BrightstarDB from source, the server executable can be found in the directory
+``src/core/BrighstarDB.Server.Runner/bin/[Debug|Release]``. This directory contains everything
+needed to run the server so you can simply copy the directory contents elsewhere and run
+from that location instead.
 
 .. warning:: 
 
     Before you run the service for the first time you must edit the `BrightstarService.exe.config`
-    file in ``mono/build/service`` as this file is copied out of the Windows build and so contains DOS path names.
+    file in as this file is copied out of the Windows build and so contains DOS path names.
     You need to edit the path for the log file (in the `system.diagnostics` section) and the `storesDirectory` 
     path in the connection string specified in the `brightstarService` section.
 
@@ -91,14 +59,18 @@ To start the server simply run the following::
 The service will start listening on port 8090 at the path /brightstar. So from a local machine you can
 access the service from a browser pointed at http://localhost:8090/brightstar.
 
+BrightstarDB in Apache
+======================
+
 TBD: Document how to run the BrightstarDB server in Apache using mod_mono
+
+BrighstarDB under nginx
+========================
+
+TBD: Document how to configure the BrighstarDB server under nginx.
+
+BrighstarDB Server Security
+===========================
 
 TBD: Document how to secure the BrightstarDB server under Mono
 
-************************************
- Unit Tests
-************************************
-
-The unit tests for Mono can be run using the ``test.sh`` script in to
-``mono`` directory. At present these tests do not successfully run
-to completion, but this is being worked on.
