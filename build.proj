@@ -154,6 +154,11 @@
     </Target>
 
     <!-- Test Targets -->
+    <Target Name="CleanTests">
+        <RemoveDir Directories="TestResults" />
+    </Target>
+    
+
     <Target Name="ResultsDir">
         <MakeDir Directories="TestResults"/>
     </Target>
@@ -220,7 +225,8 @@
     </Target>
     
     <Target Name="RunTests" 
-            DependsOnTargets="InstallNUnit;
+            DependsOnTargets="CleanTests;
+                              InstallNUnit;
                               RunEntityFrameworkTests;
                               RunInternalTests;
                               RunODataTests;
