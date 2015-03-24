@@ -11,8 +11,46 @@
 
 This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require 
 either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
-marked with FIX.
+marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
 
+****************************
+ BrightstarDB 1.10
+****************************
+
+    This is a bug-fix release. There are no changes to the store file format and no breaking API changes.
+    This is a recommended update for all users.
+    
+    All of the issues addressed in this release were reported by the BrightstarDB user community.
+    Special thanks go to GitHub user kentcb and CodePlex user e_ol, both of whom provided 
+    useful bug reports and code to reproduce the issues they discovered.
+    
+    
+    - FIX: Fix for file locking issue that prevents a store from being consolidated after one or more queries are run.
+           Thanks to e_ol for the report and repro code that helped in tracking this issue down. (#202)
+    
+    - FIX: Fix for missing AssemblyInfo.cs file in the iOS PCL build. Thanks to kentcb for the report. (#201)
+    
+    - ENHANCEMENT: Significant performance optimization for queries containing a wildcard triple pattern 
+           consisting only of variables. Thanks to kentcb for the report and repro. (#200)
+    
+    - FIX: Several fixes for Entity Framework handling of entity identifiers (#197, #192, #183, #182, #175).
+           Thanks to kentcb for the reports.
+           
+    - FIX: Removed Newtonsoft.Json from the PCL libraries NuGet package to avoid clashing with other installed
+           libraries. Thanks to kentcb for the report. (#178)
+           
+    - FIX: Fix for adding entities to collection properties that are marked as an inverse property. 
+           Thanks to kentcb for the report. (#184)
+           
+    - FIX: Added a small class to force a reference to BrightstarDB inside PCL applications. This is required
+           to prevent the iOS build from stripping out BrightstarDB code that is referenced through the PCL
+           dependency resolution process. Thanks to kentcb for the report and suggested fix. (#181)
+           
+    - FIX: Fixed PCL platform assembly resolution for iOS. Thanks to kentcb for the report. (#176)
+    
+    - ENHANCEMENT: Streamlined the build process for a better experience building under Linux. 
+           Thanks to kentcb for the suggestion. (#172)
+    
 ****************************
  BrightstarDB 1.9.1
 ****************************
