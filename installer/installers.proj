@@ -233,9 +233,6 @@
         <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
         <ForceReference Include="nuget\BrightstarDBForceReference.cs.pp" />
 		<PortableLibs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\BrightstarDB.Portable.dll" />
-        <!-- Temporary workaround for DNR packaging issues -->
-        <PortableLibs Include="..\src\portable\lib\**\*.*" Exclude="..\src\portable\lib\**\Newtonsoft*.*" />
-        <!-- End temporary workaround -->
 		<PortableDesktop Include="..\src\portable\BrightstarDB.Portable.Desktop\bin\$(Configuration)\BrightstarDB.Portable.Desktop.dll" />
 		<PortablePhone Include="..\src\portable\BrightstarDB.Portable.Phone\bin\$(Configuration)\BrightstarDB.Portable.Phone.dll"/>
 		<PortableSilverlight Include="..\src\portable\BrightstarDB.Portable.Silverlight\bin\$(Configuration)\BrightstarDB.Portable.Silverlight.dll"/>
@@ -276,7 +273,11 @@
 			 Query="package/metadata/version"
 			 Value="$(PackageBuildNumber)" />
 
+    <!-- Cannot target .NET 40 PCL due to lack of System.Xml.Linq -->
+    <!--
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
+    -->
+    
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net45"/>
     <!-- This is supposedly profile 158
     <Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1"/>
@@ -289,6 +290,7 @@
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB" />
     <Copy SourceFiles="@(TextTemplates)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\content" />
     
+	<Copy SourceFiles="@(PortableDesktop)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\net40" />
 	<Copy SourceFiles="@(PortableDesktop)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\net45" />
 	<Copy SourceFiles="@(PortablePhone)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\wp80" />
 	<Copy SourceFiles="@(PortableSilverlight)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl5" />
