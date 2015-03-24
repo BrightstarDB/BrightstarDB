@@ -15,15 +15,7 @@
     <copyright>Copyright 2015 Khalil Ahmed, Graham Moore, and other contributors</copyright>
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
     <dependencies>
-      <group targetFramework="net40">
-        <dependency id="dotNetRDF" version="1.0.7" />
-      </group>
-      <group targetFramework="net45">
-        <dependency id="dotNetRDF" version="1.0.7" />
-      </group>
-      <group targetFramework="portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10">
-        <dependency id="Newtonsoft.Json" />
-      </group>
+        <dependency id="dotNetRDF" version="1.0.8" />
     </dependencies>
   </metadata>
 </package>
