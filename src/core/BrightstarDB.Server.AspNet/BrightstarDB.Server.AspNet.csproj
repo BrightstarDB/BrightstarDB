@@ -54,6 +54,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Nancy.Hosting.Aspnet.1.1\lib\net40\Nancy.Hosting.Aspnet.dll</HintPath>
     </Reference>
+    <Reference Include="Nancy.ViewEngines.Razor, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Nancy.Viewengines.Razor.1.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -64,6 +68,10 @@
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Web.Services" />
@@ -99,6 +107,7 @@
     <Content Include="Views\StoresResponse.cshtml" />
     <Content Include="Views\StoresResponseObject.sshtml" />
     <Content Include="Views\_Layout.cshtml" />
+   
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -142,6 +151,13 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>
+if $(ConfigurationName) == Debug (
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.1.1\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll" "$(ProjectDir)bin\"
+xcopy /s /y /R "$(SolutionDir)packages\Nancy.Viewengines.Razor.1.1\lib\Net40\Nancy.ViewEngines.Razor.dll" "$(ProjectDir)bin\"
+)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
