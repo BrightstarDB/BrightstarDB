@@ -182,7 +182,7 @@
   </PropertyGroup>
   <Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
   <Target Name="AfterBuild" DependsOnTargets="CopyRazorAssemblies" />
-  <Target Name="CopyRazorAssemblies" Condition="'$(Configuration)' == 'Debug'">
-    <Copy SourceFiles="@(RazorAssemblies)" DestinationFolder="$(ProjectDir)\bin\Debug" />
+  <Target Name="CopyRazorAssemblies">
+    <Copy SourceFiles="@(RazorAssemblies)" DestinationFolder="$(ProjectDir)\bin\$(Configuration)" />
   </Target>
 </Project>
