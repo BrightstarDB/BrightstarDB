@@ -1,0 +1,23 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    using BrightstarDB.EntityFramework;
+    using System.ComponentModel;
+
+    public interface IAttributePropagation
+    {
+        [Identifier]
+        [Browsable(true)]
+        string Id
+        {
+            get;
+        }
+
+        [Browsable(true)]
+        [Description("This should carry through.")]
+        int Number
+        {
+            get;
+            set;
+        }
+    }
+}

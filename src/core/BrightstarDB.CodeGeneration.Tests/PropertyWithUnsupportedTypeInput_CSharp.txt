@@ -1,0 +1,13 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    using System;
+
+    public interface IPropertyWithUnsupportedType
+    {
+        Action Property
+        {
+            get;
+            set;
+        }
+    }
+}

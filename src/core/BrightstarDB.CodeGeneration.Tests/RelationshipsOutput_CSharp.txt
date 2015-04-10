@@ -1,0 +1,423 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class EntityContext : global::BrightstarDB.EntityFramework.BrightstarEntityContext
+    {
+        static EntityContext()
+        {
+            var provider = new global::BrightstarDB.EntityFramework.ReflectionMappingProvider();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA, BrightstarDB.CodeGeneration.Tests.Relationships_OneToOneA>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB, BrightstarDB.CodeGeneration.Tests.Relationships_OneToOneB>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA, BrightstarDB.CodeGeneration.Tests.Relationships_OneToManyA>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB, BrightstarDB.CodeGeneration.Tests.Relationships_OneToManyB>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA, BrightstarDB.CodeGeneration.Tests.Relationships_ManyToManyA>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB, BrightstarDB.CodeGeneration.Tests.Relationships_ManyToManyB>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive, BrightstarDB.CodeGeneration.Tests.Relationships_Reflexive>();
+        }
+
+        public EntityContext()
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(global::BrightstarDB.Client.IDataObjectStore dataObjectStore) : base(dataObjectStore)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string updateGraphUri, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris, string versionGraphUri) : base(updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string connectionString, System.Boolean? enableOptimisticLocking = null, string updateGraphUri = null, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris = null, string versionGraphUri = null) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        private void InitializeContext()
+        {
+            this._Relationships_OneToOneAs = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA>(this));
+            this._Relationships_OneToOneBs = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB>(this));
+            this._Relationships_OneToManyAs = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA>(this));
+            this._Relationships_OneToManyBs = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB>(this));
+            this._Relationships_ManyToManyAs = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA>(this));
+            this._Relationships_ManyToManyBs = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB>(this));
+            this._Relationships_Reflexives = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive>(this));
+        }
+
+        public global::BrightstarDB.EntityFramework.IEntitySet<T> EntitySet<T>() where T : class
+        {
+            global::System.Type type = typeof(T);
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.Relationships_OneToOneAs);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.Relationships_OneToOneBs);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.Relationships_OneToManyAs);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.Relationships_OneToManyBs);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.Relationships_ManyToManyAs);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.Relationships_ManyToManyBs);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.Relationships_Reflexives);
+            }
+
+            throw new global::System.InvalidOperationException(((typeof(T)).FullName) + (" is not a recognized entity interface type."));
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA> _Relationships_OneToOneAs;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA> Relationships_OneToOneAs
+        {
+            get
+            {
+                return this._Relationships_OneToOneAs;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB> _Relationships_OneToOneBs;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB> Relationships_OneToOneBs
+        {
+            get
+            {
+                return this._Relationships_OneToOneBs;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA> _Relationships_OneToManyAs;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA> Relationships_OneToManyAs
+        {
+            get
+            {
+                return this._Relationships_OneToManyAs;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB> _Relationships_OneToManyBs;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB> Relationships_OneToManyBs
+        {
+            get
+            {
+                return this._Relationships_OneToManyBs;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA> _Relationships_ManyToManyAs;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA> Relationships_ManyToManyAs
+        {
+            get
+            {
+                return this._Relationships_ManyToManyAs;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB> _Relationships_ManyToManyBs;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB> Relationships_ManyToManyBs
+        {
+            get
+            {
+                return this._Relationships_ManyToManyBs;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive> _Relationships_Reflexives;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive> Relationships_Reflexives
+        {
+            get
+            {
+                return this._Relationships_Reflexives;
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class Relationships_OneToOneA : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA
+    {
+        public Relationships_OneToOneA()
+        {
+        }
+
+        public Relationships_OneToOneA(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(Relationships_OneToOneA))
+        {
+        }
+
+        public Relationships_OneToOneA(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB B
+        {
+            get
+            {
+                return base.GetRelatedObject<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB>("B");
+            }
+
+            set
+            {
+                base.SetRelatedObject<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB>("B", value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class Relationships_OneToOneB : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB
+    {
+        public Relationships_OneToOneB()
+        {
+        }
+
+        public Relationships_OneToOneB(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(Relationships_OneToOneB))
+        {
+        }
+
+        public Relationships_OneToOneB(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA A
+        {
+            get
+            {
+                return base.GetRelatedObject<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA>("A");
+            }
+
+            set
+            {
+                base.SetRelatedObject<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA>("A", value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class Relationships_OneToManyA : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA
+    {
+        public Relationships_OneToManyA()
+        {
+        }
+
+        public Relationships_OneToManyA(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(Relationships_OneToManyA))
+        {
+        }
+
+        public Relationships_OneToManyA(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public global::System.Collections.Generic.ICollection<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB> Bs
+        {
+            get
+            {
+                return base.GetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB>("Bs");
+            }
+
+            set
+            {
+                if ((value) == (null))
+                {
+                    throw new global::System.ArgumentNullException("value");
+                }
+
+                base.SetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB>("Bs", value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class Relationships_OneToManyB : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB
+    {
+        public Relationships_OneToManyB()
+        {
+        }
+
+        public Relationships_OneToManyB(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(Relationships_OneToManyB))
+        {
+        }
+
+        public Relationships_OneToManyB(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA A
+        {
+            get
+            {
+                return base.GetRelatedObject<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA>("A");
+            }
+
+            set
+            {
+                base.SetRelatedObject<global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA>("A", value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class Relationships_ManyToManyA : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA
+    {
+        public Relationships_ManyToManyA()
+        {
+        }
+
+        public Relationships_ManyToManyA(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(Relationships_ManyToManyA))
+        {
+        }
+
+        public Relationships_ManyToManyA(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public global::System.Collections.Generic.ICollection<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB> Bs
+        {
+            get
+            {
+                return base.GetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB>("Bs");
+            }
+
+            set
+            {
+                if ((value) == (null))
+                {
+                    throw new global::System.ArgumentNullException("value");
+                }
+
+                base.SetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB>("Bs", value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class Relationships_ManyToManyB : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB
+    {
+        public Relationships_ManyToManyB()
+        {
+        }
+
+        public Relationships_ManyToManyB(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(Relationships_ManyToManyB))
+        {
+        }
+
+        public Relationships_ManyToManyB(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public global::System.Collections.Generic.ICollection<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA> As
+        {
+            get
+            {
+                return base.GetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA>("As");
+            }
+
+            set
+            {
+                if ((value) == (null))
+                {
+                    throw new global::System.ArgumentNullException("value");
+                }
+
+                base.SetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA>("As", value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class Relationships_Reflexive : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive
+    {
+        public Relationships_Reflexive()
+        {
+        }
+
+        public Relationships_Reflexive(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(Relationships_Reflexive))
+        {
+        }
+
+        public Relationships_Reflexive(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public global::System.Collections.Generic.ICollection<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive> As
+        {
+            get
+            {
+                return base.GetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive>("As");
+            }
+
+            set
+            {
+                if ((value) == (null))
+                {
+                    throw new global::System.ArgumentNullException("value");
+                }
+
+                base.SetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive>("As", value);
+            }
+        }
+
+        public global::System.Collections.Generic.ICollection<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive> Bs
+        {
+            get
+            {
+                return base.GetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive>("Bs");
+            }
+
+            set
+            {
+                if ((value) == (null))
+                {
+                    throw new global::System.ArgumentNullException("value");
+                }
+
+                base.SetRelatedObjects<global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive>("Bs", value);
+            }
+        }
+    }
+}

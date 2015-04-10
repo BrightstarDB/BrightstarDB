@@ -1,0 +1,78 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    using System.Collections.Generic;
+    using BrightstarDB.EntityFramework;
+
+    public interface IRelationships_OneToOneA
+    {
+        IRelationships_OneToOneB B
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface IRelationships_OneToOneB
+    {
+        [InverseProperty("B")]
+        IRelationships_OneToOneA A
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface IRelationships_OneToManyA
+    {
+        ICollection<IRelationships_OneToManyB> Bs
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface IRelationships_OneToManyB
+    {
+        [InverseProperty("Bs")]
+        IRelationships_OneToManyA A
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface IRelationships_ManyToManyA
+    {
+        ICollection<IRelationships_ManyToManyB> Bs
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface IRelationships_ManyToManyB
+    {
+        [InverseProperty("Bs")]
+        ICollection<IRelationships_ManyToManyA> As
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface IRelationships_Reflexive
+    {
+        ICollection<IRelationships_Reflexive> As
+        {
+            get;
+            set;
+        }
+
+        [InverseProperty("As")]
+        ICollection<IRelationships_Reflexive> Bs
+        {
+            get;
+            set;
+        }
+    }
+}

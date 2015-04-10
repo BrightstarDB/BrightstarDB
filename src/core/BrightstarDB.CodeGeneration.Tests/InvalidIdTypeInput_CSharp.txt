@@ -1,0 +1,13 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    using BrightstarDB.EntityFramework;
+
+    public interface IInvalidIdType
+    {
+        [Identifier]
+        int Id
+        {
+            get;
+        }
+    }
+}
