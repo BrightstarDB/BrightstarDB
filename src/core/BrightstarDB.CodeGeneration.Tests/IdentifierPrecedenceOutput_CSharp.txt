@@ -1,0 +1,339 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class EntityContext : global::BrightstarDB.EntityFramework.BrightstarEntityContext
+    {
+        static EntityContext()
+        {
+            var provider = new global::BrightstarDB.EntityFramework.ReflectionMappingProvider();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdentifierAttributeTrumpsAll));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdentifierAttributeTrumpsAll, BrightstarDB.CodeGeneration.Tests.IdentifierPrecedence_IdentifierAttributeTrumpsAll>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_ClassIdTrumpsId));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_ClassIdTrumpsId, BrightstarDB.CodeGeneration.Tests.IdentifierPrecedence_ClassIdTrumpsId>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_Base));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_Base, BrightstarDB.CodeGeneration.Tests.IdentifierPrecedence_Base>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdTrumpsInheritedId));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdTrumpsInheritedId, BrightstarDB.CodeGeneration.Tests.IdentifierPrecedence_IdTrumpsInheritedId>();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_CanInheritId));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_CanInheritId, BrightstarDB.CodeGeneration.Tests.IdentifierPrecedence_CanInheritId>();
+        }
+
+        public EntityContext()
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(global::BrightstarDB.Client.IDataObjectStore dataObjectStore) : base(dataObjectStore)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string updateGraphUri, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris, string versionGraphUri) : base(updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string connectionString, System.Boolean? enableOptimisticLocking = null, string updateGraphUri = null, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris = null, string versionGraphUri = null) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        private void InitializeContext()
+        {
+            this._IdentifierPrecedence_IdentifierAttributeTrumpsAlls = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdentifierAttributeTrumpsAll>(this));
+            this._IdentifierPrecedence_ClassIdTrumpsIds = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_ClassIdTrumpsId>(this));
+            this._IdentifierPrecedence_Bases = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_Base>(this));
+            this._IdentifierPrecedence_IdTrumpsInheritedIds = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdTrumpsInheritedId>(this));
+            this._IdentifierPrecedence_CanInheritIds = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_CanInheritId>(this));
+        }
+
+        public global::BrightstarDB.EntityFramework.IEntitySet<T> EntitySet<T>() where T : class
+        {
+            global::System.Type type = typeof(T);
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdentifierAttributeTrumpsAll)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.IdentifierPrecedence_IdentifierAttributeTrumpsAlls);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_ClassIdTrumpsId)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.IdentifierPrecedence_ClassIdTrumpsIds);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_Base)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.IdentifierPrecedence_Bases);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdTrumpsInheritedId)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.IdentifierPrecedence_IdTrumpsInheritedIds);
+            }
+
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_CanInheritId)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.IdentifierPrecedence_CanInheritIds);
+            }
+
+            throw new global::System.InvalidOperationException(((typeof(T)).FullName) + (" is not a recognized entity interface type."));
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdentifierAttributeTrumpsAll> _IdentifierPrecedence_IdentifierAttributeTrumpsAlls;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdentifierAttributeTrumpsAll> IdentifierPrecedence_IdentifierAttributeTrumpsAlls
+        {
+            get
+            {
+                return this._IdentifierPrecedence_IdentifierAttributeTrumpsAlls;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_ClassIdTrumpsId> _IdentifierPrecedence_ClassIdTrumpsIds;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_ClassIdTrumpsId> IdentifierPrecedence_ClassIdTrumpsIds
+        {
+            get
+            {
+                return this._IdentifierPrecedence_ClassIdTrumpsIds;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_Base> _IdentifierPrecedence_Bases;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_Base> IdentifierPrecedence_Bases
+        {
+            get
+            {
+                return this._IdentifierPrecedence_Bases;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdTrumpsInheritedId> _IdentifierPrecedence_IdTrumpsInheritedIds;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdTrumpsInheritedId> IdentifierPrecedence_IdTrumpsInheritedIds
+        {
+            get
+            {
+                return this._IdentifierPrecedence_IdTrumpsInheritedIds;
+            }
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_CanInheritId> _IdentifierPrecedence_CanInheritIds;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_CanInheritId> IdentifierPrecedence_CanInheritIds
+        {
+            get
+            {
+                return this._IdentifierPrecedence_CanInheritIds;
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class IdentifierPrecedence_IdentifierAttributeTrumpsAll : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdentifierAttributeTrumpsAll
+    {
+        public IdentifierPrecedence_IdentifierAttributeTrumpsAll()
+        {
+        }
+
+        public IdentifierPrecedence_IdentifierAttributeTrumpsAll(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(IdentifierPrecedence_IdentifierAttributeTrumpsAll))
+        {
+        }
+
+        public IdentifierPrecedence_IdentifierAttributeTrumpsAll(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public System.String Something
+        {
+            get
+            {
+                return base.GetKey();
+            }
+
+            set
+            {
+                base.SetKey(value);
+            }
+        }
+
+        public System.String IdentifierPrecedence_IdentifierAttributeTrumpsAllId
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.String>("IdentifierPrecedence_IdentifierAttributeTrumpsAllId");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("IdentifierPrecedence_IdentifierAttributeTrumpsAllId", value);
+            }
+        }
+
+        public System.String Id
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.String>("Id");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Id", value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class IdentifierPrecedence_ClassIdTrumpsId : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_ClassIdTrumpsId
+    {
+        public IdentifierPrecedence_ClassIdTrumpsId()
+        {
+        }
+
+        public IdentifierPrecedence_ClassIdTrumpsId(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(IdentifierPrecedence_ClassIdTrumpsId))
+        {
+        }
+
+        public IdentifierPrecedence_ClassIdTrumpsId(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public System.String IdentifierPrecedence_ClassIdTrumpsIdId
+        {
+            get
+            {
+                return base.GetKey();
+            }
+
+            set
+            {
+                base.SetKey(value);
+            }
+        }
+
+        public System.String Id
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.String>("Id");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Id", value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class IdentifierPrecedence_Base : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_Base
+    {
+        public IdentifierPrecedence_Base()
+        {
+        }
+
+        public IdentifierPrecedence_Base(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(IdentifierPrecedence_Base))
+        {
+        }
+
+        public IdentifierPrecedence_Base(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public System.String SomeId
+        {
+            get
+            {
+                return base.GetKey();
+            }
+
+            set
+            {
+                base.SetKey(value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class IdentifierPrecedence_IdTrumpsInheritedId : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdTrumpsInheritedId
+    {
+        public IdentifierPrecedence_IdTrumpsInheritedId()
+        {
+        }
+
+        public IdentifierPrecedence_IdTrumpsInheritedId(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(IdentifierPrecedence_IdTrumpsInheritedId))
+        {
+        }
+
+        public IdentifierPrecedence_IdTrumpsInheritedId(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public System.String Id
+        {
+            get
+            {
+                return base.GetKey();
+            }
+
+            set
+            {
+                base.SetKey(value);
+            }
+        }
+
+        public System.String SomeId
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.String>("SomeId");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("SomeId", value);
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class IdentifierPrecedence_CanInheritId : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_CanInheritId
+    {
+        public IdentifierPrecedence_CanInheritId()
+        {
+        }
+
+        public IdentifierPrecedence_CanInheritId(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(IdentifierPrecedence_CanInheritId))
+        {
+        }
+
+        public IdentifierPrecedence_CanInheritId(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public System.String SomeId
+        {
+            get
+            {
+                return base.GetKey();
+            }
+
+            set
+            {
+                base.SetKey(value);
+            }
+        }
+    }
+}

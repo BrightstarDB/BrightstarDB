@@ -1,0 +1,107 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class EntityContext : global::BrightstarDB.EntityFramework.BrightstarEntityContext
+    {
+        static EntityContext()
+        {
+            var provider = new global::BrightstarDB.EntityFramework.ReflectionMappingProvider();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.IAttributePropagation));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.IAttributePropagation, BrightstarDB.CodeGeneration.Tests.AttributePropagation>();
+        }
+
+        public EntityContext()
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(global::BrightstarDB.Client.IDataObjectStore dataObjectStore) : base(dataObjectStore)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string updateGraphUri, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris, string versionGraphUri) : base(updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string connectionString, System.Boolean? enableOptimisticLocking = null, string updateGraphUri = null, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris = null, string versionGraphUri = null) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        private void InitializeContext()
+        {
+            this._AttributePropagations = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IAttributePropagation>(this));
+        }
+
+        public global::BrightstarDB.EntityFramework.IEntitySet<T> EntitySet<T>() where T : class
+        {
+            global::System.Type type = typeof(T);
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IAttributePropagation)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.AttributePropagations);
+            }
+
+            throw new global::System.InvalidOperationException(((typeof(T)).FullName) + (" is not a recognized entity interface type."));
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IAttributePropagation> _AttributePropagations;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IAttributePropagation> AttributePropagations
+        {
+            get
+            {
+                return this._AttributePropagations;
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class AttributePropagation : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IAttributePropagation
+    {
+        public AttributePropagation()
+        {
+        }
+
+        public AttributePropagation(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(AttributePropagation))
+        {
+        }
+
+        public AttributePropagation(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        [global::System.ComponentModel.BrowsableAttribute(true)]
+        public System.String Id
+        {
+            get
+            {
+                return base.GetKey();
+            }
+
+            set
+            {
+                base.SetKey(value);
+            }
+        }
+
+        [global::System.ComponentModel.BrowsableAttribute(true)]
+        [global::System.ComponentModel.DescriptionAttribute("This should carry through.")]
+        public System.Int32 Number
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Int32>("Number");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Number", value);
+            }
+        }
+    }
+}

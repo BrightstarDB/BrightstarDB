@@ -1,0 +1,143 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ CleanupBehavior processor="T4VSHost" CleanupAfterProcessingtemplate="true" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="EnvDTE" #>
+<#
+// set this to either "CSharp" or "VisualBasic"
+var language = "CSharp";
+
+// you can move the .tt file to a different folder in your project to have the entity context's namespace change accordingly
+// or, you could just set it manually here
+var contextNamespace = this.Host.ResolveParameterValue("directiveId", "namespaceDirectiveProcessor", "namespaceHint") ?? "Default.Namespace";
+
+var solutionPath = this.DTE.Solution.FileName;
+
+this.SetFileExtensionForLanguage(language);
+this.HookAssemblyResolution();
+var generator = Type.GetType("BrightstarDB.CodeGeneration.Generator, BrightstarDB.CodeGeneration");
+var generateMethod = generator.GetMethod("Generate");
+var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, contextNamespace });
+
+this.WriteLine(result);
+#>
+<#+
+private DTE dte;
+
+private DTE DTE
+{
+    get
+    {
+        if (this.dte == null)
+        {
+            var hostServiceProvider = (IServiceProvider)this.Host;
+            this.dte = (DTE)hostServiceProvider.GetService(typeof(DTE));
+        }
+
+        return this.dte;
+    }
+}
+
+private void SetFileExtensionForLanguage(string language)
+{
+    switch (language)
+    {
+        case "CSharp":
+            this.Host.SetFileExtension(".g.cs");
+            break;
+        case "VisualBasic":
+            this.Host.SetFileExtension(".g.vb");
+            break;
+        default:
+            this.Host.SetFileExtension(".g");
+            break;
+    }
+}
+
+private void HookAssemblyResolution()
+{
+    var templateDirectory = Path.GetDirectoryName(this.Host.TemplateFile);
+    var currentDirectory = templateDirectory;
+    string packagesDirectory = null;
+
+    while (Path.GetPathRoot(currentDirectory) != currentDirectory)
+    {
+        var packagesDirectories = Directory.GetDirectories(currentDirectory, "packages");
+
+        if (packagesDirectories.Length == 0)
+        {
+            currentDirectory = Path.GetDirectoryName(currentDirectory);
+            continue;
+        }
+        else if (packagesDirectories.Length > 1)
+        {
+            throw new InvalidOperationException("More than one packages directory detected - aborting.");
+        }
+        else
+        {
+            packagesDirectory = packagesDirectories[0];
+            break;
+        }
+    }
+
+    if (packagesDirectory == null)
+    {
+        throw new InvalidOperationException("Could not find packages directory relative to the template's directory (" + templateDirectory + ").");
+    }
+
+    this.Debug("packages directory: {0}", packagesDirectory);
+
+    var packageDirectories = Directory.GetDirectories(packagesDirectory, "BrightstarDB.CodeGeneration.T4.*");
+
+    if (packageDirectories.Length == 0)
+    {
+        throw new InvalidOperationException("Could not find BrightstarDB.CodeGeneration.T4 package in packages directory (" + packagesDirectory + ").");
+    }
+    else if (packageDirectories.Length > 1)
+    {
+        throw new InvalidOperationException("More than 1 version of the BrightstarDB.CodeGeneration.T4 package was found in the packages directory (" + packagesDirectory + "). You must choose 1 version and remove the others.");
+    }
+
+    var packageDirectory = packageDirectories.First();
+    this.Debug("package directory: {0}", packageDirectory);
+
+    var assembliesDirectory = Path.Combine(packageDirectory, "tools");
+    this.Debug("assemblies directory: {0}", assembliesDirectory);
+
+    if (!Directory.Exists(assembliesDirectory))
+    {
+        throw new InvalidOperationException("Package directory " + packageDirectory + " was found but no 'tools' subdirectory was found within.");
+    }
+
+    AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
+    {
+        this.Debug("resolve: {0}", e.Name);
+
+        var matches = Directory.GetFiles(assembliesDirectory, e.Name + ".dll", SearchOption.TopDirectoryOnly);
+
+        if (matches.Length == 0)
+        {
+            this.Debug("Failed to find assembly in assemblies directory ({0}) named '{1}'.", assembliesDirectory, e.Name);
+            return null;
+        }
+        else if (matches.Length > 1)
+        {
+            this.Debug("Found more than one potential match for '{0}' in assemblies directory ({0}). Bailing.", e.Name, assembliesDirectory);
+            return null;
+        }
+
+        var match = matches.First();
+        this.Debug("match: {0}", match);
+
+        return Assembly.LoadFrom(match);
+    };
+}
+
+private void Debug(string format, params object[] args)
+{
+    //this.WriteLine("// " + string.Format(format, args));
+}
+#>

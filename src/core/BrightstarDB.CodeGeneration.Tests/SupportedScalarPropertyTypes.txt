@@ -1,0 +1,559 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class EntityContext : global::BrightstarDB.EntityFramework.BrightstarEntityContext
+    {
+        static EntityContext()
+        {
+            var provider = new global::BrightstarDB.EntityFramework.ReflectionMappingProvider();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.ISupportedScalarPropertyTypes));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.ISupportedScalarPropertyTypes, BrightstarDB.CodeGeneration.Tests.SupportedScalarPropertyTypes>();
+        }
+
+        public EntityContext()
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(global::BrightstarDB.Client.IDataObjectStore dataObjectStore) : base(dataObjectStore)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string updateGraphUri, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris, string versionGraphUri) : base(updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string connectionString, System.Boolean? enableOptimisticLocking = null, string updateGraphUri = null, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris = null, string versionGraphUri = null) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        private void InitializeContext()
+        {
+            this._SupportedScalarPropertyTypes = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.ISupportedScalarPropertyTypes>(this));
+        }
+
+        public global::BrightstarDB.EntityFramework.IEntitySet<T> EntitySet<T>() where T : class
+        {
+            global::System.Type type = typeof(T);
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.ISupportedScalarPropertyTypes)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.SupportedScalarPropertyTypes);
+            }
+
+            throw new global::System.InvalidOperationException(((typeof(T)).FullName) + (" is not a recognized entity interface type."));
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.ISupportedScalarPropertyTypes> _SupportedScalarPropertyTypes;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.ISupportedScalarPropertyTypes> SupportedScalarPropertyTypes
+        {
+            get
+            {
+                return this._SupportedScalarPropertyTypes;
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class SupportedScalarPropertyTypes : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.ISupportedScalarPropertyTypes
+    {
+        public SupportedScalarPropertyTypes()
+        {
+        }
+
+        public SupportedScalarPropertyTypes(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(SupportedScalarPropertyTypes))
+        {
+        }
+
+        public SupportedScalarPropertyTypes(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+
+        public System.String Id
+        {
+            get
+            {
+                return base.GetKey();
+            }
+
+            set
+            {
+                base.SetKey(value);
+            }
+        }
+
+        public System.Boolean Bool
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Boolean>("Bool");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Bool", value);
+            }
+        }
+
+        public System.Int16 Int16
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Int16>("Int16");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Int16", value);
+            }
+        }
+
+        public System.Int32 Int32
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Int32>("Int32");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Int32", value);
+            }
+        }
+
+        public System.Int64 Int64
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Int64>("Int64");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Int64", value);
+            }
+        }
+
+        public System.UInt16 UInt16
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.UInt16>("UInt16");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("UInt16", value);
+            }
+        }
+
+        public System.UInt32 UInt32
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.UInt32>("UInt32");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("UInt32", value);
+            }
+        }
+
+        public System.UInt64 UInt64
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.UInt64>("UInt64");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("UInt64", value);
+            }
+        }
+
+        public System.String String
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.String>("String");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("String", value);
+            }
+        }
+
+        public System.Decimal Decimal
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Decimal>("Decimal");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Decimal", value);
+            }
+        }
+
+        public System.Double Double
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Double>("Double");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Double", value);
+            }
+        }
+
+        public System.Single Single
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Single>("Single");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Single", value);
+            }
+        }
+
+        public System.Byte Byte
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Byte>("Byte");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Byte", value);
+            }
+        }
+
+        public System.Char Char
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Char>("Char");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Char", value);
+            }
+        }
+
+        public System.SByte SByte
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.SByte>("SByte");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("SByte", value);
+            }
+        }
+
+        public global::System.DateTime DateTime
+        {
+            get
+            {
+                return base.GetRelatedProperty<global::System.DateTime>("DateTime");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("DateTime", value);
+            }
+        }
+
+        public global::System.Guid Guid
+        {
+            get
+            {
+                return base.GetRelatedProperty<global::System.Guid>("Guid");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Guid", value);
+            }
+        }
+
+        public global::System.Uri Uri
+        {
+            get
+            {
+                return base.GetRelatedProperty<global::System.Uri>("Uri");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Uri", value);
+            }
+        }
+
+        public global::BrightstarDB.Rdf.PlainLiteral PlainLiteral
+        {
+            get
+            {
+                return base.GetRelatedProperty<global::BrightstarDB.Rdf.PlainLiteral>("PlainLiteral");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("PlainLiteral", value);
+            }
+        }
+
+        public global::System.DayOfWeek Enumeration
+        {
+            get
+            {
+                return base.GetRelatedProperty<global::System.DayOfWeek>("Enumeration");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("Enumeration", value);
+            }
+        }
+
+        public System.Byte[] ByteArray
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Byte[]>("ByteArray");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("ByteArray", value);
+            }
+        }
+
+        public System.Boolean? NullableBool
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Boolean?>("NullableBool");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableBool", value);
+            }
+        }
+
+        public System.Int16? NullableInt16
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Int16?>("NullableInt16");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableInt16", value);
+            }
+        }
+
+        public System.Int32? NullableInt32
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Int32?>("NullableInt32");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableInt32", value);
+            }
+        }
+
+        public System.Int64? NullableInt64
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Int64?>("NullableInt64");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableInt64", value);
+            }
+        }
+
+        public System.UInt16? NullableUInt16
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.UInt16?>("NullableUInt16");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableUInt16", value);
+            }
+        }
+
+        public System.UInt32? NullableUInt32
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.UInt32?>("NullableUInt32");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableUInt32", value);
+            }
+        }
+
+        public System.UInt64? NullableUInt64
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.UInt64?>("NullableUInt64");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableUInt64", value);
+            }
+        }
+
+        public System.Decimal? NullableDecimal
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Decimal?>("NullableDecimal");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableDecimal", value);
+            }
+        }
+
+        public System.Double? NullableDouble
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Double?>("NullableDouble");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableDouble", value);
+            }
+        }
+
+        public System.Single? NullableSingle
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Single?>("NullableSingle");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableSingle", value);
+            }
+        }
+
+        public System.Byte? NullableByte
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Byte?>("NullableByte");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableByte", value);
+            }
+        }
+
+        public System.Char? NullableChar
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.Char?>("NullableChar");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableChar", value);
+            }
+        }
+
+        public System.SByte? NullableSByte
+        {
+            get
+            {
+                return base.GetRelatedProperty<System.SByte?>("NullableSByte");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableSByte", value);
+            }
+        }
+
+        public global::System.DateTime? NullableDateTime
+        {
+            get
+            {
+                return base.GetRelatedProperty<global::System.DateTime?>("NullableDateTime");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableDateTime", value);
+            }
+        }
+
+        public global::System.Guid? NullableGuid
+        {
+            get
+            {
+                return base.GetRelatedProperty<global::System.Guid?>("NullableGuid");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableGuid", value);
+            }
+        }
+
+        public global::System.DayOfWeek? NullableEnumeration
+        {
+            get
+            {
+                return base.GetRelatedProperty<global::System.DayOfWeek?>("NullableEnumeration");
+            }
+
+            set
+            {
+                base.SetRelatedProperty("NullableEnumeration", value);
+            }
+        }
+    }
+}

@@ -1,0 +1,229 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    using System;
+    using BrightstarDB.Rdf;
+
+    public interface ISupportedScalarPropertyTypes
+    {
+        string Id
+        {
+            get;
+        }
+
+        bool Bool
+        {
+            get;
+            set;
+        }
+
+        short Int16
+        {
+            get;
+            set;
+        }
+
+        int Int32
+        {
+            get;
+            set;
+        }
+
+        long Int64
+        {
+            get;
+            set;
+        }
+
+        ushort UInt16
+        {
+            get;
+            set;
+        }
+
+        uint UInt32
+        {
+            get;
+            set;
+        }
+
+        ulong UInt64
+        {
+            get;
+            set;
+        }
+
+        string String
+        {
+            get;
+            set;
+        }
+
+        decimal Decimal
+        {
+            get;
+            set;
+        }
+
+        double Double
+        {
+            get;
+            set;
+        }
+
+        float Single
+        {
+            get;
+            set;
+        }
+
+        byte Byte
+        {
+            get;
+            set;
+        }
+
+        char Char
+        {
+            get;
+            set;
+        }
+
+        sbyte SByte
+        {
+            get;
+            set;
+        }
+
+        DateTime DateTime
+        {
+            get;
+            set;
+        }
+
+        Guid Guid
+        {
+            get;
+            set;
+        }
+
+        Uri Uri
+        {
+            get;
+            set;
+        }
+
+        PlainLiteral PlainLiteral
+        {
+            get;
+            set;
+        }
+
+        DayOfWeek Enumeration
+        {
+            get;
+            set;
+        }
+
+        byte[] ByteArray
+        {
+            get;
+            set;
+        }
+
+        bool? NullableBool
+        {
+            get;
+            set;
+        }
+
+        short? NullableInt16
+        {
+            get;
+            set;
+        }
+
+        int? NullableInt32
+        {
+            get;
+            set;
+        }
+
+        long? NullableInt64
+        {
+            get;
+            set;
+        }
+
+        ushort? NullableUInt16
+        {
+            get;
+            set;
+        }
+
+        uint? NullableUInt32
+        {
+            get;
+            set;
+        }
+
+        ulong? NullableUInt64
+        {
+            get;
+            set;
+        }
+
+        decimal? NullableDecimal
+        {
+            get;
+            set;
+        }
+
+        double? NullableDouble
+        {
+            get;
+            set;
+        }
+
+        float? NullableSingle
+        {
+            get;
+            set;
+        }
+
+        byte? NullableByte
+        {
+            get;
+            set;
+        }
+
+        char? NullableChar
+        {
+            get;
+            set;
+        }
+
+        sbyte? NullableSByte
+        {
+            get;
+            set;
+        }
+
+        DateTime? NullableDateTime
+        {
+            get;
+            set;
+        }
+
+        Guid? NullableGuid
+        {
+            get;
+            set;
+        }
+
+        DayOfWeek? NullableEnumeration
+        {
+            get;
+            set;
+        }
+    }
+}
