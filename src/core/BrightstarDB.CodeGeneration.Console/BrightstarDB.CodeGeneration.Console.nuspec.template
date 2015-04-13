@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>BrightstarDB.CodeGeneration.Console</id>
+    <version>${VERSION}</version>
+    <authors>Kal Ahmed</authors>
+    <owners>Kal Ahmed</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>http://brightstardb.com/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+        A console-based code generator for BrightstarDB.
+    </description>
+    <tags>.NET codegen console</tags>
+  </metadata>
+</package>

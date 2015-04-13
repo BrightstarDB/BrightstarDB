@@ -20,7 +20,7 @@ this.SetFileExtensionForLanguage(language);
 this.HookAssemblyResolution();
 var generator = Type.GetType("BrightstarDB.CodeGeneration.Generator, BrightstarDB.CodeGeneration");
 var generateMethod = generator.GetMethod("Generate");
-var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, contextNamespace });
+var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, contextNamespace, "EntityContext", null, null, null });
 
 this.WriteLine(result);
 #>

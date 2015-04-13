@@ -822,8 +822,6 @@
                     typeof(Guid),
                     typeof(Uri),
                     typeof(PlainLiteral)
-
-                    // TODO: nullables?
                 };
 
                 this.basicTypes = new HashSet<ITypeSymbol>(basicTypes.Select(x => compilation.GetTypeByMetadataName(x.FullName)));
