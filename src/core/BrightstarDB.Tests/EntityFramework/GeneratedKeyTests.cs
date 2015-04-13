@@ -172,5 +172,27 @@ namespace BrightstarDB.Tests.EntityFramework
                 Assert.That(child.Parent.Id, Is.EqualTo(parentId));
             }
         }
+
+        [Test]
+        public void TestUpdateEntityWithCompositeKey()
+        {
+            using (var context = GetContext())
+            {
+                var parent = context.ParentEntities.Create();
+                var child = context.ChildEntities.Create();
+                child.Code = "child";
+                child.Description = "Some description";
+                child.Parent = parent;
+                context.SaveChanges();
+            }
+
+            using (var context = GetContext())
+            {
+                var parent = context.ParentEntities.First();
+                var child = context.ChildEntities.First();
+                child.Description = "Update description";
+                context.SaveChanges();
+            }
+        }
     }
 }

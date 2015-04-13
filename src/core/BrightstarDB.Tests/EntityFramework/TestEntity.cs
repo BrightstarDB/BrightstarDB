@@ -2,11 +2,11 @@
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    internal partial class Entity : IEquatable<Entity>
+    internal partial class TestEntity : IEquatable<TestEntity>
     {
         public bool OnCreatedWasCalled { get; set; }
 
-        public bool Equals(Entity other)
+        public bool Equals(TestEntity other)
         {
             //Check whether the compared object is null.
             if (Object.ReferenceEquals(other, null)) return false;

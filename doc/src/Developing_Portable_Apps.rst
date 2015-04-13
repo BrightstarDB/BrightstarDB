@@ -152,8 +152,7 @@ iOS support is in the early stages of development and should be considered exper
 
 Please note the following when using BrightstarDB from within an Android application.
 
-    #. The code has only been tested on the Apple iOS emulators. 
-       It has not yet been tested on any iOS hardware.
+    #. The code has been tested on iOS simulators and on an iPad Air running iOS 8.1.
        
     #. The REST client is not tested and not supported yet.
     
@@ -174,6 +173,12 @@ Please note the following when using BrightstarDB from within an Android applica
        queried. We plan on addressing the amount of memory used by SPARQL
        query processing in a future release.
        
+    #. The iOS build process may unintentionally strip out the BrightstarDB.Portable.iOS 
+       platform support library because no code directly references it. To avoid this,
+       the iOS portable library package now includes a source file named 
+       BrightstarDBForceReference.cs which will automatically be included in your project.
+       If you are building from source, this source file can be found in the directory
+       `installer/nuget` and you should manually include this file in your project.
 
 ---------------------------------
 BrightstarDB Database Portability

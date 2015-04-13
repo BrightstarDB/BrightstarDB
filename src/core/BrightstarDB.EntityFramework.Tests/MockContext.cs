@@ -81,7 +81,7 @@ namespace BrightstarDB.EntityFramework.Tests
 
         public override string MapIdToUri(PropertyInfo propertyInfo, string id)
         {
-            return ("id:" + id);
+            return ("id:" + Uri.EscapeUriString(id));
         }
 
         public override void DeleteObject(object o)

@@ -1,4 +1,6 @@
-﻿namespace BrightstarDB.EntityFramework.Tests.ContextObjects
+﻿using System.Collections.Generic;
+
+namespace BrightstarDB.EntityFramework.Tests.ContextObjects
 {
     [Entity("Market")]
     public interface IMarket
@@ -10,7 +12,7 @@
         string Name { get; set; }
 
         [PropertyType("listing")]
-        IEntitySet<ICompany> ListedCompanies { get; set; }
+        ICollection<ICompany> ListedCompanies { get; set; }
     }
 
     public class Market : MockEntityObject, IMarket{
@@ -27,7 +29,7 @@
             set { throw new System.NotImplementedException(); }
         }
 
-        public IEntitySet<ICompany> ListedCompanies
+        public ICollection<ICompany> ListedCompanies
         {
             get { throw new System.NotImplementedException(); }
             set { throw new System.NotImplementedException(); }

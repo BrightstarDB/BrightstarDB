@@ -18,10 +18,12 @@ namespace BrightstarDB.EntityFramework.Tests
             var q = Context.Dinners.Where(d => d.EventDate.Day == 1).Select(d=>d.Id);
             var result = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?d WHERE {
+                @"SELECT ?v1 WHERE {
 ?d a <http://www.networkedplanet.com/schemas/test/Dinner> .
 ?d <http://www.networkedplanet.com/schemas/test/date> ?v0 .
-FILTER((DAY(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
+FILTER((DAY(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).
+BIND(STRAFTER(STR(?d), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}"
                 );
         }
 
@@ -31,10 +33,12 @@ FILTER((DAY(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
             var q = Context.Dinners.Where(d => d.EventDate.Hour == 1).Select(d=>d.Id);
             var result = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?d WHERE {
+                @"SELECT ?v1 WHERE {
 ?d a <http://www.networkedplanet.com/schemas/test/Dinner> .
 ?d <http://www.networkedplanet.com/schemas/test/date> ?v0 .
-FILTER((HOURS(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
+FILTER((HOURS(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).
+BIND(STRAFTER(STR(?d), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}"
                 );
         }
 
@@ -44,10 +48,12 @@ FILTER((HOURS(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
             var q = Context.Dinners.Where(d => d.EventDate.Minute == 1).Select(d=>d.Id);
             var result = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?d WHERE {
+                @"SELECT ?v1 WHERE {
 ?d a <http://www.networkedplanet.com/schemas/test/Dinner> .
 ?d <http://www.networkedplanet.com/schemas/test/date> ?v0 .
-FILTER((MINUTES(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
+FILTER((MINUTES(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).
+BIND(STRAFTER(STR(?d), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}"
                 );
         }
 
@@ -57,10 +63,12 @@ FILTER((MINUTES(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
             var q = Context.Dinners.Where(d => d.EventDate.Month == 1).Select(d=>d.Id);
             var result = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?d WHERE {
+                @"SELECT ?v1 WHERE {
 ?d a <http://www.networkedplanet.com/schemas/test/Dinner> .
 ?d <http://www.networkedplanet.com/schemas/test/date> ?v0 .
-FILTER((MONTH(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
+FILTER((MONTH(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).
+BIND(STRAFTER(STR(?d), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}"
                 );
         }
 
@@ -70,10 +78,12 @@ FILTER((MONTH(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
             var q = Context.Dinners.Where(d => d.EventDate.Second == 1).Select(d=>d.Id);
             var result = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?d WHERE {
+                @"SELECT ?v1 WHERE {
 ?d a <http://www.networkedplanet.com/schemas/test/Dinner> .
 ?d <http://www.networkedplanet.com/schemas/test/date> ?v0 .
-FILTER((SECONDS(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
+FILTER((SECONDS(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).
+BIND(STRAFTER(STR(?d), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}"
                 );
         }
 
@@ -83,10 +93,12 @@ FILTER((SECONDS(?v0)) = '1'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
             var q = Context.Dinners.Where(d => d.EventDate.Year == 2011).Select(d=>d.Id);
             var result = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?d WHERE {
+                @"SELECT ?v1 WHERE {
 ?d a <http://www.networkedplanet.com/schemas/test/Dinner> .
 ?d <http://www.networkedplanet.com/schemas/test/date> ?v0 .
-FILTER((YEAR(?v0)) = '2011'^^<http://www.w3.org/2001/XMLSchema#integer>).}"
+FILTER((YEAR(?v0)) = '2011'^^<http://www.w3.org/2001/XMLSchema#integer>).
+BIND(STRAFTER(STR(?d), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}"
                 );
         }
     }

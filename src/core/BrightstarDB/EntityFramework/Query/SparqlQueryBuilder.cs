@@ -382,21 +382,19 @@ namespace BrightstarDB.EntityFramework.Query
                 case GraphNode.Iri:
                     return String.Format("<{0}>", nodeValue);
                 case GraphNode.Literal:
-                    if (nodeValue.Contains("'"))
-                    {
-                        if (nodeValue.Contains("\""))
-                        {
-                            return String.Format("'''{0}'''", nodeValue);
-                        }
-                        return String.Format("\"{0}\"", nodeValue);
-                    }
-                    return String.Format("'{0}'", nodeValue);
+                    return QuoteLiteralString(nodeValue);
                 case GraphNode.Variable:
                     return String.Format("?{0}", nodeValue);
                 case GraphNode.Raw:
                     return nodeValue;
             }
             return String.Empty;
+        }
+
+        public static string QuoteLiteralString(string str)
+        {
+            if (!str.Contains("'")) return String.Format("'{0}'", str);
+            return String.Format(str.Contains("\"") ? "'''{0}'''" : "\"{0}\"", str);
         }
 
         public void StartOptional()
@@ -417,6 +415,17 @@ namespace BrightstarDB.EntityFramework.Query
                 _graphPatternBuilder.Append(filterExpression);
                 _graphPatternBuilder.Append(".");
             }
+        }
+
+        public void AddBindExpression(string bindExpression, string bindVar)
+        {
+            if (string.IsNullOrEmpty(bindExpression)) throw new ArgumentNullException("bindExpression");
+            if (string.IsNullOrEmpty(bindVar)) throw new ArgumentNullException("bindVar");
+            _graphPatternBuilder.Append("BIND(");
+            _graphPatternBuilder.Append(bindExpression);
+            _graphPatternBuilder.Append(" AS ?");
+            _graphPatternBuilder.Append(bindVar);
+            _graphPatternBuilder.Append(")");
         }
 
         public void AddQuerySourceMapping(IQuerySource querySource, Expression mappedExpression)
