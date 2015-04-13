@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using BrightstarDB.CodeGeneration;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Text;
     using NUnit.Framework;
@@ -14,14 +15,19 @@
     {
         [Test]
         [TestCase("EmptyEntity", Language.CSharp)]
+        [TestCase("EmptyEntity", Language.VisualBasic)]
         [TestCase("IdentifierPrecedence", Language.CSharp)]
+        [TestCase("IdentifierPrecedence", Language.VisualBasic)]
         [TestCase("SupportedScalarPropertyTypes", Language.CSharp)]
+        [TestCase("SupportedScalarPropertyTypes", Language.VisualBasic)]
         [TestCase("Relationships", Language.CSharp)]
+        [TestCase("Relationships", Language.VisualBasic)]
         [TestCase("AttributePropagation", Language.CSharp)]
+        [TestCase("AttributePropagation", Language.VisualBasic)]
         public async Task TestCodeGeneration(string resourceBaseName, Language language)
         {
-            var inputResourceName = "BrightstarDB.CodeGeneration.Tests." + resourceBaseName + "Input_" + language.ToString() + ".txt";
-            var outputResourceName = "BrightstarDB.CodeGeneration.Tests." + resourceBaseName + "Output_" + language.ToString() + ".txt";
+            var inputResourceName = "BrightstarDB.CodeGeneration.Tests.GeneratorTestsResources." + resourceBaseName + "Input_" + language.ToString() + ".txt";
+            var outputResourceName = "BrightstarDB.CodeGeneration.Tests.GeneratorTestsResources." + resourceBaseName + "Output_" + language.ToString() + ".txt";
 
             using (var inputStream = this.GetType().Assembly.GetManifestResourceStream(inputResourceName))
             using (var outputStream = this.GetType().Assembly.GetManifestResourceStream(outputResourceName))
@@ -35,7 +41,7 @@
                     versionStamp,
                     "AdhocProject",
                     "AdhocProject",
-                    LanguageNames.CSharp,
+                    language.ToSyntaxGeneratorLanguageName(),
                     metadataReferences: new[]
                     {
                         MetadataReference.CreateFromAssembly(typeof(object).Assembly),
@@ -73,12 +79,16 @@
 
         [Test]
         [TestCase("InvalidIdType", Language.CSharp, "The property 'BrightstarDB.CodeGeneration.Tests.IInvalidIdType.Id' must be of type string to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please change its type to string. If it is not intended to be the identity property, either rename this property or create an identity property and decorate it with the [BrightstarDB.EntityFramework.IdentifierAttribute] attribute.")]
+        [TestCase("InvalidIdType", Language.VisualBasic, "The property 'ReadOnly Property Id As Integer' must be of type String to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please change its type to String. If it is not intended to be the identity property, either rename this property or create an identity property and decorate it with the [BrightstarDB.EntityFramework.IdentifierAttribute] attribute.")]
         [TestCase("IdWithSetter", Language.CSharp, "The property 'BrightstarDB.CodeGeneration.Tests.IIdWithSetter.Id' must not have a setter to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please remove the setter. If it is not intended to be the identity property, either rename this property or create an identity propertyn and decorate it with the [BrightstarDB.EntityFramework.IdentifierAttribute] attribute.")]
+        [TestCase("IdWithSetter", Language.VisualBasic, "The property 'Property Id As String' must not have a setter to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please remove the setter. If it is not intended to be the identity property, either rename this property or create an identity propertyn and decorate it with the [BrightstarDB.EntityFramework.IdentifierAttribute] attribute.")]
         [TestCase("PropertyWithUnsupportedType", Language.CSharp, "Invalid property: BrightstarDB.CodeGeneration.Tests.IPropertyWithUnsupportedType.Property - the property type System.Action is not supported by Entity Framework.")]
+        [TestCase("PropertyWithUnsupportedType", Language.VisualBasic, "Invalid property: Property _Property As System.Action - the property type System.Action is not supported by Entity Framework.")]
         [TestCase("InvalidInversePropertyName", Language.CSharp, "Invalid BrightstarDB.EntityFramework.InversePropertyAttribute attribute on property BrightstarDB.CodeGeneration.Tests.IInvalidInversePropertyName_B.A. A property named 'B' cannot be found on the target interface type BrightstarDB.CodeGeneration.Tests.IInvalidInversePropertyName_A.")]
+        [TestCase("InvalidInversePropertyName", Language.VisualBasic, "Invalid BrightstarDB.EntityFramework.InversePropertyAttribute attribute on property Property A As BrightstarDB.CodeGeneration.Tests.IInvalidInversePropertyName_A. A property named 'B' cannot be found on the target interface type BrightstarDB.CodeGeneration.Tests.IInvalidInversePropertyName_A.")]
         public async Task TestErrorConditions(string resourceBaseName, Language language, string expectedErrorMessage)
         {
-            var inputResourceName = "BrightstarDB.CodeGeneration.Tests." + resourceBaseName + "Input_" + language.ToString() + ".txt";
+            var inputResourceName = "BrightstarDB.CodeGeneration.Tests.GeneratorTestsResources." + resourceBaseName + "Input_" + language.ToString() + ".txt";
 
             using (var inputStream = this.GetType().Assembly.GetManifestResourceStream(inputResourceName))
             {
@@ -90,7 +100,7 @@
                     versionStamp,
                     "AdhocProject",
                     "AdhocProject",
-                    LanguageNames.CSharp,
+                    language.ToSyntaxGeneratorLanguageName(),
                     metadataReferences: new[]
                     {
                         MetadataReference.CreateFromAssembly(typeof(object).Assembly),

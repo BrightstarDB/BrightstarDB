@@ -348,6 +348,11 @@
                 this.entityNameSelector = entityNameSelector;
             }
 
+            protected SymbolDisplayFormat ErrorMessageDisplayFormat
+            {
+                get { return language == Language.CSharp ? SymbolDisplayFormat.CSharpErrorMessageFormat : SymbolDisplayFormat.VisualBasicErrorMessageFormat; }
+            }
+
             public abstract SyntaxNode Generate();
 
             protected SyntaxNode GetNamespaceDeclaration()
@@ -976,6 +981,8 @@
                         .Where(x => !IsEntityFrameworkAttribute(x))
                         .Select(x => syntaxGenerator.Attribute(x)));
 
+                propertyDeclaration = syntaxGenerator.AsPublicInterfaceImplementation(propertyDeclaration, syntaxGenerator.TypeExpression(identityProperty.ContainingType));
+
                 return propertyDeclaration;
             }
 
@@ -1158,7 +1165,7 @@
                         }
                     }
 
-                    propertyDeclaration = syntaxGenerator.AsPublicInterfaceImplementation(propertyDeclaration, syntaxGenerator.TypeExpression(this.interfaceSymbol));
+                    propertyDeclaration = syntaxGenerator.AsPublicInterfaceImplementation(propertyDeclaration, syntaxGenerator.TypeExpression(property.ContainingType));
 
                     propertyDeclaration = syntaxGenerator.AddAttributes(
                         propertyDeclaration,
@@ -1213,9 +1220,9 @@
                         string.Format(
                             CultureInfo.InvariantCulture,
                             "The property '{0}' must be of type {1} to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please change its type to {1}. If it is not intended to be the identity property, either rename this property or create an identity property and decorate it with the [{2}] attribute.",
-                            identityProperty.ToDisplayString(),
-                            stringType.ToDisplayString(),
-                            identifierAttributeType.ToDisplayString()));
+                            identityProperty.ToDisplayString(this.ErrorMessageDisplayFormat),
+                            stringType.ToDisplayString(this.ErrorMessageDisplayFormat),
+                            identifierAttributeType.ToDisplayString(this.ErrorMessageDisplayFormat)));
                 }
 
                 if (identityProperty.SetMethod != null)
@@ -1224,8 +1231,8 @@
                         string.Format(
                             CultureInfo.InvariantCulture,
                             "The property '{0}' must not have a setter to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please remove the setter. If it is not intended to be the identity property, either rename this property or create an identity propertyn and decorate it with the [{1}] attribute.",
-                            identityProperty.ToDisplayString(),
-                            identifierAttributeType.ToDisplayString()));
+                            identityProperty.ToDisplayString(this.ErrorMessageDisplayFormat),
+                            identifierAttributeType.ToDisplayString(this.ErrorMessageDisplayFormat)));
                 }
             }
 
@@ -1245,8 +1252,8 @@
                         string.Format(
                             CultureInfo.InvariantCulture,
                             "Invalid property: {0} - the property type {1} is not supported by Entity Framework.",
-                            property.ToDisplayString(),
-                            property.Type.ToDisplayString()));
+                            property.ToDisplayString(this.ErrorMessageDisplayFormat),
+                            property.Type.ToDisplayString(this.ErrorMessageDisplayFormat)));
                 }
 
                 var inversePropertyAttributeType = compilation.GetTypeByMetadataName(typeof(InversePropertyAttribute).FullName);
@@ -1263,9 +1270,9 @@
                             string.Format(
                                 CultureInfo.InvariantCulture,
                                 "Invalid {0} attribute on property {1}. The property type {2} must be marked as an Entity.",
-                                inversePropertyAttributeType.ToDisplayString(),
-                                property.ToDisplayString(),
-                                scalarType.ToDisplayString()));
+                                inversePropertyAttributeType.ToDisplayString(this.ErrorMessageDisplayFormat),
+                                property.ToDisplayString(this.ErrorMessageDisplayFormat),
+                                scalarType.ToDisplayString(this.ErrorMessageDisplayFormat)));
                     }
 
                     var inversePropertyName = (string)inversePropertyAttribute.ConstructorArguments[0].Value;
@@ -1282,10 +1289,10 @@
                             string.Format(
                                 CultureInfo.InvariantCulture,
                                 "Invalid {0} attribute on property {1}. A property named '{2}' cannot be found on the target interface type {3}.",
-                                inversePropertyAttributeType.ToDisplayString(),
-                                property.ToDisplayString(),
+                                inversePropertyAttributeType.ToDisplayString(this.ErrorMessageDisplayFormat),
+                                property.ToDisplayString(this.ErrorMessageDisplayFormat),
                                 inversePropertyName,
-                                targetType.ToDisplayString()));
+                                targetType.ToDisplayString(this.ErrorMessageDisplayFormat)));
                     }
                 }
             }

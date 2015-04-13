@@ -129,46 +129,88 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="EmptyEntityOutput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\EmptyEntityOutput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="IdentifierPrecedenceOutput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\IdentifierPrecedenceOutput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SupportedScalarPropertyTypesOutput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\SupportedScalarPropertyTypesOutput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="RelationshipsOutput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\RelationshipsOutput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AttributePropagationOutput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\AttributePropagationOutput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="EmptyEntityInput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\EmptyEntityInput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="IdentifierPrecedenceInput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\IdentifierPrecedenceInput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SupportedScalarPropertyTypesInput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\SupportedScalarPropertyTypesInput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="RelationshipsInput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\RelationshipsInput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="AttributePropagationInput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\AttributePropagationInput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="InvalidIdTypeInput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\InvalidIdTypeInput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="IdWithSetterInput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\IdWithSetterInput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="PropertyWithUnsupportedTypeInput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\PropertyWithUnsupportedTypeInput_CSharp.txt" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="InvalidInversePropertyNameInput_CSharp.txt" />
+    <EmbeddedResource Include="GeneratorTestsResources\InvalidInversePropertyNameInput_CSharp.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\EmptyEntityInput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\EmptyEntityOutput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\IdentifierPrecedenceInput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\IdentifierPrecedenceOutput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\SupportedScalarPropertyTypesInput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\SupportedScalarPropertyTypesOutput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\RelationshipsInput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\RelationshipsOutput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\AttributePropagationInput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\AttributePropagationOutput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\InvalidIdTypeInput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\IdWithSetterInput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\PropertyWithUnsupportedTypeInput_VisualBasic.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GeneratorTestsResources\InvalidInversePropertyNameInput_VisualBasic.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

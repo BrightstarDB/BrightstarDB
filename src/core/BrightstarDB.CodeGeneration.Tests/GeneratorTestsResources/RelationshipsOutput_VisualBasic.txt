@@ -1,0 +1,384 @@
+﻿Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class EntityContext
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityContext
+
+        Shared Sub New()
+            Dim provider = New Global.BrightstarDB.EntityFramework.ReflectionMappingProvider()
+            provider.AddMappingsForType(Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance, GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA))
+            Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA, BrightstarDB.CodeGeneration.Tests.Relationships_OneToOneA)()
+            provider.AddMappingsForType(Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance, GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB))
+            Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB, BrightstarDB.CodeGeneration.Tests.Relationships_OneToOneB)()
+            provider.AddMappingsForType(Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance, GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA))
+            Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA, BrightstarDB.CodeGeneration.Tests.Relationships_OneToManyA)()
+            provider.AddMappingsForType(Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance, GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB))
+            Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB, BrightstarDB.CodeGeneration.Tests.Relationships_OneToManyB)()
+            provider.AddMappingsForType(Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance, GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA))
+            Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA, BrightstarDB.CodeGeneration.Tests.Relationships_ManyToManyA)()
+            provider.AddMappingsForType(Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance, GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB))
+            Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB, BrightstarDB.CodeGeneration.Tests.Relationships_ManyToManyB)()
+            provider.AddMappingsForType(Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance, GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive))
+            Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive, BrightstarDB.CodeGeneration.Tests.Relationships_Reflexive)()
+        End Sub
+
+        Public Sub New()
+            Me.InitializeContext()
+        End Sub
+
+        Public Sub New(dataObjectStore As Global.BrightstarDB.Client.IDataObjectStore)
+            MyBase.New(dataObjectStore)
+            Me.InitializeContext()
+        End Sub
+
+        Public Sub New(updateGraphUri As String, datasetGraphUris As Global.System.Collections.Generic.IEnumerable(Of System.String), versionGraphUri As String)
+            MyBase.New(updateGraphUri, datasetGraphUris, versionGraphUri)
+            Me.InitializeContext()
+        End Sub
+
+        Public Sub New(connectionString As String, Optional enableOptimisticLocking As System.Boolean? = Nothing, Optional updateGraphUri As String = Nothing, Optional datasetGraphUris As Global.System.Collections.Generic.IEnumerable(Of System.String) = Nothing, Optional versionGraphUri As String = Nothing)
+            MyBase.New(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+            Me.InitializeContext()
+        End Sub
+
+        Private Sub InitializeContext()
+            Me._Relationships_OneToOneAs = New Global.BrightstarDB.EntityFramework.BrightstarEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA)(Me)
+            Me._Relationships_OneToOneBs = New Global.BrightstarDB.EntityFramework.BrightstarEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB)(Me)
+            Me._Relationships_OneToManyAs = New Global.BrightstarDB.EntityFramework.BrightstarEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA)(Me)
+            Me._Relationships_OneToManyBs = New Global.BrightstarDB.EntityFramework.BrightstarEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB)(Me)
+            Me._Relationships_ManyToManyAs = New Global.BrightstarDB.EntityFramework.BrightstarEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA)(Me)
+            Me._Relationships_ManyToManyBs = New Global.BrightstarDB.EntityFramework.BrightstarEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB)(Me)
+            Me._Relationships_Reflexives = New Global.BrightstarDB.EntityFramework.BrightstarEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive)(Me)
+        End Sub
+
+        Public Function EntitySet(Of T As Class)() As Global.BrightstarDB.EntityFramework.IEntitySet(Of T)
+            Dim type As Global.System.Type = GetType(T)
+            If type.Equals(GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA)) Then
+                Return DirectCast(Me.Relationships_OneToOneAs, Global.BrightstarDB.EntityFramework.IEntitySet(Of T))
+            End If
+
+            If type.Equals(GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB)) Then
+                Return DirectCast(Me.Relationships_OneToOneBs, Global.BrightstarDB.EntityFramework.IEntitySet(Of T))
+            End If
+
+            If type.Equals(GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA)) Then
+                Return DirectCast(Me.Relationships_OneToManyAs, Global.BrightstarDB.EntityFramework.IEntitySet(Of T))
+            End If
+
+            If type.Equals(GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB)) Then
+                Return DirectCast(Me.Relationships_OneToManyBs, Global.BrightstarDB.EntityFramework.IEntitySet(Of T))
+            End If
+
+            If type.Equals(GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA)) Then
+                Return DirectCast(Me.Relationships_ManyToManyAs, Global.BrightstarDB.EntityFramework.IEntitySet(Of T))
+            End If
+
+            If type.Equals(GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB)) Then
+                Return DirectCast(Me.Relationships_ManyToManyBs, Global.BrightstarDB.EntityFramework.IEntitySet(Of T))
+            End If
+
+            If type.Equals(GetType(Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive)) Then
+                Return DirectCast(Me.Relationships_Reflexives, Global.BrightstarDB.EntityFramework.IEntitySet(Of T))
+            End If
+
+            Throw New Global.System.InvalidOperationException(((GetType(T)).FullName) + (" is not a recognized entity interface type."))
+        End Function
+
+        Private _Relationships_OneToOneAs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA)
+
+        Public ReadOnly Property Relationships_OneToOneAs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA)
+            Get
+                Return Me._Relationships_OneToOneAs
+            End Get
+        End Property
+
+        Private _Relationships_OneToOneBs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB)
+
+        Public ReadOnly Property Relationships_OneToOneBs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB)
+            Get
+                Return Me._Relationships_OneToOneBs
+            End Get
+        End Property
+
+        Private _Relationships_OneToManyAs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA)
+
+        Public ReadOnly Property Relationships_OneToManyAs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA)
+            Get
+                Return Me._Relationships_OneToManyAs
+            End Get
+        End Property
+
+        Private _Relationships_OneToManyBs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB)
+
+        Public ReadOnly Property Relationships_OneToManyBs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB)
+            Get
+                Return Me._Relationships_OneToManyBs
+            End Get
+        End Property
+
+        Private _Relationships_ManyToManyAs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA)
+
+        Public ReadOnly Property Relationships_ManyToManyAs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA)
+            Get
+                Return Me._Relationships_ManyToManyAs
+            End Get
+        End Property
+
+        Private _Relationships_ManyToManyBs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB)
+
+        Public ReadOnly Property Relationships_ManyToManyBs As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB)
+            Get
+                Return Me._Relationships_ManyToManyBs
+            End Get
+        End Property
+
+        Private _Relationships_Reflexives As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive)
+
+        Public ReadOnly Property Relationships_Reflexives As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive)
+            Get
+                Return Me._Relationships_Reflexives
+            End Get
+        End Property
+    End Class
+End Namespace
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class Relationships_OneToOneA
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
+        Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext)
+            MyBase.New(context, GetType(Relationships_OneToOneA))
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext, dataObject As Global.BrightstarDB.Client.IDataObject)
+            MyBase.New(context, dataObject)
+        End Sub
+
+        Public Property B As Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA.B
+            Get
+                Return MyBase.GetRelatedObject(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB)("B")
+            End Get
+
+            Set(value As Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB)
+                MyBase.SetRelatedObject(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB)("B", value)
+            End Set
+        End Property
+    End Class
+End Namespace
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class Relationships_OneToOneB
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
+        Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext)
+            MyBase.New(context, GetType(Relationships_OneToOneB))
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext, dataObject As Global.BrightstarDB.Client.IDataObject)
+            MyBase.New(context, dataObject)
+        End Sub
+
+        Public Property A As Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB.A
+            Get
+                Return MyBase.GetRelatedObject(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA)("A")
+            End Get
+
+            Set(value As Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA)
+                MyBase.SetRelatedObject(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA)("A", value)
+            End Set
+        End Property
+    End Class
+End Namespace
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class Relationships_OneToManyA
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
+        Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext)
+            MyBase.New(context, GetType(Relationships_OneToManyA))
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext, dataObject As Global.BrightstarDB.Client.IDataObject)
+            MyBase.New(context, dataObject)
+        End Sub
+
+        Public Property Bs As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB) Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA.Bs
+            Get
+                Return MyBase.GetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB)("Bs")
+            End Get
+
+            Set(value As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB))
+                If (value) = (Nothing) Then
+                    Throw New Global.System.ArgumentNullException("value")
+                End If
+
+                MyBase.SetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB)("Bs", value)
+            End Set
+        End Property
+    End Class
+End Namespace
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class Relationships_OneToManyB
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
+        Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext)
+            MyBase.New(context, GetType(Relationships_OneToManyB))
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext, dataObject As Global.BrightstarDB.Client.IDataObject)
+            MyBase.New(context, dataObject)
+        End Sub
+
+        Public Property A As Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB.A
+            Get
+                Return MyBase.GetRelatedObject(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA)("A")
+            End Get
+
+            Set(value As Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA)
+                MyBase.SetRelatedObject(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA)("A", value)
+            End Set
+        End Property
+    End Class
+End Namespace
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class Relationships_ManyToManyA
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
+        Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext)
+            MyBase.New(context, GetType(Relationships_ManyToManyA))
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext, dataObject As Global.BrightstarDB.Client.IDataObject)
+            MyBase.New(context, dataObject)
+        End Sub
+
+        Public Property Bs As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB) Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA.Bs
+            Get
+                Return MyBase.GetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB)("Bs")
+            End Get
+
+            Set(value As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB))
+                If (value) = (Nothing) Then
+                    Throw New Global.System.ArgumentNullException("value")
+                End If
+
+                MyBase.SetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB)("Bs", value)
+            End Set
+        End Property
+    End Class
+End Namespace
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class Relationships_ManyToManyB
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
+        Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext)
+            MyBase.New(context, GetType(Relationships_ManyToManyB))
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext, dataObject As Global.BrightstarDB.Client.IDataObject)
+            MyBase.New(context, dataObject)
+        End Sub
+
+        Public Property _As As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA) Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB._As
+            Get
+                Return MyBase.GetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA)("_As")
+            End Get
+
+            Set(value As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA))
+                If (value) = (Nothing) Then
+                    Throw New Global.System.ArgumentNullException("value")
+                End If
+
+                MyBase.SetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA)("_As", value)
+            End Set
+        End Property
+    End Class
+End Namespace
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class Relationships_Reflexive
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
+        Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext)
+            MyBase.New(context, GetType(Relationships_Reflexive))
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext, dataObject As Global.BrightstarDB.Client.IDataObject)
+            MyBase.New(context, dataObject)
+        End Sub
+
+        Public Property _As As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive) Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive._As
+            Get
+                Return MyBase.GetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive)("_As")
+            End Get
+
+            Set(value As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive))
+                If (value) = (Nothing) Then
+                    Throw New Global.System.ArgumentNullException("value")
+                End If
+
+                MyBase.SetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive)("_As", value)
+            End Set
+        End Property
+
+        Public Property Bs As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive) Implements Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive.Bs
+            Get
+                Return MyBase.GetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive)("Bs")
+            End Get
+
+            Set(value As Global.System.Collections.Generic.ICollection(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive))
+                If (value) = (Nothing) Then
+                    Throw New Global.System.ArgumentNullException("value")
+                End If
+
+                MyBase.SetRelatedObjects(Of Global.BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive)("Bs", value)
+            End Set
+        End Property
+    End Class
+End Namespace

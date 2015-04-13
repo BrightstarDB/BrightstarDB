@@ -1,0 +1,444 @@
+﻿Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class EntityContext
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityContext
+
+        Shared Sub New()
+            Dim provider = New Global.BrightstarDB.EntityFramework.ReflectionMappingProvider()
+            provider.AddMappingsForType(Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance, GetType(Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes))
+            Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping(Of Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes, BrightstarDB.CodeGeneration.Tests.SupportedScalarPropertyTypes)()
+        End Sub
+
+        Public Sub New()
+            Me.InitializeContext()
+        End Sub
+
+        Public Sub New(dataObjectStore As Global.BrightstarDB.Client.IDataObjectStore)
+            MyBase.New(dataObjectStore)
+            Me.InitializeContext()
+        End Sub
+
+        Public Sub New(updateGraphUri As String, datasetGraphUris As Global.System.Collections.Generic.IEnumerable(Of System.String), versionGraphUri As String)
+            MyBase.New(updateGraphUri, datasetGraphUris, versionGraphUri)
+            Me.InitializeContext()
+        End Sub
+
+        Public Sub New(connectionString As String, Optional enableOptimisticLocking As System.Boolean? = Nothing, Optional updateGraphUri As String = Nothing, Optional datasetGraphUris As Global.System.Collections.Generic.IEnumerable(Of System.String) = Nothing, Optional versionGraphUri As String = Nothing)
+            MyBase.New(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+            Me.InitializeContext()
+        End Sub
+
+        Private Sub InitializeContext()
+            Me._SupportedScalarPropertyTypes = New Global.BrightstarDB.EntityFramework.BrightstarEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes)(Me)
+        End Sub
+
+        Public Function EntitySet(Of T As Class)() As Global.BrightstarDB.EntityFramework.IEntitySet(Of T)
+            Dim type As Global.System.Type = GetType(T)
+            If type.Equals(GetType(Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes)) Then
+                Return DirectCast(Me.SupportedScalarPropertyTypes, Global.BrightstarDB.EntityFramework.IEntitySet(Of T))
+            End If
+
+            Throw New Global.System.InvalidOperationException(((GetType(T)).FullName) + (" is not a recognized entity interface type."))
+        End Function
+
+        Private _SupportedScalarPropertyTypes As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes)
+
+        Public ReadOnly Property SupportedScalarPropertyTypes As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes)
+            Get
+                Return Me._SupportedScalarPropertyTypes
+            End Get
+        End Property
+    End Class
+End Namespace
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class SupportedScalarPropertyTypes
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
+        Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext)
+            MyBase.New(context, GetType(SupportedScalarPropertyTypes))
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext, dataObject As Global.BrightstarDB.Client.IDataObject)
+            MyBase.New(context, dataObject)
+        End Sub
+
+        Public Property Id As System.String Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.Id
+            Get
+                Return MyBase.GetKey()
+            End Get
+
+            Set(value As System.String)
+                MyBase.SetKey(value)
+            End Set
+        End Property
+
+        Public Property Bool As System.Boolean Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.Bool
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Boolean)("Bool")
+            End Get
+
+            Set(value As System.Boolean)
+                MyBase.SetRelatedProperty("Bool", value)
+            End Set
+        End Property
+
+        Public Property Int16 As System.Int16 Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.Int16
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Int16)("Int16")
+            End Get
+
+            Set(value As System.Int16)
+                MyBase.SetRelatedProperty("Int16", value)
+            End Set
+        End Property
+
+        Public Property Int32 As System.Int32 Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.Int32
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Int32)("Int32")
+            End Get
+
+            Set(value As System.Int32)
+                MyBase.SetRelatedProperty("Int32", value)
+            End Set
+        End Property
+
+        Public Property Int64 As System.Int64 Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.Int64
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Int64)("Int64")
+            End Get
+
+            Set(value As System.Int64)
+                MyBase.SetRelatedProperty("Int64", value)
+            End Set
+        End Property
+
+        Public Property UInt16 As System.UInt16 Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.UInt16
+            Get
+                Return MyBase.GetRelatedProperty(Of System.UInt16)("UInt16")
+            End Get
+
+            Set(value As System.UInt16)
+                MyBase.SetRelatedProperty("UInt16", value)
+            End Set
+        End Property
+
+        Public Property UInt32 As System.UInt32 Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.UInt32
+            Get
+                Return MyBase.GetRelatedProperty(Of System.UInt32)("UInt32")
+            End Get
+
+            Set(value As System.UInt32)
+                MyBase.SetRelatedProperty("UInt32", value)
+            End Set
+        End Property
+
+        Public Property UInt64 As System.UInt64 Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.UInt64
+            Get
+                Return MyBase.GetRelatedProperty(Of System.UInt64)("UInt64")
+            End Get
+
+            Set(value As System.UInt64)
+                MyBase.SetRelatedProperty("UInt64", value)
+            End Set
+        End Property
+
+        Public Property _String As System.String Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes._String
+            Get
+                Return MyBase.GetRelatedProperty(Of System.String)("_String")
+            End Get
+
+            Set(value As System.String)
+                MyBase.SetRelatedProperty("_String", value)
+            End Set
+        End Property
+
+        Public Property _Decimal As System.Decimal Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes._Decimal
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Decimal)("_Decimal")
+            End Get
+
+            Set(value As System.Decimal)
+                MyBase.SetRelatedProperty("_Decimal", value)
+            End Set
+        End Property
+
+        Public Property _Double As System.Double Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes._Double
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Double)("_Double")
+            End Get
+
+            Set(value As System.Double)
+                MyBase.SetRelatedProperty("_Double", value)
+            End Set
+        End Property
+
+        Public Property _Single As System.Single Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes._Single
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Single)("_Single")
+            End Get
+
+            Set(value As System.Single)
+                MyBase.SetRelatedProperty("_Single", value)
+            End Set
+        End Property
+
+        Public Property _Byte As System.Byte Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes._Byte
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Byte)("_Byte")
+            End Get
+
+            Set(value As System.Byte)
+                MyBase.SetRelatedProperty("_Byte", value)
+            End Set
+        End Property
+
+        Public Property _Char As System.Char Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes._Char
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Char)("_Char")
+            End Get
+
+            Set(value As System.Char)
+                MyBase.SetRelatedProperty("_Char", value)
+            End Set
+        End Property
+
+        Public Property _SByte As System.SByte Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes._SByte
+            Get
+                Return MyBase.GetRelatedProperty(Of System.SByte)("_SByte")
+            End Get
+
+            Set(value As System.SByte)
+                MyBase.SetRelatedProperty("_SByte", value)
+            End Set
+        End Property
+
+        Public Property DateTime As System.DateTime Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.DateTime
+            Get
+                Return MyBase.GetRelatedProperty(Of System.DateTime)("DateTime")
+            End Get
+
+            Set(value As System.DateTime)
+                MyBase.SetRelatedProperty("DateTime", value)
+            End Set
+        End Property
+
+        Public Property Guid As Global.System.Guid Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.Guid
+            Get
+                Return MyBase.GetRelatedProperty(Of Global.System.Guid)("Guid")
+            End Get
+
+            Set(value As Global.System.Guid)
+                MyBase.SetRelatedProperty("Guid", value)
+            End Set
+        End Property
+
+        Public Property Uri As Global.System.Uri Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.Uri
+            Get
+                Return MyBase.GetRelatedProperty(Of Global.System.Uri)("Uri")
+            End Get
+
+            Set(value As Global.System.Uri)
+                MyBase.SetRelatedProperty("Uri", value)
+            End Set
+        End Property
+
+        Public Property PlainLiteral As Global.BrightstarDB.Rdf.PlainLiteral Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.PlainLiteral
+            Get
+                Return MyBase.GetRelatedProperty(Of Global.BrightstarDB.Rdf.PlainLiteral)("PlainLiteral")
+            End Get
+
+            Set(value As Global.BrightstarDB.Rdf.PlainLiteral)
+                MyBase.SetRelatedProperty("PlainLiteral", value)
+            End Set
+        End Property
+
+        Public Property Enumeration As Global.System.DayOfWeek Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.Enumeration
+            Get
+                Return MyBase.GetRelatedProperty(Of Global.System.DayOfWeek)("Enumeration")
+            End Get
+
+            Set(value As Global.System.DayOfWeek)
+                MyBase.SetRelatedProperty("Enumeration", value)
+            End Set
+        End Property
+
+        Public Property ByteArray As System.Byte() Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.ByteArray
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Byte())("ByteArray")
+            End Get
+
+            Set(value As System.Byte())
+                MyBase.SetRelatedProperty("ByteArray", value)
+            End Set
+        End Property
+
+        Public Property NullableBool As System.Boolean? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableBool
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Boolean?)("NullableBool")
+            End Get
+
+            Set(value As System.Boolean?)
+                MyBase.SetRelatedProperty("NullableBool", value)
+            End Set
+        End Property
+
+        Public Property NullableInt16 As System.Int16? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableInt16
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Int16?)("NullableInt16")
+            End Get
+
+            Set(value As System.Int16?)
+                MyBase.SetRelatedProperty("NullableInt16", value)
+            End Set
+        End Property
+
+        Public Property NullableInt32 As System.Int32? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableInt32
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Int32?)("NullableInt32")
+            End Get
+
+            Set(value As System.Int32?)
+                MyBase.SetRelatedProperty("NullableInt32", value)
+            End Set
+        End Property
+
+        Public Property NullableInt64 As System.Int64 Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableInt64
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Int64)("NullableInt64")
+            End Get
+
+            Set(value As System.Int64)
+                MyBase.SetRelatedProperty("NullableInt64", value)
+            End Set
+        End Property
+
+        Public Property NullableUInt16 As System.UInt16? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableUInt16
+            Get
+                Return MyBase.GetRelatedProperty(Of System.UInt16?)("NullableUInt16")
+            End Get
+
+            Set(value As System.UInt16?)
+                MyBase.SetRelatedProperty("NullableUInt16", value)
+            End Set
+        End Property
+
+        Public Property NullableUInt32 As System.UInt32? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableUInt32
+            Get
+                Return MyBase.GetRelatedProperty(Of System.UInt32?)("NullableUInt32")
+            End Get
+
+            Set(value As System.UInt32?)
+                MyBase.SetRelatedProperty("NullableUInt32", value)
+            End Set
+        End Property
+
+        Public Property NullableUInt64 As System.UInt64? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableUInt64
+            Get
+                Return MyBase.GetRelatedProperty(Of System.UInt64?)("NullableUInt64")
+            End Get
+
+            Set(value As System.UInt64?)
+                MyBase.SetRelatedProperty("NullableUInt64", value)
+            End Set
+        End Property
+
+        Public Property NullableDecimal As System.Decimal? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableDecimal
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Decimal?)("NullableDecimal")
+            End Get
+
+            Set(value As System.Decimal?)
+                MyBase.SetRelatedProperty("NullableDecimal", value)
+            End Set
+        End Property
+
+        Public Property NullableDouble As System.Double? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableDouble
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Double?)("NullableDouble")
+            End Get
+
+            Set(value As System.Double?)
+                MyBase.SetRelatedProperty("NullableDouble", value)
+            End Set
+        End Property
+
+        Public Property NullableSingle As System.Single? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableSingle
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Single?)("NullableSingle")
+            End Get
+
+            Set(value As System.Single?)
+                MyBase.SetRelatedProperty("NullableSingle", value)
+            End Set
+        End Property
+
+        Public Property NullableByte As System.Byte? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableByte
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Byte?)("NullableByte")
+            End Get
+
+            Set(value As System.Byte?)
+                MyBase.SetRelatedProperty("NullableByte", value)
+            End Set
+        End Property
+
+        Public Property NullableChar As System.Char? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableChar
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Char?)("NullableChar")
+            End Get
+
+            Set(value As System.Char?)
+                MyBase.SetRelatedProperty("NullableChar", value)
+            End Set
+        End Property
+
+        Public Property NullableSByte As System.SByte? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableSByte
+            Get
+                Return MyBase.GetRelatedProperty(Of System.SByte?)("NullableSByte")
+            End Get
+
+            Set(value As System.SByte?)
+                MyBase.SetRelatedProperty("NullableSByte", value)
+            End Set
+        End Property
+
+        Public Property NullableDateTime As System.DateTime? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableDateTime
+            Get
+                Return MyBase.GetRelatedProperty(Of System.DateTime?)("NullableDateTime")
+            End Get
+
+            Set(value As System.DateTime?)
+                MyBase.SetRelatedProperty("NullableDateTime", value)
+            End Set
+        End Property
+
+        Public Property NullableGuid As Global.System.Guid? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableGuid
+            Get
+                Return MyBase.GetRelatedProperty(Of Global.System.Guid?)("NullableGuid")
+            End Get
+
+            Set(value As Global.System.Guid?)
+                MyBase.SetRelatedProperty("NullableGuid", value)
+            End Set
+        End Property
+
+        Public Property NullableEnumeration As Global.System.DayOfWeek? Implements Global.BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes.NullableEnumeration
+            Get
+                Return MyBase.GetRelatedProperty(Of Global.System.DayOfWeek?)("NullableEnumeration")
+            End Get
+
+            Set(value As Global.System.DayOfWeek?)
+                MyBase.SetRelatedProperty("NullableEnumeration", value)
+            End Set
+        End Property
+    End Class
+End Namespace

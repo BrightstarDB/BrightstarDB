@@ -3,7 +3,7 @@
     using System;
     using Microsoft.CodeAnalysis;
 
-    internal static class LanguageExtensions
+    public static class LanguageExtensions
     {
         public static string ToSyntaxGeneratorLanguageName(this Language @this)
         {
