@@ -1,0 +1,8 @@
+﻿Imports BrightstarDB.EntityFramework
+
+Namespace BrightstarDB.CodeGeneration.Tests
+    Public Interface IIdWithSetter
+        <Identifier>
+        Property Id As String
+    End Interface
+End Namespace

@@ -1,0 +1,7 @@
+﻿Imports System
+
+Namespace BrightstarDB.CodeGeneration.Tests
+    Public Interface IPropertyWithUnsupportedType
+        Property _Property As Action
+    End Interface
+End Namespace

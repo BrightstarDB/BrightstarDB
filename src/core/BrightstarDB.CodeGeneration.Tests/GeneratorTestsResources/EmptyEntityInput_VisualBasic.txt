@@ -1,0 +1,4 @@
+﻿Namespace BrightstarDB.CodeGeneration.Tests
+    Public Interface IMyEmptyEntity
+    End Interface
+End Namespace

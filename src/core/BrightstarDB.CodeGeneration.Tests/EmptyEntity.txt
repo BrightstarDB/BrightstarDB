@@ -1,0 +1,78 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class EntityContext : global::BrightstarDB.EntityFramework.BrightstarEntityContext
+    {
+        static EntityContext()
+        {
+            var provider = new global::BrightstarDB.EntityFramework.ReflectionMappingProvider();
+            provider.AddMappingsForType(global::BrightstarDB.EntityFramework.EntityMappingStore.Instance, typeof(global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.IEmptyEntity));
+            global::BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping<global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.IEmptyEntity, BrightstarDB.CodeGeneration.Tests.EmptyEntity>();
+        }
+
+        public EntityContext()
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(global::BrightstarDB.Client.IDataObjectStore dataObjectStore) : base(dataObjectStore)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string updateGraphUri, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris, string versionGraphUri) : base(updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        public EntityContext(string connectionString, System.Boolean? enableOptimisticLocking = null, string updateGraphUri = null, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris = null, string versionGraphUri = null) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+        {
+            this.InitializeContext();
+        }
+
+        private void InitializeContext()
+        {
+            this._EmptyEntities = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.IEmptyEntity>(this));
+        }
+
+        public global::BrightstarDB.EntityFramework.IEntitySet<T> EntitySet<T>() where T : class
+        {
+            global::System.Type type = typeof(T);
+            if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.IEmptyEntity)))
+            {
+                return (global::BrightstarDB.EntityFramework.IEntitySet<T>)(this.EmptyEntities);
+            }
+
+            throw new global::System.InvalidOperationException(((typeof(T)).FullName) + (" is not a recognized entity interface type."));
+        }
+
+        private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.IEmptyEntity> _EmptyEntities;
+        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.IEmptyEntity> EmptyEntities
+        {
+            get
+            {
+                return this._EmptyEntities;
+            }
+        }
+    }
+}
+namespace BrightstarDB.CodeGeneration.Tests
+{
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.Runtime.CompilerServices.CompilerGenerated]
+    public partial class EmptyEntity : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.GeneratorTests.IEmptyEntity
+    {
+        public EmptyEntity()
+        {
+        }
+
+        public EmptyEntity(global::BrightstarDB.EntityFramework.BrightstarEntityContext context) : base(context, typeof(EmptyEntity))
+        {
+        }
+
+        public EmptyEntity(global::BrightstarDB.EntityFramework.BrightstarEntityContext context, global::BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject)
+        {
+        }
+    }
+}

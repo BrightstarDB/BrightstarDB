@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22609.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB", "BrightstarDB\BrightstarDB.csproj", "{121A81F3-EB1C-4228-81FB-0D7505A438FB}"
 EndProject
@@ -37,6 +37,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.AspNet.Secured", "BrightstarDB.Server.AspNet.Secured\BrightstarDB.Server.AspNet.Secured.csproj", "{47A553A3-2214-40B7-A6C5-EC2609B53B3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.CodeGeneration", "BrightstarDB.CodeGeneration\BrightstarDB.CodeGeneration.csproj", "{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.CodeGeneration.Tests", "BrightstarDB.CodeGeneration.Tests\BrightstarDB.CodeGeneration.Tests.csproj", "{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.CodeGeneration.Console", "BrightstarDB.CodeGeneration.Console\BrightstarDB.CodeGeneration.Console.csproj", "{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.CodeGeneration.T4", "BrightstarDB.CodeGeneration.T4\BrightstarDB.CodeGeneration.T4.csproj", "{D502DFEA-862E-4A30-98A0-3AD350725C20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -178,6 +186,54 @@ Global
 		{47A553A3-2214-40B7-A6C5-EC2609B53B3F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{47A553A3-2214-40B7-A6C5-EC2609B53B3F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{47A553A3-2214-40B7-A6C5-EC2609B53B3F}.Release|x86.ActiveCfg = Release|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Debug|x86.Build.0 = Debug|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Release|x86.ActiveCfg = Release|Any CPU
+		{5EF2500F-67E0-421E-A4A6-FF4675A84D1D}.Release|x86.Build.0 = Release|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Debug|x86.Build.0 = Debug|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Release|x86.ActiveCfg = Release|Any CPU
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F}.Release|x86.Build.0 = Release|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Debug|x86.Build.0 = Debug|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Release|x86.ActiveCfg = Release|Any CPU
+		{F1F4ADB7-96E9-41F2-941A-581D5A9EDB66}.Release|x86.Build.0 = Release|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Debug|x86.Build.0 = Debug|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Release|x86.ActiveCfg = Release|Any CPU
+		{D502DFEA-862E-4A30-98A0-3AD350725C20}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -190,6 +246,7 @@ Global
 		{B7BB84F3-3CB8-4D9D-B1C1-2CF4EEAE5A22} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{523BB67E-CEB7-4144-AACB-AB5937F8872E} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 		{DF96239F-5240-475C-BD33-52F0EE2536C2} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
+		{54EAADAE-8A3E-40E5-90AF-C398617F5F5F} = {EACA0627-4DC2-4E5C-A156-3EDBC1B4B670}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = BrightstarDB.vsmdi

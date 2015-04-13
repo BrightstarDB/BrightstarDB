@@ -1,0 +1,39 @@
+﻿Imports BrightstarDB.EntityFramework
+
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    Public Interface IIdentifierPrecedence_IdentifierAttributeTrumpsAll
+
+        <Identifier>
+        ReadOnly Property Something As String
+
+        ReadOnly Property IdentifierPrecedence_IdentifierAttributeTrumpsAllId As String
+
+        ReadOnly Property Id As String
+    End Interface
+
+
+    Public Interface IIdentifierPrecedence_ClassIdTrumpsId
+
+        ReadOnly Property IdentifierPrecedence_ClassIdTrumpsIdId As String
+
+        ReadOnly Property Id As String
+    End Interface
+
+
+    Public Interface IIdentifierPrecedence_Base
+        <Identifier>
+        ReadOnly Property SomeId As String
+    End Interface
+
+
+    Public Interface IIdentifierPrecedence_IdTrumpsInheritedId
+        Inherits IIdentifierPrecedence_Base
+        ReadOnly Property Id As String
+    End Interface
+
+
+    Public Interface IIdentifierPrecedence_CanInheritId
+        Inherits IIdentifierPrecedence_Base
+    End Interface
+End Namespace
