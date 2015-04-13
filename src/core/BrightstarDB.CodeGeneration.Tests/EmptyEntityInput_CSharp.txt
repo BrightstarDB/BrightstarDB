@@ -1,6 +1,0 @@
-﻿namespace BrightstarDB.CodeGeneration.Tests
-{
-    public interface IEmptyEntity
-    {
-    }
-}
