@@ -1,0 +1,80 @@
+﻿Imports System
+Imports BrightstarDB.Rdf
+
+Namespace BrightstarDB.CodeGeneration.Tests
+    Public Interface ISupportedScalarPropertyTypes
+        ReadOnly Property Id As String
+
+        Property Bool As Boolean
+
+        Property Int16 As Short
+
+        Property Int32 As Int32
+
+        Property Int64 As Int64
+
+        Property UInt16 As UShort
+
+        Property UInt32 As UInt32
+
+        Property UInt64 As ULong
+
+        Property _String As String
+
+        Property _Decimal As Decimal
+
+        Property _Double As Double
+
+        Property _Single As Single
+
+        Property _Byte As Byte
+
+        Property _Char As Char
+
+        Property _SByte As SByte
+
+        Property DateTime As DateTime
+
+        Property Guid As Guid
+
+        Property Uri As Uri
+
+        Property PlainLiteral As PlainLiteral
+
+        Property Enumeration As DayOfWeek
+
+        Property ByteArray As Byte()
+
+        Property NullableBool As Boolean?
+
+        Property NullableInt16 As Int16?
+
+        Property NullableInt32 As Int32?
+
+        Property NullableInt64 As Int64
+
+        Property NullableUInt16 As UShort?
+
+        Property NullableUInt32 As UInt32?
+
+        Property NullableUInt64 As UInt64?
+
+        Property NullableDecimal As Decimal?
+
+        Property NullableDouble As Double?
+
+        Property NullableSingle As Single?
+
+        Property NullableByte As Byte?
+
+        Property NullableChar As Char?
+
+        Property NullableSByte As SByte?
+
+        Property NullableDateTime As DateTime?
+
+        Property NullableGuid As Guid?
+
+        Property NullableEnumeration As DayOfWeek?
+    End Interface
+End Namespace

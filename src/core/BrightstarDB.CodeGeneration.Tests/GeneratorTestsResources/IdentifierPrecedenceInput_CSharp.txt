@@ -1,0 +1,57 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    using BrightstarDB.EntityFramework;
+
+    public interface IIdentifierPrecedence_IdentifierAttributeTrumpsAll
+    {
+        [Identifier]
+        string Something
+        {
+            get;
+        }
+
+        string IdentifierPrecedence_IdentifierAttributeTrumpsAllId
+        {
+            get;
+        }
+
+        string Id
+        {
+            get;
+        }
+    }
+
+    public interface IIdentifierPrecedence_ClassIdTrumpsId
+    {
+        string IdentifierPrecedence_ClassIdTrumpsIdId
+        {
+            get;
+        }
+
+        string Id
+        {
+            get;
+        }
+    }
+
+    public interface IIdentifierPrecedence_Base
+    {
+        [Identifier]
+        string SomeId
+        {
+            get;
+        }
+    }
+
+    public interface IIdentifierPrecedence_IdTrumpsInheritedId : IIdentifierPrecedence_Base
+    {
+        string Id
+        {
+            get;
+        }
+    }
+
+    public interface IIdentifierPrecedence_CanInheritId : IIdentifierPrecedence_Base
+    {
+    }
+}
