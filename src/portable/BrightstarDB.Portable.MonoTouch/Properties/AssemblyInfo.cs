@@ -8,8 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Reflection.AssemblyVersion("1.10.0.0")]
-[assembly: System.Reflection.AssemblyFileVersion("1.10.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.11.0.0")]
+[assembly: System.Reflection.AssemblyFileVersion("1.11.0.0")]
 [assembly: System.Reflection.AssemblyProduct("BrightstarDB")]
 [assembly: System.Reflection.AssemblyCopyright("Copyright (c) 2015 Khalil Ahmed, Graham Moore, and other contributors")]
 [assembly: System.Reflection.AssemblyTrademark("All rights reserved")]
