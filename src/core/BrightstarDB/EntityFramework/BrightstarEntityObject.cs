@@ -158,6 +158,10 @@ namespace BrightstarDB.EntityFramework
         /// is prepended to make a full URI.</remarks>
         protected void SetKey(string key)
         {
+            if (String.IsNullOrEmpty(key))
+            {
+                throw new EntityKeyRequiredException();
+            }
             var baseUri = GetIdentityBase();
             var identity = String.IsNullOrEmpty(baseUri) ? key : baseUri + key;
             if (!identity.Equals(Identity))

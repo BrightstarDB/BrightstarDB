@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BrightstarDB.EntityFramework;
 using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
@@ -193,6 +194,29 @@ namespace BrightstarDB.Tests.EntityFramework
                 child.Description = "Update description";
                 context.SaveChanges();
             }
+        }
+
+        [Test]
+        [ExpectedException(typeof(EntityKeyRequiredException))]
+        public void TestEntityKeyRequiredExceptionWhenIdIsNull()
+        {
+            using (var context = GetContext())
+            {
+                var entity = new StringKeyEntity();
+                context.StringKeyEntities.Add(entity);
+            }
+        }
+
+        [Test]
+        [ExpectedException(typeof (EntityKeyRequiredException))]
+        public void TestEntityKeyRequiredExceptionWhenIdIsEmptyString()
+        {
+            using (var context = GetContext())
+            {
+                var entity = new StringKeyEntity{Name=""};
+                context.StringKeyEntities.Add(entity);
+            }
+            
         }
     }
 }

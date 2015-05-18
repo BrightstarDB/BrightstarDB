@@ -858,6 +858,12 @@ is modified in this way.
     (e.g. the ID of the parent entity) is not modified once it is used to construct other
     identifiers.
     
+Null Or Empty Keys
+------------------
+
+An key that is either null or an empty string is not allowed. When using the key generation 
+features of BrightstarDB, if the generated key that resultsis either ``null`` or an empty 
+string, the framework will raise a ``BrightstarDB.EntityFramework.EntityKeyRequiredException``. 
     
 .. _Optimistic_Locking_in_EF:
 
