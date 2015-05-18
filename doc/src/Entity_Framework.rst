@@ -969,8 +969,8 @@ LongCount          Supported with or without a Boolean filter expression. Suppor
 Max                Supported as first result operator. Not supported as second or subsequent result operator.  
 Min                Supported as first result operator. Not supported as second or subsequent result operator.  
 OfType<TResult>    Supported only if ``TResult`` is an Entity Framework entity type
-OrderBy    
-OrderByDescending    
+OrderBy            The enumeration will not include those items where the sort property has a null value.
+OrderByDescending  The enumeration will not include those items where the sort property has a null value.  
 Select    
 SelectMany    
 Single             Supported with or without a Boolean filter expression  
