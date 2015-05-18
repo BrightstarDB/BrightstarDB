@@ -862,7 +862,7 @@ Null Or Empty Keys
 ------------------
 
 An key that is either null or an empty string is not allowed. When using the key generation 
-features of BrightstarDB, if the generated key that resultsis either ``null`` or an empty 
+features of BrightstarDB, if the generated key that results is either ``null`` or an empty 
 string, the framework will raise a ``BrightstarDB.EntityFramework.EntityKeyRequiredException``. 
     
 .. _Optimistic_Locking_in_EF:
