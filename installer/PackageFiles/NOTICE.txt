@@ -20,6 +20,10 @@ sharpSerializer
 Copyright (c) 2011, Pawel Idzikowski, licensed under BSD license (http://sharpserializer.codeplex.com/license)
 The full source code for this library may be found at http://sharpserializer.codeplex.com
 
+Microsoft Razor Redistributable
+Copyright (c) Microsoft Open Technologies, Inc. 
+See http://www.microsoft.com/web/webpi/eula/webpages_2_eula_enu.htm for details of the license.
+
 Library Copyright Statements
 ----------------------------
 

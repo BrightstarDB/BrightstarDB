@@ -14,6 +14,13 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
 
 ****************************
+ BrightstarDB 1.10.1
+****************************
+
+    This hotfix release fixes an issue with a required DLL missing from the packaging of the Windows installer.
+    Thanks to Martin Lercher for the bug report.
+    
+****************************
  BrightstarDB 1.10
 ****************************
 
