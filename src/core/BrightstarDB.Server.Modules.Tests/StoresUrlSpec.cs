@@ -41,7 +41,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                                       new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
             var response = app.Get("/");
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Body.AsString(), Contains.Substring("<title>BrightstarDB: Stores</title>"));
+            Assert.That(response.Body.AsString(), Contains.Substring("<title>BrightstarDB - Stores</title>"));
         }
 
         [Test]

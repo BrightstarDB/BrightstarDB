@@ -157,16 +157,9 @@
     <Copy SourceFiles="@(ViewFiles)" DestinationFolder="Views" />
     <Copy SourceFiles="@(AssetFiles)" DestinationFolder="assets" />
   </Target>
-  <ItemGroup>
-    <RazorAssemblies Include="..\BrightstarDB.Server.Modules\bin\$(Configuration)\Nancy.ViewEngines.Razor.BuildProviders.dll;..\BrightstarDB.Server.Modules\bin\$(Configuration)\Nancy.ViewEngines.Razor.dll" />
-  </ItemGroup>
   <PropertyGroup>
     <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
     <AssemblyTitle>BrightstarDB Server Authenticating ASP.NET Assembly</AssemblyTitle>
   </PropertyGroup>
   <Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
-  <Target Name="AfterBuild" DependsOnTargets="CopyRazorAssemblies" />
-  <Target Name="CopyRazorAssemblies" Condition="'$(Configuration)' == 'Debug'">
-    <Copy SourceFiles="@(RazorAssemblies)" DestinationFolder="$(ProjectDir)\bin" />
-  </Target>
 </Project>

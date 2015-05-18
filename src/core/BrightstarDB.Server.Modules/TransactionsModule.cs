@@ -19,6 +19,7 @@ namespace BrightstarDB.Server.Modules
             Get["/{storeName}/transactions"] = parameters =>
                 {
                     var transactionsRequest = this.Bind<TransactionsRequestObject>();
+                    ViewBag.Title = transactionsRequest.StoreName + " - Transactions";
                     if (transactionsRequest.Take <= 0) transactionsRequest.Take = DefaultPageSize;
                     var transactions = brightstarService.GetTransactions(transactionsRequest.StoreName,
                                                                                  transactionsRequest.Skip,
@@ -36,6 +37,8 @@ namespace BrightstarDB.Server.Modules
                     {
                         return HttpStatusCode.NotFound;
                     }
+                    var storeName = parameters["storeName"];
+                    ViewBag.Title = storeName + " - Transaction - Job " + jobId;
                     var txn = brightstarService.GetTransaction(parameters["storeName"], jobId);
                     return txn == null ? HttpStatusCode.NotFound : MakeResponseObject(txn);
                 };

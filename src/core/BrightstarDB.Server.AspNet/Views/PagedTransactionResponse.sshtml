@@ -1,0 +1,39 @@
+﻿@Master['Layout.sshtml']
+
+@Section['Content']
+
+	<nav>
+		<ul class="horizontal breadcrumb">
+			<li><a href="@Path['~/']">Home</a></li>
+			<li><a href="@Path['~/@Model.RequestProperties.StoreName']">@Model.RequestProperties.StoreName</a></li>
+			<li><a href="@Path['~/@Model.RequestProperties.StoreName/transactions']">Transaction History</a></li>
+		</ul>
+	</nav>
+
+	<section>
+		<table>
+			<thead>
+				<tr>
+					<th>Txn ID</th>
+					<th>Job ID</th>
+					<th>Txn Type</th>
+					<th>Start Time</th>
+					<th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+				@Each.Items
+					<tr>
+						<td>@Current.Id</td>
+						<td>@Current.JobId</td>
+						<td>@Current.TransactionType</td>
+						<td>@Current.StartTime</td>
+						<td>@Current.Status</td>
+					</tr>
+				@EndEach
+			</tbody>
+		</table>
+		@Partial['ListPagingPartial.sshtml']
+	</section>
+
+@EndSection

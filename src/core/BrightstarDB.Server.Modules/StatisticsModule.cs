@@ -21,6 +21,7 @@ namespace BrightstarDB.Server.Modules
             Get["/{storeName}/statistics"] = parameters =>
                 {
                     var request = this.Bind<StatisticsRequestObject>();
+                    ViewBag.Title = request.StoreName + " - Statistics";
                     var resourceUri = "statistics" + CreateQueryString(request);
 
                     // Set defaults

@@ -74,7 +74,6 @@
   <ItemGroup>
     <Content Include="assets\core.css" />
     <Content Include="assets\jquery-1.10.2.min.js" />
-    <Content Include="Views\sample.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -86,20 +85,21 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-    <Content Include="Views\JobResponse.cshtml" />
     <Content Include="Views\Layout.sshtml" />
-    <Content Include="Views\ListPaging.cshtml" />
-    <Content Include="Views\PagedCommitPointResponse.cshtml" />
-    <Content Include="Views\PagedJobResponse.cshtml" />
-    <Content Include="Views\PagedStatisticsResponse.cshtml" />
-    <Content Include="Views\PagedTransactionResponse.cshtml" />
-    <Content Include="Views\SparqlResult.cshtml" />
-    <Content Include="Views\SparqlUpdate.cshtml" />
-    <Content Include="Views\StoreDeleted.cshtml" />
-    <Content Include="Views\StoreResponse.cshtml" />
-    <Content Include="Views\StoresResponse.cshtml" />
-    <Content Include="Views\StoresResponseObject.sshtml" />
-    <Content Include="Views\_Layout.cshtml" />
+    <Content Include="Views\StoresResponse.sshtml" />
+    <Content Include="Views\StoreDeleted.sshtml" />
+    <Content Include="Views\SparqlResult.sshtml" />
+    <Content Include="Views\SparqlResultRowPartial.sshtml" />
+    <Content Include="Views\SparqlUpdate.sshtml" />
+    <Content Include="Views\PagedJobResponse.sshtml" />
+    <Content Include="Views\ListPagingPartial.sshtml" />
+    <Content Include="Views\JobResponse.sshtml" />
+    <Content Include="Views\PagedStatisticsResponse.sshtml" />
+    <Content Include="Views\JQueryPartial.sshtml" />
+    <Content Include="Views\PagedStatisticsTripleCountsPartial.sshtml" />
+    <Content Include="Views\PagedCommitPointResponse.sshtml" />
+    <Content Include="Views\PagedTransactionResponse.sshtml" />
+    <None Include="Views\StoreResponse.sshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -142,17 +142,10 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <ItemGroup>
-    <RazorAssemblies Include="..\BrightstarDB.Server.Modules\bin\$(Configuration)\Nancy.ViewEngines.Razor.BuildProviders.dll;..\BrightstarDB.Server.Modules\bin\$(Configuration)\Nancy.ViewEngines.Razor.dll" />
-  </ItemGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <PropertyGroup>
     <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
     <AssemblyTitle>BrightstarDB Server ASP.NET Assembly</AssemblyTitle>
   </PropertyGroup>
   <Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
-  <Target Name="AfterBuild" DependsOnTargets="CopyRazorAssemblies" />
-  <Target Name="CopyRazorAssemblies" Condition="'$(Configuration)' == 'Debug'">
-    <Copy SourceFiles="@(RazorAssemblies)" DestinationFolder="$(ProjectDir)\bin" />
-  </Target>
 </Project>

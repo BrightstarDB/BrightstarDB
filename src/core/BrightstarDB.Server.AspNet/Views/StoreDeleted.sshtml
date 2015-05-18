@@ -1,8 +1,7 @@
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Server.Modules.Model.StoreDeletedModel>
-@{
-    Layout = "_Layout";
-    ViewBag.Title = "BrightstarDB: Store Deleted";
-}
+﻿@Master['Layout.sshtml']
+
+@Section['Content']
+
 <nav>
     <ul class="horizontal breadcrumb">
 	    <li><a href="~/">Home</a></li>
@@ -14,4 +13,6 @@
 	<p>Store '@Model.StoreName' deleted successfully.</p>
 </div>
 
-<a class="right" href="~/">Return Home</a>
+<a class="right" href="@Path['~/']">Return Home</a>
+
+@EndSection

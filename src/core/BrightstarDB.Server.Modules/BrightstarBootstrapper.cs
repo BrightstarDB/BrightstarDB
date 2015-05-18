@@ -139,7 +139,6 @@ namespace BrightstarDB.Server.Modules
             container.Register(_brightstarService);
             container.Register(_storePermissionsProvider);
             container.Register(_systemPermissionsProvider);
-            container.Register<RazorViewEngine>();
         }
 
         protected override void ConfigureConventions(NancyConventions nancyConventions)

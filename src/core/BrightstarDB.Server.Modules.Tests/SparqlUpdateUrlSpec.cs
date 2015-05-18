@@ -97,7 +97,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var response = app.Get("/foo/update", with=>with.Accept(new MediaRange("text/html")));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Body.AsString(), Contains.Substring("<title>BrightstarDB: SPARQL Update</title>"));
+            Assert.That(response.Body.AsString(), Contains.Substring("<title>BrightstarDB - foo - SPARQL Update</title>"));
         }
     }
 }

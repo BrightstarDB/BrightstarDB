@@ -29,7 +29,8 @@ namespace BrightstarDB.Server.Modules
                     DateTime latest = Request.Query["latest"].TryParse<DateTime>();
 
                     var request = this.Bind<CommitPointsRequestModel>();
-
+                    ViewBag.Title = request.StoreName + " - Commit History";
+                    
                     if (timestamp != default(DateTime))
                     {
                         // Request for a single commit point

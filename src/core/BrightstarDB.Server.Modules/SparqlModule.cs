@@ -24,39 +24,42 @@ namespace BrightstarDB.Server.Modules
             _brightstar = brightstarService;
 
             Get["/{storeName}/sparql"] = parameters =>
+            {
+                ViewBag.Title = "SPARQL";
+                try
                 {
-                    try
-                    {
-                        var requestObject = BindSparqlRequestObject();
-                        return ProcessQuery(parameters["storeName"], requestObject);
-                    }
-                    catch (RdfParseException rdfParseException)
-                    {
-                        var r = (Response) rdfParseException.Message;
-                        r.StatusCode = HttpStatusCode.BadRequest;
-                        return r;
-                    }
-                };
+                    var requestObject = BindSparqlRequestObject();
+                    return ProcessQuery(parameters["storeName"], requestObject);
+                }
+                catch (RdfParseException rdfParseException)
+                {
+                    var r = (Response) rdfParseException.Message;
+                    r.StatusCode = HttpStatusCode.BadRequest;
+                    return r;
+                }
+            };
             Post["/{storeName}/sparql"] = parameters =>
+            {
+                ViewBag.Title = "SPARQL";
+                try
                 {
-                    try
-                    {
-                        var requestObject = BindSparqlRequestObject();
-                        return ProcessQuery(parameters["storeName"], requestObject);
-                    }
-                    catch (RdfParseException rdfParseException)
-                    {
-                        var r = (Response)rdfParseException.Message;
-                        r.StatusCode = HttpStatusCode.BadRequest;
-                        return r;
-                    }
-                };
+                    var requestObject = BindSparqlRequestObject();
+                    return ProcessQuery(parameters["storeName"], requestObject);
+                }
+                catch (RdfParseException rdfParseException)
+                {
+                    var r = (Response) rdfParseException.Message;
+                    r.StatusCode = HttpStatusCode.BadRequest;
+                    return r;
+                }
+            };
             Get["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
             Post["/{storeName}/commits/{commitId}/sparql"] = ProcessCommitPointQuery;
         }
 
         private object ProcessCommitPointQuery(dynamic parameters)
         {
+            ViewBag.Title = "SPARQL";
             var requestObject = BindSparqlRequestObject();
             ulong c;
             if (UInt64.TryParse(parameters["commitId"], out c))

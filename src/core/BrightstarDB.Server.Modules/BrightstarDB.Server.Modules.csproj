@@ -50,10 +50,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Nancy.Authentication.Basic.1.1\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.ViewEngines.Razor, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Viewengines.Razor.1.1\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -61,9 +57,6 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -122,7 +115,6 @@
     <Compile Include="Permissions\StaticStorePermissionsProvider.cs" />
     <Compile Include="Permissions\StaticSystemPermissionsProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RazorConfig.cs" />
     <Compile Include="SparqlQueryProcessingModel.cs" />
     <Compile Include="SparqlQueryResponse.cs" />
     <Compile Include="SparqlModule.cs" />
@@ -171,9 +163,6 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <RazorAssemblies Include="$(SolutionDir)packages\Nancy.Viewengines.Razor.1.1\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll;$(SolutionDir)packages\Nancy.Viewengines.Razor.1.1\lib\net40\Nancy.ViewEngines.Razor.dll" />
-  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
@@ -182,8 +171,4 @@
     <AssemblyTitle>BrightstarDB Server Core Assembly</AssemblyTitle>
   </PropertyGroup>
   <Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
-  <Target Name="AfterBuild" DependsOnTargets="CopyRazorAssemblies" />
-  <Target Name="CopyRazorAssemblies">
-    <Copy SourceFiles="@(RazorAssemblies)" DestinationFolder="$(ProjectDir)\bin\$(Configuration)" />
-  </Target>
 </Project>

@@ -1,0 +1,32 @@
+﻿@Master['Layout.sshtml']
+
+@Section['Content']
+	<nav>
+		<ul class="horizontal breadcrumb">
+			<li><a href="@Path['~/']">Home</a></li>
+			<li><a href="@Path['~/@Model.RequestProperties.StoreName']">Store: @Model.RequestProperties.StoreName</a></li>
+			<li><a href="@Path['~/@Model.RequestProperties.StoreName/commits']">Commit History</a></li>
+		</ul>
+	</nav>
+
+	<table>
+		<thead>
+			<tr>
+				<th>Commit ID</th>
+				<th>Job ID</th>
+				<th>Commit Timestamp</th>
+			</tr>
+		</thead>
+		<tbody>
+			@Each.Items
+				<tr>
+					<td>@Current.Id</td>
+					<td>@Current.JobId</td>
+					<td>@Current.CommitTime</td>
+				</tr>
+			@EndEach
+		</tbody>
+	</table>
+
+	@Partial['ListPagingPartial.sshtml']
+@EndSection

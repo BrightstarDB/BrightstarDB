@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,13 +20,14 @@ namespace BrightstarDB.Server.Modules
 
         public string StoreName { get { return _storeName; } }
         public ulong CommitId { get { return _commitId; } }
+        public bool HasCommitId { get { return CommitId > 0; } }
         public SparqlRequestObject SparqlRequest { get { return _sparqlRequest; } }
 
         public SparqlResultsFormat OverrideResultsFormat { get; set; }
         public RdfFormat OverrideGraphFormat { get; set; }
 
         public SerializableModel ResultModel { get; set; }
-
+        public bool HasErrorMessage { get { return !String.IsNullOrEmpty(ErrorMessage); } }
         public string ErrorMessage { get; private set; }
         public bool HasFormattedResults { get; private set; }
         public string RawResults { get; private set; }
@@ -110,6 +112,23 @@ namespace BrightstarDB.Server.Modules
                 {
                     RawResults = rdr.ReadToEnd();
                 }
+            }
+        }
+
+        private long _queryExecution = -1;
+        public long QueryExecution
+        {
+            get
+            {
+                if (_queryExecution < 0)
+                {
+                    var timer = new Stopwatch();
+                    timer.Start();
+                    ExecuteQueryForHtml(null);
+                    timer.Stop();
+                    _queryExecution = timer.ElapsedMilliseconds;
+                }
+                return _queryExecution;
             }
         }
 

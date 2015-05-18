@@ -20,6 +20,7 @@ namespace BrightstarDB.Server.Modules
             Get["/{storeName}/update"] = parameters =>
                 {
                     var requestObject = this.Bind<SparqlUpdateRequestObject>();
+                    ViewBag.Title = requestObject.StoreName + " - SPARQL Update";
                     return
                         Negotiate.WithAllowedMediaRange(Html)
                                  .WithModel(requestObject)
@@ -29,6 +30,7 @@ namespace BrightstarDB.Server.Modules
             Post["/{storeName}/update"] = parameters =>
                 {
                     var requestObject = this.Bind<SparqlUpdateRequestObject>();
+                    ViewBag.Title = requestObject.StoreName + " - SPARQL Update";
                     if (SparqlRequest.Matches(Request.Headers.ContentType))
                     {
                         using (var reader = new StreamReader(Request.Body))

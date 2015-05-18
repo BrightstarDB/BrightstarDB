@@ -1,12 +1,8 @@
-﻿@inherits Nancy.ViewEngines.Razor.NancyRazorViewBase<BrightstarDB.Server.Modules.Model.StoreResponseModel>
-@{
-    Layout = "_Layout";
-    ViewBag.Title = "BrightstarDB: Store Information";
-}
-
+﻿@Master['Layout.sshtml']
+@Section['Content']
 	<nav>
 		<ul class="horizontal breadcrumb">
-			<li><a href="~/">Home</a></li>
+			<li><a href="@Path['~/']">Home</a></li>
 		    <li><a href="#">Store: @Model.Name</a></li>
 		</ul>
 	</nav>
@@ -25,3 +21,4 @@
     <input type="hidden" name="X-HTTP-Method-Override" value="DELETE" />
     <button type="submit" class="linkbutton">Delete Store</button>
 </form>
+@EndSection
