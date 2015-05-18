@@ -1312,3 +1312,56 @@ writing an application that will regularly deal with different named graphs
 you may want to consider using the :ref:`Data Object Layer API <Data_Object_Layer>`
 and SPARQL or the low-level RDF API for update operations.
     
+Roslyn Code Generation
+======================
+
+From version 1.11, BrightstarDB now includes support for generating an entity context class using the .NET 
+Roslyn compiler library. The Roslyn code generator has a number of benefits over the TextTemplate code
+generator:
+
+    #. It can generate both C# and VB code.
+    #. It allows you to use the nameof operator in InverseProperty attributes::
+    
+            [InverseProperty(nameof(IParentEntity.Children))]
+         
+    #. It supports generating the code either through a T4 template or from the command-line,
+       which makes it possible to generate code without using Visual Studio.
+    #. It will support code generation in Xamarin Studio / MonoDevelop
+
+.. note::
+   The Roslyn code generation features are dependent upon .NET 4.5 and in VisualStudio
+   require VS2015 CTP5 release or later.
+   
+   
+Console-based Code Generation
+-----------------------------
+
+The console-based code generator can be added to your solution by installing the NuGet package
+BrightstarDB.CodeGeneration.Console. You can do this in the NuGet Package Manager Console with 
+the following command::
+
+    Install-Package BrightstarDB.CodeGeneration.Console
+    
+Installing this package adds a solution-level tool to your package structure. You can then run this 
+tool with the following command::
+
+    BrightstarDB.CodeGeneration.Console [/EntityContext:ContextClassName] [/Language:VB|CS] ``path/to/MySolution.sln`` ``My.Context.Namespace`` ``Output.cs``
+    
+This will scan the code in the specified solution and generate a new BrightstarDB entity context class in the namespace provided,
+writing the generated code to the specified output file. By default, the name of the entity context class is ``EntityContext``, but
+this can be changed by providing a value for the optional ``/EntityContext`` parameter (short name ``/CN``). The language used 
+in the output file will be based on the file extension, but you can override this with the optional ``/Langauge`` parameter.
+
+T4 Template-based Generation
+----------------------------
+
+We also provide a T4 template which acts as shim to invoke the code generator. This can be more convenient when working in 
+a development environment such as Visual Studio or Xamarin Studio. To use the T4 template, you should install the NuGet
+package ``BrightstarDB.CodeGeneration.T4``::
+
+    Install-Package BrightstarDB.CodeGeneration.T4
+    
+This will add a file named ``EntityContext.tt`` to your project. You can move this
+file around in the project and it will automatically use the appropriate namespace 
+for the generated context class. You can also rename this file to change the name 
+of the generated context class.
