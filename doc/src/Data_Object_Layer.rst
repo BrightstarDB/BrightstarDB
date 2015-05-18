@@ -243,6 +243,12 @@ the results to a data object, and passes back the enumeration of these instances
       Console.WriteLine("Skill is " + s.Identity);
   }
 
+.. note::
+
+  The ``BindDataObjectsWithSparql()`` method will execute the SPARQL query against the currently saved
+  store. This means that any results received will not take into account local modifications or
+  locally created new DataObjects until a call to ``SaveChanges()`` is made.
+  
 .. _optimistic_locking_in_dol:
 
 Optimistic Locking in the Data Object Layer
