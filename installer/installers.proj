@@ -74,8 +74,8 @@
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <Net40Dep Include="..\src\lib\unused_dependencies\*.dll;..\src\lib\Remotion.Linq.dll" />
       <WP71Sdk Include="..\src\mobile\BrightstarDB.Mobile\bin\$(Configuration)\*.dll"/>
+      <Service Include="..\src\core\BrightstarDB.Server.Modules\bin\$(Configuration)\*.dll" />
 	  <Service Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.dll"/>
-      <Service Include="..\src\core\BrightstarDB.Server.Modules\bin\$(Configuration)\*.dll"/>
 	  <ServiceAssets Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\assets\**\*.*"/>
 	  <ServiceViews Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\views\**\*.*"/>
 	  <ServiceExe Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.exe"
