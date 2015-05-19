@@ -1,0 +1,157 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "BrightstarDB REST API"
+    },
+    "host": "localhost:8090",
+    "basePath": "/brightstar",
+    "produces": [
+        "application/json",
+        "application/xml"
+    ],
+    "consumes": [
+        "application/json",
+        "application/xml"
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "description": "Get a list of the stores available on the server.\n",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "title": "StoresResponse",
+                            "type": "object",
+                            "properties": {
+                                "stores": {
+                                    "type": "array",
+                                    "items": {
+                                        "title": "StoreName",
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new store on the server.\n",
+                "parameters": [
+                    {
+                        "name": "StoreRequest",
+                        "in": "body",
+                        "description": "Store creation parameters",
+                        "required": true,
+                        "type": "object",
+                        "properties": {
+                            "StoreName": {
+                                "type": "string",
+                                "required": true,
+                                "description": "The name for the new store."
+                            },
+                            "PersistenceType": {
+                                "type": "integer",
+                                "required": false,
+                                "minimum": 0,
+                                "maximum": 1,
+                                "description": "The persistence type for the store. 0='AppendOnly', 1= 'Rewrite'\n"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad Request. Either the required StoreName parameter was not provided\nor the PersistenceType parameter is outside the allowed\nrange of 0-1\n"
+                    },
+                    "409": {
+                        "description": "Conflict. This status code indicates that the server already\nhas a store with the specified store name.\n"
+                    }
+                }
+            }
+        },
+        "/{storeName}": {
+            "get": {
+                "description": "Get the core operation links for a specific store.\n\nThe response object provides a \"directory\" of the\nsub-resources provided for a store. Each sub-resource\nallows you to view and manipulate a particular aspect\nof the store.\n\nThe path to each resource is provided as a path relative\nto this store resource.\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "title": "StoreResponse",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "The store name"
+                                },
+                                "commits": {
+                                    "type": "string",
+                                    "description": "The relative path to the store's commit points resource"
+                                },
+                                "jobs": {
+                                    "type": "string",
+                                    "description": "The relative path to the store's jobs resource"
+                                },
+                                "transactions": {
+                                    "type": "string",
+                                    "description": "The relative path to the store's transactions resource"
+                                },
+                                "statistics": {
+                                    "type": "string",
+                                    "description": "The relative path to the store's statistics resource"
+                                },
+                                "sparqlQuery": {
+                                    "type": "string",
+                                    "description": "The relative path to the SPARQL 1.1 Query endpoint for the store"
+                                },
+                                "sparqlUpdate": {
+                                    "type": "string",
+                                    "description": "The relative path to the SPARQL 1.1 Update endpoint for the store"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete the store from the BrightstarDB server\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store to be deleted",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful responses",
+                        "schema": {
+                            "title": "StoreDeleted",
+                            "properties": {
+                                "storeName": {
+                                    "type": "string",
+                                    "description": "The name of the deleted store"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
