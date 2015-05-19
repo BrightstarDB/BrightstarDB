@@ -43,6 +43,13 @@ namespace BrightstarDB.Client
         void Remove(ITriple triple);
 
         /// <summary>
+        /// Removes all triples from the collection for which the criteria
+        /// function returns true.
+        /// </summary>
+        /// <param name="criteria">The criteria function to apply to a triple to determine if it should be removed</param>
+        void RemoveWhere(Func<ITriple, bool> criteria);
+
+        /// <summary>
         ///     Removes all triples in the collection that have a specific subject URI
         /// </summary>
         /// <param name="subject">The subject URI of the triples to be removed from the collection</param>

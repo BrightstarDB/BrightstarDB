@@ -1,7 +1,7 @@
-﻿using System.Xml.Linq;
+﻿#if !PORTABLE
+using System.Xml.Linq;
 using BrightstarDB.Server.Modules.Configuration;
 using NUnit.Framework;
-#if !PORTABLE
 using System;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules;

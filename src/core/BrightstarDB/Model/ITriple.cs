@@ -49,5 +49,14 @@
         /// <param name="other">The other triple to match with</param>
         /// <returns>True if there is a match in the non-null parts of both triples, false otherwise</returns>
         bool Matches(ITriple other);
+
+        /// <summary>
+        /// Returns true if this triple matches the specified triple allowing
+        /// either NULL or <see cref="Constants.WildcardUri"/> in Graph, Subject, 
+        /// Predicate and Object to stand for a wildcard
+        /// </summary>
+        /// <param name="other">The other triple to match with</param>
+        /// <returns>True if there is a match in the non-null parts of both triples, false otherwise</returns>
+        bool MatchesWithWildcard(ITriple other);
     }
 }

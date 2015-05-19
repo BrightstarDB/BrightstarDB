@@ -122,6 +122,8 @@
     <Compile Include="EntityFramework\IArticle.cs" />
     <Compile Include="EntityFramework\EFClientTests.cs" />
     <Compile Include="EntityFramework\DataTypeTests.cs" />
+    <Compile Include="EntityFramework\IChildEntity2.cs" />
+    <Compile Include="EntityFramework\IParentEntity2.cs" />
     <Compile Include="EntityFramework\TestEntity.cs" />
     <Compile Include="EntityFramework\ExtendedContextTests.cs" />
     <Compile Include="EntityFramework\IChildEntity.cs" />

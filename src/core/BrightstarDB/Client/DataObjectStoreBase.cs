@@ -253,7 +253,14 @@ namespace BrightstarDB.Client
             var addTriples = _addTriples.Items.ToList();
             var deletePatterns = _deletePatterns.Items.ToList();
             var preconditions = _preconditions.Items.ToList();
+
+            // If a non-existence condition triple matches a delete pattern, don't check it
+            // This is done on the assumption that a non-existance check is a precondition to adding data
+            // Fixes the repro tests for issue 194
+            _nonExistencePreconditions.RemoveWhere(x => deletePatterns.Any(x.MatchesWithWildcard));
+
             var nePreconditions = _nonExistencePreconditions.Items.ToList();
+            
             if (_savingChanges != null)
             {
                 _savingChanges(this, new DataObjectStoreChangeEventArgs(

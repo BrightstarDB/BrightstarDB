@@ -226,15 +226,9 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         private void EnsureIdentity()
         {
-            foreach (var entry in _trackedObjects)
+            foreach (var item in _trackedObjects.Values.SelectMany(x => x.Where(y => y.IsModified)).ToList())
             {
-                foreach (var item in entry.Value)
-                {
-                    if (item.IsModified)
-                    {
-                        EnsureIdentity(item);
-                    }
-                }
+                EnsureIdentity(item);
             }
         }
 
@@ -257,86 +251,6 @@ namespace BrightstarDB.EntityFramework
             }
         }
 
-        /*
-        internal IdentityInfo GetIdentityInfo(Type t)
-        {
-            IdentityInfo cachedInfo;
-            if (_identityCache.TryGetValue(t, out cachedInfo)) return cachedInfo;
-
-            var baseUri = Constants.GeneratedUriPrefix;
-            PropertyInfo[] keyProperties = null;
-            var keySeparator = DefaultCompositeKeySeparator;
-            IKeyConverter keyConverter = null;
-
-            var interfaces = t.GetInterfaces().Where(i => i.GetCustomAttributes(typeof(EntityAttribute), true).Any());
-            var identityProperty =
-                interfaces.SelectMany(i => i.GetProperties()).FirstOrDefault(
-                    x => x.GetCustomAttributes(typeof(IdentifierAttribute), true).Any());
-            if (identityProperty != null)
-            {
-                var identityAttr =
-                    identityProperty.GetCustomAttributes(typeof(IdentifierAttribute), true).FirstOrDefault() as
-                    IdentifierAttribute;
-                var declaringType = identityProperty.DeclaringType;
-                if (identityAttr != null)
-                {
-                    if (identityAttr.BaseAddress != null && identityAttr.BaseAddress.Contains(":"))
-                    {
-                        var prefix = identityAttr.BaseAddress.Substring(0, identityAttr.BaseAddress.IndexOf(':'));
-                        var namespaceDecl = identityProperty.DeclaringType == null ? null :
-                            identityProperty.DeclaringType.Assembly.GetCustomAttributes(
-                                typeof(NamespaceDeclarationAttribute), false).Cast<NamespaceDeclarationAttribute>().
-                                FirstOrDefault(nda => nda.Prefix.Equals(prefix));
-                        if (namespaceDecl != null)
-                        {
-                            baseUri = namespaceDecl.Reference +
-                                      identityAttr.BaseAddress.Substring(identityAttr.BaseAddress.IndexOf(':') + 1);
-                        }
-                        else
-                        {
-                            baseUri = identityAttr.BaseAddress;
-                        }
-                    }
-
-                    if (identityAttr.KeyProperties != null && declaringType != null)
-                    {
-                        keyProperties = new PropertyInfo[identityAttr.KeyProperties.Length];
-                        for (int i = 0; i < identityAttr.KeyProperties.Length; i++)
-                        {
-                            var propertyName = identityAttr.KeyProperties[i];
-                            var propertyInfo = declaringType.GetProperty(propertyName);
-                            if (propertyInfo == null)
-                            {
-                                throw new EntityFrameworkException(
-                                    "Cannot find declared (composite) key property '{0}' on type '{1}'.", propertyName,
-                                    declaringType.FullName);
-                            }
-                            keyProperties[i] = propertyInfo;
-                        }
-                        keySeparator = identityAttr.KeySeparator ?? DefaultCompositeKeySeparator;
-                        if (identityAttr.KeyConverterType != null)
-                        {
-                            keyConverter = Activator.CreateInstance(identityAttr.KeyConverterType) as IKeyConverter;
-                            if (keyConverter == null)
-                            {
-                                throw new EntityFrameworkException(
-                                    "Cannot instantiate class {0} as an IKeyConverter instance.", identityAttr.KeyConverterType);
-                            }
-                        }
-                        else
-                        {
-                            keyConverter = new DefaultKeyConverter();
-                        }
-
-                    }
-
-                }
-            }
-            cachedInfo = new IdentityInfo(baseUri, keyProperties, keySeparator, keyConverter);
-            _identityCache[t] = cachedInfo;
-            return cachedInfo;
-        }
-         */
         /// <summary>
         /// Updates a single object in the object context with data from the data source
         /// </summary>

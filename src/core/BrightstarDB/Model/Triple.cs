@@ -17,7 +17,7 @@
 
         /// <summary>
         /// Returns true if this triple matches the specified triple allowing
-        /// NULL in Graph, Subject, Predicate an Object to stand for a wildcard
+        /// NULL in Graph, Subject, Predicate and Object to stand for a wildcard
         /// </summary>
         /// <param name="other">The other triple to match with</param>
         /// <returns>True if there is a match in the non-null parts of both triples, false otherwise</returns>
@@ -33,6 +33,33 @@
                         LangCode == other.LangCode &&
                         Object == other.Object
                     ));
+        }
+
+        /// <summary>
+        /// Returns true if this triple matches the specified triple allowing
+        /// either NULL or <see cref="Constants.WildcardUri"/> in Graph, Subject, 
+        /// Predicate and Object to stand for a wildcard
+        /// </summary>
+        /// <param name="other">The other triple to match with</param>
+        /// <returns>True if there is a match in the non-null parts of both triples, false otherwise</returns>
+        public bool MatchesWithWildcard(ITriple other)
+        {
+            return NullOrWildcardOrMatch(Graph, other.Graph) &&
+                   NullOrWildcardOrMatch(Subject, other.Subject) &&
+                   NullOrWildcardOrMatch(Predicate, other.Predicate) &&
+                   (Object == null || other.Object == null ||
+                    (
+                        IsLiteral == other.IsLiteral &&
+                        DataType == other.DataType &&
+                        LangCode == other.LangCode &&
+                        Object == other.Object
+                    ));
+        }
+
+        private static bool NullOrWildcardOrMatch(string x, string y)
+        {
+            return x == null || y == null || Constants.WildcardUri.Equals(x) || Constants.WildcardUri.Equals(y) ||
+                   x.Equals(y);
         }
 
         private static bool NullOrMatch(string x, string y)
