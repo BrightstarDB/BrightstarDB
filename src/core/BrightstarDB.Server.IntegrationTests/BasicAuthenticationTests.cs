@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules;
 using BrightstarDB.Server.Modules.Authentication;
+using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 using NUnit.Framework;
 using Nancy.Authentication.Basic;
@@ -19,40 +20,41 @@ namespace BrightstarDB.Server.IntegrationTests
     {
         public BasicAuthenticationTests()
             : base(new BrightstarBootstrapper(
-                       BrightstarService.GetClient(),
-                       new IAuthenticationProvider[]
-                           {
-                               new BasicAuthAuthenticationProvider(
-                           new BasicAuthenticationConfiguration(
-                               new StaticUserValidator(new Dictionary<string, string>
-                                   {
-                                       {"alice", "password"},
-                                       {"bob", "bob123"}
-                                   }), "test")),
-                           },
-                       new StaticStorePermissionsProvider(
-                           new Dictionary<string, Dictionary<string, StorePermissions>>
-                               {
-                                   {
-                                       "foo",
-                                       new Dictionary<string, StorePermissions>
-                                           {
-                                               {"alice", StorePermissions.All}
-                                           }
-                                   },
-                                   {
-                                       "bar",
-                                       new Dictionary<string, StorePermissions> {{"bob", StorePermissions.All}}
-                                   }
-                               },
-                           new Dictionary<string, Dictionary<string, StorePermissions>>()),
-                       new StaticSystemPermissionsProvider(
-                           new Dictionary<string, SystemPermissions>
-                               {
-                                   {"alice", SystemPermissions.ListStores},
-                                   {"bob", SystemPermissions.All}
-                               },
-                           new Dictionary<string, SystemPermissions>())))
+                BrightstarService.GetClient(),
+                new IAuthenticationProvider[]
+                {
+                    new BasicAuthAuthenticationProvider(
+                        new BasicAuthenticationConfiguration(
+                            new StaticUserValidator(new Dictionary<string, string>
+                            {
+                                {"alice", "password"},
+                                {"bob", "bob123"}
+                            }), "test")),
+                },
+                new StaticStorePermissionsProvider(
+                    new Dictionary<string, Dictionary<string, StorePermissions>>
+                    {
+                        {
+                            "foo",
+                            new Dictionary<string, StorePermissions>
+                            {
+                                {"alice", StorePermissions.All}
+                            }
+                        },
+                        {
+                            "bar",
+                            new Dictionary<string, StorePermissions> {{"bob", StorePermissions.All}}
+                        }
+                    },
+                    new Dictionary<string, Dictionary<string, StorePermissions>>()),
+                new StaticSystemPermissionsProvider(
+                    new Dictionary<string, SystemPermissions>
+                    {
+                        {"alice", SystemPermissions.ListStores},
+                        {"bob", SystemPermissions.All}
+                    },
+                    new Dictionary<string, SystemPermissions>()),
+                new CorsConfiguration()))
         {
         }
 

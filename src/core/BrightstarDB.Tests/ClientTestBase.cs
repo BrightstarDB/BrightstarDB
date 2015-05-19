@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using BrightstarDB.Server.Modules.Configuration;
 using NUnit.Framework;
 #if !PORTABLE
 using System;
@@ -41,12 +42,13 @@ namespace BrightstarDB.Tests
                 if (_serviceHost == null || _closed)
                 {
                     _serviceHost = new NancyHost(new BrightstarBootstrapper(
-                                                     BrightstarService.GetClient(),
-                                                     new IAuthenticationProvider[] {new NullAuthenticationProvider()},
-                                                     new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
-                                                     new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All)),
-                                                     new HostConfiguration { AllowChunkedEncoding = false },
-                                                 new Uri("http://localhost:8090/brightstar/"));
+                        BrightstarService.GetClient(),
+                        new IAuthenticationProvider[] {new NullAuthenticationProvider()},
+                        new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                        new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All),
+                        new CorsConfiguration()),
+                        new HostConfiguration {AllowChunkedEncoding = false},
+                        new Uri("http://localhost:8090/brightstar/"));
                     _serviceHost.Start();
                 }
 #endif

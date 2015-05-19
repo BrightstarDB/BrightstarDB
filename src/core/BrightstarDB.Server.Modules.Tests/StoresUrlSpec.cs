@@ -45,6 +45,18 @@ namespace BrightstarDB.Server.Modules.Tests
         }
 
         [Test]
+        public void TestGetReturnsCorsHeader()
+        {
+            var mockBrightstar = new Mock<IBrightstarService>();
+            mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
+            var app =
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
+            var response = app.Get("/", c=>c.Header("Origin", "http://example.com/"));
+            Assert.That(response.Headers["Access-Control-Allow-Origin"], Is.EqualTo("*"));            
+        }
+
+        [Test]
         public void TestGetRequiresListStoresPermissions()
         {
             // Setup

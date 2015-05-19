@@ -76,6 +76,7 @@
     <Compile Include="BrightstarModuleSecurity.cs" />
     <Compile Include="Configuration\BrightstarServiceConfiguration.cs" />
     <Compile Include="BrightstarServiceConfigurationSectionHandler.cs" />
+    <Compile Include="CorsPipelinesExtension.cs" />
     <Compile Include="FixedRootPathProvider.cs" />
     <Compile Include="GraphsModule.cs" />
     <Compile Include="JobInfoExtensions.cs" />

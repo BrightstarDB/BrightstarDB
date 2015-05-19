@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Xml.Linq;
+using BrightstarDB.Server.Modules.Configuration;
 using NUnit.Framework;
 #if !PORTABLE
 using System;
@@ -24,7 +25,8 @@ namespace BrightstarDB.Server.IntegrationTests
                        BrightstarService.GetClient(),
                        new IAuthenticationProvider[] {new NullAuthenticationProvider()},
                        new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
-                       new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All)))
+                       new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All),
+                       new CorsConfiguration()))
         {
         }
 

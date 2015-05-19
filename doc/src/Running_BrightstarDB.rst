@@ -131,6 +131,9 @@ shown::
         <systemPermissions>
           <passAll anonPermissions="All"/>
         </systemPermissions>
+		<cors disabled="false">
+			<allowOrigin>*</allowOrigin>
+		</cors>
       </brightstarService>
       
     </configuration>
@@ -156,6 +159,10 @@ handler is invoked. The section itself consists of the following elements and at
     `systemPermissions`
         This element is the root element for configuring the way that the BrightstarDB service manages
         system access permissions.
+		
+	`cors`
+		This is the root element for configuring the way that the BrighstarDB REST server handles
+		cross-origin resource sharing. See :ref:`Configuring_CORS` below.
         
 .. _Configuring Store Permissions:
 
@@ -349,8 +356,32 @@ all these pieces hang together (src\\core\\BrightstarDB.Server.AspNet.Secured).
     ASP.NET that is not suitable for a Windows Service. A future release will address this 
     deficit, but for now if you want user authentication you will have to run the ASP.NET  
     implementation of the BrightstarDB server.
+
+.. _Configuring_CORS:
+
+Configuring CORS
+================
+
+Cross-Origin Resource Sharing (CORS) is the mechanism by which scripts in one domain can access services on another domain.
+This allows a client-side web application such as a JS script that is served up from one domain
+to make a request to a BrighstarDB server running on a different domain. By default a browser
+will disallow this behaviour unless the server providing the resource enables CORS. 
+
+BrightstarDB defaults to enabling cross-origin requests from any domain. This is equivalent
+to setting the CORS "Access-Control-Allow-Origin" header to "*".
+
+To restrict CORS to a specific domain, add the following snippet inside the ``brightstarService``
+configuration section of the server's ``app.config`` (or ``web.config``) file::
+
+	<cors>
+		<allowOrigin>http://somedomain.com</allowOrigin>
+	</cors>
     
-        
+To completely disable CORS, add the ``disabled`` attribute to the ``cors`` element and set its value to ``true``::
+
+	<cors disabled="true"/>
+	
+
 Additional Configuration Options
 ================================
 
