@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>BrightstarDB API</title>
+  <link rel="icon" type="image/x-icon" href="@Path['~/assets/favicon.ico']"/>
   <link href='@Path['~/assets/swagger-ui/css/typography.css']' media='screen' rel='stylesheet' type='text/css'/>
   <link href='@Path['~/assets/swagger-ui/css/reset.css']' media='screen' rel='stylesheet' type='text/css'/>
   <link href='@Path['~/assets/swagger-ui/css/screen.css']' media='screen' rel='stylesheet' type='text/css'/>

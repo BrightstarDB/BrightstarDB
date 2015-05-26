@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<title>BrightstarDB - @Context.ViewBag.Title</title>
+		<link rel="icon" type="image/x-icon" href="@Path['~/assets/favicon.ico']" />
 		<link rel="stylesheet" href="@Path['~/assets/core.css']"/>
 		@Section['Head'];
 	</head>
