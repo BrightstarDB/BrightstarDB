@@ -884,7 +884,7 @@
                 }
             }
         },
-        "PagedList": {
+        "CommitPointList": {
             "properties": {
                 "firstPageLink": {
                     "type": "string",
@@ -904,25 +904,14 @@
                 "requestProperties": {
                     "type": "object",
                     "description": "A map of the additional parameters that were present in the request"
-                }
-            }
-        },
-        "CommitPointList": {
-            "allOf": [
-                {
-                    "$ref": "#/definitions/PagedList"
                 },
-                {
-                    "properties": {
-                        "items": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/CommitPoint"
-                            }
-                        }
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CommitPoint"
                     }
                 }
-            ]
+            }
         },
         "CommitPoint": {
             "required": [
@@ -1003,21 +992,33 @@
             }
         },
         "JobList": {
-            "allOf": [
-                {
-                    "$ref": "#/definitions/PagedList"
+            "properties": {
+                "firstPageLink": {
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to retrieve the first page of results"
                 },
-                {
-                    "properties": {
-                        "items": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/JobResponseModel"
-                            }
-                        }
+                "previousPageLink": {
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to retrieve the previous page of results"
+                },
+                "nextPageLink": {
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to retrieve the next page of results"
+                },
+                "requestProperties": {
+                    "type": "object",
+                    "description": "A map of the additional parameters that were present in the request"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/JobResponseModel"
                     }
                 }
-            ]
+            }
         },
         "ExceptionDetail": {
             "properties": {
@@ -1103,25 +1104,33 @@
             }
         },
         "StatisticsList": {
-            "allOf": [
-                {
-                    "$ref": "#/definitions/PagedList"
+            "properties": {
+                "firstPageLink": {
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to retrieve the first page of results"
                 },
-                {
+                "previousPageLink": {
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to retrieve the previous page of results"
+                },
+                "nextPageLink": {
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to retrieve the next page of results"
+                },
+                "requestProperties": {
                     "type": "object",
-                    "required": [
-                        "items"
-                    ],
-                    "properties": {
-                        "items": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/StatisticsResponseModel"
-                            }
-                        }
+                    "description": "A map of the additional parameters that were present in the request"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/StatisticsResponseModel"
                     }
                 }
-            ]
+            }
         }
     }
 }
