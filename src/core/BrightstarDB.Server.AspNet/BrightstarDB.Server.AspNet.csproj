@@ -23,6 +23,7 @@
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -74,6 +75,8 @@
   <ItemGroup>
     <Content Include="assets\core.css" />
     <Content Include="assets\jquery-1.10.2.min.js" />
+    <Content Include="assets\swagger-ui\swagger-ui.js" />
+    <Content Include="assets\swagger-ui\swagger-ui.min.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +102,8 @@
     <Content Include="Views\PagedStatisticsTripleCountsPartial.sshtml" />
     <Content Include="Views\PagedCommitPointResponse.sshtml" />
     <Content Include="Views\PagedTransactionResponse.sshtml" />
+    <Content Include="assets\swagger.json" />
+    <Content Include="Views\Documentation.sshtml" />
     <None Include="Views\StoreResponse.sshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -116,6 +121,12 @@
       <Project>{a6a05324-ba02-4c82-9199-ad19bc442c60}</Project>
       <Name>BrightstarDB.Server.Modules</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="assets\swagger-ui\css\" />
+    <Folder Include="assets\swagger-ui\fonts\" />
+    <Folder Include="assets\swagger-ui\images\" />
+    <Folder Include="assets\swagger-ui\lib\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
