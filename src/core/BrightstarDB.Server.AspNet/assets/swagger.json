@@ -22,7 +22,11 @@
     "paths": {
         "/": {
             "get": {
-                "description": "Get a list of the stores available on the server.\n",
+                "summary": "List the stores available on the server.",
+                "operationId": "listStores",
+                "tags": [
+                    "stores"
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -43,7 +47,12 @@
                 }
             },
             "post": {
-                "description": "Create a new store on the server.\n",
+                "tags": [
+                    "stores"
+                ],
+                "summary": "Create a new store on the server.",
+                "description": "",
+                "operationId": "createStore",
                 "parameters": [
                     {
                         "in": "body",
@@ -70,6 +79,10 @@
         },
         "/{storeName}": {
             "get": {
+                "tags": [
+                    "stores"
+                ],
+                "summary": "Get store operation links",
                 "description": "Get the core operation links for a specific store.\n\nThe response object provides a \"directory\" of the\nsub-resources provided for a store. Each sub-resource\nallows you to view and manipulate a particular aspect\nof the store.\n\nThe path to each resource is provided as a path relative\nto this store resource.\n",
                 "parameters": [
                     {
@@ -90,7 +103,12 @@
                 }
             },
             "delete": {
-                "description": "Delete the store from the BrightstarDB server\n",
+                "tags": [
+                    "stores"
+                ],
+                "summary": "Delete a store from the BrightstarDB server",
+                "description": "",
+                "operationId": "deleteStore",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -118,7 +136,12 @@
         },
         "/{storeName}/commits": {
             "get": {
-                "description": "Get a list of the historical commit points of the named store.\n",
+                "tags": [
+                    "commit point"
+                ],
+                "summary": "List the commit points of a store.",
+                "description": "",
+                "operationId": "listCommits",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -176,7 +199,13 @@
                 }
             },
             "post": {
-                "description": "Revert a store to a specific commit point\n",
+                "tags": [
+                    "commit point",
+                    "stores"
+                ],
+                "summary": "Revert a store to a specific commit point",
+                "description": "Reverting a store creates a new commit point that refers to the same\nstate as an existing older commit point. In this way it is possible\nto virtually roll-back a BrightstarDB store without discarding changes\nmade since.\n",
+                "operationId": "revertStore",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -206,7 +235,11 @@
         },
         "/{storeName}/graphs": {
             "get": {
-                "description": "Retrieve the RDF content of a named graph or the default graph of the store;\nor retrieve a list of the graphs contained in the store.\n\n**NOTE** When using this API to retrieve a list of the graphs in the store,\nonly application/json and application/xml are supported as response formats.\nWhen requesting the content of a graph using either the `default` or `graph`\nquery parameter; the full range of RDF serialization formats (including \nboth application/json and application/xml are supported).\n",
+                "tags": [
+                    "graph store protocol"
+                ],
+                "summary": "W3C Graph Store Protocol Endpoint",
+                "description": "This endpoint implements the [SPARQL 1.1 Graph Store HTTP Protocol](http://www.w3.org/TR/sparql11-http-rdf-update/).\n\nUsing this API, you can retrieve the RDF content of a named graph or the default graph of the store;\nor retrieve a list of the graphs contained in the store.\n\n**NOTE** When using this API to retrieve a list of the graphs in the store,\nonly application/json and application/xml are supported as response formats.\nWhen requesting the content of a graph using either the `default` or `graph`\nquery parameter; the full range of RDF serialization formats (including \nboth application/json and application/xml are supported).\n",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -266,7 +299,12 @@
                 ]
             },
             "put": {
-                "description": "Adds RDF data to the content of a named graph or the default graph.\n\n**NOTE** One of either the `default` or the `graph` parameters must be provided.\n",
+                "tags": [
+                    "graph store protocol"
+                ],
+                "summary": "Adds RDF data to the content of a named graph or the default graph.",
+                "description": "This endpoint implements the [SPARQL 1.1 Graph Store HTTP Protocol](http://www.w3.org/TR/sparql11-http-rdf-update/).\n\n**NOTE** One of either the `default` or the `graph` parameters must be provided.\n",
+                "operationId": "postGraph",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -330,7 +368,12 @@
                 ]
             },
             "delete": {
-                "description": "Deletes a named graph or removes all triples from the default graph\n\n**NOTE** One of either the `default` or the `graph` parameters must be provided.\n",
+                "tags": [
+                    "graph store protocol"
+                ],
+                "summary": "Deletes a named graph or removes all triples from the default graph",
+                "description": "This endpoint implements the [SPARQL 1.1 Graph Store HTTP Protocol](http://www.w3.org/TR/sparql11-http-rdf-update/).\n\n**NOTE** One of either the `default` or the `graph` parameters must be provided.\n",
+                "operationId": "deleteGraph",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -374,7 +417,12 @@
         },
         "/{storeName}/jobs": {
             "get": {
-                "description": "Get a list of the recently queued jobs.\n",
+                "tags": [
+                    "jobs"
+                ],
+                "summary": "Get a list of the recently queued jobs.",
+                "description": "",
+                "operationId": "listJobs",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -409,7 +457,12 @@
                 }
             },
             "post": {
-                "description": "Queue a new job for the store.\n\nThe body of the request contains a generic job request object\nThe `jobType` field is used to define the kind of job to be created.\nThe `jobParameters` field is a map of string parameter name to string\nvalue. The parameters accepted (or required) for a job vary by job type,\nas described in the table below.\n\n| Job Type | Parameter  | Description |\n|----------|------------|-------------|\n| consolidate | -       |  - \n| createsnapshot | TargetStoreName | REQUIRED: The name of the store to be created by the snapshot process.\n|  | PersistenceType | REQUIRED: The persistence model to use for the store created by the snapshot process. Must be one of `AppendOnly` or `Rewrite` |\n|  | CommitId | OPTIONAL: The unique identifier of the commit point of the source store to create the snapshot from. If not specified, the most recent commit point is used.\n| export | FileName | REQUIRED: The name of the file to be written by the export process.\n| | Format | OPTIONAL: The MIME type of the output format to be used by the export. Defaults to applicaiton/x-nquads.\n| | GraphUri | OPTIONAL: The URI of the graph to be exported. If not specified, all of the graphs in the store will be exported.\n| import | FileName | REQUIRED: The name of the file to be imported. This file must exist in the import directory of the store.\n| | DefaultGraphUri | OPTIONAL: Provides a default target graph for the data (if the data does not itself specify a target graph). Defaults to the BrightstarDB default graph.\n| repeattransaction | JobId | REQUIRED: The unique identifier of the job to be repeated.\n| sparqlupdate | UpdateExpression | REQUIRED: The SPARQL Update expression to be processed.\n| transaction | Preconditions | OPTIONAL: Triples or Quads that must exist in the store before the transaction is applied.\n| transaction | NonexistencePreconditions | OPTIONAL: Triples or Quads that must not exist in the store before the transaction is applied.\n| transaction | Deletes | OPTIONAL: Triples or Quads to be removed from the store.\n| transaction | Inserts | OPTIONAL: Triples or Quads to be added to the store.\n| transaction | DefaultGraphUri | OPTIONAL: The default target graph for the transaction, used to convert triples to quads.\n| updatestats | - | - \n\nNOTE: The `Preconditions`, `NonExistencePreconditions`, `Deletes` and Inserts parameters for the transaction job\nmust use NQuads (or NTriples) syntax with a newline separating each triple or quad. The `Preconditions`, \n`NonExistencePreconditions` and `Deletes` all support the use of the \"special\" URI `http://www.brightstardb.com/.well-known/model/wildcard` for a wildcard match in the position where it is used. For more information please see http://brightstardb.readthedocs.org/en/latest/RDF_Client_API/#transactional-update\n",
+                "tags": [
+                    "jobs"
+                ],
+                "summary": "Queue a new job for the store.",
+                "description": "The body of the request contains a generic job request object\nThe `jobType` field is used to define the kind of job to be created.\nThe `jobParameters` field is a map of string parameter name to string\nvalue. The parameters accepted (or required) for a job vary by job type,\nas described in the table below.\n\n| Job Type | Parameter  | Description |\n|----------|------------|-------------|\n| consolidate | -       |  - \n| createsnapshot | TargetStoreName | REQUIRED: The name of the store to be created by the snapshot process.\n|  | PersistenceType | REQUIRED: The persistence model to use for the store created by the snapshot process. Must be one of `AppendOnly` or `Rewrite` |\n|  | CommitId | OPTIONAL: The unique identifier of the commit point of the source store to create the snapshot from. If not specified, the most recent commit point is used.\n| export | FileName | REQUIRED: The name of the file to be written by the export process.\n| | Format | OPTIONAL: The MIME type of the output format to be used by the export. Defaults to applicaiton/x-nquads.\n| | GraphUri | OPTIONAL: The URI of the graph to be exported. If not specified, all of the graphs in the store will be exported.\n| import | FileName | REQUIRED: The name of the file to be imported. This file must exist in the import directory of the store.\n| | DefaultGraphUri | OPTIONAL: Provides a default target graph for the data (if the data does not itself specify a target graph). Defaults to the BrightstarDB default graph.\n| repeattransaction | JobId | REQUIRED: The unique identifier of the job to be repeated.\n| sparqlupdate | UpdateExpression | REQUIRED: The SPARQL Update expression to be processed.\n| transaction | Preconditions | OPTIONAL: Triples or Quads that must exist in the store before the transaction is applied.\n| transaction | NonexistencePreconditions | OPTIONAL: Triples or Quads that must not exist in the store before the transaction is applied.\n| transaction | Deletes | OPTIONAL: Triples or Quads to be removed from the store.\n| transaction | Inserts | OPTIONAL: Triples or Quads to be added to the store.\n| transaction | DefaultGraphUri | OPTIONAL: The default target graph for the transaction, used to convert triples to quads.\n| updatestats | - | - \n\nNOTE: The `Preconditions`, `NonExistencePreconditions`, `Deletes` and Inserts parameters for the transaction job\nmust use NQuads (or NTriples) syntax with a newline separating each triple or quad. The `Preconditions`, \n`NonExistencePreconditions` and `Deletes` all support the use of the \"special\" URI `http://www.brightstardb.com/.well-known/model/wildcard` for a wildcard match in the position where it is used. For more information please see http://brightstardb.readthedocs.org/en/latest/RDF_Client_API/#transactional-update\n",
+                "operationId": "createJob",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -442,7 +495,12 @@
         },
         "/{storeName}/jobs/{jobId}": {
             "get": {
-                "description": "Get the detailed information about a specific job.",
+                "tags": [
+                    "jobs"
+                ],
+                "summary": "Get the detailed information about a specific job.",
+                "description": "",
+                "operationId": "getJobInfo",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -475,7 +533,13 @@
         },
         "/{storeName}/sparql": {
             "get": {
-                "description": "Execute a SPARQL query and return the results",
+                "tags": [
+                    "sparql",
+                    "query"
+                ],
+                "summary": "Execute a SPARQL query and return the results",
+                "description": "",
+                "operationId": "sparqlQuery",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -528,7 +592,13 @@
                 ]
             },
             "post": {
-                "description": "Execute a SPARQL query and return the results\n\nNOTE: The Swagger spec only allows us to document one possible form of POST. However\nBrightstarDB fully supports all of the request options described in \n[SPARQL 1.1 Protocol](http://www.w3.org/TR/sparql11-protocol/)\n",
+                "tags": [
+                    "sparql",
+                    "query"
+                ],
+                "summary": "Execute a SPARQL query and return the results",
+                "description": "\nNOTE: The Swagger spec only allows us to document one possible form of POST. However\nBrightstarDB fully supports all of the request options described in \n[SPARQL 1.1 Protocol](http://www.w3.org/TR/sparql11-protocol/)\n",
+                "operationId": "sparqlQueryPost",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -583,7 +653,12 @@
         },
         "/{storeName}/statistics": {
             "get": {
-                "description": "Get statistics records for the store",
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Get statistics records for the store",
+                "description": "",
+                "operationId": "listStatistics",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -627,7 +702,12 @@
         },
         "/{storeName}/statistics/latest": {
             "get": {
-                "description": "Get the most recently updated store statistics.",
+                "tags": [
+                    "statistics"
+                ],
+                "summary": "Get the most recently updated store statistics.",
+                "description": "",
+                "operationId": "getLatestStatistics",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -652,7 +732,13 @@
         },
         "/{storeName}/update": {
             "get": {
-                "description": "Executes a SPARQL Update operation against the store",
+                "tags": [
+                    "sparql",
+                    "update"
+                ],
+                "summary": "Executes a SPARQL Update operation against the store",
+                "description": "",
+                "operationId": "sparqlUpdate",
                 "parameters": [
                     {
                         "name": "storeName",
@@ -696,7 +782,13 @@
                 }
             },
             "post": {
-                "description": "Executes a SPARQL Update operation against the store.\n\nNOTE: The Swagger spec only allows us to document one possible form of POST. However\nBrightstarDB fully supports all of the request options described in \n[SPARQL 1.1 Protocol](http://www.w3.org/TR/sparql11-protocol/)\n",
+                "tags": [
+                    "sparql",
+                    "update"
+                ],
+                "summary": "Executes a SPARQL Update operation against the store.",
+                "description": "NOTE: The Swagger spec only allows us to document one possible form of POST. However\nBrightstarDB fully supports all of the request options described in \n[SPARQL 1.1 Protocol](http://www.w3.org/TR/sparql11-protocol/)\n",
+                "operationId": "sparqlUpdatePost",
                 "parameters": [
                     {
                         "name": "storeName",
