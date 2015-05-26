@@ -9,7 +9,6 @@
             "url": "http://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:8090",
     "basePath": "/brightstar",
     "produces": [
         "application/json",
