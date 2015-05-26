@@ -45,6 +45,8 @@ namespace BrightstarDB
         private const string ResourceCacheLimitName = "BrightstarDB.ResourceCacheLimit";
         private const string StatsUpdateTransactionCountName = "BrightstarDB.StatsUpdate.TransactionCount";
         private const string StatsUpdateTimeSpanName = "BrightstarDB.StatsUpdate.TimeSpan";
+        private const string QueryExecutionTimeoutName = "BrightstarDB.QueryExecutionTimeout";
+        private const string UpdateExecutionTimeoutName = "BrightstarDB.UpdateExecutionTimeout";
 
         private const string PersistenceTypeAppendOnly = "appendonly";
         private const string PersistenceTypeRewrite = "rewrite";
@@ -53,6 +55,9 @@ namespace BrightstarDB
         private const int DefaultQueryCacheDiskSpace = 2048; // in MB
         private const long MegabytesToBytes = 1024*1024;
 
+        private const long DefaultQueryExecutionTimeout =  180000;
+        private const long DefaultUpdateExecutionTimeout = 180000;
+        
 #if WINDOWS_PHONE
         private const int DefaultPageCacheSize = 4; // in MB
         private const int DefaultResourceCacheLimit = 10000; // number of entries
@@ -185,6 +190,8 @@ namespace BrightstarDB
             }
 #endif
 #endif
+            QueryExecutionTimeout = GetApplicationSetting(QueryExecutionTimeoutName, DefaultQueryExecutionTimeout);
+            UpdateExecutionTimeout = GetApplicationSetting(UpdateExecutionTimeoutName, DefaultUpdateExecutionTimeout);
         }
 
         /// <summary>
@@ -338,6 +345,29 @@ namespace BrightstarDB
         /// </summary>
         public static bool IsRunningOnMono { get; private set; }
 
+        /// <summary>
+        /// Get or set the SPARQL query execution timeout (in milliseconds)
+        /// </summary>
+        /// <remarks>This configuration value applies only when running against an embedded
+        /// BrightstarDB store. For client-server connections, the timeout will be determined
+        /// by the server.</remarks>
+        public static long QueryExecutionTimeout
+        {
+            get { return VDS.RDF.Options.QueryExecutionTimeout; }
+            set { VDS.RDF.Options.QueryExecutionTimeout = value; }
+        }
+
+        /// <summary>
+        /// Get or set the SPARQL update execution timeout (in milliseconds)
+        /// </summary>
+        /// <remarks>This configuration value applies only when running against an embedded
+        /// BrightstarDB store. For client-server connections, the timeout will be determined
+        /// by the server.</remarks>
+        public static long UpdateExecutionTimeout
+        {
+            get { return VDS.RDF.Options.UpdateExecutionTimeout; }
+            set { VDS.RDF.Options.UpdateExecutionTimeout = value; }
+        }
 #if !PORTABLE
         private static ICache GetQueryCache()
         {
@@ -394,6 +424,18 @@ namespace BrightstarDB
             }
             return defaultValue;
         }
+
+        private static long GetApplicationSetting(string key, long defaultValue)
+        {
+            var setting = GetApplicationSetting(key);
+            long longValue;
+            if (!String.IsNullOrEmpty(setting) && Int64.TryParse(setting, out longValue))
+            {
+                return longValue;
+            }
+            return defaultValue;
+        }
+
 #endif
 
     }

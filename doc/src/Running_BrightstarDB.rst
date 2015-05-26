@@ -403,12 +403,16 @@ A number of other aspects of BrightstarDB service operations can be configured b
   - ``BrightstarDB.QueryCacheMemory`` - specifies the amount of memory in MB to be used by the SPARQL query cache. The default value is 256.
 
   - ``BrightstarDB.QueryCacheDisk`` - specifies the amount of disk space (in MB) to be used by the SPARQL query cache. The default value is 2048. The disk space used will be in a subdirectory under the location specified by the BrightstarDB.StoreLocation configuration property.
+  
+  - ``BrightstarDB.QueryExecutionTimeout`` - specifies the amount of time (in milliseconds) that a SPARQL query is allowed to run for - queries that exceed this threshold will be aborted. This setting applies only to embedded stores - when connecting to a server, the query timeout is determined by the server configuration.
 
   - ``BrightstarDB.PersistenceType`` - specifies the default type of persistence used for the main BrighstarDB index files. Allowed values are "appendonly" or "rewrite" (values are case-insensitive). For more information about the store persistence types please refer to the section :ref:`Store Persistence Types <Store_Persistence_Types>`.
 
   - ``BrightstarDB.StatsUpdate.Timespan`` - specifies the minimum number of seconds that must pass between automatic update of store statistics.
   
   - ``BrightstarDB.StatsUpdate.TransactionCount`` - specifies the minimum number of transactions that must occur between automatic update of store statistics.
+
+  - ``BrightstarDB.UpdateExecutionTimeout`` - specifies the amount of time (in milliseconds) that a SPARQL update is allowed to run for - updates that exceed this threshold will be aborted. This setting applies only to embedded stores - when connecting to a server, the query timeout is determined by the server configuration.
 
 Example Server Configuration
 ============================
