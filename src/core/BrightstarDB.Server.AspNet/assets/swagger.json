@@ -2,7 +2,12 @@
     "swagger": "2.0",
     "info": {
         "version": "1.0.0",
-        "title": "BrightstarDB REST API"
+        "title": "BrightstarDB REST API",
+        "description": "The BrightstarDB REST API provides access to the full functionality of the BrightstarDB\nserver. The server is modelled around a collection of \"stores\". Each store is an\nindependant RDF data store providing its own set of operations and its own SPARQL\nquery and update endpoints.\n",
+        "license": {
+            "name": "MIT License",
+            "url": "http://opensource.org/licenses/MIT"
+        }
     },
     "host": "localhost:8090",
     "basePath": "/brightstar",
@@ -41,24 +46,12 @@
                 "description": "Create a new store on the server.\n",
                 "parameters": [
                     {
-                        "name": "StoreRequest",
                         "in": "body",
+                        "name": "body",
                         "description": "Store creation parameters",
                         "required": true,
-                        "type": "object",
-                        "properties": {
-                            "StoreName": {
-                                "type": "string",
-                                "required": true,
-                                "description": "The name for the new store."
-                            },
-                            "PersistenceType": {
-                                "type": "integer",
-                                "required": false,
-                                "minimum": 0,
-                                "maximum": 1,
-                                "description": "The persistence type for the store. 0='AppendOnly', 1= 'Rewrite'\n"
-                            }
+                        "schema": {
+                            "$ref": "#/definitions/StoreRequest"
                         }
                     }
                 ],
@@ -91,37 +84,7 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "title": "StoreResponse",
-                            "properties": {
-                                "name": {
-                                    "type": "string",
-                                    "description": "The store name"
-                                },
-                                "commits": {
-                                    "type": "string",
-                                    "description": "The relative path to the store's commit points resource"
-                                },
-                                "jobs": {
-                                    "type": "string",
-                                    "description": "The relative path to the store's jobs resource"
-                                },
-                                "transactions": {
-                                    "type": "string",
-                                    "description": "The relative path to the store's transactions resource"
-                                },
-                                "statistics": {
-                                    "type": "string",
-                                    "description": "The relative path to the store's statistics resource"
-                                },
-                                "sparqlQuery": {
-                                    "type": "string",
-                                    "description": "The relative path to the SPARQL 1.1 Query endpoint for the store"
-                                },
-                                "sparqlUpdate": {
-                                    "type": "string",
-                                    "description": "The relative path to the SPARQL 1.1 Update endpoint for the store"
-                                }
-                            }
+                            "$ref": "#/definitions/StoreResponse"
                         }
                     }
                 }
@@ -152,6 +115,921 @@
                     }
                 }
             }
+        },
+        "/{storeName}/commits": {
+            "get": {
+                "description": "Get a list of the historical commit points of the named store.\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store whose commit point information is to be retrieved.",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Specifies the starting offset of the list when paging results.",
+                        "required": false,
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    {
+                        "in": "query",
+                        "name": "take",
+                        "description": "Specifies the number of items to return when paging results.",
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    {
+                        "in": "query",
+                        "name": "timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Return the single commit point that was the current commit point at the specified date/time",
+                        "required": false
+                    },
+                    {
+                        "in": "query",
+                        "name": "earliest",
+                        "description": "Return only commit points that were created on or after the specified date/time",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    {
+                        "in": "query",
+                        "name": "latest",
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Return only commit points that were created on or before the specified date/time",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/CommitPointList"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Revert a store to a specific commit point\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store to be reverted",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/CommitPoint"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success. The store has been reverted to the specified commit point."
+                    },
+                    "405": {
+                        "description": "Bad Request. The commit point ID was not provided in the request body\nor the specified commit point could not be found.\n"
+                    }
+                }
+            }
+        },
+        "/{storeName}/graphs": {
+            "get": {
+                "description": "Retrieve the RDF content of a named graph or the default graph of the store;\nor retrieve a list of the graphs contained in the store.\n\n**NOTE** When using this API to retrieve a list of the graphs in the store,\nonly application/json and application/xml are supported as response formats.\nWhen requesting the content of a graph using either the `default` or `graph`\nquery parameter; the full range of RDF serialization formats (including \nboth application/json and application/xml are supported).\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store to retrieve data from",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "default",
+                        "in": "query",
+                        "allowEmptyValue": true,
+                        "type": "boolean",
+                        "description": "Retrieve the content of the default graph",
+                        "required": false
+                    },
+                    {
+                        "name": "graph",
+                        "in": "query",
+                        "description": "The absolute URI of the named graph whose content is to be retrieved",
+                        "type": "string",
+                        "format": "url",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "description": "This schema describes the JSON format returned when the `graph`\nand `default` query parameters are **NOT** provided. If either\nof these query parameters are provided, the response will be\nRDF serialized in the format specified by the Accept header\nof the request.\n",
+                            "properties": {
+                                "graphs": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/rdf+xml",
+                    "application/xml",
+                    "text/ntriples",
+                    "text/ntriples+turtle",
+                    "applicatiuon/rdf-triples",
+                    "application/x-ntriples",
+                    "application/x-turtle",
+                    "application/turtle",
+                    "text/rdf+n3",
+                    "text/x-nquads",
+                    "application/x-trig",
+                    "application/trix",
+                    "application/rdf+json"
+                ]
+            },
+            "put": {
+                "description": "Adds RDF data to the content of a named graph or the default graph.\n\n**NOTE** One of either the `default` or the `graph` parameters must be provided.\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store to update",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "default",
+                        "in": "query",
+                        "type": "boolean",
+                        "description": "Add data to the default graph",
+                        "allowEmptyValue": true,
+                        "required": false
+                    },
+                    {
+                        "name": "graph",
+                        "in": "query",
+                        "description": "The absolute URI of the named graph whose content is to be retrieved",
+                        "type": "string",
+                        "format": "url",
+                        "required": false
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "The RDF data to be added to the contents of the target graph.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad Request. Either the target graph was not specified using either the `default`\nor the `graph` query parameter; or the content posted was not valid RDF data.\n"
+                    },
+                    "406": {
+                        "description": "The content provided in the body was not in a format that could be parsed.\n"
+                    }
+                },
+                "consumes": [
+                    "application/json",
+                    "application/rdf+xml",
+                    "application/xml",
+                    "text/ntriples",
+                    "text/ntriples+turtle",
+                    "applicatiuon/rdf-triples",
+                    "application/x-ntriples",
+                    "application/x-turtle",
+                    "application/turtle",
+                    "text/rdf+n3",
+                    "text/x-nquads",
+                    "application/x-trig",
+                    "application/trix",
+                    "application/rdf+json"
+                ]
+            },
+            "delete": {
+                "description": "Deletes a named graph or removes all triples from the default graph\n\n**NOTE** One of either the `default` or the `graph` parameters must be provided.\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store to retrieve data from",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "default",
+                        "in": "query",
+                        "type": "boolean",
+                        "description": "Delete the content of the default graph",
+                        "allowEmptyValue": true,
+                        "required": false
+                    },
+                    {
+                        "name": "graph",
+                        "in": "query",
+                        "description": "The absolute URI of the named graph to be deleted",
+                        "type": "string",
+                        "format": "url",
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful response (No Content)"
+                    },
+                    "400": {
+                        "description": "Bad Request. The request did not contain either a `default` or a `graph` query parameter;\nor the value of the `graph` query parameter could not be parsed as an aboslute URI.\n"
+                    },
+                    "404": {
+                        "description": "Not Found. The store does not contain the specified named graph."
+                    },
+                    "500": {
+                        "description": "Internal Server Error. The graph could not be deleted."
+                    }
+                }
+            }
+        },
+        "/{storeName}/jobs": {
+            "get": {
+                "description": "Get a list of the recently queued jobs.\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "Specifies the starting offset of the list when paging results.",
+                        "required": false,
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    {
+                        "in": "query",
+                        "name": "take",
+                        "description": "Specifies the number of items to return when paging results.",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/JobList"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Queue a new job for the store.\n\nThe body of the request contains a generic job request object\nThe `jobType` field is used to define the kind of job to be created.\nThe `jobParameters` field is a map of string parameter name to string\nvalue. The parameters accepted (or required) for a job vary by job type,\nas described in the table below.\n\n| Job Type | Parameter  | Description |\n|----------|------------|-------------|\n| consolidate | -       |  - \n| createsnapshot | TargetStoreName | REQUIRED: The name of the store to be created by the snapshot process.\n|  | PersistenceType | REQUIRED: The persistence model to use for the store created by the snapshot process. Must be one of `AppendOnly` or `Rewrite` |\n|  | CommitId | OPTIONAL: The unique identifier of the commit point of the source store to create the snapshot from. If not specified, the most recent commit point is used.\n| export | FileName | REQUIRED: The name of the file to be written by the export process.\n| | Format | OPTIONAL: The MIME type of the output format to be used by the export. Defaults to applicaiton/x-nquads.\n| | GraphUri | OPTIONAL: The URI of the graph to be exported. If not specified, all of the graphs in the store will be exported.\n| import | FileName | REQUIRED: The name of the file to be imported. This file must exist in the import directory of the store.\n| | DefaultGraphUri | OPTIONAL: Provides a default target graph for the data (if the data does not itself specify a target graph). Defaults to the BrightstarDB default graph.\n| repeattransaction | JobId | REQUIRED: The unique identifier of the job to be repeated.\n| sparqlupdate | UpdateExpression | REQUIRED: The SPARQL Update expression to be processed.\n| transaction | Preconditions | OPTIONAL: Triples or Quads that must exist in the store before the transaction is applied.\n| transaction | NonexistencePreconditions | OPTIONAL: Triples or Quads that must not exist in the store before the transaction is applied.\n| transaction | Deletes | OPTIONAL: Triples or Quads to be removed from the store.\n| transaction | Inserts | OPTIONAL: Triples or Quads to be added to the store.\n| transaction | DefaultGraphUri | OPTIONAL: The default target graph for the transaction, used to convert triples to quads.\n| updatestats | - | - \n\nNOTE: The `Preconditions`, `NonExistencePreconditions`, `Deletes` and Inserts parameters for the transaction job\nmust use NQuads (or NTriples) syntax with a newline separating each triple or quad. The `Preconditions`, \n`NonExistencePreconditions` and `Deletes` all support the use of the \"special\" URI `http://www.brightstardb.com/.well-known/model/wildcard` for a wildcard match in the position where it is used. For more information please see http://brightstardb.readthedocs.org/en/latest/RDF_Client_API/#transactional-update\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/JobRequestObject"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "The job request was accepted and the job has been queued.\n\nThe URL for monitoring the status of the job can be found in the \nLocation response header.\n",
+                        "schema": {
+                            "$ref": "#/definitions/JobResponseModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request.\n\nAn unrecognized jobType was specified or one or more required parameters\nfor the job were not supplied, or one or more parameters for the job\nwhere invalid.\n"
+                    }
+                }
+            }
+        },
+        "/{storeName}/jobs/{jobId}": {
+            "get": {
+                "description": "Get the detailed information about a specific job.",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "jobId",
+                        "in": "path",
+                        "description": "The unique identifier of the job",
+                        "type": "string",
+                        "format": "GUID",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/JobResponseModel"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. No job with the specified ID was found for the named store."
+                    }
+                }
+            }
+        },
+        "/{storeName}/sparql": {
+            "get": {
+                "description": "Execute a SPARQL query and return the results",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "The SPARQL query string",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "default-graph-uri",
+                        "in": "query",
+                        "description": "The URI of a graph to add to the default graph of the query dataset",
+                        "type": "string",
+                        "format": "url",
+                        "required": false,
+                        "collectionFormat": "multi"
+                    },
+                    {
+                        "name": "named-graph-uri",
+                        "in": "query",
+                        "description": "The URI of a graph to add to the query dataset as a named graph",
+                        "type": "string",
+                        "format": "url",
+                        "required": false,
+                        "collectionFormat": "multi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response. The response body contains the SPARQL query result."
+                    },
+                    "400": {
+                        "description": "Bad Request. A required was not provided or the query was not a valid SPARQL query"
+                    }
+                },
+                "produces": [
+                    "application/sparql-results+xml",
+                    "application/xml",
+                    "application/sparql-results+json",
+                    "application/json",
+                    "text/tab-seperated-values",
+                    "text/csv"
+                ]
+            },
+            "post": {
+                "description": "Execute a SPARQL query and return the results\n\nNOTE: The Swagger spec only allows us to document one possible form of POST. However\nBrightstarDB fully supports all of the request options described in \n[SPARQL 1.1 Protocol](http://www.w3.org/TR/sparql11-protocol/)\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "query",
+                        "in": "formData",
+                        "description": "The SPARQL query string",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "default-graph-uri",
+                        "in": "formData",
+                        "description": "The URI of a graph to add to the default dataset",
+                        "type": "string",
+                        "format": "url",
+                        "required": false,
+                        "collectionFormat": "multi"
+                    },
+                    {
+                        "name": "named-graph-uri",
+                        "in": "query",
+                        "description": "The URI of a graph to add to the query dataset as a named graph",
+                        "type": "string",
+                        "format": "url",
+                        "required": false,
+                        "collectionFormat": "multi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response. The response body contains the SPARQL query result."
+                    },
+                    "400": {
+                        "description": "Bad Request. A required was not provided or the query was not a valid SPARQL query"
+                    }
+                },
+                "produces": [
+                    "application/sparql-results+xml",
+                    "application/xml",
+                    "application/sparql-results+json",
+                    "application/json",
+                    "text/tab-seperated-values",
+                    "text/csv"
+                ]
+            }
+        },
+        "/{storeName}/statistics": {
+            "get": {
+                "description": "Get statistics records for the store",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "earliest",
+                        "in": "query",
+                        "description": "Return only statistics for commit points created on or after the specified date/time",
+                        "required": false,
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    {
+                        "name": "latest",
+                        "in": "query",
+                        "description": "Return only statistics for commit point created on or before the specified date/time",
+                        "required": false,
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "The number of records to skip when paging results.",
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/StatisticsList"
+                        }
+                    }
+                }
+            }
+        },
+        "/{storeName}/statistics/latest": {
+            "get": {
+                "description": "Get the most recently updated store statistics.",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "type": "string",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/StatisticsResponseModel"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. No statistics available for the named store"
+                    }
+                }
+            }
+        },
+        "/{storeName}/update": {
+            "get": {
+                "description": "Executes a SPARQL Update operation against the store",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "update",
+                        "in": "query",
+                        "description": "The SPARQL query string",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "using-graph-uri",
+                        "in": "query",
+                        "description": "The URI of a graph to add to the dataset",
+                        "type": "string",
+                        "required": false,
+                        "collectionFormat": "multi"
+                    },
+                    {
+                        "name": "using-named-graph-uri",
+                        "in": "query",
+                        "description": "The URI of a named graph to add to the dataset",
+                        "type": "string",
+                        "format": "url",
+                        "required": false,
+                        "collectionFormat": "multi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad Request. Either a required parameter was not provided;\nor the update could not be parsed.\n"
+                    }
+                }
+            },
+            "post": {
+                "description": "Executes a SPARQL Update operation against the store.\n\nNOTE: The Swagger spec only allows us to document one possible form of POST. However\nBrightstarDB fully supports all of the request options described in \n[SPARQL 1.1 Protocol](http://www.w3.org/TR/sparql11-protocol/)\n",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "update",
+                        "in": "formData",
+                        "description": "The SPARQL query string",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "using-graph-uri",
+                        "in": "formData",
+                        "description": "The URI of a graph to add to the dataset",
+                        "type": "string",
+                        "format": "url",
+                        "required": false,
+                        "collectionFormat": "multi"
+                    },
+                    {
+                        "name": "using-named-graph-uri",
+                        "in": "formData",
+                        "description": "The URI of a named graph to add to the dataset",
+                        "type": "string",
+                        "format": "url",
+                        "required": false,
+                        "collectionFormat": "multi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad Request. Either a required parameter was not provided;\nor the update could not be parsed.\n"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "StoreRequest": {
+            "required": [
+                "StoreName"
+            ],
+            "properties": {
+                "StoreName": {
+                    "type": "string",
+                    "description": "The name for the new store."
+                },
+                "PersistenceType": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "The persistence type for the store. 0='AppendOnly', 1= 'Rewrite'\n"
+                }
+            }
+        },
+        "StoreResponse": {
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The store name"
+                },
+                "commits": {
+                    "type": "string",
+                    "description": "The relative path to the store's commit points resource"
+                },
+                "jobs": {
+                    "type": "string",
+                    "description": "The relative path to the store's jobs resource"
+                },
+                "transactions": {
+                    "type": "string",
+                    "description": "The relative path to the store's transactions resource"
+                },
+                "statistics": {
+                    "type": "string",
+                    "description": "The relative path to the store's statistics resource"
+                },
+                "sparqlQuery": {
+                    "type": "string",
+                    "description": "The relative path to the SPARQL 1.1 Query endpoint for the store"
+                },
+                "sparqlUpdate": {
+                    "type": "string",
+                    "description": "The relative path to the SPARQL 1.1 Update endpoint for the store"
+                }
+            }
+        },
+        "PagedList": {
+            "properties": {
+                "firstPageLink": {
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to retrieve the first page of results"
+                },
+                "previousPageLink": {
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to retrieve the previous page of results"
+                },
+                "nextPageLink": {
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to retrieve the next page of results"
+                },
+                "requestProperties": {
+                    "type": "object",
+                    "description": "A map of the additional parameters that were present in the request"
+                }
+            }
+        },
+        "CommitPointList": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/PagedList"
+                },
+                {
+                    "properties": {
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/CommitPoint"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "CommitPoint": {
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "description": "The unique identifier of the commit point."
+                },
+                "storeName": {
+                    "type": "string",
+                    "description": "The name of the store that holds the commit point"
+                },
+                "commitTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date/time that the commit was made."
+                },
+                "jobId": {
+                    "type": "string",
+                    "format": "GUID",
+                    "description": "The unique identifier of the job that created the commit."
+                }
+            }
+        },
+        "JobResponseModel": {
+            "required": [
+                "jobId"
+            ],
+            "properties": {
+                "jobId": {
+                    "type": "string",
+                    "format": "GUID",
+                    "description": "The unique identifier of the job"
+                },
+                "label": {
+                    "type": "string",
+                    "description": "A user-friendly label for the job specified when the job was queued."
+                },
+                "jobStatus": {
+                    "type": "string",
+                    "description": "The current processing state of the job.",
+                    "enum": [
+                        "Pending",
+                        "Started",
+                        "CompletedOk",
+                        "TransactionError",
+                        "Unknown"
+                    ]
+                },
+                "statusMessage": {
+                    "type": "string",
+                    "description": "The last progress message recorded by the server for the processing of this job."
+                },
+                "storeName": {
+                    "type": "string",
+                    "description": "The name of the store that the job is queued on"
+                },
+                "exceptionInfo": {
+                    "$ref": "#/definitions/ExceptionDetail"
+                },
+                "queuedTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date/time when the job was queued on the server."
+                },
+                "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date/time when the job started processing. \n\nThis value will not be available when the jobStatus is \"Pending\".\n"
+                },
+                "endTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date/time when the job completed processing.\n\nThis value will not be available when the jobStatus is \"Pending\" or \"Started\".\n"
+                }
+            }
+        },
+        "JobList": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/PagedList"
+                },
+                {
+                    "properties": {
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/JobResponseModel"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "ExceptionDetail": {
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "description": "The type of exception"
+                },
+                "message": {
+                    "type": "string",
+                    "description": "The message string from the exception"
+                },
+                "stackTrace": {
+                    "type": "string",
+                    "description": "The stack trace captured when the exception was handled."
+                },
+                "helpLink": {
+                    "type": "string",
+                    "description": "The help link from the exception"
+                },
+                "data": {
+                    "type": "object",
+                    "description": "A map of additional data contained in the exception",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "innerException": {
+                    "$ref": "#/definitions/ExceptionDetail",
+                    "description": "Inner exception detail"
+                }
+            }
+        },
+        "JobRequestObject": {
+            "description": "An extensible model for defining the parameters of a job.\n",
+            "properties": {
+                "jobType": {
+                    "type": "string",
+                    "description": "The type of the job.",
+                    "enum": [
+                        "consolidate",
+                        "createsnapshot",
+                        "export",
+                        "import",
+                        "repeattransaction",
+                        "sparqlupdate",
+                        "transaction",
+                        "updatestats"
+                    ]
+                },
+                "label": {
+                    "type": "string",
+                    "description": "A user-friendly name for the job."
+                },
+                "jobParameters": {
+                    "type": "object",
+                    "description": "A dictionary mapping parameter name to value."
+                }
+            }
+        },
+        "StatisticsResponseModel": {
+            "properties": {
+                "commitId": {
+                    "type": "string",
+                    "description": "The unique identifier of the store commit point that the statistics were generated from"
+                },
+                "commitTimestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date/time of creation of the commit point that the statistics were generated from"
+                },
+                "predicateTripleCounts": {
+                    "description": "A map/dictionary where the key is a URI and the value is the number of\ntriples in the store that use that URI in the predicate.\n",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer",
+                        "description": "The number of triples in the store using the key as the triple predicate"
+                    }
+                },
+                "totalTripleCount": {
+                    "description": "The total number of triples in the store",
+                    "type": "integer"
+                }
+            }
+        },
+        "StatisticsList": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/PagedList"
+                },
+                {
+                    "type": "object",
+                    "required": [
+                        "items"
+                    ],
+                    "properties": {
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/StatisticsResponseModel"
+                            }
+                        }
+                    }
+                }
+            ]
         }
     }
 }
