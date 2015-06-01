@@ -14,6 +14,31 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
 
 ****************************
+ Develop Branch
+****************************
+
+	- NEW: The BrightstarDB service now provides a Swagger API description and interactive documentation. [#205]
+	
+	- NEW: The default 18 second timeout for executing SPARQL Update and SPARQL Query requests can now be 
+	  altered in the BrightstarDB service configuration file. See :ref:`Additional_Configuration_Options`
+	  for more details. Thanks to Martin Lercher for the suggestion. [#211]
+
+	- NEW: Polaris now allows defaults to *.rq and *.sq as the default extension for SPARQL queries.
+	  Thanks to Martin Lercher for the suggestion. [#216]
+		   
+	- FIX: Improvements to error reporting in the Polaris tool. Syntax errors are now properly reported for 
+	  import, SPARQL update and transactional update. Thanks to Martin Lercher for the bug report.
+		   
+	- FIX: The BrightstarDB server now uses the default Nancy view engine. This removes a dependency on
+	  Razor. [#207]
+
+	- NEW: The Entity Framework will now raise an EntityKeyRequiredException if a generated key is null or an empty string. [#199]
+	
+	- NEW: The BrightstarDB service now supports Cross-Origin Resource Sharing. This support is enabled
+	  by default but can be restricted or completely disabled in the service configuration file.
+	  For more information see :ref:`Configuring_CORS`. Thanks to Martin Lercher for the suggestion. [#210]
+
+****************************
  BrightstarDB 1.10.1
 ****************************
 

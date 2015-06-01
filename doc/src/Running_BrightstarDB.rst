@@ -381,6 +381,7 @@ To completely disable CORS, add the ``disabled`` attribute to the ``cors`` eleme
 
 	<cors disabled="true"/>
 	
+.. _Additional_Configuration_Options:
 
 Additional Configuration Options
 ================================
