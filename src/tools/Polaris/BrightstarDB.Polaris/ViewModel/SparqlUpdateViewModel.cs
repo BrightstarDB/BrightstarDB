@@ -105,6 +105,11 @@ namespace BrightstarDB.Polaris.ViewModel
                 Messages = sqe.ToString();
                 return;
             }
+            catch (SparqlUpdateException sue)
+            {
+                SummaryMessage = "Update error - see message tab for details.";
+                Messages = sue.ToString();
+            }
             catch (Exception ex)
             {
                 SummaryMessage = "Query error - see message tab for details.";
