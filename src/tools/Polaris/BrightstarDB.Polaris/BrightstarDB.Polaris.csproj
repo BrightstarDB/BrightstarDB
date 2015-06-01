@@ -113,6 +113,7 @@
     <Compile Include="Converters\SparqlColumnSelector.cs" />
     <Compile Include="Converters\TypeMatchConverter.cs" />
     <Compile Include="Converters\VisibilityConverter.cs" />
+    <Compile Include="IJobInfoExtensions.cs" />
     <Compile Include="Messages\AppExitMessage.cs" />
     <Compile Include="Messages\ShowFileDialogMessage.cs" />
     <Compile Include="Messages\CloseTabMessage.cs" />

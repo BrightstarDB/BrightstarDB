@@ -2,10 +2,12 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Polaris.Messages;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -232,7 +234,7 @@ namespace BrightstarDB.Polaris.ViewModel
                     ProgressText = String.IsNullOrEmpty(_transactionJob.StatusMessage)
                                        ? "Import job failed. No further details provided by the server."
                                        : String.Format("Import job failed. Server reports : '{0}'",
-                                                       _transactionJob.StatusMessage);
+                                       _transactionJob.ExtractJobErrorMessage(stopOnFirstDetailMessage:true));
                     Messenger.Default.Send(new ShowDialogMessage(Strings.ImportFailedDialogTitle,
                                                                  String.Format(Strings.ImportFailedDialogMsg,
                                                                                Store.Location),
@@ -251,6 +253,8 @@ namespace BrightstarDB.Polaris.ViewModel
                     "Error retrieving job status information from server. This may indicate a networking problem or that the server has stopped running.";
             }
         }
+
+        
 
         private void HandleRemoteImportChecked()
         {
