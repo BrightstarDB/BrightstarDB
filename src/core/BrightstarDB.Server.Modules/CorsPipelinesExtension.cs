@@ -20,18 +20,25 @@ namespace BrightstarDB.Server.Modules
             });
             pipelines.OnError.AddItemToEndOfPipeline((ctx, exception) =>
             {
-                if (exception != null)
+                if (exception == null)
                 {
-                    if (ctx.Request.Headers.Accept.Any(x => x.Item1.ToLowerInvariant().Contains("application/json")))
-                    {
-                        // Return the exception detail as JSON
-                        var jsonResponse = new JsonResponse(new ExceptionDetailObject(exception),
-                            new DefaultJsonSerializer()) {StatusCode = HttpStatusCode.InternalServerError};
-                        UpdateResponseHeaders(ctx.Request, jsonResponse, corsConfiguration);
-                        return jsonResponse;
-                    }
+                    // Nothing to serialize, just return default 500 response
+                    return HttpStatusCode.InternalServerError;
                 }
-                return HttpStatusCode.InternalServerError;
+                Response response;
+                if (ctx.Request.Headers.Accept.Any(x => x.Item1.ToLowerInvariant().Contains("application/json")))
+                {
+                    // Return the exception detail as JSON
+                    response = new JsonResponse(new ExceptionDetailObject(exception),
+                        new DefaultJsonSerializer()) {StatusCode = HttpStatusCode.InternalServerError};
+                }
+                else
+                {
+                    // Return the exception message as text/plain
+                    response = new TextResponse(HttpStatusCode.InternalServerError, exception.Message);
+                }
+                UpdateResponseHeaders(ctx.Request, response, corsConfiguration);
+                return response;
             });
         }
 
