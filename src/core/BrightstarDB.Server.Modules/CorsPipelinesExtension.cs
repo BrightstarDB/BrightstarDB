@@ -1,7 +1,12 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Configuration;
 using Nancy;
 using Nancy.Bootstrapper;
+using Nancy.Responses;
+using Nancy.Responses.Negotiation;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -11,17 +16,35 @@ namespace BrightstarDB.Server.Modules
         {
             pipelines.AfterRequest.AddItemToEndOfPipeline(ctx =>
             {
-                if (ctx.Request.Headers.Keys.Contains("Origin"))
+                UpdateResponseHeaders(ctx.Request, ctx.Response, corsConfiguration);
+            });
+            pipelines.OnError.AddItemToEndOfPipeline((ctx, exception) =>
+            {
+                if (exception != null)
                 {
-                    ctx.Response.WithHeader("Access-Control-Allow-Origin", corsConfiguration.AllowOrigin);
-                    if (ctx.Request.Method.Equals("OPTIONS"))
+                    if (ctx.Request.Headers.Accept.Any(x => x.Item1.ToLowerInvariant().Contains("application/json")))
                     {
-                        ctx.Response
-                            .WithHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
-                            .WithHeader("Access-Control-Allow-Headers", "Accept, Origin, Content-type");
+                        // Return the exception detail as JSON
+                        var jsonResponse = new JsonResponse(new ExceptionDetailObject(exception),
+                            new DefaultJsonSerializer()) {StatusCode = HttpStatusCode.InternalServerError};
+                        UpdateResponseHeaders(ctx.Request, jsonResponse, corsConfiguration);
+                        return jsonResponse;
                     }
                 }
+                return HttpStatusCode.InternalServerError;
             });
+        }
+
+        private static void UpdateResponseHeaders(Request request, Response response, CorsConfiguration corsConfiguration)
+        {
+            if (!request.Headers.Keys.Contains("Origin")) return;
+            response.WithHeader("Access-Control-Allow-Origin", corsConfiguration.AllowOrigin);
+            if (request.Method.Equals("OPTIONS"))
+            {
+                response
+                    .WithHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+                    .WithHeader("Access-Control-Allow-Headers", "Accept, Origin, Content-type");
+            }
         }
     }
 }

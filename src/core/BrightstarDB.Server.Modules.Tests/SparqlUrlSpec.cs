@@ -389,6 +389,29 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.Body.AsString().Contains("<form method=\"POST\">"));
         }
 
+        [Test]
+        public void TestCorsHeaderOn404Response()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            ISerializationFormat fmt = SparqlResultsFormat.Xml;
+            brightstar.Setup(
+                x =>
+                    x.ExecuteQuery("foo", It.IsAny<string>(), null, null,
+                        It.IsAny<SparqlResultsFormat>(),
+                        It.IsAny<RdfFormat>(), out fmt)).Throws(
+                        new NoSuchStoreException("foo"));
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+            var response = app.Get("/foo/sparql", with =>
+            {
+                with.Query("query", SparqlQueryString);
+                with.Accept(SparqlXml);
+                with.Header("Origin", "http://example.com/");
+            });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(response.Headers["Access-Control-Allow-Origin"], Is.EqualTo("*"));
+        }
+
         #region Helper Methods
         private static BrowserResponse TestGetFails(
             HttpStatusCode expectedStatusCode,

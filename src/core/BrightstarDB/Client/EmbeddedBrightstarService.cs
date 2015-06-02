@@ -253,6 +253,7 @@ namespace BrightstarDB.Client
             if (queryExpression == null) throw new ArgumentNullException("queryExpression");
             if (resultsFormat == null && graphFormat == null) throw new ArgumentException("Either resultsFormat or graphFormat must be non-NULL");
 
+            if (!_serverCore.DoesStoreExist(storeName)) throw new NoSuchStoreException(storeName);
             try
             {
                 var pStream = new MemoryStream();

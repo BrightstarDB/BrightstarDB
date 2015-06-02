@@ -217,7 +217,7 @@
     <Compile Include="Rdf\RdfXmlWriter.cs" />
     <Compile Include="SerializableModel.cs" />
     <Compile Include="Server\GuardedUpdateTransaction.cs" />
-    <Compile Include="Server\NoSuchStoreException.cs" />
+    <Compile Include="Client\NoSuchStoreException.cs" />
     <Compile Include="Server\QueryCacheEntry.cs" />
     <Compile Include="Server\SnapshotJob.cs" />
     <Compile Include="Server\StatsMonitor.cs" />
