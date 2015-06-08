@@ -80,6 +80,7 @@
     </Compile>
     <Compile Include="DataObjectTests.cs" />
     <Compile Include="GraphStoreProtocolTests.cs" />
+    <Compile Include="HttpTests\CorsHandlingTests.cs" />
     <Compile Include="OptimisticLockingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteProxyTests.cs" />
