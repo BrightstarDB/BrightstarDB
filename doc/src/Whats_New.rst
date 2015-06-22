@@ -23,9 +23,12 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
 	  altered in the BrightstarDB service configuration file. See :ref:`Additional_Configuration_Options`
 	  for more details. Thanks to Martin Lercher for the suggestion. [#211]
 
+	- NEW: The Import panel in Polaris now remembers the last-used file extension filter from the file selection
+	  dialog. Thanks to Martin Lercher for the suggestion. [#215]
+		   
 	- NEW: Polaris now allows defaults to *.rq and *.sq as the default extension for SPARQL queries.
 	  Thanks to Martin Lercher for the suggestion. [#216]
-		   
+	  
 	- FIX: Improvements to error reporting in the Polaris tool. Syntax errors are now properly reported for 
 	  import, SPARQL update and transactional update. Thanks to Martin Lercher for the bug report.
 		   
