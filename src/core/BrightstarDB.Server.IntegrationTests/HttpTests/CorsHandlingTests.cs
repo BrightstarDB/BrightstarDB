@@ -24,9 +24,10 @@ namespace BrightstarDB.Server.IntegrationTests.HttpTests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
         }
 
+        [TestFixtureTearDown]
         public void TestFixtureTearDown()
         {
-            BrightstarDB.Client.BrightstarService.Shutdown();
+            CloseService();
         }
 
         [Test]
