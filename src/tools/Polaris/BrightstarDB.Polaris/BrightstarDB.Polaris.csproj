@@ -124,6 +124,7 @@
     <Compile Include="Messages\ShowWindowMessage.cs" />
     <Compile Include="Messages\TabItemActionMessage.cs" />
     <Compile Include="Configuration\PolarisConfigurationModel.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
