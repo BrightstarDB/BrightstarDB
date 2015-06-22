@@ -40,6 +40,10 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
 	- NEW: The BrightstarDB service now supports Cross-Origin Resource Sharing. This support is enabled
 	  by default but can be restricted or completely disabled in the service configuration file.
 	  For more information see :ref:`Configuring_CORS`. Thanks to Martin Lercher for the suggestion. [#210]
+	  
+	- NEW: The SPARQL Update implementation now supports the use of the BrightstarDB wildcard IRI specification
+	  in DELETE and DELETE DATA commands. For more information please refer to :ref:`RDF_Client_API_SPARQL_Update`. 
+	  Thanks to Martin Lercher for the suggestion. [#217]
 
 ****************************
  BrightstarDB 1.10.1
