@@ -549,5 +549,28 @@ namespace BrightstarDB.EntityFramework.Query
         {
             return _ordering == null ? new OrderingDirection[0] : _ordering.Select(x => x.OrderingDirection);
         }
+
+        private bool _haveFirstUnionElement = false;
+
+        public void StartUnion()
+        {
+            _haveFirstUnionElement = false;
+        }
+
+        public void StartUnionElement()
+        {
+            _graphPatternBuilder.Append(!_haveFirstUnionElement ? " { " : " UNION { ");
+            _haveFirstUnionElement = true;
+        }
+
+        public void EndUnionElement()
+        {
+            _graphPatternBuilder.Append("} ");
+        }
+
+        public void EndUnion()
+        {
+            _haveFirstUnionElement = false;
+        }
     }
 }
