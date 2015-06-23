@@ -96,11 +96,97 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
+        [Test]
+        public void TestAddOrUpdateWithGeneratedId()
+        {
+            var storeName = "TestAddOrUpdateWithGeneratedId" + DateTime.UtcNow.Ticks;
+            var alice = new Person{Name="Alice", Age=25};
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.Persons.AddOrUpdate(alice);
+                context.SaveChanges();
+            }
+            Assert.IsNotNull(alice.Id);
+            var updateAlice = new Person {Id = alice.Id, Name = "UpdatedAlice", Age = 26};
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.Persons.AddOrUpdate(updateAlice);
+                context.SaveChanges();
+            }
+            Assert.AreEqual(alice.Id, updateAlice.Id);
+            using (var context = CreateEntityContext(storeName))
+            {
+                var people = context.Persons.ToList();
+                Assert.AreEqual(1, people.Count);
+                var p = people[0];
+                Assert.AreEqual("UpdatedAlice", p.Name);
+                Assert.AreEqual(26, p.Age);
+            }
+        }
+
+        [Test]
+        public void TestAddOrUpdateWithSimpleKey()
+        {
+            var storeName = "TestAddOrUpdateWithSimpleKey" + DateTime.UtcNow.Ticks;
+            var alice = new StringKeyEntity { Name = "alice", Description = "Alice Entity"};
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.StringKeyEntities.AddOrUpdate(alice);
+                context.SaveChanges();
+            }
+            Assert.IsNotNull(alice.Id);
+            Assert.AreEqual("alice", alice.Id);
+            var updateAlice = new StringKeyEntity{ Id = "alice", Description= "UpdatedAlice Entity"};
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.StringKeyEntities.AddOrUpdate(updateAlice);
+                context.SaveChanges();
+            }
+            Assert.AreEqual("alice", updateAlice.Id);
+            using (var context = CreateEntityContext(storeName))
+            {
+                var people = context.StringKeyEntities.ToList();
+                Assert.AreEqual(1, people.Count);
+                var p = people[0];
+                Assert.AreEqual("alice", p.Name);
+                Assert.AreEqual("UpdatedAlice Entity", p.Description);
+            }
+        }
+
+        [Test]
+        public void TestAddOrUpdateWithCompositeKey()
+        {
+            var storeName = "TestAddOrUpdateWithCompositeKey" + DateTime.UtcNow.Ticks;
+            var foo1 = new CompositeKeyEntity { First = "foo", Second = 1, Description="This is a test" };
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.CompositeKeyEntities.AddOrUpdate(foo1);
+                context.SaveChanges();
+            }
+            Assert.IsNotNull(foo1.Id);
+            Assert.AreEqual("foo.1", foo1.Id);
+            var updatedFoo1 = new CompositeKeyEntity{ First = "foo", Second = 1, Description = "This is an updated test" };
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.CompositeKeyEntities.AddOrUpdate(updatedFoo1);
+                context.SaveChanges();
+            }
+            Assert.AreEqual("foo.1", updatedFoo1.Id);
+            using (var context = CreateEntityContext(storeName))
+            {
+                var people = context.CompositeKeyEntities.ToList();
+                Assert.AreEqual(1, people.Count);
+                var p = people[0];
+                Assert.AreEqual("foo", p.First);
+                Assert.AreEqual(1, p.Second);
+                Assert.AreEqual("This is an updated test", p.Description);
+            }
+        }
 
         [Test]
         public void TestCustomTriplesQuery()
         {
-            string storeName = Guid.NewGuid().ToString();
+            var storeName = Guid.NewGuid().ToString();
             var people = new Person[10];
             using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
             {

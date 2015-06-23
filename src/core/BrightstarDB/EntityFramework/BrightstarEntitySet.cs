@@ -99,5 +99,51 @@ namespace BrightstarDB.EntityFramework
                 beo.Attach(_context);
             }
         }
+
+        /// <summary>
+        /// Adds a new item to the entity set or updates an existing item
+        /// </summary>
+        /// <remarks>
+        /// <p>
+        /// If <paramref name="item"/> has a non-null and non-empty <see cref="BrightstarEntityObject.Identity"/> property
+        /// then any existing entity then the existing entity will be updated with all of the properties of <paramref name="item"/>.
+        /// If <paramref name="item"/> has a null or empty <see cref="BrightstarEntityObject.Identity"/> property
+        /// then a new entity will be added and the Identity of <paramref name="item"/> updated accordingly.
+        /// </p>
+        /// </remarks>
+        /// <param name="item">The item to be added or updated</param>
+        public void AddOrUpdate(T item)
+        {
+            if (item == null) throw new ArgumentNullException("item");
+            var beo = item as BrightstarEntityObject;
+            if (beo == null)
+            {
+                throw new EntityFrameworkException("Only items of type {0} can be added to an BrightstarEntitySet", typeof(BrightstarEntityObject).FullName);
+            }
+            if (beo.IsAttached)
+            {
+                if (!beo.Context.Equals(_context))
+                {
+                    throw new EntityFrameworkException(
+                        "Object is already attached to a different context. It must be detached from its current context before adding it to a new context.");
+                }
+            }
+            else
+            {
+                beo.AssertIdentity(null);
+                beo.Attach(_context, true);
+            }
+        }
+
+        /// <summary>
+        /// Adds or updates all members of <paramref name="items"/>.
+        /// </summary>
+        /// <remarks>This is a convenience method that is equivalent to calling the <see cref="AddOrUpdate"/> method for all members of <paramref name="items"/>.</remarks>
+        /// <param name="items">An enumeration yielding the items to be added or updated.</param>
+        public void AddOrUpdateRange(IEnumerable<T> items)
+        {
+            if (items == null) throw new ArgumentNullException("items");
+            foreach(var item in items) AddOrUpdate(item);
+        }
     }
 }

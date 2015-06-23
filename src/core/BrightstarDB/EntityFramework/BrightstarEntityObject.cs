@@ -775,7 +775,8 @@ namespace BrightstarDB.EntityFramework
         /// Attaches the object to the specified context
         /// </summary>
         /// <param name="context"></param>
-        public void Attach(EntityContext context)
+        /// <param name="overwriteExisting"></param>
+        public void Attach(EntityContext context, bool overwriteExisting = false)
         {
             if (context == null) throw new ArgumentNullException("context");
             if (!(context is BrightstarEntityContext))
@@ -797,7 +798,7 @@ namespace BrightstarDB.EntityFramework
             {
                 DataObject = _context.GetDataObject(new Uri(_identity), false);
                 var identityInfo = EntityMappingStore.GetIdentityInfo(GetType());
-                if (identityInfo != null && identityInfo.EnforceClassUniqueConstraint)
+                if (identityInfo != null && identityInfo.EnforceClassUniqueConstraint && !overwriteExisting)
                 {
                     _context.EnforceClassUniqueConstraint(_identity, EntityMappingStore.MapTypeToUris(GetType()));
                 }

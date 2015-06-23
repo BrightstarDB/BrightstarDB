@@ -39,7 +39,7 @@ namespace BrightstarDB.EntityFramework.Tests.ContextObjects
             throw new NotImplementedException();
         }
 
-        public void Attach(EntityContext context)
+        public void Attach(EntityContext context, bool overwriteExisting)
         {
             throw new NotImplementedException();
         }
