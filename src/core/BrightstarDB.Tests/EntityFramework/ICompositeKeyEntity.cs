@@ -14,5 +14,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         string First { get; set; }
         int Second { get; set; }
+
+        string Description { get; set; }
     }
 }

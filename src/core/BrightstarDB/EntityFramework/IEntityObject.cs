@@ -77,7 +77,8 @@ namespace BrightstarDB.EntityFramework
         /// Attaches the object to the specified context
         /// </summary>
         /// <param name="context"></param>
-        void Attach(EntityContext context);
+        /// <param name="overwriteExisting"></param>
+        void Attach(EntityContext context, bool overwriteExisting = false);
 
         /// <summary>
         /// Removes the object from its current context
