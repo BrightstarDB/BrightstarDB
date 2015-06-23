@@ -26,7 +26,7 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
 	- NEW: The Import panel in Polaris now remembers the last-used file extension filter from the file selection
 	  dialog. Thanks to Martin Lercher for the suggestion. [#215]
 		   
-	- NEW: Polaris now allows defaults to *.rq and *.sq as the default extension for SPARQL queries.
+	- NEW: Polaris now allows defaults to \*.rq and \*.sq as the default extension for SPARQL queries.
 	  Thanks to Martin Lercher for the suggestion. [#216]
 	  
 	- FIX: Improvements to error reporting in the Polaris tool. Syntax errors are now properly reported for 
@@ -44,6 +44,9 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
 	- NEW: The SPARQL Update implementation now supports the use of the BrightstarDB wildcard IRI specification
 	  in DELETE and DELETE DATA commands. For more information please refer to :ref:`RDF_Client_API_SPARQL_Update`. 
 	  Thanks to Martin Lercher for the suggestion. [#217]
+	  
+	- NEW: Added support for retrieving a set of entities by their ID in a single LINQ query. For more information
+	  please refer to :ref:`Example_LINQ_Queries`. Thanks to kentcb for the suggestion [#190]
 
 ****************************
  BrightstarDB 1.10.1

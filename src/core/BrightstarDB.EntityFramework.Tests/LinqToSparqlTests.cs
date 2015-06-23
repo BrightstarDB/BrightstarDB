@@ -74,6 +74,26 @@ namespace BrightstarDB.EntityFramework.Tests
         }
 
         [Test]
+        public void TestGetDinnersByIds()
+        {
+            var q = from x in Context.Dinners where new string[] {"1", "2", "3"}.Contains(x.Id) select x;
+            var results = q.ToList();
+            var lastSparql = Context.LastSparqlQuery;
+            Assert.AreEqual(
+                NormalizeSparql(@"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" .} WHERE {
+?x ?x_p ?x_o . {
+SELECT ?x WHERE {
+  ?x a <http://www.networkedplanet.com/schemas/test/Dinner> . 
+  { BIND(<id:1> AS ?x) } 
+  UNION
+  { BIND(<id:2> AS ?x) } 
+  UNION
+  { BIND(<id:3> AS ?x) } 
+} } }"),
+            NormalizeSparql(lastSparql));
+        }
+
+        [Test]
         public void TestIdEscaping(){
             var q = Context.Dinners.FirstOrDefault(x => x.Id == "foo bar");
             AssertQuerySparql("ASK { <id:foo%20bar> a <http://www.networkedplanet.com/schemas/test/Dinner> . }");
