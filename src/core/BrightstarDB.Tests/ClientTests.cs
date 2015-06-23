@@ -370,6 +370,14 @@ namespace BrightstarDB.Tests
             rows = result.SparqlResultRows().ToList();
             Assert.AreEqual(1, rows.Count);
             Assert.AreEqual(new Uri("http://example.org/resource2"), rows[0].GetColumnValue("o"));
+
+            // Issue #221: It should be possible to pass NULL for the default graph IRI without causing and invalid query POST
+            resultStream = client.ExecuteQuery(storeName, "select ?p ?o where { <http://example.org/resource13> ?p ?o }", (string)null, null, SparqlResultsFormat.Xml, RdfFormat.RdfXml);
+            result = XDocument.Load(resultStream);
+            rows = result.SparqlResultRows().ToList();
+            Assert.AreEqual(1, rows.Count);
+            Assert.AreEqual(new Uri("http://example.org/resource2"), rows[0].GetColumnValue("o"));
+
         }
 
         [Test]
@@ -508,7 +516,7 @@ namespace BrightstarDB.Tests
             var client =
                 BrightstarService.GetClient("type=embedded;storesDirectory=c:\\brightstar;storeName=" + storeName);
 
-            const string tripleData = "<http://www.networkedplanet.com/people/gra> <<http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
+            const string tripleData = "<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
             client.CreateStore(storeName);
             client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData =  tripleData});
         }
@@ -532,7 +540,7 @@ namespace BrightstarDB.Tests
                 client.CreateStore(storeName);
             }
 
-            const string tripleData = "<http://www.networkedplanet.com/people/gra> <<http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
+            const string tripleData = "<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
 
             client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = tripleData});
         }

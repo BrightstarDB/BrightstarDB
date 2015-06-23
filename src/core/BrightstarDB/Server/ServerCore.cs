@@ -181,7 +181,8 @@ namespace BrightstarDB.Server
             {
                 throw new BrightstarStoreNotModifiedException();
             }
-            var g = defaultGraphUris == null ? null : defaultGraphUris.ToArray();
+            var g = defaultGraphUris == null ? null : defaultGraphUris.Where(x=>!string.IsNullOrEmpty(x)).ToArray();
+            if (g != null && g.Length == 0) g = null;
             var query = ParseSparql(queryExpression);
             var targetFormat = QueryReturnsGraph(query) ? (ISerializationFormat) graphFormat : sparqlResultFormat;
 

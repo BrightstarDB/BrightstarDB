@@ -331,7 +331,9 @@ namespace BrightstarDB.Client
             var parameters = new List<Tuple<string, string>> { new Tuple<string, string>("query", queryExpression) };
             if (defaultGraphUris != null)
             {
-                parameters.AddRange(defaultGraphUris.Select(g => new Tuple<string, string>("default-graph-uri", g)));
+                parameters.AddRange(
+                    graphs.Where(x => !string.IsNullOrEmpty(x))
+                        .Select(g => new Tuple<string, string>("default-graph-uri", g)));
             }
 
             // Execute
@@ -413,8 +415,8 @@ namespace BrightstarDB.Client
                                    SparqlResultsFormat resultsFormat = null,
             RdfFormat graphFormat = null)
         {
-            return ExecuteQuery(storeName, queryExpression, new[] {defaultGraphUri}, ifNotModifiedSince,
-                                resultsFormat, graphFormat);
+            return ExecuteQuery(storeName, queryExpression, defaultGraphUri == null ? null : new[] {defaultGraphUri},
+                ifNotModifiedSince, resultsFormat, graphFormat);
         }
 
         /// <summary>
@@ -536,7 +538,8 @@ namespace BrightstarDB.Client
             if (defaultGraphUris != null)
             {
                 postParameters.AddRange(
-                    defaultGraphUris.Select(graphUri => new Tuple<string, string>("default-graph-uri", graphUri)));
+                    defaultGraphUris.Where(x => !string.IsNullOrEmpty(x))
+                        .Select(graphUri => new Tuple<string, string>("default-graph-uri", graphUri)));
             }
             var queryResponse = AuthenticatedFormPost(queryUri, postParameters, MakeAcceptHeader(resultsFormat, graphFormat));
             streamFormat = SparqlResultsFormat.GetResultsFormat(queryResponse.ContentType) ??
@@ -1295,8 +1298,9 @@ namespace BrightstarDB.Client
 
         private static readonly byte[] Mark = new byte[] { (byte)'-', (byte)'_', (byte)'.', (byte)'~' };
 
-        private static String EscapeDataString(string value)
+        private static string EscapeDataString(string value)
         {
+            if (string.IsNullOrEmpty(value)) return string.Empty;
             var escapeBuilder = new StringBuilder();
             var bytes = Encoding.UTF8.GetBytes(value);
             foreach (var octet in bytes)

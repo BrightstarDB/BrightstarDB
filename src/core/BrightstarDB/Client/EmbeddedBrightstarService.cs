@@ -209,7 +209,7 @@ namespace BrightstarDB.Client
                                    SparqlResultsFormat resultsFormat = null,
             RdfFormat graphFormat = null)
         {
-            return ExecuteQuery(storeName, queryExpression, new[] { defaultGraphUri }, ifNotModifiedSince,
+            return ExecuteQuery(storeName, queryExpression, defaultGraphUri == null ? null : new[] { defaultGraphUri }, ifNotModifiedSince,
                                 resultsFormat, graphFormat);
         }
 
@@ -257,8 +257,10 @@ namespace BrightstarDB.Client
             try
             {
                 var pStream = new MemoryStream();
-                streamFormat = _serverCore.Query(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince,
-                                                 resultsFormat, graphFormat, pStream);
+                streamFormat = _serverCore.Query(storeName, queryExpression,
+                    defaultGraphUris == null ? null : defaultGraphUris.Where(x => !string.IsNullOrEmpty(x)), 
+                    ifNotModifiedSince, resultsFormat,
+                    graphFormat, pStream);
                 return new MemoryStream(pStream.ToArray());
             }
             catch (BrightstarStoreNotModifiedException)
