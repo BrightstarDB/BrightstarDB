@@ -780,6 +780,12 @@ namespace BrightstarDB.Tests.EntityFramework
             		get { return GetRelatedProperty<System.Int32>("Second"); }
             		set { SetRelatedProperty("Second", value); }
     	}
+    
+    	public System.String Description
+    	{
+            		get { return GetRelatedProperty<System.String>("Description"); }
+            		set { SetRelatedProperty("Description", value); }
+    	}
     	#endregion
     }
 }
