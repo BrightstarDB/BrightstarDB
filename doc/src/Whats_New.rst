@@ -47,6 +47,12 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
 	  
 	- NEW: Added support for retrieving a set of entities by their ID in a single LINQ query. For more information
 	  please refer to :ref:`Example_LINQ_Queries`. Thanks to kentcb for the suggestion [#190]
+	  
+	- NEW: Added AddOrUpdate method to entity sets. When an entity is added to a context using AddOrUpdate,
+	  if the entity has an existing identity then this identity is used and any existing entity with the same
+	  identity is overwritten; if the entity does not have an existing identity, then a new identity is generated
+	  for it. Thanks to kentcb for the suggestion [#193]
+	
 
 ****************************
  BrightstarDB 1.10.1

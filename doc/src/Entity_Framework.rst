@@ -897,6 +897,11 @@ in the context.
     generic SPARQL back-end, as the SPARQL UPDATE protocol does not allow for such transaction
     pre-conditions to be checked.
 
+.. note::
+	Key constraints are **not** validated if you use the AddOrUpdate method to add
+	an item to the context. In this case, an existing item with the same key will
+	simply be overwritten by the item being added.
+	
 Changing Identifiers
 --------------------
 
