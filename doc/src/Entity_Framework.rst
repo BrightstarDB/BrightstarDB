@@ -130,7 +130,6 @@ model. To get an entity by a given property the following can be used::
                          c => c.Name.Equals("BrightstarDB")).FirstOrDefault();
 
 
-
 Once an entity has been retrieved it can be modified or related entities can be fetched::
 
   // fetching employees
@@ -183,6 +182,69 @@ Saving the changes that have occurred is easily done by calling a method on the 
 
   dataContext.SaveChanges();
 
+.. _Example_LINQ_Queries:
+
+Example LINQ Queries
+====================
+
+LINQ provides you with a flexible query language with the added advantage of Intellisense
+type-checking. In this section we show a few LINQ query patterns that are commonly used with
+the BrightstarDB entity framework. All of the examples assume that the ``context`` variable
+is a BrightstarDB Entity Framework context.
+
+To retrieve an entity by its ID
+-------------------------------
+
+.. code-block:: c#
+
+	var bob = context.Persons.Where(x=>x.Id.Equals("bob"));
+  
+To retrieve several entities by their IDs
+-----------------------------------------
+
+.. code-block:: c#
+
+	var people = context.Persons.Where(x=>new []{"bob", "sue", "rita"}.Contains(x.Id));
+
+A simple property filter
+------------------------
+
+.. code-block:: c#
+
+    var youngsters = context.Persons.Where(x=>x.Age < 21);
+	
+Sorting results
+---------------
+
+.. code-block:: c#
+
+    var byAge = context.Persons.OrderBy(x=>x.Age);
+	var byAgeDescending = context.Persons.OrderByDescending(x=>x.Age);
+	
+Retrieving related items
+------------------------
+
+.. code-block:: c#
+
+	var fathers = context.Persons.Select(x=>x.Father);
+	var bartsFather = context.Persons.Where(x=>x.Id.Equals("bart")).FirstOrDefault(x=>x.Father);
+	
+Return complex values as anonymous objects
+------------------------------------------
+
+.. code-block:: c#
+
+    var stockInfo = from x in context.Companies select new {x.Name, x.TickerSymbol, x.Price};
+	
+Aggregates
+----------
+
+.. code-block:: c#
+
+	var averageHeadcount = context.Companies.Average(x=>x.HeadCount);
+	var smallestCompanySize = context.Companies.Min(x=>x.HeadCount);
+	var largestCompanySize = context.Companies.Max(x=>x.HeadCount);
+	
 
 .. _Annotations_Guide:
 
@@ -967,7 +1029,7 @@ Any                Supported as first result operator. Not supported as second o
 All                Supported as first result operator. Not supported as second or subsequent result operator  
 Average            Supported as first result operator. Not supported as second or subsequent result operator.  
 Cast               Supported for casting between Entity Framework entity types only  
-Contains           Supported for literal values only  
+Contains           Supported for literal values as a filter (e.g. ``x=>x.SomeProperty.Contains("foo")`` )
 Count              Supported with or without a Boolean filter expression. Supported as first result operator. Not supported as second or subsequent result operator.  
 Distinct           Supported for literal values. For entities ``Distinct()`` is supported but only to eliminate duplicates of the same Id any override of .Equals on the entity class is not used.  
 First              Supported with or without a Boolean filter expression  

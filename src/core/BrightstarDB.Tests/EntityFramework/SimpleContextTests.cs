@@ -7,6 +7,7 @@ using BrightstarDB.EntityFramework;
 using BrightstarDB.EntityFramework.Query;
 using NUnit.Framework;
 using System.ComponentModel;
+using VDS.RDF.Query.Algebra;
 using UnitTesting = NUnit.Framework;
 #if !PORTABLE
 using System.ComponentModel.DataAnnotations;
@@ -234,9 +235,29 @@ where {
 
                 }
             }
+        }
 
+        [Test]
+        public void TestGetSetOfEntitiesById()
+        {
+            var storeName = "TestGetSetOfEntitiesById_" + DateTime.Now.Ticks;
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.Persons.Add(new Person{Id="alice", Name = "Alice"});
+                context.Persons.Add(new Person { Id = "bob", Name = "Bob" });
+                context.Persons.Add(new Person { Id = "carol", Name = "Carol" });
+                context.SaveChanges();
+            }
 
-
+            using (var context = CreateEntityContext(storeName))
+            {
+                var results =
+                    context.Persons.Where(x => new string[] {"alice", "bob", "carol", "david"}.Contains(x.Id)).ToList();
+                Assert.AreEqual(3, results.Count);
+                Assert.IsTrue(results.Any(x=>x.Id.Equals("alice") && x.Name.Equals("Alice")));
+                Assert.IsTrue(results.Any(x => x.Id.Equals("bob") && x.Name.Equals("Bob")));
+                Assert.IsTrue(results.Any(x => x.Id.Equals("carol") && x.Name.Equals("Carol")));
+            }
         }
 
         [Test]
