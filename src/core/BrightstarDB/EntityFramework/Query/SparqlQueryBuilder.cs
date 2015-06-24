@@ -112,30 +112,24 @@ namespace BrightstarDB.EntityFramework.Query
                     GraphNode.Iri, typeUri);
             }
             AddQuerySourceMapping(querySource, new SelectVariableNameExpression(itemVarName, VariableBindingType.Resource, querySource.ItemType));
-            if (querySource is MainFromClause)
+            var mfc = querySource as MainFromClause;
+            if (mfc == null) return itemVarName;
+            var fromExpr = mfc.FromExpression as ConstantExpression;
+            if (fromExpr == null) return itemVarName;
+            var fromCollection = fromExpr.Value as IBrightstarEntityCollection;
+            if (fromCollection == null) return itemVarName;
+            if (fromCollection.IsInverseProperty)
             {
-                var mfc = querySource as MainFromClause;
-                if (mfc.FromExpression is ConstantExpression)
-                {
-                    var fromExpr = mfc.FromExpression as ConstantExpression;
-                    if (fromExpr.Value is IBrightstarEntityCollection)
-                    {
-                        var fromCollection = fromExpr.Value as IBrightstarEntityCollection;
-                        if (fromCollection.IsInverseProperty)
-                        {
 
-                            AddTripleConstraint(GraphNode.Variable, itemVarName,
-                                                GraphNode.Iri, fromCollection.PropertyIdentity,
-                                                GraphNode.Iri, fromCollection.ParentIdentity);
-                        }
-                        else
-                        {
-                            AddTripleConstraint(GraphNode.Iri, fromCollection.ParentIdentity,
-                                                GraphNode.Iri, fromCollection.PropertyIdentity,
-                                                GraphNode.Variable, itemVarName);
-                        }
-                    }
-                }
+                AddTripleConstraint(GraphNode.Variable, itemVarName,
+                    GraphNode.Iri, fromCollection.PropertyIdentity,
+                    GraphNode.Iri, fromCollection.ParentIdentity);
+            }
+            else
+            {
+                AddTripleConstraint(GraphNode.Iri, fromCollection.ParentIdentity,
+                    GraphNode.Iri, fromCollection.PropertyIdentity,
+                    GraphNode.Variable, itemVarName);
             }
             return itemVarName;
         }
@@ -143,13 +137,13 @@ namespace BrightstarDB.EntityFramework.Query
         public string IntroduceNamedVariable(string varName)
         {
             var safeVarName = SafeSparqlVarName(varName);
-            if (this._namedVariables.Contains(safeVarName))
+            if (_namedVariables.Contains(safeVarName))
             {
                 var suffix = 1;
-                while (this._namedVariables.Contains(safeVarName + suffix)) suffix++;
+                while (_namedVariables.Contains(safeVarName + suffix)) suffix++;
                 safeVarName = safeVarName + suffix;
             }
-            this._namedVariables.Add(safeVarName);
+            _namedVariables.Add(safeVarName);
             return safeVarName;
         }
 
@@ -292,7 +286,7 @@ namespace BrightstarDB.EntityFramework.Query
             if (withDatasetDescription) AppendFromClause(queryStringBuilder);
             queryStringBuilder
                 .Append("WHERE {")
-                .Append(_graphPatternBuilder.ToString());
+                .Append(_graphPatternBuilder);
 
             if (projectSortVariables)
             {
@@ -454,19 +448,17 @@ namespace BrightstarDB.EntityFramework.Query
 
         private string ReplaceFixedVariables(string query)
         {
-            foreach(string varName in _variableValueMapping.Keys)
+            foreach(var varName in _variableValueMapping.Keys)
             {
                 if (_selectVars.Contains(varName))
                 {
                     // selected variables cannot be replaced
                     continue;
                 }
-                string matchPattern = @"([\s+|\.|\{|\(])\?(" + Regex.Escape(varName) + @")([\s+|,|=|]|\.|\))";
-                query = Regex.Replace(query, matchPattern, m =>
-                                                               {
-                                                                   return m.Groups[1] + _variableValueMapping[varName] +
-                                                                   m.Groups[3];
-                                                               });
+                var matchPattern = @"([\s+|\.|\{|\(])\?(" + Regex.Escape(varName) + @")([\s+|,|=|]|\.|\))";
+                var name = varName;
+                query = Regex.Replace(query, matchPattern, m => m.Groups[1] + _variableValueMapping[name] +
+                                                                m.Groups[3]);
             }
             return query;
         }
@@ -550,7 +542,7 @@ namespace BrightstarDB.EntityFramework.Query
             return _ordering == null ? new OrderingDirection[0] : _ordering.Select(x => x.OrderingDirection);
         }
 
-        private bool _haveFirstUnionElement = false;
+        private bool _haveFirstUnionElement;
 
         public void StartUnion()
         {
