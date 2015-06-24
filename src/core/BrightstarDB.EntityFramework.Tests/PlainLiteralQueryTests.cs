@@ -22,11 +22,10 @@ namespace BrightstarDB.EntityFramework.Tests
             var q = Context.Concepts.Where(c => c.PrefLabel.Equals(new PlainLiteral("Test", "en"))).Select(c => c.Id);
             var results = q.ToList();
             AssertQuerySparql(
-                @"SELECT ?v1 WHERE {
+                @"SELECT ?v0 WHERE {
 ?c a <http://www.networkedplanet.com/schemas/test/Concept> .
-?c <http://www.networkedplanet.com/schemas/test/prefLabel> ?v0 .
-FILTER(?v0 = 'Test'@en) . 
-BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+{ ?c <http://www.networkedplanet.com/schemas/test/prefLabel> 'Test'@en . }
+BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v0)
 }");
         }
 
