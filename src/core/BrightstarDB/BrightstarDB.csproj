@@ -201,6 +201,7 @@
     <Compile Include="EntityFramework\IgnoreAttribute.cs" />
     <Compile Include="EntityFramework\IKeyConverter.cs" />
     <Compile Include="EntityFramework\NamespaceDeclarations.cs" />
+    <Compile Include="EntityFramework\Query\SparqlGeneratorWhereExpressionOptimisationVisitor.cs" />
     <Compile Include="EntityFramework\Query\SparqlQueryContext.cs" />
     <Compile Include="EntityFramework\UniqueConstraintViolationException.cs" />
     <Compile Include="FormatInfo.cs" />

@@ -401,6 +401,14 @@ namespace BrightstarDB.EntityFramework.Query
             _graphPatternBuilder.Append("} ");
         }
 
+        public void AddPatternExpression(string patternExpression)
+        {
+            if (!string.IsNullOrEmpty(patternExpression))
+            {
+                _graphPatternBuilder.Append(patternExpression);
+            }
+        }
+
         public void AddFilterExpression(string filterExpression)
         {
             if (!string.IsNullOrEmpty(filterExpression))

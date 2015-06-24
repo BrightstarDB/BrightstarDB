@@ -127,6 +127,26 @@ SELECT ?x WHERE {
         }
 
         [Test]
+        public void TestGetDinnerByStringProperty()
+        {
+            var q = from x in Context.Dinners where x.Title == "Test" select x;
+            var results = q.ToList();
+            var lastSparql = Context.LastSparqlQuery;
+            Assert.AreEqual(
+                NormalizeSparql(@"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" .} 
+WHERE {
+  ?x ?x_p ?x_o . {
+    SELECT ?x WHERE {
+      ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
+      { ?x <http://purl.org/dc/terms/title> 'Test' . } 
+    }
+  }
+}"), 
+                 NormalizeSparql(lastSparql));
+        }
+
+
+        [Test]
         public void TestGetAllDinnerRsvps()
         {
             var q = from p in Context.Dinners
@@ -239,8 +259,8 @@ SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
     ?r a <http://www.networkedplanet.com/schemas/test/Rsvp> .
     ?x <http://www.networkedplanet.com/schemas/test/attendees> ?r .
-    ?r <http://www.networkedplanet.com/schemas/test/email> ?v1 .
-    FILTER(?v1 = 'kal@networkedplanet.com') . } } }"), 
+    { ?r <http://www.networkedplanet.com/schemas/test/email> 'kal@networkedplanet.com' . }
+    } } }"), 
                 NormalizeSparql(lastSparql));
         }
 
@@ -369,8 +389,8 @@ SELECT ?x WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
-    ?x <http://www.networkedplanet.com/schemas/test/isListed> ?v0 .
-    FILTER (?v0 = true) . } } }");
+    { ?x <http://www.networkedplanet.com/schemas/test/isListed> true . }
+    } } }");
 
             q = from x in Context.Companies
                     where x.IsListed == false

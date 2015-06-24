@@ -3,9 +3,11 @@ using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Text.RegularExpressions;
 using BrightstarDB.Query;
+using BrightstarDB.Storage.Persistence;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ResultOperators;
@@ -15,10 +17,20 @@ namespace BrightstarDB.EntityFramework.Query
     internal class SparqlGeneratorWhereExpressionTreeVisitor : ExpressionTreeVisitorBase
     {
         private FilterWriter _filterWriter;
+        private bool _optimizeFilter;
+
+        private SparqlGeneratorWhereExpressionTreeVisitor(SparqlQueryBuilder queryBuilder, bool optimizeFilter)
+            : base(queryBuilder)
+        {
+            QueryBuilder = queryBuilder;
+            _filterWriter = new FilterWriter(this, queryBuilder, new StringBuilder(), new StringBuilder(), optimizeFilter);
+            _optimizeFilter = optimizeFilter;
+        }
 
         public static Expression GetSparqlExpression(Expression expression, SparqlQueryBuilder queryBuilder)
         {
-            var visitor = new SparqlGeneratorWhereExpressionTreeVisitor(queryBuilder);
+            var canOptimizeFilter = CanOptimizeFilter(expression, queryBuilder);
+            var visitor = new SparqlGeneratorWhereExpressionTreeVisitor(queryBuilder, canOptimizeFilter);
             var returnedExpression = visitor.VisitExpression(expression);
             var svn = returnedExpression as SelectVariableNameExpression;
             if (svn != null && expression.Type == typeof (bool))
@@ -26,19 +38,26 @@ namespace BrightstarDB.EntityFramework.Query
                 // Single boolean member expression requires a special case addition to the filter
                 queryBuilder.AddFilterExpression("(?" + svn.Name + " = true)");
             }
+            queryBuilder.AddPatternExpression(visitor.PatternExpression);
             queryBuilder.AddFilterExpression(visitor.FilterExpression);
             return returnedExpression;
         }
 
-        private SparqlGeneratorWhereExpressionTreeVisitor(SparqlQueryBuilder queryBuilder) : base(queryBuilder)
+        public static bool CanOptimizeFilter(Expression expression, SparqlQueryBuilder queryBuilder)
         {
-            QueryBuilder = queryBuilder;
-            _filterWriter = new FilterWriter(this, queryBuilder, new StringBuilder());
+            var optimisationChecker = new SparqlGeneratorWhereExpressionOptimisationVisitor(queryBuilder);
+            var visitResult = optimisationChecker.VisitExpression(expression);
+            return (visitResult is BooleanFlagExpression && ((BooleanFlagExpression) visitResult).Value);
         }
 
         public string FilterExpression
         {
             get { return _filterWriter.FilterExpression; }
+        }
+
+        public string PatternExpression
+        {
+            get { return _filterWriter.PatternExpression; }
         }
 
         private static ConstantExpression ExtractConstantExpression(BinaryExpression binaryExpression)
@@ -196,55 +215,75 @@ namespace BrightstarDB.EntityFramework.Query
             }
 
             // Process in-fix operator
-            _filterWriter.Append('(');
-            _filterWriter.VisitExpression(expression.Left);
-            switch (expression.NodeType)
+            if (_optimizeFilter)
             {
-                case ExpressionType.Add:
-                case ExpressionType.AddChecked:
-                    _filterWriter.Append(" + ");
+                switch (expression.NodeType)
+                {
+                    case ExpressionType.Equal:
+                        _filterWriter.Append("{");
                     break;
-                case ExpressionType.AndAlso:
-                    _filterWriter.Append(" && ");
-                    break;
-                case ExpressionType.Divide:
-                    _filterWriter.Append(" / ");
-                    break;
-                case ExpressionType.Equal:
-                    _filterWriter.Append(" = ");
-                    break;
-                case ExpressionType.GreaterThan:
-                    _filterWriter.Append(" > ");
-                    break;
-                case ExpressionType.GreaterThanOrEqual:
-                    _filterWriter.Append(" >= ");
-                    break;
-                case ExpressionType.LessThan:
-                    _filterWriter.Append(" < ");
-                    break;
-                case ExpressionType.LessThanOrEqual:
-                    _filterWriter.Append(" <= ");
-                    break;
-                case ExpressionType.Multiply:
-                case ExpressionType.MultiplyChecked:
-                    _filterWriter.Append(" * ");
-                    break;
-                case ExpressionType.NotEqual:
-                    _filterWriter.Append(" != ");
-                    break;
-                case ExpressionType.OrElse:
-                    _filterWriter.Append(" || ");
-                    break;
-                case ExpressionType.Subtract:
-                case ExpressionType.SubtractChecked:
-                    _filterWriter.Append(" - ");
-                    break;
-                default:
-                    base.VisitBinaryExpression(expression);
-                    break;
+                    case ExpressionType.NotEqual:
+                        _filterWriter.Append("MINUS {");
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
+                _filterWriter.VisitExpression(expression.Left);
+                _filterWriter.VisitExpression(expression.Right);
+                _filterWriter.Append("}");
             }
-            _filterWriter.VisitExpression(expression.Right);
-            _filterWriter.Append(')');
+            else
+            {
+                _filterWriter.Append('(');
+                _filterWriter.VisitExpression(expression.Left);
+                switch (expression.NodeType)
+                {
+                    case ExpressionType.Add:
+                    case ExpressionType.AddChecked:
+                        _filterWriter.Append(" + ");
+                        break;
+                    case ExpressionType.AndAlso:
+                        _filterWriter.Append(" && ");
+                        break;
+                    case ExpressionType.Divide:
+                        _filterWriter.Append(" / ");
+                        break;
+                    case ExpressionType.Equal:
+                        _filterWriter.Append(" = ");
+                        break;
+                    case ExpressionType.GreaterThan:
+                        _filterWriter.Append(" > ");
+                        break;
+                    case ExpressionType.GreaterThanOrEqual:
+                        _filterWriter.Append(" >= ");
+                        break;
+                    case ExpressionType.LessThan:
+                        _filterWriter.Append(" < ");
+                        break;
+                    case ExpressionType.LessThanOrEqual:
+                        _filterWriter.Append(" <= ");
+                        break;
+                    case ExpressionType.Multiply:
+                    case ExpressionType.MultiplyChecked:
+                        _filterWriter.Append(" * ");
+                        break;
+                    case ExpressionType.NotEqual:
+                        _filterWriter.Append(" != ");
+                        break;
+                    case ExpressionType.OrElse:
+                        _filterWriter.Append(" || ");
+                        break;
+                    case ExpressionType.Subtract:
+                    case ExpressionType.SubtractChecked:
+                        _filterWriter.Append(" - ");
+                        break;
+                    default:
+                        base.VisitBinaryExpression(expression);
+                        break;
+                }
+                _filterWriter.VisitExpression(expression.Right);
+                _filterWriter.Append(')');
+            }
             return expression;
         }
 
@@ -710,7 +749,7 @@ namespace BrightstarDB.EntityFramework.Query
 
                 var all = (AllResultOperator) expression.QueryModel.ResultOperators[0];
                 var existingWriter = _filterWriter;
-                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder());
+                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder(), new StringBuilder(), false); // TODO: Could check FromExpression to see if it is optimisable
                 QueryBuilder.StartNotExists();
                 var mappedExpression = VisitExpression(expression.QueryModel.MainFromClause.FromExpression);
                 QueryBuilder.AddQuerySourceMapping(expression.QueryModel.MainFromClause, mappedExpression);
@@ -725,7 +764,7 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 QueryBuilder.StartExists();
                 var outerFilterWriter = _filterWriter;
-                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder());
+                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder(), new StringBuilder(), false );
                 var itemVarName = SparqlQueryBuilder.SafeSparqlVarName(expression.QueryModel.MainFromClause.ItemName);
 
                 var mappedFromExpression = VisitExpression(expression.QueryModel.MainFromClause.FromExpression);
