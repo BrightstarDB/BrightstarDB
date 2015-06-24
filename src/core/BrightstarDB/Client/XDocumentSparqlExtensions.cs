@@ -44,8 +44,8 @@ namespace BrightstarDB.Client
         public static object GetColumnValue(this XElement row, string name)
         {
             var binding =
-                row.Elements(SparqlResultsNamespace + "binding").Where(
-                    e => (e.Attribute("name") != null && e.Attribute("name").Value.Equals(name))).FirstOrDefault();
+                row.Elements(SparqlResultsNamespace + "binding").FirstOrDefault(
+                    e => (e.Attribute("name") != null && e.Attribute("name").Value.Equals(name)));
             return binding == null ? null : GetTypedValue(binding);
         }
 
@@ -103,9 +103,8 @@ namespace BrightstarDB.Client
         public static bool IsLiteral(this XElement row, string name)
         {
             var binding =
-                row.Elements(SparqlResultsNamespace + "binding").Where(
-                    e => (e.Attribute("name") != null && e.Attribute("name").Value.Equals(name))).FirstOrDefault();
-
+                row.Elements(SparqlResultsNamespace + "binding").FirstOrDefault(
+                    e => (e.Attribute("name") != null && e.Attribute("name").Value.Equals(name)));
             if (binding == null) return false;
             return binding.Elements(SparqlResultsNamespace + "literal").FirstOrDefault() != null;
         }
@@ -120,8 +119,8 @@ namespace BrightstarDB.Client
         public static string GetLiteralDatatype(this XElement row, string name)
         {
             var binding =
-                row.Elements(SparqlResultsNamespace + "binding").Where(
-                    e => (e.Attribute("name") != null && e.Attribute("name").Value.Equals(name))).FirstOrDefault();
+                row.Elements(SparqlResultsNamespace + "binding").FirstOrDefault(
+                    e => (e.Attribute("name") != null && e.Attribute("name").Value.Equals(name)));
             return binding == null ? null : GetBindingDataType(binding);
         }
 
@@ -152,12 +151,9 @@ namespace BrightstarDB.Client
         /// <returns>Language code or null if the named column doesnt exist, or there is no langusge code attribute</returns>
         public static string GetLiteralLanguageCode(this XElement row, string name)
         {
-            var binding =
-                row.Elements(SparqlResultsNamespace + "binding").Where(
-                    e => (e.Attribute("name") != null && e.Attribute("name").Value.Equals(name))).FirstOrDefault();
-            if (binding == null) return null;
-
-            return GetBindingLanguageCode(binding);
+            var binding = row.Elements(SparqlResultsNamespace + "binding")
+                .FirstOrDefault(e => (e.Attribute("name") != null && e.Attribute("name").Value.Equals(name)));
+            return binding == null ? null : GetBindingLanguageCode(binding);
         }
 
         /// <summary>
@@ -170,6 +166,40 @@ namespace BrightstarDB.Client
         {
             var binding = row.Elements(SparqlResultsNamespace + "binding").ElementAtOrDefault(columnIndex);
             return GetBindingLanguageCode(binding);
+        }
+
+        /// <summary>
+        /// Gets the string literal for the specified literal column
+        /// </summary>
+        /// <param name="row">The XElement that represents a SPARQL result row</param>
+        /// <param name="name">The name of the SPARQL result parameter</param>
+        /// <returns>The string literal value for the specified SPARQL result parameter on the specified row, or NULL if the
+        /// row contains no binding for the specified parameter or if the binding is not to a literal value.</returns>
+        public static string GetLiteralString(this XElement row, string name)
+        {
+            var binding = row.Elements(SparqlResultsNamespace + "binding")
+                .FirstOrDefault(e => e.Attribute("name") != null && e.Attribute("name").Value.Equals(name));
+            return binding == null ? null : GetLiteralString(binding);
+        }
+
+
+        /// <summary>
+        /// Gets the string literal for the specified column of the SPARQL result row
+        /// </summary>
+        /// <param name="row">The XElement that represents a SPARQL result row</param>
+        /// <param name="columnIndex">The zero-based index of the column to retrieve a literal value from</param>
+        /// <returns>The string literal value of the specified column of the specified row, or NULL if the column does not exist
+        /// or if the binding for the column is not to a literal</returns>
+        public static string GetLiteralString(this XElement row, int columnIndex)
+        {
+            var binding = row.Elements(SparqlResultsNamespace + "binding").ElementAtOrDefault(columnIndex);
+            return binding == null ? null : GetLiteralString(binding);
+        }
+
+        private static string GetLiteralString(XElement bindingElement)
+        {
+            var literal = bindingElement.Elements(SparqlResultsNamespace + "literal").FirstOrDefault();
+            return literal == null ? null : literal.Value;
         }
     }
 }

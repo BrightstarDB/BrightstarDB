@@ -16,6 +16,7 @@ namespace BrightstarDB.Query
         static BrightstarQueryProcessor()
         {
             SparqlOptimiser.AddOptimiser(new VariableEqualsOptimizer());
+            SparqlOptimiser.AddOptimiser(new JoinOptimiser());
         }
 
         public BrightstarQueryProcessor(IInMemoryQueryableStore store) : base(store)

@@ -127,7 +127,7 @@ namespace BrightstarDB.Storage
         public Stream GetInputStream(string pathName)
         {
             var file = AppDataLocation.GetFileAsync(pathName).AsTask().Result;
-            return file.OpenAsync(FileAccessMode.Read).AsTask().Result.AsStreamForRead();
+            return new PoliteReaderStream(file);
         }
 
         public long GetFileLength(string pathName)

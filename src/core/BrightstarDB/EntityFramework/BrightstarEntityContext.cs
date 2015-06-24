@@ -226,15 +226,9 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         private void EnsureIdentity()
         {
-            foreach (var entry in _trackedObjects)
+            foreach (var item in _trackedObjects.Values.SelectMany(x => x.Where(y => y.IsModified)).ToList())
             {
-                foreach (var item in entry.Value)
-                {
-                    if (item.IsModified)
-                    {
-                        EnsureIdentity(item);
-                    }
-                }
+                EnsureIdentity(item);
             }
         }
 
@@ -250,90 +244,13 @@ namespace BrightstarDB.EntityFramework
                 }
                 var key = identityInfo.KeyConverter.GenerateKey(propertyValues, identityInfo.KeySeparator, item.GetType());
                 if (key == null) throw new EntityKeyRequiredException();
-                if (!key.Equals(item.GetKey())) throw new EntityKeyChangedException();
-            }
-        }
-
-        /*
-        internal IdentityInfo GetIdentityInfo(Type t)
-        {
-            IdentityInfo cachedInfo;
-            if (_identityCache.TryGetValue(t, out cachedInfo)) return cachedInfo;
-
-            var baseUri = Constants.GeneratedUriPrefix;
-            PropertyInfo[] keyProperties = null;
-            var keySeparator = DefaultCompositeKeySeparator;
-            IKeyConverter keyConverter = null;
-
-            var interfaces = t.GetInterfaces().Where(i => i.GetCustomAttributes(typeof(EntityAttribute), true).Any());
-            var identityProperty =
-                interfaces.SelectMany(i => i.GetProperties()).FirstOrDefault(
-                    x => x.GetCustomAttributes(typeof(IdentifierAttribute), true).Any());
-            if (identityProperty != null)
-            {
-                var identityAttr =
-                    identityProperty.GetCustomAttributes(typeof(IdentifierAttribute), true).FirstOrDefault() as
-                    IdentifierAttribute;
-                var declaringType = identityProperty.DeclaringType;
-                if (identityAttr != null)
+                if (!key.Equals(item.GetKey()))
                 {
-                    if (identityAttr.BaseAddress != null && identityAttr.BaseAddress.Contains(":"))
-                    {
-                        var prefix = identityAttr.BaseAddress.Substring(0, identityAttr.BaseAddress.IndexOf(':'));
-                        var namespaceDecl = identityProperty.DeclaringType == null ? null :
-                            identityProperty.DeclaringType.Assembly.GetCustomAttributes(
-                                typeof(NamespaceDeclarationAttribute), false).Cast<NamespaceDeclarationAttribute>().
-                                FirstOrDefault(nda => nda.Prefix.Equals(prefix));
-                        if (namespaceDecl != null)
-                        {
-                            baseUri = namespaceDecl.Reference +
-                                      identityAttr.BaseAddress.Substring(identityAttr.BaseAddress.IndexOf(':') + 1);
-                        }
-                        else
-                        {
-                            baseUri = identityAttr.BaseAddress;
-                        }
-                    }
-
-                    if (identityAttr.KeyProperties != null && declaringType != null)
-                    {
-                        keyProperties = new PropertyInfo[identityAttr.KeyProperties.Length];
-                        for (int i = 0; i < identityAttr.KeyProperties.Length; i++)
-                        {
-                            var propertyName = identityAttr.KeyProperties[i];
-                            var propertyInfo = declaringType.GetProperty(propertyName);
-                            if (propertyInfo == null)
-                            {
-                                throw new EntityFrameworkException(
-                                    "Cannot find declared (composite) key property '{0}' on type '{1}'.", propertyName,
-                                    declaringType.FullName);
-                            }
-                            keyProperties[i] = propertyInfo;
-                        }
-                        keySeparator = identityAttr.KeySeparator ?? DefaultCompositeKeySeparator;
-                        if (identityAttr.KeyConverterType != null)
-                        {
-                            keyConverter = Activator.CreateInstance(identityAttr.KeyConverterType) as IKeyConverter;
-                            if (keyConverter == null)
-                            {
-                                throw new EntityFrameworkException(
-                                    "Cannot instantiate class {0} as an IKeyConverter instance.", identityAttr.KeyConverterType);
-                            }
-                        }
-                        else
-                        {
-                            keyConverter = new DefaultKeyConverter();
-                        }
-
-                    }
-
+                    throw new EntityKeyChangedException();
                 }
             }
-            cachedInfo = new IdentityInfo(baseUri, keyProperties, keySeparator, keyConverter);
-            _identityCache[t] = cachedInfo;
-            return cachedInfo;
         }
-         */
+
         /// <summary>
         /// Updates a single object in the object context with data from the data source
         /// </summary>
@@ -448,6 +365,7 @@ namespace BrightstarDB.EntityFramework
             foreach (var row in resultDoc.SparqlResultRows())
             {
                 var value = row.GetColumnValue(0);
+                if (value == null) yield return default(T);
                 if (value.GetType() == typeof(T))
                 {
                     yield return (T)value;
@@ -721,7 +639,7 @@ namespace BrightstarDB.EntityFramework
         {
             var entityType = identifierProperty.DeclaringType;
             var prefix = EntityMappingStore.GetIdentifierPrefix(entityType);
-            return prefix + id;
+            return prefix + Uri.EscapeUriString(id);
         }
 
         /// <summary>
@@ -798,7 +716,7 @@ namespace BrightstarDB.EntityFramework
             string prefix = identifierInfo == null ? null : identifierInfo.BaseUri;
             var dataObject = identifierInfo != null && identifierInfo.KeyProperties != null
                 ? null
-                : _store.MakeNewDataObject(prefix);
+                : _store.MakeNewDataObject( String.Empty.Equals(prefix) ? Constants.GeneratedUriPrefix : prefix);
             if (dataObject != null)
             {
                 IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(domainObjectType);

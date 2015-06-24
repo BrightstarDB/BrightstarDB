@@ -6,6 +6,7 @@ using NUnit.Framework;
 namespace BrightstarDB.PerformanceTests
 {
     [TestFixture]
+    [Category("LongRunning")]
     public class LinqQueryPerformance : PerformanceTestBase
     {
         private const string StoresDirectory = "C:\\brightstar";

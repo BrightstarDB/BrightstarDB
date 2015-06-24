@@ -53,6 +53,11 @@ namespace BrightstarDB.Server
                 g = Constants.DefaultGraphUri;
             }
 
+            if (isLiteral && dataType == null)
+            {
+                dataType = RdfDatatypes.PlainLiteral;
+            }
+
             if (wildCards)
             {
                 var triples = _store.Match(s, p, o, isLiteral, dataType, langCode, g).ToList();

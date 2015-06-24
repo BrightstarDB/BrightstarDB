@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
@@ -632,7 +633,7 @@ namespace BrightstarDB.EntityFramework.Query
                         switch (hint.MappingType)
                         {
                             case PropertyMappingType.Id:
-                                return new SelectVariableNameExpression(sourceVarName, VariableBindingType.Resource, propertyInfo.PropertyType);
+                                return new SelectVariableNameExpression(sourceVarName, VariableBindingType.Resource, propertyInfo.DeclaringType);
                                 //return expression;
 
                             case PropertyMappingType.Arc:
@@ -701,12 +702,37 @@ namespace BrightstarDB.EntityFramework.Query
                 if (expression.QueryModel.MainFromClause.FromExpression.NodeType == ExpressionType.Constant &&
                     contains.Item is MemberExpression)
                 {
+                    var memberExpression = (MemberExpression) contains.Item;
                         var itemExpression = VisitExpression(contains.Item);
                         if (itemExpression is SelectVariableNameExpression)
                         {
-                            // We can translate the subquery to an IN expression
-                            _filterWriter.WriteInFilter(contains.Item, expression.QueryModel.MainFromClause.FromExpression);
-                            return expression;
+                            if (IsIdInArraySubQuery(memberExpression, expression.QueryModel.MainFromClause.FromExpression))
+                            {
+                                var varName = ((SelectVariableNameExpression) itemExpression).Name;
+                                // The subquery is a filter on a resource IRI
+                                // It is more efficient to use a UNION of BIND triple patterns than a FILTER
+                                var values =
+                                    ((ConstantExpression) expression.QueryModel.MainFromClause.FromExpression).Value as
+                                        IEnumerable;
+                                var identifierProperty = memberExpression.Member as PropertyInfo;
+                                QueryBuilder.StartUnion();
+                                foreach (var value in values)
+                                {
+                                    QueryBuilder.StartUnionElement();
+                                    QueryBuilder.AddBindExpression("<" + QueryBuilder.Context.MapIdToUri(identifierProperty, value.ToString()) + ">", varName);
+                                    QueryBuilder.EndUnionElement();
+                                }
+                                QueryBuilder.EndUnion();
+                                return expression;
+                            }
+                            else
+                            {
+                                // The subquery is a filter on a resource property expression
+                                // We can translate the subquery to an IN expression
+                                _filterWriter.WriteInFilter(itemExpression,
+                                    expression.QueryModel.MainFromClause.FromExpression);
+                                return expression;
+                            }
                         }
                 }
                 else if (expression.QueryModel.MainFromClause.FromExpression.NodeType == ExpressionType.MemberAccess)
@@ -804,6 +830,16 @@ namespace BrightstarDB.EntityFramework.Query
             return base.VisitSubQueryExpression(expression);
         }
 
+        private bool IsIdInArraySubQuery(MemberExpression memberExpression,
+            Expression fromExpression)
+        {
+            var propertyHint = QueryBuilder.Context.GetPropertyHint(memberExpression.Member as PropertyInfo);
+            if (propertyHint.MappingType != PropertyMappingType.Id) return false;
+            var constantExpression = fromExpression as ConstantExpression;
+            if (constantExpression == null) return false;
+            if (!(constantExpression.Value is IEnumerable)) return false;
+            return true;
+        }
         protected override Expression VisitQuerySourceReferenceExpression(QuerySourceReferenceExpression expression)
         {
             Expression mappedExpression;

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BrightstarDB.Server.Modules.Model;
 using Nancy;
+using Nancy.Responses;
 using Nancy.Responses.Negotiation;
 
 namespace BrightstarDB.Server.Modules
@@ -16,9 +18,9 @@ namespace BrightstarDB.Server.Modules
 
         public ProcessorMatch CanProcess(MediaRange requestedMediaRange, dynamic model, NancyContext context)
         {
-            if (model is SparqlQueryProcessingModel)
+            var processingModel = model as SparqlQueryProcessingModel;
+            if (processingModel != null)
             {
-                var processingModel = model as SparqlQueryProcessingModel;
                 if (processingModel.SparqlRequest.Format != null)
                 {
                     var sparqlFormat =
@@ -40,7 +42,7 @@ namespace BrightstarDB.Server.Modules
                 }
 
                 if ((processingModel.ResultModel == SerializableModel.SparqlResultSet) &&
-                    (SparqlResultsFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(MediaRange.FromString(m)))))
+                    (SparqlResultsFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(new MediaRange(m)))))
                 {
                     return new ProcessorMatch
                         {
@@ -49,7 +51,7 @@ namespace BrightstarDB.Server.Modules
                         };
                 }
                 if ((processingModel.ResultModel == SerializableModel.RdfGraph) &&
-                    (RdfFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(MediaRange.FromString(m)))))
+                    (RdfFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(new MediaRange(m)))))
                 {
                     return new ProcessorMatch
                         {
@@ -63,6 +65,17 @@ namespace BrightstarDB.Server.Modules
                         RequestedContentTypeResult = MatchResult.NoMatch
                     };
             }
+            else if (model is GraphListModel)
+            {
+                return new ProcessorMatch
+                {
+                    ModelResult = MatchResult.ExactMatch,
+                    RequestedContentTypeResult =
+                        SparqlResultsFormat.AllMediaTypes.Any(m => requestedMediaRange.Matches(new MediaRange(m)))
+                            ? MatchResult.ExactMatch
+                            : MatchResult.NoMatch
+                };
+            }
             return new ProcessorMatch
                 {
                     ModelResult = MatchResult.NoMatch,
@@ -72,16 +85,30 @@ namespace BrightstarDB.Server.Modules
 
         public Response Process(MediaRange requestedMediaRange, dynamic model, NancyContext context)
         {
-            var queryModel = model as SparqlQueryProcessingModel;
-            var format = (queryModel.OverrideResultsFormat ?? 
-                SparqlResultsFormat.AllFormats.FirstOrDefault(f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)))) ?? 
-                SparqlResultsFormat.Xml;
-            var graphFormat =
-                (queryModel.OverrideGraphFormat ??
-                RdfFormat.AllFormats.FirstOrDefault(f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)))) ??
-                RdfFormat.RdfXml;
-            
-            return new SparqlQueryResponse(queryModel, context.Request.Headers.IfModifiedSince, format, graphFormat);
+            var processingModel = model as SparqlQueryProcessingModel;
+            if (processingModel != null)
+            {
+                var format = (processingModel.OverrideResultsFormat ??
+                              SparqlResultsFormat.AllFormats.FirstOrDefault(
+                                  f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)))) ??
+                             SparqlResultsFormat.Xml;
+                var graphFormat =
+                    (processingModel.OverrideGraphFormat ??
+                     RdfFormat.AllFormats.FirstOrDefault(f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m)))) ??
+                    RdfFormat.RdfXml;
+
+                return new SparqlQueryResponse(processingModel, context.Request.Headers.IfModifiedSince, format, graphFormat);
+            }
+            var graphList = model as GraphListModel;
+            if (graphList != null)
+            {
+                var format =
+                    SparqlResultsFormat.AllFormats.FirstOrDefault(
+                        f => f.MediaTypes.Any(m => requestedMediaRange.Matches(m))) ?? SparqlResultsFormat.Xml;
+                return new TextResponse(
+                    graphList.AsString(format), format.MediaTypes[0]);
+            }
+            throw new ArgumentException("Unexpected model type: " + model.GetType());
         }
 
         public IEnumerable<Tuple<string, MediaRange>> ExtensionMappings { get { return SparqlExtensionMappings; } }

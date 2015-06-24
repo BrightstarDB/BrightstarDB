@@ -13,5 +13,12 @@ namespace BrightstarDB.Server.Modules.Configuration
         public AbstractSystemPermissionsProvider SystemPermissionsProvider { get; set; }
         public string RootPath { get; set; }
         public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public CorsConfiguration CorsConfiguration { get; set; }
+    }
+
+    public class CorsConfiguration
+    {
+        public bool DisableCors;
+        public string AllowOrigin = "*";
     }
 }

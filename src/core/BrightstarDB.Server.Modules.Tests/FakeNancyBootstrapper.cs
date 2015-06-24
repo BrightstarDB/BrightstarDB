@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules.Authentication;
+using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 
@@ -69,6 +70,7 @@ namespace BrightstarDB.Server.Modules.Tests
             {
                 _authenticationProvider.Enable(pipelines);
             }
+            pipelines.EnableCors(new CorsConfiguration());
         }
     }
 }

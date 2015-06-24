@@ -7,8 +7,9 @@ using BrightstarDB.Server.Modules.Authentication;
 using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
+using Nancy.Bootstrapper;
 using Nancy.Conventions;
-using Nancy.ViewEngines.Razor;
+using Nancy.TinyIoc;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -19,6 +20,7 @@ namespace BrightstarDB.Server.Modules
         private readonly AbstractSystemPermissionsProvider _systemPermissionsProvider;
         private readonly IEnumerable<IAuthenticationProvider> _authenticationProviders; 
         private readonly IRootPathProvider _rootPathProvider;
+        private readonly CorsConfiguration _corsConfiguration;
 
         /// <summary>
         /// Create a new bootstrapper that initializes itself from the brightstarService section
@@ -29,16 +31,19 @@ namespace BrightstarDB.Server.Modules
         /// invalid.</exception>
         public BrightstarBootstrapper()
         {
-            var config = ConfigurationManager.GetSection("brightstarService") as BrightstarServiceConfiguration;
-            if (config == null) throw new ConfigurationErrorsException(Strings.NoServiceConfiguration);
+            var configuration =
+                ConfigurationManager.GetSection("brightstarService") as BrightstarServiceConfiguration;
+            if (configuration == null)
+                throw new ConfigurationErrorsException(Strings.NoServiceConfiguration);
 
-            _brightstarService = BrightstarService.GetClient(config.ConnectionString);
-            _storePermissionsProvider = config.StorePermissionsProvider ??
+            _brightstarService = BrightstarService.GetClient(configuration.ConnectionString);
+            _storePermissionsProvider = configuration.StorePermissionsProvider ??
                                         new FallbackStorePermissionsProvider(StorePermissions.All);
-            _systemPermissionsProvider = config.SystemPermissionsProvider ??
+            _systemPermissionsProvider = configuration.SystemPermissionsProvider ??
                                          new FallbackSystemPermissionsProvider(SystemPermissions.All);
-            _authenticationProviders = config.AuthenticationProviders ??
+            _authenticationProviders = configuration.AuthenticationProviders ??
                                        new Collection<IAuthenticationProvider> {new NullAuthenticationProvider()};
+            _corsConfiguration = configuration.CorsConfiguration;
         }
 
         /// <summary>
@@ -48,10 +53,11 @@ namespace BrightstarDB.Server.Modules
         /// <param name="rootPath">The root path</param>
         public BrightstarBootstrapper(BrightstarServiceConfiguration configuration, string rootPath = null)
             : this(BrightstarService.GetClient(configuration.ConnectionString),
-                   configuration.AuthenticationProviders,
-                   configuration.StorePermissionsProvider,
-                   configuration.SystemPermissionsProvider,
-                   rootPath)
+                configuration.AuthenticationProviders,
+                configuration.StorePermissionsProvider,
+                configuration.SystemPermissionsProvider,
+                configuration.CorsConfiguration,
+                rootPath)
         {
         }
 
@@ -62,16 +68,17 @@ namespace BrightstarDB.Server.Modules
         /// <param name="service">The IBrightstarService instance to be used</param>
         /// <param name="configuration">The service configuration</param>
         /// <param name="rootPath">The root path</param>
-        public BrightstarBootstrapper(IBrightstarService service,
-                                      BrightstarServiceConfiguration configuration,
-                                      string rootPath = null)
+        public BrightstarBootstrapper(
+            IBrightstarService service,
+            BrightstarServiceConfiguration configuration,
+            string rootPath = null)
             : this(service,
-                   configuration.AuthenticationProviders,
-                   configuration.StorePermissionsProvider,
-                   configuration.SystemPermissionsProvider,
-                   rootPath)
+                configuration.AuthenticationProviders,
+                configuration.StorePermissionsProvider,
+                configuration.SystemPermissionsProvider,
+                configuration.CorsConfiguration,
+                rootPath)
         {
-
         }
 
         /// <summary>
@@ -80,13 +87,15 @@ namespace BrightstarDB.Server.Modules
         /// </summary>
         /// <param name="brightstarService"></param>
         /// <param name="authenticationProviders">An enumeration of the authentication providers to be used by the service</param>
-        public BrightstarBootstrapper(IBrightstarService brightstarService,
-                                      IEnumerable<IAuthenticationProvider> authenticationProviders)
+        public BrightstarBootstrapper(
+            IBrightstarService brightstarService,
+            IEnumerable<IAuthenticationProvider> authenticationProviders)
             : this(
                 brightstarService,
                 authenticationProviders,
                 new FallbackStorePermissionsProvider(StorePermissions.All),
-                new FallbackSystemPermissionsProvider(SystemPermissions.All))
+                new FallbackSystemPermissionsProvider(SystemPermissions.All),
+                new CorsConfiguration())
         {
         }
 
@@ -99,7 +108,7 @@ namespace BrightstarDB.Server.Modules
         /// <param name="storePermissionsProvider"></param>
         public BrightstarBootstrapper(IBrightstarService brightstarService,
             IEnumerable<IAuthenticationProvider> authenticationProviders, AbstractStorePermissionsProvider storePermissionsProvider)
-            : this(brightstarService, authenticationProviders, storePermissionsProvider, new FallbackSystemPermissionsProvider(SystemPermissions.All))
+            : this(brightstarService, authenticationProviders, storePermissionsProvider, new FallbackSystemPermissionsProvider(SystemPermissions.All), new CorsConfiguration())
         {
 
         }
@@ -111,35 +120,39 @@ namespace BrightstarDB.Server.Modules
         /// <param name="authenticationProviders">An enumeration of the authentication providers to be used by the service</param>
         /// <param name="storePermissionsProvider">The store permissions provider to be used by the service</param>
         /// <param name="systemPermissionsProvider">The system permissions provider to be used by the service</param>
+        /// <param name="corsConfiguration">The CORS configuration options for the service</param>
         /// <param name="rootPath">The path to the directory containing the service Views and assets folder</param>
         /// <exception cref="ArgumentNullException">Raised if any of the arguments to the method other than <paramref name="rootPath"/> are Null.</exception>
-        public BrightstarBootstrapper(IBrightstarService brightstarService,
+        public BrightstarBootstrapper(
+            IBrightstarService brightstarService,
                                       IEnumerable<IAuthenticationProvider> authenticationProviders,
                                       AbstractStorePermissionsProvider storePermissionsProvider,
                                       AbstractSystemPermissionsProvider systemPermissionsProvider,
+            CorsConfiguration corsConfiguration,
                                       string rootPath = null)
         {
             if (brightstarService == null) throw new ArgumentNullException("brightstarService");
             if (authenticationProviders == null) throw new ArgumentNullException("authenticationProviders");
             if (storePermissionsProvider == null) throw new ArgumentNullException("storePermissionsProvider");
             if (systemPermissionsProvider == null) throw new ArgumentNullException("systemPermissionsProvider");
+            if (corsConfiguration == null) throw new ArgumentNullException("corsConfiguration");
 
             _brightstarService = brightstarService;
             _authenticationProviders = authenticationProviders;
             _storePermissionsProvider = storePermissionsProvider;
             _systemPermissionsProvider = systemPermissionsProvider;
+            _corsConfiguration = corsConfiguration;
             _rootPathProvider = (rootPath == null
                                      ? new DefaultRootPathProvider()
                                      : new FixedRootPathProvider(rootPath) as IRootPathProvider);
         }
 
-        protected override void ConfigureApplicationContainer(Nancy.TinyIoc.TinyIoCContainer container)
+        protected override void ConfigureApplicationContainer(TinyIoCContainer container)
         {
             base.ConfigureApplicationContainer(container);
             container.Register(_brightstarService);
             container.Register(_storePermissionsProvider);
             container.Register(_systemPermissionsProvider);
-            container.Register<RazorViewEngine>();
         }
 
         protected override void ConfigureConventions(NancyConventions nancyConventions)
@@ -147,7 +160,7 @@ namespace BrightstarDB.Server.Modules
             base.ConfigureConventions(nancyConventions);
             nancyConventions.StaticContentsConventions.Add(
                 StaticContentConventionBuilder.AddDirectory("assets"));
-            Nancy.Json.JsonSettings.MaxJsonLength = Int32.MaxValue;
+            Nancy.Json.JsonSettings.MaxJsonLength = int.MaxValue;
         }
 
         protected override IRootPathProvider RootPathProvider
@@ -159,12 +172,21 @@ namespace BrightstarDB.Server.Modules
             }
         }
 
-        protected override void ApplicationStartup(Nancy.TinyIoc.TinyIoCContainer container, Nancy.Bootstrapper.IPipelines pipelines)
+        protected override void ApplicationStartup(TinyIoCContainer container, IPipelines pipelines)
         {
             base.ApplicationStartup(container, pipelines);
             foreach (var authenticationProvider in _authenticationProviders)
             {
                 authenticationProvider.Enable(pipelines);
+            }
+        }
+
+        protected override void RequestStartup(TinyIoCContainer container, IPipelines pipelines, NancyContext context)
+        {
+            base.RequestStartup(container, pipelines, context);
+            if (!_corsConfiguration.DisableCors)
+            {
+                pipelines.EnableCors(_corsConfiguration);
             }
         }
     }

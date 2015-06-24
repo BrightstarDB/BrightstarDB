@@ -1,0 +1,64 @@
+﻿@Master['Layout.sshtml']
+
+@Section['Head']
+	<script src="@Path['~/assets/jquery-1.10.2.min.js']" type="text/javascript"></script>
+@EndSection
+
+@Section['Content']
+	<nav>
+		<ul class="breadcrumb horizontal">
+			<li><a href="#">Home</a></li>
+		</ul>
+	</nav>
+
+	<section>
+		<p>Stores available on this BrightstarDB server.</p>
+
+		<table class="left items" id="storesTable">
+			<thead>
+				<tr>
+					<th>Store</th>
+				</tr>
+			</thead>
+			<tbody>
+				@Each.Stores
+				<tr>
+					<td><a href="@Path['~/@Current']">@Current</a></td>
+				</tr>
+				@EndEach
+			</tbody>
+		</table>
+		<div style="width:20em;display: inline-block;margin-top: 20px">
+			<form id="newStoreForm">
+				<fieldset>
+					<legend>Create New Store</legend>
+					<div style="margin-bottom: 1ex">
+						<label class="form-label" for="storeName">Store Name:</label><br/>
+						<input id="storeName" name="StoreName" type="text" style="width:100%"/>
+					</div>
+					<input id="newStoreButton" type="submit" value="New Store"/>
+				</fieldset>
+			</form>
+		</div>
+	</section>
+
+	<script type="text/javascript">
+		$(document).ready(function(){
+		$('#newStoreButton').click(function(event) {
+			event.preventDefault();
+			$.ajax({
+				type: "POST",
+				url: "@Path['~/']",
+				data: $('#newStoreForm').serialize(),
+				dataType: 'json'
+			}).done(function(data) {
+				$('<tr></tr>')
+					.appendTo($('#storesTable tbody'))
+					.append('<td><a href="@Path['~/']' + data.name + '">' + data.name + '</a></td>');
+			}).fail(function (jqXHR, textStatus) {
+				alert("Request failed: " + textStatus);
+			});
+		});
+		});
+	</script>
+@EndSection

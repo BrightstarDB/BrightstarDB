@@ -18,17 +18,19 @@ namespace BrightstarDB.Server.Modules
             this.RequiresBrightstarSystemPermission(systemPermissionsProvider, get:SystemPermissions.ListStores, post:SystemPermissions.CreateStore);
 
             Get["/"] = parameters =>
-                {
-                    var stores = brightstarService.ListStores();
-                    return
-                        Negotiate.WithModel(new StoresResponseModel
-                            {
-                                Stores = stores.ToList()
-                            });
+            {
+                ViewBag.Title = "Stores";
+                var stores = brightstarService.ListStores();
+                return
+                    Negotiate.WithModel(new StoresResponseModel
+                        {
+                            Stores = stores.ToList()
+                        });
                 };
 
             Post["/"] = parameters =>
                 {
+                    ViewBag.Title = "Stores";
                     var request = this.Bind<CreateStoreRequestObject>();
                     if (request == null || String.IsNullOrEmpty(request.StoreName))
                     {

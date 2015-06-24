@@ -1,0 +1,9 @@
+﻿Imports System
+Imports BrightstarDB.EntityFramework
+
+Namespace BrightstarDB.CodeGeneration.Tests
+    Public Interface IInvalidIdType
+        <Identifier>
+        ReadOnly Property Id As Int32
+    End Interface
+End Namespace

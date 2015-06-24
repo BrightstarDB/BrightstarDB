@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BrightstarDB.EntityFramework;
 using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
@@ -170,6 +171,118 @@ namespace BrightstarDB.Tests.EntityFramework
                 Assert.That(child, Is.Not.Null);
                 Assert.That(child.Position, Is.EqualTo(1));
                 Assert.That(child.Parent.Id, Is.EqualTo(parentId));
+            }
+        }
+
+        [Test]
+        public void TestUpdateEntityWithCompositeKey()
+        {
+            string childId;
+            using (var context = GetContext())
+            {
+                var parent = context.ParentEntities.Create();
+                var child = context.ChildEntities.Create();
+                child.Code = "child";
+                child.Description = "Some description";
+                child.Parent = parent;
+                childId = child.Id;
+                context.SaveChanges();
+            }
+
+            using (var context = GetContext())
+            {
+                var child = context.ChildEntities.First(x=>x.Id.Equals(childId));
+                child.Description = "Update description";
+                context.SaveChanges();
+            }
+        }
+
+        [Test]
+        [ExpectedException(typeof(EntityKeyRequiredException))]
+        public void TestEntityKeyRequiredExceptionWhenIdIsNull()
+        {
+            using (var context = GetContext())
+            {
+                var entity = new StringKeyEntity();
+                context.StringKeyEntities.Add(entity);
+            }
+        }
+
+        [Test]
+        [ExpectedException(typeof (EntityKeyRequiredException))]
+        public void TestEntityKeyRequiredExceptionWhenIdIsEmptyString()
+        {
+            using (var context = GetContext())
+            {
+                var entity = new StringKeyEntity{Name=""};
+                context.StringKeyEntities.Add(entity);
+            }
+            
+        }
+
+        [Test]
+        public void Issue194Repro()
+        {
+            using (var context = GetContext())
+            {
+                var parent = new ParentEntity();
+                parent.Id = "parent";
+                var child = context.ChildEntities.Create();
+                child.Code = "child";
+                child.Description = "Some description";
+                child.Parent = parent;
+                context.ChildEntities.Add(child);
+
+                context.SaveChanges();
+            }
+
+            using (var context = GetContext())
+            {
+                var parent = context.ParentEntities.First();
+                var modifiedChild = new ChildEntity
+                {
+                    Parent = parent,
+                    Code = "child",
+                    Description = "A new description for the existing child"
+                };
+
+                var existingChild = context.ChildEntities.First();
+                context.DeleteObject(existingChild);
+                context.ChildEntities.Add(modifiedChild);
+                context.SaveChanges();
+            }
+        }
+
+        [Test]
+        public void Issue194Repro2()
+        {
+            using (var context = GetContext())
+            {
+                var parent = new ParentEntity2();
+                parent.Id = "parent";
+                var child = context.ChildEntity2s.Create();
+                child.Code = "child";
+                child.Description = "Some description";
+                child.Parent = parent;
+                context.ChildEntity2s.Add(child);
+
+                context.SaveChanges();
+            }
+
+            using (var context = GetContext())
+            {
+                var parent = context.ParentEntity2s.First();
+                var modifiedChild = new ChildEntity2
+                {
+                    Parent = parent,
+                    Code = "child",
+                    Description = "A new description for the existing child"
+                };
+
+                var existingChild = context.ChildEntity2s.First();
+                context.DeleteObject(existingChild);
+                context.ChildEntity2s.Add(modifiedChild);
+                context.SaveChanges();
             }
         }
     }

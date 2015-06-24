@@ -145,7 +145,7 @@ namespace BrightstarDB.Tests.EntityFramework
         {
             using (var context = new MyEntityContext(_connectionString))
             {
-                var entity = context.Entities.Create() as Entity;
+                var entity = context.TestEntities.Create() as TestEntity;
                 Assert.That(entity, Is.Not.Null);
                 Assert.That(entity.OnCreatedWasCalled);
                 context.SaveChanges();
@@ -159,16 +159,16 @@ namespace BrightstarDB.Tests.EntityFramework
             string entityId;
             using (var context = new MyEntityContext(_connectionString))
             {
-                var entity = context.Entities.Create();
+                var entity = context.TestEntities.Create();
                 entityId = entity.Id;
                 context.SaveChanges();
             }
 
             using (var context = new MyEntityContext(_connectionString))
             {
-                var entity = context.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+                var entity = context.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
                 Assert.That(entity, Is.Not.Null);
-                Assert.That(!(entity as Entity).OnCreatedWasCalled);
+                Assert.That(!(entity as TestEntity).OnCreatedWasCalled);
             }
         }
 
@@ -177,9 +177,9 @@ namespace BrightstarDB.Tests.EntityFramework
         {
             using (var context = new MyEntityContext(_connectionString))
             {
-                var entity = new Entity();
+                var entity = new TestEntity();
                 Assert.That(entity.OnCreatedWasCalled);
-                context.Entities.Add(entity);
+                context.TestEntities.Add(entity);
                 context.SaveChanges();
             }
         }

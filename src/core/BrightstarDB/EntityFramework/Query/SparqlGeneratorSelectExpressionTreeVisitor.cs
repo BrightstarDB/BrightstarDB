@@ -16,7 +16,14 @@ namespace BrightstarDB.EntityFramework.Query
         {
             var visitor = new SparqlGeneratorSelectExpressionTreeVisitor(queryBuilder);
             var resultExpression = visitor.VisitExpression(expression);
-            if (resultExpression is SelectVariableNameExpression)
+            if (resultExpression is SelectIdentifierVariableNameExpression)
+            {
+                var selectId = resultExpression as SelectIdentifierVariableNameExpression;
+                var selectVar = queryBuilder.NextVariable();
+                queryBuilder.AddBindExpression("STRAFTER(STR(?" + selectId.Name + "), " +  SparqlQueryBuilder.QuoteLiteralString(selectId.IdentifierPrefix) + ")", selectVar);
+                queryBuilder.AddSelectVariable(selectVar);
+            }
+            else if (resultExpression is SelectVariableNameExpression)
             {
                 queryBuilder.AddSelectVariable((resultExpression as SelectVariableNameExpression).Name);
             }

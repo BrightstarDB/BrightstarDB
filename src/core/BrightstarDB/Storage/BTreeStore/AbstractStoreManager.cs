@@ -56,7 +56,7 @@ namespace BrightstarDB.Storage.BTreeStore
             }
         }
 
-        public IStore CreateStore(string storeLocation, bool readOnly = false)
+        public IStore CreateStore(string storeLocation, bool readOnly = false, bool withTransactionLogging = true)
         {
             Logging.LogInfo("Create Store {0}", storeLocation);
             if (_persistenceManager.DirectoryExists(storeLocation))
@@ -76,7 +76,7 @@ namespace BrightstarDB.Storage.BTreeStore
             return store;
         }
 
-        public IStore CreateStore(string storeLocation, PersistenceType persistenceType, bool readOnly = false)
+        public IStore CreateStore(string storeLocation, PersistenceType persistenceType, bool readOnly = false, bool withTransactionLogging=true)
         {
             if (persistenceType != PersistenceType.AppendOnly)
             {

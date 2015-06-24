@@ -4,7 +4,7 @@ namespace BrightstarDB.Portable.Adaptation
 {
     internal static class PlatformAdapter
     {
-        private static readonly string[] KnownPlatforms = new[] {"Desktop", "Silverlight", "Phone", "Store", "Android", "iOS"};
+        private static readonly string[] KnownPlatforms = new[] {"Desktop", "Silverlight", "Phone", "Store", "Android", "iOS", "MonoTouch"};
         private static readonly IAdapterResolver _resolver = new ProbingAdapterResolver(KnownPlatforms );
 
         public static T Resolve<T>()

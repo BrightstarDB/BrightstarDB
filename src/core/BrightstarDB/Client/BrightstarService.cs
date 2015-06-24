@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using BrightstarDB.Caching;
 using BrightstarDB.Client.RestSecurity;
+using BrightstarDB.Config;
 using BrightstarDB.Server;
 using System;
 using VDS.RDF.Query;
@@ -34,19 +35,19 @@ namespace BrightstarDB.Client
         /// Returns a client for the embededd stores in the specified location
         ///</summary>
         ///<param name="baseLocation">The base directory for stores accessed by this client</param>
-        /// <param name="clientConfiguration">Configuration options for the client.</param>
+        /// <param name="serviceConfigurationOptions">OPTIONAL: Additional configuration options that apply only when creating an embedded service instance.</param>
         ///<returns>A new Brightstar service client</returns>
-        internal static IBrightstarService GetEmbeddedClient(string baseLocation, ClientConfiguration clientConfiguration = null)
+        internal static IBrightstarService GetEmbeddedClient(string baseLocation, EmbeddedServiceConfiguration serviceConfigurationOptions = null)
         {
-            return new EmbeddedBrightstarService(baseLocation, clientConfiguration);
+            return new EmbeddedBrightstarService(baseLocation, serviceConfigurationOptions);
         }
 
         ///<summary>
         /// Gets a client based on the connection string specified in the configuration.
         ///</summary>
-        /// <param name="clientConfiguration">Configuration options for the client.</param>
+        /// <param name="serviceConfigurationOptions">OPTIONAL: Additional configuration options that apply only when creating an embedded service instance.</param>
         ///<returns>A new Brightstar service client</returns>
-        public static IBrightstarService GetClient(ClientConfiguration clientConfiguration = null)
+        public static IBrightstarService GetClient(EmbeddedServiceConfiguration serviceConfigurationOptions = null)
         {
             var configuration = Configuration.ConnectionString;
             if(String.IsNullOrEmpty(configuration))
@@ -54,36 +55,36 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException(Strings.BrightstarServiceClient_NoConnectionStringConfiguration);
             }
             // use connection string in config
-            return GetClient(new ConnectionString(Configuration.ConnectionString), clientConfiguration);
+            return GetClient(new ConnectionString(Configuration.ConnectionString), serviceConfigurationOptions);
         }
 
         ///<summary>
         /// Gets a client based on the connection string parameter
         ///</summary>
         ///<param name="connectionString">The connection string</param>
-        /// <param name="clientConfiguration">Configuration options for the client.</param>
+        /// <param name="serviceConfigurationOptions">OPTIONAL: Additional configuration options that apply only when creating an embedded service instance.</param>
         ///<returns>A new Brightstar service client</returns>
-        public static IBrightstarService GetClient(string connectionString, ClientConfiguration clientConfiguration = null)
+        public static IBrightstarService GetClient(string connectionString, EmbeddedServiceConfiguration serviceConfigurationOptions = null)
         {
-            return GetClient(new ConnectionString(connectionString), clientConfiguration);
+            return GetClient(new ConnectionString(connectionString), serviceConfigurationOptions);
         }
 
         ///<summary>
         /// Gets a client based on the connection string parameter
         ///</summary>
         ///<param name="connectionString">The connection string</param>
-        /// <param name="clientConfiguration">Configuration options for the client.</param>
+        /// <param name="serviceConfigurationOptions">OPTIONAL: Additional configuration options that apply only when creating an embedded service instance.</param>
         ///<returns>A new Brightstar service client</returns>
-        public static IBrightstarService GetClient(ConnectionString connectionString, ClientConfiguration clientConfiguration = null)
+        public static IBrightstarService GetClient(ConnectionString connectionString, EmbeddedServiceConfiguration serviceConfigurationOptions = null)
         {
-            if (clientConfiguration == null)
+            if (serviceConfigurationOptions == null)
             {
-                clientConfiguration = ClientConfiguration.Default;
+                serviceConfigurationOptions = new EmbeddedServiceConfiguration();
             }
             switch (connectionString.Type)
             {
                 case ConnectionType.Embedded:
-                    return new EmbeddedBrightstarService(connectionString.StoresDirectory, clientConfiguration);
+                    return new EmbeddedBrightstarService(connectionString.StoresDirectory, serviceConfigurationOptions);
 #if !WINDOWS_PHONE
                 case ConnectionType.Rest:
                     return GetRestClient(connectionString);

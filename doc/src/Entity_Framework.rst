@@ -130,7 +130,6 @@ model. To get an entity by a given property the following can be used::
                          c => c.Name.Equals("BrightstarDB")).FirstOrDefault();
 
 
-
 Once an entity has been retrieved it can be modified or related entities can be fetched::
 
   // fetching employees
@@ -183,6 +182,69 @@ Saving the changes that have occurred is easily done by calling a method on the 
 
   dataContext.SaveChanges();
 
+.. _Example_LINQ_Queries:
+
+Example LINQ Queries
+====================
+
+LINQ provides you with a flexible query language with the added advantage of Intellisense
+type-checking. In this section we show a few LINQ query patterns that are commonly used with
+the BrightstarDB entity framework. All of the examples assume that the ``context`` variable
+is a BrightstarDB Entity Framework context.
+
+To retrieve an entity by its ID
+-------------------------------
+
+.. code-block:: c#
+
+	var bob = context.Persons.Where(x=>x.Id.Equals("bob"));
+  
+To retrieve several entities by their IDs
+-----------------------------------------
+
+.. code-block:: c#
+
+	var people = context.Persons.Where(x=>new []{"bob", "sue", "rita"}.Contains(x.Id));
+
+A simple property filter
+------------------------
+
+.. code-block:: c#
+
+    var youngsters = context.Persons.Where(x=>x.Age < 21);
+	
+Sorting results
+---------------
+
+.. code-block:: c#
+
+    var byAge = context.Persons.OrderBy(x=>x.Age);
+	var byAgeDescending = context.Persons.OrderByDescending(x=>x.Age);
+	
+Retrieving related items
+------------------------
+
+.. code-block:: c#
+
+	var fathers = context.Persons.Select(x=>x.Father);
+	var bartsFather = context.Persons.Where(x=>x.Id.Equals("bart")).FirstOrDefault(x=>x.Father);
+	
+Return complex values as anonymous objects
+------------------------------------------
+
+.. code-block:: c#
+
+    var stockInfo = from x in context.Companies select new {x.Name, x.TickerSymbol, x.Price};
+	
+Aggregates
+----------
+
+.. code-block:: c#
+
+	var averageHeadcount = context.Companies.Average(x=>x.HeadCount);
+	var smallestCompanySize = context.Companies.Min(x=>x.HeadCount);
+	var largestCompanySize = context.Companies.Max(x=>x.HeadCount);
+	
 
 .. _Annotations_Guide:
 
@@ -249,6 +311,8 @@ The following example shows how this is defined::
 No annotation is required. It is also acceptable for the property to be called ``ID``, ``{Type}Id`` or 
 ``{Type}ID`` where ``{Type}`` is the name of the type. E.g: ``PersonId`` or ``PersonID``.
 
+.. _Identifier_Attribute:
+
 Identifier Attribute
 --------------------
 
@@ -276,6 +340,32 @@ where {prefix} is a namespace prefix defined by the Namespace Declaration Attrib
   
 The ``Identifier`` attribute has additional arguments that enable you to specify a (composite)
 key for the type. For more information please refer to the section :ref:`Key_Properties_In_EF`.
+
+From BrightstarDB release 1.9 it is possible to specify an empty string as the identifier prefix.
+When this is done, the value assigned to the Id property MUST be a absolute URI as it is used
+unaltered in the generated RDF triples. This gives your application complete control over the 
+URIs used in the RDF data, but it also requires that your application manages the generation
+of those URIs::
+
+  [Entity]
+  public interface ICompany {
+    [Identifier("")]
+    string Id {get;}
+  }
+  
+**NOTE**: When using an empty string identifier prefix like this, the ``Create()`` method on the
+context collection will automatically generate a URI with the prefix ``http://www.brightstardb.com/.well-known/genid/``.
+To avoid this, you should instead create the entity directly using the constructor and
+add it to the context. There are several ways in which this can be done::
+
+    var co1 = context.Companies.Create();                           // This will get a BrightstarDB genid URI
+    
+    var co2 = new Company { Id = "http://contoso.com/" };           // Create an entity with the URI http://contoso.com
+    context.Companies.Add(co2);                                     // ...then add it to the context
+    
+    var co3 = new Company(context) { Id = "http://example.com" };   // Create and add in a single line
+    context.Companies.Add(
+        new Company { Id = "http://networkedplanet.com" } );        // Alternate single-line approach
 
 
 Property Inclusion
@@ -334,7 +424,7 @@ on the referencing type to be specified::
   }
 
   [Entity("Company")] 
-  public interface IPerson {
+  public interface ICompany {
     string Id { get; }
     [InverseProperty("Employer")]
     ICollection<IPerson> Employees { get; set; }
@@ -807,6 +897,11 @@ in the context.
     generic SPARQL back-end, as the SPARQL UPDATE protocol does not allow for such transaction
     pre-conditions to be checked.
 
+.. note::
+	Key constraints are **not** validated if you use the AddOrUpdate method to add
+	an item to the context. In this case, an existing item with the same key will
+	simply be overwritten by the item being added.
+	
 Changing Identifiers
 --------------------
 
@@ -830,6 +925,12 @@ is modified in this way.
     (e.g. the ID of the parent entity) is not modified once it is used to construct other
     identifiers.
     
+Null Or Empty Keys
+------------------
+
+An key that is either null or an empty string is not allowed. When using the key generation 
+features of BrightstarDB, if the generated key that results is either ``null`` or an empty 
+string, the framework will raise a ``BrightstarDB.EntityFramework.EntityKeyRequiredException``. 
     
 .. _Optimistic_Locking_in_EF:
 
@@ -933,7 +1034,7 @@ Any                Supported as first result operator. Not supported as second o
 All                Supported as first result operator. Not supported as second or subsequent result operator  
 Average            Supported as first result operator. Not supported as second or subsequent result operator.  
 Cast               Supported for casting between Entity Framework entity types only  
-Contains           Supported for literal values only  
+Contains           Supported for literal values as a filter (e.g. ``x=>x.SomeProperty.Contains("foo")`` )
 Count              Supported with or without a Boolean filter expression. Supported as first result operator. Not supported as second or subsequent result operator.  
 Distinct           Supported for literal values. For entities ``Distinct()`` is supported but only to eliminate duplicates of the same Id any override of .Equals on the entity class is not used.  
 First              Supported with or without a Boolean filter expression  
@@ -941,8 +1042,8 @@ LongCount          Supported with or without a Boolean filter expression. Suppor
 Max                Supported as first result operator. Not supported as second or subsequent result operator.  
 Min                Supported as first result operator. Not supported as second or subsequent result operator.  
 OfType<TResult>    Supported only if ``TResult`` is an Entity Framework entity type
-OrderBy    
-OrderByDescending    
+OrderBy            The enumeration will not include those items where the sort property has a null value.
+OrderByDescending  The enumeration will not include those items where the sort property has a null value.  
 Select    
 SelectMany    
 Single             Supported with or without a Boolean filter expression  
@@ -1284,3 +1385,56 @@ writing an application that will regularly deal with different named graphs
 you may want to consider using the :ref:`Data Object Layer API <Data_Object_Layer>`
 and SPARQL or the low-level RDF API for update operations.
     
+Roslyn Code Generation
+======================
+
+From version 1.11, BrightstarDB now includes support for generating an entity context class using the .NET 
+Roslyn compiler library. The Roslyn code generator has a number of benefits over the TextTemplate code
+generator:
+
+    #. It can generate both C# and VB code.
+    #. It allows you to use the nameof operator in InverseProperty attributes::
+    
+            [InverseProperty(nameof(IParentEntity.Children))]
+         
+    #. It supports generating the code either through a T4 template or from the command-line,
+       which makes it possible to generate code without using Visual Studio.
+    #. It will support code generation in Xamarin Studio / MonoDevelop
+
+.. note::
+   The Roslyn code generation features are dependent upon .NET 4.5 and in VisualStudio
+   require VS2015 CTP5 release or later.
+   
+   
+Console-based Code Generation
+-----------------------------
+
+The console-based code generator can be added to your solution by installing the NuGet package
+BrightstarDB.CodeGeneration.Console. You can do this in the NuGet Package Manager Console with 
+the following command::
+
+    Install-Package BrightstarDB.CodeGeneration.Console
+    
+Installing this package adds a solution-level tool to your package structure. You can then run this 
+tool with the following command::
+
+    BrightstarDB.CodeGeneration.Console [/EntityContext:ContextClassName] [/Language:VB|CS] ``path/to/MySolution.sln`` ``My.Context.Namespace`` ``Output.cs``
+    
+This will scan the code in the specified solution and generate a new BrightstarDB entity context class in the namespace provided,
+writing the generated code to the specified output file. By default, the name of the entity context class is ``EntityContext``, but
+this can be changed by providing a value for the optional ``/EntityContext`` parameter (short name ``/CN``). The language used 
+in the output file will be based on the file extension, but you can override this with the optional ``/Langauge`` parameter.
+
+T4 Template-based Generation
+----------------------------
+
+We also provide a T4 template which acts as shim to invoke the code generator. This can be more convenient when working in 
+a development environment such as Visual Studio or Xamarin Studio. To use the T4 template, you should install the NuGet
+package ``BrightstarDB.CodeGeneration.T4``::
+
+    Install-Package BrightstarDB.CodeGeneration.T4
+    
+This will add a file named ``EntityContext.tt`` to your project. You can move this
+file around in the project and it will automatically use the appropriate namespace 
+for the generated context class. You can also rename this file to change the name 
+of the generated context class.

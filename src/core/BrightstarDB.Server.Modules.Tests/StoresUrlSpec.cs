@@ -27,7 +27,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                           new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
                                           new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
 
-            var response = app.Get("/", c=>c.Accept(MediaRange.FromString("application/json")));
+            var response = app.Get("/", c=>c.Accept(new MediaRange("application/json")));
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
@@ -41,7 +41,37 @@ namespace BrightstarDB.Server.Modules.Tests
                                                       new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
             var response = app.Get("/");
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Body.AsString(), Contains.Substring("<title>BrightstarDB: Stores</title>"));
+            Assert.That(response.Body.AsString(), Contains.Substring("<title>BrightstarDB - Stores</title>"));
+        }
+
+        [Test]
+        public void TestGetReturnsCorsHeader()
+        {
+            var mockBrightstar = new Mock<IBrightstarService>();
+            mockBrightstar.Setup(s => s.ListStores()).Returns(new string[0]);
+            var app =
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
+            var response = app.Get("/", c=>c.Header("Origin", "http://example.com/"));
+            Assert.That(response.Headers["Access-Control-Allow-Origin"], Is.EqualTo("*"));            
+        }
+
+        [Test]
+        public void TestCorsHeaderOnInternalServerErrors()
+        {
+            var mockBrightstar = new Mock<IBrightstarService>();
+            mockBrightstar.Setup(s => s.ListStores()).Throws(new Exception("An internal server error exception"));
+            var app =
+                new Browser(new FakeNancyBootstrapper(mockBrightstar.Object, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                                                      new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
+            var response = app.Get("/", c =>
+            {
+                c.Header("Origin", "http://example.com/");
+                c.Accept(new MediaRange("application/json"));
+            });
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+            Assert.That(response.Headers.ContainsKey("Access-Control-Allow-Origin"));
+            Assert.That(response.Headers["Access-Control-Allow-Origin"], Is.EqualTo("*"));            
         }
 
         [Test]
@@ -54,7 +84,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object, new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All), systemPermissions.Object));
 
             // Execute
-            var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
+            var response = app.Get("/", c => c.Accept(new MediaRange("application/json")));
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -73,7 +103,7 @@ namespace BrightstarDB.Server.Modules.Tests
                                                       new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.ListStores)));
 
             // Execute
-            var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
+            var response = app.Get("/", c => c.Accept(new MediaRange("application/json")));
 
             // Assert
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -100,7 +130,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
                 {
-                    with.Accept(MediaRange.FromString("application/json"));
+                    with.Accept(new MediaRange("application/json"));
                     with.JsonBody(new CreateStoreRequestObject("foo", PersistenceType.AppendOnly));
                     with.AjaxRequest();
                 });
@@ -130,7 +160,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject("foo", PersistenceType.AppendOnly));
                 with.AjaxRequest();
             });
@@ -151,7 +181,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject());
                 with.AjaxRequest();
             });
@@ -173,7 +203,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject("/invalid/store_name"));
                 with.AjaxRequest();
             });
@@ -196,7 +226,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject("foo"));
                 with.AjaxRequest();
             });
@@ -223,7 +253,7 @@ namespace BrightstarDB.Server.Modules.Tests
             // Execute
             var response = app.Post("/", with =>
             {
-                with.Accept(MediaRange.FromString("application/json"));
+                with.Accept(new MediaRange("application/json"));
                 with.JsonBody(new CreateStoreRequestObject("foo"));
                 with.AjaxRequest();
             });

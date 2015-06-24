@@ -11,7 +11,172 @@
 
 This section gives a brief outline of what is new / changed in each official release of BrightstarDB. Where there are breaking changes, that require 
 either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
-marked with FIX.
+marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
+
+****************************
+ Develop Branch
+****************************
+
+	- NEW: The BrightstarDB service now provides a Swagger API description and interactive documentation. [#205]
+	
+	- NEW: The default 18 second timeout for executing SPARQL Update and SPARQL Query requests can now be 
+	  altered in the BrightstarDB service configuration file. See :ref:`Additional_Configuration_Options`
+	  for more details. Thanks to Martin Lercher for the suggestion. [#211]
+
+	- NEW: The Import panel in Polaris now remembers the last-used file extension filter from the file selection
+	  dialog. Thanks to Martin Lercher for the suggestion. [#215]
+		   
+	- NEW: Polaris now allows defaults to \*.rq and \*.sq as the default extension for SPARQL queries.
+	  Thanks to Martin Lercher for the suggestion. [#216]
+	  
+	- FIX: Improvements to error reporting in the Polaris tool. Syntax errors are now properly reported for 
+	  import, SPARQL update and transactional update. Thanks to Martin Lercher for the bug report.
+		   
+	- FIX: The BrightstarDB server now uses the default Nancy view engine. This removes a dependency on
+	  Razor. [#207]
+
+	- NEW: The Entity Framework will now raise an EntityKeyRequiredException if a generated key is null or an empty string. [#199]
+	
+	- NEW: The BrightstarDB service now supports Cross-Origin Resource Sharing. This support is enabled
+	  by default but can be restricted or completely disabled in the service configuration file.
+	  For more information see :ref:`Configuring_CORS`. Thanks to Martin Lercher for the suggestion. [#210]
+	  
+	- NEW: The SPARQL Update implementation now supports the use of the BrightstarDB wildcard IRI specification
+	  in DELETE and DELETE DATA commands. For more information please refer to :ref:`RDF_Client_API_SPARQL_Update`. 
+	  Thanks to Martin Lercher for the suggestion. [#217]
+	  
+	- NEW: Added support for retrieving a set of entities by their ID in a single LINQ query. For more information
+	  please refer to :ref:`Example_LINQ_Queries`. Thanks to kentcb for the suggestion [#190]
+	  
+	- NEW: Added AddOrUpdate method to entity sets. When an entity is added to a context using AddOrUpdate,
+	  if the entity has an existing identity then this identity is used and any existing entity with the same
+	  identity is overwritten; if the entity does not have an existing identity, then a new identity is generated
+	  for it. Thanks to kentcb for the suggestion [#193]
+	
+
+****************************
+ BrightstarDB 1.10.1
+****************************
+
+    This hotfix release fixes an issue with a required DLL missing from the packaging of the Windows installer.
+    Thanks to Martin Lercher for the bug report.
+    
+****************************
+ BrightstarDB 1.10
+****************************
+
+    This is a bug-fix release. There are no changes to the store file format and no breaking API changes.
+    This is a recommended update for all users.
+    
+    All of the issues addressed in this release were reported by the BrightstarDB user community.
+    Special thanks go to GitHub user kentcb and CodePlex user e_ol, both of whom provided 
+    useful bug reports and code to reproduce the issues they discovered.
+    
+    
+    - FIX: Fix for file locking issue that prevents a store from being consolidated after one or more queries are run.
+           Thanks to e_ol for the report and repro code that helped in tracking this issue down. (#202)
+    
+    - FIX: Fix for missing AssemblyInfo.cs file in the iOS PCL build. Thanks to kentcb for the report. (#201)
+    
+    - ENHANCEMENT: Significant performance optimization for queries containing a wildcard triple pattern 
+           consisting only of variables. Thanks to kentcb for the report and repro. (#200)
+    
+    - FIX: Several fixes for Entity Framework handling of entity identifiers (#197, #192, #183, #182, #175).
+           Thanks to kentcb for the reports.
+           
+    - FIX: Removed Newtonsoft.Json from the PCL libraries NuGet package to avoid clashing with other installed
+           libraries. Thanks to kentcb for the report. (#178)
+           
+    - FIX: Fix for adding entities to collection properties that are marked as an inverse property. 
+           Thanks to kentcb for the report. (#184)
+           
+    - FIX: Added a small class to force a reference to BrightstarDB inside PCL applications. This is required
+           to prevent the iOS build from stripping out BrightstarDB code that is referenced through the PCL
+           dependency resolution process. Thanks to kentcb for the report and suggested fix. (#181)
+           
+    - FIX: Fixed PCL platform assembly resolution for iOS. Thanks to kentcb for the report. (#176)
+    
+    - ENHANCEMENT: Streamlined the build process for a better experience building under Linux. 
+           Thanks to kentcb for the suggestion. (#172)
+    
+****************************
+ BrightstarDB 1.9.1
+****************************
+
+    This is primarily a bug-fix release with some important updates for applications using date/time values in the BrightstarDB Entity Framework.
+    In addition this release adds support for the Xamarin.iOS PCL profile. This enables BrightstarDB to be used in Xamarin.Forms PCL applications 
+    across Android, Windows Phone and iOS. There are no changes to the store file format, and no breaking API changes. This is a recommended update 
+    for all users.
+
+    - NEW: The PCL platform libraries now includes support for the Xamarin.iOS, Version=1.0 PCL framework. 
+
+    - FIX: Making changes the the properties of BrightstarDB.Configuration that configure the server-side query caching will now cause the cache to be
+           deleted and recreated with the new settings on the next request for the cache handle.
+    
+    - FIX: Added caching of master file data structures to improve performance in applications that perform large numbers of reads per write.
+    
+    - FIX: UTC date/time values now keep their status as UTC values. Thanks to kentcb for the bug report.
+    
+    - FIX: Fix for round-tripping date/time values in US locale.
+    
+    - FIX: Fixed an issue in the text template code generation for EF that would report an error on properties using a nullable enumeration type.
+           Thanks to kentcb for the bug report on this one too!
+    
+    - NEW: Added caching of master file status which should improve performance in applications which perform large numbers of read/query operations
+           from the same commit point.
+          
+           
+****************************
+ BrightstarDB 1.9 Release
+****************************
+
+    - NEW: The W3C SPARQL 1.1 Graph Store Protocol is now implemented by the BrightstarDB service. See :ref:`SPARQL_Endpoint` for more information.
+    
+    - NEW: The Polaris UI now allows the default graph IRI to be specified for import operations. Thanks to Daniel Bryars for this contribution.
+    
+    - NEW: The REST API implementation now reports parser error messages back to the client along with the 400 status code. Polaris has also been
+           updated to display these messages to the end-user. Thanks to Daniel Bryars for this contribution.
+           
+    - NEW: It is now possible to configure an embedded BrightstarDB client to not log transaction data. As this transaction data can be quite large,
+           the default for mobile and windows store configurations is now for transaction logging to be disabled. For all other platforms, transaction
+           logging is enabled by default but this default can be overridden either by app settings or programmatically. For more information please
+           refer to :ref:`Controlling_Transaction_Logging`
+           
+    - **BREAKING**: There is a minor API change to the BrightstarDB.Configuration API. The PreloadConfiguration property has been replaced with the
+            EmbeddedServiceConfiguration property (the PreloadConfiguration can be found as a property of the EmbeddedServiceConfiguration). This 
+            change will only affect applications which programmatically set the page cache preload configuration. Applications which use the app.config
+            or web.config file to configure page cache preload should not be affected by this change.
+           
+    - NEW: The Entity Framework now allows the creation of Id properties whose value is the full IRI of the underlying RDF resource (without any
+           predefined prefix). This is achieved by using the Identifier decorator with an empty string for the BaseAddress parameters ([Identifier("")]).
+           For more information please refer to :ref:`Identifier_Attribute` in the Entity Framework :ref:`Annotations_Guide`.
+    
+****************************
+ BrightstarDB 1.8 Release
+****************************
+
+    - NEW: EntityFramework now supports GUID properties.
+    
+    - NEW: EntityFramework now has an [Ignore] attribute which can be used to decorate interface properties
+           that are not to be implemented by the generated EF class. See the :ref:`guide to EF Annotations <Annotations_Guide>` for
+           more information.
+           
+    - NEW: Added a constructor option to generated EF entity classes that allows property initialisation in the constructor. Thanks to CyborgDE for
+           the suggestion.
+        
+    - NEW: Added some basic logging support for Android and iOS PCL builds. These builds now log diagnostic messages when built in Debug configuration,
+           and the BrightstarDB logging subsystem can be initialized with a local file name to generate persistent log files in Release configuration.
+           
+    - NEW: It is now possible to iterate the distinct predicates of a data object using the GetPropertyTypes method.
+    
+    - FIX: Fix for Polaris crash when attempting to process a query containing a syntax error.
+    
+    - FIX: Fixed NuGet packaging to remove an obsolete reference to Windows Phone 8. WP8 (and 8.1) are still both supported but as PCL profiles.
+    
+    - FIX: Performance fix for full cache scenarios. When an attempt to evict items out of a full cache results in no items being evicted, the eviction
+           process will not be repeated again for another minute to allow for any current update transactions that have locked pages in the cache to complete.
+           This can avoid a lot of unnecessary cache scans when a large update transaction is being processed. Thanks to CyborgDE for the bug report.
+           
 
 ****************************
  BrightstarDB 1.7 Release

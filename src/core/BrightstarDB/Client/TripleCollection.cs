@@ -43,6 +43,28 @@ namespace BrightstarDB.Client
             foreach (ITriple t in triples) Add(t);
         }
 
+        public void Remove(ITriple triple)
+        {
+            if (triple.IsLiteral)
+            {
+                RemoveBySubjectPredicateLiteral(triple.Subject, triple.Predicate, triple.Object, triple.DataType,
+                    triple.LangCode);
+            }
+            else
+            {
+                RemoveBySubjectPredicateObject(triple.Subject, triple.Predicate, triple.Object);
+            }
+        }
+
+        public void RemoveWhere(Func<ITriple, bool> criteria)
+        {
+            var toRemove = Items.Where(criteria).ToList();
+            foreach (var t in toRemove)
+            {
+                Remove(t);
+            }
+        }
+
         public void RemoveBySubject(string subject)
         {
             if (subject == null) throw new ArgumentNullException("subject");

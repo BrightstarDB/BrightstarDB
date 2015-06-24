@@ -1,0 +1,3 @@
+﻿@Each
+	<td>@Current</td>
+@EndEach

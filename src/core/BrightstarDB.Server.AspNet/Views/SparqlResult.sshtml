@@ -1,0 +1,55 @@
+﻿@Master['Layout.sshtml']
+
+@Section['Content']
+<nav>
+    <ul class="horizontal breadcrumb">
+        <li><a href="@Path['~/']">Home</a></li>
+        <li><a href="@Path['~/@Model.StoreName']">Store: @Model.StoreName</a></li>
+        @If.HasCommitId
+            <li><a href="@Path['~/@Model.StoreName/commits']">Commits</a></li>
+            <li><a href="@Path['~/@Model.StoreName/commits/@Model.CommitId']">@Model.CommitId</a></li>
+        @EndIf
+        <li><a href="#">SPARQL Query</a></li>
+    </ul>
+</nav>
+
+<form method="POST">
+    <fieldset>
+        <legend>Query</legend>
+        <textarea name="query" rows="10" style="width: 100%">@Model.SparqlRequest.Query</textarea>
+        <button type="submit">Query</button>
+    </fieldset>
+</form>
+
+<fieldset>
+	<legend>Results</legend>
+	<p>Query processed in @Model.QueryExecution ms</p>
+	@If.HasErrorMessage
+		<p>One or more errors occurred. See details below.</p>
+		<div class="error">@Model.ErrorMessage</div>
+	@EndIf
+	@If.HasFormattedResults
+		<p>Query returned @Model.Rows.Count row(s).</p>
+		<table class="items">
+			<thead>
+				<tr>
+					@Each.Variables
+						<td>@Current</td>
+					@EndEach
+				</tr>
+			</thead>
+			<tbody>
+				@Each.Rows
+					<tr>
+						@Partial['SparqlResultRowPartial.sshtml', @Current]
+					</tr>
+				@EndEach
+			</tbody>
+		</table>
+	@EndIf
+	@IfNot.HasFormattedResults
+	    <textarea readonly="readonly" rows="20" style="width: 100%">@Model.RawResults</textarea>
+	@EndIf
+</fieldset>
+
+@EndSection

@@ -2,15 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Xml;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Storage;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
 using NUnit.Framework;
 using Path = BrightstarDB.Portable.Compatibility.Path;
 
@@ -125,7 +122,7 @@ namespace BrightstarDB.Portable.iOS.Tests
             var resultStream = client.ExecuteQuery(storeName, query);
             var doc = XDocument.Load(resultStream);
             Assert.IsNotNull(doc.Root);
-            var rows = doc.SparqlResultRows().ToList();
+            var rows = new List<XElement>(doc.SparqlResultRows());
             Assert.AreEqual(2, rows.Count);
 
             foreach (var row in rows)

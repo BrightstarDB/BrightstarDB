@@ -74,6 +74,32 @@ namespace BrightstarDB.EntityFramework.Tests
         }
 
         [Test]
+        public void TestGetDinnersByIds()
+        {
+            var q = from x in Context.Dinners where new string[] {"1", "2", "3"}.Contains(x.Id) select x;
+            var results = q.ToList();
+            var lastSparql = Context.LastSparqlQuery;
+            Assert.AreEqual(
+                NormalizeSparql(@"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" .} WHERE {
+?x ?x_p ?x_o . {
+SELECT ?x WHERE {
+  ?x a <http://www.networkedplanet.com/schemas/test/Dinner> . 
+  { BIND(<id:1> AS ?x) } 
+  UNION
+  { BIND(<id:2> AS ?x) } 
+  UNION
+  { BIND(<id:3> AS ?x) } 
+} } }"),
+            NormalizeSparql(lastSparql));
+        }
+
+        [Test]
+        public void TestIdEscaping(){
+            var q = Context.Dinners.FirstOrDefault(x => x.Id == "foo bar");
+            AssertQuerySparql("ASK { <id:foo%20bar> a <http://www.networkedplanet.com/schemas/test/Dinner> . }");
+        }
+
+        [Test]
         public void TestGetRsvpByDinnerId()
         {
             var q = from x in Context.Rsvps where x.Dinner.Id.Equals("1") select x;
@@ -656,25 +682,29 @@ FILTER(sameTerm(?m,?v0)) .
                     where d.Rsvps.Any(r => r.AttendeeEmail.Equals("kal@networkedplanet.com"))
                     select d.Id;
             var result = q.ToList();
-            AssertQuerySparql(@"SELECT ?d WHERE {
+            AssertQuerySparql(@"SELECT ?v2 WHERE {
     ?d a <http://www.networkedplanet.com/schemas/test/Dinner> .
     FILTER EXISTS {
         ?d <http://www.networkedplanet.com/schemas/test/attendees> ?r .
         ?r <http://www.networkedplanet.com/schemas/test/email> ?v1 .
         FILTER (?v1 = 'kal@networkedplanet.com') .
-    } }");
+    }
+    BIND(STRAFTER(STR(?d), 'http://www.brightstardb.com/.well-known/genid/') AS ?v2)
+}");
 
             var q2 = from m in Context.Markets
                      where m.ListedCompanies.Any(c => c.CurrentSharePrice > 10.0m)
                      select m.Id;
             var r2 = q2.ToList();
-            AssertQuerySparql(@"SELECT ?m WHERE {
+            AssertQuerySparql(@"SELECT ?v2 WHERE {
     ?m a <http://www.networkedplanet.com/schemas/test/Market> .
     FILTER EXISTS {
         ?m <http://www.networkedplanet.com/schemas/test/listing> ?c .
         ?c <http://www.networkedplanet.com/schemas/test/price> ?v1 .
         FILTER (?v1 > '10.00'^^<http://www.w3.org/2001/XMLSchema#decimal>) .
-    } }");
+    } 
+    BIND(STRAFTER(STR(?m), 'http://www.brightstardb.com/.well-known/genid/') AS ?v2)
+}");
         }
 
         [Test]
@@ -755,6 +785,7 @@ FILTER(sameTerm(?m,?v0)) .
     } 
 }");
         }
+
 
     }
 

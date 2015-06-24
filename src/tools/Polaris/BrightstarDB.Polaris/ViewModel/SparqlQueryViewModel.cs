@@ -257,7 +257,7 @@ namespace BrightstarDB.Polaris.ViewModel
                                            Title = "Load SPARQL Query",
                                            Directory = GetConfigurationPath(),
                                            DefaultExt = ".sq",
-                                           Filter = "SPARQL queries|*.sq",
+                                           Filter = "SPARQL queries (*.sq, *.rq)|*.sq;*.rq|All Files (*.*)|*.*",
                                            IsSave = false,
                                            Continuation = LoadSparqlQuery
                                        });
@@ -289,7 +289,7 @@ namespace BrightstarDB.Polaris.ViewModel
                                                Title = "Save SPARQL Query",
                                                Directory = targetPath,
                                                DefaultExt = ".sq",
-                                               Filter = "SPARQL queries|*.sq",
+                                               Filter = "SPARQL queries (*.sq, *.rq)|*.sq;*.rq",
                                                IsSave = true,
                                                Continuation = SaveSparqlQuery
                                            });

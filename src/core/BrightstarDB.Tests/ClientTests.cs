@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
+using BrightstarDB.Tests.EntityFramework;
 using NUnit.Framework;
 using VDS.RDF;
 using VDS.RDF.Parsing;
@@ -369,6 +370,14 @@ namespace BrightstarDB.Tests
             rows = result.SparqlResultRows().ToList();
             Assert.AreEqual(1, rows.Count);
             Assert.AreEqual(new Uri("http://example.org/resource2"), rows[0].GetColumnValue("o"));
+
+            // Issue #221: It should be possible to pass NULL for the default graph IRI without causing and invalid query POST
+            resultStream = client.ExecuteQuery(storeName, "select ?p ?o where { <http://example.org/resource13> ?p ?o }", (string)null, null, SparqlResultsFormat.Xml, RdfFormat.RdfXml);
+            result = XDocument.Load(resultStream);
+            rows = result.SparqlResultRows().ToList();
+            Assert.AreEqual(1, rows.Count);
+            Assert.AreEqual(new Uri("http://example.org/resource2"), rows[0].GetColumnValue("o"));
+
         }
 
         [Test]
@@ -507,7 +516,7 @@ namespace BrightstarDB.Tests
             var client =
                 BrightstarService.GetClient("type=embedded;storesDirectory=c:\\brightstar;storeName=" + storeName);
 
-            const string tripleData = "<http://www.networkedplanet.com/people/gra> <<http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
+            const string tripleData = "<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
             client.CreateStore(storeName);
             client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData =  tripleData});
         }
@@ -531,7 +540,7 @@ namespace BrightstarDB.Tests
                 client.CreateStore(storeName);
             }
 
-            const string tripleData = "<http://www.networkedplanet.com/people/gra> <<http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
+            const string tripleData = "<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/type/worksfor> <http://www.networkedplanet.com/companies/networkedplanet> .";
 
             client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = tripleData});
         }
@@ -981,6 +990,54 @@ namespace BrightstarDB.Tests
         }
 
         [Test]
+        public void TestExecuteTransaction()
+        {
+            var client = GetClient();
+            var storeName = "TestExecuteTransaction_" + DateTime.Now.Ticks;
+
+            client.CreateStore(storeName);
+
+            // Test a simple addition of triples
+            var insertData = new StringBuilder();
+            insertData.AppendLine(@"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/name> ""Alice"".");
+            insertData.AppendLine(
+                @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"".");
+            var job = client.ExecuteTransaction(storeName,
+                                                new UpdateTransactionData { InsertData = insertData.ToString() });
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+
+            //var resultStream = client.ExecuteQuery(storeName, "SELECT * WHERE { ?s <http://xmlns.com/foaf/0.1/mbox> ?p }");
+            //var resultDoc = XDocument.Load(resultStream);
+            //var resultRows = resultDoc.SparqlResultRows().ToList();
+            //Assert.AreEqual(1, resultRows.Count);
+
+            // Test an update with a precondition which is met
+            const string tripleToDelete = @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox> ""alice@example.org"".";
+            const string tripleToInsert = @"<http://example.org/people/alice> <http://xmlns.com/foaf/0.1/mbox_sha1sum> ""FAKESHA1""";
+            job = client.ExecuteTransaction(storeName,
+                                            new UpdateTransactionData
+                                            {
+                                                ExistencePreconditions = tripleToDelete,
+                                                DeletePatterns = tripleToDelete,
+                                                InsertData = tripleToInsert
+                                            });
+            job = WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedOk);
+
+            // Test an update with a precondition which is not met
+            job = client.ExecuteTransaction(storeName,
+                                            new UpdateTransactionData
+                                            {
+                                                ExistencePreconditions = tripleToDelete,
+                                                DeletePatterns = tripleToDelete,
+                                                InsertData = tripleToInsert
+                                            });
+            WaitForJob(job, client, storeName);
+            Assert.IsTrue(job.JobCompletedWithErrors);
+        }
+
+        [Test]
         public void TestCreateSnapshot()
         {
             var storeName = "CreateSnapshot_" + DateTime.Now.Ticks;
@@ -1182,39 +1239,12 @@ namespace BrightstarDB.Tests
 
         }
 
-
-        private static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
-                                              string graphUri)
+        [Test]
+        public void TestCreateEntityWithNoContext()
         {
-            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
+            MyEntityContext.InitializeEntityMappingStore();
+            var entity = new BaseEntity {Id = "foo"};
         }
-
-        private static void AssertTriplePatternInDefaultGraph(IBrightstarService client, string storeName,
-                                                              string triplePattern)
-        {
-            var sparql = "ASK {{" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
-        }
-
-        private static void AssertTriplePatternNotInGraph(IBrightstarService client, string storeName, string triplePattern,
-                                      string graphUri)
-        {
-            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
-        }
-
-        private static void AssertTriplePatternNotInDefaultGraph(IBrightstarService client, string storeName,
-                                                              string triplePattern)
-        {
-            var sparql = "ASK {{" + triplePattern + "}}";
-            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
-            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
-        }
-
     }
 }
 

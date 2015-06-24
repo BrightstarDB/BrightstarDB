@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -39,9 +38,11 @@ namespace BrightstarDB.Client
         {
             if (identity == null) throw new ArgumentNullException("identity");
             var resolvedIdentity = ResolveIdentity(identity);
-            var dataObject = new DataObject(this, resolvedIdentity);
-            BindDataObject(dataObject);
-            RegisterDataObject(dataObject);
+            var dataObject = RegisterDataObject(new DataObject(this, resolvedIdentity));
+            if (!dataObject.IsLoaded)
+            {
+                BindDataObject(dataObject);
+            }
             return dataObject;
         }
 
@@ -156,8 +157,8 @@ namespace BrightstarDB.Client
 
         private IEnumerable<Triple> GetTriplesForDataObject(string identity)
         {
-            Stream sparqlResultStream = Client.ExecuteQuery(string.Format(QueryTemplate, identity), DataSetGraphUris);
-            XDocument data = XDocument.Load(sparqlResultStream);
+            var sparqlResultStream = Client.ExecuteQuery(string.Format(QueryTemplate, identity), DataSetGraphUris);
+            var data = XDocument.Load(sparqlResultStream);
 
             foreach (var sparqlResultRow in data.SparqlResultRows())
             {
@@ -178,7 +179,7 @@ namespace BrightstarDB.Client
                     {
                         triple.LangCode = langCode;
                     }
-                    triple.Object = sparqlResultRow.GetColumnValue("o").ToString().Trim();
+                    triple.Object = sparqlResultRow.GetLiteralString("o");
                     triple.IsLiteral = true;
                 }
                 else

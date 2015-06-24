@@ -74,6 +74,7 @@
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <Net40Dep Include="..\src\lib\unused_dependencies\*.dll;..\src\lib\Remotion.Linq.dll" />
       <WP71Sdk Include="..\src\mobile\BrightstarDB.Mobile\bin\$(Configuration)\*.dll"/>
+      <Service Include="..\src\core\BrightstarDB.Server.Modules\bin\$(Configuration)\*.dll" />
 	  <Service Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.dll"/>
 	  <ServiceAssets Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\assets\**\*.*"/>
 	  <ServiceViews Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\views\**\*.*"/>
@@ -88,6 +89,7 @@
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityDefinition.zip"/>
       <Polaris Include="..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\*.dll;
 			..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\Polaris.exe"/>
+      <AspNetServerBin Include="..\src\core\BrightstarDB.Server.Modules\bin\$(Configuration)\*.dll"/>
       <AspNetServerBin Include="..\src\core\BrightstarDB.Server.AspNet\bin\*.dll"/>
       <AspNetServerAssets Include="..\src\core\BrightstarDB.Server.AspNet\assets\**\*.*" />
       <AspNetServerViews  Include="..\src\core\BrightstarDB.Server.AspNet\views\**\*.*" />
@@ -168,8 +170,8 @@
 	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
     <MSBuild Projects="..\src\portable\BrightstarDB.Portable.Android\BrightstarDB.Portable.Android.csproj"
              Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" />
-    <MSBuild Projects="..\src\portable\BrightstarDB.Portable.iOS\BrightstarDB.Portable.iOS.csproj"
-             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" 
+    <MSBuild Projects="..\src\portable\ios.sln"
+             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" 
              Condition="$(BuildIOS)"/>
   </Target>
   
@@ -199,7 +201,14 @@
 	<MSBuild Projects="..\src\portable\portable.sln"
 	         Targets="Clean"
 			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+	<MSBuild Projects="..\src\portable\android.sln"
+	         Targets="Clean"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+	<MSBuild Projects="..\src\portable\ios.sln"
+	         Targets="Clean"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
   </Target>
+
   <Target Name="Clean" DependsOnTargets="CleanInstallerTmp;CleanOutput;CleanPortable">
     <MSBuild Projects="BrightstarDB\BrightstarDB.wixproj"
 	     Targets="Clean"
@@ -224,13 +233,15 @@
 		<PlatformNuspecTemplate Include="nuget\BrightstarDB.Platform.nuspec.template"/>
         <Net40Libs Include="InstallerTmp\SDK\Net40\BrightstarDB.dll;InstallerTmp\SDK\Net40\Remotion.Linq.dll" />
         <TextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
-		<Portable158Libs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\BrightstarDB.Portable.dll" />
+        <ForceReference Include="nuget\BrightstarDBForceReference.cs.pp" />
+		<PortableLibs Include="..\src\portable\BrightstarDB.Portable\bin\$(Configuration)\BrightstarDB.Portable.dll" />
 		<PortableDesktop Include="..\src\portable\BrightstarDB.Portable.Desktop\bin\$(Configuration)\BrightstarDB.Portable.Desktop.dll" />
 		<PortablePhone Include="..\src\portable\BrightstarDB.Portable.Phone\bin\$(Configuration)\BrightstarDB.Portable.Phone.dll"/>
 		<PortableSilverlight Include="..\src\portable\BrightstarDB.Portable.Silverlight\bin\$(Configuration)\BrightstarDB.Portable.Silverlight.dll"/>
 		<PortableStore Include="..\src\portable\BrightstarDB.Portable.Store\bin\$(Configuration)\BrightstarDB.Portable.Store.dll" />
         <PortableAndroid Include="..\src\portable\BrightstarDB.Portable.Android\bin\$(Configuration)\BrightstarDB.Portable.Android.dll" />
         <PortableIOS Include="..\src\portable\BrightstarDB.Portable.iOS\bin\iPhone\$(Configuration)\BrightstarDB.Portable.iOS.dll"/>
+        <PortableMonoTouch Include="..\src\portable\BrightstarDB.Portable.MonoTouch\bin\iPhone\$(Configuration)\BrightstarDB.Portable.MonoTouch.dll"/>
     </ItemGroup>
     
     <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
@@ -264,20 +275,33 @@
 			 Query="package/metadata/version"
 			 Value="$(PackageBuildNumber)" />
 
+    <!-- Cannot target .NET 40 PCL due to lack of System.Xml.Linq -->
+    <!--
+	<Copy SourceFiles="@(PortableDesktop)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\net40" />
+    -->
+    
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net40"/>
     <Copy SourceFiles="@(Net40Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\net45"/>
-    <Copy SourceFiles="@(Portable158Libs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+wp80+sl5+win8+MonoAndroid10+MonoTouch10" />
+    <!-- This is supposedly profile 158
+    <Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1"/>
+    -->
+    <!-- But this is what VS2013 claims it wants for a project targetting profile 158... -->
+    <Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10"/>
+
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs" />
     
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB" />
     <Copy SourceFiles="@(TextTemplates)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB\content" />
     
+    
 	<Copy SourceFiles="@(PortableDesktop)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\net45" />
 	<Copy SourceFiles="@(PortablePhone)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\wp80" />
 	<Copy SourceFiles="@(PortableSilverlight)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl5" />
 	<Copy SourceFiles="@(PortableStore)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\win8" />
-    <Copy SourceFiles="@(PortableAndroid)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoAndroid" />
-    <Copy SourceFiles="@(PortableIOS)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoTouch" Condition="$(BuildIOS)" />
+    <Copy SourceFiles="@(PortableAndroid)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoAndroid10" />
+    <Copy SourceFiles="@(PortableMonoTouch)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoTouch10" Condition="$(BuildIOS)" />
+    <Copy SourceFiles="@(PortableIOS)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\Xamarin.iOS10" Condition="$(BuildIOS)" />
+    <Copy SourceFiles="@(ForceReference)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\content"/>
     <Warning Text="The iOS platform assembly is not included in this build." Condition="!$(BuildIOS)"/>
 	
     <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" />

@@ -21,6 +21,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="50"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -41,9 +42,12 @@
                 </i:Interaction.Triggers>
             </RadioButton>
         </StackPanel>
-        
-        <TextBlock Grid.Row="1" VerticalAlignment="Center" >Import File</TextBlock>
-        <Grid Grid.Row="1" Grid.Column="1" >
+
+        <TextBlock Grid.Row="1" VerticalAlignment="Center" >Graph Name</TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="{Binding ImportGraphName, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock Grid.Row="2" VerticalAlignment="Center" >Import File</TextBlock>
+        <Grid Grid.Row="2" Grid.Column="1" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -52,14 +56,14 @@
             <Button Grid.Column="1" Content=".." Width="20" Margin="3" Click="HandleFileSelectorClick"/>
         </Grid>
 
-        <Button Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" Width="100" Height="30" IsEnabled="{Binding IsValid}" Content="Start">
+        <Button Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" Width="100" Height="30" IsEnabled="{Binding IsValid}" Content="Start">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Click">
                     <Command:EventToCommand Command="{Binding StartClickCommand}" PassEventArgsToCommand="True"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </Button>
-        <TextBlock Grid.Row="3" VerticalAlignment="Top">Progress</TextBlock>
-        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ProgressText}" TextWrapping="Wrap"/>
+        <TextBlock Grid.Row="4" VerticalAlignment="Top">Progress</TextBlock>
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ProgressText}" TextWrapping="Wrap"/>
     </Grid>
 </UserControl>

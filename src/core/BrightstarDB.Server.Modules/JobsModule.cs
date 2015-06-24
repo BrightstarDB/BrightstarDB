@@ -21,6 +21,7 @@ namespace BrightstarDB.Server.Modules
             Get["/{storeName}/jobs"] = parameters =>
                 {
                     var jobsRequestObject = this.Bind<JobsRequestModel>();
+                    ViewBag.Title = jobsRequestObject.StoreName + " - Jobs";
                     if (jobsRequestObject == null || jobsRequestObject.StoreName == null)
                     {
                         return HttpStatusCode.BadRequest;
@@ -43,6 +44,7 @@ namespace BrightstarDB.Server.Modules
                     {
                         return HttpStatusCode.BadRequest;
                     }
+                    ViewBag.Title = request.StoreName + " - Job - " + request.JobId;
                     var job = brightstarService.GetJobInfo(request.StoreName, request.JobId);
                     if (job == null) return HttpStatusCode.NotFound;
                     var responseDto = job.MakeResponseObject(request.StoreName);
@@ -52,7 +54,7 @@ namespace BrightstarDB.Server.Modules
             Post["/{storeName}/jobs"] = parameters =>
                 {
                     var jobRequestObject = this.Bind<JobRequestObject>();
-
+                    ViewBag.Title = jobRequestObject.StoreName + "- Jobs";
                     // Validate
                     if (jobRequestObject == null) return HttpStatusCode.BadRequest;
                     if (String.IsNullOrWhiteSpace(jobRequestObject.JobType)) return HttpStatusCode.BadRequest;

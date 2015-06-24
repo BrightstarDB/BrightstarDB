@@ -2,10 +2,12 @@
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Polaris.Messages;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -22,6 +24,7 @@ namespace BrightstarDB.Polaris.ViewModel
         public delegate void ImportJobDelegate();
         private Dispatcher _dispatcher;
         private string _importFileName;
+        private string _importGraphName;
         private string _progressText;
         private bool _isValid;
         private bool _isLocalImport = true;
@@ -59,6 +62,7 @@ namespace BrightstarDB.Polaris.ViewModel
             }
         }
 
+        public string ImportGraphName { get { return _importGraphName; } set { _importGraphName = value; RaisePropertyChanged("ImportGraphName"); } }
         public string ProgressText { get { return _progressText; } set { _progressText = value; RaisePropertyChanged("ProgressText"); } }
         public bool IsValid { get { return _isValid; } set { _isValid = value; RaisePropertyChanged("IsValid"); } }
         public RelayCommand LocalImportCheckedCommand { get; private set; }
@@ -174,7 +178,12 @@ namespace BrightstarDB.Polaris.ViewModel
                         }
                     }
                     var client = BrightstarService.GetClient(Store.Source.ConnectionString);
-                    _transactionJob = client.ExecuteTransaction(Store.Location, String.Empty, String.Empty, lines, waitForCompletion:false);
+
+                    String graphUri = !String.IsNullOrWhiteSpace(ImportGraphName)
+                        ? ImportGraphName 
+                        : Constants.DefaultGraphUri;
+
+                    _transactionJob = client.ExecuteTransaction(Store.Location, String.Empty, String.Empty, lines, waitForCompletion: false, defaultGraphUri: graphUri);
                     _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle,
                                             new TransactionViewModel.JobMonitorDelegate(CheckJobStatus));
                 }
@@ -225,7 +234,7 @@ namespace BrightstarDB.Polaris.ViewModel
                     ProgressText = String.IsNullOrEmpty(_transactionJob.StatusMessage)
                                        ? "Import job failed. No further details provided by the server."
                                        : String.Format("Import job failed. Server reports : '{0}'",
-                                                       _transactionJob.StatusMessage);
+                                       _transactionJob.ExtractJobErrorMessage(stopOnFirstDetailMessage:true));
                     Messenger.Default.Send(new ShowDialogMessage(Strings.ImportFailedDialogTitle,
                                                                  String.Format(Strings.ImportFailedDialogMsg,
                                                                                Store.Location),
@@ -244,6 +253,8 @@ namespace BrightstarDB.Polaris.ViewModel
                     "Error retrieving job status information from server. This may indicate a networking problem or that the server has stopped running.";
             }
         }
+
+        
 
         private void HandleRemoteImportChecked()
         {

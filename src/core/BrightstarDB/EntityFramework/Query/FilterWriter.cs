@@ -15,6 +15,7 @@ namespace BrightstarDB.EntityFramework.Query
         private readonly ExpressionTreeVisitorBase _parent;
         private readonly StringBuilder _filterExpressionBuilder;
         private bool _castAsResourceType;
+        private string _identifierPrefix;
 
         /// <summary>
         /// Boolean flag that indicates if constant strings should be escaped using Regex.Escape when appending the to the filter.
@@ -361,6 +362,16 @@ namespace BrightstarDB.EntityFramework.Query
                     }
                     u = new Uri(resourceAddress);
                 }
+                else if (!String.IsNullOrEmpty(_identifierPrefix))
+                {
+                    if (!Uri.TryCreate(_identifierPrefix + o, UriKind.Absolute, out u))
+                    {
+                        throw new EntityFrameworkException(
+                            String.Format(
+                                "Unable to convert constant {0}{1} to a URI string as required for related resource filtering.",
+                                _identifierPrefix, o));
+                    }
+                }
                 else if (!Uri.TryCreate(o.ToString(), UriKind.Absolute, out u))
                 {
                     throw new EntityFrameworkException(
@@ -667,6 +678,8 @@ namespace BrightstarDB.EntityFramework.Query
                 ((expr) as SelectVariableNameExpression).BindingType == VariableBindingType.Resource)
             {
                 _castAsResourceType = true;
+                _identifierPrefix = EntityMappingStore.GetIdentifierPrefix(expr.Type);
+                //_identifierPrefix = EntityMappingStore.GetIdentifierPrefix(((SelectVariableNameExpression)expr).
             }
             _filterExpressionBuilder.Append(" IN (");
             VisitExpression(fromExpression);

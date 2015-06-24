@@ -1,0 +1,14 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    using BrightstarDB.EntityFramework;
+
+    public interface IIdWithSetter
+    {
+        [Identifier]
+        string Id
+        {
+            get;
+            set;
+        }
+    }
+}

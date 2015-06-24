@@ -32,7 +32,7 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
                                                 permissions.Object);
             var app = new Browser(bootstrapper);
 
-            var response = app.Get("/", c => c.Accept(MediaRange.FromString("application/json")));
+            var response = app.Get("/", c => c.Accept(new MediaRange("application/json")));
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
 
             permissions.VerifyAll();
@@ -61,7 +61,7 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
             var response = app.Get("/", c =>
             {
                 c.BasicAuth("alice", "password");
-                c.Accept(MediaRange.FromString("application/json"));
+                c.Accept(new MediaRange("application/json"));
             });
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 
@@ -91,7 +91,7 @@ namespace BrightstarDB.Server.Modules.Tests.Authentication
             var response = app.Get("/", c =>
             {
                 c.BasicAuth("alice", "invalidpassword");
-                c.Accept(MediaRange.FromString("application/json"));
+                c.Accept(new MediaRange("application/json"));
             });
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
 

@@ -143,7 +143,7 @@ namespace BrightstarDB.Rdf
         private static readonly RdfDatatype RdfDateTime = new RdfDatatype(
             DateTime,
             (o => ((DateTime) o).ToString("O", CultureInfo.InvariantCulture)),
-            (s, l) => Convert.ToDateTime(s, CultureInfo.InvariantCulture));
+            (s, l) => s.EndsWith("Z") ? Convert.ToDateTime(s, CultureInfo.InvariantCulture).ToUniversalTime() : Convert.ToDateTime(s, CultureInfo.InvariantCulture));
 
         private static readonly RdfDatatype RdfDate = new RdfDatatype(
             Date, 

@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using BrightstarDB.Caching;
 using BrightstarDB.Config;
 using BrightstarDB.Storage;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+
 
 namespace BrightstarDB
 {
@@ -20,7 +17,7 @@ namespace BrightstarDB
         public int StatsUpdateTimespan { get; set; }
         public int StatsUpdateTransactionCount { get; set; }
         public int TransactionFlushTripleCount { get; set; }
-        public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public EmbeddedServiceConfiguration EmbeddedServiceConfiguration { get; set; }
         public bool EnableVirtualizedQueries { get; set; }
 
         private const string TxnFlushTriggerPropertyName = "BrightstarDB.TxnFlushTripleCount";
@@ -94,13 +91,13 @@ namespace BrightstarDB
             StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
 
             // Cache Preload Configuration
-            PreloadConfiguration = new PageCachePreloadConfiguration
+            var preloadConfig = new PageCachePreloadConfiguration
             {
                 DefaultCacheRatio = GetApplicationSetting(CachePreloadRatioName, 0.5m),
                 Enabled = GetApplicationSetting(CachePreloadEnabledName, false)
             };
 
-
+            EmbeddedServiceConfiguration = new EmbeddedServiceConfiguration(preloadConfig, false);
         }
 
         private static string GetApplicationSetting(string key)

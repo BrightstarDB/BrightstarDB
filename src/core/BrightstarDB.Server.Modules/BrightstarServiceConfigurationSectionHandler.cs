@@ -41,6 +41,25 @@ namespace BrightstarDB.Server.Modules
                     configuration.SystemPermissionsProvider = ProcessSystemPermissions(systemPermissions);
                 }
 
+                var corsEl = sectionEl.GetElementsByTagName("cors").Item(0) as XmlElement;
+                configuration.CorsConfiguration = ProcessCorsOptions(corsEl);
+            }
+            return configuration;
+        }
+
+        private static CorsConfiguration ProcessCorsOptions(XmlElement cors)
+        {
+            var configuration = new CorsConfiguration();
+            if (cors == null) return configuration;
+            bool disableCors;
+            if (cors.HasAttribute("disabled") && bool.TryParse(cors.GetAttribute("disabled"), out disableCors))
+            {
+                configuration.DisableCors =  disableCors;
+            }
+            var allowOrigin = cors.GetElementsByTagName("allowOrigin").Item(0);
+            if (allowOrigin != null)
+            {
+                configuration.AllowOrigin = allowOrigin.InnerText;
             }
             return configuration;
         }

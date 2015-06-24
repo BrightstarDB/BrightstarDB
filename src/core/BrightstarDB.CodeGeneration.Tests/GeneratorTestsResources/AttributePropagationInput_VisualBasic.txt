@@ -1,0 +1,15 @@
+﻿Imports BrightstarDB.EntityFramework
+Imports System
+Imports System.ComponentModel
+
+Namespace BrightstarDB.CodeGeneration.Tests
+    Public Interface IAttributePropagation
+        <Identifier>
+        <Browsable(True)>
+        ReadOnly Property Id As String
+
+        <Browsable(True)>
+        <Description("This should carry through.")>
+        Property Number As Int32
+    End Interface
+End Namespace

@@ -453,6 +453,7 @@ namespace BrightstarDB.Client
                 CheckLoaded();
                 var ret = new DataObject(_store, newIdentity, true);
                 ret.BindTriples(_triples.Select(t => ReplaceIdentity(t, newIdentity)), true, enforceClassUniqueConstraint);
+                _store.ReplaceIdentity(Identity, newIdentity);
                 Delete();
                 return ret;
             }
@@ -461,6 +462,7 @@ namespace BrightstarDB.Client
                 CheckLoaded();
                 var ret = new DataObject(_store, newIdentity, true);
                 ret.BindTriples(_triples.Union(_store.GetReferencingTriples(this)).Select(t => ReplaceIdentity(t, newIdentity)), true, enforceClassUniqueConstraint);
+                _store.ReplaceIdentity(Identity, newIdentity);
                 Delete();
                 return ret;
             }

@@ -70,11 +70,8 @@
   </ItemGroup>
   <Import Project="..\BrightstarDB.PerformanceBenchmarks\BrightstarDB.PerformanceBenchmarks.projitems" Label="Shared" Condition="Exists('..\BrightstarDB.PerformanceBenchmarks\BrightstarDB.PerformanceBenchmarks.projitems')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
+    <Copy SourceFiles="..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="Models\MyEntityContext.tt" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

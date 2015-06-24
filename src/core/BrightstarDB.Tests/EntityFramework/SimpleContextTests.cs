@@ -7,6 +7,7 @@ using BrightstarDB.EntityFramework;
 using BrightstarDB.EntityFramework.Query;
 using NUnit.Framework;
 using System.ComponentModel;
+using VDS.RDF.Query.Algebra;
 using UnitTesting = NUnit.Framework;
 #if !PORTABLE
 using System.ComponentModel.DataAnnotations;
@@ -95,11 +96,97 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
+        [Test]
+        public void TestAddOrUpdateWithGeneratedId()
+        {
+            var storeName = "TestAddOrUpdateWithGeneratedId" + DateTime.UtcNow.Ticks;
+            var alice = new Person{Name="Alice", Age=25};
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.Persons.AddOrUpdate(alice);
+                context.SaveChanges();
+            }
+            Assert.IsNotNull(alice.Id);
+            var updateAlice = new Person {Id = alice.Id, Name = "UpdatedAlice", Age = 26};
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.Persons.AddOrUpdate(updateAlice);
+                context.SaveChanges();
+            }
+            Assert.AreEqual(alice.Id, updateAlice.Id);
+            using (var context = CreateEntityContext(storeName))
+            {
+                var people = context.Persons.ToList();
+                Assert.AreEqual(1, people.Count);
+                var p = people[0];
+                Assert.AreEqual("UpdatedAlice", p.Name);
+                Assert.AreEqual(26, p.Age);
+            }
+        }
+
+        [Test]
+        public void TestAddOrUpdateWithSimpleKey()
+        {
+            var storeName = "TestAddOrUpdateWithSimpleKey" + DateTime.UtcNow.Ticks;
+            var alice = new StringKeyEntity { Name = "alice", Description = "Alice Entity"};
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.StringKeyEntities.AddOrUpdate(alice);
+                context.SaveChanges();
+            }
+            Assert.IsNotNull(alice.Id);
+            Assert.AreEqual("alice", alice.Id);
+            var updateAlice = new StringKeyEntity{ Id = "alice", Description= "UpdatedAlice Entity"};
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.StringKeyEntities.AddOrUpdate(updateAlice);
+                context.SaveChanges();
+            }
+            Assert.AreEqual("alice", updateAlice.Id);
+            using (var context = CreateEntityContext(storeName))
+            {
+                var people = context.StringKeyEntities.ToList();
+                Assert.AreEqual(1, people.Count);
+                var p = people[0];
+                Assert.AreEqual("alice", p.Name);
+                Assert.AreEqual("UpdatedAlice Entity", p.Description);
+            }
+        }
+
+        [Test]
+        public void TestAddOrUpdateWithCompositeKey()
+        {
+            var storeName = "TestAddOrUpdateWithCompositeKey" + DateTime.UtcNow.Ticks;
+            var foo1 = new CompositeKeyEntity { First = "foo", Second = 1, Description="This is a test" };
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.CompositeKeyEntities.AddOrUpdate(foo1);
+                context.SaveChanges();
+            }
+            Assert.IsNotNull(foo1.Id);
+            Assert.AreEqual("foo.1", foo1.Id);
+            var updatedFoo1 = new CompositeKeyEntity{ First = "foo", Second = 1, Description = "This is an updated test" };
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.CompositeKeyEntities.AddOrUpdate(updatedFoo1);
+                context.SaveChanges();
+            }
+            Assert.AreEqual("foo.1", updatedFoo1.Id);
+            using (var context = CreateEntityContext(storeName))
+            {
+                var people = context.CompositeKeyEntities.ToList();
+                Assert.AreEqual(1, people.Count);
+                var p = people[0];
+                Assert.AreEqual("foo", p.First);
+                Assert.AreEqual(1, p.Second);
+                Assert.AreEqual("This is an updated test", p.Description);
+            }
+        }
 
         [Test]
         public void TestCustomTriplesQuery()
         {
-            string storeName = Guid.NewGuid().ToString();
+            var storeName = Guid.NewGuid().ToString();
             var people = new Person[10];
             using (var dataObjectStore = _dataObjectContext.CreateStore(storeName))
             {
@@ -234,9 +321,29 @@ where {
 
                 }
             }
+        }
 
+        [Test]
+        public void TestGetSetOfEntitiesById()
+        {
+            var storeName = "TestGetSetOfEntitiesById_" + DateTime.Now.Ticks;
+            using (var context = CreateEntityContext(storeName))
+            {
+                context.Persons.Add(new Person{Id="alice", Name = "Alice"});
+                context.Persons.Add(new Person { Id = "bob", Name = "Bob" });
+                context.Persons.Add(new Person { Id = "carol", Name = "Carol" });
+                context.SaveChanges();
+            }
 
-
+            using (var context = CreateEntityContext(storeName))
+            {
+                var results =
+                    context.Persons.Where(x => new string[] {"alice", "bob", "carol", "david"}.Contains(x.Id)).ToList();
+                Assert.AreEqual(3, results.Count);
+                Assert.IsTrue(results.Any(x=>x.Id.Equals("alice") && x.Name.Equals("Alice")));
+                Assert.IsTrue(results.Any(x => x.Id.Equals("bob") && x.Name.Equals("Bob")));
+                Assert.IsTrue(results.Any(x => x.Id.Equals("carol") && x.Name.Equals("Carol")));
+            }
         }
 
         [Test]
@@ -1235,6 +1342,60 @@ where {
         }
 
         [Test]
+        public void TestEmptyStringIdentifierPrefix()
+        {
+            var dataStoreName = "TestEmptyStringIdentifierPrefix_" + DateTime.UtcNow.Ticks;
+            using (var dataStore = _dataObjectContext.CreateStore(dataStoreName))
+            {
+                using (var context = new MyEntityContext(dataStore))
+                {
+                    var fido = new UriEntity {Id = "http://brightstardb.com/instances/Animals/fido", Label = "Fido"};
+                    context.UriEntities.Add(fido);
+                    var bob = new UriEntity(context) { Id = "http://example.org/people/bob", Label = "Bob" };
+                    context.SaveChanges();
+                }
+                var fidoDo =
+                    dataStore.BindDataObjectsWithSparql(
+                        "SELECT ?f WHERE { ?f <http://www.w3.org/2000/01/rdf-schema#label> \"Fido\"^^<http://www.w3.org/2001/XMLSchema#string> }").FirstOrDefault();
+                Assert.IsNotNull(fidoDo);
+                Assert.AreEqual(fidoDo.Identity, "http://brightstardb.com/instances/Animals/fido");
+                using (var context = new MyEntityContext(dataStore))
+                {
+                    var fido =
+                        context.UriEntities.FirstOrDefault(
+                            x => x.Id.Equals("http://brightstardb.com/instances/Animals/fido"));
+                    Assert.NotNull(fido);
+                    Assert.That(fido.Label, Is.EqualTo("Fido"));
+
+                    var bob = context.UriEntities.FirstOrDefault(x => x.Label.Equals("Bob"));
+                    Assert.NotNull(bob);
+                    Assert.That(bob.Id, Is.EqualTo("http://example.org/people/bob"));
+                }
+            }
+        }
+
+        [Test]
+        public void TestCreateMethodGeneratesValidUriForEmptyIdentifierPrefix()
+        {
+            var dataStoreName = "TestEmptyStringIdentifierPrefix_" + DateTime.UtcNow.Ticks;
+            using (var dataStore = _dataObjectContext.CreateStore(dataStoreName))
+            {
+                using (var context = new MyEntityContext(dataStore))
+                {
+                    var test = context.UriEntities.Create();
+                    test.Label = "Test";
+                    context.SaveChanges();
+                }
+                var testDo =
+                    dataStore.BindDataObjectsWithSparql(
+                        "SELECT ?f WHERE { ?f <http://www.w3.org/2000/01/rdf-schema#label> \"Test\"^^<http://www.w3.org/2001/XMLSchema#string> }")
+                        .FirstOrDefault();
+                Assert.IsNotNull(testDo);
+                Assert.IsTrue(testDo.Identity.StartsWith(Constants.GeneratedUriPrefix), "Unexpected identity: {0}. Expected a URI with the prefix {1}", testDo.Identity, Constants.GeneratedUriPrefix);
+            }
+        }
+
+        [Test]
         public void TestSkipAndTake()
         {
             string storeName = Guid.NewGuid().ToString();
@@ -1396,6 +1557,38 @@ where {
         }
 
         [Test]
+        public void TestSetCollectionWithManyToOneInverse()
+        {
+            var storeName = "TestSetCollectionWithManyToOneInverse_" + DateTime.Now.Ticks;
+            string marketId;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var market = new Market
+                {
+                    ListedCompanies = new[]
+                    {
+                        new Company {Name = "CompanyA"},
+                        new Company {Name = "CompanyB"},
+                        new Company {Name = "CompanyC"},
+                    }
+                };
+                context.Markets.Add(market);
+                context.SaveChanges();
+                marketId = market.Id;
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                var market = context.Markets.FirstOrDefault(x => x.Id.Equals(marketId));
+                Assert.IsNotNull(market);
+                Assert.AreEqual(3, market.ListedCompanies.Count);
+                Assert.IsTrue(market.ListedCompanies.Any(x => x.Name.Equals("CompanyA")));
+                Assert.IsTrue(market.ListedCompanies.Any(x => x.Name.Equals("CompanyB")));
+                Assert.IsTrue(market.ListedCompanies.Any(x => x.Name.Equals("CompanyC")));
+            }
+        }
+
+        [Test]
         public void TestQueryOnPrefixedIdentifier()
         {
             var storeName = Guid.NewGuid().ToString();
@@ -1513,7 +1706,7 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var testEntity = context.Entities.Create();
+                var testEntity = context.TestEntities.Create();
                 testEntity.SomeByteArray = new byte[] {0, 1, 2, 3, 4};
                 context.SaveChanges();
             }
@@ -1521,7 +1714,7 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var e = context.Entities.FirstOrDefault();
+                var e = context.TestEntities.FirstOrDefault();
                 Assert.IsNotNull(e);
                 Assert.IsNotNull(e.SomeByteArray);
                 Assert.AreEqual(5, e.SomeByteArray.Count());
@@ -1541,7 +1734,7 @@ where {
             {
                 using (var context = new MyEntityContext(doStore))
                 {
-                    var testEntity = context.Entities.Create();
+                    var testEntity = context.TestEntities.Create();
                     testEntity.SomeGuid = testGuid;
                     context.SaveChanges();
                 }
@@ -1550,16 +1743,16 @@ where {
             {
                 using (var context = new MyEntityContext(doStore))
                 {
-                    var testEntity = context.Entities.FirstOrDefault();
+                    var testEntity = context.TestEntities.FirstOrDefault();
                     Assert.IsNotNull(testEntity);
                     var testEntityId = testEntity.Id;
                     Assert.AreEqual(testGuid, testEntity.SomeGuid);
 
                     // Verify we can use a Guid value in a search
-                    testEntity = context.Entities.FirstOrDefault(e => e.SomeGuid.Equals(testGuid));
+                    testEntity = context.TestEntities.FirstOrDefault(e => e.SomeGuid.Equals(testGuid));
                     Assert.IsNotNull(testEntity);
                     Assert.AreEqual(testEntityId, testEntity.Id);
-                    Assert.IsNull(context.Entities.FirstOrDefault(e=>e.SomeGuid.Equals(Guid.Empty)));
+                    Assert.IsNull(context.TestEntities.FirstOrDefault(e=>e.SomeGuid.Equals(Guid.Empty)));
                 }
             }
         }
@@ -1573,7 +1766,7 @@ where {
             {
                 using (var context = new MyEntityContext(doStore))
                 {
-                    var testEntity = context.Entities.Create();
+                    var testEntity = context.TestEntities.Create();
                     testEntityId = testEntity.Id;
                     context.SaveChanges();
                 }
@@ -1582,7 +1775,7 @@ where {
             {
                 using (var context = new MyEntityContext(doStore))
                 {
-                    var testEntity = context.Entities.FirstOrDefault(x => x.Id.Equals(testEntityId));
+                    var testEntity = context.TestEntities.FirstOrDefault(x => x.Id.Equals(testEntityId));
                     Assert.IsNotNull(testEntity);
                     Assert.IsNotNull(testEntity.SomeGuid);
                     Assert.AreEqual(Guid.Empty, testEntity.SomeGuid);
@@ -1599,7 +1792,7 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var testEntity = context.Entities.Create();
+                var testEntity = context.TestEntities.Create();
                 testEntity.SomeEnumeration = TestEnumeration.Third;
                 context.SaveChanges();
             }
@@ -1607,7 +1800,7 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var e = context.Entities.FirstOrDefault();
+                var e = context.TestEntities.FirstOrDefault();
                 Assert.IsNotNull(e);
                 Assert.AreEqual(TestEnumeration.Third, e.SomeEnumeration);
             }
@@ -1621,9 +1814,9 @@ where {
                 var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
                 )
             {
-                var entity1 = context.Entities.Create();
-                var entity2 = context.Entities.Create();
-                var entity3 = context.Entities.Create();
+                var entity1 = context.TestEntities.Create();
+                var entity2 = context.TestEntities.Create();
+                var entity3 = context.TestEntities.Create();
                 entity1.SomeString = "Entity1";
                 entity1.SomeEnumeration = TestEnumeration.First;
                 entity2.SomeString = "Entity2";
@@ -1633,11 +1826,11 @@ where {
                 context.SaveChanges();
 
                 Assert.AreEqual(1,
-                                context.Entities.Count(e => e.SomeEnumeration == TestEnumeration.First));
+                                context.TestEntities.Count(e => e.SomeEnumeration == TestEnumeration.First));
                 Assert.AreEqual(2,
-                                context.Entities.Count(e => e.SomeEnumeration == TestEnumeration.Second));
+                                context.TestEntities.Count(e => e.SomeEnumeration == TestEnumeration.Second));
                 Assert.AreEqual(0,
-                                context.Entities.Count(e => e.SomeEnumeration == TestEnumeration.Third));
+                                context.TestEntities.Count(e => e.SomeEnumeration == TestEnumeration.Third));
             }
         }
 
@@ -2013,6 +2206,15 @@ where {
         }
 
         [Test]
+        public void TestRetrieveUnsetId()
+        {
+            MyEntityContext.InitializeEntityMappingStore();
+            var entity = new Person();
+            var id = entity.Id;
+            Assert.That(id, Is.EqualTo(null));
+        }
+
+        [Test]
         public void TestRepositoryPattern()
         {
             var storeName = "TestRepositoryPattern" + DateTime.Now.Ticks;
@@ -2038,9 +2240,25 @@ where {
                 Assert.That(derived.BaseStringValue, Is.EqualTo("Party!"));
                 Assert.That(derived.DateTimeProperty, Is.EqualTo(new DateTime(1999, 12, 31, 23, 58, 00)));
             }
-
         }
 
+        [Test]
+        public void TestRetrieveEntityWithSpaceInId()
+        {
+            var storeName = "TestRetrieveEntityWithSpaceInId_" + DateTime.Now.Ticks;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var entity = new TestEntity {Id = "some entity", SomeString = "Some Entity"};
+                context.TestEntities.Add(entity);
+                context.SaveChanges();
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                var entity = context.TestEntities.FirstOrDefault(x => x.Id.Equals("some entity"));
+                Assert.That(entity, Is.Not.Null);
+            }
+        }
 
         MyEntityContext CreateEntityContext(string storeName)
         {

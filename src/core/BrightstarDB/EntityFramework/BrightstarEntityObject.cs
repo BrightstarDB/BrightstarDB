@@ -158,6 +158,10 @@ namespace BrightstarDB.EntityFramework
         /// is prepended to make a full URI.</remarks>
         protected void SetKey(string key)
         {
+            if (String.IsNullOrEmpty(key))
+            {
+                throw new EntityKeyRequiredException();
+            }
             var baseUri = GetIdentityBase();
             var identity = String.IsNullOrEmpty(baseUri) ? key : baseUri + key;
             if (!identity.Equals(Identity))
@@ -758,6 +762,7 @@ namespace BrightstarDB.EntityFramework
                     {
                         if (!i.IsAttached)
                         {
+                            i.AssertIdentity();
                             i.Attach(_context);
                         }
                         DataObject.AddProperty(propertyHint.SchemaTypeUri, i.DataObject);
@@ -770,7 +775,8 @@ namespace BrightstarDB.EntityFramework
         /// Attaches the object to the specified context
         /// </summary>
         /// <param name="context"></param>
-        public void Attach(EntityContext context)
+        /// <param name="overwriteExisting"></param>
+        public void Attach(EntityContext context, bool overwriteExisting = false)
         {
             if (context == null) throw new ArgumentNullException("context");
             if (!(context is BrightstarEntityContext))
@@ -787,11 +793,12 @@ namespace BrightstarDB.EntityFramework
                 }
             }
             _context = context as BrightstarEntityContext;
+            if (_identity == null) AssertIdentity();
             if (DataObject == null && _identity != null)
             {
                 DataObject = _context.GetDataObject(new Uri(_identity), false);
                 var identityInfo = EntityMappingStore.GetIdentityInfo(GetType());
-                if (identityInfo != null && identityInfo.EnforceClassUniqueConstraint)
+                if (identityInfo != null && identityInfo.EnforceClassUniqueConstraint && !overwriteExisting)
                 {
                     _context.EnforceClassUniqueConstraint(_identity, EntityMappingStore.MapTypeToUris(GetType()));
                 }

@@ -9,6 +9,7 @@ using BrightstarDB.Rdf;
 using BrightstarDB.Server;
 using BrightstarDB.Storage;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
 namespace BrightstarDB.InternalTests
 {
@@ -16,10 +17,10 @@ namespace BrightstarDB.InternalTests
     public class StoreWorkerTests
     {
         private readonly IStoreManager _storeManager = StoreManagerFactory.GetStoreManager();
-        private string CreateStore()
+        private string CreateStore(string storeId = null, bool withTransactionLog = true)
         {
-            var sid = Guid.NewGuid().ToString();
-            using (_storeManager.CreateStore(Configuration.StoreLocation + Path.DirectorySeparatorChar + sid))
+            var sid = storeId ?? "StoreWorkerTests_" +  Guid.NewGuid();
+            using (_storeManager.CreateStore(Configuration.StoreLocation + Path.DirectorySeparatorChar + sid, false, withTransactionLog))
             {
                 return sid;
             }
@@ -610,6 +611,175 @@ namespace BrightstarDB.InternalTests
             }
 
             Configuration.EnableQueryCache = false;
+        }
+
+        [Test]
+        public void TestTransactionLogCreatedWhenLoggingEnabled()
+        {
+            // create a store
+            var sid = CreateStore(withTransactionLog: true);
+            var txnHeadersFile = Path.Combine(Configuration.StoreLocation, sid, "transactionheaders.bs");
+            var txnLogFile = Path.Combine(Configuration.StoreLocation, sid, "transactions.bs");
+
+            // Creating the store should create the files
+            Assert.IsTrue(File.Exists(txnHeadersFile), "Expected transactionheaders.bs file to be created when store is initially created");
+            Assert.IsTrue(File.Exists(txnLogFile), "Expected transactions.bs file to be created when store is initially created");
+
+            // initialise and start the store worker
+            var storeWorker = new StoreWorker(Configuration.StoreLocation, sid);
+            storeWorker.Start();
+
+
+            // execute transactions
+            const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
+
+            var jobId = storeWorker.ProcessTransaction("", "", "", data, Constants.DefaultGraphUri, "nt");
+            JobExecutionStatus jobStatus = storeWorker.GetJobStatus(jobId.ToString());
+            while (jobStatus.JobStatus != JobStatus.CompletedOk)
+            {
+                Thread.Sleep(1000);
+                jobStatus = storeWorker.GetJobStatus(jobId.ToString());
+            }
+
+            // Transaction files should still be there
+            Assert.IsTrue(File.Exists(txnHeadersFile));
+            Assert.IsTrue(File.Exists(txnLogFile));
+
+            // There should also be some content in both files
+            using (var txnStream = File.OpenRead(txnHeadersFile))
+            {
+                Assert.Greater(txnStream.Length, 0L);
+            }
+            using (var txnStream = File.OpenRead(txnLogFile))
+            {
+                Assert.Greater(txnStream.Length, 0L);
+            }
+        }
+
+        [Test]
+        public void TestNoTransactionLogWhenLoggingDisabled()
+        {
+            // create a store
+            var sid = CreateStore(withTransactionLog:false);
+
+            // initialise and start the store worker
+            var storeWorker = new StoreWorker(Configuration.StoreLocation, sid);
+            storeWorker.Start();
+
+            Assert.IsFalse(File.Exists(Path.Combine(Configuration.StoreLocation, sid, "transactionheaders.bs")));
+            Assert.IsFalse(File.Exists(Path.Combine(Configuration.StoreLocation, sid, "transactions.bs")));
+
+            // execute transactions
+            const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
+
+            var jobId = storeWorker.ProcessTransaction("", "", "", data, Constants.DefaultGraphUri, "nt");
+            var jobStatus = storeWorker.GetJobStatus(jobId.ToString());
+            while (jobStatus.JobStatus != JobStatus.CompletedOk)
+            {
+                Thread.Sleep(1000);
+                jobStatus = storeWorker.GetJobStatus(jobId.ToString());
+            }
+
+            Assert.IsFalse(File.Exists(Path.Combine(Configuration.StoreLocation, sid, "transactionheaders.bs")));
+            Assert.IsFalse(File.Exists(Path.Combine(Configuration.StoreLocation, sid, "transactions.bs")));
+
+        }
+
+        [Test]
+        public void TestTouchingTransactionHeadersEnablesLogging()
+        {
+            // create a store with logging disabled
+            var sid = CreateStore(withTransactionLog: false);
+            var txnHeadersFile = Path.Combine(Configuration.StoreLocation, sid, "transactionheaders.bs");
+            var txnLogFile = Path.Combine(Configuration.StoreLocation, sid, "transactions.bs");
+
+            // initialise and start the store worker
+            var storeWorker = new StoreWorker(Configuration.StoreLocation, sid);
+            storeWorker.Start();
+
+            // Should be no transaction files because we created the store with logging disabled
+            Assert.IsFalse(File.Exists(txnHeadersFile));
+            Assert.IsFalse(File.Exists(txnLogFile));
+
+            // But now "touch" the header file to create it
+            File.Create(txnHeadersFile).Close();
+
+            // execute a transaction that logs data
+            const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
+            var jobId = storeWorker.ProcessTransaction("", "", "", data, Constants.DefaultGraphUri, "nt");
+            AssertJobCompletedOk(storeWorker, jobId);
+
+            // Transaction files should now both be there
+            Assert.IsTrue(File.Exists(txnHeadersFile));
+            Assert.IsTrue(File.Exists(txnLogFile));
+
+            // There should also be some content in both files
+            using (var txnStream = File.OpenRead(txnHeadersFile))
+            {
+                Assert.Greater(txnStream.Length, 0L);
+            }
+            using (var txnStream = File.OpenRead(txnLogFile))
+            {
+                Assert.Greater(txnStream.Length, 0L);
+            }
+        }
+
+
+        [Test]
+        public void TestDeletingTransactionHeadersDisablesLogging()
+        {
+            // create a store
+            var sid = CreateStore(withTransactionLog: true);
+            var txnHeadersFile = Path.Combine(Configuration.StoreLocation, sid, "transactionheaders.bs");
+            var txnLogFile = Path.Combine(Configuration.StoreLocation, sid, "transactions.bs");
+
+            // Creating the store should create the files
+            Assert.IsTrue(File.Exists(txnHeadersFile), "Expected transactionheaders.bs file to be created when store is initially created");
+            Assert.IsTrue(File.Exists(txnLogFile), "Expected transactions.bs file to be created when store is initially created");
+
+            // initialise and start the store worker
+            var storeWorker = new StoreWorker(Configuration.StoreLocation, sid);
+            storeWorker.Start();
+
+
+            // execute transactions
+            const string data = @"<http://www.networkedplanet.com/people/gra> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
+            var jobId = storeWorker.ProcessTransaction("", "", "", data, Constants.DefaultGraphUri, "nt");
+            AssertJobCompletedOk(storeWorker, jobId);
+
+            long logLength;
+            using (var txnStream = File.OpenRead(txnLogFile))
+            {
+                logLength = txnStream.Length;
+                Assert.Greater(logLength, 0L);
+            }
+
+            // Remove the transaction headers file
+            File.Delete(txnHeadersFile);
+
+            // Execute a second transaction
+            const string data2 = @"<http://www.networkedplanet.com/people/kal> <http://www.networkedplanet.com/types/worksfor> <http://www.networkedplanet.com/companies/np>";
+            jobId = storeWorker.ProcessTransaction("", "", "", data2, Constants.DefaultGraphUri, "nt");
+            AssertJobCompletedOk(storeWorker, jobId);
+
+            Assert.IsFalse(File.Exists(txnHeadersFile), "Did not expect transactionheaders.bs to reappear after second transaction");
+            Assert.IsTrue(File.Exists(txnLogFile), "Expected transactions.bs file to remain untouched after second transaction");
+            using (var txnStream = File.OpenRead(txnLogFile))
+            {
+                Assert.AreEqual(logLength, txnStream.Length, "Expected transaction log file to be unchanged in size by second transaction");
+            }
+        }
+
+        private static void AssertJobCompletedOk(StoreWorker storeWorker, Guid jobId)
+        {
+            var jobStatus = storeWorker.GetJobStatus(jobId.ToString());
+            while (jobStatus.JobStatus != JobStatus.CompletedOk && jobStatus.JobStatus != JobStatus.TransactionError)
+            {
+                Thread.Sleep(1000);
+                jobStatus = storeWorker.GetJobStatus(jobId.ToString());
+            }
+            Assert.That(jobStatus.JobStatus, Is.EqualTo(JobStatus.CompletedOk),
+                "Unexpected job failure: " + jobStatus.Information + " - " + jobStatus.ExceptionDetail);
         }
     }
 }

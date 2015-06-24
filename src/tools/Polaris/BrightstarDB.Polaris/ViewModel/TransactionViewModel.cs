@@ -100,23 +100,13 @@ namespace BrightstarDB.Polaris.ViewModel
             }
             else if (_transactionJob.JobCompletedWithErrors)
             {
-                if (_transactionJob.ExceptionInfo != null &&
-                    _transactionJob.ExceptionInfo.Type == "NetworkedPlanet.Brightstar.Client.BrightstarClientException" &&
-                    _transactionJob.ExceptionInfo.InnerException != null &&
-                    _transactionJob.ExceptionInfo.InnerException.Type == "NetworkedPlanet.Rdf.RdfParserException")
-                {
-                    ValidationMessages.Clear();
-                    ValidationMessages.Add(_transactionJob.ExceptionInfo.Message);
-                }
-                else
-                {
-                    ValidationMessages.Clear();
-                    ValidationMessages.Add(Strings.TransactionFailed);
-                    Messenger.Default.Send(
-                        new ShowDialogMessage("Transaction failed",
-                                              "Transaction failed with status: " + _transactionJob.StatusMessage,
-                                              MessageBoxImage.Error, MessageBoxButton.OK), "MainWindow");
-                }
+                ValidationMessages.Clear();
+                ValidationMessages.Add(Strings.TransactionFailed);
+                ValidationMessages.Add(_transactionJob.ExtractJobErrorMessage(true));
+                Messenger.Default.Send(
+                    new ShowDialogMessage("Transaction failed",
+                                            "Transaction failed with status: " + _transactionJob.StatusMessage,
+                                            MessageBoxImage.Error, MessageBoxButton.OK), "MainWindow");
             }
             else
             {

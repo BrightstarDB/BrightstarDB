@@ -34,44 +34,37 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dotNetRDF">
+    <Reference Include="dotNetRDF, Version=1.0.8.3533, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\dotNetRDF.1.0.6.3421\lib\net40\dotNetRDF.dll</HintPath>
+      <HintPath>..\packages\dotNetRDF.1.0.8.3533\lib\net40\dotNetRDF.dll</HintPath>
     </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net40\HtmlAgilityPack.dll</HintPath>
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net40\HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy, Version=0.23.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.0.23.2\lib\net40\Nancy.dll</HintPath>
+      <HintPath>..\packages\Nancy.1.1\lib\net40\Nancy.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.Authentication.Basic, Version=0.23.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy.Authentication.Basic, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Authentication.Basic.0.23.2\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
-    </Reference>
-    <Reference Include="Nancy.ViewEngines.Razor, Version=0.23.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Viewengines.Razor.0.23.2\lib\net40\Nancy.ViewEngines.Razor.dll</HintPath>
+      <HintPath>..\packages\Nancy.Authentication.Basic.1.1\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="VDS.Common, Version=1.2.1.0, Culture=neutral, PublicKeyToken=ab5f4eb908061bf0, processorArchitecture=MSIL">
+    <Reference Include="VDS.Common, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ab5f4eb908061bf0, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\VDS.Common.1.3.0\lib\net40-client\VDS.Common.dll</HintPath>
+      <HintPath>..\packages\VDS.Common.1.5.0\lib\net40-client\VDS.Common.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -83,9 +76,13 @@
     <Compile Include="BrightstarModuleSecurity.cs" />
     <Compile Include="Configuration\BrightstarServiceConfiguration.cs" />
     <Compile Include="BrightstarServiceConfigurationSectionHandler.cs" />
+    <Compile Include="CorsPipelinesExtension.cs" />
+    <Compile Include="DocumentationModule.cs" />
     <Compile Include="FixedRootPathProvider.cs" />
+    <Compile Include="GraphsModule.cs" />
     <Compile Include="JobInfoExtensions.cs" />
     <Compile Include="Model\CommitPointsRequestModel.cs" />
+    <Compile Include="Model\GraphListModel.cs" />
     <Compile Include="Model\IPagedResultModel.cs" />
     <Compile Include="Model\ISparqlResultModel.cs" />
     <Compile Include="Model\JobRequestModel.cs" />
@@ -168,9 +165,6 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <RazorAssemblies Include="$(SolutionDir)packages\Nancy.Viewengines.Razor.0.23.2\BuildProviders\Nancy.ViewEngines.Razor.BuildProviders.dll;$(SolutionDir)packages\Nancy.Viewengines.Razor.0.23.2\lib\net40\Nancy.ViewEngines.Razor.dll" />
-  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
@@ -179,8 +173,4 @@
     <AssemblyTitle>BrightstarDB Server Core Assembly</AssemblyTitle>
   </PropertyGroup>
   <Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
-  <Target Name="AfterBuild" DependsOnTargets="CopyRazorAssemblies" />
-  <Target Name="CopyRazorAssemblies" Condition="'$(Configuration)' == 'Debug'">
-    <Copy SourceFiles="@(RazorAssemblies)" DestinationFolder="$(ProjectDir)\bin\Debug" />
-  </Target>
 </Project>

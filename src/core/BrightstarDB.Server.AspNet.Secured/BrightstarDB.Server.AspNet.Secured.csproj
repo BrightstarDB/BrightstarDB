@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\..\..\common.proj" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -49,17 +50,17 @@
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Nancy, Version=0.23.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.0.23.2\lib\net40\Nancy.dll</HintPath>
+      <HintPath>..\packages\Nancy.1.1\lib\net40\Nancy.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.Authentication.Basic, Version=0.23.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy.Authentication.Basic, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Authentication.Basic.0.23.2\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
+      <HintPath>..\packages\Nancy.Authentication.Basic.1.1\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.Hosting.Aspnet, Version=0.22.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy.Hosting.Aspnet, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Hosting.Aspnet.0.23.2\lib\net40\Nancy.Hosting.Aspnet.dll</HintPath>
+      <HintPath>..\packages\Nancy.Hosting.Aspnet.1.1\lib\net40\Nancy.Hosting.Aspnet.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -156,11 +157,9 @@
     <Copy SourceFiles="@(ViewFiles)" DestinationFolder="Views" />
     <Copy SourceFiles="@(AssetFiles)" DestinationFolder="assets" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <AssemblyTitle>BrightstarDB Server Authenticating ASP.NET Assembly</AssemblyTitle>
+  </PropertyGroup>
+  <Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
 </Project>
