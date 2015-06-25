@@ -126,24 +126,7 @@ SELECT ?x WHERE {
                 NormalizeSparql(lastSparql));
         }
 
-        [Test]
-        public void TestGetDinnerByStringProperty()
-        {
-            var q = from x in Context.Dinners where x.Title == "Test" select x;
-            var results = q.ToList();
-            var lastSparql = Context.LastSparqlQuery;
-            Assert.AreEqual(
-                NormalizeSparql(@"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" .} 
-WHERE {
-  ?x ?x_p ?x_o . {
-    SELECT ?x WHERE {
-      ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
-      { ?x <http://purl.org/dc/terms/title> 'Test' . } 
-    }
-  }
-}"), 
-                 NormalizeSparql(lastSparql));
-        }
+        
 
 
         [Test]
