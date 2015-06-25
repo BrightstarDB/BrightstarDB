@@ -58,6 +58,54 @@ WHERE {
                 NormalizeSparql(lastSparql));
         }
 
+        [Test]
+        public void TestOptimiseOrFilterAsUnion()
+        {
+            var q = from x in Context.Dinners
+                    where x.Host == "Foo" || x.Host == "Bar"
+                    select x;
+            var results = q.ToList();
+            var lastSparql = Context.LastSparqlQuery;
+            Assert.AreEqual(
+                NormalizeSparql(
+            @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" .}
+        WHERE {
+          ?x ?x_p ?x_o . {
+            SELECT ?x WHERE {
+              ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
+              { { ?x <http://www.networkedplanet.com/schemas/test/host> 'Foo' . } }
+                UNION { { ?x <http://www.networkedplanet.com/schemas/test/host> 'Bar' . } }
+        } } }"),
+                NormalizeSparql(lastSparql));
+        }
+
+        [Test]
+        public void TestOptimiseMultipleOrFilterAsUnion()
+        {
+            var q = from x in Context.Dinners
+                    where x.Host == "Foo" || x.Host == "Bar" || x.Host == "Bletch"
+                    select x;
+            var results = q.ToList();
+            var lastSparql = Context.LastSparqlQuery;
+            Assert.AreEqual(
+                NormalizeSparql(
+            @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" .}
+        WHERE {
+          ?x ?x_p ?x_o . {
+            SELECT ?x WHERE {
+              ?x a <http://www.networkedplanet.com/schemas/test/Dinner> .
+              { 
+                { 
+                  { ?x <http://www.networkedplanet.com/schemas/test/host> 'Foo' . } 
+                } UNION { 
+                  { ?x <http://www.networkedplanet.com/schemas/test/host> 'Bar' . } 
+                }
+              } UNION {
+                  { ?x <http://www.networkedplanet.com/schemas/test/host> 'Bletch' . } 
+              }
+        } } }"),
+                NormalizeSparql(lastSparql));
+        }
 
     }
 }

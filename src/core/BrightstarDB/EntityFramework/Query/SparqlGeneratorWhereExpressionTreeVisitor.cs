@@ -221,16 +221,28 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     case ExpressionType.Equal:
                         _filterWriter.Append("{");
+                        _filterWriter.VisitExpression(expression.Left);
+                        _filterWriter.VisitExpression(expression.Right);
+                        _filterWriter.Append("}");
                     break;
                     case ExpressionType.NotEqual:
                         _filterWriter.Append("MINUS {");
+                        _filterWriter.VisitExpression(expression.Left);
+                        _filterWriter.VisitExpression(expression.Right);
+                        _filterWriter.Append("}");
                         break;
+
+                    case ExpressionType.OrElse:
+                        _filterWriter.Append("{");
+                        _filterWriter.VisitExpression(expression.Left);
+                        _filterWriter.Append("} UNION {");
+                        _filterWriter.VisitExpression(expression.Right);
+                        _filterWriter.Append("}");
+                        break;
+
                     default:
                         throw new NotSupportedException();
                 }
-                _filterWriter.VisitExpression(expression.Left);
-                _filterWriter.VisitExpression(expression.Right);
-                _filterWriter.Append("}");
             }
             else
             {

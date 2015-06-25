@@ -37,6 +37,14 @@ namespace BrightstarDB.EntityFramework.Query
                             // Check left and right expression content are optimisable
                             IsTrue(VisitExpression(expression.Left)) &&
                                                   IsTrue(VisitExpression(expression.Right)));
+ 
+                case ExpressionType.OrElse:
+                    return
+                        new BooleanFlagExpression(
+                            // Check left and right expression content are optimisable
+                            IsTrue(VisitExpression(expression.Left)) &&
+                                                  IsTrue(VisitExpression(expression.Right)));
+
             }
             return new BooleanFlagExpression(false);
         }
