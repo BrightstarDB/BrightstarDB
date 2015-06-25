@@ -12,7 +12,7 @@ namespace BrightstarDB.EntityFramework.Query
 {
     internal class FilterWriter : ExpressionTreeVisitorBase
     {
-        private readonly ExpressionTreeVisitorBase _parent;
+        private readonly SparqlGeneratorWhereExpressionTreeVisitor _parent;
         private readonly StringBuilder _filterExpressionBuilder;
         private readonly StringBuilder _graphPatternBuilder;
         private bool _castAsResourceType;
@@ -35,7 +35,7 @@ namespace BrightstarDB.EntityFramework.Query
         /// </summary>
         private bool _optimizeFilter;
 
-        public FilterWriter(ExpressionTreeVisitorBase parentVisitor, SparqlQueryBuilder queryBuilder, 
+        public FilterWriter(SparqlGeneratorWhereExpressionTreeVisitor parentVisitor, SparqlQueryBuilder queryBuilder, 
             StringBuilder filterExpressionBuilder, StringBuilder patternBuilder, bool optimizeFilter) : base(queryBuilder)
         {
             _parent = parentVisitor;
@@ -50,6 +50,8 @@ namespace BrightstarDB.EntityFramework.Query
         public string FilterExpression { get { return _filterExpressionBuilder.ToString(); } }
 
         public string PatternExpression { get { return _graphPatternBuilder.ToString(); } }
+
+        public bool InBooleanExpression { get; set; }
 
         public void Append(string value)
         {
@@ -153,7 +155,21 @@ namespace BrightstarDB.EntityFramework.Query
                                 {
                                     if (_optimizeFilter)
                                     {
-                                        AppendFormat("?{0} <{1}> ", sourceVarName, hint.SchemaTypeUri);
+                                        if (InBooleanExpression)
+                                        {
+                                            if (expression.Type == typeof (bool))
+                                            {
+                                                AppendFormat("?{0} <{1}> true .", sourceVarName, hint.SchemaTypeUri);
+                                            }
+                                            else
+                                            {
+                                                AppendFormat("?{0} <{1}> ?{2} .", sourceVarName, hint.SchemaTypeUri, QueryBuilder.NextVariable());
+                                            }
+                                        }
+                                        else
+                                        {
+                                            AppendFormat("?{0} <{1}> ", sourceVarName, hint.SchemaTypeUri);
+                                        }
                                         return expression;
                                     }
                                     else
@@ -462,6 +478,15 @@ namespace BrightstarDB.EntityFramework.Query
 
         protected override Expression VisitMethodCallExpression(MethodCallExpression expression)
         {
+            var currentlyInBooleanExpression = InBooleanExpression;
+            InBooleanExpression = false;
+            var ret = HandleMethodCallExpression(expression);
+            InBooleanExpression = currentlyInBooleanExpression;
+            return ret;
+        }
+
+        private Expression HandleMethodCallExpression(MethodCallExpression expression)
+        {
             if (expression.Method.Name.Equals("Equals") && expression.Object != null)
             {
                 if(EntityMappingStore.IsKnownInterface(expression.Object.Type))
@@ -738,7 +763,7 @@ namespace BrightstarDB.EntityFramework.Query
 
         protected override Expression VisitBinaryExpression(BinaryExpression expression)
         {
-            return _parent.VisitExpression(expression);
+            return _parent.VisitExpression(expression, this.InBooleanExpression);
         }
 
         public void WriteInFilter(Expression itemExpression, Expression fromExpression)

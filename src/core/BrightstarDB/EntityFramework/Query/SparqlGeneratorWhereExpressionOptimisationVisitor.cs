@@ -12,6 +12,7 @@ namespace BrightstarDB.EntityFramework.Query
     class SparqlGeneratorWhereExpressionOptimisationVisitor : ExpressionTreeVisitor
     {
         private readonly SparqlQueryBuilder _queryBuilder;
+        private bool _inBooleanExpression = false;
 
         public SparqlGeneratorWhereExpressionOptimisationVisitor(SparqlQueryBuilder queryBuilder)
         {
@@ -26,27 +27,34 @@ namespace BrightstarDB.EntityFramework.Query
 
         protected override Expression VisitBinaryExpression(BinaryExpression expression)
         {
+            var currentlyInBooleanExpression = _inBooleanExpression;
+            var ret = new BooleanFlagExpression(false);
             switch (expression.NodeType)
             {
                 case ExpressionType.Equal:
                 case ExpressionType.NotEqual:
-                    return
+                    _inBooleanExpression = false;
+                    ret =
                         new BooleanFlagExpression(
                             // Allowed: x.prop=constant
                             (expression.Left is MemberExpression && expression.Right is ConstantExpression) &&
                             // Check left and right expression content are optimisable
                             IsTrue(VisitExpression(expression.Left)) &&
                                                   IsTrue(VisitExpression(expression.Right)));
+                    break;
  
                 case ExpressionType.OrElse:
-                    return
+                case ExpressionType.AndAlso:
+                    _inBooleanExpression = true;
+                    ret = 
                         new BooleanFlagExpression(
                             // Check left and right expression content are optimisable
                             IsTrue(VisitExpression(expression.Left)) &&
                                                   IsTrue(VisitExpression(expression.Right)));
-
+                    break;
             }
-            return new BooleanFlagExpression(false);
+            _inBooleanExpression = currentlyInBooleanExpression;
+            return ret;
         }
 
         protected override Expression VisitMethodCallExpression(MethodCallExpression expression)

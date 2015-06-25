@@ -401,8 +401,8 @@ SELECT ?x WHERE {
 ?x ?x_p ?x_o .  {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
-    ?x <http://www.networkedplanet.com/schemas/test/isListed> ?v0 .
-    FILTER (?v0 = true) . } } }");
+    ?x <http://www.networkedplanet.com/schemas/test/isListed> true .
+    } } }");
 
             q = from x in Context.Companies
                     where !x.IsListed
@@ -425,9 +425,9 @@ SELECT ?x WHERE {
 ?x ?x_p ?x_o . {
     SELECT ?x WHERE {
     ?x a <http://www.networkedplanet.com/schemas/test/Company> .
-    ?x <http://www.networkedplanet.com/schemas/test/isListed> ?v0 .
-    ?x <http://www.networkedplanet.com/schemas/test/isBlueChip> ?v1 .
-    FILTER (?v0 && ?v1) . } } }");
+    ?x <http://www.networkedplanet.com/schemas/test/isListed> true .
+    ?x <http://www.networkedplanet.com/schemas/test/isBlueChip> true .
+    } } }");
 
             q = from x in Context.Companies
                 where x.IsListed && !x.IsBlueChip

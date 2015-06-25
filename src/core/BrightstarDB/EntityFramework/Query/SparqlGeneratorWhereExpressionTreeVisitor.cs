@@ -17,20 +17,22 @@ namespace BrightstarDB.EntityFramework.Query
     internal class SparqlGeneratorWhereExpressionTreeVisitor : ExpressionTreeVisitorBase
     {
         private FilterWriter _filterWriter;
-        private bool _optimizeFilter;
+        private readonly bool _optimizeFilter;
+        private bool _inBooleanExpression = false;
 
-        private SparqlGeneratorWhereExpressionTreeVisitor(SparqlQueryBuilder queryBuilder, bool optimizeFilter)
+        private SparqlGeneratorWhereExpressionTreeVisitor(SparqlQueryBuilder queryBuilder, bool optimizeFilter, bool isBoolean)
             : base(queryBuilder)
         {
             QueryBuilder = queryBuilder;
             _filterWriter = new FilterWriter(this, queryBuilder, new StringBuilder(), new StringBuilder(), optimizeFilter);
             _optimizeFilter = optimizeFilter;
+            _inBooleanExpression = isBoolean;
         }
 
         public static Expression GetSparqlExpression(Expression expression, SparqlQueryBuilder queryBuilder)
         {
             var canOptimizeFilter = CanOptimizeFilter(expression, queryBuilder);
-            var visitor = new SparqlGeneratorWhereExpressionTreeVisitor(queryBuilder, canOptimizeFilter);
+            var visitor = new SparqlGeneratorWhereExpressionTreeVisitor(queryBuilder, canOptimizeFilter, expression.Type == typeof(bool));
             var returnedExpression = visitor.VisitExpression(expression);
             var svn = returnedExpression as SelectVariableNameExpression;
             if (svn != null && expression.Type == typeof (bool))
@@ -217,27 +219,42 @@ namespace BrightstarDB.EntityFramework.Query
             // Process in-fix operator
             if (_optimizeFilter)
             {
+                var currentlyInBooleanExpression = _filterWriter.InBooleanExpression;
                 switch (expression.NodeType)
                 {
                     case ExpressionType.Equal:
+                        _filterWriter.InBooleanExpression = false;
                         _filterWriter.Append("{");
                         _filterWriter.VisitExpression(expression.Left);
                         _filterWriter.VisitExpression(expression.Right);
                         _filterWriter.Append("}");
+                        _filterWriter.InBooleanExpression = currentlyInBooleanExpression;
                     break;
+
                     case ExpressionType.NotEqual:
+                        _filterWriter.InBooleanExpression = false;
                         _filterWriter.Append("MINUS {");
                         _filterWriter.VisitExpression(expression.Left);
                         _filterWriter.VisitExpression(expression.Right);
                         _filterWriter.Append("}");
+                        _filterWriter.InBooleanExpression = currentlyInBooleanExpression;
                         break;
 
                     case ExpressionType.OrElse:
+                        _filterWriter.InBooleanExpression = true;
                         _filterWriter.Append("{");
                         _filterWriter.VisitExpression(expression.Left);
                         _filterWriter.Append("} UNION {");
                         _filterWriter.VisitExpression(expression.Right);
                         _filterWriter.Append("}");
+                        _filterWriter.InBooleanExpression = currentlyInBooleanExpression;
+                        break;
+
+                    case ExpressionType.AndAlso:
+                        _filterWriter.InBooleanExpression = true;
+                        _filterWriter.VisitExpression(expression.Left);
+                        _filterWriter.VisitExpression(expression.Right);
+                        _filterWriter.InBooleanExpression = currentlyInBooleanExpression;
                         break;
 
                     default:
@@ -638,6 +655,21 @@ namespace BrightstarDB.EntityFramework.Query
                                 case PropertyMappingType.Arc:
                                 case PropertyMappingType.Property:
                                 {
+                                    if (_optimizeFilter && _inBooleanExpression)
+                                    {
+                                        if (expression.Type == typeof (bool))
+                                        {
+                                            _filterWriter.AppendFormat("?{0} <{1}> true .",
+                                                sourceVarName, hint.SchemaTypeUri);
+                                        }
+                                        else
+                                        {
+                                            // Any binding is acceptable
+                                            _filterWriter.AppendFormat("?{0} <{1}> ?{2}",
+                                                sourceVarName, hint.SchemaTypeUri, QueryBuilder.NextVariable());
+                                        }
+                                        return expression;
+                                    }
                                     var varName = QueryBuilder.GetVariableForObject(
                                         GraphNode.Variable, sourceVarName,
                                         GraphNode.Iri, hint.SchemaTypeUri);
@@ -869,5 +901,14 @@ namespace BrightstarDB.EntityFramework.Query
         }
 
         #endregion
+
+        internal Expression VisitExpression(BinaryExpression expression, bool inBooleanExpression)
+        {
+            var currentlyInBooleanExpression = _inBooleanExpression;
+            _inBooleanExpression = inBooleanExpression;
+            var ret = VisitExpression(expression);
+            _inBooleanExpression = currentlyInBooleanExpression;
+            return ret;
+        }
     }
 }
