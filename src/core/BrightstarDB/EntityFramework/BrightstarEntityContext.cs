@@ -31,7 +31,11 @@ namespace BrightstarDB.EntityFramework
         /// Creates a new domain context
         /// </summary>
         /// <param name="store">The Brightstar store that manages the data</param>
-        protected BrightstarEntityContext(IDataObjectStore store)
+        /// <param name="enableFilterOptimization">If true, then optimizations will be enable in the LINQ to SPARQL processor which write certain
+        /// filter operations as SPARQL graph patterns so that they are more efficiently processed by BrightstarDB. You should not enable these
+        /// optimizations if querying triple stores other than BrightstarDB or when querying RDF data that has not been created through
+        /// the BrightstarDB entity framework. The default value is false (optimizations disabled).</param>
+        protected BrightstarEntityContext(IDataObjectStore store, bool enableFilterOptimization = false)
         {
             _store = store;
             _trackedObjects = new Dictionary<string, List<BrightstarEntityObject>>();
@@ -48,16 +52,23 @@ namespace BrightstarDB.EntityFramework
         /// the remarks below.</param>
         /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
         /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+        /// <param name="enableFilterOptimization">If true, then optimizations will be enable in the LINQ to SPARQL processor which write certain
+        /// filter operations as SPARQL graph patterns so that they are more efficiently processed by BrightstarDB. You should not enable these
+        /// optimizations if querying triple stores other than BrightstarDB or when querying RDF data that has not been created through
+        /// the BrightstarDB entity framework. If not specified, the default value is true (enabled) when the connection string is a
+        /// BrightstarDB REST or embedded connection string and false (disabled) for other connection types.</param>
         /// <remarks>
         /// <para>If <paramref name="datasetGraphUris"/> is null, then the context will query the graphs defined by 
         /// <paramref name="updateGraphUri"/> and <paramref name="versionGraphUri"/> only. If all three parameters
         /// are null then the context will query across all graphs in the store.</para>
         /// </remarks>
         protected BrightstarEntityContext(string connectionString, bool? enableOptimisticLocking = null,
-            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null )
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null,
+            bool? enableFilterOptimization = null)
         {
             var cstr = new ConnectionString(connectionString);
             AssertStoreFromConnectionString(cstr);
+            FilterOptimizationEnabled = enableFilterOptimization ?? (cstr.Type == ConnectionType.Rest || cstr.Type == ConnectionType.Embedded);
             _store = OpenStore(cstr, enableOptimisticLocking,
                 updateGraphUri, datasetGraphUris, versionGraphUri);
             _trackedObjects = new Dictionary<string, List<BrightstarEntityObject>>();
@@ -567,7 +578,9 @@ namespace BrightstarDB.EntityFramework
 
         private class AnonymousConstructorArg
         {
+#pragma warning disable 414
             public string PropertyName;
+#pragma warning restore 414
             public string VariableName;
             public Func<string, string, object> ValueConverter;
             public object DefaultValue;

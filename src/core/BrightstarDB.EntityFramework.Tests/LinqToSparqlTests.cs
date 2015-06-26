@@ -12,6 +12,7 @@ namespace BrightstarDB.EntityFramework.Tests
         public void SetUp()
         {
             InitializeContext();
+            Context.FilterOptimizationEnabled = true;
         }
 
         [Test]

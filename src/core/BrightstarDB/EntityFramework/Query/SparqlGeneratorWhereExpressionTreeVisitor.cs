@@ -29,9 +29,9 @@ namespace BrightstarDB.EntityFramework.Query
             _inBooleanExpression = isBoolean;
         }
 
-        public static Expression GetSparqlExpression(Expression expression, SparqlQueryBuilder queryBuilder)
+        public static Expression GetSparqlExpression(Expression expression, SparqlQueryBuilder queryBuilder, bool filterOptimizationEnabled)
         {
-            var canOptimizeFilter = CanOptimizeFilter(expression, queryBuilder);
+            var canOptimizeFilter = filterOptimizationEnabled && CanOptimizeFilter(expression, queryBuilder);
             var visitor = new SparqlGeneratorWhereExpressionTreeVisitor(queryBuilder, canOptimizeFilter, expression.Type == typeof(bool));
             var returnedExpression = visitor.VisitExpression(expression);
             var svn = returnedExpression as SelectVariableNameExpression;

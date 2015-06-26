@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Remoting.Contexts;
 using Remotion.Linq;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ResultOperators;
@@ -166,7 +167,8 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 var fromExpression =
                     SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(fromClause.FromExpression,
-                                                                                  _queryBuilder);
+                                                                                  _queryBuilder,
+                                                                                  _context.FilterOptimizationEnabled);
                 if (fromExpression is SelectVariableNameExpression)
                 {
                     _queryBuilder.RenameVariable((fromExpression as SelectVariableNameExpression).Name,fromVar);
@@ -184,7 +186,7 @@ namespace BrightstarDB.EntityFramework.Query
 
         public override void VisitWhereClause(Remotion.Linq.Clauses.WhereClause whereClause, QueryModel queryModel, int index)
         {
-            SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(whereClause.Predicate, _queryBuilder);
+            SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(whereClause.Predicate, _queryBuilder, _context.FilterOptimizationEnabled);
             base.VisitWhereClause(whereClause, queryModel, index);
         }
 
@@ -192,8 +194,8 @@ namespace BrightstarDB.EntityFramework.Query
         {
             _isInstanceQuery = false;
             _queryBuilder.AddFromPart(joinClause);
-            var inner = SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(joinClause.InnerKeySelector, _queryBuilder);
-            var outer = SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(joinClause.OuterKeySelector, _queryBuilder);
+            var inner = SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(joinClause.InnerKeySelector, _queryBuilder, _context.FilterOptimizationEnabled);
+            var outer = SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(joinClause.OuterKeySelector, _queryBuilder, _context.FilterOptimizationEnabled);
             if (inner is SelectVariableNameExpression && outer is SelectVariableNameExpression)
             {
                 var innerVar = inner as SelectVariableNameExpression;
@@ -220,7 +222,7 @@ namespace BrightstarDB.EntityFramework.Query
         {
             _isInstanceQuery = false;
             var selector = SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(ordering.Expression,
-                                                                                         _queryBuilder);
+                _queryBuilder, _context.FilterOptimizationEnabled);
             if (selector is SelectVariableNameExpression)
             {
                 var selectorVar = selector as SelectVariableNameExpression;
@@ -383,7 +385,7 @@ namespace BrightstarDB.EntityFramework.Query
                 if (mappedExpression is SelectVariableNameExpression)
                     return (mappedExpression as SelectVariableNameExpression).Name;
             }
-            var selector = SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(expression, _queryBuilder);
+            var selector = SparqlGeneratorWhereExpressionTreeVisitor.GetSparqlExpression(expression, _queryBuilder, _context.FilterOptimizationEnabled);
             if (selector is SelectVariableNameExpression) return (selector as SelectVariableNameExpression).Name;
             return null;
         }
