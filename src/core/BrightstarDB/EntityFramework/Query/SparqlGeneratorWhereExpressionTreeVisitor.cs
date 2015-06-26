@@ -225,8 +225,16 @@ namespace BrightstarDB.EntityFramework.Query
                     case ExpressionType.Equal:
                         _filterWriter.InBooleanExpression = false;
                         _filterWriter.Append("{");
-                        _filterWriter.VisitExpression(expression.Left);
-                        _filterWriter.VisitExpression(expression.Right);
+                        if (expression.Left is MemberExpression && expression.Right is MemberExpression)
+                        {
+                            // Optimise to a join between two BGPs
+                            AppendBgpJoin((MemberExpression) expression.Left, (MemberExpression) expression.Right);
+                        }
+                        else
+                        {
+                            _filterWriter.VisitExpression(expression.Left);
+                            _filterWriter.VisitExpression(expression.Right);
+                        }
                         _filterWriter.Append("}");
                         _filterWriter.InBooleanExpression = currentlyInBooleanExpression;
                     break;
@@ -314,6 +322,31 @@ namespace BrightstarDB.EntityFramework.Query
                 _filterWriter.Append(')');
             }
             return expression;
+        }
+
+        private void AppendBgpJoin(MemberExpression left, MemberExpression right)
+        {
+            var joinVar = QueryBuilder.NextVariable();
+            var leftSourceVar = GetSourceVarName(left);
+            var leftProperty = GetPropertyHint(left);
+            var rightSourceVar = GetSourceVarName(right);
+            var rightProperty = GetPropertyHint(right);
+            if (leftProperty.MappingType == PropertyMappingType.InverseArc)
+            {
+                _filterWriter.AppendFormat(" ?{0} <{1}> ?{2} .\n", joinVar, leftProperty.SchemaTypeUri, leftSourceVar);
+            }
+            else
+            {
+                _filterWriter.AppendFormat(" ?{0} <{1}> ?{2} .\n", leftSourceVar, leftProperty.SchemaTypeUri, joinVar);
+            }
+            if (rightProperty.MappingType == PropertyMappingType.InverseArc)
+            {
+                _filterWriter.AppendFormat(" ?{0} <{1}> ?{2} .\n", joinVar, rightProperty.SchemaTypeUri, rightSourceVar);
+            }
+            else
+            {
+                _filterWriter.AppendFormat(" ?{0} <{1}> ?{2} .\n", rightSourceVar, rightProperty.SchemaTypeUri, joinVar);
+            }
         }
 
         /// <summary>

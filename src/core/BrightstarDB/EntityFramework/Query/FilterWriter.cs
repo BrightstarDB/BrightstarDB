@@ -194,32 +194,48 @@ namespace BrightstarDB.EntityFramework.Query
                             }
                             case PropertyMappingType.InverseArc:
                             {
-                                var existingVarName = QueryBuilder.GetVariableForSubject(GraphNode.Iri,
-                                    hint.SchemaTypeUri,
-                                    GraphNode.Variable,
-                                    sourceVarName);
-                                if (!String.IsNullOrEmpty(existingVarName))
+                                if (_optimizeFilter)
                                 {
-                                    if (_appendExpressionVariable)
+                                    if (InBooleanExpression)
                                     {
-                                        AppendFormat("?{0}", existingVarName);
+                                        AppendFormat("?{0} <{1}> ?{2} .", QueryBuilder.NextVariable(),
+                                            hint.SchemaTypeUri, sourceVarName);
                                     }
-                                    return new SelectVariableNameExpression(existingVarName,
-                                        VariableBindingType.Resource,
-                                        propertyInfo.PropertyType);
+                                    else
+                                    {
+                                        AppendFormat(" <{0}> ?{1} .", hint.SchemaTypeUri, sourceVarName);
+                                    }
+                                    return expression;
                                 }
                                 else
                                 {
-                                    var varName = QueryBuilder.NextVariable();
-                                    QueryBuilder.AddTripleConstraint(GraphNode.Variable, varName,
-                                        GraphNode.Iri, hint.SchemaTypeUri,
-                                        GraphNode.Variable, sourceVarName);
-                                    if (_appendExpressionVariable)
+                                    var existingVarName = QueryBuilder.GetVariableForSubject(GraphNode.Iri,
+                                        hint.SchemaTypeUri,
+                                        GraphNode.Variable,
+                                        sourceVarName);
+                                    if (!String.IsNullOrEmpty(existingVarName))
                                     {
-                                        AppendFormat("?{0}", varName);
+                                        if (_appendExpressionVariable)
+                                        {
+                                            AppendFormat("?{0}", existingVarName);
+                                        }
+                                        return new SelectVariableNameExpression(existingVarName,
+                                            VariableBindingType.Resource,
+                                            propertyInfo.PropertyType);
                                     }
-                                    return new SelectVariableNameExpression(varName, VariableBindingType.Resource,
-                                        propertyInfo.PropertyType);
+                                    else
+                                    {
+                                        var varName = QueryBuilder.NextVariable();
+                                        QueryBuilder.AddTripleConstraint(GraphNode.Variable, varName,
+                                            GraphNode.Iri, hint.SchemaTypeUri,
+                                            GraphNode.Variable, sourceVarName);
+                                        if (_appendExpressionVariable)
+                                        {
+                                            AppendFormat("?{0}", varName);
+                                        }
+                                        return new SelectVariableNameExpression(varName, VariableBindingType.Resource,
+                                            propertyInfo.PropertyType);
+                                    }
                                 }
                             }
                             case PropertyMappingType.Address:

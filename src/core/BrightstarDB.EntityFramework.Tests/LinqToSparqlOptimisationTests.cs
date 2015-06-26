@@ -162,23 +162,47 @@ WHERE {
      } } }");
         }
 
-//        [Test]
-//        public void TestResourceJoinOptimisation()
-//        {
-//            var q = from x in Context.People
-//                from y in Context.People
-//                where x.Father == y.Father
-//                select x;
-//            q.ToList();
-//            AssertQuerySparql(
-//                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
-//                    ?x ?x_p ?x_o . {
-//                    SELECT ?x WHERE {
-//                        ?x a <http://www.networkedplanet.com/schemas/test/Person> .
-//                        ?y a <http://www.networkedplanet.com/schemas/test/Person> .
-//                        ?x <http://www.networkedplanet.com/schemas/test/father> ?v0 .
-//                        ?y <http://www.networkedplanet.com/schemas/test/fater>  ?v0 .
-//                     } } }");
-//        }
+        [Test]
+        public void TestResourceJoinOptimisation()
+        {
+            var q = from x in Context.People
+                    from y in Context.People
+                    where x.Father == y.Father
+                    select x;
+            q.ToList();
+            AssertQuerySparql(
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
+                    ?x ?x_p ?x_o . {
+                    SELECT ?x WHERE {
+                        ?x a <http://www.networkedplanet.com/schemas/test/Person> .
+                        ?y a <http://www.networkedplanet.com/schemas/test/Person> .
+                        {
+                            ?x <http://www.networkedplanet.com/schemas/test/father> ?v0 .
+                            ?y <http://www.networkedplanet.com/schemas/test/father>  ?v0 .
+                        }
+                     } } }");
+        }
+
+        [Test]
+        public void TestResourceJoinOptimisationWithInverseArcs()
+        {
+            var q = from x in Context.Companies
+                from y in Context.Companies
+                where x.ListedOn == y.ListedOn
+                select x;
+            q.ToList();
+            AssertQuerySparql(
+                @"CONSTRUCT { ?x ?x_p ?x_o. ?x <http://www.brightstardb.com/.well-known/model/selectVariable> ""x"" . } WHERE {
+                    ?x ?x_p ?x_o . {
+                    SELECT ?x WHERE {
+                        ?x a <http://www.networkedplanet.com/schemas/test/Company> .
+                        ?y a <http://www.networkedplanet.com/schemas/test/Company> .
+                        {
+                            ?v0 <http://www.networkedplanet.com/schemas/test/listing> ?x .
+                            ?v0 <http://www.networkedplanet.com/schemas/test/listing> ?y .
+                        }
+                     } } }");
+
+        }
     }
 }

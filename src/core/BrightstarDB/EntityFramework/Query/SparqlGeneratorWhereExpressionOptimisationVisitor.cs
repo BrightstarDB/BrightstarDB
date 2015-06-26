@@ -36,8 +36,12 @@ namespace BrightstarDB.EntityFramework.Query
                     _inBooleanExpression = false;
                     ret =
                         new BooleanFlagExpression(
+                            (
                             // Allowed: x.prop=constant
-                            (expression.Left is MemberExpression && expression.Right is ConstantExpression) &&
+                            (expression.Left is MemberExpression && expression.Right is ConstantExpression) ||
+                            // Allowed: x.prop=y.other_prop
+                            (expression.Left is MemberExpression && expression.Right is MemberExpression)
+                            ) &&
                             // Check left and right expression content are optimisable
                             IsTrue(VisitExpression(expression.Left)) &&
                                                   IsTrue(VisitExpression(expression.Right)));
