@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using BrightstarDB.Rdf;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ExpressionTreeVisitors;
 using Remotion.Linq.Parsing;
@@ -91,35 +95,8 @@ namespace BrightstarDB.EntityFramework.Query
             return sourceVarName;
         }
 
-        protected string MakeSparqlStringConstant(string value)
-        {
-            if (value.Contains("'"))
-            {
-                if (value.Contains("\""))
-                {
-                    return String.Format("'''{0}'''", value);
-                }
-                return String.Format("\"{0}\"", value);
-            }
-            return String.Format("'{0}'", value);
-        }
-
-        protected string MakeSparqlNumericConstant(object value)
-        {
-            if (value is byte || value is short || value is ushort || value is int || value is uint || value is long || value is ulong)
-            {
-                return String.Format("{0:D}", value);
-            }
-            if (value is decimal)
-            {
-                return String.Format("{0:F}", value);
-            }
-            if (value is double || value is float)
-            {
-                return String.Format("{0:E}", value);
-            }
-            return String.Format("{0:R}", value);
-        }
+        
+        
 
         public string MakeResourceAddress(PropertyInfo identifierProperty, string topicId)
         {

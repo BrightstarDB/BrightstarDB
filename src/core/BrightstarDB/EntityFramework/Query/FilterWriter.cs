@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using BrightstarDB.Rdf;
+using Remotion.Linq.Clauses.Expressions;
 
 namespace BrightstarDB.EntityFramework.Query
 {
@@ -14,7 +13,6 @@ namespace BrightstarDB.EntityFramework.Query
     {
         private readonly SparqlGeneratorWhereExpressionTreeVisitor _parent;
         private readonly StringBuilder _filterExpressionBuilder;
-        private readonly StringBuilder _graphPatternBuilder;
         private bool _castAsResourceType;
         private string _identifierPrefix;
 
@@ -30,18 +28,11 @@ namespace BrightstarDB.EntityFramework.Query
         /// </summary>
         private bool _appendExpressionVariable = true;
 
-        /// <summary>
-        /// Flag to indicate if we are processing a filter that can be optimized to inline graph patterns
-        /// </summary>
-        private bool _optimizeFilter;
-
         public FilterWriter(SparqlGeneratorWhereExpressionTreeVisitor parentVisitor, SparqlQueryBuilder queryBuilder, 
-            StringBuilder filterExpressionBuilder, StringBuilder patternBuilder, bool optimizeFilter) : base(queryBuilder)
+            StringBuilder filterExpressionBuilder) : base(queryBuilder)
         {
             _parent = parentVisitor;
             _filterExpressionBuilder = filterExpressionBuilder;
-            _graphPatternBuilder = patternBuilder;
-            _optimizeFilter = optimizeFilter;
         }
 
         /// <summary>
@@ -49,44 +40,21 @@ namespace BrightstarDB.EntityFramework.Query
         /// </summary>
         public string FilterExpression { get { return _filterExpressionBuilder.ToString(); } }
 
-        public string PatternExpression { get { return _graphPatternBuilder.ToString(); } }
-
         public bool InBooleanExpression { get; set; }
 
         public void Append(string value)
         {
-            if (_optimizeFilter)
-            {
-                _graphPatternBuilder.Append(value);
-            }
-            else
-            {
-                _filterExpressionBuilder.Append(value);
-            }
+            _filterExpressionBuilder.Append(value);
         }
 
         public void Append(char value)
         {
-            if (_optimizeFilter)
-            {
-                _graphPatternBuilder.Append(value);
-            }
-            else
-            {
-                _filterExpressionBuilder.Append(value);
-            }
+            _filterExpressionBuilder.Append(value);
         }
 
         public void AppendFormat(string fmt, params object[] args)
         {
-            if (_optimizeFilter)
-            {
-                _graphPatternBuilder.AppendFormat(fmt, args);
-            }
-            else
-            {
-                _filterExpressionBuilder.AppendFormat(fmt, args);
-            }
+            _filterExpressionBuilder.AppendFormat(fmt, args);
         }
 
         #region Overrides of ThrowingExpressionTreeVisitor
@@ -153,27 +121,7 @@ namespace BrightstarDB.EntityFramework.Query
                                 }
                                 else
                                 {
-                                    if (_optimizeFilter)
-                                    {
-                                        if (InBooleanExpression)
-                                        {
-                                            if (expression.Type == typeof (bool))
-                                            {
-                                                AppendFormat("?{0} <{1}> true .", sourceVarName, hint.SchemaTypeUri);
-                                            }
-                                            else
-                                            {
-                                                AppendFormat("?{0} <{1}> ?{2} .", sourceVarName, hint.SchemaTypeUri, QueryBuilder.NextVariable());
-                                            }
-                                        }
-                                        else
-                                        {
-                                            AppendFormat("?{0} <{1}> ", sourceVarName, hint.SchemaTypeUri);
-                                        }
-                                        return expression;
-                                    }
-                                    else
-                                    {
+                                    
                                         var varName = QueryBuilder.NextVariable();
                                         QueryBuilder.AddTripleConstraint(
                                             GraphNode.Variable, sourceVarName,
@@ -189,54 +137,35 @@ namespace BrightstarDB.EntityFramework.Query
                                                 ? VariableBindingType.Resource
                                                 : VariableBindingType.Literal,
                                             propertyInfo.PropertyType);
-                                    }
+                                    
                                 }
                             }
                             case PropertyMappingType.InverseArc:
                             {
-                                if (_optimizeFilter)
+                                var existingVarName = QueryBuilder.GetVariableForSubject(GraphNode.Iri,
+                                    hint.SchemaTypeUri,
+                                    GraphNode.Variable,
+                                    sourceVarName);
+                                if (!String.IsNullOrEmpty(existingVarName))
                                 {
-                                    if (InBooleanExpression)
+                                    if (_appendExpressionVariable)
                                     {
-                                        AppendFormat("?{0} <{1}> ?{2} .", QueryBuilder.NextVariable(),
-                                            hint.SchemaTypeUri, sourceVarName);
+                                        AppendFormat("?{0}", existingVarName);
                                     }
-                                    else
-                                    {
-                                        AppendFormat(" <{0}> ?{1} .", hint.SchemaTypeUri, sourceVarName);
-                                    }
-                                    return expression;
+                                    return new SelectVariableNameExpression(existingVarName,
+                                        VariableBindingType.Resource,
+                                        propertyInfo.PropertyType);
                                 }
-                                else
+                                var varName = QueryBuilder.NextVariable();
+                                QueryBuilder.AddTripleConstraint(GraphNode.Variable, varName,
+                                    GraphNode.Iri, hint.SchemaTypeUri,
+                                    GraphNode.Variable, sourceVarName);
+                                if (_appendExpressionVariable)
                                 {
-                                    var existingVarName = QueryBuilder.GetVariableForSubject(GraphNode.Iri,
-                                        hint.SchemaTypeUri,
-                                        GraphNode.Variable,
-                                        sourceVarName);
-                                    if (!String.IsNullOrEmpty(existingVarName))
-                                    {
-                                        if (_appendExpressionVariable)
-                                        {
-                                            AppendFormat("?{0}", existingVarName);
-                                        }
-                                        return new SelectVariableNameExpression(existingVarName,
-                                            VariableBindingType.Resource,
-                                            propertyInfo.PropertyType);
-                                    }
-                                    else
-                                    {
-                                        var varName = QueryBuilder.NextVariable();
-                                        QueryBuilder.AddTripleConstraint(GraphNode.Variable, varName,
-                                            GraphNode.Iri, hint.SchemaTypeUri,
-                                            GraphNode.Variable, sourceVarName);
-                                        if (_appendExpressionVariable)
-                                        {
-                                            AppendFormat("?{0}", varName);
-                                        }
-                                        return new SelectVariableNameExpression(varName, VariableBindingType.Resource,
-                                            propertyInfo.PropertyType);
-                                    }
+                                    AppendFormat("?{0}", varName);
                                 }
+                                return new SelectVariableNameExpression(varName, VariableBindingType.Resource,
+                                    propertyInfo.PropertyType);
                             }
                             case PropertyMappingType.Address:
                                 if (_appendExpressionVariable)
@@ -305,136 +234,19 @@ namespace BrightstarDB.EntityFramework.Query
             return base.VisitMemberExpression(expression);
         }
 
-        private static readonly List<Type> NumericTypes = new List<Type>
-                                                              {
-                                                                  typeof (byte),
-                                                                  typeof (short),
-                                                                  typeof (ushort),
-                                                                  typeof (int),
-                                                                  typeof (uint),
-                                                                  typeof (long),
-                                                                  typeof (ulong),
-                                                                  typeof (decimal),
-                                                                  typeof (float),
-                                                                  typeof (double)
-                                                              };
+        
 
         protected override Expression VisitConstantExpression(ConstantExpression expression)
         {
-            // Determine the effective expression type (removing Nullable<T> wrapper)
-            var expressionType = expression.Type;
-            if (expression.Type.IsGenericType && expression.Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            try
             {
-                expressionType = expression.Type.GetGenericArguments()[0];
-            }
-            if (typeof(string).IsAssignableFrom(expressionType))
-            {
-                var strValue = expression.Value as string;
-                if (strValue != null)
-                {
-                    Append(
-                        MakeSparqlStringConstant(_regexEscaping ? Regex.Escape(strValue) : strValue));
-                    var dt = GetDatatype(typeof (string));
-                    if (!string.IsNullOrEmpty(dt))
-                    {
-                        AppendFormat("^^<{0}>", dt);
-                    }
-                    if (_optimizeFilter) Append(". \n");
-                    return expression;
-                }
-            }
-            if (NumericTypes.Contains(expressionType))
-            {
-                Append(MakeSparqlStringConstant(MakeSparqlNumericConstant(expression.Value)));
-                var dt = GetDatatype(expressionType);
-                if (!string.IsNullOrEmpty(dt))
-                {
-                    AppendFormat("^^<{0}>", dt);
-                }
-                if (_optimizeFilter) Append(". \n");
+                Append(QueryBuilder.MakeSparqlConstant(expression.Value, _regexEscaping));
                 return expression;
             }
-            if (expressionType == typeof(bool))
+            catch (Exception)
             {
-                Append(((bool) expression.Value) ? "true" : "false");
-                if (_optimizeFilter) Append(". \n");
-                return expression;
-            }
-            if (expressionType == typeof(DateTime))
-            {
-
-                Append(MakeSparqlStringConstant(((DateTime) expression.Value).ToString("O")));
-                var dt = GetDatatype(typeof(DateTime));
-                if (!String.IsNullOrEmpty(dt))
-                {
-                    AppendFormat("^^<{0}>", dt);
-                }
-                if (_optimizeFilter) Append(". \n");
-                return expression;
-            }
-            if (expressionType == typeof (Guid))
-            {
-                Append(MakeSparqlStringConstant(((Guid) expression.Value).ToString("D")));
-                var dt = GetDatatype(typeof (Guid));
-                if (!string.IsNullOrEmpty(dt))
-                {
-                    AppendFormat("^^<{0}>", dt);
-                }
-                if (_optimizeFilter) Append(". \n");
-                return expression;
-            }
-            if (expressionType == typeof (PlainLiteral))
-            {
-                var pl = expression.Value as PlainLiteral;
-                if (pl != null)
-                {
-                    Append(MakeSparqlStringConstant(pl.Value));
-                    if (!pl.Language.Equals(string.Empty))
-                    {
-                        AppendFormat("@{0}", pl.Language);
-                    }
-                    if (_optimizeFilter) Append(". \n");
-                    return expression;
-                }
-            }
-            if (typeof(IEnumerable).IsAssignableFrom(expression.Type))
-            {
-                var enumerable = expression.Value as IEnumerable;
-                if (enumerable != null)
-                {
-                    var isFirst = true;
-                    foreach (var o in enumerable)
-                    {
-                        if (o != null)
-                        {
-                            if (!isFirst)
-                            {
-                                Append(",");
-                            }
-                            else
-                            {
-                                isFirst = false;
-                            }
-                            Append(MakeSparqlConstant(o));
-                            var dt = GetDatatype(typeof (string));
-                            if (!string.IsNullOrEmpty(dt))
-                            {
-                                AppendFormat("^^<{0}>", dt);
-                            }
-                        }
-                    }
-                    if (_optimizeFilter) Append(". \n");
-                    return expression;
-                }
-            }
-            if (typeof(IEntityObject).IsAssignableFrom(expression.Type) ||
-                EntityMappingStore.IsKnownInterface(expression.Type))
-            {
-                var obj = expression.Value as IEntityObject;
-                var address = QueryBuilder.Context.GetResourceAddress(obj);
-                AppendFormat("<{0}>", address);
-                if (_optimizeFilter) Append(". \n");
-                return expression;
+                // Failed to handle the provided expression.
+                // TODO: Log the exception?
             }
             return base.VisitConstantExpression(expression);
         }
@@ -476,20 +288,7 @@ namespace BrightstarDB.EntityFramework.Query
                 }
                 return "<" + u + ">";
             }
-            var t = o.GetType();
-            if (typeof(string).IsAssignableFrom(t))
-            {
-                return MakeSparqlStringConstant(o as string);
-            }
-            if (NumericTypes.Contains(t))
-            {
-                return MakeSparqlNumericConstant(o);
-            }
-            if (t == typeof(bool))
-            {
-                return ((bool) o) ? "true" : "false";
-            }
-            return MakeSparqlStringConstant(o.ToString());
+            return QueryBuilder.MakeSparqlConstant(o, _regexEscaping);
         }
 
         protected override Expression VisitMethodCallExpression(MethodCallExpression expression)
@@ -548,21 +347,11 @@ namespace BrightstarDB.EntityFramework.Query
                         }
                     }
                 }
-                if (_optimizeFilter)
-                {
-                    Append("{ ");
-                    VisitExpression(expression.Object);
-                    VisitExpression(expression.Arguments[0]);
-                    Append("}");
-                }
-                else
-                {
-                    _filterExpressionBuilder.Append('(');
-                    VisitExpression(expression.Object);
-                    _filterExpressionBuilder.Append("=");
-                    VisitExpression(expression.Arguments[0]);
-                    _filterExpressionBuilder.Append(')');
-                }
+                _filterExpressionBuilder.Append('(');
+                VisitExpression(expression.Object);
+                _filterExpressionBuilder.Append("=");
+                VisitExpression(expression.Arguments[0]);
+                _filterExpressionBuilder.Append(')');
                 return expression;
             }
             if (expression.Object != null && expression.Object.Type == typeof(string))
@@ -745,7 +534,7 @@ namespace BrightstarDB.EntityFramework.Query
             return base.VisitUnaryExpression(expression);
         }
 
-        protected override Expression VisitQuerySourceReferenceExpression(Remotion.Linq.Clauses.Expressions.QuerySourceReferenceExpression expression)
+        protected override Expression VisitQuerySourceReferenceExpression(QuerySourceReferenceExpression expression)
         {
             Expression mappedExpression;
             if (QueryBuilder.TryGetQuerySourceMapping(expression.ReferencedQuerySource, out mappedExpression))
@@ -764,7 +553,7 @@ namespace BrightstarDB.EntityFramework.Query
         }
 
 #if !WINDOWS_PHONE && !PORTABLE
-        protected override Expression VisitExtensionExpression(Remotion.Linq.Clauses.Expressions.ExtensionExpression expression)
+        protected override Expression VisitExtensionExpression(ExtensionExpression expression)
         {
             var selectVariableNameExpression = expression as SelectVariableNameExpression;
             return selectVariableNameExpression != null ? VisitSelectVariableNameExpression(selectVariableNameExpression) : base.VisitExtensionExpression(expression);

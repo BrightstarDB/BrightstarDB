@@ -24,7 +24,7 @@ namespace BrightstarDB.EntityFramework.Tests
             AssertQuerySparql(
                 @"SELECT ?v0 WHERE {
 ?c a <http://www.networkedplanet.com/schemas/test/Concept> .
-{ ?c <http://www.networkedplanet.com/schemas/test/prefLabel> 'Test'@en . }
+?c <http://www.networkedplanet.com/schemas/test/prefLabel> 'Test'@en .
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v0)
 }");
         }

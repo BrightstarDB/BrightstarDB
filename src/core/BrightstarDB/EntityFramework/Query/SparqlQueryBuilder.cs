@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using BrightstarDB.Rdf;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
@@ -571,6 +573,178 @@ namespace BrightstarDB.EntityFramework.Query
         public void EndUnion()
         {
             _haveFirstUnionElement = false;
+        }
+
+        public void StartBgpGroup()
+        {
+            _graphPatternBuilder.Append(" { ");
+        }
+
+        public void EndBgpGroup()
+        {
+            _graphPatternBuilder.Append(" } ");
+        }
+
+        public void StartMinus()
+        {
+            _graphPatternBuilder.Append(" MINUS { ");
+        }
+
+        public void EndMinus()
+        {
+            _graphPatternBuilder.Append(" } ");
+        }
+
+        private static readonly List<Type> NumericTypes = new List<Type>
+                                                              {
+                                                                  typeof (byte),
+                                                                  typeof (short),
+                                                                  typeof (ushort),
+                                                                  typeof (int),
+                                                                  typeof (uint),
+                                                                  typeof (long),
+                                                                  typeof (ulong),
+                                                                  typeof (decimal),
+                                                                  typeof (float),
+                                                                  typeof (double)
+                                                              };
+        public string MakeSparqlConstant(object value, bool regexEscaping)
+        {
+            if (value == null) throw new ArgumentNullException("value");
+            // Determine the effective expression type (removing Nullable<T> wrapper)
+            var expressionType = value.GetType();
+            if (expressionType.IsGenericType && expressionType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                expressionType = expressionType.GetGenericArguments()[0];
+            }
+            if (typeof(string).IsAssignableFrom(expressionType))
+            {
+                var strValue = value as string;
+                if (strValue != null)
+                {
+                    var dt = Context.GetDatatype(typeof(string));
+                    var ret = MakeSparqlStringConstant(regexEscaping ? Regex.Escape(strValue) : strValue);
+                    if (!string.IsNullOrEmpty(dt))
+                    {
+                        ret += string.Format("^^<{0}>", dt);
+                    }
+                    return ret;
+                }
+            }
+            if (NumericTypes.Contains(expressionType))
+            {
+                var ret = MakeSparqlStringConstant(MakeSparqlNumericConstant(value));
+                var dt = Context.GetDatatype(expressionType);
+                if (!string.IsNullOrEmpty(dt))
+                {
+                    ret += string.Format("^^<{0}>", dt);
+                }
+                return ret;
+            }
+            if (expressionType == typeof(bool))
+            {
+                return ((bool)value) ? "true" : "false";
+            }
+            if (expressionType == typeof(DateTime))
+            {
+                var ret = MakeSparqlStringConstant(((DateTime)value).ToString("O"));
+                var dt = Context.GetDatatype(typeof(DateTime));
+                if (!String.IsNullOrEmpty(dt))
+                {
+                    ret += String.Format("^^<{0}>", dt);
+                }
+                return ret;
+            }
+            if (expressionType == typeof(Guid))
+            {
+                var ret = MakeSparqlStringConstant(((Guid)value).ToString("D"));
+                var dt = Context.GetDatatype(typeof(Guid));
+                if (!string.IsNullOrEmpty(dt))
+                {
+                    ret += String.Format("^^<{0}>", dt);
+                }
+                return ret;
+            }
+            if (expressionType == typeof(PlainLiteral))
+            {
+                var pl = value as PlainLiteral;
+                var ret = MakeSparqlStringConstant(pl.Value);
+                if (!pl.Language.Equals(string.Empty))
+                {
+                    ret += String.Format("@{0}", pl.Language);
+                }
+                return ret;
+            }
+            if (typeof(IEnumerable).IsAssignableFrom(expressionType))
+            {
+                var ret = new StringBuilder();
+                var enumerable = value as IEnumerable;
+                var isFirst = true;
+                foreach (var o in enumerable)
+                {
+                    if (o != null)
+                    {
+                        if (!isFirst)
+                        {
+                            ret.Append(",");
+                        }
+                        else
+                        {
+                            isFirst = false;
+                        }
+                        ret.Append(MakeSparqlConstant(o, regexEscaping));
+                        //var dt = GetDatatype(typeof (string));
+                        //if (!string.IsNullOrEmpty(dt))
+                        //{
+                        //    ret.AppendFormat("^^<{0}>", dt);
+                        //}
+                    }
+                }
+                return ret.ToString();
+            }
+            if (typeof(IEntityObject).IsAssignableFrom(expressionType) ||
+                EntityMappingStore.IsKnownInterface(expressionType))
+            {
+                var obj = value as IEntityObject;
+                var address = Context.GetResourceAddress(obj);
+                return string.Format("<{0}>", address);
+            }
+            throw new ArgumentException(string.Format("Unable to serialize value {0} ({1}) as a SPARQL constant", value, value.GetType()));
+        }
+
+        protected string MakeSparqlStringConstant(string value)
+        {
+            if (value.Contains("'"))
+            {
+                if (value.Contains("\""))
+                {
+                    return String.Format("'''{0}'''", value);
+                }
+                return String.Format("\"{0}\"", value);
+            }
+            return String.Format("'{0}'", value);
+        }
+
+        protected string MakeSparqlNumericConstant(object value)
+        {
+            if (value is byte || value is short || value is ushort || value is int || value is uint || value is long || value is ulong)
+            {
+                return String.Format("{0:D}", value);
+            }
+            if (value is decimal)
+            {
+                return String.Format("{0:F}", value);
+            }
+            if (value is double || value is float)
+            {
+                return String.Format("{0:E}", value);
+            }
+            return String.Format("{0:R}", value);
+        }
+
+        public void Union()
+        {
+            _graphPatternBuilder.Append(" UNION ");
         }
     }
 }

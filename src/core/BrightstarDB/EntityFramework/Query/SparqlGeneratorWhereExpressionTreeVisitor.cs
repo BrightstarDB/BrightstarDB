@@ -24,7 +24,7 @@ namespace BrightstarDB.EntityFramework.Query
             : base(queryBuilder)
         {
             QueryBuilder = queryBuilder;
-            _filterWriter = new FilterWriter(this, queryBuilder, new StringBuilder(), new StringBuilder(), optimizeFilter);
+            _filterWriter = new FilterWriter(this, queryBuilder, new StringBuilder());
             _optimizeFilter = optimizeFilter;
             _inBooleanExpression = isBoolean;
         }
@@ -40,7 +40,6 @@ namespace BrightstarDB.EntityFramework.Query
                 // Single boolean member expression requires a special case addition to the filter
                 queryBuilder.AddFilterExpression("(?" + svn.Name + " = true)");
             }
-            queryBuilder.AddPatternExpression(visitor.PatternExpression);
             queryBuilder.AddFilterExpression(visitor.FilterExpression);
             return returnedExpression;
         }
@@ -55,11 +54,6 @@ namespace BrightstarDB.EntityFramework.Query
         public string FilterExpression
         {
             get { return _filterWriter.FilterExpression; }
-        }
-
-        public string PatternExpression
-        {
-            get { return _filterWriter.PatternExpression; }
         }
 
         private static ConstantExpression ExtractConstantExpression(BinaryExpression binaryExpression)
@@ -162,6 +156,15 @@ namespace BrightstarDB.EntityFramework.Query
 
         protected override Expression VisitBinaryExpression(BinaryExpression expression)
         {
+            var currentlyInBooleanExpression = _inBooleanExpression;
+            _inBooleanExpression = false;
+            var ret = HandleBinaryExpression(expression);
+            _inBooleanExpression = currentlyInBooleanExpression;
+            return ret;
+        }
+
+        private Expression HandleBinaryExpression(BinaryExpression expression)
+        {
             // handle special cases
             if (expression.NodeType == ExpressionType.Equal)
             {
@@ -219,50 +222,39 @@ namespace BrightstarDB.EntityFramework.Query
             // Process in-fix operator
             if (_optimizeFilter)
             {
-                var currentlyInBooleanExpression = _filterWriter.InBooleanExpression;
                 switch (expression.NodeType)
                 {
                     case ExpressionType.Equal:
-                        _filterWriter.InBooleanExpression = false;
-                        _filterWriter.Append("{");
-                        if (expression.Left is MemberExpression && expression.Right is MemberExpression)
-                        {
-                            // Optimise to a join between two BGPs
-                            AppendBgpJoin((MemberExpression) expression.Left, (MemberExpression) expression.Right);
-                        }
-                        else
-                        {
-                            _filterWriter.VisitExpression(expression.Left);
-                            _filterWriter.VisitExpression(expression.Right);
-                        }
-                        _filterWriter.Append("}");
-                        _filterWriter.InBooleanExpression = currentlyInBooleanExpression;
-                    break;
+                        QueryBuilder.StartBgpGroup();
+                        AppendOptimisedEqualityExpression(expression.Left, expression.Right);
+                        QueryBuilder.EndBgpGroup();
+                        break;
 
                     case ExpressionType.NotEqual:
-                        _filterWriter.InBooleanExpression = false;
-                        _filterWriter.Append("MINUS {");
-                        _filterWriter.VisitExpression(expression.Left);
-                        _filterWriter.VisitExpression(expression.Right);
-                        _filterWriter.Append("}");
-                        _filterWriter.InBooleanExpression = currentlyInBooleanExpression;
+                        QueryBuilder.StartMinus();
+                        AppendOptimisedEqualityExpression(expression.Left, expression.Right);
+                        QueryBuilder.EndMinus();
                         break;
 
                     case ExpressionType.OrElse:
-                        _filterWriter.InBooleanExpression = true;
-                        _filterWriter.Append("{");
-                        _filterWriter.VisitExpression(expression.Left);
-                        _filterWriter.Append("} UNION {");
-                        _filterWriter.VisitExpression(expression.Right);
-                        _filterWriter.Append("}");
-                        _filterWriter.InBooleanExpression = currentlyInBooleanExpression;
+                        _inBooleanExpression = true;
+                        QueryBuilder.StartBgpGroup();
+                        VisitExpression(expression.Left);
+                        QueryBuilder.EndBgpGroup();
+                        
+                        QueryBuilder.Union();
+                        
+                        QueryBuilder.StartBgpGroup();
+                        VisitExpression(expression.Right);
+                        QueryBuilder.EndBgpGroup();
+                        _inBooleanExpression = false;
                         break;
 
                     case ExpressionType.AndAlso:
-                        _filterWriter.InBooleanExpression = true;
-                        _filterWriter.VisitExpression(expression.Left);
-                        _filterWriter.VisitExpression(expression.Right);
-                        _filterWriter.InBooleanExpression = currentlyInBooleanExpression;
+                        _inBooleanExpression = true;
+                        VisitExpression(expression.Left);
+                        VisitExpression(expression.Right);
+                        _inBooleanExpression = false;
                         break;
 
                     default:
@@ -324,6 +316,30 @@ namespace BrightstarDB.EntityFramework.Query
             return expression;
         }
 
+        private void AppendOptimisedEqualityExpression(Expression left, Expression right)
+        {
+            MemberExpression leftMemberExpression = left as MemberExpression;
+            if (leftMemberExpression != null)
+            {
+                if (right is MemberExpression)
+                {
+                    // Optimise to a join between two BGPs
+                    AppendBgpJoin(leftMemberExpression, (MemberExpression) right);
+                }
+                else if (right is ConstantExpression)
+                {
+                    AppendPropertyConstraint(GetSourceVarName(leftMemberExpression),
+                        GetPropertyHint(leftMemberExpression),
+                        (ConstantExpression)right);
+                }
+            }
+            else
+            {
+                VisitExpression(left);
+                VisitExpression(right);
+            }
+        }
+
         private void AppendBgpJoin(MemberExpression left, MemberExpression right)
         {
             var joinVar = QueryBuilder.NextVariable();
@@ -331,22 +347,29 @@ namespace BrightstarDB.EntityFramework.Query
             var leftProperty = GetPropertyHint(left);
             var rightSourceVar = GetSourceVarName(right);
             var rightProperty = GetPropertyHint(right);
-            if (leftProperty.MappingType == PropertyMappingType.InverseArc)
+
+            AppendPropertyConstraint(leftSourceVar, leftProperty, joinVar);
+            AppendPropertyConstraint(rightSourceVar, rightProperty, joinVar);
+        }
+
+        private void AppendPropertyConstraint(string sourceVar, PropertyHint propertyHint, string valueVar)
+        {
+            if (propertyHint.MappingType == PropertyMappingType.InverseArc)
             {
-                _filterWriter.AppendFormat(" ?{0} <{1}> ?{2} .\n", joinVar, leftProperty.SchemaTypeUri, leftSourceVar);
+                QueryBuilder.AddTripleConstraint(GraphNode.Variable, valueVar, GraphNode.Iri, propertyHint.SchemaTypeUri,
+                    GraphNode.Variable, sourceVar);
             }
             else
             {
-                _filterWriter.AppendFormat(" ?{0} <{1}> ?{2} .\n", leftSourceVar, leftProperty.SchemaTypeUri, joinVar);
+                QueryBuilder.AddTripleConstraint(GraphNode.Variable, sourceVar, GraphNode.Iri, propertyHint.SchemaTypeUri,
+                    GraphNode.Variable, valueVar);
             }
-            if (rightProperty.MappingType == PropertyMappingType.InverseArc)
-            {
-                _filterWriter.AppendFormat(" ?{0} <{1}> ?{2} .\n", joinVar, rightProperty.SchemaTypeUri, rightSourceVar);
-            }
-            else
-            {
-                _filterWriter.AppendFormat(" ?{0} <{1}> ?{2} .\n", rightSourceVar, rightProperty.SchemaTypeUri, joinVar);
-            }
+        }
+
+        private void AppendPropertyConstraint(string sourceVar, PropertyHint propertyHint,
+            ConstantExpression constantExpression)
+        {
+           QueryBuilder.AddTripleConstraint(GraphNode.Variable, sourceVar, GraphNode.Iri, propertyHint.SchemaTypeUri, GraphNode.Raw, QueryBuilder.MakeSparqlConstant(constantExpression.Value, false));
         }
 
         /// <summary>
@@ -462,7 +485,14 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     return expression;
                 }
-                _filterWriter.VisitExpression(expression);
+                if (_optimizeFilter)
+                {
+                    AppendOptimisedEqualityExpression(expression.Object, expression.Arguments[0]);
+                }
+                else
+                {
+                    _filterWriter.VisitExpression(expression);
+                }
                 return expression;
             }
             if (expression.Object != null && expression.Object.Type == typeof (string))
@@ -692,14 +722,19 @@ namespace BrightstarDB.EntityFramework.Query
                                     {
                                         if (expression.Type == typeof (bool))
                                         {
-                                            _filterWriter.AppendFormat("?{0} <{1}> true .",
-                                                sourceVarName, hint.SchemaTypeUri);
+                                            // Explicitly bind to true
+                                            QueryBuilder.AddTripleConstraint(
+                                                GraphNode.Variable, sourceVarName, 
+                                                GraphNode.Iri, hint.SchemaTypeUri, 
+                                                GraphNode.Raw, "true");
                                         }
                                         else
                                         {
                                             // Any binding is acceptable
-                                            _filterWriter.AppendFormat("?{0} <{1}> ?{2}",
-                                                sourceVarName, hint.SchemaTypeUri, QueryBuilder.NextVariable());
+                                            QueryBuilder.AddTripleConstraint(
+                                                GraphNode.Variable, sourceVarName,
+                                                GraphNode.Iri, hint.SchemaTypeUri,
+                                                GraphNode.Variable, QueryBuilder.NextVariable());
                                         }
                                         return expression;
                                     }
@@ -754,7 +789,7 @@ namespace BrightstarDB.EntityFramework.Query
         {
             if (typeof (String).IsAssignableFrom(expression.Type))
             {
-                _filterWriter.Append(MakeSparqlStringConstant(expression.Value as String));
+                _filterWriter.Append((expression.Value as String));
                 return expression;
             }
             return base.VisitConstantExpression(expression);
@@ -826,7 +861,7 @@ namespace BrightstarDB.EntityFramework.Query
 
                 var all = (AllResultOperator) expression.QueryModel.ResultOperators[0];
                 var existingWriter = _filterWriter;
-                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder(), new StringBuilder(), false); // TODO: Could check FromExpression to see if it is optimisable
+                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder()); // TODO: Could check FromExpression to see if it is optimisable
                 QueryBuilder.StartNotExists();
                 var mappedExpression = VisitExpression(expression.QueryModel.MainFromClause.FromExpression);
                 QueryBuilder.AddQuerySourceMapping(expression.QueryModel.MainFromClause, mappedExpression);
@@ -841,7 +876,7 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 QueryBuilder.StartExists();
                 var outerFilterWriter = _filterWriter;
-                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder(), new StringBuilder(), false );
+                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder() );
                 var itemVarName = SparqlQueryBuilder.SafeSparqlVarName(expression.QueryModel.MainFromClause.ItemName);
 
                 var mappedFromExpression = VisitExpression(expression.QueryModel.MainFromClause.FromExpression);
