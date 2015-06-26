@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using BrightstarDB.Rdf;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
@@ -112,30 +114,24 @@ namespace BrightstarDB.EntityFramework.Query
                     GraphNode.Iri, typeUri);
             }
             AddQuerySourceMapping(querySource, new SelectVariableNameExpression(itemVarName, VariableBindingType.Resource, querySource.ItemType));
-            if (querySource is MainFromClause)
+            var mfc = querySource as MainFromClause;
+            if (mfc == null) return itemVarName;
+            var fromExpr = mfc.FromExpression as ConstantExpression;
+            if (fromExpr == null) return itemVarName;
+            var fromCollection = fromExpr.Value as IBrightstarEntityCollection;
+            if (fromCollection == null) return itemVarName;
+            if (fromCollection.IsInverseProperty)
             {
-                var mfc = querySource as MainFromClause;
-                if (mfc.FromExpression is ConstantExpression)
-                {
-                    var fromExpr = mfc.FromExpression as ConstantExpression;
-                    if (fromExpr.Value is IBrightstarEntityCollection)
-                    {
-                        var fromCollection = fromExpr.Value as IBrightstarEntityCollection;
-                        if (fromCollection.IsInverseProperty)
-                        {
 
-                            AddTripleConstraint(GraphNode.Variable, itemVarName,
-                                                GraphNode.Iri, fromCollection.PropertyIdentity,
-                                                GraphNode.Iri, fromCollection.ParentIdentity);
-                        }
-                        else
-                        {
-                            AddTripleConstraint(GraphNode.Iri, fromCollection.ParentIdentity,
-                                                GraphNode.Iri, fromCollection.PropertyIdentity,
-                                                GraphNode.Variable, itemVarName);
-                        }
-                    }
-                }
+                AddTripleConstraint(GraphNode.Variable, itemVarName,
+                    GraphNode.Iri, fromCollection.PropertyIdentity,
+                    GraphNode.Iri, fromCollection.ParentIdentity);
+            }
+            else
+            {
+                AddTripleConstraint(GraphNode.Iri, fromCollection.ParentIdentity,
+                    GraphNode.Iri, fromCollection.PropertyIdentity,
+                    GraphNode.Variable, itemVarName);
             }
             return itemVarName;
         }
@@ -143,13 +139,13 @@ namespace BrightstarDB.EntityFramework.Query
         public string IntroduceNamedVariable(string varName)
         {
             var safeVarName = SafeSparqlVarName(varName);
-            if (this._namedVariables.Contains(safeVarName))
+            if (_namedVariables.Contains(safeVarName))
             {
                 var suffix = 1;
-                while (this._namedVariables.Contains(safeVarName + suffix)) suffix++;
+                while (_namedVariables.Contains(safeVarName + suffix)) suffix++;
                 safeVarName = safeVarName + suffix;
             }
-            this._namedVariables.Add(safeVarName);
+            _namedVariables.Add(safeVarName);
             return safeVarName;
         }
 
@@ -292,7 +288,7 @@ namespace BrightstarDB.EntityFramework.Query
             if (withDatasetDescription) AppendFromClause(queryStringBuilder);
             queryStringBuilder
                 .Append("WHERE {")
-                .Append(_graphPatternBuilder.ToString());
+                .Append(_graphPatternBuilder);
 
             if (projectSortVariables)
             {
@@ -407,6 +403,14 @@ namespace BrightstarDB.EntityFramework.Query
             _graphPatternBuilder.Append("} ");
         }
 
+        public void AddPatternExpression(string patternExpression)
+        {
+            if (!string.IsNullOrEmpty(patternExpression))
+            {
+                _graphPatternBuilder.Append(patternExpression);
+            }
+        }
+
         public void AddFilterExpression(string filterExpression)
         {
             if (!string.IsNullOrEmpty(filterExpression))
@@ -454,19 +458,17 @@ namespace BrightstarDB.EntityFramework.Query
 
         private string ReplaceFixedVariables(string query)
         {
-            foreach(string varName in _variableValueMapping.Keys)
+            foreach(var varName in _variableValueMapping.Keys)
             {
                 if (_selectVars.Contains(varName))
                 {
                     // selected variables cannot be replaced
                     continue;
                 }
-                string matchPattern = @"([\s+|\.|\{|\(])\?(" + Regex.Escape(varName) + @")([\s+|,|=|]|\.|\))";
-                query = Regex.Replace(query, matchPattern, m =>
-                                                               {
-                                                                   return m.Groups[1] + _variableValueMapping[varName] +
-                                                                   m.Groups[3];
-                                                               });
+                var matchPattern = @"([\s+|\.|\{|\(])\?(" + Regex.Escape(varName) + @")([\s+|,|=|]|\.|\))";
+                var name = varName;
+                query = Regex.Replace(query, matchPattern, m => m.Groups[1] + _variableValueMapping[name] +
+                                                                m.Groups[3]);
             }
             return query;
         }
@@ -550,7 +552,7 @@ namespace BrightstarDB.EntityFramework.Query
             return _ordering == null ? new OrderingDirection[0] : _ordering.Select(x => x.OrderingDirection);
         }
 
-        private bool _haveFirstUnionElement = false;
+        private bool _haveFirstUnionElement;
 
         public void StartUnion()
         {
@@ -571,6 +573,178 @@ namespace BrightstarDB.EntityFramework.Query
         public void EndUnion()
         {
             _haveFirstUnionElement = false;
+        }
+
+        public void StartBgpGroup()
+        {
+            _graphPatternBuilder.Append(" { ");
+        }
+
+        public void EndBgpGroup()
+        {
+            _graphPatternBuilder.Append(" } ");
+        }
+
+        public void StartMinus()
+        {
+            _graphPatternBuilder.Append(" MINUS { ");
+        }
+
+        public void EndMinus()
+        {
+            _graphPatternBuilder.Append(" } ");
+        }
+
+        private static readonly List<Type> NumericTypes = new List<Type>
+                                                              {
+                                                                  typeof (byte),
+                                                                  typeof (short),
+                                                                  typeof (ushort),
+                                                                  typeof (int),
+                                                                  typeof (uint),
+                                                                  typeof (long),
+                                                                  typeof (ulong),
+                                                                  typeof (decimal),
+                                                                  typeof (float),
+                                                                  typeof (double)
+                                                              };
+        public string MakeSparqlConstant(object value, bool regexEscaping)
+        {
+            if (value == null) throw new ArgumentNullException("value");
+            // Determine the effective expression type (removing Nullable<T> wrapper)
+            var expressionType = value.GetType();
+            if (expressionType.IsGenericType && expressionType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                expressionType = expressionType.GetGenericArguments()[0];
+            }
+            if (typeof(string).IsAssignableFrom(expressionType))
+            {
+                var strValue = value as string;
+                if (strValue != null)
+                {
+                    var dt = Context.GetDatatype(typeof(string));
+                    var ret = MakeSparqlStringConstant(regexEscaping ? Regex.Escape(strValue) : strValue);
+                    if (!string.IsNullOrEmpty(dt))
+                    {
+                        ret += string.Format("^^<{0}>", dt);
+                    }
+                    return ret;
+                }
+            }
+            if (NumericTypes.Contains(expressionType))
+            {
+                var ret = MakeSparqlStringConstant(MakeSparqlNumericConstant(value));
+                var dt = Context.GetDatatype(expressionType);
+                if (!string.IsNullOrEmpty(dt))
+                {
+                    ret += string.Format("^^<{0}>", dt);
+                }
+                return ret;
+            }
+            if (expressionType == typeof(bool))
+            {
+                return ((bool)value) ? "true" : "false";
+            }
+            if (expressionType == typeof(DateTime))
+            {
+                var ret = MakeSparqlStringConstant(((DateTime)value).ToString("O"));
+                var dt = Context.GetDatatype(typeof(DateTime));
+                if (!String.IsNullOrEmpty(dt))
+                {
+                    ret += String.Format("^^<{0}>", dt);
+                }
+                return ret;
+            }
+            if (expressionType == typeof(Guid))
+            {
+                var ret = MakeSparqlStringConstant(((Guid)value).ToString("D"));
+                var dt = Context.GetDatatype(typeof(Guid));
+                if (!string.IsNullOrEmpty(dt))
+                {
+                    ret += String.Format("^^<{0}>", dt);
+                }
+                return ret;
+            }
+            if (expressionType == typeof(PlainLiteral))
+            {
+                var pl = value as PlainLiteral;
+                var ret = MakeSparqlStringConstant(pl.Value);
+                if (!pl.Language.Equals(string.Empty))
+                {
+                    ret += String.Format("@{0}", pl.Language);
+                }
+                return ret;
+            }
+            if (typeof(IEnumerable).IsAssignableFrom(expressionType))
+            {
+                var ret = new StringBuilder();
+                var enumerable = value as IEnumerable;
+                var isFirst = true;
+                foreach (var o in enumerable)
+                {
+                    if (o != null)
+                    {
+                        if (!isFirst)
+                        {
+                            ret.Append(",");
+                        }
+                        else
+                        {
+                            isFirst = false;
+                        }
+                        ret.Append(MakeSparqlConstant(o, regexEscaping));
+                        //var dt = GetDatatype(typeof (string));
+                        //if (!string.IsNullOrEmpty(dt))
+                        //{
+                        //    ret.AppendFormat("^^<{0}>", dt);
+                        //}
+                    }
+                }
+                return ret.ToString();
+            }
+            if (typeof(IEntityObject).IsAssignableFrom(expressionType) ||
+                EntityMappingStore.IsKnownInterface(expressionType))
+            {
+                var obj = value as IEntityObject;
+                var address = Context.GetResourceAddress(obj);
+                return string.Format("<{0}>", address);
+            }
+            throw new ArgumentException(string.Format("Unable to serialize value {0} ({1}) as a SPARQL constant", value, value.GetType()));
+        }
+
+        protected string MakeSparqlStringConstant(string value)
+        {
+            if (value.Contains("'"))
+            {
+                if (value.Contains("\""))
+                {
+                    return String.Format("'''{0}'''", value);
+                }
+                return String.Format("\"{0}\"", value);
+            }
+            return String.Format("'{0}'", value);
+        }
+
+        protected string MakeSparqlNumericConstant(object value)
+        {
+            if (value is byte || value is short || value is ushort || value is int || value is uint || value is long || value is ulong)
+            {
+                return String.Format("{0:D}", value);
+            }
+            if (value is decimal)
+            {
+                return String.Format("{0:F}", value);
+            }
+            if (value is double || value is float)
+            {
+                return String.Format("{0:E}", value);
+            }
+            return String.Format("{0:R}", value);
+        }
+
+        public void Union()
+        {
+            _graphPatternBuilder.Append(" UNION ");
         }
     }
 }

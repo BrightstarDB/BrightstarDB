@@ -17,41 +17,44 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
  Develop Branch
 ****************************
 
-	- NEW: The BrightstarDB service now provides a Swagger API description and interactive documentation. [#205]
+	- NEW: The BrightstarDB service now provides a Swagger API description and interactive documentation. (#205)
 	
 	- NEW: The default 18 second timeout for executing SPARQL Update and SPARQL Query requests can now be 
 	  altered in the BrightstarDB service configuration file. See :ref:`Additional_Configuration_Options`
-	  for more details. Thanks to Martin Lercher for the suggestion. [#211]
+	  for more details. Thanks to Martin Lercher for the suggestion. (#211)
 
 	- NEW: The Import panel in Polaris now remembers the last-used file extension filter from the file selection
-	  dialog. Thanks to Martin Lercher for the suggestion. [#215]
+	  dialog. Thanks to Martin Lercher for the suggestion. (#215)
 		   
 	- NEW: Polaris now allows defaults to \*.rq and \*.sq as the default extension for SPARQL queries.
-	  Thanks to Martin Lercher for the suggestion. [#216]
+	  Thanks to Martin Lercher for the suggestion. (#216)
 	  
 	- FIX: Improvements to error reporting in the Polaris tool. Syntax errors are now properly reported for 
 	  import, SPARQL update and transactional update. Thanks to Martin Lercher for the bug report.
 		   
 	- FIX: The BrightstarDB server now uses the default Nancy view engine. This removes a dependency on
-	  Razor. [#207]
+	  Razor. (#207)
 
-	- NEW: The Entity Framework will now raise an EntityKeyRequiredException if a generated key is null or an empty string. [#199]
+	- NEW: The Entity Framework will now raise an EntityKeyRequiredException if a generated key is null or an empty string. (#199)
 	
 	- NEW: The BrightstarDB service now supports Cross-Origin Resource Sharing. This support is enabled
 	  by default but can be restricted or completely disabled in the service configuration file.
-	  For more information see :ref:`Configuring_CORS`. Thanks to Martin Lercher for the suggestion. [#210]
+	  For more information see :ref:`Configuring_CORS`. Thanks to Martin Lercher for the suggestion. (#210)
 	  
 	- NEW: The SPARQL Update implementation now supports the use of the BrightstarDB wildcard IRI specification
 	  in DELETE and DELETE DATA commands. For more information please refer to :ref:`RDF_Client_API_SPARQL_Update`. 
-	  Thanks to Martin Lercher for the suggestion. [#217]
+	  Thanks to Martin Lercher for the suggestion. (#217)
 	  
 	- NEW: Added support for retrieving a set of entities by their ID in a single LINQ query. For more information
-	  please refer to :ref:`Example_LINQ_Queries`. Thanks to kentcb for the suggestion [#190]
+	  please refer to :ref:`Example_LINQ_Queries`. Thanks to kentcb for the suggestion. (#190)
 	  
 	- NEW: Added AddOrUpdate method to entity sets. When an entity is added to a context using AddOrUpdate,
 	  if the entity has an existing identity then this identity is used and any existing entity with the same
 	  identity is overwritten; if the entity does not have an existing identity, then a new identity is generated
-	  for it. Thanks to kentcb for the suggestion [#193]
+	  for it. Thanks to kentcb for the suggestion. (#193)
+      
+	- NEW: Added some optimizations to the LINQ-to-SPARQL generator. Thanks to CyborgDE for the suggestion and initial code.
+	  For more information please refer to :ref:`EF_Filter_Optimization`. (#116)
 	
 
 ****************************

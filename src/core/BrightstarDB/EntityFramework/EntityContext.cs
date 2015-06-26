@@ -17,6 +17,12 @@ namespace BrightstarDB.EntityFramework
         private bool _disposed;
 
         /// <summary>
+        /// Get or set the flag that rewrites certain filters to SPARQL
+        /// graph pattern matches for more efficient SPARQL queries.
+        /// </summary>
+        public bool FilterOptimizationEnabled { get; set; }
+
+        /// <summary>
         /// Constructor for an EntityContext object that uses the <see cref="ReflectionMappingProvider"/>
         /// to populate its entity type and property mappings.
         /// </summary>

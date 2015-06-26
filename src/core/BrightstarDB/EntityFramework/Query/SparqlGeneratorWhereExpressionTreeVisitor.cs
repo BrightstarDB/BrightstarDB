@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using BrightstarDB.Query;
 using Remotion.Linq.Clauses;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Clauses.ResultOperators;
@@ -15,14 +15,26 @@ namespace BrightstarDB.EntityFramework.Query
     internal class SparqlGeneratorWhereExpressionTreeVisitor : ExpressionTreeVisitorBase
     {
         private FilterWriter _filterWriter;
+        private readonly bool _optimizeFilter;
+        private bool _inBooleanExpression = false;
 
-        public static Expression GetSparqlExpression(Expression expression, SparqlQueryBuilder queryBuilder)
+        private SparqlGeneratorWhereExpressionTreeVisitor(SparqlQueryBuilder queryBuilder, bool optimizeFilter, bool isBoolean)
+            : base(queryBuilder)
         {
-            var visitor = new SparqlGeneratorWhereExpressionTreeVisitor(queryBuilder);
+            QueryBuilder = queryBuilder;
+            _filterWriter = new FilterWriter(this, queryBuilder, new StringBuilder());
+            _optimizeFilter = optimizeFilter;
+            _inBooleanExpression = isBoolean;
+        }
+
+        public static Expression GetSparqlExpression(Expression expression, SparqlQueryBuilder queryBuilder, bool filterOptimizationEnabled)
+        {
+            var canOptimizeFilter = filterOptimizationEnabled && CanOptimizeFilter(expression, queryBuilder);
+            var visitor = new SparqlGeneratorWhereExpressionTreeVisitor(queryBuilder, canOptimizeFilter, expression.Type == typeof(bool));
             var returnedExpression = visitor.VisitExpression(expression);
-            if (returnedExpression is SelectVariableNameExpression && expression.Type.Equals(typeof(bool)))
+            var svn = returnedExpression as SelectVariableNameExpression;
+            if (svn != null && expression.Type == typeof (bool))
             {
-                var svn = (SelectVariableNameExpression) returnedExpression;
                 // Single boolean member expression requires a special case addition to the filter
                 queryBuilder.AddFilterExpression("(?" + svn.Name + " = true)");
             }
@@ -30,28 +42,34 @@ namespace BrightstarDB.EntityFramework.Query
             return returnedExpression;
         }
 
-        private SparqlGeneratorWhereExpressionTreeVisitor(SparqlQueryBuilder queryBuilder) : base(queryBuilder)
+        public static bool CanOptimizeFilter(Expression expression, SparqlQueryBuilder queryBuilder)
         {
-            QueryBuilder = queryBuilder;
-            _filterWriter = new FilterWriter(this, queryBuilder, new StringBuilder());
+            var optimisationChecker = new SparqlGeneratorWhereExpressionOptimisationVisitor(queryBuilder);
+            var visitResult = optimisationChecker.VisitExpression(expression);
+            return (visitResult is BooleanFlagExpression && ((BooleanFlagExpression) visitResult).Value);
         }
 
-        public string FilterExpression { get { return _filterWriter.FilterExpression; } }
-
-        private ConstantExpression ExtractConstantExpression(BinaryExpression binaryExpression)
+        public string FilterExpression
         {
-            if (binaryExpression.Left.NodeType == ExpressionType.Constant) return binaryExpression.Left as ConstantExpression;
-            if (binaryExpression.Right.NodeType == ExpressionType.Constant) return binaryExpression.Right as ConstantExpression;
+            get { return _filterWriter.FilterExpression; }
+        }
+
+        private static ConstantExpression ExtractConstantExpression(BinaryExpression binaryExpression)
+        {
+            if (binaryExpression.Left.NodeType == ExpressionType.Constant)
+                return binaryExpression.Left as ConstantExpression;
+            if (binaryExpression.Right.NodeType == ExpressionType.Constant)
+                return binaryExpression.Right as ConstantExpression;
             return null;
         }
 
         private bool HandleEqualsNotEquals(BinaryExpression equalityExpression)
         {
-            ConstantExpression constantExpression = ExtractConstantExpression(equalityExpression);
+            var constantExpression = ExtractConstantExpression(equalityExpression);
             if (constantExpression == null) return false;
-            Expression variableExpression = equalityExpression.Left.Equals(constantExpression)
-                                                ? equalityExpression.Right
-                                                : equalityExpression.Left;
+            var variableExpression = equalityExpression.Left.Equals(constantExpression)
+                ? equalityExpression.Right
+                : equalityExpression.Left;
             var variablePropertyHint = GetPropertyHint(variableExpression);
             var variableIsAddress = variablePropertyHint != null &&
                                     (variablePropertyHint.MappingType == PropertyMappingType.Address ||
@@ -64,13 +82,16 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     var querySourceReferenceExpression =
                         ((MemberExpression) variableExpression).Expression as QuerySourceReferenceExpression;
-                    var varname = querySourceReferenceExpression.ReferencedQuerySource.ItemName;
+                    if (querySourceReferenceExpression != null)
+                    {
+                        var varname = querySourceReferenceExpression.ReferencedQuerySource.ItemName;
 
-                    var filter = equalityExpression.NodeType == ExpressionType.NotEqual
-                                     ? "( bound(?{0}))"
-                                     : "(!bound(?{0}))";
-                    _filterWriter.AppendFormat(filter, varname);
-                    return true;
+                        var filter = equalityExpression.NodeType == ExpressionType.NotEqual
+                            ? "( bound(?{0}))"
+                            : "(!bound(?{0}))";
+                        _filterWriter.AppendFormat(filter, varname);
+                        return true;
+                    }
                 }
                 else
                 {
@@ -88,19 +109,19 @@ namespace BrightstarDB.EntityFramework.Query
                         if (variableExpression.Type.IsValueType && defValue != null)
                         {
                             filter = equalityExpression.NodeType == ExpressionType.NotEqual
-                                         ? "(bound(?{0}) && (?{0} != {1}))"
-                                         : "(!bound(?{0}) || (?{0} = {1}))";
+                                ? "(bound(?{0}) && (?{0} != {1}))"
+                                : "(!bound(?{0}) || (?{0} = {1}))";
                         }
                         else
                         {
                             filter = equalityExpression.NodeType == ExpressionType.NotEqual
-                                         ? "( bound(?{0}))"
-                                         : "(!bound(?{0}))";
+                                ? "( bound(?{0}))"
+                                : "(!bound(?{0}))";
                         }
                         if (defValue != null)
                         {
                             _filterWriter.AppendFormat(filter, varname,
-                                                       _filterWriter.MakeSparqlConstant(defValue));
+                                _filterWriter.MakeSparqlConstant(defValue));
                         }
                         else
                         {
@@ -112,15 +133,20 @@ namespace BrightstarDB.EntityFramework.Query
             }
             if (variableIsAddress && value != null)
             {
-                var querySourceReferenceExpression = ((MemberExpression)variableExpression).Expression as QuerySourceReferenceExpression;
-                var varname = querySourceReferenceExpression.ReferencedQuerySource.ItemName;
+                var querySourceReferenceExpression =
+                    ((MemberExpression) variableExpression).Expression as QuerySourceReferenceExpression;
+                if (querySourceReferenceExpression != null)
+                {
+                    var varname = querySourceReferenceExpression.ReferencedQuerySource.ItemName;
 
-                var filter = equalityExpression.NodeType == ExpressionType.Equal
-                                 ? "( sameTerm(?{0}, <{1}>))"
-                                 : "(!sameTerm(?{0}, <{1}>))";
+                    var filter = equalityExpression.NodeType == ExpressionType.Equal
+                        ? "( sameTerm(?{0}, <{1}>))"
+                        : "(!sameTerm(?{0}, <{1}>))";
 
-                _filterWriter.AppendFormat(filter, varname, MakeResourceAddress(GetPropertyInfo(constantExpression), value.ToString()));
-                return true;
+                    _filterWriter.AppendFormat(filter, varname,
+                        MakeResourceAddress(GetPropertyInfo(constantExpression), value.ToString()));
+                    return true;
+                }
             }
 
             return false;
@@ -128,8 +154,17 @@ namespace BrightstarDB.EntityFramework.Query
 
         protected override Expression VisitBinaryExpression(BinaryExpression expression)
         {
+            var currentlyInBooleanExpression = _inBooleanExpression;
+            _inBooleanExpression = false;
+            var ret = HandleBinaryExpression(expression);
+            _inBooleanExpression = currentlyInBooleanExpression;
+            return ret;
+        }
+
+        private Expression HandleBinaryExpression(BinaryExpression expression)
+        {
             // handle special cases
-            if(expression.NodeType == ExpressionType.Equal)
+            if (expression.NodeType == ExpressionType.Equal)
             {
                 if (HandleAddressOrIdEquals(expression.Left, expression.Right))
                 {
@@ -147,110 +182,18 @@ namespace BrightstarDB.EntityFramework.Query
                 var rightIsAddress = rightPropertyHint != null &&
                                      (rightPropertyHint.MappingType == PropertyMappingType.Address ||
                                       rightPropertyHint.MappingType == PropertyMappingType.Id);
-
-
-                //handle checking for nulls (bug 5416)
-                /*
-                if (rightPropertyHint == null && expression.Right.NodeType == ExpressionType.Constant)
-                {
-                    var constantExpression = expression.Right as ConstantExpression;
-                    var value = constantExpression.Value;
-                    var defValue = expression.Left.Type.GetDefaultValue();
-                    if ((value == null && defValue == null) || (value != null && value.Equals(defValue)))
-                    {
-                        if (leftIsAddress)
-                        {
-                            var querySourceReferenceExpression =
-                                ((MemberExpression) expression.Left).Expression as QuerySourceReferenceExpression;
-                            var varname = querySourceReferenceExpression.ReferencedQuerySource.ItemName;
-
-                            var filter = expression.NodeType == ExpressionType.NotEqual
-                                             ? "( bound(?{0}))"
-                                             : "(!bound(?{0}))";
-                            _filterWriter.AppendFormat(filter, varname);
-                            return expression;
-                        }
-                        else
-                        {
-                            string varname = null;
-                            QueryBuilder.StartOptional();
-                            var convertedExpression = VisitExpression(expression.Left);
-                            QueryBuilder.EndOptional();
-                            if (convertedExpression is SelectVariableNameExpression)
-                            {
-                                varname = (convertedExpression as SelectVariableNameExpression).Name;
-                            }
-                            if (varname != null)
-                            {
-                                string filter;
-                                if (expression.Left.Type.IsValueType && defValue != null)
-                                {
-                                    filter = expression.NodeType == ExpressionType.NotEqual
-                                                 ? "(bound(?{0}) && (?{0} != {1}))"
-                                                 : "(!bound(?{0}) || (?{0} = {1}))";
-                                }
-                                else
-                                {
-                                    filter = expression.NodeType == ExpressionType.NotEqual
-                                                 ? "( bound(?{0}))"
-                                                 : "(!bound(?{0}))";
-                                }
-                                if (defValue != null)
-                                {
-                                    _filterWriter.AppendFormat(filter, varname,
-                                                               _filterWriter.MakeSparqlConstant(defValue));
-                                }
-                                else
-                                {
-                                    _filterWriter.AppendFormat(filter, varname);
-                                }
-                                return expression;
-                            }
-                        }
-                    }
-                }
-
-                if (leftIsAddress && expression.Right.NodeType == ExpressionType.Constant)
-                {
-                    var querySourceReferenceExpression = ((MemberExpression)expression.Left).Expression as QuerySourceReferenceExpression;
-                    var varname = querySourceReferenceExpression.ReferencedQuerySource.ItemName;
-
-                    var constantExpression = expression.Right as ConstantExpression;
-                    var value = constantExpression.Value.ToString();
-
-                    var filter = expression.NodeType == ExpressionType.Equal
-                                     ? "( sameTerm(?{0}, <{1}>))"
-                                     : "(!sameTerm(?{0}, <{1}>))";
-
-                    _filterWriter.AppendFormat(filter, varname, MakeResourceAddress(GetPropertyInfo(expression.Right), value));
-                    return expression;
-                }
-
-                if (rightIsAddress && expression.Left.NodeType == ExpressionType.Constant)
-                {
-                    var querySourceReferenceExpression =
-                        ((MemberExpression) expression.Right).Expression as QuerySourceReferenceExpression;
-                    var varname = querySourceReferenceExpression.ReferencedQuerySource.ItemName;
-                    var constantExpression = expression.Left as ConstantExpression;
-                    var value = constantExpression.Value.ToString();
-                    var filter = expression.NodeType == ExpressionType.Equal
-                                     ? "(sameTerm(<{0}>,?{1}))"
-                                     : "(!sameTerm(?{0}, <{1}>))";
-                    _filterWriter.AppendFormat(filter, MakeResourceAddress(GetPropertyInfo(expression.Left), value), varname);
-                }
-                */
                 if (leftIsAddress && rightIsAddress)
                 {
                     // Comparing two resource addresses - use the sameTerm function rather then simple equality
                     _filterWriter.Append(expression.NodeType == ExpressionType.Equal
-                                                    ? "(sameTerm("
-                                                    : "(!sameTerm(");
+                        ? "(sameTerm("
+                        : "(!sameTerm(");
                     _filterWriter.VisitExpression(expression.Left);
                     _filterWriter.Append(",");
                     _filterWriter.VisitExpression(expression.Right);
                     _filterWriter.Append("))");
                     return expression;
-                } 
+                }
             }
 
             var mce = expression.Left as MethodCallExpression;
@@ -265,64 +208,166 @@ namespace BrightstarDB.EntityFramework.Query
             switch (expression.NodeType)
             {
                 case ExpressionType.Or:
-                    _filterWriter.WriteFunction(BrightstarDB.Query.BrightstarFunctionFactory.BrightstarFunctionsNamespace, BrightstarDB.Query.BrightstarFunctionFactory.BitOr, expression.Left, expression.Right);
+                    _filterWriter.WriteFunction(BrightstarFunctionFactory.BrightstarFunctionsNamespace,
+                        BrightstarFunctionFactory.BitOr, expression.Left, expression.Right);
                     return expression;
                 case ExpressionType.And:
-                    _filterWriter.WriteFunction(BrightstarDB.Query.BrightstarFunctionFactory.BrightstarFunctionsNamespace, BrightstarDB.Query.BrightstarFunctionFactory.BitAnd, expression.Left, expression.Right);
+                    _filterWriter.WriteFunction(BrightstarFunctionFactory.BrightstarFunctionsNamespace,
+                        BrightstarFunctionFactory.BitAnd, expression.Left, expression.Right);
                     return expression;
             }
 
             // Process in-fix operator
-            _filterWriter.Append('(');
-            _filterWriter.VisitExpression(expression.Left);
-            switch(expression.NodeType)
+            if (_optimizeFilter)
             {
-                case ExpressionType.Add:
-                case ExpressionType.AddChecked:
-                    _filterWriter.Append(" + ");
-                    break;
-                case ExpressionType.AndAlso:
-                    _filterWriter.Append(" && ");
-                    break;
-                case ExpressionType.Divide:
-                    _filterWriter.Append(" / ");
-                    break;
-                case ExpressionType.Equal:
-                    _filterWriter.Append(" = ");
-                    break;
-                case ExpressionType.GreaterThan:
-                    _filterWriter.Append(" > ");
-                    break;
-                case ExpressionType.GreaterThanOrEqual:
-                    _filterWriter.Append(" >= ");
-                    break;
-                case ExpressionType.LessThan:
-                    _filterWriter.Append(" < ");
-                    break;
-                case ExpressionType.LessThanOrEqual:
-                    _filterWriter.Append(" <= ");
-                    break;
-                case ExpressionType.Multiply:
-                case ExpressionType.MultiplyChecked:
-                    _filterWriter.Append(" * ");
-                    break;
-                case ExpressionType.NotEqual:
-                    _filterWriter.Append(" != ");
-                    break;
-                case ExpressionType.OrElse:
-                    _filterWriter.Append(" || ");
-                    break;
-                case ExpressionType.Subtract:
-                case ExpressionType.SubtractChecked:
-                    _filterWriter.Append(" - ");
-                    break;
-                default:
-                    base.VisitBinaryExpression(expression);
-                    break;
+                switch (expression.NodeType)
+                {
+                    case ExpressionType.Equal:
+                        QueryBuilder.StartBgpGroup();
+                        AppendOptimisedEqualityExpression(expression.Left, expression.Right);
+                        QueryBuilder.EndBgpGroup();
+                        break;
+
+                    case ExpressionType.NotEqual:
+                        QueryBuilder.StartMinus();
+                        AppendOptimisedEqualityExpression(expression.Left, expression.Right);
+                        QueryBuilder.EndMinus();
+                        break;
+
+                    case ExpressionType.OrElse:
+                        _inBooleanExpression = true;
+                        QueryBuilder.StartBgpGroup();
+                        VisitExpression(expression.Left);
+                        QueryBuilder.EndBgpGroup();
+                        
+                        QueryBuilder.Union();
+                        
+                        QueryBuilder.StartBgpGroup();
+                        VisitExpression(expression.Right);
+                        QueryBuilder.EndBgpGroup();
+                        _inBooleanExpression = false;
+                        break;
+
+                    case ExpressionType.AndAlso:
+                        _inBooleanExpression = true;
+                        VisitExpression(expression.Left);
+                        VisitExpression(expression.Right);
+                        _inBooleanExpression = false;
+                        break;
+
+                    default:
+                        throw new NotSupportedException();
+                }
             }
-            _filterWriter.VisitExpression(expression.Right);
-            _filterWriter.Append(')');
+            else
+            {
+                _filterWriter.Append('(');
+                _filterWriter.VisitExpression(expression.Left);
+                switch (expression.NodeType)
+                {
+                    case ExpressionType.Add:
+                    case ExpressionType.AddChecked:
+                        _filterWriter.Append(" + ");
+                        break;
+                    case ExpressionType.AndAlso:
+                        _filterWriter.Append(" && ");
+                        break;
+                    case ExpressionType.Divide:
+                        _filterWriter.Append(" / ");
+                        break;
+                    case ExpressionType.Equal:
+                        _filterWriter.Append(" = ");
+                        break;
+                    case ExpressionType.GreaterThan:
+                        _filterWriter.Append(" > ");
+                        break;
+                    case ExpressionType.GreaterThanOrEqual:
+                        _filterWriter.Append(" >= ");
+                        break;
+                    case ExpressionType.LessThan:
+                        _filterWriter.Append(" < ");
+                        break;
+                    case ExpressionType.LessThanOrEqual:
+                        _filterWriter.Append(" <= ");
+                        break;
+                    case ExpressionType.Multiply:
+                    case ExpressionType.MultiplyChecked:
+                        _filterWriter.Append(" * ");
+                        break;
+                    case ExpressionType.NotEqual:
+                        _filterWriter.Append(" != ");
+                        break;
+                    case ExpressionType.OrElse:
+                        _filterWriter.Append(" || ");
+                        break;
+                    case ExpressionType.Subtract:
+                    case ExpressionType.SubtractChecked:
+                        _filterWriter.Append(" - ");
+                        break;
+                    default:
+                        base.VisitBinaryExpression(expression);
+                        break;
+                }
+                _filterWriter.VisitExpression(expression.Right);
+                _filterWriter.Append(')');
+            }
             return expression;
+        }
+
+        private void AppendOptimisedEqualityExpression(Expression left, Expression right)
+        {
+            MemberExpression leftMemberExpression = left as MemberExpression;
+            if (leftMemberExpression != null)
+            {
+                if (right is MemberExpression)
+                {
+                    // Optimise to a join between two BGPs
+                    AppendBgpJoin(leftMemberExpression, (MemberExpression) right);
+                }
+                else if (right is ConstantExpression)
+                {
+                    AppendPropertyConstraint(GetSourceVarName(leftMemberExpression),
+                        GetPropertyHint(leftMemberExpression),
+                        (ConstantExpression)right);
+                }
+            }
+            else
+            {
+                VisitExpression(left);
+                VisitExpression(right);
+            }
+        }
+
+        private void AppendBgpJoin(MemberExpression left, MemberExpression right)
+        {
+            var joinVar = QueryBuilder.NextVariable();
+            var leftSourceVar = GetSourceVarName(left);
+            var leftProperty = GetPropertyHint(left);
+            var rightSourceVar = GetSourceVarName(right);
+            var rightProperty = GetPropertyHint(right);
+
+            AppendPropertyConstraint(leftSourceVar, leftProperty, joinVar);
+            AppendPropertyConstraint(rightSourceVar, rightProperty, joinVar);
+        }
+
+        private void AppendPropertyConstraint(string sourceVar, PropertyHint propertyHint, string valueVar)
+        {
+            if (propertyHint.MappingType == PropertyMappingType.InverseArc)
+            {
+                QueryBuilder.AddTripleConstraint(GraphNode.Variable, valueVar, GraphNode.Iri, propertyHint.SchemaTypeUri,
+                    GraphNode.Variable, sourceVar);
+            }
+            else
+            {
+                QueryBuilder.AddTripleConstraint(GraphNode.Variable, sourceVar, GraphNode.Iri, propertyHint.SchemaTypeUri,
+                    GraphNode.Variable, valueVar);
+            }
+        }
+
+        private void AppendPropertyConstraint(string sourceVar, PropertyHint propertyHint,
+            ConstantExpression constantExpression)
+        {
+           QueryBuilder.AddTripleConstraint(GraphNode.Variable, sourceVar, GraphNode.Iri, propertyHint.SchemaTypeUri, GraphNode.Raw, QueryBuilder.MakeSparqlConstant(constantExpression.Value, false));
         }
 
         /// <summary>
@@ -334,13 +379,23 @@ namespace BrightstarDB.EntityFramework.Query
         private void HandleCompareExpression(MethodCallExpression compareExpression, ExpressionType nodeType)
         {
             var filter = nodeType == ExpressionType.GreaterThan
-                                  ? "(?{0} > '{1}')"
-                                  : "(?{0} < '{1}')";
+                ? "(?{0} > '{1}')"
+                : "(?{0} < '{1}')";
             var expression = compareExpression.Arguments[0] as MemberExpression;
+            if (expression == null)
+            {
+                throw new NotSupportedException(
+                    "LINQ to SPARQL does not currently support a comparison expression where the first argument is not a member expression.");
+            }
             var sourceVarName = GetSourceVarName(expression);
             var constantExpression = compareExpression.Arguments[1] as ConstantExpression;
+            if (constantExpression == null)
+            {
+                throw new NotSupportedException(
+                    "LINQ to SPARQL does not currently support a comparison expression where the second argument is not a constant.");
+            }
             var value = constantExpression.Value.ToString();
-            
+
             if (sourceVarName != null)
             {
 #if PORTABLE
@@ -350,28 +405,30 @@ namespace BrightstarDB.EntityFramework.Query
 #endif
                 {
                     var propertyInfo = expression.Member as PropertyInfo;
-                    var hint = QueryBuilder.Context.GetPropertyHint(propertyInfo);
-                    
-                    if (hint != null)
+                    if (propertyInfo != null)
                     {
-                        switch (hint.MappingType)
+                        var hint = QueryBuilder.Context.GetPropertyHint(propertyInfo);
+
+                        if (hint != null)
                         {
-                            case PropertyMappingType.Id:
-                                filter = nodeType == ExpressionType.GreaterThan
-                                  ? "(str(?{0}) > '{1}')"
-                                  : "(str(?{0}) < '{1}')";
-                                var prefix = EntityMappingStore.GetIdentifierPrefix(propertyInfo.DeclaringType);
-                                _filterWriter.AppendFormat(filter, sourceVarName, prefix + value);
-                                break;
-                                
-                            case PropertyMappingType.Arc:
-                            case PropertyMappingType.Property:
+                            switch (hint.MappingType)
+                            {
+                                case PropertyMappingType.Id:
+                                    filter = nodeType == ExpressionType.GreaterThan
+                                        ? "(str(?{0}) > '{1}')"
+                                        : "(str(?{0}) < '{1}')";
+                                    var prefix = EntityMappingStore.GetIdentifierPrefix(propertyInfo.DeclaringType);
+                                    _filterWriter.AppendFormat(filter, sourceVarName, prefix + value);
+                                    break;
+
+                                case PropertyMappingType.Arc:
+                                case PropertyMappingType.Property:
                                 {
                                     var existingVarName = QueryBuilder.GetVariableForObject(GraphNode.Variable,
-                                                                                            sourceVarName,
-                                                                                            GraphNode.Iri,
-                                                                                            hint.SchemaTypeUri);
-                                    if (!String.IsNullOrEmpty(existingVarName))
+                                        sourceVarName,
+                                        GraphNode.Iri,
+                                        hint.SchemaTypeUri);
+                                    if (!string.IsNullOrEmpty(existingVarName))
                                     {
 
                                         _filterWriter.AppendFormat(filter, existingVarName, value);
@@ -388,12 +445,12 @@ namespace BrightstarDB.EntityFramework.Query
                                     break;
 
                                 }
-                            case PropertyMappingType.InverseArc:
+                                case PropertyMappingType.InverseArc:
                                 {
                                     var existingVarName = QueryBuilder.GetVariableForSubject(GraphNode.Iri,
-                                                                                             hint.SchemaTypeUri,
-                                                                                             GraphNode.Variable,
-                                                                                             sourceVarName);
+                                        hint.SchemaTypeUri,
+                                        GraphNode.Variable,
+                                        sourceVarName);
                                     if (!String.IsNullOrEmpty(existingVarName))
                                     {
                                         _filterWriter.AppendFormat(filter, existingVarName, value);
@@ -407,13 +464,13 @@ namespace BrightstarDB.EntityFramework.Query
                                         _filterWriter.AppendFormat(filter, varName, value);
                                     }
                                 }
-                                break;
-                            case PropertyMappingType.Address:
-                                _filterWriter.AppendFormat(filter, sourceVarName, value);
-                                break;
+                                    break;
+                                case PropertyMappingType.Address:
+                                    _filterWriter.AppendFormat(filter, sourceVarName, value);
+                                    break;
+                            }
                         }
                     }
-                    
                 }
             }
         }
@@ -426,16 +483,23 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     return expression;
                 }
-                _filterWriter.VisitExpression(expression);
+                if (_optimizeFilter)
+                {
+                    AppendOptimisedEqualityExpression(expression.Object, expression.Arguments[0]);
+                }
+                else
+                {
+                    _filterWriter.VisitExpression(expression);
+                }
                 return expression;
             }
-            if (expression.Object != null && expression.Object.Type == typeof(String))
+            if (expression.Object != null && expression.Object.Type == typeof (string))
             {
                 if (expression.Method.Name.Equals("StartsWith"))
                 {
-                    if (expression.Arguments[0].NodeType == ExpressionType.Constant)
+                    var constantExpression = expression.Arguments[0] as ConstantExpression;
+                    if (constantExpression != null)
                     {
-                        var constantExpression = expression.Arguments[0] as ConstantExpression;
                         if (expression.Arguments.Count == 1)
                         {
                             _filterWriter.WriteFunction("STRSTARTS", expression.Object, expression.Arguments[0]);
@@ -444,8 +508,8 @@ namespace BrightstarDB.EntityFramework.Query
                         {
                             var flags = GetStringComparisonFlags(expression.Arguments[1]);
                             _filterWriter.WriteRegexFilter(expression.Object,
-                                                           "^" + Regex.Escape(constantExpression.Value.ToString()),
-                                                           flags);
+                                "^" + Regex.Escape(constantExpression.Value.ToString()),
+                                flags);
                             return expression;
                         }
                         return expression;
@@ -453,19 +517,19 @@ namespace BrightstarDB.EntityFramework.Query
                 }
                 if (expression.Method.Name.Equals("EndsWith"))
                 {
-                    if (expression.Arguments[0].NodeType == ExpressionType.Constant)
+                    var constantExpression = expression.Arguments[0] as ConstantExpression;
+                    if (constantExpression != null)
                     {
-                        var constantExpression = expression.Arguments[0] as ConstantExpression;
                         if (expression.Arguments.Count == 1)
                         {
                             _filterWriter.WriteFunction("STRENDS", expression.Object, expression.Arguments[0]);
                         }
                         if (expression.Arguments.Count > 1 && expression.Arguments[1] is ConstantExpression)
                         {
-                            string flags = GetStringComparisonFlags(expression.Arguments[1]);
+                            var flags = GetStringComparisonFlags(expression.Arguments[1]);
                             _filterWriter.WriteRegexFilter(expression.Object,
-                                                           Regex.Escape(constantExpression.Value.ToString()) + "$",
-                                                           flags);
+                                Regex.Escape(constantExpression.Value.ToString()) + "$",
+                                flags);
                         }
                         return expression;
                     }
@@ -483,7 +547,7 @@ namespace BrightstarDB.EntityFramework.Query
                         {
                             var flags = GetStringComparisonFlags(expression.Arguments[1]);
                             _filterWriter.WriteRegexFilter(expression.Object, Regex.Escape(seekValue.Value.ToString()),
-                                                           flags);
+                                flags);
                         }
                         return expression;
                     }
@@ -491,10 +555,10 @@ namespace BrightstarDB.EntityFramework.Query
                 if (expression.Method.Name.Equals("Substring"))
                 {
                     Expression start;
-                    if (expression.Arguments[0] is ConstantExpression &&
-                        expression.Arguments[0].Type == typeof(int))
+                    ConstantExpression constantExpression = expression.Arguments[0] as ConstantExpression;
+                    if (constantExpression != null && constantExpression.Type == typeof (int))
                     {
-                        start = Expression.Constant(((int)(expression.Arguments[0] as ConstantExpression).Value) + 1);
+                        start = Expression.Constant((int) (constantExpression.Value) + 1);
                     }
                     else
                     {
@@ -523,60 +587,68 @@ namespace BrightstarDB.EntityFramework.Query
             if (expression.Object == null)
             {
                 // Static method
-                if(expression.Method.DeclaringType.Equals(typeof(Regex)))
+                var declType = expression.Method.DeclaringType;
+                if (declType != null)
                 {
-                    if (expression.Method.Name.Equals("IsMatch"))
+                    if (declType == typeof (Regex))
                     {
-                        var sourceExpression = expression.Arguments[0];
-                        var regexExpression = expression.Arguments[1] as ConstantExpression;
-                        var flagsExpression = expression.Arguments.Count > 2
-                                                  ? expression.Arguments[2] as ConstantExpression
-                                                  : null;
-                        if(regexExpression != null)
+                        if (expression.Method.Name.Equals("IsMatch"))
                         {
-                            var regex = regexExpression.Value.ToString();
-                            string flags = String.Empty;
-                            if (flagsExpression != null && flagsExpression.Type == typeof(RegexOptions))
+                            var sourceExpression = expression.Arguments[0];
+                            var regexExpression = expression.Arguments[1] as ConstantExpression;
+                            var flagsExpression = expression.Arguments.Count > 2
+                                ? expression.Arguments[2] as ConstantExpression
+                                : null;
+                            if (regexExpression != null)
                             {
-                                var regexOptions = (RegexOptions) flagsExpression.Value;
-                                if ((regexOptions & RegexOptions.IgnoreCase) == RegexOptions.IgnoreCase) flags += "i";
-                                if ((regexOptions & RegexOptions.Multiline) == RegexOptions.Multiline) flags += "m";
-                                if ((regexOptions & RegexOptions.Singleline) == RegexOptions.Singleline) flags += "s";
-                                if ((regexOptions & RegexOptions.IgnorePatternWhitespace) == RegexOptions.IgnorePatternWhitespace)
-                                    flags += "x";
+                                var regex = regexExpression.Value.ToString();
+                                var flags = string.Empty;
+                                if (flagsExpression != null && flagsExpression.Type == typeof (RegexOptions))
+                                {
+                                    var regexOptions = (RegexOptions) flagsExpression.Value;
+                                    if ((regexOptions & RegexOptions.IgnoreCase) == RegexOptions.IgnoreCase)
+                                        flags += "i";
+                                    if ((regexOptions & RegexOptions.Multiline) == RegexOptions.Multiline) flags += "m";
+                                    if ((regexOptions & RegexOptions.Singleline) == RegexOptions.Singleline)
+                                        flags += "s";
+                                    if ((regexOptions & RegexOptions.IgnorePatternWhitespace) ==
+                                        RegexOptions.IgnorePatternWhitespace)
+                                        flags += "x";
+                                }
+                                _filterWriter.WriteRegexFilter(sourceExpression, regex,
+                                    string.Empty.Equals(flags) ? null : flags);
+                                return expression;
                             }
-                            _filterWriter.WriteRegexFilter(sourceExpression, regex, String.Empty.Equals(flags) ? null : flags);
+                        }
+                    }
+                    if (typeof (string) == declType)
+                    {
+                        if (expression.Method.Name.Equals("Concat"))
+                        {
+                            _filterWriter.WriteFunction("CONCAT", expression.Arguments.ToArray());
                             return expression;
                         }
                     }
-                }
-                if (typeof(String).Equals(expression.Method.DeclaringType))
-                {
-                    if (expression.Method.Name.Equals("Concat"))
+                    if (typeof (Math) == declType)
                     {
-                        _filterWriter.WriteFunction("CONCAT", expression.Arguments.ToArray());
-                        return expression;
-                    }
-                }
-                if (typeof(Math).Equals(expression.Method.DeclaringType))
-                {
-                    string fnName = null;
-                    switch (expression.Method.Name)
-                    {
-                        case "Round":
-                            fnName = "ROUND";
-                            break;
-                        case "Floor":
-                            fnName = "FLOOR";
-                            break;
-                        case "Ceiling":
-                            fnName = "CEIL";
-                            break;
-                    }
-                    if (fnName != null)
-                    {
-                        _filterWriter.WriteFunction(fnName, expression.Arguments[0]);
-                        return expression;
+                        string fnName = null;
+                        switch (expression.Method.Name)
+                        {
+                            case "Round":
+                                fnName = "ROUND";
+                                break;
+                            case "Floor":
+                                fnName = "FLOOR";
+                                break;
+                            case "Ceiling":
+                                fnName = "CEIL";
+                                break;
+                        }
+                        if (fnName != null)
+                        {
+                            _filterWriter.WriteFunction(fnName, expression.Arguments[0]);
+                            return expression;
+                        }
                     }
                 }
             }
@@ -586,15 +658,18 @@ namespace BrightstarDB.EntityFramework.Query
         internal static string GetStringComparisonFlags(Expression comparisonArgument)
         {
             var arg1 = comparisonArgument as ConstantExpression;
-            if ((arg1.Type == typeof(bool) && (bool)arg1.Value) ||
-                (arg1.Type == typeof(StringComparison) &&
-                ((StringComparison)arg1.Value == StringComparison.CurrentCultureIgnoreCase ||
-#if !PORTABLE
-                (StringComparison)arg1.Value == StringComparison.InvariantCultureIgnoreCase ||
-#endif
-                (StringComparison)arg1.Value == StringComparison.OrdinalIgnoreCase)))
+            if (arg1 != null)
             {
-                return "i";
+                if ((arg1.Type == typeof (bool) && (bool) arg1.Value) ||
+                    (arg1.Type == typeof (StringComparison) &&
+                     ((StringComparison) arg1.Value == StringComparison.CurrentCultureIgnoreCase ||
+#if !PORTABLE
+                         (StringComparison) arg1.Value == StringComparison.InvariantCultureIgnoreCase ||
+#endif
+                         (StringComparison) arg1.Value == StringComparison.OrdinalIgnoreCase)))
+                {
+                    return "i";
+                }
             }
             return null;
         }
@@ -626,20 +701,42 @@ namespace BrightstarDB.EntityFramework.Query
 #endif
                 {
                     var propertyInfo = expression.Member as PropertyInfo;
-                    var hint = QueryBuilder.Context.GetPropertyHint(propertyInfo);
-
-                    if (hint != null)
+                    if (propertyInfo != null)
                     {
-                        switch (hint.MappingType)
-                        {
-                            case PropertyMappingType.Id:
-                                return new SelectVariableNameExpression(sourceVarName, VariableBindingType.Resource, propertyInfo.DeclaringType);
-                                //return expression;
+                        var hint = QueryBuilder.Context.GetPropertyHint(propertyInfo);
 
-                            case PropertyMappingType.Arc:
-                            case PropertyMappingType.Property:
+                        if (hint != null)
+                        {
+                            switch (hint.MappingType)
+                            {
+                                case PropertyMappingType.Id:
+                                    return new SelectVariableNameExpression(sourceVarName, VariableBindingType.Resource,
+                                        propertyInfo.DeclaringType);
+
+                                case PropertyMappingType.Arc:
+                                case PropertyMappingType.Property:
                                 {
-                                    string varName = QueryBuilder.GetVariableForObject(
+                                    if (_optimizeFilter && _inBooleanExpression)
+                                    {
+                                        if (expression.Type == typeof (bool))
+                                        {
+                                            // Explicitly bind to true
+                                            QueryBuilder.AddTripleConstraint(
+                                                GraphNode.Variable, sourceVarName, 
+                                                GraphNode.Iri, hint.SchemaTypeUri, 
+                                                GraphNode.Raw, "true");
+                                        }
+                                        else
+                                        {
+                                            // Any binding is acceptable
+                                            QueryBuilder.AddTripleConstraint(
+                                                GraphNode.Variable, sourceVarName,
+                                                GraphNode.Iri, hint.SchemaTypeUri,
+                                                GraphNode.Variable, QueryBuilder.NextVariable());
+                                        }
+                                        return expression;
+                                    }
+                                    var varName = QueryBuilder.GetVariableForObject(
                                         GraphNode.Variable, sourceVarName,
                                         GraphNode.Iri, hint.SchemaTypeUri);
                                     if (varName == null)
@@ -651,17 +748,19 @@ namespace BrightstarDB.EntityFramework.Query
                                             GraphNode.Variable, varName);
                                     }
                                     return new SelectVariableNameExpression(varName,
-                                                                            hint.MappingType == PropertyMappingType.Arc
-                                                                                ? VariableBindingType.Resource
-                                                                                : VariableBindingType.Literal,
-                                                                                propertyInfo.PropertyType);
+                                        hint.MappingType == PropertyMappingType.Arc
+                                            ? VariableBindingType.Resource
+                                            : VariableBindingType.Literal,
+                                        propertyInfo.PropertyType);
                                 }
-                            case PropertyMappingType.Address:
-                                return new SelectVariableNameExpression(sourceVarName, VariableBindingType.Resource, propertyInfo.PropertyType);
 
-                            case PropertyMappingType.InverseArc:
+                                case PropertyMappingType.Address:
+                                    return new SelectVariableNameExpression(sourceVarName, VariableBindingType.Resource,
+                                        propertyInfo.PropertyType);
+
+                                case PropertyMappingType.InverseArc:
                                 {
-                                    string varName = QueryBuilder.GetVariableForSubject(
+                                    var varName = QueryBuilder.GetVariableForSubject(
                                         GraphNode.Iri, hint.SchemaTypeUri,
                                         GraphNode.Variable, sourceVarName);
                                     if (varName == null)
@@ -673,9 +772,10 @@ namespace BrightstarDB.EntityFramework.Query
                                             GraphNode.Variable, sourceVarName);
                                     }
                                     return new SelectVariableNameExpression(varName,
-                                                                            VariableBindingType.Resource,
-                                                                            propertyInfo.PropertyType);
+                                        VariableBindingType.Resource,
+                                        propertyInfo.PropertyType);
                                 }
+                            }
                         }
                     }
                 }
@@ -685,9 +785,9 @@ namespace BrightstarDB.EntityFramework.Query
 
         protected override Expression VisitConstantExpression(ConstantExpression expression)
         {
-            if (typeof(String).IsAssignableFrom(expression.Type))
+            if (typeof (String).IsAssignableFrom(expression.Type))
             {
-                _filterWriter.Append(MakeSparqlStringConstant(expression.Value as String));
+                _filterWriter.Append((expression.Value as String));
                 return expression;
             }
             return base.VisitConstantExpression(expression);
@@ -698,42 +798,49 @@ namespace BrightstarDB.EntityFramework.Query
             if (expression.QueryModel.ResultOperators.Count == 1 &&
                 expression.QueryModel.ResultOperators[0] is ContainsResultOperator)
             {
-                var contains = expression.QueryModel.ResultOperators[0] as ContainsResultOperator;
+                var contains = (ContainsResultOperator) expression.QueryModel.ResultOperators[0];
                 if (expression.QueryModel.MainFromClause.FromExpression.NodeType == ExpressionType.Constant &&
                     contains.Item is MemberExpression)
                 {
                     var memberExpression = (MemberExpression) contains.Item;
-                        var itemExpression = VisitExpression(contains.Item);
-                        if (itemExpression is SelectVariableNameExpression)
+                    var itemExpression = VisitExpression(contains.Item);
+                    var varNameExpression = itemExpression as SelectVariableNameExpression;
+                    if (varNameExpression != null)
+                    {
+                        if (IsIdInArraySubQuery(memberExpression, expression.QueryModel.MainFromClause.FromExpression))
                         {
-                            if (IsIdInArraySubQuery(memberExpression, expression.QueryModel.MainFromClause.FromExpression))
+                            var varName = varNameExpression.Name;
+                            // The subquery is a filter on a resource IRI
+                            // It is more efficient to use a UNION of BIND triple patterns than a FILTER
+                            var values =
+                                ((ConstantExpression) expression.QueryModel.MainFromClause.FromExpression).Value as
+                                    IEnumerable;
+                            if (values != null)
                             {
-                                var varName = ((SelectVariableNameExpression) itemExpression).Name;
-                                // The subquery is a filter on a resource IRI
-                                // It is more efficient to use a UNION of BIND triple patterns than a FILTER
-                                var values =
-                                    ((ConstantExpression) expression.QueryModel.MainFromClause.FromExpression).Value as
-                                        IEnumerable;
                                 var identifierProperty = memberExpression.Member as PropertyInfo;
                                 QueryBuilder.StartUnion();
                                 foreach (var value in values)
                                 {
                                     QueryBuilder.StartUnionElement();
-                                    QueryBuilder.AddBindExpression("<" + QueryBuilder.Context.MapIdToUri(identifierProperty, value.ToString()) + ">", varName);
+                                    QueryBuilder.AddBindExpression(
+                                        "<" + QueryBuilder.Context.MapIdToUri(identifierProperty, value.ToString()) +
+                                        ">", varName);
                                     QueryBuilder.EndUnionElement();
                                 }
                                 QueryBuilder.EndUnion();
                                 return expression;
                             }
-                            else
-                            {
-                                // The subquery is a filter on a resource property expression
-                                // We can translate the subquery to an IN expression
-                                _filterWriter.WriteInFilter(itemExpression,
-                                    expression.QueryModel.MainFromClause.FromExpression);
-                                return expression;
-                            }
+                            return base.VisitSubQueryExpression(expression);
                         }
+                        else
+                        {
+                            // The subquery is a filter on a resource property expression
+                            // We can translate the subquery to an IN expression
+                            _filterWriter.WriteInFilter(itemExpression,
+                                expression.QueryModel.MainFromClause.FromExpression);
+                            return expression;
+                        }
+                    }
                 }
                 else if (expression.QueryModel.MainFromClause.FromExpression.NodeType == ExpressionType.MemberAccess)
                 {
@@ -749,28 +856,25 @@ namespace BrightstarDB.EntityFramework.Query
             if (expression.QueryModel.ResultOperators.Count == 1 &&
                 expression.QueryModel.ResultOperators[0] is AllResultOperator)
             {
-                
-                var all = expression.QueryModel.ResultOperators[0] as AllResultOperator;
-                if (all != null)
-                {
-                    FilterWriter existingWriter = _filterWriter;
-                    _filterWriter = new FilterWriter(this, this.QueryBuilder, new StringBuilder());
-                    QueryBuilder.StartNotExists();
-                    var mappedExpression = VisitExpression(expression.QueryModel.MainFromClause.FromExpression);
-                    QueryBuilder.AddQuerySourceMapping(expression.QueryModel.MainFromClause, mappedExpression);
-                    _filterWriter.WriteInvertedFilterPredicate(all.Predicate);
-                    QueryBuilder.AddFilterExpression(_filterWriter.FilterExpression);
-                    QueryBuilder.EndNotExists();
-                    _filterWriter = existingWriter;
-                    return expression;
-                }
+
+                var all = (AllResultOperator) expression.QueryModel.ResultOperators[0];
+                var existingWriter = _filterWriter;
+                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder()); // TODO: Could check FromExpression to see if it is optimisable
+                QueryBuilder.StartNotExists();
+                var mappedExpression = VisitExpression(expression.QueryModel.MainFromClause.FromExpression);
+                QueryBuilder.AddQuerySourceMapping(expression.QueryModel.MainFromClause, mappedExpression);
+                _filterWriter.WriteInvertedFilterPredicate(all.Predicate);
+                QueryBuilder.AddFilterExpression(_filterWriter.FilterExpression);
+                QueryBuilder.EndNotExists();
+                _filterWriter = existingWriter;
+                return expression;
             }
             if (expression.QueryModel.ResultOperators.Count == 1 &&
                 expression.QueryModel.ResultOperators[0] is AnyResultOperator)
             {
                 QueryBuilder.StartExists();
                 var outerFilterWriter = _filterWriter;
-                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder());
+                _filterWriter = new FilterWriter(this, QueryBuilder, new StringBuilder() );
                 var itemVarName = SparqlQueryBuilder.SafeSparqlVarName(expression.QueryModel.MainFromClause.ItemName);
 
                 var mappedFromExpression = VisitExpression(expression.QueryModel.MainFromClause.FromExpression);
@@ -778,10 +882,10 @@ namespace BrightstarDB.EntityFramework.Query
                 if (mappedFromExpression is SelectVariableNameExpression)
                 {
                     QueryBuilder.RenameVariable((mappedFromExpression as SelectVariableNameExpression).Name,
-                                                itemVarName);
+                        itemVarName);
                 }
 
-                foreach(var bodyClause in expression.QueryModel.BodyClauses)
+                foreach (var bodyClause in expression.QueryModel.BodyClauses)
                 {
                     if (bodyClause is WhereClause)
                     {
@@ -794,7 +898,7 @@ namespace BrightstarDB.EntityFramework.Query
                     }
                 }
                 var innerFilter = _filterWriter.ToString();
-                if (!String.IsNullOrEmpty(innerFilter))
+                if (!string.IsNullOrEmpty(innerFilter))
                 {
                     QueryBuilder.AddFilterExpression(innerFilter);
                 }
@@ -840,6 +944,7 @@ namespace BrightstarDB.EntityFramework.Query
             if (!(constantExpression.Value is IEnumerable)) return false;
             return true;
         }
+
         protected override Expression VisitQuerySourceReferenceExpression(QuerySourceReferenceExpression expression)
         {
             Expression mappedExpression;
@@ -855,11 +960,21 @@ namespace BrightstarDB.EntityFramework.Query
         // Called when a LINQ expression type is not handled above.
         protected override Exception CreateUnhandledItemException<T>(T unhandledItem, string visitMethod)
         {
-            string itemText = FormatUnhandledItem(unhandledItem);
-            var message = string.Format("The expression '{0}' (type: {1}) is not supported by this LINQ provider.", itemText, typeof(T));
+            var itemText = FormatUnhandledItem(unhandledItem);
+            var message = string.Format("The expression '{0}' (type: {1}) is not supported by this LINQ provider.",
+                itemText, typeof (T));
             return new NotSupportedException(message);
         }
 
         #endregion
+
+        internal Expression VisitExpression(BinaryExpression expression, bool inBooleanExpression)
+        {
+            var currentlyInBooleanExpression = _inBooleanExpression;
+            _inBooleanExpression = inBooleanExpression;
+            var ret = VisitExpression(expression);
+            _inBooleanExpression = currentlyInBooleanExpression;
+            return ret;
+        }
     }
 }
