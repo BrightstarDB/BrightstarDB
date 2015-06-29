@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="EntityFrameworkCodegen.BrightstarDB.66d16fc6-15f8-465f-8ddf-c7ff7373afce" Version="1.0" Language="en-US" Publisher="Kal Ahmed" />
+    <DisplayName>BrightstarDB EntityFramework</DisplayName>
+    <Description xml:space="preserve">Installs project and item templates for the Roslyn-based Entity Framework code generator.I</Description>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[14.0]" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="EntityItemTemplate" d:TargetPath="|EntityItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+    <Asset Type="BrightstarDBLibs.1.11.0.0.nupkg" d:Source="File" Path="Packages\BrightstarDBLibs.1.11.0.0.nupkg" d:VsixSubPath="Packages" />
+    <Asset Type="BrightstarDB.CodeGeneration.T4.1.11.0.0.nupkg" d:Source="File" Path="Packages\BrightstarDB.CodeGeneration.T4.1.11.0.0.nupkg" d:VsixSubPath="Packages" />
+    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="BrightstarCodegenEntityContext" d:TargetPath="|BrightstarCodegenEntityContext;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+  </Assets>
+</PackageManifest>

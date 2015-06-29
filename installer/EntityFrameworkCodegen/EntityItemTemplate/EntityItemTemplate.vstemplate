@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>Brightstar Entity Definition</Name>
+    <Description>A project item for a BrightstarDB entity definition interface.</Description>
+    <Icon>EntityItemTemplate.ico</Icon>
+    <TemplateID>85bdfe6e-d81e-42dd-a8c5-70c55b4fb742</TemplateID>
+    <ProjectType>CSharp</ProjectType>
+    <RequiredFrameworkVersion>4.0</RequiredFrameworkVersion>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <DefaultName>IMyEntity.cs</DefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true">IMyEntity.cs</ProjectItem>
+  </TemplateContent>
+</VSTemplate>
