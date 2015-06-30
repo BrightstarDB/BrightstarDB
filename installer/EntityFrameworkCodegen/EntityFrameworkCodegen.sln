@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityItemTemplate", "Entit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarCodegenEntityContext", "BrightstarCodegenEntityContext\BrightstarCodegenEntityContext.csproj", "{947BB231-EC4F-45AD-90BF-44121DBD3FE7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSIXProject1", "VSIXProject1\VSIXProject1.csproj", "{5CE48AB6-C1AD-44C9-86C5-F38085B09779}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{947BB231-EC4F-45AD-90BF-44121DBD3FE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{947BB231-EC4F-45AD-90BF-44121DBD3FE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{947BB231-EC4F-45AD-90BF-44121DBD3FE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CE48AB6-C1AD-44C9-86C5-F38085B09779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CE48AB6-C1AD-44C9-86C5-F38085B09779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CE48AB6-C1AD-44C9-86C5-F38085B09779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CE48AB6-C1AD-44C9-86C5-F38085B09779}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

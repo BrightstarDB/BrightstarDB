@@ -44,9 +44,9 @@
                     language.ToSyntaxGeneratorLanguageName(),
                     metadataReferences: new[]
                     {
-                        MetadataReference.CreateFromAssembly(typeof(object).Assembly),
-                        MetadataReference.CreateFromAssembly(typeof(Uri).Assembly),
-                        MetadataReference.CreateFromAssembly(typeof(BrightstarException).Assembly)
+                        MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location)
                     });
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));
@@ -103,9 +103,9 @@
                     language.ToSyntaxGeneratorLanguageName(),
                     metadataReferences: new[]
                     {
-                        MetadataReference.CreateFromAssembly(typeof(object).Assembly),
-                        MetadataReference.CreateFromAssembly(typeof(Uri).Assembly),
-                        MetadataReference.CreateFromAssembly(typeof(BrightstarException).Assembly)
+                        MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location)
                     });
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));
