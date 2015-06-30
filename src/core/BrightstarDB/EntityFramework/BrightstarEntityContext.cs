@@ -26,6 +26,14 @@ namespace BrightstarDB.EntityFramework
     {
         private readonly IDataObjectStore _store;
         private readonly Dictionary<string, List<BrightstarEntityObject>> _trackedObjects;
+        private Dictionary<Type, EntitySetInfo> _entitySets = null;
+
+        private struct EntitySetInfo
+        {
+            public IEntitySet entitySet;
+            public MethodInfo addMethodInfo;
+            public MethodInfo addOrUpdateMethodInfo;
+        }
 
         /// <summary>
         /// Creates a new domain context
@@ -85,6 +93,97 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         public IEnumerable<BrightstarEntityObject> TrackedObjects { get { return _trackedObjects.Values.SelectMany(v=>v); } }
 
+        /// <summary>
+        /// Attempt to add the specified object to this context
+        /// </summary>
+        /// <param name="o">The object to be added</param>
+        /// <remarks>The object <paramref name="o"/> must implement one of the entity interfaces supported by this entity context.</remarks>
+        /// <exception cref="InvalidOperationException">Raised if <paramref name="o"/> does not implement one of the entity interfaces supported by this entity context.</exception>
+        /// <exception cref="ArgumentNullException">Raised if <paramref name="o"/> is null.</exception>
+        public void Add(object o)
+        {
+            if (o == null) throw new ArgumentNullException("o");
+            EnsureEntitySetInfo();
+            _Add(o);
+        }
+
+        private void _Add(object o)
+        {
+            bool added = false;
+            foreach (var i in o.GetType().GetInterfaces())
+            {
+                EntitySetInfo entitySetInfo;
+                if (_entitySets.TryGetValue(i, out entitySetInfo))
+                {
+                    entitySetInfo.addMethodInfo.Invoke(entitySetInfo.entitySet, new[] {o});
+                    added = true;
+                }
+            }
+            if (!added)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Cannot add an object of type {0} to this context as it does not implement any known entity interface.", o.GetType().FullName));
+            }
+        }
+
+        /// <summary>
+        /// Attempts to add the items in the provided enumeration to this context.
+        /// </summary>
+        /// <param name="items">An enumeration of the items to be added</param>
+        /// <remarks>Each item in the enumeration must implement at least one of the entity interfaces supported by this entity context.
+        /// This method will attempt to add each item in turn, any failures for the addition of individual items will be notified at
+        /// in an AggregateException thrown after all items have been processed. At this point, calling SaveChanges on the context
+        /// will persistenly store only those items that have been successfully added.</remarks>
+        /// <exception cref="ArgumentNullException">Raised if <paramref name="items"/> is null</exception>
+        /// <exception cref="AggregateException">Raised if the adding of one or more items to the context failed. The inner exceptions list each 
+        /// of the exceptions encountered for the individual items that falied.</exception>
+        public void AddRange(IEnumerable items)
+        {
+            if (items == null) throw new ArgumentNullException("items");
+            List<Exception> exceptions = null;
+            EnsureEntitySetInfo();
+            foreach (var item in items)
+            {
+                try
+                {
+                    _Add(item);
+                }
+                catch (Exception ex)
+                {
+                    if (exceptions == null) exceptions = new List<Exception>();
+                    exceptions.Add(ex);
+                }
+            }
+            if (exceptions != null)
+            {
+                throw new AggregateException("One or more items could not be added to the context.", exceptions);
+            }
+        }
+
+        private void EnsureEntitySetInfo()
+        {
+            if (_entitySets == null)
+            {
+                Dictionary<Type, EntitySetInfo> entitySets = new Dictionary<Type, EntitySetInfo>();
+                foreach (var p in this.GetType()
+                    .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(
+                        p =>
+                            p.PropertyType.IsGenericType &&
+                            p.PropertyType.UnderlyingSystemType.Name.Equals("IEntitySet`1")))
+                {
+                    var entityType = p.PropertyType.GetGenericArguments()[0];
+                    var entitySetInfo = new EntitySetInfo
+                    {
+                        entitySet = p.GetValue(this, null) as IEntitySet,
+                        addMethodInfo = p.PropertyType.GetMethod("Add", new Type[] {entityType}),
+                        addOrUpdateMethodInfo = p.PropertyType.GetMethod("AddOrUpdate", new Type[] {entityType})
+                    };
+                    entitySets[entityType] = entitySetInfo;
+                }
+                _entitySets = entitySets;
+            }
+        }
         private static void AssertStoreFromConnectionString(ConnectionString connectionString)
         {
             if (connectionString.Type == ConnectionType.DotNetRdf || connectionString.Type == ConnectionType.Sparql)
