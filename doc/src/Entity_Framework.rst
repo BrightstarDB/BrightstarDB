@@ -34,8 +34,10 @@ The process of using the Entity Framework is to:
 
   #. Use the generated context to create, query or get and modify objects.
 
+Creating a Context
+------------------
 
-**Including the BrightstarDB Entity Context**
+**Include the BrightstarDB Entity Context**
 
 The **Brightstar Entity Context** is a text template that when run introspects the other 
 code elements in the project and generates a number of classes and a context in a single file 
@@ -104,7 +106,8 @@ annotated interfaces are turned into concrete classes.
   remember to run it.
 
 
-**Using a Context**
+Using a Context
+---------------
 
 A context can be thought of as a connection to a BrightstarDB instance. It provides access to 
 the collections of domain objects defined by the interfaces. It also tracks all changes to 
@@ -146,13 +149,41 @@ and attaching the object to the context; or by passing the context into the cons
   var bob = dataContext.Persons.Create();
   bob.Name = "bob";
 
-
   // or created using new and attached to the context
   var bob = new Person() { Name = "Bob" };
   dataContext.Persons.Add(bob);
 
   // or created using new and passing the context into the constructor
   var bob = new Person(dataContext) { Name = "Bob" };
+  
+  // Add multiple items from any IEnumerable<T> with AddRange
+  var newPeople = new Person[] { 
+    new Person() { Name = "Alice" },
+	new Person() { Name = "Carol" },
+	new Person() { Name = "Dave"}
+  }
+  dataContext.Persons.AddRange(newPeople);
+  
+
+In addition to the ``Add`` and ``AddRange`` methods on each entity set, there are also ``Add`` and ``AddRange``
+methods on the context. These methods introspect the objects being added to determine which 
+of the entity interfaces they implement and then add them to the appropriate collections::
+
+  var newItems = new object[] {
+    new Person() { Name = "Edith" },
+	new Company() { Name = "BigCorp" },
+	new Product() { Name = "BrightstarDB" }
+  }
+  dataContext.AddRange(newItems);
+  
+.. note::
+	If you pass an item to the ``Add`` or ``AddRange`` methods on the context object that does not implement
+	one of the supported entity interfaces, the ``Add`` method will raise an ``InvalidOperationException``
+	and the ``AddRange`` method will raise an ``AggregateException`` containing one ``InvalidOperationException``
+	inner exception for each item that could not be added. In the case of ``AddRange``, all items are 
+	processed, even if one item cannot be added. Remember that at this stage, no changes are 
+	committed to the server, you still can choose whether or not to call ``SaveChanges`` to 
+	persist the items that were successfully added.
 
 
 Once a new object has been created it can be used in relationships with other objects. The 
@@ -219,7 +250,7 @@ Sorting results
 .. code-block:: c#
 
     var byAge = context.Persons.OrderBy(x=>x.Age);
-	var byAgeDescending = context.Persons.OrderByDescending(x=>x.Age);
+    var byAgeDescending = context.Persons.OrderByDescending(x=>x.Age);
 	
 Retrieving related items
 ------------------------
