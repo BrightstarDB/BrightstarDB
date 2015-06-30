@@ -109,7 +109,7 @@ namespace BrightstarDB.EntityFramework
 
         private void _Add(object o)
         {
-            bool added = false;
+            var added = false;
             foreach (var i in o.GetType().GetInterfaces())
             {
                 EntitySetInfo entitySetInfo;
@@ -127,13 +127,47 @@ namespace BrightstarDB.EntityFramework
         }
 
         /// <summary>
+        /// Attempt to add the specified object to this context or update the object in this context if the object already has an ID assigned to it
+        /// </summary>
+        /// <param name="o">The object to be added / updated</param>
+        /// <remarks>The object <paramref name="o"/> must implement one of the entity interfaces supported by this entity context.</remarks>
+        /// <exception cref="InvalidOperationException">Raised if <paramref name="o"/> does not implement one of the entity interfaces supported by this entity context.</exception>
+        /// <exception cref="ArgumentNullException">Raised if <paramref name="o"/> is null.</exception>
+        public void AddOrUpdate(object o)
+        {
+            if (o == null) throw new ArgumentNullException("o");
+            EnsureEntitySetInfo();
+            _AddOrUpdate(o);
+        }
+
+        private void _AddOrUpdate(object o)
+        {
+            var added = false;
+            foreach (var i in o.GetType().GetInterfaces())
+            {
+                EntitySetInfo entitySetInfo;
+                if (_entitySets.TryGetValue(i, out entitySetInfo))
+                {
+                    entitySetInfo.addOrUpdateMethodInfo.Invoke(entitySetInfo.entitySet, new[] { o });
+                    added = true;
+                }
+            }
+            if (!added)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Cannot add or update an object of type {0} to this context as it does not implement any known entity interface.", o.GetType().FullName));
+            }
+        }
+
+
+        /// <summary>
         /// Attempts to add the items in the provided enumeration to this context.
         /// </summary>
         /// <param name="items">An enumeration of the items to be added</param>
         /// <remarks>Each item in the enumeration must implement at least one of the entity interfaces supported by this entity context.
         /// This method will attempt to add each item in turn, any failures for the addition of individual items will be notified at
         /// in an AggregateException thrown after all items have been processed. At this point, calling SaveChanges on the context
-        /// will persistenly store only those items that have been successfully added.</remarks>
+        /// will persistently store only those items that have been successfully added.</remarks>
         /// <exception cref="ArgumentNullException">Raised if <paramref name="items"/> is null</exception>
         /// <exception cref="AggregateException">Raised if the adding of one or more items to the context failed. The inner exceptions list each 
         /// of the exceptions encountered for the individual items that falied.</exception>
@@ -159,6 +193,42 @@ namespace BrightstarDB.EntityFramework
                 throw new AggregateException("One or more items could not be added to the context.", exceptions);
             }
         }
+
+
+        /// <summary>
+        /// Attempts to add the items in the provided enumeration to this context, or update the items in the context if they are already assigned an ID.
+        /// </summary>
+        /// <param name="items">An enumeration of the items to be added or updated</param>
+        /// <remarks>Each item in the enumeration must implement at least one of the entity interfaces supported by this entity context.
+        /// This method will attempt to add/update each item in turn, any failures for the addition of individual items will be notified at
+        /// in an AggregateException thrown after all items have been processed. At this point, calling SaveChanges on the context
+        /// will persistently store only those items that have been successfully added.</remarks>
+        /// <exception cref="ArgumentNullException">Raised if <paramref name="items"/> is null</exception>
+        /// <exception cref="AggregateException">Raised if the adding of one or more items to the context failed. The inner exceptions list each 
+        /// of the exceptions encountered for the individual items that falied.</exception>
+        public void AddOrUpdateRange(IEnumerable items)
+        {
+            if (items == null) throw new ArgumentNullException("items");
+            List<Exception> exceptions = null;
+            EnsureEntitySetInfo();
+            foreach (var item in items)
+            {
+                try
+                {
+                    _AddOrUpdate(item);
+                }
+                catch (Exception ex)
+                {
+                    if (exceptions == null) exceptions = new List<Exception>();
+                    exceptions.Add(ex);
+                }
+            }
+            if (exceptions != null)
+            {
+                throw new AggregateException("One or more items could not be added to the context.", exceptions);
+            }
+        }
+
 
         private void EnsureEntitySetInfo()
         {
