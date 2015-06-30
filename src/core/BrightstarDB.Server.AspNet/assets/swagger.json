@@ -230,7 +230,7 @@
                     "200": {
                         "description": "Success. The store has been reverted to the specified commit point."
                     },
-                    "405": {
+                    "400": {
                         "description": "Bad Request. The commit point ID was not provided in the request body\nor the specified commit point could not be found.\n"
                     }
                 }
