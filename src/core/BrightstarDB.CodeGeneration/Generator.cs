@@ -1,4 +1,4 @@
-﻿namespace BrightstarDB.CodeGeneration
+namespace BrightstarDB.CodeGeneration
 {
     using System;
     using System.Collections.Generic;
@@ -254,8 +254,8 @@
             Compilation compilation;
             var references = new[]
             {
-                MetadataReference.CreateFromAssembly(typeof(object).Assembly),
-                MetadataReference.CreateFromAssembly(typeof(BrightstarException).Assembly)
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location)
             };
 
             // we create our own compilation with which to generate the entity context
