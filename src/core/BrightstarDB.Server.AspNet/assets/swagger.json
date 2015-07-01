@@ -523,7 +523,11 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/JobList"
+                            "name": "JobList",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/JobResponseModel"
+                            }
                         }
                     }
                 }
