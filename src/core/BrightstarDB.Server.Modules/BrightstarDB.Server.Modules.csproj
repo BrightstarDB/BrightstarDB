@@ -80,6 +80,7 @@
     <Compile Include="CorsPipelinesExtension.cs" />
     <Compile Include="DocumentationModule.cs" />
     <Compile Include="FixedRootPathProvider.cs" />
+    <Compile Include="GraphListProcessor.cs" />
     <Compile Include="GraphsModule.cs" />
     <Compile Include="JobInfoExtensions.cs" />
     <Compile Include="Model\CommitPointsRequestModel.cs" />

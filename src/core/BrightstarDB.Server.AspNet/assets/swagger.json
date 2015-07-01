@@ -272,7 +272,7 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "description": "This schema describes the JSON format returned when the `graph`\nand `default` query parameters are **NOT** provided. If either\nof these query parameters are provided, the response will be\nRDF serialized in the format specified by the Accept header\nof the request.\n",
+                            "description": "This schema describes the JSON format returned when the `graph`\nand `default` query parameters are **NOT** provided. If either\nof these query parameters are provided, the response will be\nRDF serialized in the format specified by the Accept header\nof the request.\nIf a SPARQL query results format is requested in the Accept header, the result will be a SPARQL result set with a single column that lists each of the graph IRIs in the store on a separate row.",
                             "properties": {
                                 "graphs": {
                                     "type": "array",

@@ -140,6 +140,8 @@ A 200 response indicates that the store has been deleted.
 
 
 
+.. _SPARQL_Query_Endpoint:
+
 SPARQL Query Endpoint
 =====================
 
@@ -231,13 +233,15 @@ GET
 List Graphs
 +++++++++++
 
-A GET operation with no query parameters returns a list of the URIs of all graphs in the store. The response is a simple JSON object::
+A GET operation with no query parameters returns a list of the URIs of all graphs in the store. 
 
-	{
-		"graphs": [
-			"string"
-		]
-	}
+The response can be returned as a simple JSON object when the Accept header requests the media type ``application/json``::
+
+	[ "string", "string", "string" ... ]
+	
+Alternatively if the Accept header specifies one of the supported SPARQL SELECT query results media types, the response will
+be returned as a SPARQL results set with a single column listing the graphs in the store on separate rows. For a list of 
+the media types supported for SPARQL SELECT queries please refer to :ref:`SPARQL_Query_Endpoint`.
 
 The ``graphs`` property is an array containing the the graph URIs.
 
