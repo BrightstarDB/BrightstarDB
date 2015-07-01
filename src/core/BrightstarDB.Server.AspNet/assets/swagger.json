@@ -766,7 +766,11 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/StatisticsList"
+                            "name": "StatisticsList",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/StatisticsResponseModel"
+                            }
                         }
                     }
                 }
