@@ -517,7 +517,7 @@ where:
 	* **Deletes** - Triples or Quads to be removed from the store. The string must be in N-Triples or N-Quads syntax. This parameter is optional.
 	* **Inserts** - Triples or Quads to add to the store. The string must be in N-Triples or N-Quads syntax. This parameter is optional.
 	* **DefaultGraphUri** - The default graph for the transaction. This is used to convert triples to quads for both testing preconditions and for insert/delete. 
-	  This parameter is optional. If not specified, it defaults to the BrightstarDB default graph uri.
+	  This parameter is optional. If not specified, it defaults to the BrightstarDB default graph URI.
 
 .. note::
 	The ``Preconditions`` and ``NonexistencePreconditions`` and ``Deletes`` parameters allow the use of the special IRI <http://www.brightstardb.com/.well-known/model/wildcard> as a wildcard match for 
