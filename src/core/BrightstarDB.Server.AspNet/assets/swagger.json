@@ -301,7 +301,7 @@
                     "application/rdf+json"
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "graph store protocol"
                 ],
@@ -327,7 +327,7 @@
                     {
                         "name": "graph",
                         "in": "query",
-                        "description": "The absolute URI of the named graph whose content is to be retrieved",
+                        "description": "The absolute URI of the named graph whose content is to be updated",
                         "type": "string",
                         "format": "url",
                         "required": false
@@ -336,6 +336,75 @@
                         "name": "body",
                         "in": "body",
                         "description": "The RDF data to be added to the contents of the target graph.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad Request. Either the target graph was not specified using either the `default`\nor the `graph` query parameter; or the content posted was not valid RDF data.\n"
+                    },
+                    "406": {
+                        "description": "The content provided in the body was not in a format that could be parsed.\n"
+                    }
+                },
+                "consumes": [
+                    "application/json",
+                    "application/rdf+xml",
+                    "application/xml",
+                    "text/ntriples",
+                    "text/ntriples+turtle",
+                    "applicatiuon/rdf-triples",
+                    "application/x-ntriples",
+                    "application/x-turtle",
+                    "application/turtle",
+                    "text/rdf+n3",
+                    "text/x-nquads",
+                    "application/x-trig",
+                    "application/trix",
+                    "application/rdf+json"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "graph store protocol"
+                ],
+                "summary": "Replaces the content of a named graph or the default graph.",
+                "description": "This endpoint implements the [SPARQL 1.1 Graph Store HTTP Protocol](http://www.w3.org/TR/sparql11-http-rdf-update/).\n\n**NOTE** One of either the `default` or the `graph` parameters must be provided.\n",
+                "operationId": "putGraph",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store to update",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "default",
+                        "in": "query",
+                        "type": "boolean",
+                        "description": "Replace the data in the default graph",
+                        "allowEmptyValue": true,
+                        "required": false
+                    },
+                    {
+                        "name": "graph",
+                        "in": "query",
+                        "description": "The absolute URI of the named graph whose content is to be replaced",
+                        "type": "string",
+                        "format": "url",
+                        "required": false
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "The RDF data to replace the contents of the target graph.",
                         "schema": {
                             "type": "string"
                         },
