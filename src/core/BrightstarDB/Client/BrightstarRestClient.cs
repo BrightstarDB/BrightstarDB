@@ -224,17 +224,7 @@ namespace BrightstarDB.Client
             try
             {
                 var response = AuthenticatedGet(storeName + "/graphs");
-                var responseStream = response.GetResponseStream();
-                using (var reader = new StreamReader(responseStream))
-                {
-                    var p = new VDS.RDF.Parsing.SparqlJsonParser();
-                    var rs = new SparqlResultSet();
-                    p.Load(rs, reader);
-                    return rs.Results.Where(row => row.HasValue("graphUri"))
-                        .Select(row => row["graphUri"])
-                        .OfType<IUriNode>()
-                        .Select(n => n.Uri.ToString());
-                }
+                return Deserialize <List<string>>(response);
             }
             catch (BrightstarClientException ex)
             {
