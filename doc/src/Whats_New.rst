@@ -60,6 +60,10 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
 	  item should be added to. This allows for easy add/update of heterogeneous collections of items. 
 	  Thanks to kentcb for the suggestion (#102)
 	  
+	- NEW: Added documentation of the HTTP interface to BrightstarDB. For more information please refer to :ref:`HTTP_API` (#220)
+	
+	- NEW: The HTTP API to retrieve a list of statistics now accepts an optional take query parameter for specifying the result page size. (#223)
+	  
 
 ****************************
  BrightstarDB 1.10.1
