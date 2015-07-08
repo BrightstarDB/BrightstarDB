@@ -99,6 +99,7 @@
     <Compile Include="DotNetRdfStoreTests.cs" />
     <Compile Include="PreloadTests.cs" />
     <Compile Include="RdfXmlWriterTests.cs" />
+    <Compile Include="ResourceLookupTest.cs" />
     <Compile Include="StatisticsLogTests.cs" />
     <Compile Include="StatsMonitorTests.cs" />
     <Compile Include="StoreExtensions.cs" />
