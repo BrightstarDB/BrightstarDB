@@ -107,9 +107,7 @@ namespace BrightstarDB.Storage.Persistence
                     outputStream.Seek((long) _writeOffset, SeekOrigin.Begin);
                 }
                 outputStream.Write(_data, 0, _pageSize);
-                // KA: Commented out flush on every page write as this causes massive overhead on the Azure block implementation
-                // If it turns out that flush is needed on the normal filesystem, may need to either make it conditional or rework the azure block impl
-                //outputStream.Flush();
+                outputStream.Flush();
                 return ret;
             }
         }
@@ -126,8 +124,7 @@ namespace BrightstarDB.Storage.Persistence
 #if DEBUG_PAGESTORE
                     Logging.LogDebug("Write {0} {1}", Id, _modified);
 #endif
-                    // KA: See comment in Write() method above.
-                    //outputStream.Flush();
+                    outputStream.Flush();
                 }
 #if DEBUG_PAGESTORE
                 else
