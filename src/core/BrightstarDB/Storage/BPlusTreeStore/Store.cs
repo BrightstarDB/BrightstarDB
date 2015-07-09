@@ -978,5 +978,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             Dispose(false);
         }
+
+        internal void DumpResourceIndex()
+        {
+            (_resourceIndex as BPlusTree).DumpStructure();
+        }
     }
 }
