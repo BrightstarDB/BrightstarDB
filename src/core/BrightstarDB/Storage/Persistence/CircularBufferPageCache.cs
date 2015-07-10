@@ -1,4 +1,5 @@
-﻿using System;
+﻿/* This whole class is no longer in use. Kept here for now in case we find a reason to resurrect it later
+using System;
 using System.Linq;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
@@ -11,6 +12,7 @@ using BrightstarDB.Utils;
 
 namespace BrightstarDB.Storage.Persistence
 {
+    [Obsolete("This class is replaced by the LruPageCache")]
     internal class CircularBufferPageCache : IPageCache
     {
         private readonly object _partitionIdLock = new object();
@@ -28,6 +30,7 @@ namespace BrightstarDB.Storage.Persistence
 
         public event PreEvictionDelegate BeforeEvict;
         public event PostEvictionDelegate AfterEvict;
+        public event EvictionCompletedDelegate EvictionCompleted;
 
         public void InsertOrUpdate(string partition, IPageCacheItem page)
         {
@@ -53,6 +56,7 @@ namespace BrightstarDB.Storage.Persistence
                     _pages.Remove(k);
                     FirePostEvict(eventArgs);
                 }
+                FireEvictionCompleted();
             }
         }
 
@@ -99,6 +103,14 @@ namespace BrightstarDB.Storage.Persistence
             }
         }
 
+        private void FireEvictionCompleted()
+        {
+            if (EvictionCompleted != null)
+            {
+                EvictionCompleted(this, new EventArgs());
+            }
+        }
+
         class PartitionPageKey
         {
             public int PartitionId { get; private set; }
@@ -127,3 +139,4 @@ namespace BrightstarDB.Storage.Persistence
         }
     }
 }
+*/

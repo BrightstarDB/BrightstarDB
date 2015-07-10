@@ -19,6 +19,7 @@ namespace BrightstarDB.Storage.Persistence
  
         public event PreEvictionDelegate BeforeEvict;
         public event PostEvictionDelegate AfterEvict;
+        public event EvictionCompletedDelegate EvictionCompleted;
 
         /// <summary>
         /// Time between cache eviction retries when the cache is blocked with unevictable pages
@@ -193,7 +194,14 @@ namespace BrightstarDB.Storage.Persistence
             }
             finally
             {
-                _evictInProgress = false;
+                try
+                {
+                    FireEvictionCompleted();
+                }
+                finally
+                {
+                    _evictInProgress = false;
+                }
             }
         }
 
@@ -205,6 +213,11 @@ namespace BrightstarDB.Storage.Persistence
         private void FireBeforeEvict(EvictionEventArgs evictionArgs)
         {
             if (BeforeEvict != null) BeforeEvict(this, evictionArgs);
+        }
+
+        private void FireEvictionCompleted()
+        {
+            if (EvictionCompleted != null) EvictionCompleted(this, new EventArgs());
         }
 
         private string MakeCacheKey(string partition, ulong pageId)
