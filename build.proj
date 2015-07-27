@@ -253,19 +253,19 @@
     </Target>
             
     <Target Name="BuildServerIntegrationTests"
-	    DependsOnTargets="BuildServerRunner">
+	    DependsOnTargets="CompileServerRunner">
       <MSBuild Projects="src/core/BrightstarDB.Server.IntegrationTests/BrightstarDB.Server.IntegrationTests.csproj"
 	       Targets="Build"/>
     </Target>
 
     <Target Name="BuildServerModulesTests"
-	    DependsOnTargets="BuildServerModules">
+	    DependsOnTargets="CompileServerModules">
       <MSBuild Projects="src/core/BrightstarDB.Server.Modules.Tests/BrightstarDB.Server.Modules.Tests.csproj"
 	       Targets="Build"/>
     </Target>
 
     <Target Name="BuildCoreTests"
-	    DependsOnTargets="BuildCore">
+	    DependsOnTargets="CompileCore">
       <MSBuild Projects="src/core/BrightstarDB.Tests/BrightstarDB.Tests.csproj"/>
     </Target>
 
