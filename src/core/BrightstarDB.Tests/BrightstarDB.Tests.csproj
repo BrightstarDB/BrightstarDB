@@ -39,9 +39,9 @@
     <AssemblyOriginatorKeyFile>..\..\..\key\brightstardb.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dotNetRDF, Version=1.0.9.0, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\dotNetRDF.1.0.9-prerelease02\lib\net40\dotNetRDF.dll</HintPath>
+    <Reference Include="dotNetRDF, Version=1.0.9.3683, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
+      <HintPath>..\packages\dotNetRDF.1.0.9.3683\lib\net40\dotNetRDF.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
