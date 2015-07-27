@@ -192,7 +192,11 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/CommitPointList"
+                            "title": "CommitPointsResponse",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/CommitPoint"
+                            }
                         }
                     }
                 }
@@ -226,7 +230,7 @@
                     "200": {
                         "description": "Success. The store has been reverted to the specified commit point."
                     },
-                    "405": {
+                    "400": {
                         "description": "Bad Request. The commit point ID was not provided in the request body\nor the specified commit point could not be found.\n"
                     }
                 }
@@ -268,7 +272,7 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "description": "This schema describes the JSON format returned when the `graph`\nand `default` query parameters are **NOT** provided. If either\nof these query parameters are provided, the response will be\nRDF serialized in the format specified by the Accept header\nof the request.\n",
+                            "description": "This schema describes the JSON format returned when the `graph`\nand `default` query parameters are **NOT** provided. If either\nof these query parameters are provided, the response will be\nRDF serialized in the format specified by the Accept header\nof the request.\nIf a SPARQL query results format is requested in the Accept header, the result will be a SPARQL result set with a single column that lists each of the graph IRIs in the store on a separate row.",
                             "properties": {
                                 "graphs": {
                                     "type": "array",
@@ -297,7 +301,7 @@
                     "application/rdf+json"
                 ]
             },
-            "put": {
+            "post": {
                 "tags": [
                     "graph store protocol"
                 ],
@@ -323,7 +327,7 @@
                     {
                         "name": "graph",
                         "in": "query",
-                        "description": "The absolute URI of the named graph whose content is to be retrieved",
+                        "description": "The absolute URI of the named graph whose content is to be updated",
                         "type": "string",
                         "format": "url",
                         "required": false
@@ -332,6 +336,75 @@
                         "name": "body",
                         "in": "body",
                         "description": "The RDF data to be added to the contents of the target graph.",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    },
+                    "400": {
+                        "description": "Bad Request. Either the target graph was not specified using either the `default`\nor the `graph` query parameter; or the content posted was not valid RDF data.\n"
+                    },
+                    "406": {
+                        "description": "The content provided in the body was not in a format that could be parsed.\n"
+                    }
+                },
+                "consumes": [
+                    "application/json",
+                    "application/rdf+xml",
+                    "application/xml",
+                    "text/ntriples",
+                    "text/ntriples+turtle",
+                    "applicatiuon/rdf-triples",
+                    "application/x-ntriples",
+                    "application/x-turtle",
+                    "application/turtle",
+                    "text/rdf+n3",
+                    "text/x-nquads",
+                    "application/x-trig",
+                    "application/trix",
+                    "application/rdf+json"
+                ]
+            },
+            "put": {
+                "tags": [
+                    "graph store protocol"
+                ],
+                "summary": "Replaces the content of a named graph or the default graph.",
+                "description": "This endpoint implements the [SPARQL 1.1 Graph Store HTTP Protocol](http://www.w3.org/TR/sparql11-http-rdf-update/).\n\n**NOTE** One of either the `default` or the `graph` parameters must be provided.\n",
+                "operationId": "putGraph",
+                "parameters": [
+                    {
+                        "name": "storeName",
+                        "in": "path",
+                        "description": "The name of the store to update",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "default",
+                        "in": "query",
+                        "type": "boolean",
+                        "description": "Replace the data in the default graph",
+                        "allowEmptyValue": true,
+                        "required": false
+                    },
+                    {
+                        "name": "graph",
+                        "in": "query",
+                        "description": "The absolute URI of the named graph whose content is to be replaced",
+                        "type": "string",
+                        "format": "url",
+                        "required": false
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "The RDF data to replace the contents of the target graph.",
                         "schema": {
                             "type": "string"
                         },
@@ -450,7 +523,11 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/JobList"
+                            "name": "JobList",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/JobResponseModel"
+                            }
                         }
                     }
                 }
@@ -693,7 +770,11 @@
                     "200": {
                         "description": "Successful response",
                         "schema": {
-                            "$ref": "#/definitions/StatisticsList"
+                            "name": "StatisticsList",
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/StatisticsResponseModel"
+                            }
                         }
                     }
                 }
@@ -833,303 +914,303 @@
             }
         }
     },
-    "definitions": {
-        "StoreRequest": {
-            "required": [
-                "StoreName"
-            ],
-            "properties": {
-                "StoreName": {
-                    "type": "string",
-                    "description": "The name for the new store."
-                },
-                "PersistenceType": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 1,
-                    "description": "The persistence type for the store. 0='AppendOnly', 1= 'Rewrite'\n"
-                }
-            }
-        },
-        "StoreResponse": {
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "description": "The store name"
-                },
-                "commits": {
-                    "type": "string",
-                    "description": "The relative path to the store's commit points resource"
-                },
-                "jobs": {
-                    "type": "string",
-                    "description": "The relative path to the store's jobs resource"
-                },
-                "transactions": {
-                    "type": "string",
-                    "description": "The relative path to the store's transactions resource"
-                },
-                "statistics": {
-                    "type": "string",
-                    "description": "The relative path to the store's statistics resource"
-                },
-                "sparqlQuery": {
-                    "type": "string",
-                    "description": "The relative path to the SPARQL 1.1 Query endpoint for the store"
-                },
-                "sparqlUpdate": {
-                    "type": "string",
-                    "description": "The relative path to the SPARQL 1.1 Update endpoint for the store"
-                }
-            }
-        },
-        "CommitPointList": {
-            "properties": {
-                "firstPageLink": {
-                    "type": "string",
-                    "format": "url",
-                    "description": "URL to retrieve the first page of results"
-                },
-                "previousPageLink": {
-                    "type": "string",
-                    "format": "url",
-                    "description": "URL to retrieve the previous page of results"
-                },
-                "nextPageLink": {
-                    "type": "string",
-                    "format": "url",
-                    "description": "URL to retrieve the next page of results"
-                },
-                "requestProperties": {
-                    "type": "object",
-                    "description": "A map of the additional parameters that were present in the request"
-                },
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/CommitPoint"
-                    }
-                }
-            }
-        },
-        "CommitPoint": {
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "id": {
-                    "type": "integer",
-                    "description": "The unique identifier of the commit point."
-                },
-                "storeName": {
-                    "type": "string",
-                    "description": "The name of the store that holds the commit point"
-                },
-                "commitTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The date/time that the commit was made."
-                },
-                "jobId": {
-                    "type": "string",
-                    "format": "GUID",
-                    "description": "The unique identifier of the job that created the commit."
-                }
-            }
-        },
-        "JobResponseModel": {
-            "required": [
-                "jobId"
-            ],
-            "properties": {
-                "jobId": {
-                    "type": "string",
-                    "format": "GUID",
-                    "description": "The unique identifier of the job"
-                },
-                "label": {
-                    "type": "string",
-                    "description": "A user-friendly label for the job specified when the job was queued."
-                },
-                "jobStatus": {
-                    "type": "string",
-                    "description": "The current processing state of the job.",
-                    "enum": [
-                        "Pending",
-                        "Started",
-                        "CompletedOk",
-                        "TransactionError",
-                        "Unknown"
-                    ]
-                },
-                "statusMessage": {
-                    "type": "string",
-                    "description": "The last progress message recorded by the server for the processing of this job."
-                },
-                "storeName": {
-                    "type": "string",
-                    "description": "The name of the store that the job is queued on"
-                },
-                "exceptionInfo": {
-                    "$ref": "#/definitions/ExceptionDetail"
-                },
-                "queuedTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The date/time when the job was queued on the server."
-                },
-                "startTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The date/time when the job started processing. \n\nThis value will not be available when the jobStatus is \"Pending\".\n"
-                },
-                "endTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The date/time when the job completed processing.\n\nThis value will not be available when the jobStatus is \"Pending\" or \"Started\".\n"
-                }
-            }
-        },
-        "JobList": {
-            "properties": {
-                "firstPageLink": {
-                    "type": "string",
-                    "format": "url",
-                    "description": "URL to retrieve the first page of results"
-                },
-                "previousPageLink": {
-                    "type": "string",
-                    "format": "url",
-                    "description": "URL to retrieve the previous page of results"
-                },
-                "nextPageLink": {
-                    "type": "string",
-                    "format": "url",
-                    "description": "URL to retrieve the next page of results"
-                },
-                "requestProperties": {
-                    "type": "object",
-                    "description": "A map of the additional parameters that were present in the request"
-                },
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/JobResponseModel"
-                    }
-                }
-            }
-        },
-        "ExceptionDetail": {
-            "properties": {
-                "type": {
-                    "type": "string",
-                    "description": "The type of exception"
-                },
-                "message": {
-                    "type": "string",
-                    "description": "The message string from the exception"
-                },
-                "stackTrace": {
-                    "type": "string",
-                    "description": "The stack trace captured when the exception was handled."
-                },
-                "helpLink": {
-                    "type": "string",
-                    "description": "The help link from the exception"
-                },
-                "data": {
-                    "type": "object",
-                    "description": "A map of additional data contained in the exception",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "innerException": {
-                    "$ref": "#/definitions/ExceptionDetail",
-                    "description": "Inner exception detail"
-                }
-            }
-        },
-        "JobRequestObject": {
-            "description": "An extensible model for defining the parameters of a job.\n",
-            "properties": {
-                "jobType": {
-                    "type": "string",
-                    "description": "The type of the job.",
-                    "enum": [
-                        "consolidate",
-                        "createsnapshot",
-                        "export",
-                        "import",
-                        "repeattransaction",
-                        "sparqlupdate",
-                        "transaction",
-                        "updatestats"
-                    ]
-                },
-                "label": {
-                    "type": "string",
-                    "description": "A user-friendly name for the job."
-                },
-                "jobParameters": {
-                    "type": "object",
-                    "description": "A dictionary mapping parameter name to value."
-                }
-            }
-        },
-        "StatisticsResponseModel": {
-            "properties": {
-                "commitId": {
-                    "type": "string",
-                    "description": "The unique identifier of the store commit point that the statistics were generated from"
-                },
-                "commitTimestamp": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The date/time of creation of the commit point that the statistics were generated from"
-                },
-                "predicateTripleCounts": {
-                    "description": "A map/dictionary where the key is a URI and the value is the number of\ntriples in the store that use that URI in the predicate.\n",
-                    "type": "object",
-                    "additionalProperties": {
+        "definitions": {
+            "StoreRequest": {
+                "required": [
+                    "StoreName"
+                ],
+                "properties": {
+                    "StoreName": {
+                        "type": "string",
+                        "description": "The name for the new store."
+                    },
+                    "PersistenceType": {
                         "type": "integer",
-                        "description": "The number of triples in the store using the key as the triple predicate"
+                        "minimum": 0,
+                        "maximum": 1,
+                        "description": "The persistence type for the store. 0='AppendOnly', 1= 'Rewrite'\n"
                     }
-                },
-                "totalTripleCount": {
-                    "description": "The total number of triples in the store",
-                    "type": "integer"
                 }
-            }
-        },
-        "StatisticsList": {
-            "properties": {
-                "firstPageLink": {
-                    "type": "string",
-                    "format": "url",
-                    "description": "URL to retrieve the first page of results"
-                },
-                "previousPageLink": {
-                    "type": "string",
-                    "format": "url",
-                    "description": "URL to retrieve the previous page of results"
-                },
-                "nextPageLink": {
-                    "type": "string",
-                    "format": "url",
-                    "description": "URL to retrieve the next page of results"
-                },
-                "requestProperties": {
-                    "type": "object",
-                    "description": "A map of the additional parameters that were present in the request"
-                },
-                "items": {
-                    "type": "array",
+            },
+            "StoreResponse": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The store name"
+                    },
+                    "commits": {
+                        "type": "string",
+                        "description": "The relative path to the store's commit points resource"
+                    },
+                    "jobs": {
+                        "type": "string",
+                        "description": "The relative path to the store's jobs resource"
+                    },
+                    "transactions": {
+                        "type": "string",
+                        "description": "The relative path to the store's transactions resource"
+                    },
+                    "statistics": {
+                        "type": "string",
+                        "description": "The relative path to the store's statistics resource"
+                    },
+                    "sparqlQuery": {
+                        "type": "string",
+                        "description": "The relative path to the SPARQL 1.1 Query endpoint for the store"
+                    },
+                    "sparqlUpdate": {
+                        "type": "string",
+                        "description": "The relative path to the SPARQL 1.1 Update endpoint for the store"
+                    }
+                }
+            },
+            "CommitPointList": {
+                "properties": {
+                    "firstPageLink": {
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to retrieve the first page of results"
+                    },
+                    "previousPageLink": {
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to retrieve the previous page of results"
+                    },
+                    "nextPageLink": {
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to retrieve the next page of results"
+                    },
+                    "requestProperties": {
+                        "type": "object",
+                        "description": "A map of the additional parameters that were present in the request"
+                    },
                     "items": {
-                        "$ref": "#/definitions/StatisticsResponseModel"
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/CommitPoint"
+                        }
+                    }
+                }
+            },
+            "CommitPoint": {
+                "required": [
+                    "id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "The unique identifier of the commit point."
+                    },
+                    "storeName": {
+                        "type": "string",
+                        "description": "The name of the store that holds the commit point"
+                    },
+                    "commitTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "The date/time that the commit was made."
+                    },
+                    "jobId": {
+                        "type": "string",
+                        "format": "GUID",
+                        "description": "The unique identifier of the job that created the commit."
+                    }
+                }
+            },
+            "JobResponseModel": {
+                "required": [
+                    "jobId"
+                ],
+                "properties": {
+                    "jobId": {
+                        "type": "string",
+                        "format": "GUID",
+                        "description": "The unique identifier of the job"
+                    },
+                    "label": {
+                        "type": "string",
+                        "description": "A user-friendly label for the job specified when the job was queued."
+                    },
+                    "jobStatus": {
+                        "type": "string",
+                        "description": "The current processing state of the job.",
+                        "enum": [
+                            "Pending",
+                            "Started",
+                            "CompletedOk",
+                            "TransactionError",
+                            "Unknown"
+                        ]
+                    },
+                    "statusMessage": {
+                        "type": "string",
+                        "description": "The last progress message recorded by the server for the processing of this job."
+                    },
+                    "storeName": {
+                        "type": "string",
+                        "description": "The name of the store that the job is queued on"
+                    },
+                    "exceptionInfo": {
+                        "$ref": "#/definitions/ExceptionDetail"
+                    },
+                    "queuedTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "The date/time when the job was queued on the server."
+                    },
+                    "startTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "The date/time when the job started processing. \n\nThis value will not be available when the jobStatus is \"Pending\".\n"
+                    },
+                    "endTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "The date/time when the job completed processing.\n\nThis value will not be available when the jobStatus is \"Pending\" or \"Started\".\n"
+                    }
+                }
+            },
+            "JobList": {
+                "properties": {
+                    "firstPageLink": {
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to retrieve the first page of results"
+                    },
+                    "previousPageLink": {
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to retrieve the previous page of results"
+                    },
+                    "nextPageLink": {
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to retrieve the next page of results"
+                    },
+                    "requestProperties": {
+                        "type": "object",
+                        "description": "A map of the additional parameters that were present in the request"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/JobResponseModel"
+                        }
+                    }
+                }
+            },
+            "ExceptionDetail": {
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "description": "The type of exception"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "The message string from the exception"
+                    },
+                    "stackTrace": {
+                        "type": "string",
+                        "description": "The stack trace captured when the exception was handled."
+                    },
+                    "helpLink": {
+                        "type": "string",
+                        "description": "The help link from the exception"
+                    },
+                    "data": {
+                        "type": "object",
+                        "description": "A map of additional data contained in the exception",
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    },
+                    "innerException": {
+                        "$ref": "#/definitions/ExceptionDetail",
+                        "description": "Inner exception detail"
+                    }
+                }
+            },
+            "JobRequestObject": {
+                "description": "An extensible model for defining the parameters of a job.\n",
+                "properties": {
+                    "jobType": {
+                        "type": "string",
+                        "description": "The type of the job.",
+                        "enum": [
+                            "consolidate",
+                            "createsnapshot",
+                            "export",
+                            "import",
+                            "repeattransaction",
+                            "sparqlupdate",
+                            "transaction",
+                            "updatestats"
+                        ]
+                    },
+                    "label": {
+                        "type": "string",
+                        "description": "A user-friendly name for the job."
+                    },
+                    "jobParameters": {
+                        "type": "object",
+                        "description": "A dictionary mapping parameter name to value."
+                    }
+                }
+            },
+            "StatisticsResponseModel": {
+                "properties": {
+                    "commitId": {
+                        "type": "string",
+                        "description": "The unique identifier of the store commit point that the statistics were generated from"
+                    },
+                    "commitTimestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "The date/time of creation of the commit point that the statistics were generated from"
+                    },
+                    "predicateTripleCounts": {
+                        "description": "A map/dictionary where the key is a URI and the value is the number of\ntriples in the store that use that URI in the predicate.\n",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "integer",
+                            "description": "The number of triples in the store using the key as the triple predicate"
+                        }
+                    },
+                    "totalTripleCount": {
+                        "description": "The total number of triples in the store",
+                        "type": "integer"
+                    }
+                }
+            },
+            "StatisticsList": {
+                "properties": {
+                    "firstPageLink": {
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to retrieve the first page of results"
+                    },
+                    "previousPageLink": {
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to retrieve the previous page of results"
+                    },
+                    "nextPageLink": {
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to retrieve the next page of results"
+                    },
+                    "requestProperties": {
+                        "type": "object",
+                        "description": "A map of the additional parameters that were present in the request"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/StatisticsResponseModel"
+                        }
                     }
                 }
             }
         }
     }
-}

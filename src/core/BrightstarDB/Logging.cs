@@ -136,7 +136,7 @@ namespace BrightstarDB
         {
             var logMessage = DateTime.Now.ToString(System.Globalization.CultureInfo.CurrentCulture) +
                              " (" + ThreadId + ") : " + lvl + " : " + msg;
-            if (args != null)
+            if (args != null && args.Length > 0) // Under PCL args can be an empty array if there are no params. 
             {
                 Debug.WriteLine(logMessage, args);
             }

@@ -80,6 +80,96 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
+        public void TestContextAddMethod()
+        {
+            var storeName = "TestContextAddMethod_" + DateTime.UtcNow.Ticks;
+            string aliceId;
+            string gingerId;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var alice = new Person {Name = "Alice", Age = 25};
+                var ginger = new Animal{Name="Ginger", Owner = alice};
+                context.Add(alice);
+                context.Add(ginger);
+                context.SaveChanges();
+                aliceId = alice.Id;
+                gingerId = ginger.Id;
+            }
+            Assert.That(aliceId, Is.Not.Null);
+            using (var context = CreateEntityContext(storeName))
+            {
+                var alice = context.Persons.FirstOrDefault(x => x.Id == aliceId);
+                Assert.That(alice, Is.Not.Null);
+                Assert.That(alice.Age, Is.EqualTo(25));
+                Assert.That(alice.Pet, Is.Not.Null);
+                Assert.That(alice.Pet.Id, Is.EqualTo(gingerId));
+                Assert.That(alice.Pet.Name, Is.EqualTo("Ginger"));
+            }
+        }
+
+        [Test]
+        public void TestContextAddRangeMethod()
+        {
+            var storeName = "TestContextAddRangeMethod_" + DateTime.UtcNow.Ticks;
+            string aliceId, gingerId;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var alice = new Person { Name = "Alice", Age = 25 };
+                var ginger = new Animal { Name = "Ginger" };
+                context.AddRange(new object[] {alice, ginger});
+                context.SaveChanges();
+                aliceId = alice.Id;
+                gingerId = ginger.Id;
+            }
+            Assert.That(aliceId, Is.Not.Null);
+            Assert.That(gingerId, Is.Not.Null);
+            using (var context = CreateEntityContext(storeName))
+            {
+                var alice = context.Persons.FirstOrDefault(x => x.Id == aliceId);
+                Assert.That(alice, Is.Not.Null);
+                Assert.That(alice.Age, Is.EqualTo(25));
+                var ginger = context.Animals.FirstOrDefault(x => x.Id == gingerId);
+                Assert.That(ginger, Is.Not.Null);
+                Assert.That(ginger.Name, Is.EqualTo("Ginger"));
+            }
+        }
+
+        [Test]
+        public void TestContextAddOrUpdateRangeMethod()
+        {
+            var storeName = "TestContextAddOrUpdateRangeMethod_" + DateTime.UtcNow.Ticks;
+            string aliceId, gingerId;
+            using (var context = CreateEntityContext(storeName))
+            {
+                var alice = new Person { Name = "Alice", Age = 25 };
+                var ginger = new Animal { Name = "Ginger" };
+                context.AddRange(new object[] { alice, ginger });
+                context.SaveChanges();
+                aliceId = alice.Id;
+                gingerId = ginger.Id;
+            }
+            Assert.That(aliceId, Is.Not.Null);
+            Assert.That(gingerId, Is.Not.Null);
+            using (var context = CreateEntityContext(storeName))
+            {
+                var alice= new Person{Id=aliceId, Name="Updated Alice", Age=26};
+                var ginger = new Animal{Id=gingerId, Name = "Updated Ginger"};
+                context.AddOrUpdateRange(new object[] {alice, ginger});
+                context.SaveChanges();
+            }
+            using (var context = CreateEntityContext(storeName))
+            {
+                var alice = context.Persons.FirstOrDefault(x => x.Id == aliceId);
+                Assert.That(alice, Is.Not.Null);
+                Assert.That(alice.Age, Is.EqualTo(26));
+                var ginger = context.Animals.FirstOrDefault(x => x.Id == gingerId);
+                Assert.That(ginger, Is.Not.Null);
+                Assert.That(ginger.Name, Is.EqualTo("Updated Ginger"));
+            }
+        }
+
+
+        [Test]
         [ExpectedException(typeof(EntityKeyRequiredException))]
         [NUnit.Framework.Ignore("Behaviour is changed - an entity can be created, but will not be tracked or saved until its identity is set")]
         public void TestCannotCreateEntityWithKey()

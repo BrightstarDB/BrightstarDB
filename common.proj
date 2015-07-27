@@ -22,6 +22,7 @@
     <Revision>0</Revision>
   </PropertyGroup>
   
+  
   <ItemGroup>
 	<PropertyFiles Include="**\AssemblyInfo.cs"/>
   </ItemGroup>

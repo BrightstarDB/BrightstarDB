@@ -90,7 +90,7 @@ namespace BrightstarDB.Storage.Persistence
                 if (!disableBackgroundWrites)
                 {
                     _backgroundPageWriter =
-                        new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open));
+                        new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open), 1024);
                 }
                 PageCache.Instance.BeforeEvict += BeforePageCacheEvict;
             }
@@ -130,13 +130,6 @@ namespace BrightstarDB.Storage.Persistence
                     return page;
                 }
                
-                // See if the page is queued for writing
-                if (_backgroundPageWriter != null && _backgroundPageWriter.TryGetPage(pageId, out page))
-                {
-                    profiler.Incr("BackgroundWriter Queue Hit");
-                    return page;
-                }
-
                 // Not found in memory, so go to the disk
                 profiler.Incr("PageCache Miss");
                 using (profiler.Step("Load Page"))
@@ -179,14 +172,13 @@ namespace BrightstarDB.Storage.Persistence
                     _backgroundPageWriter.Flush();
                     lock (_restartLock)
                     {
-                        _backgroundPageWriter.Shutdown();
                         _backgroundPageWriter.Dispose();
                         PageCache.Instance.Clear(_partitionId);
                         UpdatePartitionId();
                         _readTxnId = _writeTxnId;
                         _writeTxnId++;
                         _backgroundPageWriter =
-                            new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open));
+                            new BackgroundPageWriter(_persistenceManager.GetOutputStream(_filePath, FileMode.Open), 1024);
                     }
                 }
                 else
@@ -259,7 +251,6 @@ namespace BrightstarDB.Storage.Persistence
 
             if (_backgroundPageWriter != null)
             {
-                _backgroundPageWriter.Shutdown();
                 _backgroundPageWriter.Dispose();
                 _backgroundPageWriter = null;
             }
@@ -269,10 +260,6 @@ namespace BrightstarDB.Storage.Persistence
         internal void OnPageModified(BinaryFilePage page)
         {
             _modifiedPages.AddOrUpdate(page.Id, true, (k, v) => true);
-            if (_backgroundPageWriter != null)
-            {
-                _backgroundPageWriter.QueueWrite(page, _writeTxnId);
-            }
         }
 
         public void MarkDirty(ulong commitId, ulong pageId)

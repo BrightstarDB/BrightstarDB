@@ -1,6 +1,6 @@
-.. _Building_BrightstarDB:
-
 :title: Building BrightstarDB!
+
+.. _Building_BrightstarDB:
 
 ######################
  Building BrightstarDB
@@ -16,11 +16,10 @@ This section will take you through the steps necessary to build BrightstarDB fro
 
 Before you can build BrightstarDB you need to install the following tools.
 
-    1.  **Visual Studio 2013** or **Mono 3.4.2 or later**
+    1.  **Visual Studio 2013/2015** or **Mono 3.2.4 or later**
     
         You can use the Professional or Ultimate editions to build everything.
         
-        *TBD: Check what can be built with VS 2013 Express*
         
     #.  **OPTIONAL: WiX**
         
@@ -185,6 +184,40 @@ important targets are:
         Run the PCL unit tests
         
 
+The ``build.proj`` script will not only compile the sources, but also package up the most commonly used binaries and
+place them in a new ``build`` directory. The current contents of the ``build`` directory (assuming you build everything)
+is:
+
+    build/sdk/NET40
+        The core .NET libraries for BrightstarDB
+        
+    build/sdk/pcl
+        The core Portable Class Library assemblies for BrighstarDB
+        
+    build/sdk/pcl/platforms
+        Individual platform-specific assemblies for supported PCL targets
+        
+    build/sdk/pcl_ARM
+        Windows Store portable class libraries targetting the ARM architecture
+
+    build/sdk/pcl_x86
+        Windows Store portable class libraries targetting the x86 architecture
+        
+    build/server
+        Standalone (self-hosted) BrightstarDB server. You can run this directly with ``BrightstarService`` under Windows
+        or ``mono BrightstarService.exe`` when using Mono. 
+        
+    build/tools/codegen
+        The standalone entity framework code generator.
+        
+    build/tools/polaris
+        The Polaris desktop client application (this is a WPF application and is not available on non-Windows platforms).
+        
+.. warning::
+    The default configuration file for the BrighstarDB server contains Windows-specific paths. Please edit this file
+    to change the log file configuration and BrightstarDB service connection string before attempting to run the server
+    on non-Windows system.
+    
 .. note::
     The ``build.proj`` script is provided to make it easy to locally build and test 
     BrightstarDB. It does not contain targets for building release packages. The

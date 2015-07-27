@@ -41,7 +41,7 @@ Self-Hosted
 ===========
 
 After building BrightstarDB from source, the server executable can be found in the directory
-``src/core/BrighstarDB.Server.Runner/bin/[Debug|Release]``. This directory contains everything
+``build/server``. This directory contains everything
 needed to run the server so you can simply copy the directory contents elsewhere and run
 from that location instead.
 

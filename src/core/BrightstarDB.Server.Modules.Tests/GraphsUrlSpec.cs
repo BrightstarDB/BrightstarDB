@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using BrightstarDB.Client;
 using Moq;
 using Nancy;
+using Nancy.ModelBinding.DefaultBodyDeserializers;
 using Nancy.Responses.Negotiation;
 using NUnit.Framework;
 using Nancy.Testing;
@@ -38,6 +39,27 @@ namespace BrightstarDB.Server.Modules.Tests
             var rows = xmlDoc.SparqlResultRows().ToList();
             Assert.That(rows[0].GetColumnValue("graphUri"), Is.EqualTo(new Uri("http://example.org/g1")));
             Assert.That(rows[1].GetColumnValue("graphUri"), Is.EqualTo(new Uri("http://example.org/g2")));
+        }
+
+        [Test]
+        public void TestListGraphsAsJson()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            IEnumerable<string> graphs = new[] { "http://example.org/g1", "http://example.org/g2" };
+            brightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true).Verifiable();
+            brightstar.Setup(s => s.ListNamedGraphs("foo")).Returns(graphs).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+            var response = app.Get("/foo/graphs", with => with.Accept("application/json"));
+
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+
+            var jobs = response.Body.DeserializeJson<List<string>>();
+            Assert.That(jobs, Is.Not.Null);
+            Assert.That(jobs.Count, Is.EqualTo(2));
+            Assert.That(jobs, Contains.Item("http://example.org/g1"));
+            Assert.That(jobs, Contains.Item("http://example.org/g2"));
+
         }
 
         [Test]

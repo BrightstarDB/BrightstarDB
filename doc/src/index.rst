@@ -20,6 +20,7 @@ BrightstarDB Documentation
 	Dynamic API <Dynamic_API>
     RDF Client API <RDF_Client_API>
     Admin API <Admin_API>
+	HTTP API <HTTP_API>
     Concurrency And Multi-threading <Concurrency>
 	Developing Portable Apps <Developing_Portable_Apps>
     Connecting to Other Stores <Other_Stores>
