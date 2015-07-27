@@ -73,30 +73,8 @@
             BuildPackage;
         </BuildDependsOn>
     
-        <BuildDependsOn Condition="$(BuildConsoleCodeGenPackage) == 'true'">
-            $(BuildDependsOn);
-            BuildConsoleCodeGenPackage;
-        </BuildDependsOn>
+	</PropertyGroup>
     
-        <BuildDependsOn Condition="$(BuildT4CodeGenPackage) == 'true'">
-            $(BuildDependsOn);
-            BuildT4CodeGenPackage;
-        </BuildDependsOn>
-    </PropertyGroup>
-    
-    <Import Project="..\..\..\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
-    
-    <!-- ensure the Version property is set appropriately -->
-    <Target Name="GetVersion">
-        <GetAssemblyIdentity AssemblyFiles="$(OutputPath)\BrightstarDB.dll">
-            <Output TaskParameter="Assemblies" ItemName="AssemblyInfo"/>
-        </GetAssemblyIdentity>
-        
-        <CreateProperty Condition="$(BrightstarVersion) == ''" Value="%(AssemblyInfo.Version)">
-            <Output TaskParameter="Value" PropertyName="BrightstarVersion" />
-        </CreateProperty>
-    </Target>
-
     <Target Name="CheckPrerequisites">
         <!-- Raise an error if we're unable to locate nuget.exe  -->
         <Error Condition="'$(DownloadNuGetExe)' != 'true' AND !Exists('$(NuGetExePath)')" Text="Unable to locate '$(NuGetExePath)'" />
@@ -128,76 +106,6 @@
         <Exec Command="$(BuildCommand)"
               LogStandardErrorAsError="true"
               Condition=" '$(OS)' == 'Windows_NT' " />
-    </Target>
-    
-    <Target Name="BuildConsoleCodeGenPackage" DependsOnTargets="CheckPrerequisites;GetVersion">
-        <MakeDir
-            Condition="!Exists('$(OutputPath)\NuGet\tools')"
-            Directories="$(OutputPath)\NuGet\tools"/>
-
-        <ItemGroup>
-            <ConsolePackageFiles Include="$(OutputPath)\*.*"/>
-        </ItemGroup>
-    
-        <Copy
-            SourceFiles="@(ConsolePackageFiles)"
-            DestinationFolder="$(OutputPath)\NuGet\tools"/>
-    
-        <ItemGroup>
-            <Tokens Include="Version">
-                <ReplacementValue>$(BrightstarVersion)</ReplacementValue>
-            </Tokens>
-        </ItemGroup>
-
-        <TemplateFile
-            Template="$(SrcDir)\core\BrightstarDB.CodeGeneration.Console\BrightstarDB.CodeGeneration.Console.nuspec.template"
-            OutputFileName="$(SrcDir)\core\BrightstarDB.CodeGeneration.Console\$(OutputPath)NuGet\BrightstarDB.CodeGeneration.Console.nuspec"
-            Tokens="@(Tokens)"/>
-    
-        <Exec
-            Command='$(NuGetCommand) pack "$(SrcDir)core\BrightstarDB.CodeGeneration.Console\$(OutputPath)NuGet\BrightstarDB.CodeGeneration.Console.nuspec"'
-            WorkingDirectory="$(SrcDir)core\BrightstarDB.CodeGeneration.Console\$(OutputPath)NuGet"/>
-    </Target>
-    
-    <Target Name="BuildT4CodeGenPackage" DependsOnTargets="CheckPrerequisites;GetVersion">
-        <MakeDir
-            Condition="!Exists('$(OutputPath)\NuGet\content')"
-            Directories="$(OutputPath)\NuGet\content"/>
-        <MakeDir
-            Condition="!Exists('$(OutputPath)\NuGet\tools')"
-            Directories="$(OutputPath)\NuGet\tools"/>
-
-        <ItemGroup>
-            <T4PackageContentFiles
-                Include="$(OutputPath)\*.tt"/>
-        </ItemGroup>
-        <ItemGroup>
-            <T4PackageToolFiles
-                Include="$(OutputPath)\*.*"
-                Exclude="$(OutputPath)\*.tt"/>
-        </ItemGroup>
-    
-        <Copy
-            SourceFiles="@(T4PackageContentFiles)"
-            DestinationFolder="$(OutputPath)\NuGet\content"/>
-        <Copy
-            SourceFiles="@(T4PackageToolFiles)"
-            DestinationFolder="$(OutputPath)\NuGet\tools"/>
-    
-        <ItemGroup>
-            <Tokens Include="Version">
-                <ReplacementValue>$(BrightstarVersion)</ReplacementValue>
-            </Tokens>
-        </ItemGroup>
-
-        <TemplateFile
-            Template="$(SrcDir)\core\BrightstarDB.CodeGeneration.T4\BrightstarDB.CodeGeneration.T4.nuspec.template"
-            OutputFileName="$(SrcDir)\core\BrightstarDB.CodeGeneration.T4\$(OutputPath)NuGet\BrightstarDB.CodeGeneration.T4.nuspec"
-            Tokens="@(Tokens)"/>
-    
-        <Exec
-            Command='$(NuGetCommand) pack "$(SrcDir)core\BrightstarDB.CodeGeneration.T4\$(OutputPath)NuGet\BrightstarDB.CodeGeneration.T4.nuspec"'
-            WorkingDirectory="$(SrcDir)core\BrightstarDB.CodeGeneration.T4\$(OutputPath)NuGet"/>
     </Target>
     
     <UsingTask TaskName="DownloadNuGet" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">

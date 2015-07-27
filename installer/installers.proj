@@ -112,7 +112,7 @@
 
     <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\SDK\NET40"/>
     <Copy SourceFiles="@(Net40Dep)" DestinationFolder="InstallerTmp\SDK\NET40"/>
-    <Copy SourceFiles="@(Docs)" DestinationFolder="InstallerTmp\Docs"/>
+    <Copy SourceFiles="@(Docs)" DestinationFolder="InstallerTmp\Docs" Condition="!$(NoDocs)"/>
     <Copy SourceFiles="@(VisualStudio)" DestinationFolder="InstallerTmp\VisualStudio"/>
     <Copy SourceFiles="@(Root)" DestinationFolder="InstallerTmp"/>
     <Copy SourceFiles="@(Service)" DestinationFolder="InstallerTmp\Service"/>
@@ -242,6 +242,7 @@
         <PortableAndroid Include="..\src\portable\BrightstarDB.Portable.Android\bin\$(Configuration)\BrightstarDB.Portable.Android.dll" />
         <PortableIOS Include="..\src\portable\BrightstarDB.Portable.iOS\bin\iPhone\$(Configuration)\BrightstarDB.Portable.iOS.dll"/>
         <PortableMonoTouch Include="..\src\portable\BrightstarDB.Portable.MonoTouch\bin\iPhone\$(Configuration)\BrightstarDB.Portable.MonoTouch.dll"/>
+		<CodeGenPackages Include="..\src\core\BrightstarDB.CodeGeneration.Console\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.Console.$(BuildNumber).nupkg;..\src\core\BrightstarDB.CodeGeneration.T4\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.T4.$(BuildNumber).nupkg" />
     </ItemGroup>
     
     <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
@@ -304,9 +305,10 @@
     <Copy SourceFiles="@(ForceReference)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\content"/>
     <Warning Text="The iOS platform assembly is not included in this build." Condition="!$(BuildIOS)"/>
 	
-    <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" />
-    <Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec" />
-	<Exec Command="nuget\NuGet pack $(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec" />
+    <Exec Command="..\nuget\NuGet pack nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" WorkingDirectory="$(OutputPath)" />
+    <Exec Command="..\nuget\NuGet pack nuget\BrightstarDB\BrightstarDB.nuspec" WorkingDirectory="$(OutputPath)" />
+	<Exec Command="..\nuget\NuGet pack nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec" WorkingDirectory="$(OutputPath)" />
+	<Copy SourceFiles="@(CodeGenPackages)" DestinationFolder="$(OutputPath)"/>
+	
   </Target>
-  
 </Project>
