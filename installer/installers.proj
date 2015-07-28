@@ -291,6 +291,9 @@
     -->
     <!-- But this is what VS2013 claims it wants for a project targetting profile 158... -->
     <Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10"/>
+    
+    <!-- Supported profile is now Profile344 -->
+    <Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+sl5+netcore45+wpa81+wp8" />
 
     <Copy SourceFiles="@(Readme)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs" />
     
