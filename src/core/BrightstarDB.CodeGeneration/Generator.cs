@@ -1,3 +1,4 @@
+using System.IO;
 using System.Reflection;
 
 namespace BrightstarDB.CodeGeneration
@@ -20,26 +21,6 @@ namespace BrightstarDB.CodeGeneration
     using VB = Microsoft.CodeAnalysis.VisualBasic;
     using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
-    public static class Constants
-    {
-        public const string AssemblyName = "BrightstarDB";
-        public const string EF = "BrightstarDB.EntityFramework.";
-        public const string Client = "BrightstarDB.Client.";
-        public const string EntityAttribute = EF + "EntityAttribute";
-        public const string IdentifierAttribute = EF + "IdentifierAttribute";
-        public const string IgnoreAttribute = EF + "IgnoreAttribute";
-        public const string InversePropertyAttribute = EF + "InversePropertyAttribute";
-        public const string BrightstarEntityContext = EF + "BrightstarEntityContext";
-        public const string BrightstarEntityObject = EF + "BrightstarEntityObject";
-        public const string ReflectionMappingProvider = EF + "ReflectionMappingProvider";
-        public const string EntityMappingStore = EF + "EntityMappingStore";
-        public const string IDataObjectStore = Client + "IDataObjectStore";
-        public const string IDataObject = Client + "IDataObject";
-        public const string BrightstarEntitySet = EF + "BrightstarEntitySet`1";
-        public const string IEntitySet = EF + "IEntitySet`1";
-        public const string PlainLiteral = "BrightstarDB.Rdf.PlainLiteral";
-        public const string BrightstarException = "BrightstarDB.BrightstarException";
-    }
     public static class Generator
     {
         private static readonly Regex interfaceNameTransformationExpression = new Regex("I(?<name>[A-Z].*)", RegexOptions.Compiled);
@@ -261,6 +242,16 @@ namespace BrightstarDB.CodeGeneration
                 .ToImmutableList();
         }
 
+        private static string GetBrightstarAssemblyLocation(Solution solution)
+        {
+            var brightstarRef = solution.Projects.SelectMany(x => x.MetadataReferences)
+                .FirstOrDefault(
+                    x =>
+                        x.Properties.Kind == MetadataImageKind.Assembly &&
+                        x.Display.EndsWith("BrightstarDB.dll", StringComparison.InvariantCultureIgnoreCase));
+            return brightstarRef?.Display;
+        }
+
         private static SyntaxNode GenerateContext(
             Language language,
             Solution solution,
@@ -271,12 +262,12 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, string> entityNameSelector)
         {
             Compilation compilation;
-            var brightstarAssembly = Assembly.ReflectionOnlyLoad(Constants.AssemblyName);
+            var brightstarAssemblyPath = GetBrightstarAssemblyLocation(solution);
             
             var references = new[]
             {
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(brightstarAssembly.Location)
+                MetadataReference.CreateFromFile(brightstarAssemblyPath)
             };
 
             // we create our own compilation with which to generate the entity context
@@ -383,17 +374,15 @@ namespace BrightstarDB.CodeGeneration
 
             protected IEnumerable<SyntaxNode> GetClassAttributes()
             {
-                var brightstarAssembly
-                    = Assembly.ReflectionOnlyLoad(Constants.AssemblyName);
                 // GENERATED CODE:
                 //
-                //     [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "[version]")]
+                //     [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "[version]")]
                 //     [System.Runtime.CompilerServices.CompilerGenerated)]
                 yield return syntaxGenerator
                     .Attribute(
                         "System.CodeDom.Compiler.GeneratedCode",
-                        syntaxGenerator.LiteralExpression("BrightstarDB"),
-                        syntaxGenerator.LiteralExpression(brightstarAssembly.GetName().Version.ToString()));
+                        syntaxGenerator.LiteralExpression("BrightstarDB.CodeGeneration"),
+                        syntaxGenerator.LiteralExpression(Assembly.GetAssembly(typeof(Generator)).GetName().Version.ToString()));
                 yield return syntaxGenerator
                     .Attribute(
                         "System.Runtime.CompilerServices.CompilerGenerated");

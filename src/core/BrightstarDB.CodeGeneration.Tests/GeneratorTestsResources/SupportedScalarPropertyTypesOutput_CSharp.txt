@@ -1,6 +1,6 @@
 ﻿namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class EntityContext : global::BrightstarDB.EntityFramework.BrightstarEntityContext
     {
@@ -59,7 +59,7 @@
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class SupportedScalarPropertyTypes : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes
     {

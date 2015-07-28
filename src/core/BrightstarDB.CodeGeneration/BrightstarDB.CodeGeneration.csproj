@@ -105,6 +105,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="Generator.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="LanguageExtensions.cs" />
@@ -130,11 +131,14 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
+    <AssemblyTitle>BrightstarDB Code Generation Assembly</AssemblyTitle>
+  </PropertyGroup>
   <Target Name="BeforeBuild">
+    <CallTarget Targets="GenerateAssemblyInfo" />
   </Target>
-  -->
   <Target Name="AfterBuild">
     <CallTarget Targets="Package" />
   </Target>
