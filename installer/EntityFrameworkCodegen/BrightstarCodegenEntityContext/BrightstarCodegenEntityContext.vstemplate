@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>Brightstar Codegen Entity Context</Name>
+    <Description>A project item for generating a strongly-typed EntityContext class and BrightstarDB persistence-aware classes using the BrightstarDB Roslyn code generator.</Description>
+    <Icon>BrightstarCodegenEntityContext.ico</Icon>
+    <TemplateID>289eae03-0382-4b26-9f72-42361074eadf</TemplateID>
+    <ProjectType>CSharp</ProjectType>
+    <RequiredFrameworkVersion>4.0</RequiredFrameworkVersion>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <DefaultName>EntityContext.tt</DefaultName>
+    <AppliesTo>CSharp | (CSharp + MultiTarget)</AppliesTo>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true">EntityContext.tt</ProjectItem>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>NuGet.VisualStudio.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>NuGet.VisualStudio.TemplateWizard</FullClassName>
+  </WizardExtension>
+  <WizardData>
+    <packages repository="extension"
+              repositoryId="EntityFrameworkCodegen.BrightstarDB.66d16fc6-15f8-465f-8ddf-c7ff7373afce">
+      <package id="BrightstarDB.CodeGeneration" version="1.11.0"/>
+      <package id="BrightstarDBLibs" version="1.11.0" />
+      <package id="dotNetRDF" version="1.0.9.3683"/>
+      <package id="HtmlAgilityPack" version="1.4.9" />
+      <package id="Newtonsoft.Json" version="7.0.1" />
+      <package id="VDS.Common" version="1.6.0" />
+    </packages>
+  </WizardData>
+</VSTemplate>

@@ -15,7 +15,7 @@
     <copyright>Copyright 2015 Khalil Ahmed, Graham Moore, and other contributors</copyright>
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
     <dependencies>
-        <dependency id="dotNetRDF" version="1.0.8" />
+        <dependency id="dotNetRDF" version="1.0.9" />
     </dependencies>
   </metadata>
 </package>

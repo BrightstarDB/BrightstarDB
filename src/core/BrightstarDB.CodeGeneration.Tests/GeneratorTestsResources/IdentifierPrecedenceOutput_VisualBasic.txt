@@ -1,6 +1,6 @@
 ﻿Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class EntityContext
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityContext
@@ -114,7 +114,7 @@
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class IdentifierPrecedence_IdentifierAttributeTrumpsAll
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -164,7 +164,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class IdentifierPrecedence_ClassIdTrumpsId
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -204,7 +204,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class IdentifierPrecedence_Base
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -234,7 +234,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class IdentifierPrecedence_IdTrumpsInheritedId
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -274,7 +274,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class IdentifierPrecedence_CanInheritId
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject

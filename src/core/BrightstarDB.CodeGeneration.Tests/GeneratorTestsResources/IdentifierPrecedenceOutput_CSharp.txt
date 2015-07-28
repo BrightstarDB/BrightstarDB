@@ -1,6 +1,6 @@
 ﻿namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class EntityContext : global::BrightstarDB.EntityFramework.BrightstarEntityContext
     {
@@ -127,7 +127,7 @@
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class IdentifierPrecedence_IdentifierAttributeTrumpsAll : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdentifierAttributeTrumpsAll
     {
@@ -185,7 +185,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class IdentifierPrecedence_ClassIdTrumpsId : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_ClassIdTrumpsId
     {
@@ -230,7 +230,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class IdentifierPrecedence_Base : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_Base
     {
@@ -262,7 +262,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class IdentifierPrecedence_IdTrumpsInheritedId : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_IdTrumpsInheritedId
     {
@@ -307,7 +307,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class IdentifierPrecedence_CanInheritId : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IIdentifierPrecedence_CanInheritId
     {

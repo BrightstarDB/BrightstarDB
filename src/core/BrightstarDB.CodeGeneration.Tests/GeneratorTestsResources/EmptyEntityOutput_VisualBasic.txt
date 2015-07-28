@@ -1,6 +1,6 @@
 ﻿Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class EntityContext
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityContext
@@ -54,7 +54,7 @@
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class MyEmptyEntity
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject

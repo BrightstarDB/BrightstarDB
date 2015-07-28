@@ -1,6 +1,6 @@
 ﻿Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class EntityContext
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityContext
@@ -144,7 +144,7 @@
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class Relationships_OneToOneA
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -174,7 +174,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class Relationships_OneToOneB
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -204,7 +204,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class Relationships_OneToManyA
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -238,7 +238,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class Relationships_OneToManyB
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -268,7 +268,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class Relationships_ManyToManyA
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -302,7 +302,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class Relationships_ManyToManyB
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
@@ -336,7 +336,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 End Namespace
 Namespace BrightstarDB.CodeGeneration.Tests
 
-    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")>
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
     Public Partial Class Relationships_Reflexive
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject

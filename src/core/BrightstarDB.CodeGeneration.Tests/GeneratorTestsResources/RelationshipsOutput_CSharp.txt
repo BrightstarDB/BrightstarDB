@@ -1,6 +1,6 @@
 ﻿namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class EntityContext : global::BrightstarDB.EntityFramework.BrightstarEntityContext
     {
@@ -161,7 +161,7 @@
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Relationships_OneToOneA : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneA
     {
@@ -193,7 +193,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Relationships_OneToOneB : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToOneB
     {
@@ -225,7 +225,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Relationships_OneToManyA : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyA
     {
@@ -262,7 +262,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Relationships_OneToManyB : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_OneToManyB
     {
@@ -294,7 +294,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Relationships_ManyToManyA : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyA
     {
@@ -331,7 +331,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Relationships_ManyToManyB : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_ManyToManyB
     {
@@ -368,7 +368,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 }
 namespace BrightstarDB.CodeGeneration.Tests
 {
-    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "$VERSION$")]
+    [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
     public partial class Relationships_Reflexive : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IRelationships_Reflexive
     {
