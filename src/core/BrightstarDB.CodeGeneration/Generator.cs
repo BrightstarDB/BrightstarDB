@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace BrightstarDB.CodeGeneration
 {
     using System;
@@ -20,8 +22,9 @@ namespace BrightstarDB.CodeGeneration
 
     public static class Constants
     {
+        public const string AssemblyName = "BrightstarDB";
         public const string EF = "BrightstarDB.EntityFramework.";
-        public const string Client = "BrightstarDB.Client";
+        public const string Client = "BrightstarDB.Client.";
         public const string EntityAttribute = EF + "EntityAttribute";
         public const string IdentifierAttribute = EF + "IdentifierAttribute";
         public const string IgnoreAttribute = EF + "IgnoreAttribute";
@@ -268,11 +271,12 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, string> entityNameSelector)
         {
             Compilation compilation;
+            var brightstarAssembly = Assembly.ReflectionOnlyLoad(Constants.AssemblyName);
             
             var references = new[]
             {
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(Type.GetType(Constants.BrightstarException).Assembly.Location)
+                MetadataReference.CreateFromFile(brightstarAssembly.Location)
             };
 
             // we create our own compilation with which to generate the entity context
@@ -379,6 +383,8 @@ namespace BrightstarDB.CodeGeneration
 
             protected IEnumerable<SyntaxNode> GetClassAttributes()
             {
+                var brightstarAssembly
+                    = Assembly.ReflectionOnlyLoad(Constants.AssemblyName);
                 // GENERATED CODE:
                 //
                 //     [System.CodeDom.Compiler.GeneratedCode("BrightstarDB", "[version]")]
@@ -387,7 +393,7 @@ namespace BrightstarDB.CodeGeneration
                     .Attribute(
                         "System.CodeDom.Compiler.GeneratedCode",
                         syntaxGenerator.LiteralExpression("BrightstarDB"),
-                        syntaxGenerator.LiteralExpression(Type.GetType(Constants.BrightstarException).Assembly.GetName().Version.ToString()));
+                        syntaxGenerator.LiteralExpression(brightstarAssembly.GetName().Version.ToString()));
                 yield return syntaxGenerator
                     .Attribute(
                         "System.Runtime.CompilerServices.CompilerGenerated");
