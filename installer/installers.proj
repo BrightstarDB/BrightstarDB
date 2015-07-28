@@ -242,7 +242,9 @@
         <PortableAndroid Include="..\src\portable\BrightstarDB.Portable.Android\bin\$(Configuration)\BrightstarDB.Portable.Android.dll" />
         <PortableIOS Include="..\src\portable\BrightstarDB.Portable.iOS\bin\iPhone\$(Configuration)\BrightstarDB.Portable.iOS.dll"/>
         <PortableMonoTouch Include="..\src\portable\BrightstarDB.Portable.MonoTouch\bin\iPhone\$(Configuration)\BrightstarDB.Portable.MonoTouch.dll"/>
-		<CodeGenPackages Include="..\src\core\BrightstarDB.CodeGeneration.Console\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.Console.$(BuildNumber).nupkg;..\src\core\BrightstarDB.CodeGeneration.T4\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.T4.$(BuildNumber).nupkg" />
+        <CodeGenPackage Include="..\src\core\BrightstarDB.CodeGeneration\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.$(BuildNumber).nupkg" />
+		<CodeGenConsolePackage Include="..\src\core\BrightstarDB.CodeGeneration.Console\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.Console.$(BuildNumber).nupkg"/>
+        <CodeGenT4Package Include="..\src\core\BrightstarDB.CodeGeneration.T4\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.T4.$(BuildNumber).nupkg" />
     </ItemGroup>
     
     <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
@@ -308,7 +310,8 @@
     <Exec Command="..\nuget\NuGet pack nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" WorkingDirectory="$(OutputPath)" />
     <Exec Command="..\nuget\NuGet pack nuget\BrightstarDB\BrightstarDB.nuspec" WorkingDirectory="$(OutputPath)" />
 	<Exec Command="..\nuget\NuGet pack nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec" WorkingDirectory="$(OutputPath)" />
-	<Copy SourceFiles="@(CodeGenPackages)" DestinationFolder="$(OutputPath)"/>
-	
+	<Copy SourceFiles="@(CodeGenPackages);@(CodeGenT4Package);@(CodeGenConsolePackage)" DestinationFolder="$(OutputPath)"/>
+	<Copy SourceFiles="@(CodeGenPackage)" DestinationFolder="EntityFrameworkCodegen\EntityFrameworkCodegen\Packages" />
+    <Copy SourceFiles="$(OutputPath)\BrightstarDBLibs.$(PackageBuildNumber).nupkg" DestinationFolder="EntityFrameworkCodegen\EntityFrameworkCodegen\Packages" />
   </Target>
 </Project>

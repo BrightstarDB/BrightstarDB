@@ -20,7 +20,7 @@
   <WizardData>
     <packages repository="extension"
               repositoryId="EntityFrameworkCodegen.BrightstarDB.66d16fc6-15f8-465f-8ddf-c7ff7373afce">
-      <package id="BrightstarDB.CodeGeneration.T4" version="1.11.0"/>
+      <package id="BrightstarDB.CodeGeneration" version="1.11.0"/>
       <package id="BrightstarDBLibs" version="1.11.0" />
     </packages>
   </WizardData>

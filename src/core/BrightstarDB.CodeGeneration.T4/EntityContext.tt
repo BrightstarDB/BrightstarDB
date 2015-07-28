@@ -90,27 +90,23 @@ private void HookAssemblyResolution()
 
     this.Debug("packages directory: {0}", packagesDirectory);
 
-    var packageDirectories = Directory.GetDirectories(packagesDirectory, "BrightstarDB.CodeGeneration.T4.*");
-
-    if (packageDirectories.Length == 0)
-    {
-        throw new InvalidOperationException("Could not find BrightstarDB.CodeGeneration.T4 package in packages directory (" + packagesDirectory + ").");
+    var codeGenAssemblies = Directory.GetDirectories(packagesDirectory, "BrightstarDB.CodeGeneration.*").SelectMany(x=>Directory.GetDirectories(x, "tools")).SelectMany(x=>Directory.GetFiles(x, "BrightstarDB.CodeGeneration.dll"));
+	AssemblyName latestAssemblyName = null;
+	string latestAssemblyPath = null;
+	foreach(var codeGenAssemblyPath in codeGenAssemblies){
+		AssemblyName assemblyName = AssemblyName.GetAssemblyName(codeGenAssemblyPath);
+		if (latestAssemblyName == null || latestAssemblyName.CompareTo(assemblyName) <= 0) {
+		  latestAssemblyName = assemblyName;
+		  latestAssemblyPath = codeGenAssemblyPath;
+		}
+	}
+	
+    if (latestAssemblyPath == null) {
+        throw new InvalidOperationException("Could not find BrightstarDB.CodeGeneration assembly in packages directory (" + packagesDirectory + ").");
     }
-    else if (packageDirectories.Length > 1)
-    {
-        throw new InvalidOperationException("More than 1 version of the BrightstarDB.CodeGeneration.T4 package was found in the packages directory (" + packagesDirectory + "). You must choose 1 version and remove the others.");
-    }
 
-    var packageDirectory = packageDirectories.First();
-    this.Debug("package directory: {0}", packageDirectory);
-
-    var assembliesDirectory = Path.Combine(packageDirectory, "tools");
+    var assembliesDirectory = Path.GetDirectoryName(latestAssemblyPath);
     this.Debug("assemblies directory: {0}", assembliesDirectory);
-
-    if (!Directory.Exists(assembliesDirectory))
-    {
-        throw new InvalidOperationException("Package directory " + packageDirectory + " was found but no 'tools' subdirectory was found within.");
-    }
 
     AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
     {

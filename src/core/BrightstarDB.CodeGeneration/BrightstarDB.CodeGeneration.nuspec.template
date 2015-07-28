@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>BrightstarDB.CodeGeneration.T4</id>
+    <id>BrightstarDB.CodeGeneration</id>
     <version>${VERSION}</version>
     <authors>Kal Ahmed</authors>
     <owners>Kal Ahmed</owners>
@@ -9,11 +9,11 @@
     <projectUrl>http://brightstardb.com/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
-        A T4-based code generator for BrightstarDB.
+        A Roslyn-based code generator for BrightstarDB.
     </description>
-    <tags>.NET codegen t4</tags>
+    <tags>.NET codegen roslyn</tags>
     <dependencies>
-        <dependency id="BrightstarDB.CodeGeneration" version="${VERSION}" />
+        <dependency id="BrightstarDBLibs" version="${VERSION}" />
     </dependencies>
   </metadata>
 </package>
