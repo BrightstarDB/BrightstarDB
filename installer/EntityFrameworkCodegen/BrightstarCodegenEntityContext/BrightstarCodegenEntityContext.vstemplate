@@ -9,6 +9,7 @@
     <RequiredFrameworkVersion>4.0</RequiredFrameworkVersion>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <DefaultName>EntityContext.tt</DefaultName>
+    <AppliesTo>CSharp | (CSharp + MultiTarget)</AppliesTo>
   </TemplateData>
   <TemplateContent>
     <ProjectItem ReplaceParameters="true">EntityContext.tt</ProjectItem>
@@ -22,6 +23,10 @@
               repositoryId="EntityFrameworkCodegen.BrightstarDB.66d16fc6-15f8-465f-8ddf-c7ff7373afce">
       <package id="BrightstarDB.CodeGeneration" version="1.11.0"/>
       <package id="BrightstarDBLibs" version="1.11.0" />
+      <package id="dotNetRDF" version="1.0.9.3683"/>
+      <package id="HtmlAgilityPack" version="1.4.9" />
+      <package id="Newtonsoft.Json" version="7.0.1" />
+      <package id="VDS.Common" version="1.6.0" />
     </packages>
   </WizardData>
 </VSTemplate>

@@ -15,6 +15,9 @@ var language = "CSharp";
 // or, you could just set it manually here
 var contextNamespace = this.Host.ResolveParameterValue("directiveId", "namespaceDirectiveProcessor", "namespaceHint") ?? "Default.Namespace";
 
+// The name of the .tt file determines the name of the generated context class
+var contextClassName = System.IO.Path.GetFileNameWithoutExtension(this.Host.TemplateFile);
+
 // Ensure that the solution and all projects in it are saved to disk as the generator will read the files from disk
 var solution = this.DTE.Solution;
 foreach(Project proj in solution.Projects) {
@@ -31,7 +34,7 @@ this.SetFileExtensionForLanguage(language);
 this.HookAssemblyResolution();
 var generator = Type.GetType("BrightstarDB.CodeGeneration.Generator, BrightstarDB.CodeGeneration");
 var generateMethod = generator.GetMethod("Generate");
-var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, contextNamespace, "EntityContext", null, null, null });
+var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, contextNamespace, contextClassName, null, null, null });
 
 this.WriteLine(result);
 #>

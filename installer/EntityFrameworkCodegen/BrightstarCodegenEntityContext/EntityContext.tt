@@ -5,6 +5,7 @@
 <#@ import namespace="System.IO" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Reflection" #>
+<#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="EnvDTE" #>
 <#
 // set this to either "CSharp" or "VisualBasic"
@@ -14,13 +15,26 @@ var language = "CSharp";
 // or, you could just set it manually here
 var contextNamespace = this.Host.ResolveParameterValue("directiveId", "namespaceDirectiveProcessor", "namespaceHint") ?? "Default.Namespace";
 
+// The name of the .tt file determines the name of the generated context class
+var contextClassName = System.IO.Path.GetFileNameWithoutExtension(this.Host.TemplateFile);
+
+// Ensure that the solution and all projects in it are saved to disk as the generator will read the files from disk
+var solution = this.DTE.Solution;
+foreach(Project proj in solution.Projects) {
+  if (!proj.Saved){
+	proj.Save();
+  }
+}
 var solutionPath = this.DTE.Solution.FileName;
+if (!this.DTE.Solution.Saved) { 
+  this.DTE.Solution.SaveAs(solutionPath);
+}
 
 this.SetFileExtensionForLanguage(language);
 this.HookAssemblyResolution();
 var generator = Type.GetType("BrightstarDB.CodeGeneration.Generator, BrightstarDB.CodeGeneration");
 var generateMethod = generator.GetMethod("Generate");
-var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, contextNamespace, "EntityContext", null, null, null });
+var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, contextNamespace, contextClassName, null, null, null });
 
 this.WriteLine(result);
 #>
@@ -57,6 +71,19 @@ private void SetFileExtensionForLanguage(string language)
     }
 }
 
+private string GetLatestAssemblyPath(IEnumerable<string> assemblyPaths){
+	AssemblyName latestAssemblyName = null;
+	string latestAssemblyPath = null;
+	foreach(var assemblyPath in assemblyPaths){
+		AssemblyName assemblyName = AssemblyName.GetAssemblyName(assemblyPath);
+		if (latestAssemblyName == null || latestAssemblyName.Version.CompareTo(assemblyName.Version) <= 0) {
+		  latestAssemblyName = assemblyName;
+		  latestAssemblyPath = assemblyPath;
+		}
+	}
+	return latestAssemblyPath;
+}
+
 private void HookAssemblyResolution()
 {
     var templateDirectory = Path.GetDirectoryName(this.Host.TemplateFile);
@@ -88,51 +115,24 @@ private void HookAssemblyResolution()
         throw new InvalidOperationException("Could not find packages directory relative to the template's directory (" + templateDirectory + ").");
     }
 
-    this.Debug("packages directory: {0}", packagesDirectory);
-
     var codeGenAssemblies = Directory.GetDirectories(packagesDirectory, "BrightstarDB.CodeGeneration.*").SelectMany(x=>Directory.GetDirectories(x, "tools")).SelectMany(x=>Directory.GetFiles(x, "BrightstarDB.CodeGeneration.dll"));
-	AssemblyName latestAssemblyName = null;
-	string latestAssemblyPath = null;
-	foreach(var codeGenAssemblyPath in codeGenAssemblies){
-		AssemblyName assemblyName = AssemblyName.GetAssemblyName(codeGenAssemblyPath);
-		if (latestAssemblyName == null || latestAssemblyName.CompareTo(assemblyName) <= 0) {
-		  latestAssemblyName = assemblyName;
-		  latestAssemblyPath = codeGenAssemblyPath;
-		}
-	}
-	if (latestAssemblyPath == null) {
+	var latestCodeGenAssemblyPath = this.GetLatestAssemblyPath(codeGenAssemblies);
+    if (latestCodeGenAssemblyPath == null) {
         throw new InvalidOperationException("Could not find BrightstarDB.CodeGeneration assembly in packages directory (" + packagesDirectory + ").");
     }
 
-    var assembliesDirectory = Path.GetDirectoryName(latestAssemblyPath);
-    this.Debug("assemblies directory: {0}", assembliesDirectory);
+	var searchPaths = new string[] {
+		Path.GetDirectoryName(latestCodeGenAssemblyPath)
+	};
 
     AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
     {
-        this.Debug("resolve: {0}", e.Name);
-
-        var matches = Directory.GetFiles(assembliesDirectory, e.Name + ".dll", SearchOption.TopDirectoryOnly);
-
-        if (matches.Length == 0)
+        var match = searchPaths.SelectMany( p => Directory.GetFiles(p, e.Name + ".dll", SearchOption.TopDirectoryOnly)).FirstOrDefault();
+        if (match == null)
         {
-            this.Debug("Failed to find assembly in assemblies directory ({0}) named '{1}'.", assembliesDirectory, e.Name);
             return null;
         }
-        else if (matches.Length > 1)
-        {
-            this.Debug("Found more than one potential match for '{0}' in assemblies directory ({0}). Bailing.", e.Name, assembliesDirectory);
-            return null;
-        }
-
-        var match = matches.First();
-        this.Debug("match: {0}", match);
-
         return Assembly.LoadFrom(match);
     };
-}
-
-private void Debug(string format, params object[] args)
-{
-    //this.WriteLine("// " + string.Format(format, args));
 }
 #>

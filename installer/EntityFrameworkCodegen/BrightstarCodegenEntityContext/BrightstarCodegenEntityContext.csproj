@@ -107,4 +107,8 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="BeforeBuild">
+    <Copy SourceFiles="../../../src/core/BrightstarDB.CodeGeneration.T4/EntityContext.tt"
+          DestinationFiles="EntityContext.tt" />
+  </Target>
 </Project>

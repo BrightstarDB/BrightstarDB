@@ -14,8 +14,12 @@
   </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="EntityItemTemplate" d:TargetPath="|EntityItemTemplate;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="BrightstarCodegenEntityContext" d:TargetPath="|BrightstarCodegenEntityContext;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
     <Asset Type="BrightstarDBLibs.1.11.0.0.nupkg" d:Source="File" Path="Packages\BrightstarDBLibs.1.11.0.0.nupkg" d:VsixSubPath="Packages" />
     <Asset Type="BrightstarDB.CodeGeneration.1.11.0.0.nupkg" d:Source="File" Path="Packages\BrightstarDB.CodeGeneration.1.11.0.0.nupkg" d:VsixSubPath="Packages" />
-    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="BrightstarCodegenEntityContext" d:TargetPath="|BrightstarCodegenEntityContext;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+    <Asset Type="dotNetRDF.1.0.9.3683.nupkg" d:Source="File" Path="Packages\dotNetRDF.1.0.9.3683.nupkg" d:VsixSubPath="Packages" />
+    <Asset Type="HTMLAgilityPack.1.4.9.nupkg" d:Source="File" Path="Packages\HtmlAgilityPack.1.4.9.nupkg" d:VsixSubPath="Packages" />
+    <Asset Type="Newtonsoft.Json.7.0.1.nupkg" d:Source="File" Path="Packages\Newtonsoft.Json.7.0.1.nupkg" d:VsixSubPath="Packages" />
+    <Asset Type="VDS.Common.1.6.0.nupkg" d:Source="File" Path="Packages\VDS.Common.1.6.0.nupkg" d:VsixSubPath="Packages" />
   </Assets>
 </PackageManifest>
