@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Linq.Expressions;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
+#else
+using System.Collections.Specialized;
 #endif
 using Remotion.Linq;
 using Remotion.Linq.Parsing.Structure;
@@ -70,7 +71,7 @@ namespace BrightstarDB.EntityFramework
             
         }
 
-        #region Implementation of IEntityCollection<T>
+#region Implementation of IEntityCollection<T>
         /// <summary>
         /// Updates this collection to only contain the specified items
         /// </summary>
@@ -112,8 +113,8 @@ namespace BrightstarDB.EntityFramework
         }
 
 
-        #endregion
-        #region Implementation of IEnumerable
+#endregion
+#region Implementation of IEnumerable
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
@@ -140,9 +141,9 @@ namespace BrightstarDB.EntityFramework
             return GetEnumerator();
         }
 
-        #endregion
+#endregion
 
-        #region Implementation of ICollection<T>
+#region Implementation of ICollection<T>
 
         /// <summary>
         /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
@@ -257,7 +258,7 @@ namespace BrightstarDB.EntityFramework
             get { return false; }
         }
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Adds all items in the enumeration to this collection
@@ -269,7 +270,7 @@ namespace BrightstarDB.EntityFramework
             foreach(var item in items) Add(item);
         }
 
-        #region Implementation of IEntityCollection
+#region Implementation of IEntityCollection
 
         /// <summary>
         /// Loads the entity collection from the store
@@ -319,7 +320,7 @@ namespace BrightstarDB.EntityFramework
             }
         }
 
-        #endregion
+#endregion
 
         private void AssertLoaded()
         {
@@ -341,7 +342,7 @@ namespace BrightstarDB.EntityFramework
             return beo;
         }
 
-        #region Implementation of IBrightstarEntityCollection
+#region Implementation of IBrightstarEntityCollection
         private List<BrightstarEntityObject> _loadedObjects;
 
         /// <summary>
@@ -435,9 +436,9 @@ namespace BrightstarDB.EntityFramework
         /// Returns a flag indicating if the object collection is currently loaded
         /// </summary>
         public bool IsLoaded { get { return _loadedObjects != null; } }
-        #endregion
+#endregion
 
-        #region Implementation of INotifyCollectionChanged
+#region Implementation of INotifyCollectionChanged
 
         /// <summary>
         /// Occurs when items are added to or removed from the collection or the collection is reset
@@ -451,7 +452,7 @@ namespace BrightstarDB.EntityFramework
                 CollectionChanged(this, e);
             }
         }
-        #endregion
+#endregion
     }
 
 }
