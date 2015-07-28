@@ -67,6 +67,8 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
     - NEW: The Build targets in build.proj now also package up the most commonly used binaries into a build/ directory. For more information
         please refer to :ref:`Building_BrightstarDB`. (#228)
 	  
+    - NEW: Added support for Windows 8.1 Universal applications (both Windows 8.1 and Windows Phone 8.1 apps are supported). (#230)
+    
 
 ****************************
  BrightstarDB 1.10.1

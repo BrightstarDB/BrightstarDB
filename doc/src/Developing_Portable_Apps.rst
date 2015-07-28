@@ -14,13 +14,15 @@ Layer <Data_Object_Layer>` and the :ref:`Entity Framework <Entity_Framework>` as
 Supported Platforms
 -------------------
 
-The BrightstarDB Portable Class Library supports the following platforms:
+The BrightstarDB Portable Class Library supports PCL Profile 344. That includes the following platforms:
   - .NET 4.5
   - Silverlight 5
-  - Windows Phone 8
-  - Windows Store Apps
+  - Windows 8
+  - Windows Phone 8.1
+  - Windows Phone Silverlight 8
   - Android
   - iOS
+  - MonoTouch
   
 --------------------------------------  
 Including BrightstarDB In Your Project
@@ -52,11 +54,11 @@ platform-specific extension libraries. You should then include the
 BrightstarDB.Portable.DLL and one of the following extension DLLs:
 
   - BrightstarDB.Portable.Desktop.DLL for .NET 4.5 applications
-  - BrightstarDB.Portable.Phone.DLL for Windows Phone 8 applications
   - BrightstarDB.Portable.Silverlight.DLL for Silverlight 5 applications
-  - BrightstarDB.Portable.Store.DLL for Windows store applications.
   - BrightstarDB.Portable.Android for Android applications.
   - BrightstarDB.Portable.iOS for iOS applications.
+  - BrightstarDB.Portable.MonoTouch for MonoTouch applications.
+  - BrightstarDB.Portable.Universal81 for Windows 8/Windows Phone 8.1 applications
   
 Alternatively you can include just the relevant project files in your application
 solution and build them as part of your application build.
@@ -103,10 +105,10 @@ storage for the application (the store returned by
 a store location will be resolved relative to this isolated storage root. It is
 not possible to create or access a BrightstarDB store under any other location.
 
-Windows Store
-=============
+Windows Universal App
+=====================
 
-For Windows Store applications paths are resolved relative to the user-scoped local
+For Windows Store / WP8.1 applications paths are resolved relative to the user-scoped local
 storage folder for the application (the folder returned by 
 `ApplicationData.Current.LocalFolder`). It is not possible to create or access a
 BrightstarDB store under any other location.
@@ -148,9 +150,7 @@ trying this out in a test Android application and giving us some feedback.
 iOS
 ===
 
-iOS support is in the early stages of development and should be considered experimental.
-
-Please note the following when using BrightstarDB from within an Android application.
+Please note the following when using BrightstarDB from within an iOS application.
 
     #. The code has been tested on iOS simulators and on an iPad Air running iOS 8.1.
        
