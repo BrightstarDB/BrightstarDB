@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Portable.Deskt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Portable.Universal81", "BrightstarDB.Portable.Universal81\BrightstarDB.Portable.Universal81.csproj", "{3981146A-3729-4D12-9E05-5AF3F5579EC2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Portable.Universal81.Tests", "Test\BrightstarDB.Portable.Universal81.Tests\BrightstarDB.Portable.Universal81.Tests.csproj", "{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -226,6 +228,36 @@ Global
 		{3981146A-3729-4D12-9E05-5AF3F5579EC2}.Release|x64.Build.0 = Release|Any CPU
 		{3981146A-3729-4D12-9E05-5AF3F5579EC2}.Release|x86.ActiveCfg = Release|Any CPU
 		{3981146A-3729-4D12-9E05-5AF3F5579EC2}.Release|x86.Build.0 = Release|Any CPU
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|ARM.ActiveCfg = Debug|ARM
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|ARM.Build.0 = Debug|ARM
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|ARM.Deploy.0 = Debug|ARM
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|Mixed Platforms.Deploy.0 = Debug|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|x64.ActiveCfg = Debug|x64
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|x64.Build.0 = Debug|x64
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|x64.Deploy.0 = Debug|x64
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|x86.ActiveCfg = Debug|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|x86.Build.0 = Debug|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Debug|x86.Deploy.0 = Debug|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|ARM.ActiveCfg = Release|ARM
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|ARM.Build.0 = Release|ARM
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|ARM.Deploy.0 = Release|ARM
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|Mixed Platforms.Build.0 = Release|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|Mixed Platforms.Deploy.0 = Release|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|x64.ActiveCfg = Release|x64
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|x64.Build.0 = Release|x64
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|x64.Deploy.0 = Release|x64
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|x86.ActiveCfg = Release|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|x86.Build.0 = Release|x86
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -240,5 +272,6 @@ Global
 		{49B52EA0-94EF-4A8A-8955-686A80B7CD12} = {1A9C795E-6E5A-4585-BED5-5920948E2807}
 		{886B9EB4-FEF1-4AB5-A3FC-CA2B11CC8D95} = {1A9C795E-6E5A-4585-BED5-5920948E2807}
 		{3981146A-3729-4D12-9E05-5AF3F5579EC2} = {0FD14156-1EC2-4025-AECE-F1CADEDBA18D}
+		{DFED83D8-EF9B-4741-8C38-8A8CBD09DC38} = {1A9C795E-6E5A-4585-BED5-5920948E2807}
 	EndGlobalSection
 EndGlobal
