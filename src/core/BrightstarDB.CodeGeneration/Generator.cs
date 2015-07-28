@@ -8,9 +8,6 @@ namespace BrightstarDB.CodeGeneration
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
-    using BrightstarDB.Client;
-    using BrightstarDB.EntityFramework;
-    using BrightstarDB.Rdf;
     using Humanizer;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -21,6 +18,25 @@ namespace BrightstarDB.CodeGeneration
     using VB = Microsoft.CodeAnalysis.VisualBasic;
     using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
+    public static class Constants
+    {
+        public const string EF = "BrightstarDB.EntityFramework.";
+        public const string Client = "BrightstarDB.Client";
+        public const string EntityAttribute = EF + "EntityAttribute";
+        public const string IdentifierAttribute = EF + "IdentifierAttribute";
+        public const string IgnoreAttribute = EF + "IgnoreAttribute";
+        public const string InversePropertyAttribute = EF + "InversePropertyAttribute";
+        public const string BrightstarEntityContext = EF + "BrightstarEntityContext";
+        public const string BrightstarEntityObject = EF + "BrightstarEntityObject";
+        public const string ReflectionMappingProvider = EF + "ReflectionMappingProvider";
+        public const string EntityMappingStore = EF + "EntityMappingStore";
+        public const string IDataObjectStore = Client + "IDataObjectStore";
+        public const string IDataObject = Client + "IDataObject";
+        public const string BrightstarEntitySet = EF + "BrightstarEntitySet`1";
+        public const string IEntitySet = EF + "IEntitySet`1";
+        public const string PlainLiteral = "BrightstarDB.Rdf.PlainLiteral";
+        public const string BrightstarException = "BrightstarDB.BrightstarException";
+    }
     public static class Generator
     {
         private static readonly Regex interfaceNameTransformationExpression = new Regex("I(?<name>[A-Z].*)", RegexOptions.Compiled);
@@ -154,7 +170,7 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, bool> interfacePredicate = null)
         {
             entityNamespaceSelector = entityNamespaceSelector ?? (x => x.ContainingNamespace.ToDisplayString());
-            interfacePredicate = interfacePredicate ?? (x => x.GetAttributes().Any(y => y.AttributeClass.ToString() == typeof(EntityAttribute).FullName));
+            interfacePredicate = interfacePredicate ?? (x => x.GetAttributes().Any(y => y.AttributeClass.ToString() == Constants.EntityAttribute));
             entityNameSelector = entityNameSelector ??
                 (x =>
                 {
@@ -252,10 +268,11 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, string> entityNameSelector)
         {
             Compilation compilation;
+            
             var references = new[]
             {
                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location)
+                MetadataReference.CreateFromFile(Type.GetType(Constants.BrightstarException).Assembly.Location)
             };
 
             // we create our own compilation with which to generate the entity context
@@ -370,7 +387,7 @@ namespace BrightstarDB.CodeGeneration
                     .Attribute(
                         "System.CodeDom.Compiler.GeneratedCode",
                         syntaxGenerator.LiteralExpression("BrightstarDB"),
-                        syntaxGenerator.LiteralExpression(typeof(BrightstarException).Assembly.GetName().Version.ToString()));
+                        syntaxGenerator.LiteralExpression(Type.GetType(Constants.BrightstarException).Assembly.GetName().Version.ToString()));
                 yield return syntaxGenerator
                     .Attribute(
                         "System.Runtime.CompilerServices.CompilerGenerated");
@@ -443,7 +460,7 @@ namespace BrightstarDB.CodeGeneration
             private SyntaxNode GetClassDeclaration()
             {
                 var baseType = compilation
-                    .GetTypeByMetadataName(typeof(BrightstarEntityContext).FullName);
+                    .GetTypeByMetadataName(Constants.BrightstarEntityContext);
                 
                 if (baseType == null)
                 {
@@ -477,9 +494,9 @@ namespace BrightstarDB.CodeGeneration
 
             private IEnumerable<SyntaxNode> GetConstructors()
             {
-                var reflectionMappingProviderType = compilation.GetTypeByMetadataName(typeof(ReflectionMappingProvider).FullName);
-                var entityMappingStoreType = compilation.GetTypeByMetadataName(typeof(EntityMappingStore).FullName);
-                var iDataObjectStoreType = compilation.GetTypeByMetadataName(typeof(IDataObjectStore).FullName);
+                var reflectionMappingProviderType = compilation.GetTypeByMetadataName(Constants.ReflectionMappingProvider);
+                var entityMappingStoreType = compilation.GetTypeByMetadataName(Constants.EntityMappingStore);
+                var iDataObjectStoreType = compilation.GetTypeByMetadataName(Constants.IDataObjectStore);
                 var iEnumerableTType = compilation.GetTypeByMetadataName(typeof(IEnumerable<>).FullName);
                 var nullableTType = compilation.GetTypeByMetadataName(typeof(Nullable<>).FullName);
                 var stringType = compilation.GetTypeByMetadataName(typeof(string).FullName);
@@ -657,7 +674,7 @@ namespace BrightstarDB.CodeGeneration
 
             private SyntaxNode GetInitializeContextMethod()
             {
-                var brightstarEntitySetType = compilation.GetTypeByMetadataName(typeof(BrightstarEntitySet<>).FullName);
+                var brightstarEntitySetType = compilation.GetTypeByMetadataName(Constants.BrightstarEntitySet);
 
                 // GENERATED CODE:
                 //
@@ -682,7 +699,7 @@ namespace BrightstarDB.CodeGeneration
 
             private IEnumerable<SyntaxNode> GetEntityProperties()
             {
-                var iEntitySetType = compilation.GetTypeByMetadataName(typeof(IEntitySet<>).FullName);
+                var iEntitySetType = compilation.GetTypeByMetadataName(Constants.IEntitySet);
                 
                 // GENERATED CODE:
                 //
@@ -724,7 +741,7 @@ namespace BrightstarDB.CodeGeneration
             private SyntaxNode GetEntitySetMethod()
             {
                 var typeType = compilation.GetTypeByMetadataName(typeof(Type).FullName);
-                var iEntitySetType = compilation.GetTypeByMetadataName(typeof(IEntitySet<>).FullName);
+                var iEntitySetType = compilation.GetTypeByMetadataName(Constants.IEntitySet);
                 var invalidOperationExceptionType = compilation.GetTypeByMetadataName(typeof(InvalidOperationException).FullName);
 
                 // GENERATED CODE:
@@ -809,27 +826,27 @@ namespace BrightstarDB.CodeGeneration
 
                 var basicTypes = new[]
                 {
-                    typeof(bool),
-                    typeof(short),
-                    typeof(int),
-                    typeof(long),
-                    typeof(ushort),
-                    typeof(uint),
-                    typeof(ulong),
-                    typeof(string),
-                    typeof(decimal),
-                    typeof(double),
-                    typeof(float),
-                    typeof(byte),
-                    typeof(char),
-                    typeof(sbyte),
-                    typeof(DateTime),
-                    typeof(Guid),
-                    typeof(Uri),
-                    typeof(PlainLiteral)
+                    typeof(bool).FullName,
+                    typeof(short).FullName,
+                    typeof(int).FullName,
+                    typeof(long).FullName,
+                    typeof(ushort).FullName,
+                    typeof(uint).FullName,
+                    typeof(ulong).FullName,
+                    typeof(string).FullName,
+                    typeof(decimal).FullName,
+                    typeof(double).FullName,
+                    typeof(float).FullName,
+                    typeof(byte).FullName,
+                    typeof(char).FullName,
+                    typeof(sbyte).FullName,
+                    typeof(DateTime).FullName,
+                    typeof(Guid).FullName,
+                    typeof(Uri).FullName,
+                    Constants.PlainLiteral,
                 };
 
-                this.basicTypes = new HashSet<ITypeSymbol>(basicTypes.Select(x => compilation.GetTypeByMetadataName(x.FullName)));
+                this.basicTypes = new HashSet<ITypeSymbol>(basicTypes.Select(x => compilation.GetTypeByMetadataName(x)));
             }
 
             public override SyntaxNode Generate()
@@ -850,7 +867,7 @@ namespace BrightstarDB.CodeGeneration
             private SyntaxNode GetClassDeclaration()
             {
                 var baseType = compilation
-                    .GetTypeByMetadataName(typeof(BrightstarEntityObject).FullName);
+                    .GetTypeByMetadataName(Constants.BrightstarEntityObject);
 
                 if (baseType == null)
                 {
@@ -882,8 +899,8 @@ namespace BrightstarDB.CodeGeneration
 
             private IEnumerable<SyntaxNode> GetConstructors()
             {
-                var brightstarEntityContextType = compilation.GetTypeByMetadataName(typeof(BrightstarEntityContext).FullName);
-                var iDataObjectType = compilation.GetTypeByMetadataName(typeof(IDataObject).FullName);
+                var brightstarEntityContextType = compilation.GetTypeByMetadataName(Constants.BrightstarEntityContext);
+                var iDataObjectType = compilation.GetTypeByMetadataName(Constants.IDataObject);
 
                 // GENERATED CODE:
                 //
@@ -1185,7 +1202,7 @@ namespace BrightstarDB.CodeGeneration
 
             private IPropertySymbol FindIdentityProperty()
             {
-                var identifierAttributeType = compilation.GetTypeByMetadataName(typeof(IdentifierAttribute).FullName);
+                var identifierAttributeType = compilation.GetTypeByMetadataName(Constants.IdentifierAttribute);
                 var potentialIdentifierProperties =
                     from property in GetMembersRecursive(this.interfaceSymbol).OfType<IPropertySymbol>()
                     let isDefinedInOriginalInterface = property.ContainingSymbol == this.interfaceSymbol
@@ -1212,7 +1229,7 @@ namespace BrightstarDB.CodeGeneration
             private void ValidateIdentityProperty(IPropertySymbol identityProperty)
             {
                 var stringType = compilation.GetTypeByMetadataName(typeof(string).FullName);
-                var identifierAttributeType = compilation.GetTypeByMetadataName(typeof(IdentifierAttribute).FullName);
+                var identifierAttributeType = compilation.GetTypeByMetadataName(Constants.IdentifierAttribute);
 
                 if (identityProperty.Type != stringType)
                 {
@@ -1238,7 +1255,7 @@ namespace BrightstarDB.CodeGeneration
 
             private bool IsIgnoredProperty(IPropertySymbol property)
             {
-                var ignoreAttributeType = compilation.GetTypeByMetadataName(typeof(IgnoreAttribute).FullName);
+                var ignoreAttributeType = compilation.GetTypeByMetadataName(Constants.IgnoreAttribute);
                 return property
                     .GetAttributes()
                     .Any(x => x.AttributeClass == ignoreAttributeType);
@@ -1256,7 +1273,7 @@ namespace BrightstarDB.CodeGeneration
                             property.Type.ToDisplayString(this.ErrorMessageDisplayFormat)));
                 }
 
-                var inversePropertyAttributeType = compilation.GetTypeByMetadataName(typeof(InversePropertyAttribute).FullName);
+                var inversePropertyAttributeType = compilation.GetTypeByMetadataName(Constants.InversePropertyAttribute);
                 var inversePropertyAttribute = property.GetAttributes().SingleOrDefault(x => x.AttributeClass == inversePropertyAttributeType);
 
                 if (inversePropertyAttribute != null)

@@ -115,10 +115,6 @@
       <Project>{5ef2500f-67e0-421e-a4a6-ff4675a84d1d}</Project>
       <Name>BrightstarDB.CodeGeneration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\BrightstarDB\BrightstarDB.csproj">
-      <Project>{121a81f3-eb1c-4228-81fb-0d7505a438fb}</Project>
-      <Name>BrightstarDB</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
