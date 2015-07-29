@@ -52,7 +52,7 @@
         <!-- Not currently included in the build output -->
     </Target>
     
-    <Target Name="BuildPortable" DependsOnTargets="CompilePortable">
+    <Target Name="BuildPortable" DependsOnTargets="CompilePortable" Condition="!$(NoPortable)">
         <ItemGroup>
             <PortableSDK Include="src\portable\BrightstarDB.Portable\bin\$(Configuration)\*.dll"/>
             <AndroidLib Include="src\portable\BrightstarDB.Portable.Android\bin\$(Configuration)\BrightstarDB.Portable.Android.dll" />
@@ -72,7 +72,7 @@
         <Copy SourceFiles="@(Storex86Lib)" DestinationFolder="build\sdk\pcl_x86"/>
     </Target>
     
-    <Target Name="BuildTools" DependsOnTargets="CompileTools">
+    <Target Name="BuildTools" DependsOnTargets="CompileTools" Condition=" '$(OS)' != 'Unix' ">
         <ItemGroup>
             <PolarisBinaries Include="src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\*.dll;src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\*.exe;src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\*.exe.config"
             Exclude="**\*.vshost.exe*" />
