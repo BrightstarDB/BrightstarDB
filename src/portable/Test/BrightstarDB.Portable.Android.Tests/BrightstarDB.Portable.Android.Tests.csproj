@@ -11,13 +11,12 @@
     <RootNamespace>BrightstarDB.Portable.Android.Tests</RootNamespace>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidUseLatestPlatformSdk>
-    </AndroidUseLatestPlatformSdk>
+    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <AssemblyName>BrightstarDB.Portable.Android.Tests</AssemblyName>
-    <TargetFrameworkVersion>v2.3</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <AndroidSupportedAbis>armeabi,armeabi-v7a,x86</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions />
@@ -35,6 +34,17 @@
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
     <ConsolePause>false</ConsolePause>
+    <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
+    <AndroidLinkSkip />
+    <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+    <BundleAssemblies>False</BundleAssemblies>
+    <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+    <AndroidSupportedAbis>armeabi,armeabi-v7a,x86</AndroidSupportedAbis>
+    <AndroidStoreUncompressedFileExtensions />
+    <MandroidI18n />
+    <Debugger>Xamarin</Debugger>
+    <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
+    <DevInstrumentationEnabled>True</DevInstrumentationEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -61,6 +71,22 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrightstarDBForceReference.cs" />
+    <Compile Include="EntityFramework\Entity.cs" />
+    <Compile Include="EntityFramework\IAnimal.cs" />
+    <Compile Include="EntityFramework\IDepartment.cs" />
+    <Compile Include="EntityFramework\IEntity.cs" />
+    <Compile Include="EntityFramework\IFoafAgent.cs" />
+    <Compile Include="EntityFramework\IFoafPerson.cs" />
+    <Compile Include="EntityFramework\IJobRole.cs" />
+    <Compile Include="EntityFramework\IPerson.cs" />
+    <Compile Include="EntityFramework\ISkill.cs" />
+    <Compile Include="EntityFramework\MyEntityContext.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MyEntityContext.tt</DependentUpon>
+    </Compile>
+    <Compile Include="EntityFramework\SimpleContextTests.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="StorageTests.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
@@ -92,7 +118,16 @@
   <ItemGroup>
     <AndroidAsset Include="Assets\TestData\simple.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="EntityFramework\MyEntityContext.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MyEntityContext.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
   <Target Name="BeforeBuild">
-    <Copy SourceFiles="..\..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="Tests\EntityFramework\MyEntityContext.tt" />
+    <Copy SourceFiles="..\..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="EntityFramework\MyEntityContext.tt" />
   </Target>
 </Project>
