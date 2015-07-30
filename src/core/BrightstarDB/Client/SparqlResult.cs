@@ -38,9 +38,15 @@ namespace BrightstarDB.Client
             SourceSparqlQueryContext = sparqlQueryContext;
         }
 
-        internal SparqlResult(Stream resultStream, ISerializationFormat resultFormat, SparqlQueryContext sparqlQueryContext):
-            this(new StreamReader(resultStream), resultFormat, sparqlQueryContext)
+        internal SparqlResult(Stream resultStream, ISerializationFormat resultFormat, SparqlQueryContext sparqlQueryContext)
         {
+            if (resultStream == null) throw new ArgumentNullException(nameof(resultStream));
+            ResultFormat = resultFormat;
+            SourceSparqlQueryContext = sparqlQueryContext;
+            using (var reader = new StreamReader(resultStream))
+            {
+                ParseResult(reader);
+            }
         }
 
         internal SparqlResult(string resultString, ISerializationFormat resultFormat, SparqlQueryContext sparqlQueryContext) :

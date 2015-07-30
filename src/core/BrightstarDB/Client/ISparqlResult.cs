@@ -25,4 +25,5 @@ namespace BrightstarDB.Client
         /// </summary>
         bool IsGraphResult { get; }
     }
+    
 }
