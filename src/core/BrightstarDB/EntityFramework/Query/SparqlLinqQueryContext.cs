@@ -64,7 +64,7 @@ namespace BrightstarDB.EntityFramework.Query
             ConstructorInfo constructor, List<string> constructorArgs, List<Tuple<MemberInfo, string>> memberMap,
             Expression memberInitExpression,
             IEnumerable<OrderingDirection> orderingDirections 
-            ) :base(sparqlQuery, anonymousMembersMap, orderingDirections)
+            ) :base(sparqlQuery, anonymousMembersMap, orderingDirections, SparqlResultsFormat.Xml, RdfFormat.NTriples)
         {
             IsInstanceQuery = false;
             Constructor = constructor;
