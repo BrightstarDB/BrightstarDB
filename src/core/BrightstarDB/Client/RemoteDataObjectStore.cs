@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Xml.Linq;
 using BrightstarDB.EntityFramework.Query;
-using BrightstarDB.Model;
 using BrightstarDB.Rdf;
+using VDS.RDF;
+using Triple = BrightstarDB.Model.Triple;
 
 namespace BrightstarDB.Client
 {
@@ -60,7 +60,7 @@ namespace BrightstarDB.Client
 
         public override SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext)
         {
-            return new SparqlResult(Client.ExecuteQuery(sparqlQueryContext.SparqlQuery, DataSetGraphUris), sparqlQueryContext);
+            return Client.ExecuteQuery(sparqlQueryContext, DataSetGraphUris);
         }
 
         protected virtual string GetQueryTemplate()
@@ -157,36 +157,33 @@ namespace BrightstarDB.Client
 
         private IEnumerable<Triple> GetTriplesForDataObject(string identity)
         {
-            var sparqlResultStream = Client.ExecuteQuery(string.Format(QueryTemplate, identity), DataSetGraphUris);
-            var data = XDocument.Load(sparqlResultStream);
-
-            foreach (var sparqlResultRow in data.SparqlResultRows())
+            var queryContext = new SparqlQueryContext(string.Format(QueryTemplate, identity));
+            queryContext.SparqlResultsFormat = SparqlResultsFormat.Xml;
+            queryContext.GraphResultsFormat = RdfFormat.NTriples;
+            var results = Client.ExecuteQuery(queryContext, DataSetGraphUris);
+            foreach(var row in results.ResultSet)
             {
                 // create new triple
                 var triple = new Triple
                 {
                     Subject = identity,
-                    Graph = sparqlResultRow.GetColumnValue("g").ToString(),
-                    Predicate = sparqlResultRow.GetColumnValue("p").ToString()
+                    Graph = row["g"].ToString(),
+                    Predicate = row["p"].ToString()
                 };
 
-                if (sparqlResultRow.IsLiteral("o"))
+                var literal = row["o"] as ILiteralNode;
+                if (literal != null)
                 {
-                    var dt = sparqlResultRow.GetLiteralDatatype("o");
-                    var langCode = sparqlResultRow.GetLiteralLanguageCode("o");
+                    var dt = literal.DataType?.ToString();
+                    triple.LangCode = literal.Language;
                     triple.DataType = dt ?? RdfDatatypes.String;
-                    if (langCode != null)
-                    {
-                        triple.LangCode = langCode;
-                    }
-                    triple.Object = sparqlResultRow.GetLiteralString("o");
+                    triple.Object = literal.Value;
                     triple.IsLiteral = true;
                 }
                 else
                 {
-                    triple.Object = sparqlResultRow.GetColumnValue("o").ToString().Trim();
+                    triple.Object = row["o"].ToString().Trim();
                 }
-
                 yield return triple;
             }
         }
