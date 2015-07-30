@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
+using BrightstarDB.EntityFramework.Query;
 using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 using VDS.RDF.Update;
-using VDS.RDF.Writing;
 using ITriple = BrightstarDB.Model.ITriple;
 
 namespace BrightstarDB.Client
@@ -23,29 +22,12 @@ namespace BrightstarDB.Client
             _updateProcessor = updateProcessor;
         }
 
-        public Stream ExecuteQuery(string queryExpression, IList<string> datasetGraphUris)
+        public SparqlResult ExecuteQuery(SparqlQueryContext queryContext, IList<string> datasetGraphUris)
         {
             var parser = new SparqlQueryParser();
-            var query = parser.ParseFromString(queryExpression);
+            var query = parser.ParseFromString(queryContext.SparqlQuery);
             var sparqlResults = _queryProcessor.ProcessQuery(query);
-            var memoryStream = new MemoryStream();
-            using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
-            {
-                if (sparqlResults is SparqlResultSet)
-                {
-                    var resultSet = sparqlResults as SparqlResultSet;
-                    var writer = new SparqlXmlWriter();
-                    writer.Save(resultSet, streamWriter);
-                }
-                else if (sparqlResults is IGraph)
-                {
-                    var g = sparqlResults as IGraph;
-                    var writer = new RdfXmlWriter();
-                    writer.Save(g, streamWriter);
-                }
-            }
-            return new MemoryStream(memoryStream.ToArray());
-            //return new MemoryStream(Encoding.UTF8.GetBytes(buff.ToString()), false);
+            return new SparqlResult(sparqlResults, queryContext);
         }
 
         public void ApplyTransaction(IEnumerable<ITriple> existencePreconditions, IEnumerable<ITriple> nonexistencePreconditions, IEnumerable<ITriple> deletePatterns, IEnumerable<ITriple> inserts, string updateGraphUri)

@@ -171,6 +171,17 @@ namespace BrightstarDB.Client
         public IDataObject SetProperty(IDataObject type, object value, string langCode = null)
         {
             if (value is IDataObject) return SetRelatedObject(type, value as IDataObject);
+            if (value is ILiteralNode)
+            {
+                var lit = value as ILiteralNode;
+                SetPropertyLiteral(type, lit.Value, lit.DataType.ToString(), lit.Language);
+                return this;
+            }
+            if (value is IUriNode)
+            {
+                var uri = value as IUriNode;
+                return SetRelatedObject(type, _store.MakeDataObject(uri.Uri.ToString()));
+            }
             if (value is Uri) return SetRelatedObject(type, _store.MakeDataObject(value.ToString()));
             if (type == null) throw new ArgumentNullException("type");
             if (value == null) throw new ArgumentNullException("value");

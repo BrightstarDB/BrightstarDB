@@ -29,8 +29,8 @@ namespace BrightstarDB.Tests.DataObjectsTests
             newObject.SetProperty("http://example.org/p", "Some Value");
             store.SaveChanges();
 
-            var results = store.ExecuteSparql(String.Format("SELECT ?v WHERE {{ <{0}> <http://example.org/p> ?v }}",newObject.Identity ));
-            Assert.AreEqual(1, results.ResultDocument.SparqlResultRows().Count());
+            var results = store.ExecuteSparql(string.Format("SELECT ?v WHERE {{ <{0}> <http://example.org/p> ?v }}",newObject.Identity ));
+            Assert.AreEqual(1, results.ResultSet.Count());
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
             }
 
             var results = store.ExecuteSparql(String.Format("SELECT ?v WHERE {{ <{0}> <http://example.org/p> ?v }}", x.Identity));
-            Assert.AreEqual(0, results.ResultDocument.SparqlResultRows().Count());
+            Assert.AreEqual(0, results.ResultSet.Count());
         }
 
         private void ThrowOnSave(object sender, EventArgs e)

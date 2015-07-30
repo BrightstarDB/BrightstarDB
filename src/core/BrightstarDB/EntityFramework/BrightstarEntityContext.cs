@@ -10,9 +10,13 @@ using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Rdf;
+using BrightstarDB.Storage.BTreeStore;
 using BrightstarDB.Storage.Persistence;
 using Remotion.Linq.Clauses;
-
+using VDS.RDF;
+using VDS.RDF.Nodes;
+using VDS.RDF.Query;
+using SparqlResult = BrightstarDB.Client.SparqlResult;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
@@ -472,9 +476,9 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="sparqlQuery">The query to execute</param>
         /// <returns></returns>
-        public override XDocument ExecuteQuery(string sparqlQuery)
+        public override ISparqlResult ExecuteQuery(string sparqlQuery)
         {
-            return _store.ExecuteSparql(sparqlQuery).ResultDocument;
+            return _store.ExecuteSparql(sparqlQuery);
         }
 
         #region Bindings
@@ -536,23 +540,44 @@ namespace BrightstarDB.EntityFramework
         private IEnumerable<T> BindRowsToEntites<T>(SparqlResult sparqlQueryResult)
         {
             var sparqlResult = sparqlQueryResult;
-            var resultDoc = sparqlResult.ResultDocument;
+            var resultSet = sparqlResult.ResultSet;
+            if (resultSet == null) throw new ArgumentException("Result does not contain a SPARQL Result Table", nameof(sparqlQueryResult));
             var converter = GetStringConverter(typeof(T));
             if (converter == null)
             {
                 throw new EntityFrameworkException("No SPARQL results conversion found from string to type '{0}'", typeof(T).FullName);
             }
-            foreach (var row in resultDoc.SparqlResultRows())
+            foreach (var row in resultSet)
             {
-                var value = row.GetColumnValue(0);
-                if (value == null) yield return default(T);
-                if (value.GetType() == typeof(T))
+                // TODO: Could now make better use of IValuedNode?
+                var literal = row[0] as ILiteralNode;
+                if (literal == null)
                 {
-                    yield return (T)value;
+                    if (typeof (Uri) == typeof (T))
+                    {
+                        var uriNode = row[0] as IUriNode;
+                        if (uriNode != null)
+                        {
+                            object v = uriNode.Uri;
+                            yield return (T) v;
+                        }
+                    }
+                    if (typeof (string) == typeof (T))
+                    {
+                        object v = row[0].ToString();
+                        yield return (T) v;
+                    }
                 }
                 else
                 {
-                    yield return (T)converter(row.GetColumnValue(0).ToString(), row.GetLiteralLanguageCode(0));
+                    if (typeof (string) == typeof (T))
+                    {
+                        yield return (T) (object) literal.Value;
+                    }
+                    else
+                    {
+                        yield return (T) converter(literal.Value, literal.Language);
+                    }
                 }
             }
         }
@@ -562,13 +587,15 @@ namespace BrightstarDB.EntityFramework
             if (sparqlLinqQueryContext.HasMemberInitExpression)
             {
                 var sparqlResult = _store.ExecuteSparql(sparqlLinqQueryContext);
-                var resultDoc = sparqlResult.ResultDocument;
-                foreach (var row in resultDoc.SparqlResultRows())
+                var resultSet = sparqlResult.ResultSet;
+                foreach (var row in resultSet)
                 {
                     var values = new Dictionary<string, object>();
-                    foreach (var c in resultDoc.GetVariableNames())
+                    foreach (var c in resultSet.Variables)
                     {
-                        values[c] = row.GetColumnValue(c);
+                        var node = row[c];
+                        var lit = node as ILiteralNode;
+                        values[c] = lit?.Value ?? node.ToString();
                     }
                     var value = sparqlLinqQueryContext.ApplyMemberInitExpression<T>(values, ConvertString);
                     yield return (T)value;
@@ -599,20 +626,34 @@ namespace BrightstarDB.EntityFramework
                 }
 
                 var sparqlResult = sparqlQueryResult;
-                var resultDoc = sparqlResult.ResultDocument;
-                foreach (var row in resultDoc.SparqlResultRows())
+                var resultSet = sparqlResult.ResultSet;
+                foreach (var row in resultSet)
                 {
                     var args = new object[anonymousConstructorArgs.Count];
                     for (int i = 0; i < anonymousConstructorArgs.Count; i++)
                     {
                         var argInfo = anonymousConstructorArgs[i];
-                        var colValue = row.GetColumnValue(argInfo.VariableName);
-                        var colLang = row.GetLiteralLanguageCode(argInfo.VariableName);
-                        args[i] = colValue == null ? argInfo.DefaultValue : argInfo.ValueConverter(colValue.ToString(), colLang);
+                        var node = row[argInfo.VariableName];
+                        var colValue = GetNodeStringValue(node);
+                        var colLang = GetLiteralLanguageCode(node);
+                        args[i] = colValue == null ? argInfo.DefaultValue : argInfo.ValueConverter(colValue, colLang);
                     }
                     yield return (T)Activator.CreateInstance(typeof(T), args);
                 }
             }
+        }
+
+        private static string GetNodeStringValue(INode node)
+        {
+            if (node == null) return null;
+            var lit = node as ILiteralNode;
+            return lit?.Value ?? node.ToString();
+        }
+
+        private static string GetLiteralLanguageCode(INode node)
+        {
+            var lit = node as ILiteralNode;
+            return lit?.Language;
         }
 
         #endregion
@@ -732,17 +773,16 @@ namespace BrightstarDB.EntityFramework
         /// the enumeration returns a single object, otherwise it returns no objects.</returns>
         public override IEnumerable<T> ExecuteInstanceQuery<T>(string instanceIdentifier, string typeIdentifier)
         {
-            var sparqlQuery = String.Format("ASK {0} {{ <{1}> a <{2}>. }}", _store.GetDatasetClause(), instanceIdentifier, typeIdentifier);
+            var sparqlQuery = string.Format("ASK {0} {{ <{1}> a <{2}>. }}", _store.GetDatasetClause(), instanceIdentifier, typeIdentifier);
 
 
             var sparqResult = _store.ExecuteSparql(sparqlQuery);
-            var resultDoc = sparqResult.ResultDocument;
-            if (resultDoc.SparqlBooleanResult())
+            var resultSet = sparqResult.ResultSet;
+            if (resultSet.ResultsType == SparqlResultsType.Boolean && resultSet.Result)
             {
                 var dataObject = _store.MakeDataObject(instanceIdentifier);
                 yield return BindDataObject<T>(dataObject, GetImplType(typeof (T)));
             }
-            yield break;
         }
 
         private class AnonymousConstructorArg

@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using BrightstarDB.EntityFramework.Query;
 using VDS.RDF;
+using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 
 namespace BrightstarDB.Client
@@ -10,32 +11,90 @@ namespace BrightstarDB.Client
     /// <summary>
     /// Represents the results of running a SPARQL query against a Brightstar store
     /// </summary>
-    public class SparqlResult : IDisposable
+    public class SparqlResult : IDisposable, ISparqlResult
     {
+        /// <summary>
+        /// Get the results of a SPARQL CONSTRUCT or DESCRIBE query as an RDF graph.
+        /// </summary>
+        /// <remarks>This property will be NULL if the query was an ASK or SELECT query</remarks>
+        public IGraph ResultGraph { get; private set; }
+
+        /// <summary>
+        /// Get the results of a SPARQL ASK or SELECT query
+        /// </summary>
+        /// <remarks>This property will be NULL if the query was a CONSTRUCT or DESCRIBE query.</remarks>
+        public SparqlResultSet ResultSet { get; private set; }
+
         /// <summary>
         /// The SparqlQueryContext that generated this result
         /// </summary>
         public readonly SparqlQueryContext SourceSparqlQueryContext;
 
-        internal SparqlResult(Stream resultStream, ISerializationFormat resultFormat, SparqlQueryContext sparqlQueryContext)
+        internal SparqlResult(TextReader streamReader, ISerializationFormat resultFormat,
+            SparqlQueryContext sparqlQueryContext)
         {
-            ResultStream = resultStream;
             ResultFormat = resultFormat;
+            ParseResult(streamReader);
             SourceSparqlQueryContext = sparqlQueryContext;
         }
 
-        internal SparqlResult(string resultString, ISerializationFormat resultFormat, SparqlQueryContext sparqlQueryContext)
+        internal SparqlResult(Stream resultStream, ISerializationFormat resultFormat, SparqlQueryContext sparqlQueryContext):
+            this(new StreamReader(resultStream), resultFormat, sparqlQueryContext)
         {
-            ResultStream = new MemoryStream(Encoding.UTF8.GetBytes(resultString));
-            ResultFormat = resultFormat;
+        }
+
+        internal SparqlResult(string resultString, ISerializationFormat resultFormat, SparqlQueryContext sparqlQueryContext) :
+            this(new StringReader(resultString), resultFormat, sparqlQueryContext )
+        {
+            
+        }
+
+
+        internal SparqlResult(object resultObject, SparqlQueryContext sparqlQueryContext)
+        {
+            if (resultObject == null) throw new ArgumentNullException(nameof(resultObject));
+            if (sparqlQueryContext == null) throw new ArgumentNullException(nameof(sparqlQueryContext));
             SourceSparqlQueryContext = sparqlQueryContext;
+
+            ResultGraph = resultObject as IGraph;
+            if (ResultGraph == null)
+            {
+                ResultSet = resultObject as SparqlResultSet;
+                if (ResultSet == null)
+                {
+                    throw new ArgumentException(
+                        $"Result object must be either a {typeof (IGraph).FullName} or a {typeof (SparqlResultSet).FullName} instance. Got a {resultObject.GetType().FullName}");
+                }
+                ResultFormat = sparqlQueryContext.SparqlResultsFormat ?? SparqlResultsFormat.Xml;
+            }
+
+            
+            if (resultObject is IGraph)
+            {
+                ResultGraph = resultObject as IGraph;
+                ResultFormat = sparqlQueryContext.GraphResultsFormat ?? RdfFormat.RdfXml;
+            }
+        }
+
+        private void ParseResult(TextReader reader)
+        {
+            if (ResultFormat is RdfFormat)
+            {
+                ResultGraph = new Graph();
+                var parser = MimeTypesHelper.GetParser(ResultFormat.MediaTypes);
+                parser.Load(ResultGraph, reader);
+            }
+            else
+            {
+                ResultSet = new SparqlResultSet();
+                var parser = MimeTypesHelper.GetSparqlParser(ResultFormat.MediaTypes[0]);
+                parser.Load(ResultSet, reader);
+            }
         }
 
         /// <summary>
-        /// The raw XML sparql result stream
+        /// Get the serialization format that the results were provided in
         /// </summary>
-        public Stream ResultStream { get; }
-
         public ISerializationFormat ResultFormat { get; }
 
         /// <summary>
@@ -44,42 +103,20 @@ namespace BrightstarDB.Client
         public bool IsGraphResult => ResultFormat is RdfFormat;
 
         /// <summary>
-        /// Return the results processed into a <see cref="IGraph"/> for easier processing
-        /// </summary>
-        /// <returns>The parsed <see cref="IGraph"/></returns>
-        /// <exception cref="InvalidOperationException">Raised if <see cref="ResultFormat"/> is not an <see cref="RdfFormat"/>.</exception>
-        public IGraph GetResultsAsGraph()
-        {
-            if (!IsGraphResult) throw new InvalidOperationException("Result format is not an RDF Graph format");
-            var g = new Graph();
-            var reader = MimeTypesHelper.GetParser(ResultFormat.MediaTypes);
-            using (var sr = new StreamReader(ResultStream))
-            {
-                reader.Load(g, sr);
-            }
-            return g;
-        }
-
-        /// <summary>
-        /// Return the results processed into a <see cref="SparqlResultSet"/> for easier processing
-        /// </summary>
-        /// <returns>The parsed <see cref="SparqlResultSet"/></returns>
-        /// <exception cref="InvalidOperationException">Raised if <see cref="ResultFormat"/> is not a <see cref="SparqlResultsFormat"/>.</exception>
-        public SparqlResultSet GetResultAsSparqlResultSet()
-        {
-            if (IsGraphResult) throw new InvalidOperationException("Result format is not a SPARQL result format");
-            var resultSet = new SparqlResultSet();
-            var parser = MimeTypesHelper.GetSparqlParser(ResultFormat.MediaTypes[0]);
-            parser.Load(resultSet, new StreamReader(ResultStream));
-            return resultSet;
-        }
-
-        /// <summary>
         /// Disposes of the underlying resources. 
         /// </summary>
         public void Dispose()
         {
-            ResultStream?.Dispose();
+            if (ResultGraph != null)
+            {
+                ResultGraph.Dispose();
+                ResultGraph = null;
+            }
+            if (ResultSet != null)
+            {
+                ResultSet.Dispose();
+                ResultSet = null;
+            }
         }
     }
 }

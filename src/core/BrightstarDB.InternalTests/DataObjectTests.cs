@@ -972,8 +972,8 @@ namespace BrightstarDB.InternalTests
             var sparqlResult = store.ExecuteSparql(lowpay);
 
             Assert.IsNotNull(sparqlResult);
-            var result = sparqlResult.ResultDocument;
-            Assert.AreEqual(4, result.SparqlResultRows().Count());
+            var result = sparqlResult.ResultSet;
+            Assert.AreEqual(4, result.Count());
 
         }
 
@@ -993,8 +993,8 @@ namespace BrightstarDB.InternalTests
             var sparqlResult = store.ExecuteSparql(highPay);
 
             Assert.IsNotNull(sparqlResult);
-            var result = sparqlResult.ResultDocument;
-            Assert.AreEqual(5, result.SparqlResultRows().Count());
+            var result = sparqlResult.ResultSet;
+            Assert.AreEqual(5, result.Count());
         }
 
         [Test]

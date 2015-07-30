@@ -60,7 +60,7 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="sparqlQuery">The query to execute</param>
         /// <returns></returns>
-        public abstract XDocument ExecuteQuery(string sparqlQuery);
+        public abstract ISparqlResult ExecuteQuery(string sparqlQuery);
 
         /// <summary>
         /// Method to execute a SPARQL query against the underlying store and bind its results to instances of a class

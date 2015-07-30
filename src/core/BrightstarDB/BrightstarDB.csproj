@@ -158,6 +158,7 @@
     <Compile Include="Client\ICommitPointInfo.cs" />
     <Compile Include="Client\ICommitPointStats.cs" />
     <Compile Include="Client\IJobInfo.cs" />
+    <Compile Include="Client\ISparqlResult.cs" />
     <Compile Include="Client\IStoreStatistics.cs" />
     <Compile Include="Client\ITransactionInfo.cs" />
     <Compile Include="Client\ITripleCollection.cs" />

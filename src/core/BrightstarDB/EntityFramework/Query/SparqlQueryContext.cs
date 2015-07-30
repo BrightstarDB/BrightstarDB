@@ -54,6 +54,12 @@ namespace BrightstarDB.EntityFramework.Query
         {
         }
 
+        /// <summary>
+        /// Creates a new SparqlQuerContext instance
+        /// </summary>
+        /// <param name="sparqlQuery">The SPARQL query to be executed</param>
+        /// <param name="tableResultsFormat">The requested serialization form for a SPARQL result set</param>
+        /// <param name="graphResultsFormat">The requested serialization form for a SPARQL result graph</param>
         public SparqlQueryContext(string sparqlQuery, SparqlResultsFormat tableResultsFormat, RdfFormat graphResultsFormat) : 
             this(sparqlQuery, new System.Tuple<string, string>[0], new OrderingDirection[0], tableResultsFormat, graphResultsFormat) { }
 
@@ -78,6 +84,14 @@ namespace BrightstarDB.EntityFramework.Query
         {
         }
 
+        /// <summary>
+        /// Creates a new SparqlQueryContext instance
+        /// </summary>
+        /// <param name="sparqlQuery">sparql query</param>
+        /// <param name="anonymousMembersMap">mappings for anonymous types</param>
+        /// <param name="orderingDirections">ordering direction for the sort expressions in the SPARQL query</param>
+        /// <param name="tableResultsFormat">The requested serialization form for a SPARQL result set</param>
+        /// <param name="graphResultsFormat">The requested serialization form for a SPARQL result graph</param>
         public SparqlQueryContext(string sparqlQuery, IEnumerable<System.Tuple<string, string>> anonymousMembersMap,
             IEnumerable<OrderingDirection> orderingDirections,
             SparqlResultsFormat tableResultsFormat, RdfFormat graphResultsFormat)

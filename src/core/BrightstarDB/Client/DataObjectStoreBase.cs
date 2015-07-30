@@ -432,15 +432,17 @@ namespace BrightstarDB.Client
 
         public IEnumerable<Triple> GetReferencingTriples(string identity)
         {
-            var queryResults = ExecuteSparql(String.Format(AllInverseOfSparql, identity));
-            return queryResults.ResultDocument.SparqlResultRows().Select(row => new Triple
-            {
-                Subject = row.GetColumnValue("s").ToString(),
-                Predicate = row.GetColumnValue("p").ToString(),
-                Object = identity,
-                IsLiteral = false,
-                Graph = row.GetColumnValue("g").ToString()
-            });
+            var queryResults = ExecuteSparql(string.Format(AllInverseOfSparql, identity));
+            return queryResults.ResultSet.Results.Select(r =>
+                new Triple
+                {
+                    Subject = r["s"].ToString(),
+                    Predicate = r["p"].ToString(),
+                    Object = identity,
+                    IsLiteral = false,
+                    Graph = r["g"].ToString()
+                }
+            );
         } 
 
         /// <summary>
@@ -516,8 +518,8 @@ namespace BrightstarDB.Client
 
         private static void UpdateVersionFromSparqlResult(SparqlResult sparqlResult, IDataObject dataObject)
         {
-            var firstRow = sparqlResult.ResultDocument.SparqlResultRows().FirstOrDefault();
-            var value = firstRow.GetColumnValue("v");
+            var firstRow = sparqlResult.ResultSet.First();
+            var value = firstRow["v"];
             dataObject.SetProperty(Constants.VersionPredicateUri, value);
         }
 
