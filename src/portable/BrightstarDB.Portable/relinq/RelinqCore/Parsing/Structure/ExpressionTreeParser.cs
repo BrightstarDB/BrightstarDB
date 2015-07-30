@@ -44,15 +44,26 @@ namespace Remotion.Linq.Parsing.Structure
       throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// Creates a default <see cref="CompoundNodeTypeProvider"/> that already has all expression node parser defined by the re-linq assembly 
-    /// registered. Users can add inner providers to register their own expression node parsers.
-    /// </summary>
-    /// <returns>A default <see cref="CompoundNodeTypeProvider"/> that already has all expression node parser defined by the re-linq assembly 
-    /// registered.</returns>
-    public static CompoundNodeTypeProvider CreateDefaultNodeTypeProvider ()
-    {
-      var searchedTypes = typeof (MethodInfoBasedNodeTypeRegistry).Assembly.GetTypes ();
+      /// <summary>
+      /// Creates a default <see cref="CompoundNodeTypeProvider"/> that already has all expression node parser defined by the re-linq assembly 
+      /// registered. Users can add inner providers to register their own expression node parsers.
+      /// </summary>
+      /// <returns>A default <see cref="CompoundNodeTypeProvider"/> that already has all expression node parser defined by the re-linq assembly 
+      /// registered.</returns>
+      public static CompoundNodeTypeProvider CreateDefaultNodeTypeProvider()
+      {
+          Type[] reflectedTypes;
+          try
+          {
+              reflectedTypes = typeof(MethodInfoBasedNodeTypeRegistry).Assembly.GetTypes();
+          }
+          catch (ReflectionTypeLoadException e)
+          {
+              reflectedTypes = e.Types;
+          }
+          var searchedTypes = reflectedTypes.Where(t => t != null).ToArray();
+
+
       var innerProviders = new INodeTypeProvider[]
                            {
                                MethodInfoBasedNodeTypeRegistry.CreateFromTypes (searchedTypes),
