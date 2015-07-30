@@ -54,10 +54,13 @@ namespace BrightstarDB.Client
         public override SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext)
         {
             var resultStream = new MemoryStream();
-            _serverCore.Query(_storeName, sparqlQueryContext.SparqlQuery, DataSetGraphUris, null, SparqlResultsFormat.Xml,
-                              RdfFormat.RdfXml, resultStream);
+            var resultFormat = _serverCore.Query(
+                _storeName, sparqlQueryContext.SparqlQuery,
+                DataSetGraphUris, null,
+                sparqlQueryContext.SparqlResultsFormat,
+                sparqlQueryContext.GraphResultsFormat, resultStream);
             resultStream.Seek(0, SeekOrigin.Begin);
-            return new SparqlResult(resultStream, sparqlQueryContext);
+            return new SparqlResult(resultStream, resultFormat, sparqlQueryContext);
         }
 
         public override bool BindDataObject(DataObject dataObject)

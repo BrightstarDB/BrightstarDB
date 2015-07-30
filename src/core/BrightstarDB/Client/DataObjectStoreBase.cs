@@ -238,6 +238,7 @@ namespace BrightstarDB.Client
         {
             return ExecuteSparql(new SparqlQueryContext(sparqlQuery));
         }
+
         public abstract SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext);
 
         /// <summary>

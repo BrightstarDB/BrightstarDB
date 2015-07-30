@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Xml.Linq;
 using BrightstarDB.EntityFramework.Query;
+using VDS.RDF;
+using VDS.RDF.Query;
 
 namespace BrightstarDB.Client
 {
@@ -11,58 +12,66 @@ namespace BrightstarDB.Client
     /// </summary>
     public class SparqlResult : IDisposable
     {
-        private Stream _resultStream;
-        private readonly string _resultString;
-        private XDocument _resultDocument;
-
         /// <summary>
         /// The SparqlQueryContext that generated this result
         /// </summary>
         public readonly SparqlQueryContext SourceSparqlQueryContext;
 
-        internal SparqlResult(Stream resultStream, SparqlQueryContext sparqlQueryContext)
+        internal SparqlResult(Stream resultStream, ISerializationFormat resultFormat, SparqlQueryContext sparqlQueryContext)
         {
-            _resultStream = resultStream;
+            ResultStream = resultStream;
+            ResultFormat = resultFormat;
             SourceSparqlQueryContext = sparqlQueryContext;
         }
 
-        internal SparqlResult(string xml, SparqlQueryContext sparqlQueryContext)
+        internal SparqlResult(string resultString, ISerializationFormat resultFormat, SparqlQueryContext sparqlQueryContext)
         {
-            _resultString = xml;
+            ResultStream = new MemoryStream(Encoding.UTF8.GetBytes(resultString));
+            ResultFormat = resultFormat;
             SourceSparqlQueryContext = sparqlQueryContext;
         }
 
         /// <summary>
         /// The raw XML sparql result stream
         /// </summary>
-        public Stream ResultStream
+        public Stream ResultStream { get; }
+
+        public ISerializationFormat ResultFormat { get; }
+
+        /// <summary>
+        /// Returns true if the format specified by <see cref="ResultFormat"/> is an RDF graph format
+        /// </summary>
+        public bool IsGraphResult => ResultFormat is RdfFormat;
+
+        /// <summary>
+        /// Return the results processed into a <see cref="IGraph"/> for easier processing
+        /// </summary>
+        /// <returns>The parsed <see cref="IGraph"/></returns>
+        /// <exception cref="InvalidOperationException">Raised if <see cref="ResultFormat"/> is not an <see cref="RdfFormat"/>.</exception>
+        public IGraph GetResultsAsGraph()
         {
-            get
+            if (!IsGraphResult) throw new InvalidOperationException("Result format is not an RDF Graph format");
+            var g = new Graph();
+            var reader = MimeTypesHelper.GetParser(ResultFormat.MediaTypes);
+            using (var sr = new StreamReader(ResultStream))
             {
-                if (_resultStream != null)
-                {
-                    return _resultStream;
-                }
-                _resultStream = new MemoryStream(Encoding.UTF8.GetBytes(_resultString));
-                return _resultStream;
+                reader.Load(g, sr);
             }
+            return g;
         }
 
         /// <summary>
-        /// The sparql result as an XDocument
+        /// Return the results processed into a <see cref="SparqlResultSet"/> for easier processing
         /// </summary>
-        public XDocument ResultDocument
+        /// <returns>The parsed <see cref="SparqlResultSet"/></returns>
+        /// <exception cref="InvalidOperationException">Raised if <see cref="ResultFormat"/> is not a <see cref="SparqlResultsFormat"/>.</exception>
+        public SparqlResultSet GetResultAsSparqlResultSet()
         {
-            get
-            {
-                if (_resultDocument == null)
-                {
-                    _resultDocument = _resultString != null
-                        ? XDocument.Parse(_resultString)
-                        : XDocument.Load(_resultStream);
-                }
-                return _resultDocument;
-            }
+            if (IsGraphResult) throw new InvalidOperationException("Result format is not a SPARQL result format");
+            var resultSet = new SparqlResultSet();
+            var parser = MimeTypesHelper.GetSparqlParser(ResultFormat.MediaTypes[0]);
+            parser.Load(resultSet, new StreamReader(ResultStream));
+            return resultSet;
         }
 
         /// <summary>
@@ -70,10 +79,7 @@ namespace BrightstarDB.Client
         /// </summary>
         public void Dispose()
         {
-            if (_resultStream != null)
-            {
-                _resultStream.Dispose();
-            }
+            ResultStream?.Dispose();
         }
     }
 }
