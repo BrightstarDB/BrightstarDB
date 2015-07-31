@@ -108,7 +108,14 @@ namespace BrightstarDB.Query
                                                               "No acceptable format provided for writing an RDF graph result.");
                     }
                     rdfWriter.Save(g, resultsWriter);
-                    resultsWriter.Flush();
+                    try
+                    {
+                        resultsWriter.Flush();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // resultWriter is already closed
+                    }
                     return BrightstarSparqlResultsType.Graph;
                 }
                 throw new BrightstarInternalException(
