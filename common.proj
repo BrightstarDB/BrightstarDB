@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- Import CommunityTasks -->
-  <Import Project="tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
-
   <!-- Common targets for Brightstar projects -->
   <PropertyGroup>
     <AssemblyProduct>BrightstarDB</AssemblyProduct>
@@ -38,17 +35,27 @@
 		</CreateItem>
 			
 		<MakeDir Directories="%(AssemblyInfoFileItem.RootDir)%(AssemblyInfoFileItem.Directory)" />
-		<AssemblyInfo
-				Condition="( '$(Configuration)' == 'Release' ) Or (!Exists('$(AssemblyInfoFile)'))"
- 				CodeLanguage="CS"
-                  OutputFile="$(AssemblyInfoFile)"
-                  AssemblyVersion="$(Major).$(Minor).$(Build).$(Revision)"
-                  AssemblyFileVersion="$(Major).$(Minor).$(Build).$(Revision)"
-                  AssemblyProduct="$(AssemblyProduct)"
-                  AssemblyCompany="$(AssemblyCompany)"
-                  AssemblyCopyright="$(AssemblyCopyright)"
-                  AssemblyTrademark="$(AssemblyTrademark)"
-                  AssemblyTitle="$(AssemblyTitle)"/>
+		<ItemGroup>
+			<AssemblyAttributes Include="AssemblyTitle">
+				<_Parameter1>$(AssemblyTitle)</_Parameter1>
+			</AssemblyAttributes>
+			<AssemblyAttributes Include="AssemblyProduct">
+				<_Parameter1>$(AssemblyProduct)</_Parameter1>
+			</AssemblyAttributes>
+			<AssemblyAttributes Include="AssemblyCopyright">
+				<_Parameter1>$(AssemblyCopyright)</_Parameter1>
+			</AssemblyAttributes>
+			<AssemblyAttributes Include="AssemblyTrademark">
+				<_Parameter1>$(AssemblyTrademark)</_Parameter1>
+			</AssemblyAttributes>
+			<AssemblyAttributes Include="AssemblyVersion">
+				<_Parameter1>$(Major).$(Minor).$(Build).$(Revision)</_Parameter1>
+			</AssemblyAttributes>   
+			<AssemblyAttributes Include="AssemblyFileVersion">
+				<_Parameter1>$(Major).$(Minor).$(Build).$(Revision)</_Parameter1>
+			</AssemblyAttributes>
+		</ItemGroup>
+		<WriteCodeFragment Language="C#" OutputFile="$(AssemblyInfoFile)" AssemblyAttributes="@(AssemblyAttributes)" />
 	</Target>
 
   <!-- Sets a property named 'Timestamp' to the current Date/Time -->

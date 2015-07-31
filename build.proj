@@ -14,8 +14,6 @@
 	<NUnitFramework Condition=" '$(OS)' != 'Windows_NT' "></NUnitFramework>
     </PropertyGroup>
     
-    <Import Project="$(MSBuildProjectDirectory)\tools\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" />
-
     <!-- Main Build Targets -->
     <Target Name="Build" DependsOnTargets="BuildCore;BuildServer;BuildOData;BuildPortable;BuildTools"/>
     
