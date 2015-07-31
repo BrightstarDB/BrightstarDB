@@ -155,16 +155,12 @@
 		SourceFiles="@(ConsolePackageFiles)"
 		DestinationFolder="$(OutputPath)\NuGet\tools"/>
 
-	<ItemGroup>
-		<Tokens Include="Version">
-			<ReplacementValue>$(Major).$(Minor).$(Build).$(Revision)</ReplacementValue>
-		</Tokens>
-	</ItemGroup>
+	<Copy SourceFiles="BrightstarDB.CodeGeneration.Console.nuspec.template" DestinationFiles="$(OutputPath)NuGet\BrightstarDB.CodeGeneration.Console.nuspec" />
 
-	<TemplateFile
-		Template="$(SrcDir)\core\BrightstarDB.CodeGeneration.Console\BrightstarDB.CodeGeneration.Console.nuspec.template"
-		OutputFileName="$(SrcDir)\core\BrightstarDB.CodeGeneration.Console\$(OutputPath)NuGet\BrightstarDB.CodeGeneration.Console.nuspec"
-		Tokens="@(Tokens)"/>
+	<XmlPoke XmlInputPath="$(OutputPath)\NuGet\BrightstarDB.CodeGeneration.Console.nuspec"
+			 Namespaces="$(NuSpecNamespaces)"
+			 Query="/ns:package/ns:metadata/ns:version"
+			 Value="$(Major).$(Minor).$(Build).$(Revision)" />
 
 	<Exec
 		Command='$(NuGetCommand) pack "$(SrcDir)core\BrightstarDB.CodeGeneration.Console\$(OutputPath)NuGet\BrightstarDB.CodeGeneration.Console.nuspec"'

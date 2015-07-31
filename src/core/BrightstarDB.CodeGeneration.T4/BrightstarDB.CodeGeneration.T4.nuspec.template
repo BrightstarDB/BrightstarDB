@@ -13,7 +13,7 @@
     </description>
     <tags>.NET codegen t4</tags>
     <dependencies>
-        <dependency id="BrightstarDB.CodeGeneration" version="${VERSION}" />
+        <dependency id="BrightstarDB.CodeGeneration" version="VERSION" />
     </dependencies>
   </metadata>
 </package>

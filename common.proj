@@ -19,7 +19,10 @@
     <Revision>0</Revision>
   </PropertyGroup>
   
-  
+  <PropertyGroup>
+	<NuSpecNamespaces>&lt;Namespace Prefix='ns' Uri='http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd'/&gt;</NuSpecNamespaces>
+  </PropertyGroup>
+
   <ItemGroup>
 	<PropertyFiles Include="**\AssemblyInfo.cs"/>
   </ItemGroup>
