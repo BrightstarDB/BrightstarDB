@@ -252,11 +252,6 @@
     <Copy SourceFiles="@(LibsNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec')" />
 	<Copy SourceFiles="@(PlatformNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec')" />
 
-    <ReadLinesFromFile File="@(ReleaseNotes)">
-      <Output TaskParameter="Lines" PropertyName="ReleaseNotesText" />
-    </ReadLinesFromFile>
-    <Message Text="Release Notes: $(ReleaseNotesText)"/>
-        
     <PropertyGroup>
 	    <PackageBuildNumber Condition="'$(Prerelease)' == ''">$(BuildNumber)</PackageBuildNumber>
 		<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(BuildNumber)-$(Prerelease)</PackageBuildNumber>
