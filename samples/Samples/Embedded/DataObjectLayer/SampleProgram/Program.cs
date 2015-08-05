@@ -107,10 +107,10 @@ namespace BrightstarDB.Samples.DataObjectLayerSample
             Console.WriteLine(getPersonSkillsQuery);
             var sparqlResult = store.ExecuteSparql(getPersonSkillsQuery);
 
-            var result = sparqlResult.ResultDocument;
-            foreach (var sparqlResultRow in result.SparqlResultRows())
+            var result = sparqlResult.ResultSet;
+            foreach (var sparqlResultRow in result)
             {
-                var val = sparqlResultRow.GetColumnValue("skill");
+                var val = sparqlResultRow["skill"];
                 Console.WriteLine("Skill is " + val);
             }
 
