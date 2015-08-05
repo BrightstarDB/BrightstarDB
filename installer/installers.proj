@@ -256,27 +256,30 @@
       <Output TaskParameter="Lines" PropertyName="ReleaseNotesText" />
     </ReadLinesFromFile>
     <Message Text="Release Notes: $(ReleaseNotesText)"/>
-    <FileUpdate Files="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec;$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec;$(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec"
-                Regex="\$releaseNotes\$"
-                ReplacementText="$([System.IO.File]::ReadAllText('nuget\ReleaseNotes.txt'))" />
         
     <PropertyGroup>
 	    <PackageBuildNumber Condition="'$(Prerelease)' == ''">$(BuildNumber)</PackageBuildNumber>
 		<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(BuildNumber)-$(Prerelease)</PackageBuildNumber>
 	</PropertyGroup>
 
-    <FileUpdate Files="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec;$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec;$(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec"
-                Regex="\$version\$"
-                ReplacementText="$(PackageBuildNumber)" />
-    	
+   	
     <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec"
              Query="package/metadata/version"
+             Value="$(PackageBuildNumber)" />
+    <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec"
+             Query="package/metadata/releaseNotes"
              Value="$(PackageBuildNumber)" />
     <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec"
              Query="package/metadata/version"
              Value="$(PackageBuildNumber)" />
+    <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec"
+             Query="package/metadata/dependencies/dependency[@id='BrightstarDBLibs']/@version"
+             Value="$(PackageBuildNumber)" />
 	<XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDB.Platform\BrightstardB.Platform.nuspec"
 			 Query="package/metadata/version"
+			 Value="$(PackageBuildNumber)" />
+	<XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDB.Platform\BrightstardB.Platform.nuspec"
+             Query="package/metadata/dependencies/dependency[@id='BrightstarDBLibs']/@version"
 			 Value="$(PackageBuildNumber)" />
 
     <!-- Cannot target .NET 40 PCL due to lack of System.Xml.Linq -->
