@@ -24,6 +24,20 @@ namespace BrightstarDB.Portable.Tests.EntityFramework.Model
     	
     	static MyEntityContext() 
     	{
+            InitializeEntityMappingStore();
+        }
+        
+        /// <summary>
+        /// Initialize the internal cache of entity attribute information.
+        /// </summary>
+        /// <remarks>
+        /// This method is normally invoked from the static constructor for the generated context class.
+        /// It is provided as a public static method to enable the use of the cached entity attribute 
+        /// information without the need to construct a context (typically in test code). 
+        /// In normal application code you should never need to explicitly call this method.
+        /// </remarks>
+        public static void InitializeEntityMappingStore()
+        {
     		var provider = new ReflectionMappingProvider();
     		provider.AddMappingsForType(EntityMappingStore.Instance, typeof(BrightstarDB.Portable.Tests.EntityFramework.Model.IAnimal));
     		EntityMappingStore.Instance.SetImplMapping<BrightstarDB.Portable.Tests.EntityFramework.Model.IAnimal, BrightstarDB.Portable.Tests.EntityFramework.Model.Animal>();

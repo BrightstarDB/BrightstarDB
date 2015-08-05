@@ -1,29 +1,53 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
-  <Identity Name="e85de518-eb0e-4c11-a118-21388e65801f" Publisher="CN=BrightstarDB Project" Version="1.0.0.0" />
+  
+  <Identity Name="f32a9e00-b0c7-49af-a1f9-04d400406468"
+            Publisher="CN=Khalil"
+            Version="1.0.0.0" />
+  
   <Properties>
     <DisplayName>BrightstarDB.Portable.Store.Tests</DisplayName>
     <PublisherDisplayName>Khalil</PublisherDisplayName>
     <Logo>Images\UnitTestStoreLogo.png</Logo>
     <Description>BrightstarDB.Portable.Store.Tests</Description>
   </Properties>
+  
   <Prerequisites>
-    <OSMinVersion>6.2.1</OSMinVersion>
-    <OSMaxVersionTested>6.2.1</OSMaxVersionTested>
+    <OSMinVersion>6.3.0</OSMinVersion>
+    <OSMaxVersionTested>6.3.0</OSMaxVersionTested>
   </Prerequisites>
+  
   <Resources>
-    <Resource Language="x-generate" />
+    <Resource Language="x-generate"/>
   </Resources>
+  
   <Applications>
-    <Application Id="vstest.executionengine.App" Executable="vstest.executionengine.appcontainer.exe" EntryPoint="vstest.executionengine.App">
-      <VisualElements DisplayName="NoUIEntryPoints" Logo="Images\UnitTestLogo.png" SmallLogo="Images\UnitTestSmallLogo.png" Description="vstest.executionengine.App" ForegroundText="light" BackgroundColor="#0084FF">
-        <SplashScreen Image="Images\UnitTestSplashScreen.png" />
-      </VisualElements>
+    <Application Id="vstest.executionengine.App" 
+        Executable="vstest.executionengine.appcontainer.exe" 
+        EntryPoint="vstest.executionengine.App">
+        <VisualElements 
+            DisplayName="NoUIEntryPoints"
+            Logo="Images\UnitTestLogo.png"
+            SmallLogo="Images\UnitTestSmallLogo.png"
+            Description="vstest.executionengine.App"
+            ForegroundText="light"
+            BackgroundColor="#0084FF">
+            <SplashScreen Image="Images\UnitTestSplashScreen.png" />
+        </VisualElements>
     </Application>
-    <Application Id="vstest.executionengine.x86.App" Executable="vstest.executionengine.appcontainer.x86.exe" EntryPoint="vstest.executionengine.x86.App">
-      <VisualElements DisplayName="NoUIEntryPoints" Logo="Images\UnitTestLogo.png" SmallLogo="Images\UnitTestSmallLogo.png" Description="vstest.executionengine.x86.App" ForegroundText="light" BackgroundColor="#0084FF">
-        <SplashScreen Image="Images\UnitTestSplashScreen.png" />
-      </VisualElements>
+
+    <Application Id="vstest.executionengine.x86.App" 
+        Executable="vstest.executionengine.appcontainer.x86.exe" 
+        EntryPoint="vstest.executionengine.x86.App">
+        <VisualElements 
+            DisplayName="NoUIEntryPoints"
+            Logo="Images\UnitTestLogo.png"
+            SmallLogo="Images\UnitTestSmallLogo.png"
+            Description="vstest.executionengine.x86.App"
+            ForegroundText="light"
+            BackgroundColor="#0084FF">
+            <SplashScreen Image="Images\UnitTestSplashScreen.png" />
+        </VisualElements>
     </Application>
   </Applications>
   <Capabilities>
