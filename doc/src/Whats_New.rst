@@ -17,6 +17,14 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
  Develop Branch
 ****************************
 
+    - BREAKING: The code-base is now being developed and compiled under VS2015 using C# 6.0 constructs.
+      To compile BrightstarDB you will require a minimum of Visual Studio 2015 Express or Mono 4.0.
+      
+    - BREAKING: The BrightstarEntityContext method ExecuteQuery now returns an ISparqlResult that
+      wraps the SPARQL results set (or RDF graph) rather than the raw results stream. 
+      The ISparqlResult interface provides direct access to DotNetRDF IGraph and SparqlResultSet instances.
+      This change makes much easier to manage the results of a SPARQL query from your code.
+
 	- NEW: The BrightstarDB service now provides a Swagger API description and interactive documentation. (#205)
 	
 	- NEW: The default 18 second timeout for executing SPARQL Update and SPARQL Query requests can now be 

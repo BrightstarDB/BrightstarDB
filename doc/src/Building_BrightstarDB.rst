@@ -16,7 +16,7 @@ This section will take you through the steps necessary to build BrightstarDB fro
 
 Before you can build BrightstarDB you need to install the following tools.
 
-    1.  **Visual Studio 2013/2015** or **Mono 3.2.4 or later**
+    1.  **Visual Studio 2015** or **Mono 4.0.2 or later**
     
         You can use the Professional or Ultimate editions to build everything.
         
