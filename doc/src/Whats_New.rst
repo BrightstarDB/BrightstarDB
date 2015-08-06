@@ -14,7 +14,7 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
 
 ****************************
- Develop Branch
+ BrightstarDB 1.11
 ****************************
 
     - BREAKING: The code-base is now being developed and compiled under VS2015 using C# 6.0 constructs.
