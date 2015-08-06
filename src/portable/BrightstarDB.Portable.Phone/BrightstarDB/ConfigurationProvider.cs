@@ -16,7 +16,7 @@ namespace BrightstarDB
         public int StatsUpdateTimespan { get; set; }
         public int StatsUpdateTransactionCount { get; set; }
         public int TransactionFlushTripleCount { get; set; }
-        public PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public EmbeddedServiceConfiguration EmbeddedServiceConfiguration { get; set; }
         public bool EnableVirtualizedQueries { get; set; }
 
         private const string TxnFlushTriggerPropertyName = "BrightstarDB.TxnFlushTripleCount";
@@ -33,6 +33,7 @@ namespace BrightstarDB
 
         private const string CachePreloadRatioName = "BrightstarDB.PageCachePreload.Ratio";
         private const string CachePreloadEnabledName = "BrightstarDB.PageCachePreload.Enabled";
+        private const string TransactionLoggingEnabledName = "BrightstarDB.TransactionLogging.Enabled";
 
         private const PersistenceType DefaultPersistenceType = PersistenceType.AppendOnly;
         private const int DefaultQueryCacheMemory = 4; // in MB
@@ -90,11 +91,15 @@ namespace BrightstarDB
             StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
 
             // Cache Preload Configuration
-            PreloadConfiguration = new PageCachePreloadConfiguration
+            var preloadConfiguration = new PageCachePreloadConfiguration
                 {
                     DefaultCacheRatio = GetApplicationSetting(CachePreloadRatioName, 0.5m),
                     Enabled = GetApplicationSetting(CachePreloadEnabledName, false)
                 };
+
+            // Transaction logging configuration
+            var txnLoggingEnabled = GetApplicationSetting(TransactionLoggingEnabledName, false);
+            EmbeddedServiceConfiguration = new EmbeddedServiceConfiguration(preloadConfiguration, txnLoggingEnabled);
         }
 
         private static string GetApplicationSetting(string key)

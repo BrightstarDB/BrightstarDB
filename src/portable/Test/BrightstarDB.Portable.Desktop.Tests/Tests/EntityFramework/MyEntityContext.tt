@@ -73,6 +73,20 @@ public partial class <#=code.Escape(contextClassName) #> : BrightstarEntityConte
 	
 	static <#= code.Escape(contextClassName) #>() 
 	{
+        InitializeEntityMappingStore();
+    }
+    
+    /// <summary>
+    /// Initialize the internal cache of entity attribute information.
+    /// </summary>
+    /// <remarks>
+    /// This method is normally invoked from the static constructor for the generated context class.
+    /// It is provided as a public static method to enable the use of the cached entity attribute 
+    /// information without the need to construct a context (typically in test code). 
+    /// In normal application code you should never need to explicitly call this method.
+    /// </remarks>
+    public static void InitializeEntityMappingStore()
+    {
 		var provider = new ReflectionMappingProvider();
 <#+
 	foreach(var i in helper.GetDecoratedInterfaces()) 
@@ -198,6 +212,7 @@ private void WriteEntityClass(CodeGenerationTools code, Helper helper, ResourceI
 <#= code.SpaceAfter(iface.EntitySetAccessLevel)#>partial class <#= iface.ClassName #> : BrightstarEntityObject, <#= iface.InterfaceName #> 
 {
 	public <#= iface.ClassName#>(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
+    public <#= iface.ClassName#>(BrightstarEntityContext context) : base(context, typeof(<#= iface.ClassName #>)) { }
 	public <#= iface.ClassName#>() : base() { }
 <#+
 	if (identityProperty != null) 
@@ -224,6 +239,9 @@ private void WriteInterfaceImplementation(CodeGenerationTools code, Helper helpe
 	#region Implementation of <#= iface.InterfaceFullName #>
 <#+
 	foreach(var p in iface.Properties) {
+        if (IsIgnoredProperty(p)) {
+            continue;
+        }
 		if (!p.Equals(iface.IdentityProperty)) 
 		{
 			bool isCollectionProperty;
@@ -380,7 +398,7 @@ private bool IsValidLiteralType(Helper helper, CodeTypeRef t)
 	string genericName, typeName;
 	if (Helper.TryParseGenericTypeName(t.AsFullName, out genericName, out typeName)
 		&& genericName.Equals("System.Nullable")
-		&& helper.GetEnums().Any(e=>e.FullName.Equals(typeName))) {
+		&& (helper.GetEnums().Any(e=>e.FullName.Equals(typeName)) || Helper.IsExternalEnum(typeName)) ) {
 		return true;
 	}
 	
@@ -458,6 +476,12 @@ private void ValidateIdentityProperty(CodeProperty property) {
 	}
 }
 
+private bool IsIgnoredProperty(CodeProperty property) {
+  var ignore = property.Attributes.OfType<CodeAttribute>().FirstOrDefault(
+    attr => attr.FullName.Equals(Constants.IgnorePropertyAttributeName));
+  return ignore != null;
+}
+
 private bool ValidateProperty(CodeProperty property, Helper helper, out bool isCollection) 
 {
 	var propertyTypeName = property.Type.AsFullName;
@@ -518,6 +542,8 @@ static class Constants {
 	public const string IdentityAttributeShortName = "Identifier";
 	public const string EntityAttributeName =   "BrightstarDB.EntityFramework.EntityAttribute";
 	public const string InversePropertyAttributeName = "BrightstarDB.EntityFramework.InversePropertyAttribute";
+    public const string IgnorePropertyAttributeName = "BrightstarDB.EntityFramework.IgnoreAttribute";
+    
 	/// <summary>
 	/// The property types that are supported entity property types
 	/// </summary>
@@ -539,6 +565,7 @@ static class Constants {
 		"System.Byte",
 		"System.Char",
 		"System.SByte",
+        "System.Guid",
 		"BrightstarDB.Rdf.PlainLiteral",
 		"System.Nullable<System.Boolean>",
 		"System.Nullable<System.Int16>",
@@ -554,6 +581,7 @@ static class Constants {
 		"System.Nullable<System.Byte>",
 		"System.Nullable<System.Char>",
 		"System.Nullable<System.SByte>",
+        "System.Nullable<System.Guid>",
 	};
 	
 	/// <summary>
@@ -676,6 +704,14 @@ class Helper {
 					yield return child;
 				}
 			}
+		}
+	}
+
+	public static bool IsExternalEnum(string typeName){
+		try {
+			return Type.GetType(typeName, true, false).IsEnum;
+		} catch(Exception){
+			return false;
 		}
 	}
 	

@@ -24,9 +24,9 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.That(alice, Is.Not.Null);
             // Can find by ID
             alice = context.FoafPersons.FirstOrDefault(p => p.Id.Equals("alice"));
-            Assert.That(alice, Is.Not.Null);
+            Assert.That(alice, Is.Not.Null, "Expected to find a FoafPerson entity with Id=='alice'");
             Assert.That(alice.Name, Is.EqualTo("Alice"));
-            Assert.That(alice.Knows, Is.Not.Null);
+            Assert.That(alice.Knows, Is.Not.Null, "Expected a non-null value for the Knows property on the entity for Alice.");
         }
 
         [Test]

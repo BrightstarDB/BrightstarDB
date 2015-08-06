@@ -30,12 +30,12 @@ namespace BrightstarDB.Client
         /// <summary>
         /// The current transaction delete patterns
         /// </summary>
-        List<Triple> DeletePatterns { get; }
+        ITripleCollection DeletePatterns { get; }
 
         /// <summary>
         /// The current transaction triples to add
         /// </summary>
-        List<Triple> AddTriples { get; }
+        ITripleCollection AddTriples { get; }
 
         /// <summary>
         /// Returns an enumeration of all data objects that are the subject
@@ -57,11 +57,26 @@ namespace BrightstarDB.Client
         IEnumerable<Triple> GetReferencingTriples(IDataObject obj);
 
         /// <summary>
+        /// Returns an enumeration of all triples that have the specified
+        /// object URI.
+        /// </summary>
+        /// <param name="objUri">The object resource URI</param>
+        /// <returns>An enumeration of all triples that have <paramref name="objUri"/> as the object of the triple.</returns>
+        IEnumerable<Triple> GetReferencingTriples(string objUri); 
+
+        /// <summary>
         /// Adds preconditions to validate that there is no existing resource with the URI
         /// <paramref name="identity"/> that is an instance of one or more of the specified types.
         /// </summary>
         /// <param name="identity">The identity of the resource to be validated</param>
         /// <param name="types">An enumeration of class resources URIs</param>
         void SetClassUniqueConstraints(string identity, IEnumerable<string> types);
+
+        /// <summary>
+        /// Replace all references to one resource identifier with references to a new resource identifier
+        /// </summary>
+        /// <param name="oldIdentity">The old resource identifier to be replaced</param>
+        /// <param name="newIdentity">The new resource identifier to be used</param>
+        void ReplaceIdentity(string oldIdentity, string newIdentity);
     }
 }

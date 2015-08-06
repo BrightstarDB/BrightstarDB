@@ -14,6 +14,10 @@
         
         <!-- Download NuGet.exe if it does not already exist -->
         <DownloadNuGetExe Condition=" '$(DownloadNuGetExe)' == '' ">false</DownloadNuGetExe>
+    
+        <MSBuildCommunityTasksPath>.</MSBuildCommunityTasksPath>
+    
+        <SrcDir>$(MSBuildThisFileDirectory)..\..\</SrcDir>
     </PropertyGroup>
     
     <ItemGroup Condition=" '$(PackageSources)' == '' ">
@@ -27,13 +31,13 @@
 
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT'">
         <!-- Windows specific commands -->
-        <NuGetToolsPath>$([System.IO.Path]::Combine($(SolutionDir), ".nuget"))</NuGetToolsPath>
+        <NuGetToolsPath>$(MSBuildThisFileDirectory)</NuGetToolsPath>
         <PackagesConfig>$([System.IO.Path]::Combine($(ProjectDir), "packages.config"))</PackagesConfig>
     </PropertyGroup>
     
     <PropertyGroup Condition=" '$(OS)' != 'Windows_NT'">
         <!-- We need to launch nuget.exe with the mono command if we're not on windows -->
-        <NuGetToolsPath>$(SolutionDir).nuget</NuGetToolsPath>
+        <NuGetToolsPath>$(MSBuildThisFileDirectory)</NuGetToolsPath>
         <PackagesConfig>packages.config</PackagesConfig>
     </PropertyGroup>
     
@@ -68,8 +72,9 @@
             $(BuildDependsOn);
             BuildPackage;
         </BuildDependsOn>
-    </PropertyGroup>
-
+    
+	</PropertyGroup>
+    
     <Target Name="CheckPrerequisites">
         <!-- Raise an error if we're unable to locate nuget.exe  -->
         <Error Condition="'$(DownloadNuGetExe)' != 'true' AND !Exists('$(NuGetExePath)')" Text="Unable to locate '$(NuGetExePath)'" />

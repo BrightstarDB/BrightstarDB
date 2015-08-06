@@ -1,4 +1,7 @@
 ﻿#if !PORTABLE
+using System.Xml.Linq;
+using BrightstarDB.Server.Modules.Configuration;
+using NUnit.Framework;
 using System;
 using BrightstarDB.Client;
 using BrightstarDB.Server.Modules;
@@ -39,16 +42,49 @@ namespace BrightstarDB.Tests
                 if (_serviceHost == null || _closed)
                 {
                     _serviceHost = new NancyHost(new BrightstarBootstrapper(
-                                                     BrightstarService.GetClient(),
-                                                     new IAuthenticationProvider[] {new NullAuthenticationProvider()},
-                                                     new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
-                                                     new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All)),
-                                                     new HostConfiguration { AllowChunkedEncoding = false },
-                                                 new Uri("http://localhost:8090/brightstar/"));
+                        BrightstarService.GetClient(),
+                        new IAuthenticationProvider[] {new NullAuthenticationProvider()},
+                        new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                        new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All),
+                        new CorsConfiguration()),
+                        new HostConfiguration {AllowChunkedEncoding = false},
+                        new Uri("http://localhost:8090/brightstar/"));
                     _serviceHost.Start();
                 }
 #endif
             }
+        }
+
+        protected static void AssertTriplePatternInGraph(IBrightstarService client, string storeName, string triplePattern,
+            string graphUri)
+        {
+            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
+        }
+
+        protected static void AssertTriplePatternInDefaultGraph(IBrightstarService client, string storeName,
+            string triplePattern)
+        {
+            var sparql = "ASK {{" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsTrue(resultsDoc.SparqlBooleanResult());
+        }
+
+        protected static void AssertTriplePatternNotInGraph(IBrightstarService client, string storeName, string triplePattern,
+            string graphUri)
+        {
+            var sparql = "ASK { GRAPH <" + graphUri + "> {" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
+        }
+
+        protected static void AssertTriplePatternNotInDefaultGraph(IBrightstarService client, string storeName,
+            string triplePattern)
+        {
+            var sparql = "ASK {{" + triplePattern + "}}";
+            var resultsDoc = XDocument.Load(client.ExecuteQuery(storeName, sparql));
+            Assert.IsFalse(resultsDoc.SparqlBooleanResult());
         }
     }
 }

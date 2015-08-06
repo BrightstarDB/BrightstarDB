@@ -20,5 +20,10 @@ namespace BrightstarDB.Storage
         /// <param name="ts">The maximum age of transaction to return</param>
         /// <returns>An enumeration of the <paramref name="maxCount"/> most recent transactions that match the age filter</returns>
         List<ITransactionInfo> GetTransactionList(int maxCount, TimeSpan ts);
+
+        /// <summary>
+        /// Get the boolean flag that indicates if the transaction log is currently enabled.
+        /// </summary>
+        bool IsEnabled { get; }
     }
 }

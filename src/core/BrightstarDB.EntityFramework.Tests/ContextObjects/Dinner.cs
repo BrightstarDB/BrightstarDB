@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BrightstarDB.EntityFramework.Tests.ContextObjects
 {
@@ -18,7 +19,7 @@ namespace BrightstarDB.EntityFramework.Tests.ContextObjects
         DateTime EventDate { get; set; }
 
         [PropertyType("attendees")]
-        IEntitySet<IRsvp> Rsvps { get; set; }
+        ICollection<IRsvp> Rsvps { get; set; }
 
         [PropertyType("dinnerType")]
         DinnerType? DinnerType { get; set; }
@@ -50,7 +51,7 @@ namespace BrightstarDB.EntityFramework.Tests.ContextObjects
             set { throw new NotImplementedException(); }
         }
 
-        public IEntitySet<IRsvp> Rsvps
+        public ICollection<IRsvp> Rsvps
         {
             get { throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }

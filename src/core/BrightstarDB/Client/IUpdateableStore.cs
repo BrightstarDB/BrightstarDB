@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 
 namespace BrightstarDB.Client
 {
     internal interface IUpdateableStore
     {
-        Stream ExecuteQuery(string queryExpression, IList<string> datasetGraphUris);
+        SparqlResult ExecuteQuery(SparqlQueryContext queryContext, IList<string> datasetGraphUris);
 
-        void ApplyTransaction(IList<Triple> existencePreconditions, IList<Triple> nonexistencePreconditions,
-                              IList<Triple> deletePatterns, IList<Triple> inserts,
+        void ApplyTransaction(IEnumerable<ITriple> existencePreconditions, IEnumerable<ITriple> nonexistencePreconditions,
+                              IEnumerable<ITriple> deletePatterns, IEnumerable<ITriple> inserts,
                               string updateGraphUri);
 
         void Cleanup();

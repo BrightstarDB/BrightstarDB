@@ -1,0 +1,18 @@
+﻿@Master['Layout.sshtml']
+
+@Section['Content']
+
+<nav>
+    <ul class="horizontal breadcrumb">
+	    <li><a href="~/">Home</a></li>
+        <li><a href="#">Delete Store @Model.StoreName</a></li>
+    </ul>
+</nav>
+
+<div class="info">
+	<p>Store '@Model.StoreName' deleted successfully.</p>
+</div>
+
+<a class="right" href="@Path['~/']">Return Home</a>
+
+@EndSection

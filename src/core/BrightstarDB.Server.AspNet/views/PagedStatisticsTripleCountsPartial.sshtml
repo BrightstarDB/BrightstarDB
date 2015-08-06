@@ -1,0 +1,6 @@
+﻿@Each
+						<tr>
+								<td>@Current.Key</td>
+								<td>@Current.Value</td>
+							</tr>
+@EndEach

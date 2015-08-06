@@ -6,9 +6,9 @@ namespace BrightstarDB.Server.Modules
     public static class BrightstarModuleSecurity
     {
         public static void RequiresBrightstarStorePermission(this NancyModule module,
-            AbstractStorePermissionsProvider permissionsProvider, StorePermissions get = StorePermissions.None, StorePermissions post = StorePermissions.None, StorePermissions delete = StorePermissions.None)
+            AbstractStorePermissionsProvider permissionsProvider, StorePermissions get = StorePermissions.None, StorePermissions post = StorePermissions.None, StorePermissions delete = StorePermissions.None, StorePermissions put = StorePermissions.None)
         {
-            module.Before.AddItemToEndOfPipeline(ctx => RequiresAuthorization(ctx, permissionsProvider, get, post, delete));
+            module.Before.AddItemToEndOfPipeline(ctx => RequiresAuthorization(ctx, permissionsProvider, get, post, delete, put));
         }
 
         /// <summary>
@@ -16,6 +16,7 @@ namespace BrightstarDB.Server.Modules
         /// with the store permissions during the Before module pipeline.
         /// </summary>
         /// <param name="module">The module requesting permission data</param>
+        /// <param name="permissionsProvider">The provider that retrieves permission info for the current user</param>
         public static void RequiresBrightstarStorePermissionData(this NancyModule module, AbstractStorePermissionsProvider permissionsProvider)
         {
             module.Before.AddItemToEndOfPipeline(ctx=>RequiresPermissionData(ctx,permissionsProvider));
@@ -38,7 +39,7 @@ namespace BrightstarDB.Server.Modules
             return null;
         }
 
-        private static Response RequiresAuthorization(NancyContext context, AbstractStorePermissionsProvider permissionsProvider, StorePermissions get, StorePermissions post, StorePermissions delete)
+        private static Response RequiresAuthorization(NancyContext context, AbstractStorePermissionsProvider permissionsProvider, StorePermissions get, StorePermissions post, StorePermissions delete, StorePermissions put)
         {
             var permissionRequired = StorePermissions.None;
             
@@ -51,6 +52,10 @@ namespace BrightstarDB.Server.Modules
 
                 case "POST":
                     permissionRequired = post;
+                    break;
+
+                case "PUT":
+                    permissionRequired = put;
                     break;
 
                 case "DELETE":

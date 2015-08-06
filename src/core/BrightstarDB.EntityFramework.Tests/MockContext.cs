@@ -7,6 +7,8 @@ using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.EntityFramework.Tests.ContextObjects;
+using VDS.RDF;
+using VDS.RDF.Query;
 
 namespace BrightstarDB.EntityFramework.Tests
 {
@@ -59,10 +61,10 @@ namespace BrightstarDB.EntityFramework.Tests
             throw new NotImplementedException();
         }
 
-        public override XDocument ExecuteQuery(string sparqlQuery)
+        public override ISparqlResult ExecuteQuery(string sparqlQuery)
         {
             _lastQuery = sparqlQuery;
-            return new XDocument();
+            return new MockSparqlResult();
         }
 
         public override IEnumerable<T> ExecuteQuery<T>(SparqlLinqQueryContext sparqlLinqQuery)
@@ -81,7 +83,7 @@ namespace BrightstarDB.EntityFramework.Tests
 
         public override string MapIdToUri(PropertyInfo propertyInfo, string id)
         {
-            return ("id:" + id);
+            return ("id:" + Uri.EscapeUriString(id));
         }
 
         public override void DeleteObject(object o)
@@ -145,5 +147,12 @@ namespace BrightstarDB.EntityFramework.Tests
 
         public const string Double = XsdNamespace + "double";
 
+    }
+
+    public class MockSparqlResult : ISparqlResult
+    {
+        public IGraph ResultGraph { get; }
+        public SparqlResultSet ResultSet { get; }
+        public bool IsGraphResult { get; }
     }
 }

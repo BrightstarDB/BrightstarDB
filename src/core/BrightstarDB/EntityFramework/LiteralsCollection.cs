@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+#if PORTABLE
+using BrightstarDB.Portable.Compatibility;
+#else
 using System.Collections.Specialized;
+#endif
 using System.Linq;
 using BrightstarDB.Client;
 
@@ -43,7 +47,7 @@ namespace BrightstarDB.EntityFramework
             _isAttached = true;
         }
 
-        #region Implementation of IEnumerable
+#region Implementation of IEnumerable
 
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
@@ -69,9 +73,9 @@ namespace BrightstarDB.EntityFramework
             return GetEnumerator();
         }
 
-        #endregion
+#endregion
 
-        #region Implementation of ICollection<T>
+#region Implementation of ICollection<T>
 
         /// <summary>
         /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
@@ -202,7 +206,7 @@ namespace BrightstarDB.EntityFramework
             get { return false; }
         }
 
-        #endregion
+#endregion
 
         /// <summary>
         /// Adds a collection of items to this collection
@@ -235,7 +239,7 @@ namespace BrightstarDB.EntityFramework
             return _beo.DataObject.GetPropertyValues(_propertyTypeUri).OfType<T>();
         }
 
-        #region Implementation of INotifyCollectionChanged
+#region Implementation of INotifyCollectionChanged
 
         /// <summary>
         /// Occurrs when an item is added, removed, changed, moved or the entire list is refreshed
@@ -253,6 +257,6 @@ namespace BrightstarDB.EntityFramework
                 CollectionChanged(this, e);
             }
         }
-        #endregion
+#endregion
     }
 }

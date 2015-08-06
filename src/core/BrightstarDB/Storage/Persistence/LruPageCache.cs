@@ -1,22 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace BrightstarDB.Storage.Persistence
 {
     internal class LruPageCache: IPageCache
     {
-        private object _updateLock = new object();
+        private readonly object _updateLock = new object();
         private int _count;
         private readonly int _highWaterMark;
         private readonly int _lowWaterMark;
         private bool _evictInProgress;
+        private DateTime _cacheBlocked = DateTime.MinValue;
 
         private readonly Dictionary<string, LinkedListNode<KeyValuePair<string, IPageCacheItem>>> _cacheItems;
         private readonly LinkedList<KeyValuePair<string, IPageCacheItem>> _accessList;
  
         public event PreEvictionDelegate BeforeEvict;
         public event PostEvictionDelegate AfterEvict;
+        public event EvictionCompletedDelegate EvictionCompleted;
+
+        /// <summary>
+        /// Time between cache eviction retries when the cache is blocked with unevictable pages
+        /// </summary>
+        public static int BlockedCacheRetryTimeout = 10;
 
         public LruPageCache(int limit)
         {
@@ -97,6 +105,12 @@ namespace BrightstarDB.Storage.Persistence
                         p = p.Next;
                     }
                 }
+
+                if (_count < _highWaterMark)
+                {
+                    // Reset the cache blocked timeout
+                    _cacheBlocked = DateTime.MinValue;
+                }
             }
         }
 
@@ -115,6 +129,14 @@ namespace BrightstarDB.Storage.Persistence
 
         private void EvictItems()
         {
+            if (DateTime.Now.Subtract(_cacheBlocked).TotalSeconds < BlockedCacheRetryTimeout)
+            {
+#if DEBUG_PAGECACHE
+                Logging.LogDebug("LruPageCache.EvictItems: In cache blocked timeout.");
+#endif
+                return; // Last eviction failed recently so don't repeat until the timeout is exceeded
+            }
+
             if (_evictInProgress) return;
             _evictInProgress = true;
             try
@@ -123,6 +145,7 @@ namespace BrightstarDB.Storage.Persistence
             Logging.LogDebug("LruPageCache.EvictItems: START");
 #endif
                 var evictPointer = _accessList.Last;
+                var evictionCount = 0;
                 while (evictPointer != null && _count > _lowWaterMark)
                 {
                     var partition = evictPointer.Value.Key;
@@ -139,6 +162,7 @@ namespace BrightstarDB.Storage.Persistence
                         _accessList.Remove(evictPointer);
                         _cacheItems.Remove(cacheKey);
                         _count--;
+                        evictionCount++;
                         FireAfterEvict(evictionArgs);
 #if DEBUG_PAGECACHE
                     Logging.LogDebug("LruPageCache.EvictItems: Evicted {0}", pageId);
@@ -153,13 +177,31 @@ namespace BrightstarDB.Storage.Persistence
                         evictPointer = evictPointer.Previous;
                     }
                 }
+                if (evictionCount == 0)
+                {
+                    // The entire cache is blocked with modified pages that cannot be written out
+                    // this can happen with large transactions on the BinaryFilePageStore or on
+                    // the AppendOnlyFilePageStore with background writes disabled.
+                    // To prevent repeated iteration through a blocked cache we will check this timestamp:
+                    _cacheBlocked = DateTime.Now;
+#if DEBUG_PAGECACHE
+                    Logging.LogDebug("LruPageCache.EvictItems: Setting cached blocked timeout");
+#endif
+                }
 #if DEBUG_PAGECACHE
             Logging.LogDebug("LruPageCache.EvictItems: END");
 #endif
             }
             finally
             {
-                _evictInProgress = false;
+                try
+                {
+                    FireEvictionCompleted();
+                }
+                finally
+                {
+                    _evictInProgress = false;
+                }
             }
         }
 
@@ -171,6 +213,11 @@ namespace BrightstarDB.Storage.Persistence
         private void FireBeforeEvict(EvictionEventArgs evictionArgs)
         {
             if (BeforeEvict != null) BeforeEvict(this, evictionArgs);
+        }
+
+        private void FireEvictionCompleted()
+        {
+            if (EvictionCompleted != null) EvictionCompleted(this, new EventArgs());
         }
 
         private string MakeCacheKey(string partition, ulong pageId)

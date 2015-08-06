@@ -1,0 +1,24 @@
+﻿@Master['Layout.sshtml']
+@Section['Content']
+	<nav>
+		<ul class="horizontal breadcrumb">
+			<li><a href="@Path['~/']">Home</a></li>
+		    <li><a href="#">Store: @Model.Name</a></li>
+		</ul>
+	</nav>
+
+	Currently available store operations are:
+	<ul>
+		<li><a href="@Model.SparqlQuery">SPARQL Query</a></li>
+		<li><a href="@Model.SparqlUpdate">SPARQL Update</a></li>
+		<li><a href="@Model.Jobs">Jobs</a></li>
+		<li><a href="@Model.Statistics">Statistics</a></li>
+		<li><a href="@Model.Commits">Commit History</a></li>
+		<li><a href="@Model.Transactions">Transaction History</a></li>
+	</ul>
+
+<form method="POST">
+    <input type="hidden" name="X-HTTP-Method-Override" value="DELETE" />
+    <button type="submit" class="linkbutton">Delete Store</button>
+</form>
+@EndSection

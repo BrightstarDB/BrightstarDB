@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using BrightstarDB.Dto;
 using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
@@ -39,7 +38,7 @@ namespace BrightstarDB.Client
             if (!registeredDataObject.IsLoaded)
             {
                 var triples = GetFilteredResourceStatements(_storeName, resolvedIdentity)
-                    .Union(AddTriples.Where(p => p.Subject.Equals(resolvedIdentity)));
+                    .Union(AddTriples.GetMatches(resolvedIdentity));
                 registeredDataObject.BindTriples(triples);
             }
             return registeredDataObject;
@@ -55,10 +54,13 @@ namespace BrightstarDB.Client
         public override SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext)
         {
             var resultStream = new MemoryStream();
-            _serverCore.Query(_storeName, sparqlQueryContext.SparqlQuery, DataSetGraphUris, null, SparqlResultsFormat.Xml,
-                              RdfFormat.RdfXml, resultStream);
+            var resultFormat = _serverCore.Query(
+                _storeName, sparqlQueryContext.SparqlQuery,
+                DataSetGraphUris, null,
+                sparqlQueryContext.SparqlResultsFormat,
+                sparqlQueryContext.GraphResultsFormat, resultStream);
             resultStream.Seek(0, SeekOrigin.Begin);
-            return new SparqlResult(resultStream, sparqlQueryContext);
+            return new SparqlResult(resultStream, resultFormat, sparqlQueryContext);
         }
 
         public override bool BindDataObject(DataObject dataObject)
@@ -83,11 +85,9 @@ namespace BrightstarDB.Client
             if (_optimisticLockingEnabled)
             {
                 // get subject entity and see if there is a version triple
-                var subjects =
-                    AddTriples.Select(x => x.Subject)
-                              .Distinct()
-                              .Union(DeletePatterns.Select(x => x.Subject).Distinct())
-                              .Except(new[] {Constants.WildcardUri}).ToList();
+                var subjects = AddTriples.Subjects
+                    .Union(DeletePatterns.Subjects)
+                    .Except(new[] {Constants.WildcardUri}).ToList();
                 foreach (var subject in subjects)
                 {
                     var entity = LookupDataObject(subject);
@@ -121,7 +121,7 @@ namespace BrightstarDB.Client
 
             var deleteData = new StringWriter();
             var dw = new BrightstarTripleSinkAdapter(new NQuadsWriter(deleteData));
-            foreach (var triple in DeletePatterns)
+            foreach (var triple in DeletePatterns.Items)
             {
                 dw.Triple(triple);
             }
@@ -129,7 +129,7 @@ namespace BrightstarDB.Client
 
             var addData = new StringWriter();
             var aw = new BrightstarTripleSinkAdapter(new NQuadsWriter(addData));
-            foreach (var triple in AddTriples)
+            foreach (var triple in AddTriples.Items)
             {
                 aw.Triple(triple);               
             }
@@ -137,7 +137,7 @@ namespace BrightstarDB.Client
 
             var preconditionsData = new StringWriter();
             var pw = new BrightstarTripleSinkAdapter(new NQuadsWriter(preconditionsData));
-            foreach (var triple in Preconditions)
+            foreach (var triple in Preconditions.Items)
             {
                 pw.Triple(triple);
             }
@@ -145,7 +145,7 @@ namespace BrightstarDB.Client
 
             var nePreconditionsData = new StringWriter();
             var nw = new BrightstarTripleSinkAdapter(new NQuadsWriter(nePreconditionsData));
-            foreach (var triple in NonExistencePreconditions)
+            foreach (var triple in NonExistencePreconditions.Items)
             {
                 nw.Triple(triple);
             }
@@ -191,15 +191,11 @@ namespace BrightstarDB.Client
             {
                 return _serverCore.GetResourceStatements(storeId, resourceUri);
             }
-            else
-            {
-                return _serverCore.GetResourceStatements(storeId, resourceUri)
-                                  .Where(t =>
-                                         DataSetGraphUris.Contains(t.Graph) ||
-                                         (_optimisticLockingEnabled && t.Predicate.Equals(Constants.VersionPredicateUri) &&
-                                          t.Graph.Equals(VersionGraphUri)));
-            }
+            return _serverCore.GetResourceStatements(storeId, resourceUri)
+                .Where(t =>
+                    DataSetGraphUris.Contains(t.Graph) ||
+                    (_optimisticLockingEnabled && t.Predicate.Equals(Constants.VersionPredicateUri) &&
+                     t.Graph.Equals(VersionGraphUri)));
         }
-
     }
 }

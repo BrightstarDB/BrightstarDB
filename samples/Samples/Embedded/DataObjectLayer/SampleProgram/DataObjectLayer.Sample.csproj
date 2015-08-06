@@ -38,6 +38,10 @@
     <Reference Include="BrightstarDB">
       <HintPath>..\..\..\..\SDK\net40\BrightstarDB.dll</HintPath>
     </Reference>
+    <Reference Include="dotNetRDF, Version=1.0.9.3683, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\SDK\net40\dotNetRDF.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

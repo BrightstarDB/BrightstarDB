@@ -349,22 +349,26 @@ namespace BrightstarDB.Polaris.ViewModel
 
         private static void ExtractSyntaxError(ExceptionDetailObject exceptionDetail)
         {
-            if (exceptionDetail == null) return;
-            if (exceptionDetail.Type.Equals("VDS.RDF.Parsing.RdfParseException"))
+            while (exceptionDetail != null)
             {
-                throw new RdfParseException(exceptionDetail.Message);
+                if (exceptionDetail.Type.Equals("VDS.RDF.Parsing.RdfParseException"))
+                {
+                    throw new RdfParseException(exceptionDetail.Message);
+                }
+                exceptionDetail = exceptionDetail.InnerException;
             }
-            ExtractSyntaxError(exceptionDetail.InnerException);
         }
 
         private static void ExtractSyntaxError(Exception exception)
         {
-            if (exception == null) return;
-            if (exception is RdfParseException)
+            while (exception != null)
             {
-                throw exception;
+                if (exception is RdfParseException)
+                {
+                    throw exception;
+                }
+                exception = exception.InnerException;
             }
-            ExtractSyntaxError(exception);
         }
 
         public IEnumerable<CommitPointViewModel> GetCommitPoints(Store store, int skip, int take)

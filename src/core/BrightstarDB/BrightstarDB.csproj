@@ -27,8 +27,10 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\Debug\BrightstarDB.XML</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors Condition=" '$(OS)' == 'Windows_NT' ">true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors Condition=" '$(OS)' != 'Windows_NT' ">false</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,7 +39,8 @@
     <DefineConstants>TRACE;MONITOR_MEMORY_LOAD</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors Condition=" '$(OS)' == 'Windows_NT' ">true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors Condition=" '$(OS)' != 'Windows_NT' ">false</TreatWarningsAsErrors>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'CloudDebug|AnyCPU'">
@@ -80,17 +83,18 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dotNetRDF">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\dotNetRDF.1.0.6.3421\lib\net40\dotNetRDF.dll</HintPath>
+    <Reference Include="dotNetRDF, Version=1.0.9.3683, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
+      <HintPath>..\packages\dotNetRDF.1.0.9.3683\lib\net40\dotNetRDF.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net40\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net40\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Remotion.Linq, Version=1.13.102.1, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -111,9 +115,9 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="VDS.Common, Version=1.2.1.0, Culture=neutral, PublicKeyToken=ab5f4eb908061bf0, processorArchitecture=MSIL">
+    <Reference Include="VDS.Common, Version=1.6.0.0, Culture=neutral, PublicKeyToken=ab5f4eb908061bf0, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\VDS.Common.1.3.0\lib\net40-client\VDS.Common.dll</HintPath>
+      <HintPath>..\packages\VDS.Common.1.6.0\lib\net40-client\VDS.Common.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +146,7 @@
     <Compile Include="Client\BrightstarStoreIsReadOnlyException.cs" />
     <Compile Include="Client\CachedQueryResult.cs" />
     <Compile Include="Client\DataObjectStoreBase.cs" />
+    <Compile Include="Client\DataObjectStoreChangeEventArgs.cs" />
     <Compile Include="Client\DotNetRdfConfigurationHelper.cs" />
     <Compile Include="Client\DotNetRdfConfigurationPathResolver.cs" />
     <Compile Include="Client\DotNetRdfDataObjectContext.cs" />
@@ -149,13 +154,14 @@
     <Compile Include="Client\DotNetRdfStorageProvidersDataObjectContext.cs" />
     <Compile Include="Client\DotNetRdfStorageServerDataObjectContext.cs" />
     <Compile Include="Client\EmbeddedBrightstarService.cs" />
-    <Compile Include="Client\ClientConfiguration.cs" />
     <Compile Include="Client\IBrightStarService.cs" />
     <Compile Include="Client\ICommitPointInfo.cs" />
     <Compile Include="Client\ICommitPointStats.cs" />
     <Compile Include="Client\IJobInfo.cs" />
+    <Compile Include="Client\ISparqlResult.cs" />
     <Compile Include="Client\IStoreStatistics.cs" />
     <Compile Include="Client\ITransactionInfo.cs" />
+    <Compile Include="Client\ITripleCollection.cs" />
     <Compile Include="Client\IUpdateableStore.cs" />
     <Compile Include="Client\RefreshMode.cs" />
     <Compile Include="Client\RestClientHelper.cs" />
@@ -169,8 +175,9 @@
     <Compile Include="Client\SparqlDataObjectContext.cs" />
     <Compile Include="Client\SparqlDataObjectStore.cs" />
     <Compile Include="Client\SparqlUpdatableStore.cs" />
+    <Compile Include="Client\TripleCollection.cs" />
     <Compile Include="Client\UpdateTransaction.cs" />
-    <Compile Include="Config\BrightstarConfiguration.cs" />
+    <Compile Include="Config\EmbeddedServiceConfiguration.cs" />
     <Compile Include="Config\BrightstarConfigurationSectionHandler.cs" />
     <Compile Include="Config\PageCachePreloadConfiguration.cs" />
     <Compile Include="Config\StorePreloadConfiguration.cs" />
@@ -193,24 +200,27 @@
     <Compile Include="EntityFramework\EntityKeyRequiredException.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
     <Compile Include="EntityFramework\IdentityInfo.cs" />
+    <Compile Include="EntityFramework\IgnoreAttribute.cs" />
     <Compile Include="EntityFramework\IKeyConverter.cs" />
     <Compile Include="EntityFramework\NamespaceDeclarations.cs" />
+    <Compile Include="EntityFramework\Query\SparqlGeneratorWhereExpressionOptimisationVisitor.cs" />
     <Compile Include="EntityFramework\Query\SparqlQueryContext.cs" />
     <Compile Include="EntityFramework\UniqueConstraintViolationException.cs" />
     <Compile Include="FormatInfo.cs" />
     <Compile Include="ISerializationFormat.cs" />
+    <Compile Include="Model\ITriple.cs" />
     <Compile Include="NoAcceptableFormatException.cs" />
     <Compile Include="Query\BrightstarRdfProvider.cs" />
     <Compile Include="Query\BrightstarVirtualNode.cs" />
+    <Compile Include="Query\Processor\JoinOptimiser.cs" />
     <Compile Include="Query\VirtualizingSparqlDataset.cs" />
     <Compile Include="RdfFormat.cs" />
     <Compile Include="Rdf\PlainLiteral.cs" />
-    <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryExecutor.cs" />
     <Compile Include="EntityFramework\Query\EntityFrameworkCollectionQueryProvider.cs" />
     <Compile Include="Rdf\RdfXmlWriter.cs" />
     <Compile Include="SerializableModel.cs" />
     <Compile Include="Server\GuardedUpdateTransaction.cs" />
-    <Compile Include="Server\NoSuchStoreException.cs" />
+    <Compile Include="Client\NoSuchStoreException.cs" />
     <Compile Include="Server\QueryCacheEntry.cs" />
     <Compile Include="Server\SnapshotJob.cs" />
     <Compile Include="Server\StatsMonitor.cs" />

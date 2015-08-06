@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Client;
-using BrightstarDB.Dto;
 using BrightstarDB.Server.Modules.Model;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
 using Nancy.Responses.Negotiation;
-using StoreResponseModel = BrightstarDB.Server.Modules.Model.StoreResponseModel;
 
 namespace BrightstarDB.Server.Modules
 {
@@ -18,33 +15,32 @@ namespace BrightstarDB.Server.Modules
             this.RequiresBrightstarStorePermission(storePermissionsProvider, get:StorePermissions.Read, delete:StorePermissions.Admin);
 
             Get["/{storeName}"] = parameters =>
+            {
+                var storeName = parameters["storeName"];
+                ViewBag.Title = storeName;
+
+                if (!brightstarService.DoesStoreExist(storeName)) return HttpStatusCode.NotFound;
+                if (Request.Method.ToUpperInvariant() == "HEAD")
                 {
-                    if (brightstarService.DoesStoreExist(parameters["storeName"]))
-                    {
-                        if (Request.Method.ToUpperInvariant() == "HEAD")
-                        {
-                            var storeName = parameters["storeName"];
-                            IEnumerable<ICommitPointInfo> commitPoints = brightstarService.GetCommitPoints(storeName, 0,
-                                                                                                           1);
-                            ICommitPointInfo commit = commitPoints.FirstOrDefault();
-                            return
-                                Negotiate.WithHeader("Last-Modified", commit.CommitTime.ToUniversalTime().ToString("r"))
-                                         .WithStatusCode(HttpStatusCode.OK)
-                                         .WithModel(new StoreResponseModel(parameters["storeName"]));
-                        }
-                        return new StoreResponseModel(parameters["storeName"]);
-                    }
-                    return HttpStatusCode.NotFound;
-                };
+                    IEnumerable < ICommitPointInfo > commitPoints = brightstarService.GetCommitPoints(storeName, 0, 1);
+                    var commit = commitPoints.First();
+                    return
+                        Negotiate.WithHeader("Last-Modified", commit.CommitTime.ToUniversalTime().ToString("r"))
+                            .WithStatusCode(HttpStatusCode.OK)
+                            .WithModel(new StoreResponseModel(parameters["storeName"]));
+                }
+                return new StoreResponseModel(parameters["storeName"]);
+            };
 
             Delete["/{storeName}"] = parameters =>
                 {
                     var storeName = parameters["storeName"];
+                    ViewBag.Title = "Deleted - " + storeName;
                     if (brightstarService.DoesStoreExist(storeName))
                     {
                         brightstarService.DeleteStore(storeName);
                     }
-                    return Negotiate.WithMediaRangeModel(MediaRange.FromString("text/html"),
+                    return Negotiate.WithMediaRangeModel(new MediaRange("text/html"), 
                                                          new StoreDeletedModel {StoreName = storeName});
                 };
         }

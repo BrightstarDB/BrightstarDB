@@ -1,0 +1,38 @@
+﻿Imports System.Collections.Generic
+Imports BrightstarDB.EntityFramework
+
+Namespace BrightstarDB.CodeGeneration.Tests
+    Public Interface IRelationships_OneToOneA
+        Property B As IRelationships_OneToOneB
+    End Interface
+
+    Public Interface IRelationships_OneToOneB
+        <InverseProperty("B")>
+        Property A As IRelationships_OneToOneA
+    End Interface
+
+    Public Interface IRelationships_OneToManyA
+        Property Bs As ICollection(Of IRelationships_OneToManyB)
+    End Interface
+
+    Public Interface IRelationships_OneToManyB
+        <InverseProperty("Bs")>
+        Property A As IRelationships_OneToManyA
+    End Interface
+
+    Public Interface IRelationships_ManyToManyA
+        Property Bs As ICollection(Of IRelationships_ManyToManyB)
+    End Interface
+
+    Public Interface IRelationships_ManyToManyB
+        <InverseProperty("Bs")>
+        Property _As As ICollection(Of IRelationships_ManyToManyA)
+    End Interface
+
+    Public Interface IRelationships_Reflexive
+        Property _As As ICollection(Of IRelationships_Reflexive)
+
+        <InverseProperty("_As")>
+        Property Bs As ICollection(Of IRelationships_Reflexive)
+    End Interface
+End Namespace

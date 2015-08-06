@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BrightstarDB.Query;
+using BrightstarDB.Server;
 using BrightstarDB.Storage;
 using VDS.RDF;
 using VDS.RDF.Parsing;
@@ -66,26 +67,12 @@ namespace BrightstarDB.Update
 
         private static Model.Triple MakeBrighstarTriple(Triple t, string uniqueImportId)
         {
-            var ret = new Model.Triple();
-            if (t.Subject is BlankNode)
+            var ret = new Model.Triple
             {
-                ret.Subject = String.Format("{0}/{1}/{2}", Constants.GeneratedUriPrefix, uniqueImportId,
-                                            (t.Subject as BlankNode).InternalID);
-            }
-            else
-            {
-                ret.Subject = t.Subject.ToString();
-            }
+                Subject = Stringify(t.Subject, uniqueImportId),
+                Predicate = Stringify(t.Predicate, uniqueImportId)
+            };
 
-            if (t.Predicate is BlankNode)
-            {
-                ret.Predicate = String.Format("{0}/{1}/{2}", Constants.GeneratedUriPrefix, uniqueImportId,
-                                            (t.Predicate as BlankNode).InternalID);
-            }
-            else
-            {
-                ret.Predicate = t.Predicate.ToString();
-            }
 
             if (t.Object is UriNode)
             {
@@ -93,7 +80,7 @@ namespace BrightstarDB.Update
             }
             else if (t.Object is LiteralNode)
             {
-                var ln = t.Object as LiteralNode;
+                var ln = (LiteralNode)t.Object;
                 ret.DataType = ln.DataType == null ? Constants.DefaultDatatypeUri : ln.DataType.ToString();
                 ret.IsLiteral = true;
                 ret.Object = ln.Value;
@@ -102,7 +89,7 @@ namespace BrightstarDB.Update
             else if (t.Object is BlankNode)
             {
                 ret.Object = String.Format("{0}/{1}/{2}", Constants.GeneratedUriPrefix, uniqueImportId,
-                                            (t.Object as BlankNode).InternalID);
+                                            ((BlankNode) t.Object).InternalID);
             }
             if (t.GraphUri != null)
             {
@@ -111,17 +98,45 @@ namespace BrightstarDB.Update
             return ret;
         }
 
+        private static string Stringify(INode n, string uniqueImportId)
+        {
+            var node = n as BlankNode;
+            if (node != null)
+            {
+                return String.Format("{0}/{1}/{2}", Constants.GeneratedUriPrefix, uniqueImportId,
+                                            node.InternalID);
+            }
+            return n.ToString();
+        }
+
         public void UpdateGraph(string graphUri, IEnumerable<Triple> additions, IEnumerable<Triple> removals)
         {
             string uniqueImportId = Guid.NewGuid().ToString();
             if (graphUri == null) graphUri = Constants.DefaultGraphUri;
             if (removals != null)
             {
+                var deleteSink = new DeletePatternSink(_store);
                 foreach (var removal in removals)
                 {
-                    var t = MakeBrighstarTriple(removal, uniqueImportId);
-                    t.Graph = graphUri;
-                    _store.DeleteTriple(t);
+                    var node = removal.Object as ILiteralNode;
+                    if (node != null)
+                    {
+                        deleteSink.Triple(
+                            Stringify(removal.Subject, uniqueImportId), removal.Subject is IBlankNode,
+                            Stringify(removal.Predicate, uniqueImportId), removal.Predicate is IBlankNode,
+                            node.Value, false, true, node.DataType == null ? null : node.DataType.ToString(), node.Language,
+                            removal.GraphUri == null ? graphUri : removal.GraphUri.ToString()
+                            );
+                    }
+                    else
+                    {
+                        deleteSink.Triple(
+                            Stringify(removal.Subject, uniqueImportId), removal.Subject is IBlankNode,
+                            Stringify(removal.Predicate, uniqueImportId), removal.Predicate is IBlankNode,
+                            Stringify(removal.Object, uniqueImportId), removal.Object is IBlankNode, false, null, null,
+                            removal.GraphUri == null ? graphUri : removal.GraphUri.ToString()
+                            );
+                    }
                 }
             }
             if (additions != null)

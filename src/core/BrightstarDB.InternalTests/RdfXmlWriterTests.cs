@@ -205,5 +205,6 @@ namespace BrightstarDB.InternalTests
             var descriptions = doc.Root.Elements(RdfNS + "Description");
             Assert.That(descriptions.Count(), Is.EqualTo(3));
         }
+
     }
 }

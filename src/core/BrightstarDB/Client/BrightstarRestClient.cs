@@ -7,11 +7,12 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-#if !PORTABLE && !WINDOWS_PHONE
-using System.Web.Script.Serialization;
-#endif
-#if PORTABLE || WINDOWS_PHONE
+using BrightstarDB.Server;
 using VDS.RDF;
+using VDS.RDF.Query;
+#if !PORTABLE && !WINDOWS_PHONE
+using System.ServiceModel.Security.Tokens;
+using System.Web.Script.Serialization;
 #endif
 using BrightstarDB.Caching;
 using BrightstarDB.Client.RestSecurity;
@@ -207,8 +208,42 @@ namespace BrightstarDB.Client
                 {
                     return false;
                 }
-                LogWebException("HEAD", storeName, wex);
-                throw new BrightstarClientException("Could not verify existence of store.", wex);
+                var webExceptionDetail = GetAndLogWebExceptionDetail("HEAD", storeName, wex);
+                throw new BrightstarClientException(String.Format("Could not verify existence of store - '{0}'",webExceptionDetail), wex);                
+            }
+        }
+
+        /// <summary>
+        /// List the URIs of the named graphs contained in the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store</param>
+        /// <returns>An enumeration of the URI identifiers of the named graphs in the store.</returns>
+        public IEnumerable<string> ListNamedGraphs(string storeName)
+        {
+            ValidateStoreName(storeName);
+            try
+            {
+                var response = AuthenticatedGet(storeName + "/graphs");
+                return Deserialize <List<string>>(response);
+            }
+            catch (BrightstarClientException ex)
+            {
+                if (InnerExceptionHasStatusCode(ex, HttpStatusCode.NotFound))
+                {
+                    throw new NoSuchStoreException(storeName);
+                }
+                throw;
+            }
+            catch (WebException wex)
+            {
+                var response = wex.Response as HttpWebResponse;
+                if (response != null && response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    throw new NoSuchStoreException(storeName);
+                }
+                var webExceptionDetail = GetAndLogWebExceptionDetail("GET", storeName + "/graphs", wex);
+                throw new BrightstarClientException(
+                    String.Format("Could not retrieve named graphs for store '{0}' - '{1}'.",storeName,webExceptionDetail), wex);
             }
         }
 
@@ -286,7 +321,9 @@ namespace BrightstarDB.Client
             var parameters = new List<Tuple<string, string>> { new Tuple<string, string>("query", queryExpression) };
             if (defaultGraphUris != null)
             {
-                parameters.AddRange(defaultGraphUris.Select(g => new Tuple<string, string>("default-graph-uri", g)));
+                parameters.AddRange(
+                    graphs.Where(x => !string.IsNullOrEmpty(x))
+                        .Select(g => new Tuple<string, string>("default-graph-uri", g)));
             }
 
             // Execute
@@ -368,8 +405,8 @@ namespace BrightstarDB.Client
                                    SparqlResultsFormat resultsFormat = null,
             RdfFormat graphFormat = null)
         {
-            return ExecuteQuery(storeName, queryExpression, new[] {defaultGraphUri}, ifNotModifiedSince,
-                                resultsFormat, graphFormat);
+            return ExecuteQuery(storeName, queryExpression, defaultGraphUri == null ? null : new[] {defaultGraphUri},
+                ifNotModifiedSince, resultsFormat, graphFormat);
         }
 
         /// <summary>
@@ -491,7 +528,8 @@ namespace BrightstarDB.Client
             if (defaultGraphUris != null)
             {
                 postParameters.AddRange(
-                    defaultGraphUris.Select(graphUri => new Tuple<string, string>("default-graph-uri", graphUri)));
+                    defaultGraphUris.Where(x => !string.IsNullOrEmpty(x))
+                        .Select(graphUri => new Tuple<string, string>("default-graph-uri", graphUri)));
             }
             var queryResponse = AuthenticatedFormPost(queryUri, postParameters, MakeAcceptHeader(resultsFormat, graphFormat));
             streamFormat = SparqlResultsFormat.GetResultsFormat(queryResponse.ContentType) ??
@@ -1037,7 +1075,6 @@ namespace BrightstarDB.Client
 
         #endregion
 
-
         private HttpWebResponse AuthenticatedGet(string relativePath)
         {
             var uri = new Uri(_serviceEndpoint, relativePath);
@@ -1058,8 +1095,8 @@ namespace BrightstarDB.Client
             }
             catch (WebException wex)
             {
-                LogWebException("GET", relativePath, wex);
-                throw new BrightstarClientException("HTTP Transport Error", wex);
+                var webExceptionDetail = GetAndLogWebExceptionDetail("GET", relativePath, wex);
+                throw new BrightstarClientException(webExceptionDetail, wex);
             }
         }
 
@@ -1088,8 +1125,8 @@ namespace BrightstarDB.Client
             }
             catch (WebException wex)
             {
-                LogWebException("HEAD", relativePath, wex);
-                throw new BrightstarClientException("HTTP Transport Error", wex);
+                var webExceptionDetail = GetAndLogWebExceptionDetail("HEAD", relativePath, wex);
+                throw new BrightstarClientException(webExceptionDetail, wex);
             }
         }
 
@@ -1136,8 +1173,8 @@ namespace BrightstarDB.Client
             }
             catch (WebException wex)
             {
-                LogWebException("POST", relativePath, wex);
-                throw new BrightstarClientException("HTTP Transport Error", wex);
+                var webExceptionDetail = GetAndLogWebExceptionDetail("POST", relativePath, wex);
+                throw new BrightstarClientException(webExceptionDetail, wex);
             }
         }
 
@@ -1186,8 +1223,8 @@ namespace BrightstarDB.Client
             }
             catch (WebException wex)
             {
-                LogWebException("POST", relativePath, wex);
-                throw new BrightstarClientException("HTTP Transport error", wex);
+                var webExceptionDetail = GetAndLogWebExceptionDetail("POST", relativePath, wex);
+                throw new BrightstarClientException(webExceptionDetail, wex);
             }
         }
 
@@ -1207,17 +1244,17 @@ namespace BrightstarDB.Client
             }
             catch (WebException wex)
             {
-                LogWebException("DELETE", relativePath, wex);
-                throw new BrightstarClientException("HTTP Transport error", wex);
+                var webExceptionDetail = GetAndLogWebExceptionDetail("DELETE", relativePath, wex);
+                throw new BrightstarClientException(webExceptionDetail, wex);                
             }
         }
 
-        private static void LogWebException(string httpMethod, string requestUri, WebException wex)
+        private static String GetAndLogWebExceptionDetail(string httpMethod, string requestUri, WebException wex)
         {
-            if (wex.Response != null)
-            {
-                if (wex.Response is HttpWebResponse)
-                {
+            String webExceptionDetail;
+
+            if (wex.Response is HttpWebResponse)
+            {                
                     var httpResponse = wex.Response as HttpWebResponse;
                     var responseStream = wex.Response.GetResponseStream();
                     if (responseStream != null)
@@ -1225,30 +1262,35 @@ namespace BrightstarDB.Client
                         using (var rdr = new StreamReader(responseStream))
                         {
                             var responseContent = rdr.ReadToEnd();
-                            Logging.LogWarning(BrightstarEventId.TransportError,
-                                               "HTTP {0} to {1} failed. Server response was: {2} - {3} : {4}",
+
+                            webExceptionDetail = String.Format("HTTP {0} to {1} failed. Server response was: {2} - {3} : {4}",
                                                httpMethod, requestUri, httpResponse.StatusCode,
                                                httpResponse.StatusDescription,
                                                responseContent);
-                            return;
                         }
                     }
-                    Logging.LogWarning(BrightstarEventId.TransportError,
-                                       "HTTP {0} to {1} failed. Server response was: {2} - {3}",
-                                       httpMethod, requestUri, httpResponse.StatusCode,
-                                       httpResponse.StatusDescription);
-                    return;
-                }
+                    else
+                    {
+                        webExceptionDetail = String.Format("HTTP {0} to {1} failed. Server response was: {2} - {3}",
+                                           httpMethod, requestUri, httpResponse.StatusCode,
+                                           httpResponse.StatusDescription);                        
+                    }                                    
             }
-            Logging.LogWarning(BrightstarEventId.TransportError,
-                               "HTTP {0} to {1} failed. Could not process server response.",
-                               httpMethod, requestUri);
+            else
+            {
+                webExceptionDetail = String.Format("HTTP {0} to {1} failed. Could not process server response.",
+                    httpMethod, requestUri);                
+            }
+
+            Logging.LogWarning(BrightstarEventId.TransportError, webExceptionDetail);
+            return webExceptionDetail;
         }
 
         private static readonly byte[] Mark = new byte[] { (byte)'-', (byte)'_', (byte)'.', (byte)'~' };
 
-        private static String EscapeDataString(string value)
+        private static string EscapeDataString(string value)
         {
+            if (string.IsNullOrEmpty(value)) return string.Empty;
             var escapeBuilder = new StringBuilder();
             var bytes = Encoding.UTF8.GetBytes(value);
             foreach (var octet in bytes)

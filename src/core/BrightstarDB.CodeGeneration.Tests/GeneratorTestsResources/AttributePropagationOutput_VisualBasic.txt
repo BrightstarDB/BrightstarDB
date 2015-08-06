@@ -1,0 +1,97 @@
+﻿Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class EntityContext
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityContext
+
+        Shared Sub New()
+            Dim provider = New Global.BrightstarDB.EntityFramework.ReflectionMappingProvider()
+            provider.AddMappingsForType(Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance, GetType(Global.BrightstarDB.CodeGeneration.Tests.IAttributePropagation))
+            Global.BrightstarDB.EntityFramework.EntityMappingStore.Instance.SetImplMapping(Of Global.BrightstarDB.CodeGeneration.Tests.IAttributePropagation, BrightstarDB.CodeGeneration.Tests.AttributePropagation)()
+        End Sub
+
+        Public Sub New()
+            Me.InitializeContext()
+        End Sub
+
+        Public Sub New(dataObjectStore As Global.BrightstarDB.Client.IDataObjectStore)
+            MyBase.New(dataObjectStore)
+            Me.InitializeContext()
+        End Sub
+
+        Public Sub New(updateGraphUri As String, datasetGraphUris As Global.System.Collections.Generic.IEnumerable(Of System.String), versionGraphUri As String)
+            MyBase.New(updateGraphUri, datasetGraphUris, versionGraphUri)
+            Me.InitializeContext()
+        End Sub
+
+        Public Sub New(connectionString As String, Optional enableOptimisticLocking As System.Boolean? = Nothing, Optional updateGraphUri As String = Nothing, Optional datasetGraphUris As Global.System.Collections.Generic.IEnumerable(Of System.String) = Nothing, Optional versionGraphUri As String = Nothing)
+            MyBase.New(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+            Me.InitializeContext()
+        End Sub
+
+        Private Sub InitializeContext()
+            Me._AttributePropagations = New Global.BrightstarDB.EntityFramework.BrightstarEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IAttributePropagation)(Me)
+        End Sub
+
+        Public Function EntitySet(Of T As Class)() As Global.BrightstarDB.EntityFramework.IEntitySet(Of T)
+            Dim type As Global.System.Type = GetType(T)
+            If type.Equals(GetType(Global.BrightstarDB.CodeGeneration.Tests.IAttributePropagation)) Then
+                Return DirectCast(Me.AttributePropagations, Global.BrightstarDB.EntityFramework.IEntitySet(Of T))
+            End If
+
+            Throw New Global.System.InvalidOperationException(((GetType(T)).FullName) + (" is not a recognized entity interface type."))
+        End Function
+
+        Private _AttributePropagations As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IAttributePropagation)
+
+        Public ReadOnly Property AttributePropagations As Global.BrightstarDB.EntityFramework.IEntitySet(Of Global.BrightstarDB.CodeGeneration.Tests.IAttributePropagation)
+            Get
+                Return Me._AttributePropagations
+            End Get
+        End Property
+    End Class
+End Namespace
+Namespace BrightstarDB.CodeGeneration.Tests
+
+    <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
+    <System.Runtime.CompilerServices.CompilerGenerated>
+    Public Partial Class AttributePropagation
+        Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
+        Implements Global.BrightstarDB.CodeGeneration.Tests.IAttributePropagation
+
+        Public Sub New()
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext)
+            MyBase.New(context, GetType(AttributePropagation))
+        End Sub
+
+        Public Sub New(context As Global.BrightstarDB.EntityFramework.BrightstarEntityContext, dataObject As Global.BrightstarDB.Client.IDataObject)
+            MyBase.New(context, dataObject)
+        End Sub
+
+        <Global.System.ComponentModel.BrowsableAttribute(True)>
+        Public Property Id As System.String Implements Global.BrightstarDB.CodeGeneration.Tests.IAttributePropagation.Id
+            Get
+                Return MyBase.GetKey()
+            End Get
+
+            Set(value As System.String)
+                MyBase.SetKey(value)
+            End Set
+        End Property
+
+        <Global.System.ComponentModel.BrowsableAttribute(True)>
+        <Global.System.ComponentModel.DescriptionAttribute("This should carry through.")>
+        Public Property Number As System.Int32 Implements Global.BrightstarDB.CodeGeneration.Tests.IAttributePropagation.Number
+            Get
+                Return MyBase.GetRelatedProperty(Of System.Int32)("Number")
+            End Get
+
+            Set(value As System.Int32)
+                MyBase.SetRelatedProperty("Number", value)
+            End Set
+        End Property
+    End Class
+End Namespace

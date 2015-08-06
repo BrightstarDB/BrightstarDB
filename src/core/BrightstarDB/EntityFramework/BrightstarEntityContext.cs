@@ -10,9 +10,13 @@ using System.Xml.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Rdf;
+using BrightstarDB.Storage.BTreeStore;
 using BrightstarDB.Storage.Persistence;
 using Remotion.Linq.Clauses;
-
+using VDS.RDF;
+using VDS.RDF.Nodes;
+using VDS.RDF.Query;
+using SparqlResult = BrightstarDB.Client.SparqlResult;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
@@ -26,12 +30,24 @@ namespace BrightstarDB.EntityFramework
     {
         private readonly IDataObjectStore _store;
         private readonly Dictionary<string, List<BrightstarEntityObject>> _trackedObjects;
+        private Dictionary<Type, EntitySetInfo> _entitySets = null;
+
+        private struct EntitySetInfo
+        {
+            public IEntitySet entitySet;
+            public MethodInfo addMethodInfo;
+            public MethodInfo addOrUpdateMethodInfo;
+        }
 
         /// <summary>
         /// Creates a new domain context
         /// </summary>
         /// <param name="store">The Brightstar store that manages the data</param>
-        protected BrightstarEntityContext(IDataObjectStore store)
+        /// <param name="enableFilterOptimization">If true, then optimizations will be enable in the LINQ to SPARQL processor which write certain
+        /// filter operations as SPARQL graph patterns so that they are more efficiently processed by BrightstarDB. You should not enable these
+        /// optimizations if querying triple stores other than BrightstarDB or when querying RDF data that has not been created through
+        /// the BrightstarDB entity framework. The default value is false (optimizations disabled).</param>
+        protected BrightstarEntityContext(IDataObjectStore store, bool enableFilterOptimization = false)
         {
             _store = store;
             _trackedObjects = new Dictionary<string, List<BrightstarEntityObject>>();
@@ -48,16 +64,23 @@ namespace BrightstarDB.EntityFramework
         /// the remarks below.</param>
         /// <param name="versionGraphUri">OPTIONAL: The URI identifier of the graph that contains version number statements for entities. 
         /// If not defined, the <paramref name="updateGraphUri"/> will be used.</param>
+        /// <param name="enableFilterOptimization">If true, then optimizations will be enable in the LINQ to SPARQL processor which write certain
+        /// filter operations as SPARQL graph patterns so that they are more efficiently processed by BrightstarDB. You should not enable these
+        /// optimizations if querying triple stores other than BrightstarDB or when querying RDF data that has not been created through
+        /// the BrightstarDB entity framework. If not specified, the default value is true (enabled) when the connection string is a
+        /// BrightstarDB REST or embedded connection string and false (disabled) for other connection types.</param>
         /// <remarks>
         /// <para>If <paramref name="datasetGraphUris"/> is null, then the context will query the graphs defined by 
         /// <paramref name="updateGraphUri"/> and <paramref name="versionGraphUri"/> only. If all three parameters
         /// are null then the context will query across all graphs in the store.</para>
         /// </remarks>
         protected BrightstarEntityContext(string connectionString, bool? enableOptimisticLocking = null,
-            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null )
+            string updateGraphUri = null, IEnumerable<string> datasetGraphUris = null, string versionGraphUri = null,
+            bool? enableFilterOptimization = null)
         {
             var cstr = new ConnectionString(connectionString);
             AssertStoreFromConnectionString(cstr);
+            FilterOptimizationEnabled = enableFilterOptimization ?? (cstr.Type == ConnectionType.Rest || cstr.Type == ConnectionType.Embedded);
             _store = OpenStore(cstr, enableOptimisticLocking,
                 updateGraphUri, datasetGraphUris, versionGraphUri);
             _trackedObjects = new Dictionary<string, List<BrightstarEntityObject>>();
@@ -74,6 +97,167 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         public IEnumerable<BrightstarEntityObject> TrackedObjects { get { return _trackedObjects.Values.SelectMany(v=>v); } }
 
+        /// <summary>
+        /// Attempt to add the specified object to this context
+        /// </summary>
+        /// <param name="o">The object to be added</param>
+        /// <remarks>The object <paramref name="o"/> must implement one of the entity interfaces supported by this entity context.</remarks>
+        /// <exception cref="InvalidOperationException">Raised if <paramref name="o"/> does not implement one of the entity interfaces supported by this entity context.</exception>
+        /// <exception cref="ArgumentNullException">Raised if <paramref name="o"/> is null.</exception>
+        public void Add(object o)
+        {
+            if (o == null) throw new ArgumentNullException("o");
+            EnsureEntitySetInfo();
+            _Add(o);
+        }
+
+        private void _Add(object o)
+        {
+            var added = false;
+            foreach (var i in o.GetType().GetInterfaces())
+            {
+                EntitySetInfo entitySetInfo;
+                if (_entitySets.TryGetValue(i, out entitySetInfo))
+                {
+                    entitySetInfo.addMethodInfo.Invoke(entitySetInfo.entitySet, new[] {o});
+                    added = true;
+                }
+            }
+            if (!added)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Cannot add an object of type {0} to this context as it does not implement any known entity interface.", o.GetType().FullName));
+            }
+        }
+
+        /// <summary>
+        /// Attempt to add the specified object to this context or update the object in this context if the object already has an ID assigned to it
+        /// </summary>
+        /// <param name="o">The object to be added / updated</param>
+        /// <remarks>The object <paramref name="o"/> must implement one of the entity interfaces supported by this entity context.</remarks>
+        /// <exception cref="InvalidOperationException">Raised if <paramref name="o"/> does not implement one of the entity interfaces supported by this entity context.</exception>
+        /// <exception cref="ArgumentNullException">Raised if <paramref name="o"/> is null.</exception>
+        public void AddOrUpdate(object o)
+        {
+            if (o == null) throw new ArgumentNullException("o");
+            EnsureEntitySetInfo();
+            _AddOrUpdate(o);
+        }
+
+        private void _AddOrUpdate(object o)
+        {
+            var added = false;
+            foreach (var i in o.GetType().GetInterfaces())
+            {
+                EntitySetInfo entitySetInfo;
+                if (_entitySets.TryGetValue(i, out entitySetInfo))
+                {
+                    entitySetInfo.addOrUpdateMethodInfo.Invoke(entitySetInfo.entitySet, new[] { o });
+                    added = true;
+                }
+            }
+            if (!added)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Cannot add or update an object of type {0} to this context as it does not implement any known entity interface.", o.GetType().FullName));
+            }
+        }
+
+
+        /// <summary>
+        /// Attempts to add the items in the provided enumeration to this context.
+        /// </summary>
+        /// <param name="items">An enumeration of the items to be added</param>
+        /// <remarks>Each item in the enumeration must implement at least one of the entity interfaces supported by this entity context.
+        /// This method will attempt to add each item in turn, any failures for the addition of individual items will be notified at
+        /// in an AggregateException thrown after all items have been processed. At this point, calling SaveChanges on the context
+        /// will persistently store only those items that have been successfully added.</remarks>
+        /// <exception cref="ArgumentNullException">Raised if <paramref name="items"/> is null</exception>
+        /// <exception cref="AggregateException">Raised if the adding of one or more items to the context failed. The inner exceptions list each 
+        /// of the exceptions encountered for the individual items that falied.</exception>
+        public void AddRange(IEnumerable items)
+        {
+            if (items == null) throw new ArgumentNullException("items");
+            List<Exception> exceptions = null;
+            EnsureEntitySetInfo();
+            foreach (var item in items)
+            {
+                try
+                {
+                    _Add(item);
+                }
+                catch (Exception ex)
+                {
+                    if (exceptions == null) exceptions = new List<Exception>();
+                    exceptions.Add(ex);
+                }
+            }
+            if (exceptions != null)
+            {
+                throw new AggregateException("One or more items could not be added to the context.", exceptions);
+            }
+        }
+
+
+        /// <summary>
+        /// Attempts to add the items in the provided enumeration to this context, or update the items in the context if they are already assigned an ID.
+        /// </summary>
+        /// <param name="items">An enumeration of the items to be added or updated</param>
+        /// <remarks>Each item in the enumeration must implement at least one of the entity interfaces supported by this entity context.
+        /// This method will attempt to add/update each item in turn, any failures for the addition of individual items will be notified at
+        /// in an AggregateException thrown after all items have been processed. At this point, calling SaveChanges on the context
+        /// will persistently store only those items that have been successfully added.</remarks>
+        /// <exception cref="ArgumentNullException">Raised if <paramref name="items"/> is null</exception>
+        /// <exception cref="AggregateException">Raised if the adding of one or more items to the context failed. The inner exceptions list each 
+        /// of the exceptions encountered for the individual items that falied.</exception>
+        public void AddOrUpdateRange(IEnumerable items)
+        {
+            if (items == null) throw new ArgumentNullException("items");
+            List<Exception> exceptions = null;
+            EnsureEntitySetInfo();
+            foreach (var item in items)
+            {
+                try
+                {
+                    _AddOrUpdate(item);
+                }
+                catch (Exception ex)
+                {
+                    if (exceptions == null) exceptions = new List<Exception>();
+                    exceptions.Add(ex);
+                }
+            }
+            if (exceptions != null)
+            {
+                throw new AggregateException("One or more items could not be added to the context.", exceptions);
+            }
+        }
+
+
+        private void EnsureEntitySetInfo()
+        {
+            if (_entitySets == null)
+            {
+                Dictionary<Type, EntitySetInfo> entitySets = new Dictionary<Type, EntitySetInfo>();
+                foreach (var p in this.GetType()
+                    .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .Where(
+                        p =>
+                            p.PropertyType.IsGenericType &&
+                            p.PropertyType.UnderlyingSystemType.Name.Equals("IEntitySet`1")))
+                {
+                    var entityType = p.PropertyType.GetGenericArguments()[0];
+                    var entitySetInfo = new EntitySetInfo
+                    {
+                        entitySet = p.GetValue(this, null) as IEntitySet,
+                        addMethodInfo = p.PropertyType.GetMethod("Add", new Type[] {entityType}),
+                        addOrUpdateMethodInfo = p.PropertyType.GetMethod("AddOrUpdate", new Type[] {entityType})
+                    };
+                    entitySets[entityType] = entitySetInfo;
+                }
+                _entitySets = entitySets;
+            }
+        }
         private static void AssertStoreFromConnectionString(ConnectionString connectionString)
         {
             if (connectionString.Type == ConnectionType.DotNetRdf || connectionString.Type == ConnectionType.Sparql)
@@ -226,15 +410,9 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         private void EnsureIdentity()
         {
-            foreach (var entry in _trackedObjects)
+            foreach (var item in _trackedObjects.Values.SelectMany(x => x.Where(y => y.IsModified)).ToList())
             {
-                foreach (var item in entry.Value)
-                {
-                    if (item.IsModified)
-                    {
-                        EnsureIdentity(item);
-                    }
-                }
+                EnsureIdentity(item);
             }
         }
 
@@ -250,90 +428,13 @@ namespace BrightstarDB.EntityFramework
                 }
                 var key = identityInfo.KeyConverter.GenerateKey(propertyValues, identityInfo.KeySeparator, item.GetType());
                 if (key == null) throw new EntityKeyRequiredException();
-                if (!key.Equals(item.GetKey())) throw new EntityKeyChangedException();
-            }
-        }
-
-        /*
-        internal IdentityInfo GetIdentityInfo(Type t)
-        {
-            IdentityInfo cachedInfo;
-            if (_identityCache.TryGetValue(t, out cachedInfo)) return cachedInfo;
-
-            var baseUri = Constants.GeneratedUriPrefix;
-            PropertyInfo[] keyProperties = null;
-            var keySeparator = DefaultCompositeKeySeparator;
-            IKeyConverter keyConverter = null;
-
-            var interfaces = t.GetInterfaces().Where(i => i.GetCustomAttributes(typeof(EntityAttribute), true).Any());
-            var identityProperty =
-                interfaces.SelectMany(i => i.GetProperties()).FirstOrDefault(
-                    x => x.GetCustomAttributes(typeof(IdentifierAttribute), true).Any());
-            if (identityProperty != null)
-            {
-                var identityAttr =
-                    identityProperty.GetCustomAttributes(typeof(IdentifierAttribute), true).FirstOrDefault() as
-                    IdentifierAttribute;
-                var declaringType = identityProperty.DeclaringType;
-                if (identityAttr != null)
+                if (!key.Equals(item.GetKey()))
                 {
-                    if (identityAttr.BaseAddress != null && identityAttr.BaseAddress.Contains(":"))
-                    {
-                        var prefix = identityAttr.BaseAddress.Substring(0, identityAttr.BaseAddress.IndexOf(':'));
-                        var namespaceDecl = identityProperty.DeclaringType == null ? null :
-                            identityProperty.DeclaringType.Assembly.GetCustomAttributes(
-                                typeof(NamespaceDeclarationAttribute), false).Cast<NamespaceDeclarationAttribute>().
-                                FirstOrDefault(nda => nda.Prefix.Equals(prefix));
-                        if (namespaceDecl != null)
-                        {
-                            baseUri = namespaceDecl.Reference +
-                                      identityAttr.BaseAddress.Substring(identityAttr.BaseAddress.IndexOf(':') + 1);
-                        }
-                        else
-                        {
-                            baseUri = identityAttr.BaseAddress;
-                        }
-                    }
-
-                    if (identityAttr.KeyProperties != null && declaringType != null)
-                    {
-                        keyProperties = new PropertyInfo[identityAttr.KeyProperties.Length];
-                        for (int i = 0; i < identityAttr.KeyProperties.Length; i++)
-                        {
-                            var propertyName = identityAttr.KeyProperties[i];
-                            var propertyInfo = declaringType.GetProperty(propertyName);
-                            if (propertyInfo == null)
-                            {
-                                throw new EntityFrameworkException(
-                                    "Cannot find declared (composite) key property '{0}' on type '{1}'.", propertyName,
-                                    declaringType.FullName);
-                            }
-                            keyProperties[i] = propertyInfo;
-                        }
-                        keySeparator = identityAttr.KeySeparator ?? DefaultCompositeKeySeparator;
-                        if (identityAttr.KeyConverterType != null)
-                        {
-                            keyConverter = Activator.CreateInstance(identityAttr.KeyConverterType) as IKeyConverter;
-                            if (keyConverter == null)
-                            {
-                                throw new EntityFrameworkException(
-                                    "Cannot instantiate class {0} as an IKeyConverter instance.", identityAttr.KeyConverterType);
-                            }
-                        }
-                        else
-                        {
-                            keyConverter = new DefaultKeyConverter();
-                        }
-
-                    }
-
+                    throw new EntityKeyChangedException();
                 }
             }
-            cachedInfo = new IdentityInfo(baseUri, keyProperties, keySeparator, keyConverter);
-            _identityCache[t] = cachedInfo;
-            return cachedInfo;
         }
-         */
+
         /// <summary>
         /// Updates a single object in the object context with data from the data source
         /// </summary>
@@ -375,9 +476,9 @@ namespace BrightstarDB.EntityFramework
         /// </summary>
         /// <param name="sparqlQuery">The query to execute</param>
         /// <returns></returns>
-        public override XDocument ExecuteQuery(string sparqlQuery)
+        public override ISparqlResult ExecuteQuery(string sparqlQuery)
         {
-            return _store.ExecuteSparql(sparqlQuery).ResultDocument;
+            return _store.ExecuteSparql(sparqlQuery);
         }
 
         #region Bindings
@@ -439,22 +540,44 @@ namespace BrightstarDB.EntityFramework
         private IEnumerable<T> BindRowsToEntites<T>(SparqlResult sparqlQueryResult)
         {
             var sparqlResult = sparqlQueryResult;
-            var resultDoc = sparqlResult.ResultDocument;
+            var resultSet = sparqlResult.ResultSet;
+            if (resultSet == null) throw new ArgumentException("Result does not contain a SPARQL Result Table", nameof(sparqlQueryResult));
             var converter = GetStringConverter(typeof(T));
             if (converter == null)
             {
                 throw new EntityFrameworkException("No SPARQL results conversion found from string to type '{0}'", typeof(T).FullName);
             }
-            foreach (var row in resultDoc.SparqlResultRows())
+            foreach (var row in resultSet)
             {
-                var value = row.GetColumnValue(0);
-                if (value.GetType() == typeof(T))
+                // TODO: Could now make better use of IValuedNode?
+                var literal = row[0] as ILiteralNode;
+                if (literal == null)
                 {
-                    yield return (T)value;
+                    if (typeof (Uri) == typeof (T))
+                    {
+                        var uriNode = row[0] as IUriNode;
+                        if (uriNode != null)
+                        {
+                            object v = uriNode.Uri;
+                            yield return (T) v;
+                        }
+                    }
+                    if (typeof (string) == typeof (T))
+                    {
+                        object v = row[0].ToString();
+                        yield return (T) v;
+                    }
                 }
                 else
                 {
-                    yield return (T)converter(row.GetColumnValue(0).ToString(), row.GetLiteralLanguageCode(0));
+                    if (typeof (string) == typeof (T))
+                    {
+                        yield return (T) (object) literal.Value;
+                    }
+                    else
+                    {
+                        yield return (T) converter(literal.Value, literal.Language);
+                    }
                 }
             }
         }
@@ -464,13 +587,15 @@ namespace BrightstarDB.EntityFramework
             if (sparqlLinqQueryContext.HasMemberInitExpression)
             {
                 var sparqlResult = _store.ExecuteSparql(sparqlLinqQueryContext);
-                var resultDoc = sparqlResult.ResultDocument;
-                foreach (var row in resultDoc.SparqlResultRows())
+                var resultSet = sparqlResult.ResultSet;
+                foreach (var row in resultSet)
                 {
                     var values = new Dictionary<string, object>();
-                    foreach (var c in resultDoc.GetVariableNames())
+                    foreach (var c in resultSet.Variables)
                     {
-                        values[c] = row.GetColumnValue(c);
+                        var node = row[c];
+                        var lit = node as ILiteralNode;
+                        values[c] = lit?.Value ?? node.ToString();
                     }
                     var value = sparqlLinqQueryContext.ApplyMemberInitExpression<T>(values, ConvertString);
                     yield return (T)value;
@@ -501,20 +626,34 @@ namespace BrightstarDB.EntityFramework
                 }
 
                 var sparqlResult = sparqlQueryResult;
-                var resultDoc = sparqlResult.ResultDocument;
-                foreach (var row in resultDoc.SparqlResultRows())
+                var resultSet = sparqlResult.ResultSet;
+                foreach (var row in resultSet)
                 {
                     var args = new object[anonymousConstructorArgs.Count];
                     for (int i = 0; i < anonymousConstructorArgs.Count; i++)
                     {
                         var argInfo = anonymousConstructorArgs[i];
-                        var colValue = row.GetColumnValue(argInfo.VariableName);
-                        var colLang = row.GetLiteralLanguageCode(argInfo.VariableName);
-                        args[i] = colValue == null ? argInfo.DefaultValue : argInfo.ValueConverter(colValue.ToString(), colLang);
+                        var node = row[argInfo.VariableName];
+                        var colValue = GetNodeStringValue(node);
+                        var colLang = GetLiteralLanguageCode(node);
+                        args[i] = colValue == null ? argInfo.DefaultValue : argInfo.ValueConverter(colValue, colLang);
                     }
                     yield return (T)Activator.CreateInstance(typeof(T), args);
                 }
             }
+        }
+
+        private static string GetNodeStringValue(INode node)
+        {
+            if (node == null) return null;
+            var lit = node as ILiteralNode;
+            return lit?.Value ?? node.ToString();
+        }
+
+        private static string GetLiteralLanguageCode(INode node)
+        {
+            var lit = node as ILiteralNode;
+            return lit?.Language;
         }
 
         #endregion
@@ -634,22 +773,23 @@ namespace BrightstarDB.EntityFramework
         /// the enumeration returns a single object, otherwise it returns no objects.</returns>
         public override IEnumerable<T> ExecuteInstanceQuery<T>(string instanceIdentifier, string typeIdentifier)
         {
-            var sparqlQuery = String.Format("ASK {0} {{ <{1}> a <{2}>. }}", _store.GetDatasetClause(), instanceIdentifier, typeIdentifier);
+            var sparqlQuery = string.Format("ASK {0} {{ <{1}> a <{2}>. }}", _store.GetDatasetClause(), instanceIdentifier, typeIdentifier);
 
 
             var sparqResult = _store.ExecuteSparql(sparqlQuery);
-            var resultDoc = sparqResult.ResultDocument;
-            if (resultDoc.SparqlBooleanResult())
+            var resultSet = sparqResult.ResultSet;
+            if (resultSet.ResultsType == SparqlResultsType.Boolean && resultSet.Result)
             {
                 var dataObject = _store.MakeDataObject(instanceIdentifier);
                 yield return BindDataObject<T>(dataObject, GetImplType(typeof (T)));
             }
-            yield break;
         }
 
         private class AnonymousConstructorArg
         {
+#pragma warning disable 414
             public string PropertyName;
+#pragma warning restore 414
             public string VariableName;
             public Func<string, string, object> ValueConverter;
             public object DefaultValue;
@@ -721,7 +861,7 @@ namespace BrightstarDB.EntityFramework
         {
             var entityType = identifierProperty.DeclaringType;
             var prefix = EntityMappingStore.GetIdentifierPrefix(entityType);
-            return prefix + id;
+            return prefix + Uri.EscapeUriString(id);
         }
 
         /// <summary>
@@ -781,13 +921,27 @@ namespace BrightstarDB.EntityFramework
         ///<returns>The new object</returns>
         public T CreateObject<T>() where T : class
         {
-            //string prefix = EntityMappingStore.GetIdentifierPrefix(typeof (T));
-            var identifierInfo = EntityMappingStore.GetIdentityInfo(typeof(T));
+            var dataObject = CreateDataObject(typeof(T));
+            var bindType = GetImplType(typeof (T));
+
+            return ((T)Activator.CreateInstance(bindType, this, dataObject));
+        }
+
+        /// <summary>
+        /// Creates a new DataObject backing object for a context object of a specific type
+        /// </summary>
+        /// <param name="domainObjectType">The type of domain context object that the data object backs</param>
+        /// <returns>The new data object</returns>
+        internal IDataObject CreateDataObject(Type domainObjectType)
+        {
+            var identifierInfo = EntityMappingStore.GetIdentityInfo(domainObjectType);
             string prefix = identifierInfo == null ? null : identifierInfo.BaseUri;
-            var dataObject = identifierInfo != null && identifierInfo.KeyProperties != null ? null : _store.MakeNewDataObject(prefix);
+            var dataObject = identifierInfo != null && identifierInfo.KeyProperties != null
+                ? null
+                : _store.MakeNewDataObject( String.Empty.Equals(prefix) ? Constants.GeneratedUriPrefix : prefix);
             if (dataObject != null)
             {
-                IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(typeof (T));
+                IEnumerable<string> typeIds = EntityMappingStore.MapTypeToUris(domainObjectType);
                 foreach (var typeId in typeIds)
                 {
                     if (!String.IsNullOrEmpty(typeId))
@@ -797,12 +951,10 @@ namespace BrightstarDB.EntityFramework
                     }
                 }
             }
-            var bindType = GetImplType(typeof (T));
-
-            return ((T)Activator.CreateInstance(bindType, this, dataObject));
+            return dataObject;
         }
 
-        
+
         private object Bind(IDataObject dataObject, Type t)
         {
             if (dataObject == null) return null;

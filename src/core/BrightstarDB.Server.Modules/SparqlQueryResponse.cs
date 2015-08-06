@@ -24,6 +24,10 @@ namespace BrightstarDB.Server.Modules
             {
                 StatusCode = HttpStatusCode.NotModified;
             }
+            catch (NoSuchStoreException)
+            {
+                StatusCode = HttpStatusCode.NotFound;
+            }
         }
     }
 }

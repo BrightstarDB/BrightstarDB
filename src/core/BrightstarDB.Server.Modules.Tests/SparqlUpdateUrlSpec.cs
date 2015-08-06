@@ -94,10 +94,10 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
 
-            var response = app.Get("/foo/update", with=>with.Accept(MediaRange.FromString("text/html")));
+            var response = app.Get("/foo/update", with=>with.Accept(new MediaRange("text/html")));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Body.AsString(), Contains.Substring("<title>BrightstarDB: SPARQL Update</title>"));
+            Assert.That(response.Body.AsString(), Contains.Substring("<title>BrightstarDB - foo - SPARQL Update</title>"));
         }
     }
 }

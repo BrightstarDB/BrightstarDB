@@ -1,0 +1,14 @@
+﻿Imports System.Collections.Generic
+Imports BrightstarDB.EntityFramework
+
+Namespace BrightstarDB.CodeGeneration.Tests
+    Public Interface IInvalidInversePropertyName_A
+        Property Bs As ICollection(Of IInvalidInversePropertyName_B)
+    End Interface
+
+
+    Public Interface IInvalidInversePropertyName_B
+        <InverseProperty("B")>
+        Property A As IInvalidInversePropertyName_A
+    End Interface
+End Namespace

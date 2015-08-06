@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 #if !PORTABLE && !WINDOWS_PHONE
 #endif
+using BrightstarDB.Config;
 using BrightstarDB.Dto;
 using BrightstarDB.Storage;
 using BrightstarDB.Server;
@@ -23,19 +24,35 @@ namespace BrightstarDB.Client
         /// </summary>
         public DateTime? LastResponseTimestamp { get { return null; } }
 
+
         /// <summary>
         /// Create a new instance of the service that attaches to the specified directory location
         /// </summary>
         /// <param name="baseLocation">The full path to the location of the directory that contains one or more Brightstar stores</param>
-        /// <param name="clientConfiguration">An optional configuration for the client.</param>
+        /// <remarks>The embedded server is thread-safe but doesn't support concurrent access to the same base location by multiple
+        /// instances. You should ensure in your code that only one EmbeddedBrightstarService instance is connected to any given base location
+        /// at a given time. For additional control over the service internals, it is recommended to use the overload of this constructor
+        /// that accepts a <see cref="EmbeddedServiceConfiguration"/></remarks>
+        /// 
+        public EmbeddedBrightstarService(string baseLocation)
+            : this(baseLocation, Configuration.EmbeddedServiceConfiguration)
+        {
+            
+        }
+        
+        /// <summary>
+        /// Create a new instance of the service that attaches to the specified directory location
+        /// </summary>
+        /// <param name="baseLocation">The full path to the location of the directory that contains one or more Brightstar stores</param>
+        /// <param name="serviceConfigurationOptions">OPTIONAL: Additional configuration options that apply only when creating an embedded service instance.</param>
         /// <remarks>The embedded server is thread-safe but doesn't support concurrent access to the same base location by multiple
         /// instances. You should ensure in your code that only one EmbeddedBrightstarService instance is connected to any given base location
         /// at a given time.</remarks>
-        public EmbeddedBrightstarService(string baseLocation, ClientConfiguration clientConfiguration = null)
+        public EmbeddedBrightstarService(string baseLocation, EmbeddedServiceConfiguration serviceConfigurationOptions)
         {
             _serverCore = ServerCoreManager.GetServerCore(
-                baseLocation, 
-                clientConfiguration == null ? null : clientConfiguration.PreloadConfiguration);
+                baseLocation,
+                serviceConfigurationOptions ?? Configuration.EmbeddedServiceConfiguration);
         }
 
         #region Implementation of IBrightstarService
@@ -135,6 +152,29 @@ namespace BrightstarDB.Client
         }
 
         /// <summary>
+        /// List the URIs of the named graphs contained in the specified store
+        /// </summary>
+        /// <param name="storeName">The name of the store</param>
+        /// <returns>An enumeration of the URI identifiers of the named graphs in the store.</returns>
+        public IEnumerable<string> ListNamedGraphs(string storeName)
+        {
+            if (storeName == null)
+                throw new ArgumentNullException("storeName", Strings.BrightstarServiceClient_StoreNameMustNotBeNull);
+            if (String.IsNullOrEmpty(storeName))
+                throw new ArgumentException(Strings.BrightstarServiceClient_StoreNameMustNotBeEmptyString,
+                                            "storeName");
+            try
+            {
+                return _serverCore.ListNamedGraphs(storeName);
+            }
+            catch (Exception ex)
+            {
+                Logging.LogError(BrightstarEventId.ServerCoreException, "Error listing named graphs for store {0}.", storeName);
+                throw new BrightstarClientException("Error listing named graphs for store " + storeName + ". " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
         /// Query the store using a SPARQL query
         /// </summary>
         /// <param name="storeName">The name of the store to query</param>
@@ -169,7 +209,7 @@ namespace BrightstarDB.Client
                                    SparqlResultsFormat resultsFormat = null,
             RdfFormat graphFormat = null)
         {
-            return ExecuteQuery(storeName, queryExpression, new[] { defaultGraphUri }, ifNotModifiedSince,
+            return ExecuteQuery(storeName, queryExpression, defaultGraphUri == null ? null : new[] { defaultGraphUri }, ifNotModifiedSince,
                                 resultsFormat, graphFormat);
         }
 
@@ -211,12 +251,16 @@ namespace BrightstarDB.Client
         {
             if (storeName == null) throw new ArgumentNullException("storeName");
             if (queryExpression == null) throw new ArgumentNullException("queryExpression");
+            if (resultsFormat == null && graphFormat == null) throw new ArgumentException("Either resultsFormat or graphFormat must be non-NULL");
 
+            if (!_serverCore.DoesStoreExist(storeName)) throw new NoSuchStoreException(storeName);
             try
             {
                 var pStream = new MemoryStream();
-                streamFormat = _serverCore.Query(storeName, queryExpression, defaultGraphUris, ifNotModifiedSince,
-                                                 resultsFormat, graphFormat, pStream);
+                streamFormat = _serverCore.Query(storeName, queryExpression,
+                    defaultGraphUris == null ? null : defaultGraphUris.Where(x => !string.IsNullOrEmpty(x)), 
+                    ifNotModifiedSince, resultsFormat,
+                    graphFormat, pStream);
                 return new MemoryStream(pStream.ToArray());
             }
             catch (BrightstarStoreNotModifiedException)

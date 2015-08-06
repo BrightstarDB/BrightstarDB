@@ -17,6 +17,11 @@ namespace BrightstarDB
     /// </summary>
     public class Configuration
     {
+        private static bool _enableQueryCache;
+        private static string _queryCacheDirectory;
+        private static int _queryCacheMemory;
+        private static int _queryCacheDiskSpace;
+        private static ICache _queryCache;
         private const string StoreLocationPropertyName = "BrightstarDB.StoreLocation";
         private const string TxnFlushTriggerPropertyName = "BrightstarDB.TxnFlushTripleCount";
         private const string ConnectionStringPropertyName = "BrightstarDB.ConnectionString";
@@ -40,6 +45,8 @@ namespace BrightstarDB
         private const string ResourceCacheLimitName = "BrightstarDB.ResourceCacheLimit";
         private const string StatsUpdateTransactionCountName = "BrightstarDB.StatsUpdate.TransactionCount";
         private const string StatsUpdateTimeSpanName = "BrightstarDB.StatsUpdate.TimeSpan";
+        private const string QueryExecutionTimeoutName = "BrightstarDB.QueryExecutionTimeout";
+        private const string UpdateExecutionTimeoutName = "BrightstarDB.UpdateExecutionTimeout";
 
         private const string PersistenceTypeAppendOnly = "appendonly";
         private const string PersistenceTypeRewrite = "rewrite";
@@ -48,6 +55,9 @@ namespace BrightstarDB
         private const int DefaultQueryCacheDiskSpace = 2048; // in MB
         private const long MegabytesToBytes = 1024*1024;
 
+        private const long DefaultQueryExecutionTimeout =  180000;
+        private const long DefaultUpdateExecutionTimeout = 180000;
+        
 #if WINDOWS_PHONE
         private const int DefaultPageCacheSize = 4; // in MB
         private const int DefaultResourceCacheLimit = 10000; // number of entries
@@ -59,6 +69,7 @@ namespace BrightstarDB
 
         static Configuration()
         {
+            IsRunningOnMono = (Type.GetType("Mono.Runtime") != null);
 #if WINDOWS_PHONE
             var store = IsolatedStorageFile.GetUserStoreForApplication();
             if (!store.DirectoryExists("brightstar"))
@@ -122,11 +133,8 @@ namespace BrightstarDB
             StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
 
             // Advanced embedded application settings - read from the brightstar section of the app/web.config
-            var advancedConfiguration = ConfigurationManager.GetSection("brightstar") as BrightstarConfiguration;
-            if (advancedConfiguration != null)
-            {
-                PreloadConfiguration = advancedConfiguration.PreloadConfiguration;
-            }
+            EmbeddedServiceConfiguration = ConfigurationManager.GetSection("brightstar") as EmbeddedServiceConfiguration ??
+                                           new EmbeddedServiceConfiguration();
 
 #endif
 #if !PORTABLE
@@ -182,6 +190,8 @@ namespace BrightstarDB
             }
 #endif
 #endif
+            QueryExecutionTimeout = GetApplicationSetting(QueryExecutionTimeoutName, DefaultQueryExecutionTimeout);
+            UpdateExecutionTimeout = GetApplicationSetting(UpdateExecutionTimeoutName, DefaultUpdateExecutionTimeout);
         }
 
         /// <summary>
@@ -224,27 +234,67 @@ namespace BrightstarDB
         /// <summary>
         /// Enable or disable server-side SPARQL query cache
         /// </summary>
-        public static bool EnableQueryCache { get; set; }
+        public static bool EnableQueryCache
+        {
+            get { return _enableQueryCache; }
+            set
+            {
+                if (value == _enableQueryCache) return;
+                _enableQueryCache = value;
+                QueryCache = null;
+            }
+        }
 
         /// <summary>
         /// The path to the directory to use for the server-side SPARQL query disk cache
         /// </summary>
-        public static string QueryCacheDirectory { get; set; }
+        public static string QueryCacheDirectory
+        {
+            get { return _queryCacheDirectory; }
+            set
+            {
+                if (value == _queryCacheDirectory) return;
+                _queryCacheDirectory = value;
+                QueryCache = null;
+            }
+        }
 
         /// <summary>
         /// Maximum size of server-side SPARQL query memory cache in MB
         /// </summary>
-        public static int QueryCacheMemory { get; set; }
+        public static int QueryCacheMemory
+        {
+            get { return _queryCacheMemory; }
+            set
+            {
+                if (value == _queryCacheMemory) return;
+                _queryCacheMemory = value;
+                QueryCache = null;
+            }
+        }
 
         /// <summary>
         /// Maximum size of the server-side SPARQL query disk cache in MB
         /// </summary>
-        public static int QueryCacheDiskSpace { get; set; }
+        public static int QueryCacheDiskSpace
+        {
+            get { return _queryCacheDiskSpace; }
+            set
+            {
+                if (value == _queryCacheDiskSpace) return;
+                _queryCacheDiskSpace = value;
+                QueryCache = null;
+            }
+        }
 
         /// <summary>
         /// Retrieves the SPARQL query cache
         /// </summary>
-        public static ICache QueryCache { get; private set; }
+        public static ICache QueryCache
+        {
+            get { return _queryCache ?? (_queryCache = GetQueryCache()); }
+            private set { _queryCache = value; }
+        }
 
 
         /// <summary>
@@ -280,9 +330,9 @@ namespace BrightstarDB
         public static int StatsUpdateTimespan { get; set; }
 
         /// <summary>
-        /// Get or set the configuration for the page cache warmup
+        /// Get or set the additional configuration options for running an embedded service
         /// </summary>
-        public static PageCachePreloadConfiguration PreloadConfiguration { get; set; }
+        public static EmbeddedServiceConfiguration EmbeddedServiceConfiguration { get; set; }
 
         /// <summary>
         /// Set this property to true to enable the use of virtual nodes in SPARQL
@@ -290,6 +340,34 @@ namespace BrightstarDB
         /// </summary>
         public static bool EnableVirtualizedQueries { get; set; }
 
+        /// <summary>
+        /// Boolean flag that is set to true when the Mono runtime is detected.
+        /// </summary>
+        public static bool IsRunningOnMono { get; private set; }
+
+        /// <summary>
+        /// Get or set the SPARQL query execution timeout (in milliseconds)
+        /// </summary>
+        /// <remarks>This configuration value applies only when running against an embedded
+        /// BrightstarDB store. For client-server connections, the timeout will be determined
+        /// by the server.</remarks>
+        public static long QueryExecutionTimeout
+        {
+            get { return VDS.RDF.Options.QueryExecutionTimeout; }
+            set { VDS.RDF.Options.QueryExecutionTimeout = value; }
+        }
+
+        /// <summary>
+        /// Get or set the SPARQL update execution timeout (in milliseconds)
+        /// </summary>
+        /// <remarks>This configuration value applies only when running against an embedded
+        /// BrightstarDB store. For client-server connections, the timeout will be determined
+        /// by the server.</remarks>
+        public static long UpdateExecutionTimeout
+        {
+            get { return VDS.RDF.Options.UpdateExecutionTimeout; }
+            set { VDS.RDF.Options.UpdateExecutionTimeout = value; }
+        }
 #if !PORTABLE
         private static ICache GetQueryCache()
         {
@@ -346,6 +424,18 @@ namespace BrightstarDB
             }
             return defaultValue;
         }
+
+        private static long GetApplicationSetting(string key, long defaultValue)
+        {
+            var setting = GetApplicationSetting(key);
+            long longValue;
+            if (!String.IsNullOrEmpty(setting) && Int64.TryParse(setting, out longValue))
+            {
+                return longValue;
+            }
+            return defaultValue;
+        }
+
 #endif
 
     }

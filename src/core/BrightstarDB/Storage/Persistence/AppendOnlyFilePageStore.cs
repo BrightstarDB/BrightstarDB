@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
 #endif
@@ -11,9 +12,8 @@ namespace BrightstarDB.Storage.Persistence
     internal class AppendOnlyFilePageStore : IPageStore
     {
         private readonly string _path;
-        private readonly Stream _stream;
+        private Stream _stream;
         private readonly int _pageSize;
-        private readonly int _bitShift;
         private ulong _nextPageId;
         private readonly bool _readonly;
         private bool _disposed;
@@ -32,7 +32,7 @@ namespace BrightstarDB.Storage.Persistence
                 throw new ArgumentException("Page size must be a multiple of 4096 bytes");
             }
             _pageSize = pageSize;
-            _bitShift = (int)Math.Log(_pageSize, 2.0);
+            var bitShift = (int)Math.Log(_pageSize, 2.0);
 
             if (!_peristenceManager.FileExists(filePath) && !readOnly)
             {
@@ -40,7 +40,7 @@ namespace BrightstarDB.Storage.Persistence
                 _peristenceManager.CreateFile(filePath);
             }
             _stream = _peristenceManager.GetInputStream(_path);
-            _nextPageId = ((ulong)_stream.Length >> _bitShift) + 1;
+            _nextPageId = ((ulong)_stream.Length >> bitShift) + 1;
             if (!readOnly)
             {
                 _newPages = new List<WeakReference>(512);
@@ -52,12 +52,13 @@ namespace BrightstarDB.Storage.Persistence
             if (!readOnly && !disableBackgroundWrites)
             {
                 _backgroundPageWriter =
-                    new BackgroundPageWriter(persistenceManager.GetOutputStream(filePath, FileMode.Open));
+                    new BackgroundPageWriter(persistenceManager.GetOutputStream(filePath, FileMode.Open), 1024);
             }
 
             if (!readOnly)
             {
                 PageCache.Instance.BeforeEvict += BeforePageCacheEvict;
+                PageCache.Instance.EvictionCompleted += OnEvictionCompleted;
             }
         }
 
@@ -104,6 +105,15 @@ namespace BrightstarDB.Storage.Persistence
             }
         }
 
+        private void OnEvictionCompleted(object sender, EventArgs args)
+        {
+            if (_backgroundPageWriter != null)
+            {
+                // Flush any evicted writable pages to disk
+                _backgroundPageWriter.Flush();
+            }
+        }
+
         #region Implementation of IPageStore
 
         public IPage Retrieve(ulong pageId, BrightstarProfiler profiler)
@@ -125,25 +135,12 @@ namespace BrightstarDB.Storage.Persistence
                     profiler.Incr("PageCache Hit");
                     return page;
                 }
-                if (_backgroundPageWriter != null)
-                {
-                    // See if the page is currently queued for background write
-                    if (_backgroundPageWriter.TryGetPage(pageId, out page))
-                    {
-                        profiler.Incr("BackgroundWriter Queue Hit");
-                        return page;
-                    }
-                }
                 using (profiler.Step("Load Page"))
                 {
                     profiler.Incr("PageCache Miss");
                     using (profiler.Step("Create FilePage"))
                     {
                         page = new FilePage(_stream, pageId, _pageSize);
-                        if (_backgroundPageWriter != null)
-                        {
-                            _backgroundPageWriter.ResetTimestamp(pageId);
-                        }
 #if DEBUG_PAGESTORE
                         Logging.LogDebug("Load {0} {1}", pageId, BitConverter.ToInt32(page.Data, 0));
 #endif
@@ -178,36 +175,29 @@ namespace BrightstarDB.Storage.Persistence
         {
             using (profiler.Step("PageStore.Commit"))
             {
-                var livePages = new List<IPage>();
+                var pagesToWrite = _newPages.Where(rf => rf.IsAlive).Select(rf => rf.Target as IPage).Where(pg => pg != null);
                 if (_backgroundPageWriter != null)
                 {
-                    foreach (var p in _newPages)
+                    foreach (var page in pagesToWrite)
                     {
-                        if (p.IsAlive)
-                        {
-                            _backgroundPageWriter.QueueWrite(p.Target as IPage, commitId);
-                            livePages.Add(p.Target as IPage);
-                        }
+                        _backgroundPageWriter.QueueWrite(page, commitId);
                     }
                     _backgroundPageWriter.Flush();
                     RestartBackgroundWriter();
-                    PageCache.Instance.Clear(_path);
                 }
                 else
                 {
                     using (var outputStream = _peristenceManager.GetOutputStream(_path, FileMode.Open))
                     {
-                        foreach (var p in _newPages)
+                        foreach (var page in pagesToWrite)
                         {
-                            if (p.IsAlive)
-                            {
-                                (p.Target as IPage).Write(outputStream, commitId);
-                            }
+                            page.Write(outputStream, commitId);
                         }
                     }
                 }
                 _newPages.Clear();
                 _newPageOffset = _nextPageId;
+                PageCache.Instance.Clear(_path);
             }
             
         }
@@ -227,13 +217,6 @@ namespace BrightstarDB.Storage.Persistence
             {
                 var page = Retrieve(pageId, profiler);
                 page.SetData(data, srcOffset, pageOffset, len);
-                if (_backgroundPageWriter != null)
-                {
-#if DEBUG_PAGESTORE
-                    Logging.LogDebug("Mark {0}", page.Id);
-#endif
-                    _backgroundPageWriter.QueueWrite(page, commitId);
-                }
             }
         }
 
@@ -251,8 +234,7 @@ namespace BrightstarDB.Storage.Persistence
 
         public IPage GetWriteablePage(ulong txnId, IPage page)
         {
-            if (IsWriteable(page)) return page;
-            return Create(txnId, page.Data);
+            return IsWriteable(page) ? page : Create(txnId, page.Data);
         }
 
         /// <summary>
@@ -289,10 +271,10 @@ namespace BrightstarDB.Storage.Persistence
                 if (_stream != null)
                 {
                     _stream.Close();
+                    _stream = null;
                 }
                 if (_backgroundPageWriter != null)
                 {
-                    _backgroundPageWriter.Shutdown();
                     _backgroundPageWriter.Dispose();
                     _backgroundPageWriter = null;
                 }
@@ -365,10 +347,9 @@ namespace BrightstarDB.Storage.Persistence
             {
                 lock (this)
                 {
-                    _backgroundPageWriter.Shutdown();
                     _backgroundPageWriter.Dispose();
                     _backgroundPageWriter =
-                        new BackgroundPageWriter(_peristenceManager.GetOutputStream(_path, FileMode.Open));
+                        new BackgroundPageWriter(_peristenceManager.GetOutputStream(_path, FileMode.Open), 1024);
                 }
             }
         }

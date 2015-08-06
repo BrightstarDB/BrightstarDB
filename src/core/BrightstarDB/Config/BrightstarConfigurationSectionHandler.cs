@@ -21,28 +21,37 @@ namespace BrightstarDB.Config
         /// <param name="parent">Parent object.</param><param name="configContext">Configuration context object.</param><param name="section">Section XML node.</param><filterpriority>2</filterpriority>
         public object Create(object parent, object configContext, XmlNode section)
         {
-            BrightstarConfiguration ret = null;
-            if (section is XmlElement)
+            if (!(section is XmlElement)) return null;
+            var ret = new EmbeddedServiceConfiguration();
+            var sectionEl = section as XmlElement;
+            var preloadPages = sectionEl.GetElementsByTagName("preloadPages").Item(0) as XmlElement;
+            if (preloadPages != null)
             {
-                ret = new BrightstarConfiguration();
-                var sectionEl = section as XmlElement;
-                var preloadPages = sectionEl.GetElementsByTagName("preloadPages").Item(0) as XmlElement;
-                if (preloadPages != null)
-                {
-                    ret.PreloadConfiguration = ProcessPreloadConfiguration(preloadPages);
-                }
+                ret.PreloadConfiguration = ProcessPreloadConfiguration(preloadPages);
+            }
+            var txnLogging =
+                sectionEl.GetElementsByTagName("transactionLogging").OfType<XmlElement>().FirstOrDefault();
+            if (txnLogging != null)
+            {
+                ret.EnableTransactionLoggingOnNewStores = IsEnabled(txnLogging);
             }
             return ret;
         }
 
+        private static bool IsEnabled(XmlElement moduleElement, bool defaultValue = false)
+        {
+            if (!moduleElement.HasAttribute("enabled"))
+            {
+                return defaultValue;
+            }
+            var enabled = moduleElement.GetAttribute("enabled");
+            return enabled.ToLowerInvariant().Equals("true");
+        }
+
         private static PageCachePreloadConfiguration ProcessPreloadConfiguration(XmlElement preloadPages)
         {
-            var enabled = preloadPages.GetAttribute("enabled");
-            if (!enabled.ToLowerInvariant().Equals("true"))
-            {
-                return new PageCachePreloadConfiguration {Enabled = false};
-            }
-            var preloadConfiguration = new PageCachePreloadConfiguration {Enabled = true};
+            var enabled = IsEnabled(preloadPages);
+            var preloadConfiguration = new PageCachePreloadConfiguration {Enabled = enabled};
             decimal defaultRatio;
             preloadConfiguration.DefaultCacheRatio = Decimal.TryParse(preloadPages.GetAttribute("defaultCacheRatio"),
                                                                       out defaultRatio)

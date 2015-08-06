@@ -13,6 +13,7 @@ namespace BrightstarDB.PerformanceTests
 {
     [TestFixture(true)]
     [TestFixture(false)]
+    [Category("LongRunning")]
     public class SparqlPerformance
     {
         private readonly bool _useVirtualNodes;
@@ -49,7 +50,7 @@ namespace BrightstarDB.PerformanceTests
 
             // Profile
             var profiler = new BrightstarProfiler("SimpleJoinQuery");
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 using (profiler.Step("ExecuteQuery"))
                 {

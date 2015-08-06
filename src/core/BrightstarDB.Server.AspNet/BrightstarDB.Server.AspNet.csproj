@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\..\..\common.proj" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -22,6 +23,7 @@
     <TargetFrameworkProfile />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,6 +33,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -42,16 +45,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Nancy, Version=0.22.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.0.22.2\lib\net40\Nancy.dll</HintPath>
+      <HintPath>..\packages\Nancy.1.2.0\lib\net40\Nancy.dll</HintPath>
     </Reference>
-    <Reference Include="Nancy.Authentication.Basic">
-      <HintPath>..\packages\Nancy.Authentication.Basic.0.22.2\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
-    </Reference>
-    <Reference Include="Nancy.Hosting.Aspnet, Version=0.22.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Nancy.Authentication.Basic, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Nancy.Hosting.Aspnet.0.22.2\lib\net40\Nancy.Hosting.Aspnet.dll</HintPath>
+      <HintPath>..\packages\Nancy.Authentication.Basic.1.2.0\lib\net40\Nancy.Authentication.Basic.dll</HintPath>
+    </Reference>
+    <Reference Include="Nancy.Hosting.Aspnet, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Nancy.Hosting.Aspnet.1.2.0\lib\net40\Nancy.Hosting.Aspnet.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web.DynamicData" />
@@ -72,10 +76,12 @@
   <ItemGroup>
     <Content Include="assets\core.css" />
     <Content Include="assets\jquery-1.10.2.min.js" />
-    <Content Include="Views\sample.html" />
+    <Content Include="assets\swagger-ui\swagger-ui.js" />
+    <Content Include="assets\swagger-ui\swagger-ui.min.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AspNetRootSourceProvider.cs" />
     <Compile Include="Authentication\MembershipUserIdentity.cs" />
     <Compile Include="Authentication\MembershipValidator.cs" />
     <Compile Include="DefaultBootstrapper.cs" />
@@ -83,20 +89,23 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-    <Content Include="Views\JobResponse.cshtml" />
     <Content Include="Views\Layout.sshtml" />
-    <Content Include="Views\ListPaging.cshtml" />
-    <Content Include="Views\PagedCommitPointResponse.cshtml" />
-    <Content Include="Views\PagedJobResponse.cshtml" />
-    <Content Include="Views\PagedStatisticsResponse.cshtml" />
-    <Content Include="Views\PagedTransactionResponse.cshtml" />
-    <Content Include="Views\SparqlResult.cshtml" />
-    <Content Include="Views\SparqlUpdate.cshtml" />
-    <Content Include="Views\StoreDeleted.cshtml" />
-    <Content Include="Views\StoreResponse.cshtml" />
-    <Content Include="Views\StoresResponse.cshtml" />
-    <Content Include="Views\StoresResponseObject.sshtml" />
-    <Content Include="Views\_Layout.cshtml" />
+    <Content Include="Views\StoresResponse.sshtml" />
+    <Content Include="Views\StoreDeleted.sshtml" />
+    <Content Include="Views\SparqlResult.sshtml" />
+    <Content Include="Views\SparqlResultRowPartial.sshtml" />
+    <Content Include="Views\SparqlUpdate.sshtml" />
+    <Content Include="Views\PagedJobResponse.sshtml" />
+    <Content Include="Views\ListPagingPartial.sshtml" />
+    <Content Include="Views\JobResponse.sshtml" />
+    <Content Include="Views\PagedStatisticsResponse.sshtml" />
+    <Content Include="Views\JQueryPartial.sshtml" />
+    <Content Include="Views\PagedStatisticsTripleCountsPartial.sshtml" />
+    <Content Include="Views\PagedCommitPointResponse.sshtml" />
+    <Content Include="Views\PagedTransactionResponse.sshtml" />
+    <Content Include="assets\swagger.json" />
+    <Content Include="Views\Documentation.sshtml" />
+    <None Include="Views\StoreResponse.sshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -113,6 +122,12 @@
       <Project>{a6a05324-ba02-4c82-9199-ad19bc442c60}</Project>
       <Name>BrightstarDB.Server.Modules</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="assets\swagger-ui\css\" />
+    <Folder Include="assets\swagger-ui\fonts\" />
+    <Folder Include="assets\swagger-ui\images\" />
+    <Folder Include="assets\swagger-ui\lib\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -140,11 +155,9 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <PropertyGroup>
+    <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
+    <AssemblyTitle>BrightstarDB Server ASP.NET Assembly</AssemblyTitle>
+  </PropertyGroup>
+  <Target Name="BeforeBuild" DependsOnTargets="GenerateAssemblyInfo" />
 </Project>

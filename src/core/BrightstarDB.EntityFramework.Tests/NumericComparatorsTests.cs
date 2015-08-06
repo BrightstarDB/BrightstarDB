@@ -19,10 +19,12 @@ namespace BrightstarDB.EntityFramework.Tests
                     where c.HeadCount < 10
                     select c.Id;
             var results = q.ToList();
-            AssertQuerySparql(@"SELECT ?c WHERE { 
+            AssertQuerySparql(@"SELECT ?v1 WHERE { 
 ?c a <http://www.networkedplanet.com/schemas/test/Company> .
 ?c <http://www.networkedplanet.com/schemas/test/headCount> ?v0 .
-FILTER (?v0 < '10'^^<http://www.w3.org/2001/XMLSchema#integer>) .}");
+FILTER (?v0 < '10'^^<http://www.w3.org/2001/XMLSchema#integer>) .
+BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}");
         }
 
         [Test]
@@ -32,10 +34,12 @@ FILTER (?v0 < '10'^^<http://www.w3.org/2001/XMLSchema#integer>) .}");
                     where !(c.HeadCount < 10)
                     select c.Id;
             var results = q.ToList();
-            AssertQuerySparql(@"SELECT ?c WHERE { 
+            AssertQuerySparql(@"SELECT ?v1 WHERE { 
 ?c a <http://www.networkedplanet.com/schemas/test/Company> .
 ?c <http://www.networkedplanet.com/schemas/test/headCount> ?v0 .
-FILTER (!((?v0 < '10'^^<http://www.w3.org/2001/XMLSchema#integer>))) .}");
+FILTER (!((?v0 < '10'^^<http://www.w3.org/2001/XMLSchema#integer>))) .
+BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
+}");
         }
 
     }

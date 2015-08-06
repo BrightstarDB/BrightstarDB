@@ -1,0 +1,24 @@
+﻿namespace BrightstarDB.CodeGeneration.Tests
+{
+    using System.Collections.Generic;
+    using BrightstarDB.EntityFramework;
+
+    public interface IInvalidInversePropertyName_A
+    {
+        ICollection<IInvalidInversePropertyName_B> Bs
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface IInvalidInversePropertyName_B
+    {
+        [InverseProperty("B")]
+        IInvalidInversePropertyName_A A
+        {
+            get;
+            set;
+        }
+    }
+}

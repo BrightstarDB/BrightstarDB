@@ -28,26 +28,26 @@ namespace BrightstarDB.Client
         /// <summary>
         /// Collection of triple deletions to send to the server on save
         /// </summary>
-        private List<Triple> _deletePatterns;
+        private TripleCollection _deletePatterns;
 
         /// <summary>
         /// Collection of triple insertions to send to server on save
         /// </summary>
-        private List<Triple> _addTriples;
+        private TripleCollection _addTriples;
 
         /// <summary>
         /// Collection of triples that must be present before the transaction can be executed.
         /// </summary>
-        private List<Triple> _preconditions;
+        private TripleCollection _preconditions;
 
         /// <summary>
         /// Collection of triples that must no be present before the transaction can be executed.
         /// </summary>
-        private List<Triple> _nonExistencePreconditions;
+        private TripleCollection _nonExistencePreconditions;
 
-        private bool _isReadOnly;
+        private readonly bool _isReadOnly;
 
-        private EventHandler _savingChanges;
+        private EventHandler<DataObjectStoreChangeEventArgs> _savingChanges;
 
         private readonly string _updateGraphUri;
         private readonly string[] _datasetGraphUris;
@@ -160,7 +160,7 @@ namespace BrightstarDB.Client
 
         public bool IsReadOnly { get { return _isReadOnly; } }
 
-        public EventHandler SavingChanges
+        public EventHandler<DataObjectStoreChangeEventArgs> SavingChanges
         {
             get { return _savingChanges; }
             set { _savingChanges = value; }
@@ -224,7 +224,8 @@ namespace BrightstarDB.Client
             var validUri = Uri.TryCreate(identity, UriKind.Absolute, out uri);
             if(validUri)
             {
-                return RegisterDataObject(new DataObject(this, identity));
+                // Use uri.ToString() to allow for correct unescaping of identity
+                return RegisterDataObject(new DataObject(this, uri.ToString()));
             }
             
             throw new ArgumentException(Strings.InvalidDataObjectIdentity, "identity");
@@ -235,8 +236,9 @@ namespace BrightstarDB.Client
 
         public SparqlResult ExecuteSparql(string sparqlQuery)
         {
-            return this.ExecuteSparql(new SparqlQueryContext(sparqlQuery));
+            return ExecuteSparql(new SparqlQueryContext(sparqlQuery));
         }
+
         public abstract SparqlResult ExecuteSparql(SparqlQueryContext sparqlQueryContext);
 
         /// <summary>
@@ -245,7 +247,29 @@ namespace BrightstarDB.Client
         public void SaveChanges()
         {
             if (_isReadOnly) throw new BrightstarStoreIsReadOnlyException();
-            if (_savingChanges != null) _savingChanges(this, new EventArgs());
+            // Convert the triple collections to flat lists for processing the SavingChanges event and DoSaveChanges
+            // This is inefficient but we are doing it for now to preserve API compatibilty between 1.7 and 1.8
+            // For the 2.0 release this should be changed so that the event notification uses the the TripleCollection directly
+
+            var addTriples = _addTriples.Items.ToList();
+            var deletePatterns = _deletePatterns.Items.ToList();
+            var preconditions = _preconditions.Items.ToList();
+
+            // If a non-existence condition triple matches a delete pattern, don't check it
+            // This is done on the assumption that a non-existance check is a precondition to adding data
+            // Fixes the repro tests for issue 194
+            _nonExistencePreconditions.RemoveWhere(x => deletePatterns.Any(x.MatchesWithWildcard));
+
+            var nePreconditions = _nonExistencePreconditions.Items.ToList();
+            
+            if (_savingChanges != null)
+            {
+                _savingChanges(this, new DataObjectStoreChangeEventArgs(
+                    addTriples,
+                    deletePatterns,
+                    preconditions,
+                    nePreconditions));
+            }
             DoSaveChanges();
         }
 
@@ -282,8 +306,8 @@ namespace BrightstarDB.Client
                 var managed = _managedProxies[dataObject.Identity];
                 BindDataObject(managed);
                 // Reset all updates for the bound object
-                _addTriples.RemoveAll(t => t.Subject == managed.Identity);
-                _deletePatterns.RemoveAll(t => t.Subject == managed.Identity);
+                _addTriples.RemoveBySubject(managed.Identity);
+                _deletePatterns.RemoveBySubject(managed.Identity);
             }
         }
 
@@ -353,19 +377,19 @@ namespace BrightstarDB.Client
         /// <summary>
         /// The current transaction delete patterns
         /// </summary>
-        public List<Triple> DeletePatterns { get { return _deletePatterns; } }
+        public ITripleCollection DeletePatterns { get { return _deletePatterns; } }
 
         /// <summary>
         /// The current transaction triples to add
         /// </summary>
-        public List<Triple> AddTriples { get { return _addTriples; } }
+        public ITripleCollection AddTriples { get { return _addTriples; } }
 
         /// <summary>
         /// The current transaction preconditions
         /// </summary>
-        public List<Triple> Preconditions { get { return _preconditions; } }
+        public ITripleCollection Preconditions { get { return _preconditions; } }
 
-        public List<Triple> NonExistencePreconditions { get { return _nonExistencePreconditions; } }
+        public ITripleCollection NonExistencePreconditions { get { return _nonExistencePreconditions; } }
         /// <summary>
         /// Returns an enumeration of all data objects that are the subject
         /// of a triple that binds a predicate of type <paramref name="pred"/>
@@ -388,35 +412,38 @@ namespace BrightstarDB.Client
             foreach(var x in queryResults)
             {
                 matchTriple.Subject = x.Identity;
-                if (!_deletePatterns.Any(p=>p.Matches(matchTriple)))
+                if(!_deletePatterns.GetMatches(matchTriple).Any())
                 {
                     yield return x;
                 }
             }
             matchTriple.Subject = null;
-            foreach(var addTriple in AddTriples)
+            foreach(var addTriple in _addTriples.GetMatches(matchTriple))
             {
-                if (matchTriple.Matches(addTriple))
-                {
-                    yield return MakeDataObject(addTriple.Subject);
-                }
+                yield return MakeDataObject(addTriple.Subject);
             }
         }
 
 
         public IEnumerable<Triple> GetReferencingTriples(IDataObject obj)
         {
-            var queryResults = ExecuteSparql(String.Format(AllInverseOfSparql, obj.Identity));
-            return queryResults.ResultDocument.SparqlResultRows().Select(row => new Triple
-                {
-                    Subject = row.GetColumnValue("s").ToString(),
-                    Predicate = row.GetColumnValue("p").ToString(),
-                    Object = obj.Identity,
-                    IsLiteral = false,
-                    Graph = row.GetColumnValue("g").ToString()
-                });
+            return GetReferencingTriples(obj.Identity);
         }
 
+        public IEnumerable<Triple> GetReferencingTriples(string identity)
+        {
+            var queryResults = ExecuteSparql(string.Format(AllInverseOfSparql, identity));
+            return queryResults.ResultSet.Results.Select(r =>
+                new Triple
+                {
+                    Subject = r["s"].ToString(),
+                    Predicate = r["p"].ToString(),
+                    Object = identity,
+                    IsLiteral = false,
+                    Graph = r["g"].ToString()
+                }
+            );
+        } 
 
         /// <summary>
         /// Adds preconditions to validate that there is no existing resource with the URI
@@ -426,10 +453,53 @@ namespace BrightstarDB.Client
         /// <param name="types">An enumeration of class resources URIs</param>
         public void SetClassUniqueConstraints(string identity, IEnumerable<string> types)
         {
-            _nonExistencePreconditions.RemoveAll(
-                x => x.Subject.Equals(identity) && x.Predicate.Equals(DataObject.TypeDataObject.Identity));
+            _nonExistencePreconditions.RemoveBySubjectPredicate(identity, DataObject.TypeDataObject.Identity);
             _nonExistencePreconditions.AddRange(
                 types.Select(x=>new Triple{Subject = identity, Predicate = DataObject.TypeDataObject.Identity, Object = x, Graph = Constants.WildcardUri}));
+        }
+
+        public void ReplaceIdentity(string oldIdentity, string newIdentity)
+        {
+            // Replace any references in the AddTriples collection
+            foreach (var addTriple in AddTriples.GetMatches(new Triple{Subject=null, Predicate=null, Object=oldIdentity, IsLiteral = false}).ToList())
+            {
+                AddTriples.Add(new Triple
+                {
+                    Subject = addTriple.Subject,
+                    Predicate = addTriple.Predicate,
+                    Object = newIdentity,
+                    Graph = addTriple.Graph
+                });
+            }
+            AddTriples.RemoveByObject(oldIdentity);
+
+            DataObject dataObject;
+            var isNew = _managedProxies.TryGetValue(oldIdentity, out dataObject) && dataObject.IsNew;
+            if (!isNew)
+            {
+                // There may be some references in the store that are not currently materialised on the client
+                // So query for those and ensure an update
+                foreach (var refTriple in GetReferencingTriples(oldIdentity))
+                {
+                    AddTriples.Add(new Triple
+                    {
+                        Subject = refTriple.Subject,
+                        Predicate = refTriple.Predicate,
+                        Object = newIdentity,
+                        Graph = refTriple.Graph
+                    });
+                }
+                DeletePatterns.Add(new Triple
+                {
+                    Subject = Constants.WildcardUri,
+                    Predicate = Constants.WildcardUri,
+                    Object = oldIdentity,
+                    Graph = _updateGraphUri
+                });
+            }
+
+            // Remove class unique constraints for the old identiy (if any)
+            _nonExistencePreconditions.RemoveBySubjectPredicate(oldIdentity, DataObject.TypeDataObject.Identity);
         }
 
         #endregion
@@ -440,16 +510,16 @@ namespace BrightstarDB.Client
             {
                 managedProxy.IsNew = false;
             }
-            _deletePatterns = new List<Triple>();
-            _addTriples = new List<Triple>();
-            _preconditions = new List<Triple>();
-            _nonExistencePreconditions = new List<Triple>();
+            _deletePatterns = new TripleCollection();
+            _addTriples = new TripleCollection();
+            _preconditions = new TripleCollection();
+            _nonExistencePreconditions = new TripleCollection();
         }
 
         private static void UpdateVersionFromSparqlResult(SparqlResult sparqlResult, IDataObject dataObject)
         {
-            var firstRow = sparqlResult.ResultDocument.SparqlResultRows().FirstOrDefault();
-            var value = firstRow.GetColumnValue("v");
+            var firstRow = sparqlResult.ResultSet.First();
+            var value = firstRow["v"];
             dataObject.SetProperty(Constants.VersionPredicateUri, value);
         }
 

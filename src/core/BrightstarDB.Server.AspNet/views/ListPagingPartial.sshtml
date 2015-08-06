@@ -1,0 +1,13 @@
+﻿<nav>
+	<ul class="links">
+		@If.HasFirstPageLink
+            <li><a href="@Model.FirstPageLink" title="First page of results">&lt;&lt;</a></li>
+		@EndIf
+		@If.HasPreviousPageLink
+			<li><a href="@Model.PreviousPageLink" title="Previous page of results">&lt;</a></li>
+		@EndIf
+		@If.HasNextPageLink
+            <li><a href="@Model.NextPageLink" title="Next page of results">&gt;</a></li>
+		@EndIf
+    </ul>
+</nav>

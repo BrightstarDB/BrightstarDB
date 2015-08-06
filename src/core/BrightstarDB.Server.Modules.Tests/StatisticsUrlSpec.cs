@@ -13,7 +13,7 @@ namespace BrightstarDB.Server.Modules.Tests
 {
     public class StatisticsUrlSpecBase
     {
-        protected static readonly MediaRange Json = MediaRange.FromString("application/json");
+        protected static readonly MediaRange Json = new MediaRange("application/json");
         protected IEnumerable<IStoreStatistics> MockStatistics(int count)
         {
             var ret = new List<IStoreStatistics>();
@@ -53,6 +53,31 @@ namespace BrightstarDB.Server.Modules.Tests
             var results = response.Body.DeserializeJson<List<StatisticsResponseModel>>();
             Assert.That(results, Is.Not.Null);
             Assert.That(results.Count, Is.EqualTo(10));
+            brightstar.Verify();
+        }
+
+        [Test]
+        public void TestGetStatisticsWithTake()
+        {
+            // Setup
+            var brightstar = new Mock<IBrightstarService>();
+            brightstar.Setup(s => s.GetStatistics("foo", DateTime.MaxValue, DateTime.MinValue, 0, 3))
+                      .Returns(MockStatistics(3))
+                      .Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+            // Execute
+            var response = app.Get("/foo/statistics", with =>
+            {
+                with.Accept(Json);
+                with.Query("take", "2");
+            });
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Headers["Link"], new LinkExistsConstraint("next", "statistics?skip=2"));
+            var results = response.Body.DeserializeJson<List<StatisticsResponseModel>>();
+            Assert.That(results, Is.Not.Null);
+            Assert.That(results.Count, Is.EqualTo(2));
             brightstar.Verify();
         }
 

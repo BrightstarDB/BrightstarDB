@@ -147,6 +147,91 @@ WHERE
         }
 
         [Test]
+        public void TestWildcardSubjetDelete()
+        {
+            var storeName = CreateStore("TestWildcardSubjectDelete");
+            ExecuteUpdate(storeName,
+                @"PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ns: <http://example.org/ns#>
+INSERT DATA {
+<http://example/book1> dc:title ""Principles of Compiler Design"" .
+<http://example/book1> dc:date ""1977-01-01T00:00:00-02:00""^^xsd:dateTime .
+
+<http://example/book2> ns:price 42 .
+<http://example/book2> dc:title ""David Copperfield"" .
+<http://example/book2> dc:creator ""Edmund Wells"" .
+<http://example/book2> dc:date ""1948-01-01T00:00:00-02:00""^^xsd:dateTime .
+
+<http://example/book3> dc:title ""SPARQL 1.1 Tutorial"" .}");
+
+            ExecuteUpdate(storeName, @"PREFIX dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+DELETE DATA
+ { <http://www.brightstardb.com/.well-known/model/wildcard> dc:title ""David Copperfield"" }");
+            var results = _client.ExecuteQuery(storeName,
+                                               "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?b ?t WHERE { ?b dc:title ?t}");
+            var resultsDoc = XDocument.Load(results);
+            Assert.AreEqual(2, resultsDoc.SparqlResultRows().Count());
+            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r => r.GetColumnValue("b").Equals(new Uri("http://example/book1")) && r.GetColumnValue("t").ToString().Equals("Principles of Compiler Design")));
+            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r => r.GetColumnValue("b").Equals(new Uri("http://example/book3")) && r.GetColumnValue("t").ToString().Equals("SPARQL 1.1 Tutorial")));
+        }
+
+        private void LoadBooks(string storeName)
+        {
+            ExecuteUpdate(storeName,
+    @"PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ns: <http://example.org/ns#>
+INSERT DATA {
+<http://example/book1> dc:title ""Principles of Compiler Design"" .
+<http://example/book1> dc:date ""1977-01-01T00:00:00-02:00""^^xsd:dateTime .
+
+<http://example/book2> ns:price 42 .
+<http://example/book2> dc:title ""David Copperfield"" .
+<http://example/book2> dc:creator ""Edmund Wells"" .
+<http://example/book2> dc:date ""1948-01-01T00:00:00-02:00""^^xsd:dateTime .
+
+<http://example/book3> dc:title ""SPARQL 1.1 Tutorial"" .}");
+        }
+
+        [Test]
+        public void TestWildcardPredicateDelete()
+        {
+            var storeName = CreateStore("TestWildcardSubjectDelete");
+            LoadBooks(storeName);
+
+            ExecuteUpdate(storeName, @"PREFIX dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+DELETE DATA
+ { <http://example/book2> <http://www.brightstardb.com/.well-known/model/wildcard> ""David Copperfield"" }");
+            var results = _client.ExecuteQuery(storeName,
+                                               "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?b ?t WHERE { ?b dc:title ?t}");
+            var resultsDoc = XDocument.Load(results);
+            Assert.AreEqual(2, resultsDoc.SparqlResultRows().Count());
+            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r => r.GetColumnValue("b").Equals(new Uri("http://example/book1")) && r.GetColumnValue("t").ToString().Equals("Principles of Compiler Design")));
+            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r => r.GetColumnValue("b").Equals(new Uri("http://example/book3")) && r.GetColumnValue("t").ToString().Equals("SPARQL 1.1 Tutorial")));
+        }
+
+        [Test]
+        public void TestWildcardObjectDelete()
+        {
+            var storeName = CreateStore("TestWildcardSubjectDelete");
+            LoadBooks(storeName);
+
+            ExecuteUpdate(storeName, @"PREFIX dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+DELETE DATA
+ { <http://example/book2> dc:title <http://www.brightstardb.com/.well-known/model/wildcard> }");
+            var results = _client.ExecuteQuery(storeName,
+                                               "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?b ?t WHERE { ?b dc:title ?t}");
+            var resultsDoc = XDocument.Load(results);
+            Assert.AreEqual(2, resultsDoc.SparqlResultRows().Count());
+            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r => r.GetColumnValue("b").Equals(new Uri("http://example/book1")) && r.GetColumnValue("t").ToString().Equals("Principles of Compiler Design")));
+            Assert.IsTrue(resultsDoc.SparqlResultRows().Any(r => r.GetColumnValue("b").Equals(new Uri("http://example/book3")) && r.GetColumnValue("t").ToString().Equals("SPARQL 1.1 Tutorial")));
+        }
+
+        [Test]
         public void TestDeleteFromGraph()
         {
             var storeName = CreateStore("TestDeleteFromGraph");

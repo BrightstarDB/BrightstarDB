@@ -95,6 +95,18 @@ Where ``options`` are:
     
     For a step-by-step guide please refer to :ref:`BrightstarDB_In_IIS`
     
+********************************
+ Running BrightstarDB in Docker
+********************************
+
+From the 1.8 release we now provide pre-built `Docker <http://www.docker.com>`_ images to run the BrightstarDB service. 
+Docker is an open platform for developers and sysadmins to build, ship and run distributed applications, whether on 
+laptops, data center VMs, or the cloud.
+
+The BrightstarDB Docker images are built on the most recent Ubuntu LTS and the most recent Mono stable
+release. The Dockerfile and other configuration files can be found in `our Docker repository on GitHub <https://github.com/BrightstarDB/Docker>`_
+where you will also find important information about how to configure and run the Docker images.
+
 ***********************************
  BrightstarDB Service Configuration 
 ***********************************
@@ -119,6 +131,9 @@ shown::
         <systemPermissions>
           <passAll anonPermissions="All"/>
         </systemPermissions>
+		<cors disabled="false">
+			<allowOrigin>*</allowOrigin>
+		</cors>
       </brightstarService>
       
     </configuration>
@@ -144,6 +159,10 @@ handler is invoked. The section itself consists of the following elements and at
     `systemPermissions`
         This element is the root element for configuring the way that the BrightstarDB service manages
         system access permissions.
+		
+	`cors`
+		This is the root element for configuring the way that the BrighstarDB REST server handles
+		cross-origin resource sharing. See :ref:`Configuring_CORS` below.
         
 .. _Configuring Store Permissions:
 
@@ -337,8 +356,33 @@ all these pieces hang together (src\\core\\BrightstarDB.Server.AspNet.Secured).
     ASP.NET that is not suitable for a Windows Service. A future release will address this 
     deficit, but for now if you want user authentication you will have to run the ASP.NET  
     implementation of the BrightstarDB server.
+
+.. _Configuring_CORS:
+
+Configuring CORS
+================
+
+Cross-Origin Resource Sharing (CORS) is the mechanism by which scripts in one domain can access services on another domain.
+This allows a client-side web application such as a JS script that is served up from one domain
+to make a request to a BrighstarDB server running on a different domain. By default a browser
+will disallow this behaviour unless the server providing the resource enables CORS. 
+
+BrightstarDB defaults to enabling cross-origin requests from any domain. This is equivalent
+to setting the CORS "Access-Control-Allow-Origin" header to "*".
+
+To restrict CORS to a specific domain, add the following snippet inside the ``brightstarService``
+configuration section of the server's ``app.config`` (or ``web.config``) file::
+
+	<cors>
+		<allowOrigin>http://somedomain.com</allowOrigin>
+	</cors>
     
-        
+To completely disable CORS, add the ``disabled`` attribute to the ``cors`` element and set its value to ``true``::
+
+	<cors disabled="true"/>
+	
+.. _Additional_Configuration_Options:
+
 Additional Configuration Options
 ================================
 
@@ -360,12 +404,16 @@ A number of other aspects of BrightstarDB service operations can be configured b
   - ``BrightstarDB.QueryCacheMemory`` - specifies the amount of memory in MB to be used by the SPARQL query cache. The default value is 256.
 
   - ``BrightstarDB.QueryCacheDisk`` - specifies the amount of disk space (in MB) to be used by the SPARQL query cache. The default value is 2048. The disk space used will be in a subdirectory under the location specified by the BrightstarDB.StoreLocation configuration property.
+  
+  - ``BrightstarDB.QueryExecutionTimeout`` - specifies the amount of time (in milliseconds) that a SPARQL query is allowed to run for - queries that exceed this threshold will be aborted. This setting applies only to embedded stores - when connecting to a server, the query timeout is determined by the server configuration.
 
   - ``BrightstarDB.PersistenceType`` - specifies the default type of persistence used for the main BrighstarDB index files. Allowed values are "appendonly" or "rewrite" (values are case-insensitive). For more information about the store persistence types please refer to the section :ref:`Store Persistence Types <Store_Persistence_Types>`.
 
   - ``BrightstarDB.StatsUpdate.Timespan`` - specifies the minimum number of seconds that must pass between automatic update of store statistics.
   
   - ``BrightstarDB.StatsUpdate.TransactionCount`` - specifies the minimum number of transactions that must occur between automatic update of store statistics.
+
+  - ``BrightstarDB.UpdateExecutionTimeout`` - specifies the amount of time (in milliseconds) that a SPARQL update is allowed to run for - updates that exceed this threshold will be aborted. This setting applies only to embedded stores - when connecting to a server, the query timeout is determined by the server configuration.
 
 Example Server Configuration
 ============================
@@ -546,7 +594,7 @@ Equally you can use other switchValue settings to reduce the amount of logging p
 BrightstarDB.
 
 
-.. _Preloading_Stores
+.. _Preloading_Stores:
 
 ******************
  Preloading Stores
@@ -660,3 +708,76 @@ storeC     0              0M
 storeD     0              0M
 ========== ============== =================
 
+.. _Controlling_Transaction_Logging:
+
+********************
+ Transaction Logging
+********************
+
+BrightstarDB provides a persistent text log of the transactions applied to a store. This log is contained in the file
+``transactions.bs`` and is indexed by the file ``transactionheaders.bs``. The purpose of these files is to enable a 
+transaction or set of transactions to be replayed at any time either against the same store or against another 
+store as a form of data synchronization. The BrightstarDB API provides methods for accessing the index; retrieving
+the data for specific transactions from the log files; and replaying transactions.
+
+Disabling Transaction Logging
+=============================
+
+The ``transaction.bs`` file lists the RDF quads inserted and deleted by
+each transaction executed against the store, and so over time this file can grow to be quite large. For this
+reason, from release 1.9 of BrightstarDB it is now possible to control whether a store logs these transactions 
+or not and it is possible for a BrightstarDB server (or embedded application) to control the default setting
+for this configuration.
+
+Disabling Store Logging
+-----------------------
+
+Transaction logging for an individual store is controlled by the existence of the ``transactionheaders.bs`` file
+in the directory for the store. If this file exists when a job is processed, then the data for that job will be logged
+to the ``transactions.bs`` file and an index entry appended to the ``transactionheaders.bs`` file. If the file does not 
+exist when a job is processed, then no data will be logged for that job.
+
+This makes it easy to disable logging on a store - simply delete (or rename) the ``transactionheaders.bs`` and ``transactions.bs``
+files from the store's directory. In either case it is recommended to delete or rename the ``transactionheaders.bs`` file 
+first.
+
+Equally it is easy to enable logging on a store - simply create an empty file named ``transactionheaders.bs`` in the
+store's directory. The ``transactions.bs`` file will be automatically created if it does not exist (if it does exist,
+new transaction data will be logged to the end of the existing file).
+
+Specifying the Server Default
+-----------------------------
+
+For regular Windows/Mono applications or web applications (i.e. those applications that can read from an ``app.config`` or
+``web.config`` file), the default transaction logging configuration can be specified in the ``brightstar`` configuration section::
+
+  <?xml version="1.0"?>
+  <configuration>
+    <configSections>
+      <section name="brightstar" type="BrightstarDB.Config.BrightstarConfigurationSectionHandler, BrightstarDB" />
+    </configSections>
+
+    <appSettings>
+
+        <!-- Other server configuration options can be specified here -->
+    
+    <brightstar>
+    
+      <!-- Disable transaction logging -->
+      <transactionLogging enabled="false" />
+    
+    </brightstar>
+    
+  </configuration>
+  
+
+Alternatively (and for those platforms where there is no support for ``app.config files``), the configuration can be specified
+programatically when creating the client by creating an instance of ``BrightstarDB.Config.EmbeddedServiceConfiguration`` and
+passing that as the optional second parameter to the ``BrightstarService.GetClient()`` method::
+
+    var client = BrightstarService.GetClient(myConnectionString,
+        new EmbeddedServiceConfiguration(enableTransactionLoggingOnNewStores: false));
+
+Note: These options merely set the default logging setting for newly created stores. In effect we are controlling whether or
+not the `transactionheaders.bs` file is created when the store is first created. Logging for an individual store can still
+be enabled or disabled by managing the `transactionheaders.bs` file as described in the section above.

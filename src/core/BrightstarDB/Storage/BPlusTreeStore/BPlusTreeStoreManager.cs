@@ -7,6 +7,8 @@ using BrightstarDB.Storage.Statistics;
 using BrightstarDB.Storage.TransactionLog;
 #if PORTABLE
 using BrightstarDB.Portable.Compatibility;
+#else
+using System.Collections.Concurrent;
 #endif
 
 namespace BrightstarDB.Storage.BPlusTreeStore
@@ -24,10 +26,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         internal const int PageSize = 4096; // 4kB pages
 
+        internal static readonly ConcurrentDictionary<string, MasterFile> MasterFileCache= new ConcurrentDictionary<string, MasterFile>();
+
         public BPlusTreeStoreManager(StoreConfiguration configuration, IPersistenceManager persistenceManager)
         {
             _storeConfiguration = configuration;
             _persistenceManager = persistenceManager;
+            
         }
 
         #region Implementation of IStoreManager
@@ -49,12 +54,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             }
         }
 
-        public IStore CreateStore(string storeLocation, bool readOnly)
+        public IStore CreateStore(string storeLocation, bool readOnly, bool withTransactionLogging)
         {
-            return CreateStore(storeLocation, _storeConfiguration.PersistenceType, readOnly);
+            return CreateStore(storeLocation, _storeConfiguration.PersistenceType, readOnly, withTransactionLogging);
         }
 
-        public IStore CreateStore(string storeLocation, PersistenceType storePersistenceType, bool readOnly)
+        public IStore CreateStore(string storeLocation, PersistenceType storePersistenceType, bool readOnly, bool withTransactionLogging)
         {
             Logging.LogInfo("Create Store {0} with persistence type {1}", storeLocation, storePersistenceType);
             if (_persistenceManager.DirectoryExists(storeLocation))
@@ -80,14 +85,22 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     dataPageStore = new AppendOnlyFilePageStore(_persistenceManager, dataFilePath, PageSize, false, _storeConfiguration.DisableBackgroundWrites);
                     break;
                 case PersistenceType.Rewrite:
-                    dataPageStore = new BinaryFilePageStore(_persistenceManager, dataFilePath, PageSize, false, 0, 1);
+                    dataPageStore = new BinaryFilePageStore(_persistenceManager, dataFilePath, PageSize, false, 0, 1, _storeConfiguration.DisableBackgroundWrites);
                     break;
             }
+
             IPageStore resourcePageStore = new AppendOnlyFilePageStore(_persistenceManager, resourceFilePath, PageSize, false, _storeConfiguration.DisableBackgroundWrites);
             var resourceTable = new ResourceTable(resourcePageStore);
             using (var store = new Store(storeLocation, dataPageStore, resourceTable))
             {
                 store.Commit(Guid.Empty);
+                store.Close();
+            }
+
+            if (withTransactionLogging)
+            {
+                _persistenceManager.CreateFile(Path.Combine(storeLocation, "transactionheaders.bs"));
+                _persistenceManager.CreateFile(Path.Combine(storeLocation, "transactions.bs"));
             }
 
             Logging.LogInfo("Store created at {0}", storeLocation);
@@ -97,7 +110,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         public IStore OpenStore(string storeLocation, bool readOnly)
         {
             Logging.LogInfo("Open Store {0}", storeLocation);
-            var masterFile = MasterFile.Open(_persistenceManager, storeLocation);
+            var masterFile = GetMasterFile(storeLocation);
             var latestCommitPoint = masterFile.GetLatestCommitPoint();
             var dataFilePath = Path.Combine(storeLocation, DataFileName);
             var resourceFilePath = Path.Combine(storeLocation, ResourceFileName);
@@ -110,7 +123,8 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                         dataPageStore = new AppendOnlyFilePageStore(_persistenceManager, dataFilePath, PageSize, readOnly, _storeConfiguration.DisableBackgroundWrites);
                         break;
                         case PersistenceType.Rewrite:
-                        dataPageStore = new BinaryFilePageStore(_persistenceManager, dataFilePath, PageSize, readOnly, latestCommitPoint.CommitNumber, latestCommitPoint.NextCommitNumber);
+                        dataPageStore = new BinaryFilePageStore(_persistenceManager, dataFilePath, PageSize, readOnly, 
+                            latestCommitPoint.CommitNumber, latestCommitPoint.NextCommitNumber, _storeConfiguration.DisableBackgroundWrites);
                         break;
                 }
                 var resourcePageStore = new AppendOnlyFilePageStore(_persistenceManager, resourceFilePath, PageSize, readOnly, _storeConfiguration.DisableBackgroundWrites);
@@ -178,6 +192,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public virtual ITransactionLog GetTransactionLog(string storeLocation)
         {
+            
             return new PersistentTransactionLog(_persistenceManager, storeLocation);
         }
 
@@ -188,7 +203,13 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 
         public MasterFile GetMasterFile(string storeLocation)
         {
-            return MasterFile.Open(_persistenceManager, storeLocation);
+            MasterFile masterFile;
+            if (!MasterFileCache.TryGetValue(storeLocation, out masterFile))
+            {
+                masterFile = MasterFile.Open(_persistenceManager, storeLocation);
+                MasterFileCache.TryAdd(storeLocation, masterFile);
+            }
+            return masterFile;
         }
 
         public IPageStore CreateConsolidationStore(string storeLocation)
@@ -206,7 +227,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 case PersistenceType.AppendOnly:
                     return new AppendOnlyFilePageStore(_persistenceManager, storePath, PageSize, false, _storeConfiguration.DisableBackgroundWrites);
                 case PersistenceType.Rewrite:
-                    return new BinaryFilePageStore(_persistenceManager, storePath, PageSize, false, 0, 1);
+                    return new BinaryFilePageStore(_persistenceManager, storePath, PageSize, false, 0, 1, _storeConfiguration.DisableBackgroundWrites);
                 default:
                     throw new NotImplementedException(String.Format("No support for creating consolidated store with persistence type {0}", _storeConfiguration.PersistenceType));
             }
@@ -278,7 +299,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                                                                     _storeConfiguration.DisableBackgroundWrites);
                         break;
                     case PersistenceType.Rewrite:
-                        destPageStore = new BinaryFilePageStore(_persistenceManager, dataFilePath, PageSize, false, 0, 1);
+                        destPageStore = new BinaryFilePageStore(_persistenceManager, dataFilePath, PageSize, false, 0, 1, _storeConfiguration.DisableBackgroundWrites);
                         break;
                     default:
                         throw new BrightstarInternalException("Unrecognized target store type: " + storePersistenceType);

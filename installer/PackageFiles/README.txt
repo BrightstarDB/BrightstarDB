@@ -7,7 +7,7 @@ into the main documentation.
 
 Version
 -------
-1.7.0
+1.10
 
 We welcome feedback, comments, feature requests and bug reports sent to 
 support@brightstardb.com.
@@ -36,7 +36,7 @@ Licensing
 ---------
 BrightstarDB is provided under the MIT license:
 
-Copyright (c) 2013-2014 Khalil Ahmed, Graham Moore and other contributors
+Copyright (c) 2013-2015 Khalil Ahmed, Graham Moore and other contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

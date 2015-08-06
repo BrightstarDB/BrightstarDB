@@ -1,0 +1,138 @@
+﻿<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ CleanupBehavior processor="T4VSHost" CleanupAfterProcessingtemplate="true" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="EnvDTE" #>
+<#
+// set this to either "CSharp" or "VisualBasic"
+var language = "CSharp";
+
+// you can move the .tt file to a different folder in your project to have the entity context's namespace change accordingly
+// or, you could just set it manually here
+var contextNamespace = this.Host.ResolveParameterValue("directiveId", "namespaceDirectiveProcessor", "namespaceHint") ?? "Default.Namespace";
+
+// The name of the .tt file determines the name of the generated context class
+var contextClassName = System.IO.Path.GetFileNameWithoutExtension(this.Host.TemplateFile);
+
+// Ensure that the solution and all projects in it are saved to disk as the generator will read the files from disk
+var solution = this.DTE.Solution;
+foreach(Project proj in solution.Projects) {
+  if (!proj.Saved){
+	proj.Save();
+  }
+}
+var solutionPath = this.DTE.Solution.FileName;
+if (!this.DTE.Solution.Saved) { 
+  this.DTE.Solution.SaveAs(solutionPath);
+}
+
+this.SetFileExtensionForLanguage(language);
+this.HookAssemblyResolution();
+var generator = Type.GetType("BrightstarDB.CodeGeneration.Generator, BrightstarDB.CodeGeneration");
+var generateMethod = generator.GetMethod("Generate");
+var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, contextNamespace, contextClassName, null, null, null });
+
+this.WriteLine(result);
+#>
+<#+
+private DTE dte;
+
+private DTE DTE
+{
+    get
+    {
+        if (this.dte == null)
+        {
+            var hostServiceProvider = (IServiceProvider)this.Host;
+            this.dte = (DTE)hostServiceProvider.GetService(typeof(DTE));
+        }
+
+        return this.dte;
+    }
+}
+
+private void SetFileExtensionForLanguage(string language)
+{
+    switch (language)
+    {
+        case "CSharp":
+            this.Host.SetFileExtension(".g.cs");
+            break;
+        case "VisualBasic":
+            this.Host.SetFileExtension(".g.vb");
+            break;
+        default:
+            this.Host.SetFileExtension(".g");
+            break;
+    }
+}
+
+private string GetLatestAssemblyPath(IEnumerable<string> assemblyPaths){
+	AssemblyName latestAssemblyName = null;
+	string latestAssemblyPath = null;
+	foreach(var assemblyPath in assemblyPaths){
+		AssemblyName assemblyName = AssemblyName.GetAssemblyName(assemblyPath);
+		if (latestAssemblyName == null || latestAssemblyName.Version.CompareTo(assemblyName.Version) <= 0) {
+		  latestAssemblyName = assemblyName;
+		  latestAssemblyPath = assemblyPath;
+		}
+	}
+	return latestAssemblyPath;
+}
+
+private void HookAssemblyResolution()
+{
+    var templateDirectory = Path.GetDirectoryName(this.Host.TemplateFile);
+    var currentDirectory = templateDirectory;
+    string packagesDirectory = null;
+
+    while (Path.GetPathRoot(currentDirectory) != currentDirectory)
+    {
+        var packagesDirectories = Directory.GetDirectories(currentDirectory, "packages");
+
+        if (packagesDirectories.Length == 0)
+        {
+            currentDirectory = Path.GetDirectoryName(currentDirectory);
+            continue;
+        }
+        else if (packagesDirectories.Length > 1)
+        {
+            throw new InvalidOperationException("More than one packages directory detected - aborting.");
+        }
+        else
+        {
+            packagesDirectory = packagesDirectories[0];
+            break;
+        }
+    }
+
+    if (packagesDirectory == null)
+    {
+        throw new InvalidOperationException("Could not find packages directory relative to the template's directory (" + templateDirectory + ").");
+    }
+
+    var codeGenAssemblies = Directory.GetDirectories(packagesDirectory, "BrightstarDB.CodeGeneration.*").SelectMany(x=>Directory.GetDirectories(x, "tools")).SelectMany(x=>Directory.GetFiles(x, "BrightstarDB.CodeGeneration.dll"));
+	var latestCodeGenAssemblyPath = this.GetLatestAssemblyPath(codeGenAssemblies);
+    if (latestCodeGenAssemblyPath == null) {
+        throw new InvalidOperationException("Could not find BrightstarDB.CodeGeneration assembly in packages directory (" + packagesDirectory + ").");
+    }
+
+	var searchPaths = new string[] {
+		Path.GetDirectoryName(latestCodeGenAssemblyPath)
+	};
+
+    AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
+    {
+        var match = searchPaths.SelectMany( p => Directory.GetFiles(p, e.Name + ".dll", SearchOption.TopDirectoryOnly)).FirstOrDefault();
+        if (match == null)
+        {
+            return null;
+        }
+        return Assembly.LoadFrom(match);
+    };
+}
+#>

@@ -8,5 +8,6 @@ namespace BrightstarDB.Server.Modules.Model
         public DateTime? Earliest { get; set; }
         public DateTime? Latest { get; set; }
         public int Skip { get; set; }
+        public int Take { get; set; }
     }
 }

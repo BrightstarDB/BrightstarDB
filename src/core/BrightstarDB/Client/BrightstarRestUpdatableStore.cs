@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 #if PORTABLE
 using VDS.RDF; // Pulls in the extension methods for Close() on streams
-using Triple = BrightstarDB.Model.Triple;
 #endif
 
 namespace BrightstarDB.Client
@@ -21,13 +21,16 @@ namespace BrightstarDB.Client
             _storeName = storeName;
         }
 
-        public Stream ExecuteQuery(string queryExpression, IList<string> datasetGraphUris)
+        public SparqlResult ExecuteQuery(SparqlQueryContext queryContext, IList<string> datasetGraphUris)
         {
-            return _client.ExecuteQuery(_storeName, queryExpression, datasetGraphUris);
+            ISerializationFormat resultFormat;
+            var resultStream = _client.ExecuteQuery(_storeName, queryContext.SparqlQuery, datasetGraphUris, null, queryContext.SparqlResultsFormat,
+                queryContext.GraphResultsFormat, out resultFormat);
+            return new SparqlResult(resultStream, resultFormat, queryContext);
         }
 
-        public void ApplyTransaction(IList<Triple> existencePreconditions, IList<Triple> nonexistencePreconditions, 
-            IList<Triple> deletePatterns, IList<Triple> inserts, string updateGraphUri)
+        public void ApplyTransaction(IEnumerable<ITriple> existencePreconditions, IEnumerable<ITriple> nonexistencePreconditions, 
+            IEnumerable<ITriple> deletePatterns, IEnumerable<ITriple> inserts, string updateGraphUri)
         {
             var existencePreconditionsData = SerializeTriples(existencePreconditions);
             var nonexistencePreconditionsData = SerializeTriples(nonexistencePreconditions);
@@ -38,7 +41,7 @@ namespace BrightstarDB.Client
                             updateGraphUri);
         }
 
-        private static string SerializeTriples(IEnumerable<Triple> triples)
+        private static string SerializeTriples(IEnumerable<ITriple> triples)
         {
             if (triples == null) return string.Empty;
             using (var writer = new StringWriter())

@@ -1,1 +1,0 @@
-Please see http://brightstardb.readthedocs.org/en/latest/Whats_New/ for the updated release notes.

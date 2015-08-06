@@ -20,7 +20,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestCreateAndSetProperties()
         {
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
             var now = DateTime.Now;
             entity.SomeDateTime = now;
             entity.SomeDecimal = 3.14m;
@@ -38,7 +38,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            var checkEntity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            var checkEntity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
 
             Assert.IsNotNull(checkEntity);
             Assert.IsNotNull(checkEntity.SomeDateTime);
@@ -64,7 +64,7 @@ namespace BrightstarDB.Tests.EntityFramework
         public void TestIssue128CannotSetFloatValueBelow1()
         {
             // Create an entity
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
             // Set the properties that allow fractional values to values < 1.0
             entity.SomeDecimal = 0.14m;
             entity.SomeDouble = 0.14;
@@ -76,7 +76,7 @@ namespace BrightstarDB.Tests.EntityFramework
             // Create a new context connection so that we don't get a locally cached value from the context
             var newContext = new MyEntityContext(_connectionString);
             // Retrieve the previously created entity
-            var checkEntity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            var checkEntity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
 
             // Assert that the entity was found and the values we set are set to the values we originally provided
             Assert.IsNotNull(checkEntity);
@@ -91,7 +91,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestCreateAndSetCollections()
         {
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
 
             var now = DateTime.Now;
             for(var i = 0; i<10;i++)
@@ -135,7 +135,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            var checkEntity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            var checkEntity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
 
             Assert.IsNotNull(checkEntity);
             Assert.IsNotNull(checkEntity.CollectionOfDateTimes);
@@ -179,7 +179,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestSetByte()
         {
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
             entity.SomeByte = 255;
             entity.AnotherByte = 128;
             entity.NullableByte = null;
@@ -189,7 +189,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            entity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeByte);
             Assert.IsNotNull(entity.AnotherByte);
@@ -204,7 +204,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestSetChar()
         {
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
             entity.SomeChar = 'C';
             entity.AnotherChar = 'c';
             entity.NullableChar = null;
@@ -214,7 +214,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            entity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeChar);
             Assert.IsNotNull(entity.AnotherChar);
@@ -232,7 +232,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestSetSbyte()
         {
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
             entity.SomeSByte = 127;
             entity.AnotherSByte = 64;
             _myEntityContext.SaveChanges();
@@ -240,7 +240,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            entity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeSByte);
             Assert.IsNotNull(entity.AnotherSByte);
@@ -256,7 +256,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestSetShort()
         {
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
             entity.SomeShort = 32767;
             entity.AnotherShort = -32768;
             _myEntityContext.SaveChanges();
@@ -264,7 +264,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            entity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeShort);
             Assert.IsNotNull(entity.AnotherShort);
@@ -279,7 +279,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestSetUint()
         {
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
             entity.SomeUInt = 4294967295;
             entity.AnotherUInt = 12;
             _myEntityContext.SaveChanges();
@@ -287,7 +287,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            entity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeUInt);
             Assert.IsNotNull(entity.AnotherUInt);
@@ -302,7 +302,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestSetUlong()
         {
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
             entity.SomeULong = 18446744073709551615;
             entity.AnotherULong = 52;
             _myEntityContext.SaveChanges();
@@ -310,7 +310,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            entity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeULong);
             Assert.IsNotNull(entity.AnotherULong);
@@ -325,7 +325,7 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestSetUShort()
         {
-            var entity = _myEntityContext.Entities.Create();
+            var entity = _myEntityContext.TestEntities.Create();
             entity.SomeUShort = 65535;
             entity.AnotherUShort = 52;
             _myEntityContext.SaveChanges();
@@ -333,7 +333,7 @@ namespace BrightstarDB.Tests.EntityFramework
             var entityId = entity.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entityId));
+            entity = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entityId));
             Assert.IsNotNull(entity);
             Assert.IsNotNull(entity.SomeUShort);
             Assert.IsNotNull(entity.AnotherUShort);
@@ -348,31 +348,37 @@ namespace BrightstarDB.Tests.EntityFramework
         [Test]
         public void TestEnums()
         {
-            var entity1 = _myEntityContext.Entities.Create();
+            var entity1 = _myEntityContext.TestEntities.Create();
             entity1.SomeEnumeration = TestEnumeration.Second;
             entity1.SomeNullableEnumeration = TestEnumeration.Third;
             entity1.SomeFlagsEnumeration = TestFlagsEnumeration.FlagA | TestFlagsEnumeration.FlagB;
             entity1.SomeNullableFlagsEnumeration = TestFlagsEnumeration.FlagB | TestFlagsEnumeration.FlagC;
-            var entity2 = _myEntityContext.Entities.Create();
+            entity1.SomeSystemEnumeration = DayOfWeek.Friday;
+            entity1.SomeNullableSystemEnumeration = DayOfWeek.Friday;
+            var entity2 = _myEntityContext.TestEntities.Create();
             _myEntityContext.SaveChanges();
 
             var entity1Id = entity1.Id;
             var entity2Id = entity2.Id;
 
             var newContext = new MyEntityContext(_connectionString);
-            entity1 = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entity1Id));
-            entity2 = newContext.Entities.FirstOrDefault(e => e.Id.Equals(entity2Id));
+            entity1 = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entity1Id));
+            entity2 = newContext.TestEntities.FirstOrDefault(e => e.Id.Equals(entity2Id));
             Assert.IsNotNull(entity1);
             Assert.IsNotNull(entity2);
             Assert.AreEqual(TestEnumeration.Second, entity1.SomeEnumeration);
             Assert.AreEqual(TestEnumeration.Third, entity1.SomeNullableEnumeration);
             Assert.AreEqual(TestFlagsEnumeration.FlagB|TestFlagsEnumeration.FlagA, entity1.SomeFlagsEnumeration);
             Assert.AreEqual(TestFlagsEnumeration.FlagC|TestFlagsEnumeration.FlagB, entity1.SomeNullableFlagsEnumeration);
+            Assert.AreEqual(DayOfWeek.Friday, entity1.SomeSystemEnumeration);
+            Assert.AreEqual(DayOfWeek.Friday, entity1.SomeNullableSystemEnumeration);
 
             Assert.AreEqual(TestEnumeration.First, entity2.SomeEnumeration);
             Assert.IsNull(entity2.SomeNullableEnumeration);
             Assert.AreEqual(TestFlagsEnumeration.NoFlags, entity2.SomeFlagsEnumeration);
             Assert.IsNull(entity2.SomeNullableFlagsEnumeration);
+            Assert.AreEqual(DayOfWeek.Sunday, entity2.SomeSystemEnumeration);
+            Assert.IsNull(entity2.SomeNullableSystemEnumeration);
         }
         //note Test for SetByteArray and SetEnumeration are in SimpleContextTests.cs
 

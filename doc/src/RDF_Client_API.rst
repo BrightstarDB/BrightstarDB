@@ -343,6 +343,7 @@ and language code.
      Console.WriteLine("Category is " + val);
   }
 
+.. _RDF_Client_API_SPARQL_Update:
 
 Update data using SPARQL
 ========================
@@ -362,7 +363,20 @@ However, you can also run the job asynchronously by passing false for the option
 In this case the resulting ``IJobInfo`` object will describe the current state of the update job 
 and you can use calls to ``GetJobInfo()`` to poll the job for its current status.
 
+From version 1.11, BrightstarDB now supports the use of the BrightstarDB-specific wildcard IRI
+(``http://www.brightstardb.com/.well-known/model/wildcard``)
+in the DELETE and DELETE DATA clauses of a SPARQL Update command. The following example uses
+the wildcard IRI to specify a deletion of all tags from a given article::
 
+  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  PREFIX : <http://www.brightstardb.com/example/article#>
+  DELETE DATA {
+    <http://www.brightstardb.com/example/article/1433424821849> :tags <http://www.brightstardb.com/.well-known/model/wildcard>  .
+  }
+
+It is possible to use the wildcard IRI in the subject, predicate or object positions of a triple. In the object position,
+the wildcard will match all literal values as well as all resources and blank nodes.
+  
 Data Imports
 ============
 

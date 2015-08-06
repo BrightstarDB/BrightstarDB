@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BrightstarDB.Config;
 using BrightstarDB.Server;
 using BrightstarDB.Storage;
 
@@ -24,19 +25,20 @@ namespace BrightstarDB.Client
         /// Create a new instance of the context that attaches to the specified directory location
         /// </summary>
         /// <param name="connectionString">The Brightstar service connection string</param>
-        /// <param name="clientConfiguration">Additional client configuration options</param>
+        /// <param name="serviceConfigurationOptions">OPTIONAL: Additional configuration options specific to an embedded store. If a
+        /// value is provided, it overrides any configuration read from the brightstar section of the application's app.config or web.config file.</param>
         /// <remarks>The data context is thread-safe but doesn't support concurrent access to the same base location by multiple
         /// instances. You should ensure in your code that only one EmbeddedDataObjectContext instance is connected to any given base location
         /// at a given time.</remarks>
-        public EmbeddedDataObjectContext(ConnectionString connectionString, ClientConfiguration clientConfiguration = null)
+        public EmbeddedDataObjectContext(ConnectionString connectionString, EmbeddedServiceConfiguration serviceConfigurationOptions = null)
         {
             if (connectionString == null) throw new ArgumentNullException("connectionString");
             if (connectionString.Type != ConnectionType.Embedded) throw new ArgumentException("Invalid connection type", "connectionString");
 
-            if (clientConfiguration == null) clientConfiguration = ClientConfiguration.Default;
+            if (serviceConfigurationOptions == null) serviceConfigurationOptions = Configuration.EmbeddedServiceConfiguration;
             _serverCore = ServerCoreManager.GetServerCore(
                 connectionString.StoresDirectory,
-                clientConfiguration == null ? null : clientConfiguration.PreloadConfiguration);
+                serviceConfigurationOptions);
             _optimisticLockingEnabled = connectionString.OptimisticLocking;
         }
 

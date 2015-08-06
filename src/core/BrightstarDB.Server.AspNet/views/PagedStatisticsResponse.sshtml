@@ -1,0 +1,71 @@
+﻿@Master['Layout.sshtml']
+
+@Section['Head']
+	@Partial['JQueryPartial.sshtml']
+@EndSection
+
+@Section['Content']
+
+<nav>
+    <ul class="horizontal breadcrumb">
+        <li><a href="@Path['~/']">Home</a></li>
+        <li><a href="@Path['~/@Model.RequestProperties.StoreName']">Store: @Model.RequestProperties.StoreName</a></li>
+        <li><a href="@Path['~/@Model.RequestProperties.StoreName/statistics']">Statistics</a></li>
+    </ul>
+</nav>
+
+<section>
+    <noscript>
+        <p>To see detailed statistics you need to enable Javascript.</p>
+    </noscript>
+	@IfNot.HasItems
+            <p>No statistics available for this store yet. Create statistics by running a <a href="jobs">Update Statistics Job</a>.</p>
+	@EndIf
+	@If.HasItems
+		<p>Click on a row to show the detailed statistics.</p>
+		<div class="left">
+			<table id="statistics" style="margin-top: 0">
+				<thead>
+					<tr>
+						<th>Statistics Timestamp</th>
+						<th>Total Triple Count</th>
+					</tr>
+				</thead>
+				<tbody>
+					@Each.Items
+						<tr id="job-@Current.CommitId">
+							<td>@Current.CommitTimestamp</td>
+							<td>@Current.TotalTripleCount</td>
+						</tr>
+					@EndEach
+				</tbody>
+			</table>
+			@Partial['ListPagingPartial.sshtml']
+		</div>
+		<aside>
+			@Each.Items
+				<table id="detail-job-@Current.CommitId" style="display: none">
+					<thead>
+						<tr>
+							<th>Predicate</th>
+							<th>Triple Count</th>
+						</tr>
+					</thead>
+					<tbody>
+						@Partial['PagedStatisticsTripleCountsPartial.sshtml', @Current.PredicateTripleCounts]
+					</tbody>
+				</table>
+			@EndEach
+		</aside>
+	@EndIf
+</section>
+
+<script type="text/javascript">
+    $('#statistics tr').click(function (event) {
+        var id = $(this).attr('id');
+        $('aside table').hide();
+        $('#detail-' + id).show();
+    });
+</script>
+
+@EndSection

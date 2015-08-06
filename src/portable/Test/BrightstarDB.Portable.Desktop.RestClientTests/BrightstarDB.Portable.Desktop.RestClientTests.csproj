@@ -32,9 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -69,10 +69,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BrightstarDB.Portable.Desktop\BrightstarDB.Portable.Desktop.csproj">
-      <Project>{ad54985b-d980-4efa-93f2-8491cdb4eefc}</Project>
-      <Name>BrightstarDB.Portable.Desktop</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\BrightstarDB.Portable\BrightstarDB.Portable.csproj">
       <Project>{365e38e3-eda2-4a3d-9740-375ec496df79}</Project>
       <Name>BrightstarDB.Portable</Name>

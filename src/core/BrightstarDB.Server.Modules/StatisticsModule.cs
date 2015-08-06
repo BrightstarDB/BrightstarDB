@@ -21,18 +21,20 @@ namespace BrightstarDB.Server.Modules
             Get["/{storeName}/statistics"] = parameters =>
                 {
                     var request = this.Bind<StatisticsRequestObject>();
+                    ViewBag.Title = request.StoreName + " - Statistics";
                     var resourceUri = "statistics" + CreateQueryString(request);
 
                     // Set defaults
                     if (!request.Latest.HasValue) {  request.Latest = DateTime.MaxValue; }
                     if (!request.Earliest.HasValue) { request.Earliest = DateTime.MinValue; }
+                    if (request.Take <= 0) request.Take = DefaultPageSize;
 
                     // Execute
                     var stats = brightstarService.GetStatistics(
                         request.StoreName, request.Latest.Value, request.Earliest.Value,
-                        request.Skip, DefaultPageSize + 1);
+                        request.Skip, request.Take + 1);
 
-                    return Negotiate.WithPagedList(request, stats.Select(MakeResponseModel), request.Skip, DefaultPageSize,
+                    return Negotiate.WithPagedList(request, stats.Select(MakeResponseModel), request.Skip, request.Take,
                                                    DefaultPageSize, resourceUri);
                 };
         }
