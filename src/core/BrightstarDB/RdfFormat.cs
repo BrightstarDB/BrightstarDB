@@ -68,7 +68,7 @@ namespace BrightstarDB
         /// <summary>
         /// Turtle Format
         /// </summary>
-        public static RdfFormat Turtle = new RdfFormat("ttl", typeof(TurtleW3CFormatter), SerializableModel.RdfGraph, "application/x-turtle", "application/turtle");
+        public static RdfFormat Turtle = new RdfFormat("ttl", typeof(TurtleW3CFormatter), SerializableModel.RdfGraph, "text/turtle", "application/x-turtle", "application/turtle");
 
         /// <summary>
         /// Notation 3 Format
@@ -139,7 +139,7 @@ namespace BrightstarDB
         /// <returns></returns>
         public bool MatchesMediaType(RdfFormat other)
         {
-            return this.MediaTypes.Any(x => other.MediaTypes.Contains(x));
+            return MediaTypes.Any(x => other.MediaTypes.Contains(x));
         }
     }
 }
