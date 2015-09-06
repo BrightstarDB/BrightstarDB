@@ -110,12 +110,33 @@ for the syntax you are importing. The supported syntaxes and their file
 extensions are listed in the table below as shown, BrightstarDB also supports 
 reading from files that are compressed with the GZip compression method.
 
-==========  =============================  ================================  
-RDF Syntax  File Extension (uncompressed)  File Extension (GZip compressed)  
-==========  =============================  ================================  
-NTriples    .nt                            .nt.gz  
-NQuads      .nq                            .nq.gz  
-RDF/XML     .rdf                           .rdf.gz  
-Turtle      .ttl                           .ttl.gz  
-RDF/JSON    .rj or .json                   .rj.gz or .json.gz
-==========  =============================  ================================  
+The table below also lists the MIME media types that are recognized by
+BrightstarDB for each of the supported RDF formats. Where more than one
+media type is listed, the first media type in the list is the **preferred**
+media type - this is the media type that BrightstarDB will use when emitting
+RDF in that particular format. We recommend that if you have a choice, you use
+the preferred media type - the other media types are supported for backwards 
+compatibility and compatibility with media types used "in the wild".
+
+==========  =============================  ================================  ==============================
+RDF Syntax  File Extension (uncompressed)  File Extension (GZip compressed)  Supported MIME Media Types
+==========  =============================  ================================  ==============================
+NTriples    .nt                            .nt.gz                            | text/ntriples
+                                                                             | text/ntriples+turtle
+                                                                             | application/rdf-triples 
+                                                                             | application/x-ntriples
+NQuads      .nq                            .nq.gz                            | application/n-quads 
+                                                                             | text/x-nquads
+RDF/XML     .rdf                           .rdf.gz                           | application/rdf+xml
+                                                                             | application/xml
+Turtle      .ttl                           .ttl.gz                           | text/turtle
+                                                                             | application/x-turtle
+                                                                             | application/turtle
+RDF/JSON    .rj or .json                   .rj.gz or .json.gz                | text/json
+                                                                             | application/rdf+json
+Notation3   .n3                            .n3.gz                            | text/n3
+                                                                             | text/rdf+n3
+TriG        .trig                          .trig.gz                          | application/trig
+                                                                             | application/x-trig
+TriX        .xml                           .xml.gz                           application/trix
+==========  =============================  ================================  ==============================
