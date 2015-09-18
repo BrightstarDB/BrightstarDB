@@ -714,15 +714,17 @@ namespace BrightstarDB.EntityFramework.Query
 
         protected string MakeSparqlStringConstant(string value)
         {
-            if (value.Contains("'"))
-            {
-                if (value.Contains("\""))
-                {
-                    return String.Format("'''{0}'''", value);
-                }
-                return String.Format("\"{0}\"", value);
-            }
-            return String.Format("'{0}'", value);
+            var sb = new StringBuilder(value);
+            sb.Replace("\\", "\\\\")
+                .Replace("\t", "\\t")
+                .Replace("\n", "\\n")
+                .Replace("\r", "\\r")
+                .Replace("\b", "\\b")
+                .Replace("\f", "\\f")
+                //.Replace("\"", "\\\"") - not necessary as we are surrounding the string with single quotes, and DNR complains if we also escape the double-quote
+                .Replace("'", "\\'");
+            sb.Insert(0, "'").Append("'");
+            return sb.ToString();
         }
 
         protected string MakeSparqlNumericConstant(object value)
