@@ -3,6 +3,7 @@ using BrightstarDB.Utils;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
+    [Obsolete("No longer in use. Was succeeded by WeakReferenceNodeCache")]
     internal class NodeCache : INodeCache
     {
         private readonly IndexedCircularBuffer<ulong, WeakReference> _leafNodeCache;
