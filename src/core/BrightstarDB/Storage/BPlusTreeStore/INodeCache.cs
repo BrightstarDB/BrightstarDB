@@ -1,5 +1,8 @@
+using System;
+
 namespace BrightstarDB.Storage.BPlusTreeStore
 {
+    [Obsolete("No longer in use. Could possibly be removed")]
     internal interface INodeCache
     {
         void Add(INode node);

@@ -12,7 +12,6 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         private ulong _rootId;
         private readonly BPlusTreeConfiguration _config;
         private readonly IPageStore _pageStore;
-        private readonly INodeCache _nodeCache;
         private bool _isDirty;
 
         public BPlusTreeConfiguration Configuration { get { return _config; } }
@@ -30,8 +29,6 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             _pageStore = pageStore;
             var root = MakeLeafNode(txnId);
             _rootId = root.PageId;
-            _nodeCache = new WeakReferenceNodeCache();
-            _nodeCache.Add(root);
         }
 
         /// <summary>
@@ -46,9 +43,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             _config = new BPlusTreeConfiguration(pageStore, keySize, dataSize, pageStore.PageSize);
             _pageStore = pageStore;
-            _nodeCache = new WeakReferenceNodeCache();
             var root = GetNode(rootPageId, profiler);
-            _nodeCache.Add(root);
             _rootId = root.PageId;
         }
 
@@ -68,16 +63,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         {
             using (profiler.Step("BPlusTree.GetNode"))
             {
-                INode ret;
-                if (_nodeCache.TryGetValue(nodeId, out ret))
-                {
-                    profiler.Incr("NodeCache Hit");
-                    return ret;
-                }
-
-                profiler.Incr("NodeCache Miss");
                 using (profiler.Step("Load Node"))
                 {
+                    INode ret;
                     var nodePage = _pageStore.Retrieve(nodeId, profiler);
                     var header = BitConverter.ToInt32(nodePage.Data, 0);
                     if (header < 0)
@@ -94,7 +82,6 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                         _config.BTreeDebug("{0}: Loaded LEAF node from page {1}. {2}", _config.DebugId, nodePage.Id, ret.ToString());
 #endif
                     }
-                    _nodeCache.Add(ret);
                     return ret;
                 }
             }
@@ -612,7 +599,6 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             using (profiler.Step("BPlusTree.Save"))
             {
                 _isDirty = false;
-                _nodeCache.Clear();
                 return RootId;
             }
         }
