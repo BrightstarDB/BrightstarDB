@@ -15,6 +15,7 @@ namespace BrightstarDB.Server.Runner
         /// </summary>
         static void Main(string[] args)
         {
+            try {
 #if __MonoCS__
             if (AppDomain.CurrentDomain.FriendlyName == "BrightstarDB"){
                 RunAsService();
@@ -31,6 +32,9 @@ namespace BrightstarDB.Server.Runner
                 RunAsService();
             }
 #endif
+            } catch (Exception ex) {
+              Console.WriteLine(ex);
+            }
         }
 
         private static void RunAsService()
@@ -58,13 +62,17 @@ namespace BrightstarDB.Server.Runner
             {
                 try
                 {
+					Console.WriteLine("BrightstarDB Service is starting...");
                     var bootstrapper = ServiceBootstrap.GetBootstrapper(serviceArgs);
                     var baseUris = serviceArgs.BaseUris.Select(x => x.EndsWith("/") ? new Uri(x) : new Uri(x + "/")).ToArray();
                     var nancyHost = new NancyHost(bootstrapper, new HostConfiguration {AllowChunkedEncoding = false}, baseUris);
                     Nancy.StaticConfiguration.DisableErrorTraces = !serviceArgs.ShowErrorTraces;
                     nancyHost.Start();
+					Console.WriteLine("BrightstarDB Service is running. Hit Enter to stop the service.");
                     Console.ReadLine();
+					Console.WriteLine("Stopping BrightstarDB Service...");
                     nancyHost.Stop();
+					Console.WriteLine("BrightstarDB Service stopped.");
                 }
                 catch (BootstrapperException ex)
                 {
