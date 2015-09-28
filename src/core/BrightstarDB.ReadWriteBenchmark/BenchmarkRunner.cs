@@ -60,7 +60,7 @@ namespace BrightstarDB.ReadWriteBenchmark
                 WaitForAnExportToComplete();
             }
             var label = _storeName + "_export_" + expectCount;
-            var exportJobInfo = _brightstar.StartExport(_storeName, label + ".nt", exportFormat: RdfFormat.NTriples, label:expectCount.ToString());
+            var exportJobInfo = _brightstar.StartExport(_storeName, label + ".nt", exportFormat: RdfFormat.NTriples, label:label);
             _activeJobList.Add(exportJobInfo.JobId);
         }
 
@@ -91,14 +91,28 @@ namespace BrightstarDB.ReadWriteBenchmark
                     }
                     if (jobInfo.JobCompletedOk)
                     {
-                        BenchmarkLogging.Info("EXPORT {0}, {1}", jobInfo.Label,
-                            jobInfo.EndTime.Subtract(jobInfo.StartTime).TotalMilliseconds);
-                        // TODO: Verify that the file contains the expected number of lines
+                        ReportCompletedJob(jobInfo);
                         toRemove.Add(jobId);
                     }
                 }
                 foreach (var r in toRemove) _activeJobList.Remove(r);
                 Thread.Sleep(5000);
+            }
+        }
+
+        private void ReportCompletedJob(IJobInfo jobInfo)
+        {
+            var expectedCount = Int32.Parse(jobInfo.Label.Split('_').Last());
+            BenchmarkLogging.Info("EXPORT {0}, {1}", expectedCount, jobInfo.EndTime.Subtract(jobInfo.StartTime).TotalMilliseconds);
+            var actualCount = CountLines("import" + Path.DirectorySeparatorChar + jobInfo.Label + ".nt");
+            if (expectedCount == actualCount)
+            {
+                BenchmarkLogging.Info("Validated expected number of triples exported in {0}.nt", jobInfo.Label);
+            }
+            else
+            {
+                BenchmarkLogging.Error("Exported triple count in file {0}.nt does not match the expected count. (Expected: {1}, Counted: {2})",
+                    jobInfo.Label, expectedCount, actualCount);
             }
         }
 
@@ -118,10 +132,8 @@ namespace BrightstarDB.ReadWriteBenchmark
                     }
                     if (jobInfo.JobCompletedOk)
                     {
-                        BenchmarkLogging.Info("EXPORT {0}, {1}", jobInfo.Label,
-                            jobInfo.EndTime.Subtract(jobInfo.StartTime).TotalMilliseconds);
+                        ReportCompletedJob(jobInfo);
                         toRemove.Add(jobId);
-                        // TODO: Verify that the file contains the expected number of lines
                     }
                 }
                 if (toRemove.Count == 0)
