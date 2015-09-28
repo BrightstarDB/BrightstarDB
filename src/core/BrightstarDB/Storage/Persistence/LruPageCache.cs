@@ -49,6 +49,7 @@ namespace BrightstarDB.Storage.Persistence
 #if DEBUG_PAGECACHE
                     Logging.LogDebug("LruPageCache.InsertOrUpdate: Updated {0}", cacheKey);
 #endif
+                    Debug.Assert(_count == _cacheItems.Count, "Internal count is out of sync with _cacheItems count after lookup");
                 }
                 else
                 {
@@ -62,10 +63,17 @@ namespace BrightstarDB.Storage.Persistence
                     if (_count > _highWaterMark)
                     {
                         EvictItems();
+                        Debug.Assert(_count == _cacheItems.Count,
+                            "Internal count is out of sync with _cacheItems count after evict");
+                    }
+                    else
+                    {
+                        Debug.Assert(_count == _cacheItems.Count,
+                            "Internal count is out of sync with _cacheItems count after insert");
                     }
                 }
             }
-            Debug.Assert(_count == _cacheItems.Count, "Internal count is out of sync with _cacheItems count.");
+
         }
 
         public IPageCacheItem Lookup(string partition, ulong pageId)
