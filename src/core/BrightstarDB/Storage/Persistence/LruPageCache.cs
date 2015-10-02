@@ -152,37 +152,40 @@ namespace BrightstarDB.Storage.Persistence
 #if DEBUG_PAGECACHE
             Logging.LogDebug("LruPageCache.EvictItems: START");
 #endif
-                var evictPointer = _accessList.Last;
                 var evictionCount = 0;
-                while (evictPointer != null && _count > _lowWaterMark)
+                lock (_updateLock)
                 {
-                    var partition = evictPointer.Value.Key;
-                    var pageId = evictPointer.Value.Value.Id;
-                    var evictionArgs = new EvictionEventArgs(partition, pageId);
+                    var evictPointer = _accessList.Last;
+                    while (evictPointer != null && _count > _lowWaterMark)
+                    {
+                        var partition = evictPointer.Value.Key;
+                        var pageId = evictPointer.Value.Value.Id;
+                        var evictionArgs = new EvictionEventArgs(partition, pageId);
 #if DEBUG_PAGECACHE
                 Logging.LogDebug("LruPageCache.EvictItems: Selected {0}", pageId);
 #endif
-                    FireBeforeEvict(evictionArgs);
-                    if (!evictionArgs.CancelEviction)
-                    {
-                        var cacheKey = MakeCacheKey(partition, pageId);
-                        var tmp = evictPointer.Previous;
-                        _accessList.Remove(evictPointer);
-                        _cacheItems.Remove(cacheKey);
-                        _count--;
-                        evictionCount++;
-                        FireAfterEvict(evictionArgs);
+                        FireBeforeEvict(evictionArgs);
+                        if (!evictionArgs.CancelEviction)
+                        {
+                            var cacheKey = MakeCacheKey(partition, pageId);
+                            var tmp = evictPointer.Previous;
+                            _accessList.Remove(evictPointer);
+                            _cacheItems.Remove(cacheKey);
+                            _count--;
+                            evictionCount++;
+                            FireAfterEvict(evictionArgs);
 #if DEBUG_PAGECACHE
                     Logging.LogDebug("LruPageCache.EvictItems: Evicted {0}", pageId);
 #endif
-                        evictPointer = tmp;
-                    }
-                    else
-                    {
+                            evictPointer = tmp;
+                        }
+                        else
+                        {
 #if DEBUG_PAGECACHE
                     Logging.LogDebug("LruPageCache.EvictItems: Eviction of {0} was cancelled", pageId);
 #endif
-                        evictPointer = evictPointer.Previous;
+                            evictPointer = evictPointer.Previous;
+                        }
                     }
                 }
                 if (evictionCount == 0)
