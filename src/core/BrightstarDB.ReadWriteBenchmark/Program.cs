@@ -10,6 +10,7 @@ namespace BrightstarDB.ReadWriteBenchmark
 {
     internal class Program
     {
+        public static TraceListener BrightstarListener;
         private static void Main(string[] args)
         {
             var opts = new BenchmarkArgs();
@@ -19,6 +20,10 @@ namespace BrightstarDB.ReadWriteBenchmark
                 if (!string.IsNullOrEmpty(opts.LogFilePath))
                 {
                     BenchmarkLogging.EnableFileLogging(opts.LogFilePath);
+                    var logStream = new FileStream(opts.LogFilePath + ".bslog", FileMode.Create);
+                    BrightstarListener = new TextWriterTraceListener(logStream);
+                    BrightstarDB.Logging.BrightstarTraceSource.Listeners.Add(BrightstarListener);
+                    BrightstarDB.Logging.BrightstarTraceSource.Switch.Level = SourceLevels.All;
                 }
             }
             else
@@ -29,6 +34,7 @@ namespace BrightstarDB.ReadWriteBenchmark
             var runner = new BenchmarkRunner(opts);
             runner.Run();
             BenchmarkLogging.Close();
+            BrightstarDB.Logging.BrightstarTraceSource.Close();
         }
     }
 }
