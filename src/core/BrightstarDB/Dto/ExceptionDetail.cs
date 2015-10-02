@@ -101,7 +101,7 @@ namespace BrightstarDB.Dto
                 sb.Append(prefix);
                 sb.AppendLine(StackTrace);
             }
-            if (Data.Count > 0)
+            if (Data != null && Data.Count > 0)
             {
                 sb.AppendLine(SectionSeparator);
                 sb.Append(prefix);
