@@ -14,6 +14,9 @@ namespace BrightstarDB.Storage.Persistence
         private readonly int _pageSize;
         private readonly byte[] _data;
         private readonly object _writeLock = new object();
+#if DEBUG_PAGESTORE
+        private readonly MD5 _md5 = MD5.Create();
+#endif
 
         public FilePage(ulong pageId, int pageSize)
         {
@@ -24,6 +27,9 @@ namespace BrightstarDB.Storage.Persistence
             _modified = 1;
             _writeOffset = (pageId - 1) * (ulong)pageSize; // TODO : could be a bit shift instead?
             _pageSize = pageSize;
+#if DEBUG_PAGESTORE
+            Logging.LogDebug("New Page: PageId={0}", Id);
+#endif
         }
 
         public FilePage(ulong pageId, int pageSize, byte[] data)
@@ -36,20 +42,35 @@ namespace BrightstarDB.Storage.Persistence
             _modified = 1;
             _writeOffset = (pageId - 1) * (ulong)pageSize; // TODO : could be a bit shift instead?
             _pageSize = pageSize;
+#if DEBUG_PAGESTORE
+            Logging.LogDebug("New Data: PageId={0} Hash={1}", Id, DataHash());
+#endif
         }
 
         public FilePage(Stream stream, ulong pageId, int pageSize)
         {
-            _writeOffset = (pageId -1) * (ulong)pageSize; // TODO : could be a bit shift instead?
-            stream.Seek((long)_writeOffset, SeekOrigin.Begin);
             _data = new byte[pageSize];
-            stream.Read(Data, 0, pageSize);
+            _writeOffset = (pageId -1) * (ulong)pageSize; // TODO : could be a bit shift instead?
+            lock (stream)
+            {
+                stream.Seek((long) _writeOffset, SeekOrigin.Begin);
+                stream.Read(Data, 0, pageSize);
+            }
+#if DEBUG_PAGESTORE
+            Logging.LogDebug("Read: PageId={0} Hash={1}", Id, DataHash());
+#endif
             IsDirty = false;
             Deleted = false;
             Id = pageId;
             _modified = 0;
             _pageSize = pageSize;
         }
+
+#if DEBUG_PAGESTORE
+        private string DataHash() {
+            return BitConverter.ToString(_md5.ComputeHash(_data)).Replace("-", "");
+        }
+#endif
 
         #region Implementation of IPage
 
@@ -86,7 +107,7 @@ namespace BrightstarDB.Storage.Persistence
                 IsDirty = true;
                 _modified++;
 #if DEBUG_PAGESTORE
-                Logging.LogDebug("Update {0} {1} {2}", Id, _modified, BitConverter.ToInt32(_data, 0));
+                Logging.LogDebug("Update: PageId={0} Hash={1}", Id, DataHash());
 #endif
             }
         }
@@ -108,6 +129,9 @@ namespace BrightstarDB.Storage.Persistence
                 }
                 outputStream.Write(_data, 0, _pageSize);
                 outputStream.Flush();
+#if DEBUG_PAGESTORE
+                Logging.LogDebug("Write: PageId={0} Hash={1}", Id, DataHash());
+#endif
                 return ret;
             }
         }
@@ -122,22 +146,22 @@ namespace BrightstarDB.Storage.Persistence
                     outputStream.Seek((long) _writeOffset, SeekOrigin.Begin);
                     outputStream.Write(_data, 0, _pageSize);
 #if DEBUG_PAGESTORE
-                    Logging.LogDebug("Write {0} {1}", Id, _modified);
+                    Logging.LogDebug("Write: PageId={0} Hash={1}", Id, DataHash());
 #endif
                     outputStream.Flush();
                 }
 #if DEBUG_PAGESTORE
                 else
                 {
-                    Logging.LogDebug("Skip {0} {1}", Id, _modified);
+                    Logging.LogDebug("Skip: {0}", Id);
                 }
 #endif
                 return ret;
             }
         }
-        #endregion
+#endregion
 
-        #region Implementation of IDisposable
+#region Implementation of IDisposable
         public void Dispose()
         {
             Dispose(true);
@@ -154,6 +178,6 @@ namespace BrightstarDB.Storage.Persistence
             }
             _disposed = true;
         }
-        #endregion
+#endregion
     }
 }
