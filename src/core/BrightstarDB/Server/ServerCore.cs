@@ -39,7 +39,8 @@ namespace BrightstarDB.Server
             Logging.LogInfo("ServerCore Initialised {0}", baseLocation);
             _baseLocation = baseLocation;
             _stores = new Dictionary<string, StoreWorker>();
-            var configuration = new StoreConfiguration {PersistenceType = persistenceType};
+            var configuration = StoreConfiguration.DefaultStoreConfiguration.Clone() as StoreConfiguration;
+            configuration.PersistenceType = persistenceType;
             _storeManager = StoreManagerFactory.GetStoreManager(configuration);
             _queryCache = queryCache;
             _enableTransactionLogging = enableTransactionLoggingOnNewStores;
