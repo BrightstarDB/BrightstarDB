@@ -3,14 +3,16 @@
   <metadata>
     <id>BrightstarDB.CodeGeneration.Console</id>
     <version>${VERSION}</version>
+	<title>BrightstarDB Entity Context Generator Console</title>
     <authors>Kal Ahmed</authors>
     <owners>Kal Ahmed</owners>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>http://brightstardb.com/</projectUrl>
+    <iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
         A console-based code generator for BrightstarDB.
     </description>
-    <tags>.NET codegen console</tags>
+    <tags>brightstardb .NET codegen console</tags>
   </metadata>
 </package>
