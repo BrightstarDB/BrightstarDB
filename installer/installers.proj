@@ -313,7 +313,7 @@
     <Exec Command="..\nuget\NuGet pack nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" WorkingDirectory="$(OutputPath)" />
     <Exec Command="..\nuget\NuGet pack nuget\BrightstarDB\BrightstarDB.nuspec" WorkingDirectory="$(OutputPath)" />
 	<Exec Command="..\nuget\NuGet pack nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec" WorkingDirectory="$(OutputPath)" />
-	<Copy SourceFiles="@(CodeGenPackages);@(CodeGenT4Package);@(CodeGenConsolePackage)" DestinationFolder="$(OutputPath)"/>
+	<Copy SourceFiles="@(CodeGenPackage);@(CodeGenT4Package);@(CodeGenConsolePackage)" DestinationFolder="$(OutputPath)"/>
 	<Copy SourceFiles="@(CodeGenPackage)" DestinationFolder="EntityFrameworkCodegen\EntityFrameworkCodegen\Packages" />
     <Copy SourceFiles="$(OutputPath)\BrightstarDBLibs.$(PackageBuildNumber).nupkg" DestinationFolder="EntityFrameworkCodegen\EntityFrameworkCodegen\Packages" />
   </Target>
