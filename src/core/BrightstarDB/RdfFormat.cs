@@ -63,27 +63,27 @@ namespace BrightstarDB
         /// <summary>
         /// NTriples Format
         /// </summary>
-        public static RdfFormat NTriples = new RdfFormat("nt", typeof(NTriplesFormatter), SerializableModel.RdfGraph, "text/ntriples", "text/ntriples+turtle", "application/rdf-triples", "application/x-ntriples");
+        public static RdfFormat NTriples = new RdfFormat("nt", typeof(NTriplesFormatter), SerializableModel.RdfGraph, "application/n-triples", "text/ntriples", "text/ntriples+turtle", "application/rdf-triples", "application/x-ntriples");
 
         /// <summary>
         /// Turtle Format
         /// </summary>
-        public static RdfFormat Turtle = new RdfFormat("ttl", typeof(TurtleW3CFormatter), SerializableModel.RdfGraph, "application/x-turtle", "application/turtle");
+        public static RdfFormat Turtle = new RdfFormat("ttl", typeof(TurtleW3CFormatter), SerializableModel.RdfGraph, "text/turtle", "application/x-turtle", "application/turtle");
 
         /// <summary>
         /// Notation 3 Format
         /// </summary>
-        public static RdfFormat Notation3 = new RdfFormat("n3", typeof(Notation3Formatter), SerializableModel.RdfGraph, "text/rdf+n3");
+        public static RdfFormat Notation3 = new RdfFormat("n3", typeof(Notation3Formatter), SerializableModel.RdfGraph, "text/n3", "text/rdf+n3");
 
         /// <summary>
         /// NQuads Format
         /// </summary>
-        public static RdfFormat NQuads = new RdfFormat("nq", typeof(NQuadsFormatter), SerializableModel.RdfDataset, "text/x-nquads");
+        public static RdfFormat NQuads = new RdfFormat("nq", typeof(NQuadsFormatter), SerializableModel.RdfDataset, "application/n-quads", "text/x-nquads");
 
         /// <summary>
         /// TriG format
         /// </summary>
-        public static RdfFormat TriG = new RdfFormat("trig", null, SerializableModel.RdfDataset, "application/x-trig");
+        public static RdfFormat TriG = new RdfFormat("trig", null, SerializableModel.RdfDataset, "applicaiton/trig", "application/x-trig");
 
         /// <summary>
         /// TriX format
@@ -139,7 +139,7 @@ namespace BrightstarDB
         /// <returns></returns>
         public bool MatchesMediaType(RdfFormat other)
         {
-            return this.MediaTypes.Any(x => other.MediaTypes.Contains(x));
+            return MediaTypes.Any(x => other.MediaTypes.Contains(x));
         }
     }
 }

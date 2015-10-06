@@ -4,6 +4,7 @@ using BrightstarDB.Storage.BPlusTreeStore;
 
 namespace BrightstarDB.Storage
 {
+    [Obsolete("No longer in use - could possibly be removed.")]
     internal class WeakReferenceNodeCache : INodeCache
     {
         private object _dictLock = new object();

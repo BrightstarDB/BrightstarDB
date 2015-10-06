@@ -3,17 +3,19 @@
   <metadata>
     <id>BrightstarDB.CodeGeneration.T4</id>
     <version>${VERSION}</version>
+	<title>BrightstarDB Entity Context Generator Console</title>
     <authors>Kal Ahmed</authors>
     <owners>Kal Ahmed</owners>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>http://brightstardb.com/</projectUrl>
+	<iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
         A T4-based code generator for BrightstarDB.
     </description>
-    <tags>.NET codegen t4</tags>
+    <tags>brightstardb .NET codegen t4</tags>
     <dependencies>
-        <dependency id="BrightstarDB.CodeGeneration" version="VERSION" />
+        <dependency id="BrightstarDB.CodeGeneration" version="${VERSION}" />
     </dependencies>
   </metadata>
 </package>

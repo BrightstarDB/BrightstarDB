@@ -95,6 +95,7 @@
     <Compile Include="NumericComparatorsTests.cs" />
     <Compile Include="PlainLiteralQueryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringEscapeSequenceTests.cs" />
     <Compile Include="StringFunctionTests.cs" />
   </ItemGroup>
   <ItemGroup>

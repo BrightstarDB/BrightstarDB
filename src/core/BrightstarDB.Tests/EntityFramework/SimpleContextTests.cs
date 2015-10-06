@@ -7,6 +7,8 @@ using BrightstarDB.EntityFramework;
 using BrightstarDB.EntityFramework.Query;
 using NUnit.Framework;
 using System.ComponentModel;
+using BrightstarDB.Query;
+using VDS.RDF.Parsing;
 using VDS.RDF.Query.Algebra;
 using UnitTesting = NUnit.Framework;
 #if !PORTABLE
@@ -2347,6 +2349,33 @@ where {
             {
                 var entity = context.TestEntities.FirstOrDefault(x => x.Id.Equals("some entity"));
                 Assert.That(entity, Is.Not.Null);
+            }
+        }
+
+        [TestCase("\\")]
+        [TestCase("\t")]
+        [TestCase("\n")]
+        [TestCase("\r")]
+        [TestCase("\b")]
+        [TestCase("\f")]
+        [TestCase("\"")]
+        [TestCase("'")]
+        public void TestEscapeOfStringValues(string sep)
+        {
+            var storeName = "TestBackslashInStringValue_" + DateTime.Now.Ticks;
+            var testString = "Client" + sep + "Server";
+            using (var context = CreateEntityContext(storeName))
+            {
+                var entity = new TestEntity {Id="test", SomeString = testString};
+                context.TestEntities.Add(entity);
+                context.SaveChanges();
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                var entity = context.TestEntities.FirstOrDefault(x => x.SomeString == testString);
+                Assert.That(entity, Is.Not.Null);
+                Assert.That(entity, Has.Property("Id").EqualTo("test"));
             }
         }
 

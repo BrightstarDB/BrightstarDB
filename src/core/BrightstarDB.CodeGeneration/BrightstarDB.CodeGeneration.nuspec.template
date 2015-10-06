@@ -3,15 +3,17 @@
   <metadata>
     <id>BrightstarDB.CodeGeneration</id>
     <version>${VERSION}</version>
+	<title>BrightstarDB Entity Context Generator Library</title>
     <authors>Kal Ahmed</authors>
     <owners>Kal Ahmed</owners>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <projectUrl>http://brightstardb.com/</projectUrl>
+	<iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>
         A Roslyn-based code generator for BrightstarDB.
     </description>
-    <tags>.NET codegen roslyn</tags>
+    <tags>brightstardb .NET codegen roslyn</tags>
     <dependencies>
         <dependency id="BrightstarDBLibs" version="${VERSION}" />
     </dependencies>
