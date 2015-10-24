@@ -325,6 +325,18 @@
       <Name>BrightstarDB</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\hourglass.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\hourglass_go.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\tick.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\exclamation.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\..\..\common.proj" />
   <PropertyGroup>
