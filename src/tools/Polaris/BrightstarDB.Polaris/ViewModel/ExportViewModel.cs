@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -14,6 +16,7 @@ namespace BrightstarDB.Polaris.ViewModel
         public delegate void ExportJobDelegate();
         private Dispatcher _dispatcher;
         private string _exportFileName;
+        private RdfFormatViewModel _exportFileFormat;
         private string _progressText;
         private bool _isValid;
         private IJobInfo _transactionJob;
@@ -22,8 +25,11 @@ namespace BrightstarDB.Polaris.ViewModel
             : base(store)
         {
             StartClickCommand = new RelayCommand<RoutedEventArgs>(HandleStartClick);
-            ExportFileName = String.Format(store.Location + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".nt");
+            ExportFileName = string.Format(store.Location + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss"));
+            ExportFileFormats = RdfFormat.AllFormats.Select(x=>new RdfFormatViewModel(x)).OrderBy(x=>x.DisplayName).ToArray();
+            ExportFileFormat = ExportFileFormats.FirstOrDefault(x => x.Format.DefaultExtension.Equals("nt"));
         }
+
 
         public string ExportFileName
         {
@@ -33,6 +39,21 @@ namespace BrightstarDB.Polaris.ViewModel
                 _exportFileName = value;
                 Validate();
                 RaisePropertyChanged("ExportFileName");
+            }
+        }
+
+        public ICollection<RdfFormatViewModel> ExportFileFormats { get; }
+
+        public RdfFormatViewModel ExportFileFormat
+        {
+            get { return _exportFileFormat; }
+            set
+            {
+                var oldValue = _exportFileFormat?.Format.DefaultExtension;
+                _exportFileFormat = value;
+                UpdateExportFileExtension(oldValue, _exportFileFormat.Format.DefaultExtension);
+                Validate();
+                RaisePropertyChanged("ExportFileFormat");
             }
         }
 
@@ -62,11 +83,27 @@ namespace BrightstarDB.Polaris.ViewModel
             }
         }
 
+        private void HandleExportFileFormatChanged(RoutedEventArgs e)
+        {
+            try
+            {
+                var combo = e.Source as ComboBox;
+            }
+            catch (Exception)
+            {
+                Messenger.Default.Send(
+                    new ShowDialogMessage(Strings.ExportFailedDialogTitle,
+                                          Strings.ExportUnexpectedErrorMsg,
+                                          MessageBoxImage.Error, MessageBoxButton.OK),
+                    "MainWindow");
+            }
+        }
+
 
         private void StartExport()
         {
             var client = BrightstarService.GetClient(Store.Source.ConnectionString);
-            _transactionJob = client.StartExport(Store.Location, ExportFileName);
+            _transactionJob = client.StartExport(Store.Location, ExportFileName, exportFormat:ExportFileFormat.Format);
             _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle,
                                     new TransactionViewModel.JobMonitorDelegate(CheckJobStatus));
         }
@@ -110,6 +147,23 @@ namespace BrightstarDB.Polaris.ViewModel
         private void Validate()
         {
             IsValid = !String.IsNullOrEmpty(_exportFileName);
+        }
+
+        private void UpdateExportFileExtension(string oldExtension, string newExtension)
+        {
+            if (newExtension == null) return;
+            if (oldExtension == null)
+            {
+                ExportFileName = ExportFileName + "." + newExtension;
+            }
+            else
+            {
+                if (ExportFileName.EndsWith(oldExtension, StringComparison.OrdinalIgnoreCase))
+                {
+                    ExportFileName = ExportFileName.Substring(0, ExportFileName.Length - oldExtension.Length) +
+                                      newExtension;
+                }
+            }
         }
     }
 }

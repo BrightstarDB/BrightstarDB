@@ -41,8 +41,9 @@ namespace BrightstarDB
             SerializedModel = copyOf.SerializedModel;
         }
 
-        private RdfFormat(string defaultExtension, Type formatterType, SerializableModel models, params string[] mediaTypes)
+        private RdfFormat(string displayName, string defaultExtension, Type formatterType, SerializableModel models, params string[] mediaTypes)
         {
+            DisplayName = displayName;
             DefaultExtension = defaultExtension;
             TripleFormatterType = formatterType;
             Encoding = Encoding.UTF8;
@@ -58,42 +59,42 @@ namespace BrightstarDB
         /// <summary>
         /// RDF/XML format
         /// </summary>
-        public static RdfFormat RdfXml = new RdfFormat("rdf", typeof(RdfXmlFormatter), SerializableModel.RdfGraph, "application/rdf+xml", "application/xml");
+        public static RdfFormat RdfXml = new RdfFormat("RDF/XML", "rdf", typeof(RdfXmlFormatter), SerializableModel.RdfGraph, "application/rdf+xml", "application/xml");
 
         /// <summary>
         /// NTriples Format
         /// </summary>
-        public static RdfFormat NTriples = new RdfFormat("nt", typeof(NTriplesFormatter), SerializableModel.RdfGraph, "application/n-triples", "text/ntriples", "text/ntriples+turtle", "application/rdf-triples", "application/x-ntriples");
+        public static RdfFormat NTriples = new RdfFormat("NTriples", "nt", typeof(NTriplesFormatter), SerializableModel.RdfGraph, "application/n-triples", "text/ntriples", "text/ntriples+turtle", "application/rdf-triples", "application/x-ntriples");
 
         /// <summary>
         /// Turtle Format
         /// </summary>
-        public static RdfFormat Turtle = new RdfFormat("ttl", typeof(TurtleW3CFormatter), SerializableModel.RdfGraph, "text/turtle", "application/x-turtle", "application/turtle");
+        public static RdfFormat Turtle = new RdfFormat("Turtle", "ttl", typeof(TurtleW3CFormatter), SerializableModel.RdfGraph, "text/turtle", "application/x-turtle", "application/turtle");
 
         /// <summary>
         /// Notation 3 Format
         /// </summary>
-        public static RdfFormat Notation3 = new RdfFormat("n3", typeof(Notation3Formatter), SerializableModel.RdfGraph, "text/n3", "text/rdf+n3");
+        public static RdfFormat Notation3 = new RdfFormat("Notation3", "n3", typeof(Notation3Formatter), SerializableModel.RdfGraph, "text/n3", "text/rdf+n3");
 
         /// <summary>
         /// NQuads Format
         /// </summary>
-        public static RdfFormat NQuads = new RdfFormat("nq", typeof(NQuadsFormatter), SerializableModel.RdfDataset, "application/n-quads", "text/x-nquads");
+        public static RdfFormat NQuads = new RdfFormat("NQuads", "nq", typeof(NQuadsFormatter), SerializableModel.RdfDataset, "application/n-quads", "text/x-nquads");
 
         /// <summary>
         /// TriG format
         /// </summary>
-        public static RdfFormat TriG = new RdfFormat("trig", null, SerializableModel.RdfDataset, "applicaiton/trig", "application/x-trig");
+        public static RdfFormat TriG = new RdfFormat("TriG", "trig", null, SerializableModel.RdfDataset, "applicaiton/trig", "application/x-trig");
 
         /// <summary>
         /// TriX format
         /// </summary>
-        public static RdfFormat TriX = new RdfFormat("xml", null, SerializableModel.RdfDataset, "application/trix");
+        public static RdfFormat TriX = new RdfFormat("TriX", "xml", null, SerializableModel.RdfDataset, "application/trix");
 
         /// <summary>
         /// RDF/JSON format
         /// </summary>
-        public static RdfFormat Json = new RdfFormat("rj", null, SerializableModel.RdfGraph, "text/json", "application/rdf+json");
+        public static RdfFormat Json = new RdfFormat("RDF/JSON", "rj", null, SerializableModel.RdfGraph, "text/json", "application/rdf+json");
 
         /// <summary>
         /// All RDF serialization formats supported by BrightstarDB

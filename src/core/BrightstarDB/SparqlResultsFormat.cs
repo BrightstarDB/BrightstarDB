@@ -26,49 +26,50 @@ namespace BrightstarDB
         /// <returns>A SparqlResultsFormat instance</returns>
         public SparqlResultsFormat WithEncoding(Encoding encoding)
         {
-            return new SparqlResultsFormat(DefaultExtension, encoding, MediaTypes);
+            return new SparqlResultsFormat(DisplayName, DefaultExtension, encoding, MediaTypes);
         }
 
-        private SparqlResultsFormat(string defaultExtension, Encoding encoding, IEnumerable<string> mediaTypes)
+        private SparqlResultsFormat(string displayName, string defaultExtension, Encoding encoding, IEnumerable<string> mediaTypes)
         {
+            DisplayName = displayName;
             DefaultExtension = defaultExtension;
             Encoding = encoding;
             MediaTypes = new List<String>(mediaTypes);
         }
 
-        private SparqlResultsFormat(string defaultExtension, Encoding encoding, params string[] mediaTypes)
-            :this(defaultExtension,encoding, (IEnumerable<string>)mediaTypes)
+        private SparqlResultsFormat(string displayName, string defaultExtension, Encoding encoding, params string[] mediaTypes)
+            :this(displayName, defaultExtension,encoding, (IEnumerable<string>)mediaTypes)
         {
         }
 
-        private SparqlResultsFormat(string defaultExtension, params string[] mediaTypes) : 
-            this(defaultExtension, Encoding.UTF8, mediaTypes)
+        private SparqlResultsFormat(string displayName, string defaultExtension, params string[] mediaTypes) : 
+            this(displayName, defaultExtension, Encoding.UTF8, mediaTypes)
         {
         }
 
         /// <summary>
         /// SPARQL Query Results XML Format
         /// </summary>
-        public static SparqlResultsFormat Xml = new SparqlResultsFormat("srx",
+        public static SparqlResultsFormat Xml = new SparqlResultsFormat("XML", "srx",
                                                                         "application/sparql-results+xml",
                                                                         "application/xml");
 
         /// <summary>
         /// SPARQL 1.1 Query Results JSON Format
         /// </summary>
-        public static SparqlResultsFormat Json = new SparqlResultsFormat("jrx",
+        public static SparqlResultsFormat Json = new SparqlResultsFormat("JSON", "jrx",
                                                                          "application/sparql-results+json",
                                                                          "application/json");
 
         /// <summary>
         /// SPARQL 1.1 Query Results TSV Format
         /// </summary>
-        public static SparqlResultsFormat Tsv = new SparqlResultsFormat("tsv", "text/tab-separated-values");
+        public static SparqlResultsFormat Tsv = new SparqlResultsFormat("Tab-separated Values", "tsv", "text/tab-separated-values");
 
         /// <summary>
         /// SPARQL 1.1 Query Results CSV format
         /// </summary>
-        public static SparqlResultsFormat Csv = new SparqlResultsFormat("csv", "text/csv");
+        public static SparqlResultsFormat Csv = new SparqlResultsFormat("Comma-separated Values", "csv", "text/csv");
 
         /// <summary>
         /// Returns an array of all the pre-defined <see cref="SparqlResultsFormat"/> instances.
