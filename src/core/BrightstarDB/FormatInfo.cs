@@ -9,6 +9,11 @@ namespace BrightstarDB
     public class FormatInfo : ISerializationFormat
     {
         /// <summary>
+        /// Get the user-friendly display name for this format
+        /// </summary>
+        public string DisplayName { get; protected set; }
+
+        /// <summary>
         /// Get the list of media types that are recognized for this results format
         /// </summary>
         public List<string> MediaTypes { get; protected set; }
