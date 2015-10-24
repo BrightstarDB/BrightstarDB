@@ -723,11 +723,12 @@ namespace BrightstarDB.Client
         /// <param name="fileName">The URI of the data to import</param>
         /// <param name="graphUri">The URI identifier of the graph that the data is to be imported into. If NULL, import is into the default graph</param>
         /// <param name="label">Optional user-friendly label for the job.</param>
+        /// <param name="importFormat">The format of the data to import</param>
         /// <returns>A <see cref="IJobInfo"/> instance to use for monitoring the progress of the job</returns>
-        public IJobInfo StartImport(string store, string fileName, string graphUri, string label = null)
+        public IJobInfo StartImport(string store, string fileName, string graphUri, string label = null, RdfFormat importFormat = null)
         {
             ValidateStoreName(store);
-            var job = JobRequestObject.CreateImportJob(fileName, graphUri, label);
+            var job = JobRequestObject.CreateImportJob(fileName, graphUri, label, importFormat);
             var jobUri = CreateJob(store, job);
             var jobInfoResponse = AuthenticatedGet(jobUri);
             return Deserialize<JobResponseModel>(jobInfoResponse);

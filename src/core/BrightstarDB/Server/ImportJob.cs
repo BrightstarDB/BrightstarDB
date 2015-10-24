@@ -26,11 +26,13 @@ namespace BrightstarDB.Server
         private ITripleSink _importTripleSink;
         private Stream _fileStream;
         private int _tripleCount;
+        private RdfFormat _importFormat;
 
-        public ImportJob(Guid jobId, string label, StoreWorker storeWorker, string contentFileName, string graphUri)
+        public ImportJob(Guid jobId, string label, StoreWorker storeWorker, string contentFileName, RdfFormat importFormat, string graphUri)
             : base(jobId, label, storeWorker)
         {
             _contentFileName = contentFileName;
+            _importFormat = importFormat;
             _graphUri = graphUri;
         }
 
@@ -170,7 +172,7 @@ namespace BrightstarDB.Server
 
         #endregion
 
-        private static IRdfParser GetParser(string fileName)
+        private IRdfParser GetParser(string fileName)
         {
             Options.DefaultTokenQueueMode = TokenQueueMode.SynchronousBufferDuringParsing;
             var fileExtension = MimeTypesHelper.GetTrueFileExtension(fileName);
@@ -180,8 +182,10 @@ namespace BrightstarDB.Server
 #else
             bool isGZiped = fileExtension.EndsWith(MimeTypesHelper.DefaultGZipExtension, StringComparison.InvariantCultureIgnoreCase);
 #endif
-            var parserDefinition = MimeTypesHelper.GetDefinitionsByFileExtension(fileExtension).FirstOrDefault(
-                def => def.CanParseRdf);
+            var parserDefinition = _importFormat == null
+                ? MimeTypesHelper.GetDefinitionsByFileExtension(fileExtension).FirstOrDefault(def => def.CanParseRdf)
+                : MimeTypesHelper.GetDefinitionsByFileExtension(_importFormat.DefaultExtension)
+                    .FirstOrDefault(def => def.CanParseRdf);
             if (parserDefinition != null)
             {
                 var rdfReader = parserDefinition.GetRdfParser();
