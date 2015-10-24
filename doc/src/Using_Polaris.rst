@@ -352,6 +352,13 @@ To run a Local import:
 
 .. image:: Images/polaris05.png
 
+You can use the import interface to queue up multiple files to import. To do this, 
+simply repeat the process described above. Each import request will be queued with
+the server and the interface will display a list of all of the queued import jobs
+and monitor them through to completion.
+
+.. image:: Images/polaris11.png
+
 
 ***************
  Exporting Data
