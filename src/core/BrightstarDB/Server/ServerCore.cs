@@ -10,6 +10,7 @@ using BrightstarDB.Storage;
 using System.Threading;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
+using VDS.RDF.Query.Algebra;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 using TransactionType = BrightstarDB.Dto.TransactionType;
 using Triple = BrightstarDB.Model.Triple;
@@ -278,10 +279,10 @@ namespace BrightstarDB.Server
             return storeWorker.ProcessTransaction(preconditions, notExistsPreconditions, deletePatterns, insertData, defaultGraphUri, "nt", jobLabel);
         }
 
-        public Guid Import(string storeName, string contentFileName, string graphUri, string jobLabel = null)
+        public Guid Import(string storeName, string contentFileName, string graphUri, RdfFormat importFormat = null, string jobLabel = null)
         {
             var storeWorker = GetStoreWorker(storeName);
-            return storeWorker.Import(contentFileName, graphUri, jobLabel);
+            return storeWorker.Import(contentFileName, graphUri, importFormat, jobLabel);
         }
 
         internal IEnumerable<JobExecutionStatus> GetJobs(string storeName)

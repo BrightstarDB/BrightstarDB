@@ -266,8 +266,9 @@ namespace BrightstarDB.Client
         /// <param name="fileName">The name of the file in brighhtstar\import folder to import.</param>
         /// <param name="graphUri">The URI of the default graph to import the data into. Defaults to <see cref="Constants.DefaultGraphUri"/></param>
         /// <param name="label">Optional user-friendly label for the job.</param>
+        /// <param name="importFormat">The RDF format that the file uses. If omitted, the processor will attempt to guess the file format from the file extension.</param>
         /// <returns>A <see cref="IJobInfo"/> instance for monitoring the status of the job</returns>
-        IJobInfo StartImport(string store, string fileName, string graphUri = Constants.DefaultGraphUri, string label = null);
+        IJobInfo StartImport(string store, string fileName, string graphUri = Constants.DefaultGraphUri, string label = null, RdfFormat importFormat = null);
 
         /// <summary>
         /// Starts an export job

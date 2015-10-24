@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.Storage;
 
@@ -112,23 +113,24 @@ namespace BrightstarDB.Dto
         /// <param name="importFileName">The name of the file to import the data from</param>
         /// <param name="defaultGraphUri">OPTIONAL: The default graph to apply to triples parsed from the import file. If not provided, defaults to the system default graph./</param>
         /// <param name="label">A user-friendly label for the job</param>
+        /// <param name="importFormat">The format of the file to be imported</param>
         /// <returns>A new <see cref="JobRequestObject"/> instance</returns>
         public static JobRequestObject CreateImportJob(string importFileName, string defaultGraphUri = null,
-                                                       string label = null)
+                                                       string label = null, RdfFormat importFormat = null)
         {
-            if (importFileName == null) throw new ArgumentNullException("importFileName");
-            if (String.IsNullOrWhiteSpace(importFileName))
-                throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "importFileName");
-            if (defaultGraphUri != null && String.Empty.Equals(defaultGraphUri.Trim()))
-                throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "defaultGraphUri");
+            if (importFileName == null) throw new ArgumentNullException(nameof(importFileName));
+            if (string.IsNullOrWhiteSpace(importFileName))
+                throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, nameof(importFileName));
+            if (defaultGraphUri != null && string.Empty.Equals(defaultGraphUri.Trim()))
+                throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, nameof(defaultGraphUri));
 
-            return new JobRequestObject("Import",
-                                        new Dictionary<string, string>
-                                            {
-                                                {"FileName", importFileName},
-                                                {"DefaultGraphUri", defaultGraphUri}
-                                            },
-                                        label);
+            var jobParams = new Dictionary<string, string>
+            {
+                {"FileName", importFileName},
+                {"DefaultGraphUri", defaultGraphUri}
+            };
+            if (importFormat != null) jobParams["ImportFormat"] = importFormat.MediaTypes.First();
+            return new JobRequestObject("Import", jobParams, label);
         }
 
         /// <summary>

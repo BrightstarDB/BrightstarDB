@@ -1212,6 +1212,18 @@ namespace BrightstarDB.Tests
         }
 
         [Test]
+        public void TestRdfImportFormatOverride()
+        {
+            CopyTestDataToImportFolder("simple.txt", "simple.rdf");
+            var storeName = "TestRdfImportFormatOverride_" + DateTime.Now.Ticks;
+            var client = GetClient();
+            client.CreateStore(storeName);
+            var importJob = client.StartImport(storeName, "simple.rdf", importFormat:RdfFormat.NTriples);
+            importJob = WaitForJob(importJob, client, storeName);
+            Assert.That(importJob.JobCompletedOk, "Import failed: {0} - {1}", importJob.StatusMessage, importJob.ExceptionInfo);
+        }
+
+        [Test]
         public void TestRdfXmlExport()
         {
             CopyTestDataToImportFolder("simple.txt");
