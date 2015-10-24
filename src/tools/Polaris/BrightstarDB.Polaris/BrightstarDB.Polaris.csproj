@@ -139,6 +139,7 @@
     <Compile Include="ViewModel\ImportViewModel.cs" />
     <Compile Include="ViewModel\Connection.cs" />
     <Compile Include="ViewModel\PredicateTripleCountViewModel.cs" />
+    <Compile Include="ViewModel\RdfFormatViewModel.cs" />
     <Compile Include="ViewModel\SparqlQueryException.cs" />
     <Compile Include="ViewModel\SparqlUpdateException.cs" />
     <Compile Include="ViewModel\SparqlUpdateViewModel.cs" />

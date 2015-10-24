@@ -18,21 +18,35 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="50"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Row 0: File name -->
         <TextBlock VerticalAlignment="Center" >Export File Name</TextBlock>
         <TextBox Grid.Column="1" VerticalAlignment="Center" Text="{Binding ExportFileName, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <Button Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Width="100" Height="30" IsEnabled="{Binding IsValid}" Content="Start">
+        <!-- Row 1: File format selector -->
+        <TextBlock Grid.Row="1" VerticalAlignment="Center">Export File Format</TextBlock>
+        <ComboBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" 
+                  SelectedItem="{Binding ExportFileFormat, UpdateSourceTrigger=PropertyChanged}"
+                  ItemsSource="{Binding ExportFileFormats, Mode=OneWay}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayName}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        
+        <Button Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" Width="100" Height="30" IsEnabled="{Binding IsValid}" Content="Start">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Click">
                     <c:EventToCommand Command="{Binding StartClickCommand}" PassEventArgsToCommand="True"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </Button>
-        <TextBlock Grid.Row="2" VerticalAlignment="Top">Progress</TextBlock>
-        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ProgressText}" TextWrapping="Wrap"/>
+        <TextBlock Grid.Row="3" VerticalAlignment="Top">Progress</TextBlock>
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding ProgressText}" TextWrapping="Wrap"/>
     </Grid>
 </UserControl>
