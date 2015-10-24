@@ -373,6 +373,10 @@ To run an export:
   #. In the interface that is displayed, a default name for the export file 
      is generated based on the store name and the current date/time. You can 
      modify this file name if you wish.
+     
+  #. Select the RDF format you wish to use for the exported data. 
+     The default format used is NTriples, but you may want to choose
+     a format such as TriG or NQuads to preserve graph information.
 
   #. Click on the Start button to submit the job to the server.
 
