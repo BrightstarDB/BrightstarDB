@@ -11,6 +11,8 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <OutputPath>packages</OutputPath>
     <TempDir>InstallerTmp</TempDir>
+    <BuildXamarin Condition=" '$(BuildXamarin)' == '' ">True</BuildXamarin>
+    <BuildAndroid Condition=" '$(BuildAndroid)' == '' ">True</BuildAndroid> 
     <BuildIOS Condition=" '$(BuildIOS)' == '' ">True</BuildIOS>
   </PropertyGroup>
 
@@ -169,10 +171,15 @@
 	<MSBuild Projects="..\src\portable\portable.sln"
 	         Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
     <MSBuild Projects="..\src\portable\BrightstarDB.Portable.Android\BrightstarDB.Portable.Android.csproj"
-             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" />
+             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)" 
+             Condition="$(BuildXamarin) And $(BuildAndroid)" />
+    <Message Text="Android PCL build skipped due to flag settings: BuildAndroid=$(BuildAndroid), BuildXamarin=$(BuildXamarin)" 
+             Condition="!($(BuildXamarin) And $(BuildAndroid))"/>
     <MSBuild Projects="..\src\portable\ios.sln"
              Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" 
-             Condition="$(BuildIOS)"/>
+             Condition="$(BuildXamarin) And $(BuildIOS)"/>
+    <Message Text="iOS PCL build skipped due to flag settings: BuildIOS=$(BuildIOS), BuildXamarin=$(BuildXamarin)" 
+             Condition="!($(BuildXamarin) And $(BuildIOS))"/>
   </Target>
   
   <!-- ============================================================ -->
@@ -203,10 +210,12 @@
 			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
 	<MSBuild Projects="..\src\portable\android.sln"
 	         Targets="Clean"
-			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU"
+             Condition="$(BuildXamarin) And $(BuildAndroid)" />
 	<MSBuild Projects="..\src\portable\ios.sln"
 	         Targets="Clean"
-			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" />
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Platform=Any CPU" 
+             Condition="$(BuildXamarin) And $(BuildIOS)"/>
   </Target>
 
   <Target Name="Clean" DependsOnTargets="CleanInstallerTmp;CleanOutput;CleanPortable">
@@ -219,7 +228,7 @@
   <!-- NuGet Package Building                                       -->
   <!-- ============================================================ -->
   
-  <Target Name="NuGet" DependsOnTargets="Version;Prepare;Portable">
+  <Target Name="NuGet" DependsOnTargets="Version;BuildNet40;Portable">
     <RemoveDir Directories="$(OutputPath)\nuget" />
 	<MakeDir Directories="$(OutputPath)\nuget" />
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDBLibs" />
@@ -287,8 +296,9 @@
     <!-- This is supposedly profile 158
     <Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1"/>
     -->
+
     <!-- But this is what VS2013 claims it wants for a project targetting profile 158... -->
-    <Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10"/>
+    <Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10" />
     
     <!-- Supported profile is now Profile344 -->
     <Copy SourceFiles="@(PortableLibs)" DestinationFolder="$(OutputPath)\nuget\BrightstarDBLibs\lib\portable-net45+sl5+netcore45+wpa81+wp8" />
@@ -303,12 +313,13 @@
 	<Copy SourceFiles="@(PortablePhone)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\wp80" />
 	<Copy SourceFiles="@(PortableSilverlight)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\sl5" />
 	<Copy SourceFiles="@(PortableStore)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\win8" />
-    <Copy SourceFiles="@(PortableAndroid)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoAndroid10" />
-    <Copy SourceFiles="@(PortableMonoTouch)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoTouch10" Condition="$(BuildIOS)" />
-    <Copy SourceFiles="@(PortableIOS)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\Xamarin.iOS10" Condition="$(BuildIOS)" />
+    <Copy SourceFiles="@(PortableAndroid)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoAndroid10" Condition="$(BuildXamarin) And $(BuildAndroid)" />
+    <Copy SourceFiles="@(PortableMonoTouch)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\MonoTouch10" Condition="$(BuildXamarin) And $(BuildIOS)" />
+    <Copy SourceFiles="@(PortableIOS)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\Xamarin.iOS10" Condition="$(BuildXamarin) And $(BuildIOS)" />
     <Copy SourceFiles="@(PortableUniversal81)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\portable-netcore451+wpa81" />
     <Copy SourceFiles="@(ForceReference)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\content"/>
-    <Warning Text="The iOS platform assembly is not included in this build." Condition="!$(BuildIOS)"/>
+    <Warning Text="The Andorid platform assembly is not included in this build." Condition="!($(BuildXamarin) And $(BuildAndroid))" />
+    <Warning Text="The iOS platform assembly is not included in this build." Condition="!($(BuildXamarin) And $(BuildIOS))" />
 	
     <Exec Command="..\nuget\NuGet pack nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" WorkingDirectory="$(OutputPath)" />
     <Exec Command="..\nuget\NuGet pack nuget\BrightstarDB\BrightstarDB.nuspec" WorkingDirectory="$(OutputPath)" />
