@@ -188,7 +188,7 @@ namespace BrightstarDB.Server
             var query = ParseSparql(queryExpression);
             var targetFormat = QueryReturnsGraph(query) ? (ISerializationFormat) graphFormat : sparqlResultFormat;
 
-            var cacheKey = MakeQueryCacheKey(storeName, commitPoint.CommitTime.Ticks, query, g, targetFormat);
+            var cacheKey = MakeQueryCacheKey(storeName, commitPoint.CommitTime.Ticks, queryExpression, g, targetFormat);
             var cachedResult = GetCachedResult(cacheKey);
             if (cachedResult == null)
             {
@@ -226,7 +226,7 @@ namespace BrightstarDB.Server
 
             var query = ParseSparql(queryExpression);
             var targetFormat = QueryReturnsGraph(query) ? (ISerializationFormat)graphFormat : sparqlResultFormat;
-            var cacheKey = MakeQueryCacheKey(storeName, commitPoint.CommitTime.Ticks, query, g, targetFormat);
+            var cacheKey = MakeQueryCacheKey(storeName, commitPoint.CommitTime.Ticks, queryExpression, g, targetFormat);
             var cachedResult = GetCachedResult(cacheKey);
             if (cachedResult == null)
             {
@@ -250,7 +250,7 @@ namespace BrightstarDB.Server
         #region Query Caching
 
         
-        private string MakeQueryCacheKey(string storeName, long commitTime, SparqlQuery query, string[] defaultGraphUris, ISerializationFormat targetFormat)
+        private string MakeQueryCacheKey(string storeName, long commitTime, string query, string[] defaultGraphUris, ISerializationFormat targetFormat)
         {
             var graphHashCode = defaultGraphUris == null ? 0 : String.Join(",", defaultGraphUris.OrderBy(s=>s)).GetHashCode();
             return storeName + "_" + commitTime + "_" + query.GetHashCode() + "_" + graphHashCode + "_" + targetFormat;
