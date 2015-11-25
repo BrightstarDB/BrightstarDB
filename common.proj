@@ -14,8 +14,8 @@
        with the MSBuild Community Tasks Version task under monodevelop  -->
   <PropertyGroup>
     <Major>1</Major>
-    <Minor>11</Minor>
-    <Build>1</Build>
+    <Minor>12</Minor>
+    <Build>0</Build>
     <Revision>0</Revision>
   </PropertyGroup>
   
