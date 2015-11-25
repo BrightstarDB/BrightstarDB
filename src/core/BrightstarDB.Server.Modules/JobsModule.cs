@@ -133,11 +133,18 @@ namespace BrightstarDB.Server.Modules
                                 {
                                     return HttpStatusCode.BadRequest;
                                 }
+                                RdfFormat importFormat = null;
+                                if (jobRequestObject.JobParameters.ContainsKey("ImportFormat"))
+                                {
+                                    importFormat = RdfFormat.GetResultsFormat(jobRequestObject.JobParameters["ImportFormat"]);
+                                    if (importFormat == null) return HttpStatusCode.BadRequest;
+                                }
                                 queuedJobInfo = brightstarService.StartImport(
                                     storeName,
                                     jobRequestObject.JobParameters["FileName"],
                                     jobRequestObject.JobParameters.ContainsKey("DefaultGraphUri") ? jobRequestObject.JobParameters["DefaultGraphUri"] : Constants.DefaultGraphUri,
-                                    label);
+                                    label, 
+                                    importFormat);
                                 break;
 
                             case "repeattransaction":

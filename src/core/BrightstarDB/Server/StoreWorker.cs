@@ -353,11 +353,11 @@ namespace BrightstarDB.Server
             return jobId;
         }
 
-        public Guid Import(string contentFileName, string graphUri, string jobLabel = null)
+        public Guid Import(string contentFileName, string graphUri, RdfFormat importFormat = null, string jobLabel = null)
         {
-            Logging.LogDebug("Import {0}, {1}", contentFileName, graphUri);
+            Logging.LogDebug("Import {0}, {1}, {2}", contentFileName, graphUri, importFormat);
             var jobId = Guid.NewGuid();
-            var job = new ImportJob(jobId, jobLabel, this, contentFileName, graphUri);
+            var job = new ImportJob(jobId, jobLabel, this, contentFileName, importFormat, graphUri);
             QueueJob(job);
             return jobId;
         }

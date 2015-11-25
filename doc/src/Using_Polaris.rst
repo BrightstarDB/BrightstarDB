@@ -352,6 +352,13 @@ To run a Local import:
 
 .. image:: Images/polaris05.png
 
+You can use the import interface to queue up multiple files to import. To do this, 
+simply repeat the process described above. Each import request will be queued with
+the server and the interface will display a list of all of the queued import jobs
+and monitor them through to completion.
+
+.. image:: Images/polaris11.png
+
 
 ***************
  Exporting Data
@@ -373,6 +380,10 @@ To run an export:
   #. In the interface that is displayed, a default name for the export file 
      is generated based on the store name and the current date/time. You can 
      modify this file name if you wish.
+     
+  #. Select the RDF format you wish to use for the exported data. 
+     The default format used is NTriples, but you may want to choose
+     a format such as TriG or NQuads to preserve graph information.
 
   #. Click on the Start button to submit the job to the server.
 

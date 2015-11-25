@@ -609,15 +609,16 @@ namespace BrightstarDB.Client
         /// <param name="fileName">The name of the file in brighhtstar\import folder to import.</param>
         /// <param name="graphUri">The URI of the graph that the data will be imported into.</param>
         /// <param name="label">Optional user-friendly label for the job.</param>
+        /// <param name="importFormat">The format of the RDF file to be imported.</param>
         /// <returns>An IJobInfo instance</returns>
-        public IJobInfo StartImport(string storeName, string fileName, string graphUri = Constants.DefaultGraphUri, string label = null)
+        public IJobInfo StartImport(string storeName, string fileName, string graphUri = Constants.DefaultGraphUri, string label = null, RdfFormat importFormat = null)
         {
             if (String.IsNullOrEmpty(storeName)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "storeName");
             if (String.IsNullOrEmpty(fileName)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "fileName");
             if (String.IsNullOrEmpty(graphUri)) throw new ArgumentException(Strings.StringParameterMustBeNonEmpty, "graphUri");
             try
             {
-                var jobId = _serverCore.Import(storeName, fileName, graphUri, label);
+                var jobId = _serverCore.Import(storeName, fileName, graphUri, importFormat, label);
                 return GetJobInfo(storeName, jobId.ToString());
             }
             catch (Exception ex)

@@ -17,17 +17,21 @@
     <dependencies>
         <group>
             <dependency id="dotNetRDF" version="1.0.9" />
+            <dependency id="Newtonsoft.Json" version="7.0.1" />
         </group>
         <group targetFramework="net45">
             <dependency id="dotNetRDF" version="1.0.9" />
+            <dependency id="Newtonsoft.Json" version="7.0.1" />
         </group>
         <group targetFramework="portable-net45+sl5+netcore45+wpa81+wp8">
             <dependency id="dotNetRDF" version="1.0.9" />
             <dependency id="SharpSerializer.PCL" version="2.18.7" />
+            <dependency id="Newtonsoft.Json" version="7.0.1" />
         </group>
         <group targetFramework="portable-net45+sl50+win+wp80+Xamarin.iOS10+MonoAndroid10+MonoTouch10">
             <dependency id="dotNetRDF" version="1.0.9" />
             <dependency id="SharpSerializer.PCL" version="2.18.7" />
+            <dependency id="Newtonsoft.Json" version="7.0.1" />
         </group>
     </dependencies>
   </metadata>

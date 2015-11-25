@@ -113,7 +113,7 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("3456");
-            brightstar.Setup(s=>s.StartImport("foo", "import.nt", null, "ImportJob")).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s=>s.StartImport("foo", "import.nt", null, "ImportJob", null)).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var requestObject = JobRequestObject.CreateImportJob("import.nt", label:"ImportJob");
 
@@ -136,9 +136,32 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             var mockJobInfo = new Mock<IJobInfo>();
             mockJobInfo.Setup(s => s.JobId).Returns("3456");
-            brightstar.Setup(s => s.StartImport("foo", "import.nt", "http://import/graph/uri", "ImportGraphJob")).Returns(mockJobInfo.Object).Verifiable();
+            brightstar.Setup(s => s.StartImport("foo", "import.nt", "http://import/graph/uri", "ImportGraphJob", null)).Returns(mockJobInfo.Object).Verifiable();
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var requestObject = JobRequestObject.CreateImportJob("import.nt", "http://import/graph/uri", "ImportGraphJob");
+
+            // Execute
+            var response = app.Post("/foo/jobs", with =>
+            {
+                with.Accept(new MediaRange("application/json"));
+                with.JsonBody(requestObject);
+            });
+
+            // Assert
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+            Assert.That(response.Headers["Location"], Is.EqualTo("foo/jobs/3456"));
+            brightstar.Verify();
+        }
+
+        [Test]
+        public void TestPostImportWithFormatOverride()
+        {
+            var brightstar = new Mock<IBrightstarService>();
+            var mockJobInfo = new Mock<IJobInfo>();
+            mockJobInfo.Setup(s => s.JobId).Returns("3456");
+            brightstar.Setup(s => s.StartImport("foo", "import.nt", null, "ImportJob", It.Is<RdfFormat>(f=>f.MatchesMediaType(RdfFormat.RdfXml)))).Returns(mockJobInfo.Object).Verifiable();
+            var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
+            var requestObject = JobRequestObject.CreateImportJob("import.nt", label: "ImportJob", importFormat:RdfFormat.RdfXml);
 
             // Execute
             var response = app.Post("/foo/jobs", with =>

@@ -401,7 +401,7 @@ Examples::
   var importJob = client.StartImport("mystore", "data.nt");
   
   // Import the RDF/XML data into a specific graph in "mystore"
-  var importJob = client.StartImport("mystore", "data.rdf", "http://example.org/graphs/1", RdfFormat.RdfXml);
+  var importJob = client.StartImport("mystore", "data.rdf", "http://example.org/graphs/1", importFormat:RdfFormat.RdfXml);
 
 Data Exports
 ============

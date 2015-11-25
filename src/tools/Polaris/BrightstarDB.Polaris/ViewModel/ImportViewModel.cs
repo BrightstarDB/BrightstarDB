@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using BrightstarDB.Client;
 using BrightstarDB.Dto;
 using BrightstarDB.Polaris.Messages;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using VDS.RDF;
@@ -28,14 +33,15 @@ namespace BrightstarDB.Polaris.ViewModel
         private string _progressText;
         private bool _isValid;
         private bool _isLocalImport = true;
-        private IJobInfo _transactionJob;
         public static long MaxRecommendedImportSize = 50*1024*1024; // 50MB
+        private bool _monitorStarted;
 
         public ImportViewModel(Store store) : base(store)
         {
             LocalImportCheckedCommand = new RelayCommand(HandleLocalImportChecked);
             RemoteImportCheckedCommand = new RelayCommand(HandleRemoteImportChecked);
             StartClickCommand = new RelayCommand<RoutedEventArgs>(HandleStartClick);
+            QueuedJobs = new ObservableCollection<ImportJobViewModel>();
         }
 
         public string ImportFileName
@@ -43,7 +49,7 @@ namespace BrightstarDB.Polaris.ViewModel
             get { return _importFileName; }
             set
             {
-                if (!_isLocalImport && !String.IsNullOrEmpty(value))
+                if (!_isLocalImport && !string.IsNullOrEmpty(value))
                 {
                     try
                     {
@@ -61,6 +67,8 @@ namespace BrightstarDB.Polaris.ViewModel
                 RaisePropertyChanged("ImportFileName");
             }
         }
+
+        public ObservableCollection<ImportJobViewModel> QueuedJobs { get; }
 
         public string ImportGraphName { get { return _importGraphName; } set { _importGraphName = value; RaisePropertyChanged("ImportGraphName"); } }
         public string ProgressText { get { return _progressText; } set { _progressText = value; RaisePropertyChanged("ProgressText"); } }
@@ -168,7 +176,7 @@ namespace BrightstarDB.Polaris.ViewModel
                             {
                                 Messenger.Default.Send(new ShowDialogMessage(
                                                            Strings.ParseErrorTitle,
-                                                           String.Format(Strings.ParseErrorDescription, _importFileName,
+                                                           string.Format(Strings.ParseErrorDescription, _importFileName,
                                                                          ex.Message),
                                                            MessageBoxImage.Error,
                                                            MessageBoxButton.OK),
@@ -179,13 +187,18 @@ namespace BrightstarDB.Polaris.ViewModel
                     }
                     var client = BrightstarService.GetClient(Store.Source.ConnectionString);
 
-                    String graphUri = !String.IsNullOrWhiteSpace(ImportGraphName)
+                    var graphUri = !string.IsNullOrWhiteSpace(ImportGraphName)
                         ? ImportGraphName 
                         : Constants.DefaultGraphUri;
 
-                    _transactionJob = client.ExecuteTransaction(Store.Location, String.Empty, String.Empty, lines, waitForCompletion: false, defaultGraphUri: graphUri);
-                    _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle,
-                                            new TransactionViewModel.JobMonitorDelegate(CheckJobStatus));
+                    var transactionJob = client.ExecuteTransaction(Store.Location,
+                        new UpdateTransactionData {InsertData = lines, DefaultGraphUri = graphUri},
+                        waitForCompletion: false);
+                    QueuedJobs.Add(new ImportJobViewModel(ImportFileName, transactionJob, true));
+
+                    if (_monitorStarted) return;
+                    _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle, new TransactionViewModel.JobMonitorDelegate(CheckJobStatus));
+                    _monitorStarted = true;
                 }
             }
             catch (OutOfMemoryException)
@@ -200,9 +213,13 @@ namespace BrightstarDB.Polaris.ViewModel
         private void StartRemoteImport()
         {
             var client = BrightstarService.GetClient(Store.Source.ConnectionString);
-            _transactionJob = client.StartImport(Store.Location, ImportFileName);
-            _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle,
-                                    new TransactionViewModel.JobMonitorDelegate(CheckJobStatus));
+            var importJob = client.StartImport(Store.Location, ImportFileName);
+            QueuedJobs.Add(new ImportJobViewModel(ImportFileName, importJob, false));
+            if (!_monitorStarted)
+            {
+                _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle,
+                    new TransactionViewModel.JobMonitorDelegate(CheckJobStatus));
+            }
         }
 
         public void CheckJobStatus()
@@ -210,41 +227,20 @@ namespace BrightstarDB.Polaris.ViewModel
             try
             {
                 var client = BrightstarService.GetClient(Store.Source.ConnectionString);
-                _transactionJob = client.GetJobInfo(Store.Location, _transactionJob.JobId);
-                if (_transactionJob.JobPending)
+                var inProgress = QueuedJobs.Where(j => !j.Completed).ToList();
+                if (inProgress.Any())
                 {
-                    ProgressText = "Job is currently queued for processing.";
-                }
-                if (_transactionJob.JobStarted)
-                {
-                    ProgressText = !String.IsNullOrEmpty(_transactionJob.StatusMessage)
-                                       ? _transactionJob.StatusMessage
-                                       : "Job is running";
-                }
-                if (_transactionJob.JobCompletedOk)
-                {
-                    ProgressText = "Job completed successfully";
-                    Messenger.Default.Send(new ShowDialogMessage(
-                                               Strings.ImportCompletedDialogTitle,
-                                               String.Format(Strings.ImportCompletedDialogMsg, Store.Location),
-                                               MessageBoxImage.Information, MessageBoxButton.OK), "MainWindow");
-                }
-                else if (_transactionJob.JobCompletedWithErrors)
-                {
-                    ProgressText = String.IsNullOrEmpty(_transactionJob.StatusMessage)
-                                       ? "Import job failed. No further details provided by the server."
-                                       : String.Format("Import job failed. Server reports : '{0}'",
-                                       _transactionJob.ExtractJobErrorMessage(stopOnFirstDetailMessage:true));
-                    Messenger.Default.Send(new ShowDialogMessage(Strings.ImportFailedDialogTitle,
-                                                                 String.Format(Strings.ImportFailedDialogMsg,
-                                                                               Store.Location),
-                                                                 MessageBoxImage.Error, MessageBoxButton.OK),
-                                           "MainWindow");
+                    foreach (var job in inProgress)
+                    {
+                        job.RefreshStatus(client, Store.Location);
+                    }
+                    Thread.Sleep(1000);
+                    _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle,
+                        new TransactionViewModel.JobMonitorDelegate(this.CheckJobStatus));
                 }
                 else
                 {
-                    _dispatcher.BeginInvoke(DispatcherPriority.SystemIdle,
-                                            new TransactionViewModel.JobMonitorDelegate(this.CheckJobStatus));
+                    _monitorStarted = false;
                 }
             } 
             catch(Exception)
@@ -283,6 +279,61 @@ namespace BrightstarDB.Polaris.ViewModel
             IsValid = !String.IsNullOrEmpty(_importFileName) && (!_isLocalImport || File.Exists(_importFileName));
         }
 
-       
+    }
+
+    public class ImportJobViewModel : ViewModelBase
+    {
+        private IJobInfo _importJobInfo;
+
+        public string ImportFileName { get; private set; }
+        public bool IsLocalImport { get; private set; }
+        public string ProgressText { get; private set; }
+        public string StatusImage { get; private set; }
+
+        public ImportJobViewModel(string importFileName, IJobInfo importJobInfo, bool isLocalImport)
+        {
+            ImportFileName = importFileName;
+            IsLocalImport = isLocalImport;
+            _importJobInfo = importJobInfo;
+            UpdateStatusProperties();
+        }
+
+        public void RefreshStatus(IBrightstarService client, string storeName)
+        {
+            _importJobInfo = client.GetJobInfo(storeName, _importJobInfo.JobId);
+            UpdateStatusProperties();
+        }
+        private void UpdateStatusProperties()
+        { 
+            if (_importJobInfo.JobPending)
+            {
+                ProgressText = "Job is currently queued for processing.";
+                StatusImage = "/Polaris;component/Resources/hourglass.png";
+            }
+            if (_importJobInfo.JobStarted)
+            {
+                ProgressText = !string.IsNullOrEmpty(_importJobInfo.StatusMessage)
+                                   ? _importJobInfo.StatusMessage
+                                   : "Job is running";
+                StatusImage = "/Polaris;component/Resources/hourglass_go.png";
+            }
+            if (_importJobInfo.JobCompletedOk)
+            {
+                ProgressText = "Job completed successfully";
+                StatusImage = "/Polaris;component/Resources/tick.png";
+            }
+            else if (_importJobInfo.JobCompletedWithErrors)
+            {
+                ProgressText = string.IsNullOrEmpty(_importJobInfo.StatusMessage)
+                                   ? "Import job failed. No further details provided by the server."
+                                   : $"Import job failed. Server reports : '{_importJobInfo.ExtractJobErrorMessage(stopOnFirstDetailMessage: true)}'";
+                StatusImage = "/Polaris;component/Resources/exclamation.png";
+            }
+
+            RaisePropertyChanged("StatusImage");
+            RaisePropertyChanged("ProgressText");
+        }
+
+        public bool Completed => _importJobInfo.JobCompletedOk || _importJobInfo.JobCompletedWithErrors;
     }
 }

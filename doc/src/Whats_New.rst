@@ -14,6 +14,23 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
 
 ****************************
+ BrightstarDB 1.12
+****************************
+
+	- FIX: Fix for a bug in the server-side query cache that could cause incorrect results to be returned from the cache. Thanks to jvdonk for the bug report and repro. (#252)
+	
+	- FIX: Fix to the NuGet package dependency list to install the correct version of Newtonsoft.Json rather than depending on upstream dependencies. Thanks to jvdonk for the bug report. (#251)
+	
+	- Enhancement: Added an optional parameter to the StartImport method to specify the format of the import file. (#236)
+	
+	- Enhancement: Polaris now supports export in all supported RDF formats. (#219)
+	
+	- Enhancement: Polaris import UI now supports starting multiple imports. Imports will run consecutively with progress shown in the import UI. (#214)
+	
+	- Enhancement: The build process was updated to enable the compilation of NuGet packages from source without needing to build the docs or the Xamarin-specific libraries. (#250)
+	
+
+****************************
  BrightstarDB 1.11.1
 ****************************
 
