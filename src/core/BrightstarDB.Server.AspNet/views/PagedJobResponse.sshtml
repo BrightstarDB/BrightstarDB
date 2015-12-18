@@ -108,9 +108,9 @@
                     <td><a href="@Path['~/@Model.RequestProperties.StoreName/jobs/@Current.JobId']">@Current.Label</a></td>
                     <td><a href="@Path['~/@Model.RequestProperties.StoreName/jobs/@Current.JobId']">@Current.JobId</a></td>
                     <td>@Current.JobStatus</td>
-                    <td class="time">@Current.QueuedTime</td>
-                    <td class="time">@Current.StartTime</td>
-                    <td class="time">@Current.EndTime</td>
+                    <td class="time">@Current.QueuedTimeUtc</td>
+                    <td class="time">@Current.StartTimeUtc</td>
+                    <td class="time">@Current.EndTimeUtc</td>
                     <td>@Current.StatusMessage</td>
                 </tr>
             @EndEach
