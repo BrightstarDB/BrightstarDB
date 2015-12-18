@@ -187,12 +187,8 @@ namespace BrightstarDB.Polaris.ViewModel
                     }
                     var client = BrightstarService.GetClient(Store.Source.ConnectionString);
 
-                    var graphUri = !string.IsNullOrWhiteSpace(ImportGraphName)
-                        ? ImportGraphName 
-                        : Constants.DefaultGraphUri;
-
                     var transactionJob = client.ExecuteTransaction(Store.Location,
-                        new UpdateTransactionData {InsertData = lines, DefaultGraphUri = graphUri},
+                        new UpdateTransactionData {InsertData = lines, DefaultGraphUri = TargetGraphUri},
                         waitForCompletion: false);
                     QueuedJobs.Add(new ImportJobViewModel(ImportFileName, transactionJob, true));
 
@@ -210,10 +206,26 @@ namespace BrightstarDB.Polaris.ViewModel
             }
         }
 
+        private string TargetGraphUri
+        {
+            get
+            {
+                var graphUri = !string.IsNullOrWhiteSpace(ImportGraphName)
+                    ? ImportGraphName
+                    : Constants.DefaultGraphUri;
+                return graphUri;
+            }
+        }
+
+        private string JobLabel
+        {
+            get { return string.Format("Import of file '{0}' submitted from Polaris", ImportFileName); }
+        }
+
         private void StartRemoteImport()
         {
             var client = BrightstarService.GetClient(Store.Source.ConnectionString);
-            var importJob = client.StartImport(Store.Location, ImportFileName);
+            var importJob = client.StartImport(Store.Location, ImportFileName, TargetGraphUri, JobLabel);
             QueuedJobs.Add(new ImportJobViewModel(ImportFileName, importJob, false));
             if (!_monitorStarted)
             {
