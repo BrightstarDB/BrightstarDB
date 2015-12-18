@@ -135,7 +135,9 @@
 
         $('#jobParameters div').hide({
             complete: function () {
-                $('#jobParameters div.' + jobType).show();
+				if (jobType && jobType != '') {
+					$('#jobParameters div.' + jobType).show();
+				}
             }
         });
     }
@@ -163,6 +165,14 @@
         }
     }
 
+	function getInputValue(inputId, paramName, obj) {
+        var val = $('#' + inputId).val();
+        if (val) {
+            obj[paramName] = val;
+        }
+		return val;
+	}
+
     function validateJobParameters() {
         
         var params = {};
@@ -173,11 +183,11 @@
             break;
         case 'Import':
             isValid = validateNotNull('fileName', 'FileName', params);
-            //isValid = validateNotNull('defaultGraphUri', 'DefaultGraphUri', params) && isValid;
+			getInputValue('defaultGraphUri', 'DefaultGraphUri', params);
             break;
         case 'Export':
             isValid = validateNotNull('fileName', 'FileName', params);
-            //isValid = validateNotNull('graphUri', 'GraphUri', params) && isValid;
+			getInputValue('graphUri', 'GraphUri', params);
             break;
         case 'Transaction':
             params.Preconditions = $('#preconditions').val();
