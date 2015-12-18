@@ -222,97 +222,97 @@ namespace BrightstarDB.Tests.EntityFramework
     		UriEntities = 	new BrightstarEntitySet<BrightstarDB.Tests.EntityFramework.IUriEntity>(this);
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IAnimal> Animals
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IAnimal> Animals
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IArticle> Articles
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IArticle> Articles
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IBaseEntity> BaseEntities
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IBaseEntity> BaseEntities
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IChildEntity> ChildEntities
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IChildEntity> ChildEntities
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IChildEntity2> ChildEntity2s
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IChildEntity2> ChildEntity2s
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IChildKeyEntity> ChildKeyEntities
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IChildKeyEntity> ChildKeyEntities
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.ICompany> Companies
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.ICompany> Companies
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity> CompositeKeyEntities
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.ICompositeKeyEntity> CompositeKeyEntities
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IConcept> Concepts
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IConcept> Concepts
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IDBPediaPerson> DBPediaPersons
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IDBPediaPerson> DBPediaPersons
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IDepartment> Departments
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IDepartment> Departments
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IDerivedEntity> DerivedEntities
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IDerivedEntity> DerivedEntities
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IFoafAgent> FoafAgents
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IFoafAgent> FoafAgents
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IFoafPerson> FoafPersons
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IFoafPerson> FoafPersons
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity> HierarchicalKeyEntities
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IHierarchicalKeyEntity> HierarchicalKeyEntities
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTest> IdentityClashTests
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTest> IdentityClashTests
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1> IdentityClashTestLevel1s
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel1> IdentityClashTestLevel1s
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2> IdentityClashTestLevel2s
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IIdentityClashTestLevel2> IdentityClashTestLevel2s
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IJobRole> JobRoles
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IJobRole> JobRoles
     	{
     		get; private set;
     	}
@@ -322,7 +322,7 @@ namespace BrightstarDB.Tests.EntityFramework
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IMarket> Markets
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IMarket> Markets
     	{
     		get; private set;
     	}
@@ -332,67 +332,67 @@ namespace BrightstarDB.Tests.EntityFramework
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IPerformance> Performances
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IPerformance> Performances
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IPhoto> Photos
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IPhoto> Photos
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProduction> Productions
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProduction> Productions
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionMember> ProductionMembers
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionMember> ProductionMembers
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionPerson> ProductionPersons
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.InverseProperty.IProductionPerson> ProductionPersons
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IParentEntity> ParentEntities
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IParentEntity> ParentEntities
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IParentEntity2> ParentEntity2s
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IParentEntity2> ParentEntity2s
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IPerson> Persons
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IPerson> Persons
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.ISession> Sessions
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.ISession> Sessions
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IEveningSession> EveningSessions
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IEveningSession> EveningSessions
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession> TechnicalEveningSessions
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.ITechnicalEveningSession> TechnicalEveningSessions
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.ISkill> Skills
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.ISkill> Skills
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IStringKeyEntity> StringKeyEntities
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IStringKeyEntity> StringKeyEntities
     	{
     		get; private set;
     	}
@@ -402,12 +402,12 @@ namespace BrightstarDB.Tests.EntityFramework
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.ITrackable> Trackables
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.ITrackable> Trackables
     	{
     		get; private set;
     	}
     	
-    	public IEntitySet<BrightstarDB.Tests.EntityFramework.IUriEntity> UriEntities
+    	internal IEntitySet<BrightstarDB.Tests.EntityFramework.IUriEntity> UriEntities
     	{
     		get; private set;
     	}
@@ -537,7 +537,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Animal : BrightstarEntityObject, IAnimal 
+    internal partial class Animal : BrightstarEntityObject, IAnimal 
     {
     	public Animal(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Animal(BrightstarEntityContext context) : base(context, typeof(Animal)) { }
@@ -562,7 +562,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Article : BrightstarEntityObject, IArticle 
+    internal partial class Article : BrightstarEntityObject, IArticle 
     {
     	public Article(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Article(BrightstarEntityContext context) : base(context, typeof(Article)) { }
@@ -607,7 +607,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class BaseEntity : BrightstarEntityObject, IBaseEntity 
+    internal partial class BaseEntity : BrightstarEntityObject, IBaseEntity 
     {
     	public BaseEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public BaseEntity(BrightstarEntityContext context) : base(context, typeof(BaseEntity)) { }
@@ -626,7 +626,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class ChildEntity : BrightstarEntityObject, IChildEntity 
+    internal partial class ChildEntity : BrightstarEntityObject, IChildEntity 
     {
     	public ChildEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public ChildEntity(BrightstarEntityContext context) : base(context, typeof(ChildEntity)) { }
@@ -657,7 +657,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class ChildEntity2 : BrightstarEntityObject, IChildEntity2 
+    internal partial class ChildEntity2 : BrightstarEntityObject, IChildEntity2 
     {
     	public ChildEntity2(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public ChildEntity2(BrightstarEntityContext context) : base(context, typeof(ChildEntity2)) { }
@@ -688,7 +688,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class ChildKeyEntity : BrightstarEntityObject, IChildKeyEntity 
+    internal partial class ChildKeyEntity : BrightstarEntityObject, IChildKeyEntity 
     {
     	public ChildKeyEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public ChildKeyEntity(BrightstarEntityContext context) : base(context, typeof(ChildKeyEntity)) { }
@@ -713,7 +713,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Company : BrightstarEntityObject, ICompany 
+    internal partial class Company : BrightstarEntityObject, ICompany 
     {
     	public Company(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Company(BrightstarEntityContext context) : base(context, typeof(Company)) { }
@@ -762,7 +762,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class CompositeKeyEntity : BrightstarEntityObject, ICompositeKeyEntity 
+    internal partial class CompositeKeyEntity : BrightstarEntityObject, ICompositeKeyEntity 
     {
     	public CompositeKeyEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public CompositeKeyEntity(BrightstarEntityContext context) : base(context, typeof(CompositeKeyEntity)) { }
@@ -793,7 +793,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Concept : BrightstarEntityObject, IConcept 
+    internal partial class Concept : BrightstarEntityObject, IConcept 
     {
     	public Concept(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Concept(BrightstarEntityContext context) : base(context, typeof(Concept)) { }
@@ -811,7 +811,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class DBPediaPerson : BrightstarEntityObject, IDBPediaPerson 
+    internal partial class DBPediaPerson : BrightstarEntityObject, IDBPediaPerson 
     {
     	public DBPediaPerson(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public DBPediaPerson(BrightstarEntityContext context) : base(context, typeof(DBPediaPerson)) { }
@@ -848,7 +848,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Department : BrightstarEntityObject, IDepartment 
+    internal partial class Department : BrightstarEntityObject, IDepartment 
     {
     	public Department(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Department(BrightstarEntityContext context) : base(context, typeof(Department)) { }
@@ -878,7 +878,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class DerivedEntity : BrightstarEntityObject, IDerivedEntity 
+    internal partial class DerivedEntity : BrightstarEntityObject, IDerivedEntity 
     {
     	public DerivedEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public DerivedEntity(BrightstarEntityContext context) : base(context, typeof(DerivedEntity)) { }
@@ -910,7 +910,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class FoafAgent : BrightstarEntityObject, IFoafAgent 
+    internal partial class FoafAgent : BrightstarEntityObject, IFoafAgent 
     {
     	public FoafAgent(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public FoafAgent(BrightstarEntityContext context) : base(context, typeof(FoafAgent)) { }
@@ -927,7 +927,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     [DisplayName("Person")]
-    public partial class FoafPerson : BrightstarEntityObject, IFoafPerson 
+    internal partial class FoafPerson : BrightstarEntityObject, IFoafPerson 
     {
     	public FoafPerson(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public FoafPerson(BrightstarEntityContext context) : base(context, typeof(FoafPerson)) { }
@@ -991,7 +991,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class HierarchicalKeyEntity : BrightstarEntityObject, IHierarchicalKeyEntity 
+    internal partial class HierarchicalKeyEntity : BrightstarEntityObject, IHierarchicalKeyEntity 
     {
     	public HierarchicalKeyEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public HierarchicalKeyEntity(BrightstarEntityContext context) : base(context, typeof(HierarchicalKeyEntity)) { }
@@ -1016,7 +1016,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class IdentityClashTest : BrightstarEntityObject, IIdentityClashTest 
+    internal partial class IdentityClashTest : BrightstarEntityObject, IIdentityClashTest 
     {
     	public IdentityClashTest(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public IdentityClashTest(BrightstarEntityContext context) : base(context, typeof(IdentityClashTest)) { }
@@ -1029,7 +1029,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class IdentityClashTestLevel1 : BrightstarEntityObject, IIdentityClashTestLevel1 
+    internal partial class IdentityClashTestLevel1 : BrightstarEntityObject, IIdentityClashTestLevel1 
     {
     	public IdentityClashTestLevel1(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public IdentityClashTestLevel1(BrightstarEntityContext context) : base(context, typeof(IdentityClashTestLevel1)) { }
@@ -1044,7 +1044,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class IdentityClashTestLevel2 : BrightstarEntityObject, IIdentityClashTestLevel2 
+    internal partial class IdentityClashTestLevel2 : BrightstarEntityObject, IIdentityClashTestLevel2 
     {
     	public IdentityClashTestLevel2(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public IdentityClashTestLevel2(BrightstarEntityContext context) : base(context, typeof(IdentityClashTestLevel2)) { }
@@ -1061,7 +1061,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class JobRole : BrightstarEntityObject, IJobRole 
+    internal partial class JobRole : BrightstarEntityObject, IJobRole 
     {
     	public JobRole(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public JobRole(BrightstarEntityContext context) : base(context, typeof(JobRole)) { }
@@ -1104,7 +1104,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Market : BrightstarEntityObject, IMarket 
+    internal partial class Market : BrightstarEntityObject, IMarket 
     {
     	public Market(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Market(BrightstarEntityContext context) : base(context, typeof(Market)) { }
@@ -1152,7 +1152,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework.InverseProperty 
 {
     
-    public partial class Performance : BrightstarEntityObject, IPerformance 
+    internal partial class Performance : BrightstarEntityObject, IPerformance 
     {
     	public Performance(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Performance(BrightstarEntityContext context) : base(context, typeof(Performance)) { }
@@ -1171,7 +1171,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
 namespace BrightstarDB.Tests.EntityFramework.InverseProperty 
 {
     
-    public partial class Photo : BrightstarEntityObject, IPhoto 
+    internal partial class Photo : BrightstarEntityObject, IPhoto 
     {
     	public Photo(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Photo(BrightstarEntityContext context) : base(context, typeof(Photo)) { }
@@ -1190,7 +1190,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
 namespace BrightstarDB.Tests.EntityFramework.InverseProperty 
 {
     
-    public partial class Production : BrightstarEntityObject, IProduction 
+    internal partial class Production : BrightstarEntityObject, IProduction 
     {
     	public Production(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Production(BrightstarEntityContext context) : base(context, typeof(Production)) { }
@@ -1224,7 +1224,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
 namespace BrightstarDB.Tests.EntityFramework.InverseProperty 
 {
     
-    public partial class ProductionMember : BrightstarEntityObject, IProductionMember 
+    internal partial class ProductionMember : BrightstarEntityObject, IProductionMember 
     {
     	public ProductionMember(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public ProductionMember(BrightstarEntityContext context) : base(context, typeof(ProductionMember)) { }
@@ -1249,7 +1249,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
 namespace BrightstarDB.Tests.EntityFramework.InverseProperty 
 {
     
-    public partial class ProductionPerson : BrightstarEntityObject, IProductionPerson 
+    internal partial class ProductionPerson : BrightstarEntityObject, IProductionPerson 
     {
     	public ProductionPerson(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public ProductionPerson(BrightstarEntityContext context) : base(context, typeof(ProductionPerson)) { }
@@ -1268,7 +1268,7 @@ namespace BrightstarDB.Tests.EntityFramework.InverseProperty
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class ParentEntity : BrightstarEntityObject, IParentEntity 
+    internal partial class ParentEntity : BrightstarEntityObject, IParentEntity 
     {
     	public ParentEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public ParentEntity(BrightstarEntityContext context) : base(context, typeof(ParentEntity)) { }
@@ -1286,7 +1286,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class ParentEntity2 : BrightstarEntityObject, IParentEntity2 
+    internal partial class ParentEntity2 : BrightstarEntityObject, IParentEntity2 
     {
     	public ParentEntity2(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public ParentEntity2(BrightstarEntityContext context) : base(context, typeof(ParentEntity2)) { }
@@ -1304,7 +1304,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Person : BrightstarEntityObject, IPerson 
+    internal partial class Person : BrightstarEntityObject, IPerson 
     {
     	public Person(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Person(BrightstarEntityContext context) : base(context, typeof(Person)) { }
@@ -1398,7 +1398,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Session : BrightstarEntityObject, ISession 
+    internal partial class Session : BrightstarEntityObject, ISession 
     {
     	public Session(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Session(BrightstarEntityContext context) : base(context, typeof(Session)) { }
@@ -1417,7 +1417,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class EveningSession : BrightstarEntityObject, IEveningSession 
+    internal partial class EveningSession : BrightstarEntityObject, IEveningSession 
     {
     	public EveningSession(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public EveningSession(BrightstarEntityContext context) : base(context, typeof(EveningSession)) { }
@@ -1450,7 +1450,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class TechnicalEveningSession : BrightstarEntityObject, ITechnicalEveningSession 
+    internal partial class TechnicalEveningSession : BrightstarEntityObject, ITechnicalEveningSession 
     {
     	public TechnicalEveningSession(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public TechnicalEveningSession(BrightstarEntityContext context) : base(context, typeof(TechnicalEveningSession)) { }
@@ -1491,7 +1491,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Skill : BrightstarEntityObject, ISkill 
+    internal partial class Skill : BrightstarEntityObject, ISkill 
     {
     	public Skill(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Skill(BrightstarEntityContext context) : base(context, typeof(Skill)) { }
@@ -1532,7 +1532,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class StringKeyEntity : BrightstarEntityObject, IStringKeyEntity 
+    internal partial class StringKeyEntity : BrightstarEntityObject, IStringKeyEntity 
     {
     	public StringKeyEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public StringKeyEntity(BrightstarEntityContext context) : base(context, typeof(StringKeyEntity)) { }
@@ -1838,7 +1838,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class Trackable : BrightstarEntityObject, ITrackable 
+    internal partial class Trackable : BrightstarEntityObject, ITrackable 
     {
     	public Trackable(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public Trackable(BrightstarEntityContext context) : base(context, typeof(Trackable)) { }
@@ -1862,7 +1862,7 @@ namespace BrightstarDB.Tests.EntityFramework
 namespace BrightstarDB.Tests.EntityFramework 
 {
     
-    public partial class UriEntity : BrightstarEntityObject, IUriEntity 
+    internal partial class UriEntity : BrightstarEntityObject, IUriEntity 
     {
     	public UriEntity(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
         public UriEntity(BrightstarEntityContext context) : base(context, typeof(UriEntity)) { }

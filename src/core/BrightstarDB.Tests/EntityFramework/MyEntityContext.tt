@@ -175,7 +175,7 @@ public partial class <#=code.Escape(contextClassName) #> : BrightstarEntityConte
 	foreach(var i in helper.GetDecoratedInterfaces())
 	{
 #>
-	<#=i.EntitySetAccessLevel#> IEntitySet<<#=i.InterfaceFullName#>> <#= code.Escape(i.PluralizedName) #>
+	<#=i.GetEntitySetAccessLevel(helper)#> IEntitySet<<#=i.InterfaceFullName#>> <#= code.Escape(i.PluralizedName) #>
 	{
 		get; private set;
 	}
@@ -209,7 +209,7 @@ private void WriteEntityClass(CodeGenerationTools code, Helper helper, ResourceI
     WriteClassAttributes(code, helper, iface);
 #>
 
-<#= code.SpaceAfter(iface.EntitySetAccessLevel)#>partial class <#= iface.ClassName #> : BrightstarEntityObject, <#= iface.InterfaceName #> 
+<#= code.SpaceAfter(iface.GetEntitySetAccessLevel(helper))#>partial class <#= iface.ClassName #> : BrightstarEntityObject, <#= iface.InterfaceName #> 
 {
 	public <#= iface.ClassName#>(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     public <#= iface.ClassName#>(BrightstarEntityContext context) : base(context, typeof(<#= iface.ClassName #>)) { }
@@ -543,7 +543,8 @@ static class Constants {
 	public const string EntityAttributeName =   "BrightstarDB.EntityFramework.EntityAttribute";
 	public const string InversePropertyAttributeName = "BrightstarDB.EntityFramework.InversePropertyAttribute";
     public const string IgnorePropertyAttributeName = "BrightstarDB.EntityFramework.IgnoreAttribute";
-    
+    public const string EntityClassAccessibilityAttributeName = "BrightstarDB.EntityFramework.GenerateInternalEntityClassesAttribute";
+
 	/// <summary>
 	/// The property types that are supported entity property types
 	/// </summary>
@@ -604,11 +605,13 @@ class Helper {
 	public static TextTransformation _transformation;
 	private ProjectItem _templateProjectItem;
 	private Project _project;
+	private vsCMAccess _defaultEntityClassAccess;
 	
 	public Helper(TextTransformation transformation) {
 		_transformation = transformation;
 		_templateProjectItem = DTE.Solution.FindProjectItem(Host.TemplateFile);
 		_project = _templateProjectItem.ContainingProject;
+		_defaultEntityClassAccess = this.GetDefaultEntityClassAccess();
 	}
 	
 	public ITextTemplatingEngineHost Host {
@@ -651,6 +654,16 @@ class Helper {
 		.Distinct().Except(Constants.CoreImports);
 	}
 
+	public IEnumerable<CodeAttribute> GetAssemblyAttributes() {
+		foreach(var pi in GetCodeProjectItems()) {
+			foreach(CodeElement ce in GetTopLevelAttributes(pi.FileCodeModel.CodeElements)) {
+				yield return (CodeAttribute)ce;
+			}
+		}
+	}
+
+	public vsCMAccess DefaultEntityClassAccessibilty { get { return _defaultEntityClassAccess; } }
+
 	/// <summary>
 	/// Returns an enumeration over all the enums types defined in the project
 	/// </summary>
@@ -663,6 +676,14 @@ class Helper {
 		}
 	}
 	
+	public static IEnumerable<CodeAttribute> GetTopLevelAttributes(CodeElements container){
+		foreach(CodeElement ce in container) {
+			if (ce.Kind == vsCMElement.vsCMElementAttribute) {
+				yield return (CodeAttribute)ce;
+			} 
+		}
+	}
+
 	/// <summary>
 	/// Pass-through write operation to allow this class to contain template output
 	/// </summary>
@@ -777,6 +798,16 @@ class Helper {
 			}
 		}
 	}	
+
+	private vsCMAccess GetDefaultEntityClassAccess() {
+		foreach(var attr in GetAssemblyAttributes()) {
+			if (attr.FullName == Constants.EntityClassAccessibilityAttributeName) {
+				return vsCMAccess.vsCMAccessProject;
+			}
+		}
+		return vsCMAccess.vsCMAccessDefault;
+	}
+
 }
 
 class ResourceInterface {
@@ -940,21 +971,23 @@ class ResourceInterface {
 		return name + "s";
 	}
 	
-	public string EntitySetAccessLevel 
+	public string GetEntitySetAccessLevel(Helper helper)
 	{
-		get 
-		{
-			switch (_interfaceCE.Access) {
-				case vsCMAccess.vsCMAccessPublic : 
-					return "public";
-				case vsCMAccess.vsCMAccessPrivate :
-					return "private";
-				case vsCMAccess.vsCMAccessProject :
-				case vsCMAccess.vsCMAccessAssemblyOrFamily:
-					return "internal";
-				default : 
-					return "private";
-			}
+		var defaultAccess = helper.DefaultEntityClassAccessibilty;
+		switch (_interfaceCE.Access) {
+			case vsCMAccess.vsCMAccessPublic : 
+				// If the interface is public, the class will be public *unless* overridden by the EF-specific assembly-level attribute
+				return defaultAccess == vsCMAccess.vsCMAccessProject ? "internal" : "public";
+			case vsCMAccess.vsCMAccessPrivate :
+				// A private interface must be implemented by a private class
+				return "private";
+			case vsCMAccess.vsCMAccessProject :
+			case vsCMAccess.vsCMAccessAssemblyOrFamily:
+				// Internal or Internal protected interfaces must be implemented by an internal class
+				return "internal";
+			default : 
+				// We shouldn't hit this
+				return "private";
 		}
 	}
 }
