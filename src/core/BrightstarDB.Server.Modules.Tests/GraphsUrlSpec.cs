@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using BrightstarDB.Client;
@@ -172,6 +173,18 @@ namespace BrightstarDB.Server.Modules.Tests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotModified));
         }
 
+        private bool SpaceNormalizedStringsAreEqual(string expected, string actual)
+        {
+            var wsregex = new Regex(@"\s+");
+            var check = wsregex.Replace(expected, " ").Equals(wsregex.Replace(actual, " "));
+            if (!check)
+            {
+                // Output for debugging purposes
+                Console.WriteLine("Strings do not match when space-normalized. Expected: '{0}'. Actual: '{1}'.", expected, actual);
+            }
+            return check;
+        }
+
         [Test]
         public void TestPutUpdatesNamedGraph()
         {
@@ -182,8 +195,8 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true);
             brightstar.Setup(s => s.ListNamedGraphs("foo")).Returns(existingGraphs);
             brightstar.Setup(s => s.ExecuteUpdate("foo",
-                @"DROP SILENT GRAPH <http://example.org/g>; INSERT DATA { GRAPH <http://example.org/g> { <http://example.org/s> <http://example.org/p> <http://example.org/o> .
- } }", true, It.IsAny<string>())).Returns(mockJobInfo.Object).Verifiable();
+                It.Is<string>(p=>SpaceNormalizedStringsAreEqual(@"DROP SILENT GRAPH <http://example.org/g>; INSERT DATA { GRAPH <http://example.org/g> { <http://example.org/s> <http://example.org/p> <http://example.org/o> . } }",p)),
+                true, It.IsAny<string>())).Returns(mockJobInfo.Object).Verifiable();
                   
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var response = app.Put("/foo/graphs", with =>
@@ -207,8 +220,8 @@ namespace BrightstarDB.Server.Modules.Tests
             brightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true);
             brightstar.Setup(s => s.ListNamedGraphs("foo")).Returns(existingGraphs);
             brightstar.Setup(s => s.ExecuteUpdate("foo",
-                @"DROP SILENT GRAPH <http://example.org/g>; INSERT DATA { GRAPH <http://example.org/g> { <http://example.org/s> <http://example.org/p> <http://example.org/o> .
- } }", true, It.IsAny<string>())).Returns(mockJobInfo.Object).Verifiable();
+                It.Is<string>(p=>SpaceNormalizedStringsAreEqual(@"DROP SILENT GRAPH <http://example.org/g>; INSERT DATA { GRAPH <http://example.org/g> { <http://example.org/s> <http://example.org/p> <http://example.org/o> . } }", p)),
+                true, It.IsAny<string>())).Returns(mockJobInfo.Object).Verifiable();
 
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var response = app.Put("/foo/graphs", with =>
@@ -230,8 +243,8 @@ namespace BrightstarDB.Server.Modules.Tests
             var brightstar = new Mock<IBrightstarService>();
             brightstar.Setup(s => s.DoesStoreExist("foo")).Returns(true);
             brightstar.Setup(s => s.ExecuteUpdate("foo",
-                @"DROP SILENT DEFAULT; INSERT DATA { <http://example.org/s> <http://example.org/p> <http://example.org/o> .
- }", true, It.IsAny<string>())).Returns(mockJobInfo.Object).Verifiable();
+                It.Is<string>(p=>SpaceNormalizedStringsAreEqual(@"DROP SILENT DEFAULT; INSERT DATA { <http://example.org/s> <http://example.org/p> <http://example.org/o> . }", p)),
+                true, It.IsAny<string>())).Returns(mockJobInfo.Object).Verifiable();
 
             var app = new Browser(new FakeNancyBootstrapper(brightstar.Object));
             var response = app.Put("/foo/graphs", with =>
