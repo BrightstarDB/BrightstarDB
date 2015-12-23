@@ -471,7 +471,7 @@ private void ValidateIdentityProperty(CodeProperty property) {
 			property.FullName, Constants.IdentityAttributeShortName));
 	}
 	if (property.Setter != null) {
-		Error(String.Format("The property '{0}' must not have a setter to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please remove the setter. If it is not intended to be the identity property, either rename this property or create an identity propertyn and decorate it with the [{1}] attribute.",
+		Error(String.Format("The property '{0}' must not have a setter to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please remove the setter. If it is not intended to be the identity property, either rename this property or create an identity property and decorate it with the [{1}] attribute.",
 			property.FullName, Constants.IdentityAttributeShortName));
 	}
 }
