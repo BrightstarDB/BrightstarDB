@@ -525,7 +525,7 @@ namespace BrightstarDB.Tests
         [Test]
         public void TestEmbeddedClientDeleteCreatePattern()
         {
-            var storeName = Guid.NewGuid().ToString();
+            var storeName = "TestEmbeddedClientDeleteCreatePattern" + DateTime.Now.Ticks;
 
             // create store
             var client = BrightstarService.GetClient("type=embedded;storesDirectory=c:\\brightstar");

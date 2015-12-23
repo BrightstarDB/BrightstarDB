@@ -48,7 +48,7 @@
         }
 
         private global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IEmptyEntity> _EmptyEntities;
-        public global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IEmptyEntity> EmptyEntities
+        internal global::BrightstarDB.EntityFramework.IEntitySet<global::BrightstarDB.CodeGeneration.Tests.IEmptyEntity> EmptyEntities
         {
             get
             {
@@ -61,7 +61,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 {
     [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    $ENTITYACCESS$ partial class EmptyEntity : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IEmptyEntity
+    internal partial class EmptyEntity : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IEmptyEntity
     {
         public EmptyEntity()
         {

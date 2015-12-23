@@ -12,8 +12,12 @@
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating"#>
 <#@ include file="EF.Utility.CS.ttinclude"#>
 <#
+
+// Set this flag to true to generate internal implementation classes for public entity interfaces
+var internalEntityClasses = false;
+
 var code = new CodeGenerationTools(this);
-var helper = new Helper(this);
+var helper = new Helper(this, internalEntityClasses);
 var namespaceName = code.VsNamespaceSuggestion();
 var contextClassName = System.IO.Path.GetFileNameWithoutExtension(this.Host.TemplateFile);
 WriteHeader(helper.GetExtraUsings().ToArray());
@@ -175,7 +179,7 @@ public partial class <#=code.Escape(contextClassName) #> : BrightstarEntityConte
 	foreach(var i in helper.GetDecoratedInterfaces())
 	{
 #>
-	<#=i.EntitySetAccessLevel#> IEntitySet<<#=i.InterfaceFullName#>> <#= code.Escape(i.PluralizedName) #>
+	<#=i.GetEntitySetAccessLevel(helper)#> IEntitySet<<#=i.InterfaceFullName#>> <#= code.Escape(i.PluralizedName) #>
 	{
 		get; private set;
 	}
@@ -209,7 +213,7 @@ private void WriteEntityClass(CodeGenerationTools code, Helper helper, ResourceI
     WriteClassAttributes(code, helper, iface);
 #>
 
-<#= code.SpaceAfter(iface.EntitySetAccessLevel)#>partial class <#= iface.ClassName #> : BrightstarEntityObject, <#= iface.InterfaceName #> 
+<#= code.SpaceAfter(iface.GetEntitySetAccessLevel(helper))#>partial class <#= iface.ClassName #> : BrightstarEntityObject, <#= iface.InterfaceName #> 
 {
 	public <#= iface.ClassName#>(BrightstarEntityContext context, BrightstarDB.Client.IDataObject dataObject) : base(context, dataObject) { }
     public <#= iface.ClassName#>(BrightstarEntityContext context) : base(context, typeof(<#= iface.ClassName #>)) { }
@@ -471,7 +475,7 @@ private void ValidateIdentityProperty(CodeProperty property) {
 			property.FullName, Constants.IdentityAttributeShortName));
 	}
 	if (property.Setter != null) {
-		Error(String.Format("The property '{0}' must not have a setter to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please remove the setter. If it is not intended to be the identity property, either rename this property or create an identity property and decorate it with the [{1}] attribute.",
+		Error(String.Format("The property '{0}' must not have a setter to be used as the identity property for an entity. If this property is intended to be the identity property for the entity please remove the setter. If it is not intended to be the identity property, either rename this property or create an identity propertyn and decorate it with the [{1}] attribute.",
 			property.FullName, Constants.IdentityAttributeShortName));
 	}
 }
@@ -543,7 +547,7 @@ static class Constants {
 	public const string EntityAttributeName =   "BrightstarDB.EntityFramework.EntityAttribute";
 	public const string InversePropertyAttributeName = "BrightstarDB.EntityFramework.InversePropertyAttribute";
     public const string IgnorePropertyAttributeName = "BrightstarDB.EntityFramework.IgnoreAttribute";
-    
+
 	/// <summary>
 	/// The property types that are supported entity property types
 	/// </summary>
@@ -604,11 +608,13 @@ class Helper {
 	public static TextTransformation _transformation;
 	private ProjectItem _templateProjectItem;
 	private Project _project;
+	private vsCMAccess _defaultEntityClassAccess;
 	
-	public Helper(TextTransformation transformation) {
+	public Helper(TextTransformation transformation, bool internalEntityClasses) {
 		_transformation = transformation;
 		_templateProjectItem = DTE.Solution.FindProjectItem(Host.TemplateFile);
 		_project = _templateProjectItem.ContainingProject;
+		_defaultEntityClassAccess = this.GetDefaultEntityClassAccess(internalEntityClasses);
 	}
 	
 	public ITextTemplatingEngineHost Host {
@@ -650,6 +656,8 @@ class Helper {
 			.SelectMany(pi=>pi.FileCodeModel.CodeElements.OfType<CodeImport>().Select(ce=>ce.Namespace))
 		.Distinct().Except(Constants.CoreImports);
 	}
+
+	public vsCMAccess DefaultEntityClassAccessibilty { get { return _defaultEntityClassAccess; } }
 
 	/// <summary>
 	/// Returns an enumeration over all the enums types defined in the project
@@ -762,6 +770,7 @@ class Helper {
 			return quotedString;
 		}
 	}
+
 	private IEnumerable<ProjectItem> GetCodeProjectItems(ProjectItems projectItems) {
 		foreach(ProjectItem pi in projectItems) {
 			if (pi.Equals(_templateProjectItem)) {
@@ -777,6 +786,11 @@ class Helper {
 			}
 		}
 	}	
+
+	private vsCMAccess GetDefaultEntityClassAccess(bool internalEntityClasses) {
+		return internalEntityClasses ? vsCMAccess.vsCMAccessProject : vsCMAccess.vsCMAccessDefault;
+	}
+
 }
 
 class ResourceInterface {
@@ -940,21 +954,23 @@ class ResourceInterface {
 		return name + "s";
 	}
 	
-	public string EntitySetAccessLevel 
+	public string GetEntitySetAccessLevel(Helper helper)
 	{
-		get 
-		{
-			switch (_interfaceCE.Access) {
-				case vsCMAccess.vsCMAccessPublic : 
-					return "public";
-				case vsCMAccess.vsCMAccessPrivate :
-					return "private";
-				case vsCMAccess.vsCMAccessProject :
-				case vsCMAccess.vsCMAccessAssemblyOrFamily:
-					return "internal";
-				default : 
-					return "private";
-			}
+		var defaultAccess = helper.DefaultEntityClassAccessibilty;
+		switch (_interfaceCE.Access) {
+			case vsCMAccess.vsCMAccessPublic : 
+				// If the interface is public, the class will be public *unless* overridden by the EF-specific assembly-level attribute
+				return defaultAccess == vsCMAccess.vsCMAccessProject ? "internal" : "public";
+			case vsCMAccess.vsCMAccessPrivate :
+				// A private interface must be implemented by a private class
+				return "private";
+			case vsCMAccess.vsCMAccessProject :
+			case vsCMAccess.vsCMAccessAssemblyOrFamily:
+				// Internal or Internal protected interfaces must be implemented by an internal class
+				return "internal";
+			default : 
+				// We shouldn't hit this
+				return "private";
 		}
 	}
 }
