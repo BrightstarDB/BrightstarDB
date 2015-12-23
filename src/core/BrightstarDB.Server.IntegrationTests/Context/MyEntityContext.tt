@@ -12,8 +12,12 @@
 <#@ import namespace="Microsoft.VisualStudio.TextTemplating"#>
 <#@ include file="EF.Utility.CS.ttinclude"#>
 <#
+
+// Set this flag to true to generate internal implementation classes for public entity interfaces
+var internalEntityClasses = false;
+
 var code = new CodeGenerationTools(this);
-var helper = new Helper(this);
+var helper = new Helper(this, internalEntityClasses);
 var namespaceName = code.VsNamespaceSuggestion();
 var contextClassName = System.IO.Path.GetFileNameWithoutExtension(this.Host.TemplateFile);
 WriteHeader(helper.GetExtraUsings().ToArray());
@@ -543,7 +547,6 @@ static class Constants {
 	public const string EntityAttributeName =   "BrightstarDB.EntityFramework.EntityAttribute";
 	public const string InversePropertyAttributeName = "BrightstarDB.EntityFramework.InversePropertyAttribute";
     public const string IgnorePropertyAttributeName = "BrightstarDB.EntityFramework.IgnoreAttribute";
-    public const string EntityClassAccessibilityAttributeName = "BrightstarDB.EntityFramework.GenerateInternalEntityClassesAttribute";
 
 	/// <summary>
 	/// The property types that are supported entity property types
@@ -607,11 +610,11 @@ class Helper {
 	private Project _project;
 	private vsCMAccess _defaultEntityClassAccess;
 	
-	public Helper(TextTransformation transformation) {
+	public Helper(TextTransformation transformation, bool internalEntityClasses) {
 		_transformation = transformation;
 		_templateProjectItem = DTE.Solution.FindProjectItem(Host.TemplateFile);
 		_project = _templateProjectItem.ContainingProject;
-		_defaultEntityClassAccess = this.GetDefaultEntityClassAccess();
+		_defaultEntityClassAccess = this.GetDefaultEntityClassAccess(internalEntityClasses);
 	}
 	
 	public ITextTemplatingEngineHost Host {
@@ -654,14 +657,6 @@ class Helper {
 		.Distinct().Except(Constants.CoreImports);
 	}
 
-	public IEnumerable<CodeAttribute> GetAssemblyAttributes() {
-		foreach(var pi in GetCodeProjectItems()) {
-			foreach(CodeElement ce in GetTopLevelAttributes(pi.FileCodeModel.CodeElements)) {
-				yield return (CodeAttribute)ce;
-			}
-		}
-	}
-
 	public vsCMAccess DefaultEntityClassAccessibilty { get { return _defaultEntityClassAccess; } }
 
 	/// <summary>
@@ -676,14 +671,6 @@ class Helper {
 		}
 	}
 	
-	public static IEnumerable<CodeAttribute> GetTopLevelAttributes(CodeElements container){
-		foreach(CodeElement ce in container) {
-			if (ce.Kind == vsCMElement.vsCMElementAttribute) {
-				yield return (CodeAttribute)ce;
-			} 
-		}
-	}
-
 	/// <summary>
 	/// Pass-through write operation to allow this class to contain template output
 	/// </summary>
@@ -783,6 +770,7 @@ class Helper {
 			return quotedString;
 		}
 	}
+
 	private IEnumerable<ProjectItem> GetCodeProjectItems(ProjectItems projectItems) {
 		foreach(ProjectItem pi in projectItems) {
 			if (pi.Equals(_templateProjectItem)) {
@@ -799,13 +787,8 @@ class Helper {
 		}
 	}	
 
-	private vsCMAccess GetDefaultEntityClassAccess() {
-		foreach(var attr in GetAssemblyAttributes()) {
-			if (attr.FullName == Constants.EntityClassAccessibilityAttributeName) {
-				return vsCMAccess.vsCMAccessProject;
-			}
-		}
-		return vsCMAccess.vsCMAccessDefault;
+	private vsCMAccess GetDefaultEntityClassAccess(bool internalEntityClasses) {
+		return internalEntityClasses ? vsCMAccess.vsCMAccessProject : vsCMAccess.vsCMAccessDefault;
 	}
 
 }

@@ -44,6 +44,35 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, string> entityNameSelector = null,
             Func<INamedTypeSymbol, bool> interfacePredicate = null)
         {
+            return _Generate(language, solutionPath, contextNamespace, contextName, entityNamespaceSelector, entityNameSelector, null, interfacePredicate);
+        }
+
+        // Updated version of the T4 entry point for the generation logic. Removes the unused selector functions and adds a boolean flag for controlling 
+        // whether entity classes default to internal accessibility. The old entry point is kept for backwards compatibility with existing project's T4 templates
+        public static string Generate2(
+            string language,
+            string solutionPath,
+            string contextNamespace,
+            string contextName = "EntityContext",
+            bool internalEntityClasses = false
+            )
+        {
+            return _Generate(language, solutionPath, contextNamespace, contextName,
+                entityAccessibiltySelector:
+                    internalEntityClasses
+                        ? (Func<INamedTypeSymbol, Accessibility>)Generator.InteralyEntityAccessibilitySelector
+                        : Generator.DefaultEntityAccessibilitySelector);
+        }
+
+        private static string _Generate(string language,
+            string solutionPath,
+            string contextNamespace,
+            string contextName = "EntityContext",
+            Func<INamedTypeSymbol, string> entityNamespaceSelector = null,
+            Func<INamedTypeSymbol, string> entityNameSelector = null,
+            Func<INamedTypeSymbol, Accessibility> entityAccessibiltySelector = null,
+            Func<INamedTypeSymbol, bool> interfacePredicate = null)
+        {
             var castLanguage = (Language)Enum.Parse(typeof(Language), language);
 
             var nodes = GenerateAsync(
@@ -53,6 +82,7 @@ namespace BrightstarDB.CodeGeneration
                 contextName,
                 entityNamespaceSelector,
                 entityNameSelector,
+                entityAccessibiltySelector,
                 interfacePredicate).Result;
 
             return nodes
@@ -85,6 +115,10 @@ namespace BrightstarDB.CodeGeneration
         /// A callback used to determine the name for each generated entity. If left as <see langword="null"/>, generated entities are named the same as their interface
         /// except with the leading "I" removed. If there is no leading "I", an "Impl" suffix is instead added to the interface's name.
         /// </param>
+        /// <param name="entityAccessibilitySelector">
+        /// A callback used to determine the declared accessibility for each generated entity. If left as <see langword="null"/>, generated entity classes have the same
+        /// declared accessibility as the entity interface that they implement.
+        /// </param>
         /// <param name="interfacePredicate">
         /// A callback used to determine which interfaces should result in generated entities. If left as <see langword="null"/>, all interfaces marked with
         /// <see cref="EntityAttribute"/> are included.
@@ -99,6 +133,7 @@ namespace BrightstarDB.CodeGeneration
             string contextName = "EntityContext",
             Func<INamedTypeSymbol, string> entityNamespaceSelector = null,
             Func<INamedTypeSymbol, string> entityNameSelector = null,
+            Func<INamedTypeSymbol, Accessibility> entityAccessibilitySelector = null,
             Func<INamedTypeSymbol, bool> interfacePredicate = null)
         {
             var workspace = MSBuildWorkspace.Create();
@@ -111,6 +146,7 @@ namespace BrightstarDB.CodeGeneration
                 contextName,
                 entityNamespaceSelector,
                 entityNameSelector,
+                entityAccessibilitySelector,
                 interfacePredicate);
         }
 
@@ -137,6 +173,10 @@ namespace BrightstarDB.CodeGeneration
         /// A callback used to determine the name for each generated entity. If left as <see langword="null"/>, generated entities are named the same as their interface
         /// except with the leading "I" removed. If there is no leading "I", an "Impl" suffix is instead added to the interface's name.
         /// </param>
+        /// <param name="entityAccessibilitySelector">
+        /// A callback used to determine the declared accessibility for each generated entity. If left as <see langword="null"/>, generated entity classes have the same
+        /// declared accessibility as the entity interface that they implement.
+        /// </param>
         /// <param name="interfacePredicate">
         /// A callback used to determine which interfaces should result in generated entities. If left as <see langword="null"/>, all interfaces marked with
         /// <see cref="EntityAttribute"/> are included.
@@ -151,6 +191,7 @@ namespace BrightstarDB.CodeGeneration
             string contextName = "EntityContext",
             Func<INamedTypeSymbol, string> entityNamespaceSelector = null,
             Func<INamedTypeSymbol, string> entityNameSelector = null,
+            Func<INamedTypeSymbol, Accessibility> entityAccessibilitySelector = null,
             Func<INamedTypeSymbol, bool> interfacePredicate = null)
         {
             entityNamespaceSelector = entityNamespaceSelector ?? (x => x.ContainingNamespace.ToDisplayString());
@@ -169,6 +210,7 @@ namespace BrightstarDB.CodeGeneration
                         return name + "Impl";
                     }
                 });
+            entityAccessibilitySelector = entityAccessibilitySelector ?? DefaultEntityAccessibilitySelector;
 
             var compilations = await Task.WhenAll(
                 solution
@@ -224,6 +266,7 @@ namespace BrightstarDB.CodeGeneration
                         interfaceSymbols,
                         entityNamespaceSelector,
                         entityNameSelector,
+                        entityAccessibilitySelector,
                         x.InterfaceSymbol))
                 .ToList();
 
@@ -240,6 +283,36 @@ namespace BrightstarDB.CodeGeneration
                 .Concat(entities)
                 .Select(x => Formatter.Format(x, solution.Workspace))
                 .ToImmutableList();
+        }
+
+        /// <summary>
+        /// A utility function providing the default BrightstarDB entity class accessibility logic
+        /// </summary>
+        /// <param name="interfaceSymbol">The entity interface that the class is generated from</param>
+        /// <returns>The accessibility to apply to the generated entity class.</returns>
+        /// <remarks>
+        /// This default selector returns the declared accessibility of the interface symbol, so
+        /// that the generated entity class has the same access level as the interface it is generated from.
+        /// </remarks>
+        public static Accessibility DefaultEntityAccessibilitySelector(INamedTypeSymbol interfaceSymbol)
+        {
+            return interfaceSymbol.DeclaredAccessibility;
+        }
+
+        /// <summary>
+        /// A utility function providing the "internal entity classes" entity class accessibility logic
+        /// </summary>
+        /// <param name="interfaceSymbol">The entity interface that the class is generated from</param>
+        /// <returns>The accessibility to apply to the generated entity class.</returns>
+        /// <remarks>
+        /// If the declared accessibility of the interface is <see cref="Accessibility.Public"/>, then 
+        /// this function returns <see cref="Accessibility.Internal"/>; so that public interfaces are
+        /// implemented by internal entity classes. For all other entity interface 
+        /// accessibility levels, the generated class will have the same accessibility as the interface.
+        /// </remarks>
+        public static Accessibility InteralyEntityAccessibilitySelector(INamedTypeSymbol interfaceSymbol)
+        {
+            return interfaceSymbol.DeclaredAccessibility == Accessibility.Public ? Accessibility.Internal : interfaceSymbol.DeclaredAccessibility;
         }
 
         private static string GetBrightstarAssemblyLocation(Solution solution)
@@ -311,6 +384,7 @@ namespace BrightstarDB.CodeGeneration
             IImmutableList<INamedTypeSymbol> interfaceSymbols,
             Func<INamedTypeSymbol, string> entityNamespaceSelector,
             Func<INamedTypeSymbol, string> entityNameSelector,
+            Func<INamedTypeSymbol, Accessibility> entityAccessibilitySelector,
             INamedTypeSymbol interfaceSymbol)
         {
             var syntaxGenerator = SyntaxGenerator.GetGenerator(solution.Workspace, language.ToSyntaxGeneratorLanguageName());
@@ -322,6 +396,7 @@ namespace BrightstarDB.CodeGeneration
                 interfaceSymbols,
                 entityNamespaceSelector,
                 entityNameSelector,
+                entityAccessibilitySelector,
                 interfaceSymbol);
 
             return generator
@@ -720,7 +795,7 @@ namespace BrightstarDB.CodeGeneration
                             syntaxGenerator.PropertyDeclaration(
                                 propertyName,
                                 syntaxGenerator.TypeExpression(propertyType),
-                                accessibility: Accessibility.Public,
+                                accessibility: x.DeclaredAccessibility,
                                 modifiers: DeclarationModifiers.ReadOnly,
                                 getAccessorStatements: new[]
                                 {
@@ -803,6 +878,7 @@ namespace BrightstarDB.CodeGeneration
         {
             private readonly INamedTypeSymbol interfaceSymbol;
             private readonly string name;
+            private readonly Accessibility accessibility;
             private readonly ISet<ITypeSymbol> basicTypes;
 
             public EntityGenerator(
@@ -813,11 +889,13 @@ namespace BrightstarDB.CodeGeneration
                     IImmutableList<INamedTypeSymbol> interfaceSymbols,
                     Func<INamedTypeSymbol, string> entityNamespaceSelector,
                     Func<INamedTypeSymbol, string> entityNameSelector,
+                    Func<INamedTypeSymbol, Accessibility> entityAccessibilitySelector,
                     INamedTypeSymbol interfaceSymbol)
                 : base(language, syntaxGenerator, solution, compilation, entityNamespaceSelector(interfaceSymbol), interfaceSymbols, entityNamespaceSelector, entityNameSelector)
             {
                 this.interfaceSymbol = interfaceSymbol;
                 this.name = entityNameSelector(interfaceSymbol);
+                this.accessibility = entityAccessibilitySelector(interfaceSymbol);
 
                 var basicTypes = new[]
                 {
@@ -876,7 +954,7 @@ namespace BrightstarDB.CodeGeneration
                 return syntaxGenerator
                     .ClassDeclaration(
                         this.name,
-                        accessibility: Accessibility.Public,
+                        accessibility: this.accessibility,
                         modifiers: DeclarationModifiers.Partial,
                         baseType: syntaxGenerator.TypeExpression(baseType),
                         interfaceTypes: new[] { syntaxGenerator.TypeExpression(this.interfaceSymbol) });

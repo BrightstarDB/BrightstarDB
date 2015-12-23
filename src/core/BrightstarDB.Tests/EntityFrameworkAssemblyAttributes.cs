@@ -5,5 +5,4 @@ using BrightstarDB.EntityFramework;
 [assembly: NamespaceDeclaration("foaf", "http://xmlns.com/foaf/0.1/")]
 [assembly: NamespaceDeclaration("bsi", "http://brightstardb.com/instances/")]
 [assembly: TypeIdentifierPrefix("http://www.example.org/schema/")]
-[assembly: GenerateInternalEntityClasses]
 #endif

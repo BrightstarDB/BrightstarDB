@@ -196,7 +196,6 @@
     <Compile Include="Dto\TransactionStatus.cs" />
     <Compile Include="Dto\TransactionType.cs" />
     <Compile Include="EntityFramework\DefaultKeyConverter.cs" />
-    <Compile Include="EntityFramework\GenerateInternalEntityClassesAttribute.cs" />
     <Compile Include="EntityFramework\EntityKeyChangedException.cs" />
     <Compile Include="EntityFramework\EntityKeyRequiredException.cs" />
     <Compile Include="EntityFramework\IBrightstarEntityCollection.cs" />
