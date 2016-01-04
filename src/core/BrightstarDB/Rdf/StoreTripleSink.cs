@@ -77,6 +77,8 @@ namespace BrightstarDB.Rdf
                     {
                         Logging.LogInfo("Flushing...");
                         _store.FlushChanges(_profiler);
+                        // Clear out any interned URIs to free up more memory
+                        VDS.RDF.UriFactory.Clear();
                         Logging.LogDebug("Initiating garbage collection...");
                         GC.Collect();
                     }
