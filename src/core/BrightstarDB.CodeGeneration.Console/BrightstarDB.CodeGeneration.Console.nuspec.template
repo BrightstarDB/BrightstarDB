@@ -14,5 +14,6 @@
         A console-based code generator for BrightstarDB.
     </description>
     <tags>brightstardb .NET codegen console</tags>
+    <copyright>Copyright 2016 Khalil Ahmed, Graham Moore, and other contributors</copyright>
   </metadata>
 </package>
