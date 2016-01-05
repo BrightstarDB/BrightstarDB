@@ -22,18 +22,38 @@ Create New Project
 ==================
 
 Create a new project in Visual Studio. For this example we chose a command line application. 
-After creating the project ensure the build target is set to  '.NET Framework 4' and that the 
+After creating the project ensure the build target is set to  '.NET Framework 4' or later (
+do not select a Client Profile version of the .NET Framework) and that the 
 Platform Target is set to 'Any CPU'
 
-In the solution explorer right click and add a new item. Choose the 'Brightstar Entity 
-Context' from the list.
+In the solution explorer, right click on the project icon and select 'Manage NuGet Packages...'
+Set the Package source to 'nuget.org' and then use the search facility to search for BrightstarDB.
+A number of packages will be displayed as shown in the screenshot below. Install the one named 'BrightstarDB'.
 
-.. image:: Images/getting-started-add-entity-context.png
+.. image:: Images/getting-started-add-nuget-package.png
 
-The project will now show a new component has been added called "MyEntityContext.tt". On the 
-project references right click and add references. Browse to the [INSTALLDIR]\\SDK\\net40 folder 
-and include all the ".dll" files that are there.
+.. note::
+  The version you install will probably differ from the one shown in the screenshot, however unless
+  you are experimenting with new features from a beta release; or have a specific reason for sticking
+  with an older release; we recommend that you always select the version labelled as 'Latest stable'.
+  
+The NuGet package and its dependencies will be automatically downloaded and added to your project.
+The project will now show a new component has been added called 'MyEntityContext.tt'. This is
+a T4 Text Template - a compile-time source code generator that will create the code framework
+for you to query and updated BrightstarDB using LINQ.
 
+.. note::
+  When the T4 file is installed, Visual Studio may prompt you to confirm if you wish to run it with a dialog
+  like the one shown below:
+  
+  .. image:: Images/getting-started-t4-template-confirmation.png
+
+  Click OK to run the template (you can optionally check the 'Do not show this message again' which will prevent
+  Visual Studio from popping up this dialog again).
+  
+It is also worth noting here that there is an alternate method for generating the code framework which will work
+in Visual Studio 2015 and provides the possibility to use BrightstarDB's Entity Framework with Visual Basic. For
+more information please refer to the section :ref:`Roslyn Code Generation <Roslyn_Code_Generation>`.
 
 Create the Model
 ================
@@ -43,10 +63,9 @@ and a date of birth. An actor can star in many films and each film has many acto
 have name property.
 
 The BrightstarDB Entity Framework requires you to define the data model as a set of .NET 
-interface definitions.  You can either write these interfaces entirely by hand or you can use 
-the Brightstar Entity Definition item template. Again, right-click on the solution item in the 
+interface definitions.  Again, right-click on the solution item in the 
 project explorer window and add a new item, this time from the displayed list choose 
-Brightstar Entity Definition and change the name of the file to IActor.cs.
+Interface (under ``Visual C# Items > Code`` ) and change the name of the file to IActor.cs.
 
 Add the following code to that file::
 
@@ -58,7 +77,7 @@ Add the following code to that file::
     ICollection<IFilm> Films { get; set; }
   }
 
-Then add another Brightstar Entity Definition named IFilm.cs and include the following code::
+Then add another Interface file named IFilm.cs and include the following code::
 
   [Entity]
   public interface IFilm
@@ -69,6 +88,16 @@ Then add another Brightstar Entity Definition named IFilm.cs and include the fol
     ICollection<IActor> Actors { get; }
   }
 
+The ``[Entity]`` and ``[InverseProperty("Films")]`` decorators are instructions
+to the BrightstarDB Entity Framework. The former indicates that this interface
+defines an entity that should be included in the generated framework. The latter
+specifies that the Actors property in the IFilm interface represents the inverse of the
+relationship that the Films property in the IActor interface declares, so if an IFilm
+is in the Films collection of an IActor instance, then that IActor instance will be found in the 
+Actors collection of the IFilm instance. There are several other such decorators provided by 
+BrightstarDB to give you more control over the generated entity framework code - these are 
+described in much more detail in the :ref:`Entity Framework <Entity_Framework>` chapter of 
+this documentation.
 
 Generating the Context and Classes
 ==================================
@@ -76,7 +105,7 @@ Generating the Context and Classes
 A context is a manager for objects in a store. It provides an entry point for running LINQ 
 queries and creating new objects. The context and implementing classes are automatically 
 generated from the interface definitions. To create a context, right click on the 
-MyEntityContext.tt file and select "Run custom tool". This updates the MyEntityContext.cs to 
+MyEntityContext.tt file and select 'Run custom tool'. This updates the MyEntityContext.cs to 
 contain the context class and also classes that implement the specified interfaces.
 
 .. note::
