@@ -240,7 +240,7 @@ namespace BrightstarDB.EntityFramework
             {
                 Dictionary<Type, EntitySetInfo> entitySets = new Dictionary<Type, EntitySetInfo>();
                 foreach (var p in this.GetType()
-                    .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                    .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                     .Where(
                         p =>
                             p.PropertyType.IsGenericType &&
@@ -353,6 +353,7 @@ namespace BrightstarDB.EntityFramework
                 // Don't track the object until it has an underlying data object
                 return;
             }
+
             if (_trackedObjects.TryGetValue(obj.DataObject.Identity, out trackedObjects))
             {
                 if (!trackedObjects.Contains(obj)) trackedObjects.Add(obj);
@@ -362,6 +363,12 @@ namespace BrightstarDB.EntityFramework
                 trackedObjects = new List<BrightstarEntityObject> {obj};
                 _trackedObjects[obj.DataObject.Identity] = trackedObjects;
             }
+        }
+
+        internal void AttachDataObject(BrightstarEntityObject obj)
+        {
+            // Refresh the data object 
+            obj.DataObject = _store.CopyDataObject(obj.DataObject);
         }
 
         internal void UntrackObject(BrightstarEntityObject obj)
