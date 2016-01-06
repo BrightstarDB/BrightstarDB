@@ -235,7 +235,7 @@
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDB" />
 	<MakeDir Directories="$(OutputPath)\nuget\BrightstarDB.Platform" />
     <ItemGroup>
-        <Readme Include="nuget\README.txt" />
+        <Readme Include="PackageFiles\README.txt" />
         <ReleaseNotes Include="nuget\ReleaseNotes.txt"/>
         <NuspecTemplate Include="nuget\BrightstarDB.nuspec.template"/>
         <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
@@ -262,8 +262,8 @@
 	<Copy SourceFiles="@(PlatformNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec')" />
 
     <PropertyGroup>
-	    <PackageBuildNumber Condition="'$(Prerelease)' == ''">$(BuildNumber)</PackageBuildNumber>
-		<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(BuildNumber)-$(Prerelease)</PackageBuildNumber>
+	    <PackageBuildNumber Condition="'$(Prerelease)' == ''">$(Major).$(Minor).$(Build)</PackageBuildNumber>
+		<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(Major).$(Minor).$(Build)-$(Prerelease)</PackageBuildNumber>
 	</PropertyGroup>
 
    	
