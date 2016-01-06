@@ -144,6 +144,11 @@
   <Target Name="AfterClean">
     <CallTarget Targets="CleanPackage" />
   </Target>
+  <PropertyGroup>
+	<PackageBuildNumber Condition="'$(Prerelease)' == ''">$(Major).$(Minor).$(Build)</PackageBuildNumber>
+	<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(Major).$(Minor).$(Build)-$(Prerelease)</PackageBuildNumber>
+  </PropertyGroup>
+  
   <Target Name="Package" DependsOnTargets="CheckPrerequisites">
     <MakeDir Condition="!Exists('$(OutputPath)\NuGet\content')" Directories="$(OutputPath)\NuGet\content" />
     <ItemGroup>
@@ -154,11 +159,11 @@
 	<XmlPoke XmlInputPath="$(OutputPath)\NuGet\BrightstarDB.CodeGeneration.T4.nuspec"
 			 Namespaces="$(NuSpecNamespaces)"
 			 Query="/ns:package/ns:metadata/ns:version"
-			 Value="$(Major).$(Minor).$(Build).$(Revision)" />
+			 Value="$(PackageBuildNumber)" />
 	<XmlPoke XmlInputPath="$(OutputPath)\NuGet\BrightstarDB.CodeGeneration.T4.nuspec"
 			 Namespaces="$(NuSpecNamespaces)"
 			 Query="/ns:package/ns:metadata/ns:dependencies/ns:dependency[@id='BrightstarDB.CodeGeneration']/@version"
-			 Value="$(Major).$(Minor).$(Build).$(Revision)" />
+			 Value="$(PackageBuildNumber)" />
     <Exec Command="$(NuGetCommand) pack &quot;$(SrcDir)core\BrightstarDB.CodeGeneration.T4\$(OutputPath)NuGet\BrightstarDB.CodeGeneration.T4.nuspec&quot;" WorkingDirectory="$(SrcDir)core\BrightstarDB.CodeGeneration.T4\$(OutputPath)NuGet" />
   </Target>
   

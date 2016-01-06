@@ -135,6 +135,8 @@
     <AssemblyInfoFile>Properties\AssemblyInfo.cs</AssemblyInfoFile>
     <BuildNumberFile>..\..\..\buildnumber.txt</BuildNumberFile>
     <AssemblyTitle>BrightstarDB Code Generation Assembly</AssemblyTitle>
+	<PackageBuildNumber Condition="'$(Prerelease)' == ''">$(Major).$(Minor).$(Build)</PackageBuildNumber>
+	<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(Major).$(Minor).$(Build)-$(Prerelease)</PackageBuildNumber>
   </PropertyGroup>
   <Target Name="BeforeBuild">
     <CallTarget Targets="GenerateAssemblyInfo" />
@@ -153,11 +155,11 @@
 	<XmlPoke XmlInputPath="$(OutputPath)\NuGet\BrightstarDB.CodeGeneration.nuspec"
 			 Namespaces="&lt;Namespace Prefix='ns' Uri='http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd' /&gt;"
 			 Query="/ns:package/ns:metadata/ns:version"
-			 Value="$(Major).$(Minor).$(Build).$(Revision)" />
+			 Value="$(PackageBuildNumber)" />
 	<XmlPoke XmlInputPath="$(OutputPath)\NuGet\BrightstarDB.CodeGeneration.nuspec"
 			 Namespaces="&lt;Namespace Prefix='ns' Uri='http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd' /&gt;"
 			 Query="/ns:package/ns:metadata/ns:dependencies/ns:dependency[@id='BrightstarDBLibs']/@version"
-			 Value="$(Major).$(Minor).$(Build).$(Revision)" />
+			 Value="$(PackageBuildNumber)" />
     <Exec Command="$(NuGetCommand) pack &quot;BrightstarDB.CodeGeneration.nuspec&quot;" WorkingDirectory="$(OutputPath)NuGet" />
   </Target>
 </Project>

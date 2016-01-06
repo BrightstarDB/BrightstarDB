@@ -40,7 +40,7 @@
   
   <Target Name="BuildNet40">
 	<MSBuild Projects="..\src\core\core.sln"
-			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Prerelease=$(Prerelease)"
 			 Targets="Clean;Build"/>
   </Target>
 
@@ -234,6 +234,13 @@
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDBLibs" />
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDB" />
 	<MakeDir Directories="$(OutputPath)\nuget\BrightstarDB.Platform" />
+	
+	<PropertyGroup>
+	    <PackageBuildNumber Condition="'$(Prerelease)' == ''">$(Major).$(Minor).$(Build)</PackageBuildNumber>
+		<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(Major).$(Minor).$(Build)-$(Prerelease)</PackageBuildNumber>
+	</PropertyGroup>
+
+
     <ItemGroup>
         <Readme Include="PackageFiles\README.txt" />
         <ReleaseNotes Include="nuget\ReleaseNotes.txt"/>
@@ -252,19 +259,14 @@
         <PortableIOS Include="..\src\portable\BrightstarDB.Portable.iOS\bin\iPhone\$(Configuration)\BrightstarDB.Portable.iOS.dll"/>
         <PortableMonoTouch Include="..\src\portable\BrightstarDB.Portable.MonoTouch\bin\iPhone\$(Configuration)\BrightstarDB.Portable.MonoTouch.dll"/>
         <PortableUniversal81 Include="..\src\portable\BrightstarDB.Portable.Universal81\bin\$(Configuration)\BrightstarDB.Portable.Universal81.dll" />
-        <CodeGenPackage Include="..\src\core\BrightstarDB.CodeGeneration\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.$(BuildNumber).nupkg" />
-		<CodeGenConsolePackage Include="..\src\core\BrightstarDB.CodeGeneration.Console\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.Console.$(BuildNumber).nupkg"/>
-        <CodeGenT4Package Include="..\src\core\BrightstarDB.CodeGeneration.T4\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.T4.$(BuildNumber).nupkg" />
+        <CodeGenPackage Include="..\src\core\BrightstarDB.CodeGeneration\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.$(PackageBuildNumber).nupkg" />
+		<CodeGenConsolePackage Include="..\src\core\BrightstarDB.CodeGeneration.Console\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.Console.$(PackageBuildNumber).nupkg"/>
+        <CodeGenT4Package Include="..\src\core\BrightstarDB.CodeGeneration.T4\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.T4.$(PackageBuildNumber).nupkg" />
     </ItemGroup>
     
     <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
     <Copy SourceFiles="@(LibsNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec')" />
 	<Copy SourceFiles="@(PlatformNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec')" />
-
-    <PropertyGroup>
-	    <PackageBuildNumber Condition="'$(Prerelease)' == ''">$(Major).$(Minor).$(Build)</PackageBuildNumber>
-		<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(Major).$(Minor).$(Build)-$(Prerelease)</PackageBuildNumber>
-	</PropertyGroup>
 
    	
     <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec"
