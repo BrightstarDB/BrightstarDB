@@ -57,6 +57,12 @@
 		     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
 			 Targets="Build"/>
   </Target>
+
+  <Target Name="BuildVSIX">
+    <MSBuild Projects="VSIX\BrightstarDB.EntityFramework.sln"
+             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
+             Targets="Build"/>
+  </Target>
   
   <Target Name="BuildPolaris">
 	<MSBuild Projects="..\src\tools\Polaris\Polaris.sln" 
@@ -71,7 +77,7 @@
     <Copy SourceFiles="@(SdkFiles)" DestinationFolder="..\samples\SDK\%(RecursiveDir)"/>
   </Target>
   
-  <Target Name="Prepare" DependsOnTargets="Version;BuildNet40;BuildVisualStudio;BuildPolaris;BuildDocs">
+  <Target Name="Prepare" DependsOnTargets="Version;BuildNet40;BuildVisualStudio;BuildVSIX;BuildPolaris;BuildDocs">
     <ItemGroup>
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
       <Net40Dep Include="..\src\lib\unused_dependencies\*.dll;..\src\lib\Remotion.Linq.dll" />
@@ -89,6 +95,7 @@
       <Root Include="PackageFiles\README.txt;PackageFiles\EULA.rtf;PackageFiles\NOTICE.txt"/>
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.zip"/>
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityDefinition.zip"/>
+      <VSIX Include="VSIX\BrightstarDB.EntityFramework\bin\$(Configuration)\BrightstarDB.EntityFramework.vsix"/>
       <Polaris Include="..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\*.dll;
 			..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\Polaris.exe"/>
       <AspNetServerBin Include="..\src\core\BrightstarDB.Server.Modules\bin\$(Configuration)\*.dll"/>
@@ -122,6 +129,7 @@
     <Copy SourceFiles="@(ServiceViews)" DestinationFolder="InstallerTmp\Service\views" />
     <Copy SourceFiles="@(ServiceExe)" DestinationFolder="InstallerTmp\ServiceExe"/>
     <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\ItemTemplates"/>
+    <Copy SourceFiles="@(VSIX)" DestinationFolder="InstallerTmp\VSIX"/>
     <Copy SourceFiles="@(Polaris)" DestinationFolder="InstallerTmp\Tools\Polaris"/>
     <Copy SourceFiles="@(Samples)" DestinationFiles="@(Samples->'InstallerTmp\Samples\%(recursivedir)%(filename)%(extension)')"/>
     <Copy SourceFiles="@(AspNetServerBin)" DestinationFolder="InstallerTmp\Webapp\bin" />
