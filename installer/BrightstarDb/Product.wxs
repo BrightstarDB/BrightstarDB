@@ -310,7 +310,7 @@
                Description="Add item and project templates into the local Visual Studion 2015 installation."
                AllowAdvertise="no">
         <Condition Level="0">NOT VS2015_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED</Condition>
-        <Component Id="vs2015VSIXComponent" Guid="{5485319E-D1D0-4345-AEFC-5F3FAC67AA8B}" Directory="INSTALLLOCATION" Win64="$(var.Win64)">
+        <Component Id="vs2015VSIXComponent" Guid="{5485319E-D1D0-4345-AEFC-5F3FAC67AA8B}" Directory="VSDIR" Win64="$(var.Win64)">
           <File Id="vs2015VSIXFile" Source="..\InstallerTmp\VSIX\BrightstarDB.EntityFramework.vsix">
             <vs:VsixPackage PackageId="BrightstarDB.EntityFramework.Kal Ahmed.1fc42aaa-e5df-41b9-a34e-cfa06f8a990e" />
           </File>
