@@ -50,8 +50,12 @@ You can also install this package from the NuGet console with the command::
 
 	Install-Package BrightstarDB
 
-Alternatively if you want to create your project using the SDK distributed with the BrightstarDB
-installer, you can copy the text template file from ``[INSTALLDIR]\\SDK\\EntityFramework``.
+Alternatively if you have used the BrightstarDB Windows Installer that installer will provide
+two additional ways to access this text template. Firstly, if the machine you installed onto has
+Visual Stuio Professional (or above) then the text template will be installed as a Visual Studio
+C# item template which makes it possible to simply select "Add Item..." and then choose 
+"BrightstarDB Entity Context" from the list of C# items. Secondly, the installer will also
+place a copy of the text template in ``[INSTALLDIR]\\SDK\\EntityFramework``.
 
 The default name of the entity context template file is ``MyEntityContext.tt`` - this will generate
 a code file named ``MyEntityContext.cs`` and the context class will be named ``MyEntityContext``.
@@ -63,8 +67,9 @@ to change the namespace that the class is generated in.
 **Define Interfaces**
 
 Interfaces are used to define a data model contract. Only interfaces marked with the ``Entity`` 
-attribute will be processed by the text template. The following interfaces define a model that 
-captures the idea of people working for an company.
+attribute will be processed by the text template. 
+
+The following interfaces define a model that captures the idea of people working for an company.
 
 .. code-block:: c#
 
@@ -84,6 +89,13 @@ captures the idea of people working for an company.
 	   [InverseProperty("Employer")]
 	   ICollection<IPerson> Employees { get; }
 	}
+
+
+.. note::
+	If you have installed with the Windows Installer, you will have the option to add the Visual Studio 
+	integration into Visual Studio Professional and above. This integration adds a simple C# item 
+	template for an entity definition which makes it possible to simply select "Add Item..." on your 
+	project and then choose "BrightstarDB Entity Definition" from the list of C# items.
 
 
 **Run the MyEntityContext.tt Custom Tool**
@@ -1554,12 +1566,14 @@ the following command::
 Installing this package adds a solution-level tool to your package structure. You can then run this 
 tool with the following command::
 
-    BrightstarDB.CodeGeneration.Console [/EntityContext:ContextClassName] [/Language:VB|CS] ``path/to/MySolution.sln`` ``My.Context.Namespace`` ``Output.cs``
-    
+    BrightstarDB.CodeGeneration.Console [/EntityContext:ContextClassName] [/Language:VB|CS] [/InternalEntityClasses] ``path/to/MySolution.sln`` ``My.Context.Namespace`` ``Output.cs``
+
 This will scan the code in the specified solution and generate a new BrightstarDB entity context class in the namespace provided,
 writing the generated code to the specified output file. By default, the name of the entity context class is ``EntityContext``, but
 this can be changed by providing a value for the optional ``/EntityContext`` parameter (short name ``/CN``). The language used 
-in the output file will be based on the file extension, but you can override this with the optional ``/Langauge`` parameter.
+in the output file will be based on the file extension, but you can override this with the optional ``/Langauge`` parameter. To
+generate entity classes with internal visibility for public interfaces, you can add the optional ``/InternalEntityClasses`` flag
+(short name ``/IE``) to the command-line (see :ref:`Generated_Class_Visibility` for more information about this feature).
 
 T4 Template-based Generation
 ----------------------------
@@ -1574,3 +1588,30 @@ This will add a file named ``EntityContext.tt`` to your project. You can move th
 file around in the project and it will automatically use the appropriate namespace 
 for the generated context class. You can also rename this file to change the name 
 of the generated context class.
+
+
+.. _Generated_Class_Visibility:
+
+Generated Class Visibility
+==========================
+
+By default the Entity Framework code generators will generate entity classes that 
+implement each entity interface with the same visibility as the interface. This 
+means that by default a public interface will be implemented by a public generated class;
+whereas an internal interface will be implemented by an internal generated class.
+
+In some cases it is desirable to restrict the visibility of the generated entity classes,
+having a public entity interface and an internal implementation of that interface. This
+is now supported through a flag that can be either passed to the Roslyn console-based
+code generator or set by editing the T4 text template used for code generation.
+
+If you are using a T4 template to generate the entity context and entity classes,
+you can set this flag by finding the following code in the template::
+
+	var internalEntityClasses = false;
+
+and change it to::
+
+	var internalEntityClasses = true;
+
+This code is the same in both the standard and the Roslyn-based T4 templates.
