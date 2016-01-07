@@ -144,3 +144,4 @@ src/core/UpgradeLog*
 src/core/coverage
 tools/NUnit.Runners.*/
 installer/VSIX/BrightstarEntityContext/MyEntityContext.tt
+installer/VSIX/BrightstarDB.EntityFramework/Properties/AssemblyInfo.cs
