@@ -141,9 +141,10 @@
   <Target Name="PrepareSdk" DependsOnTargets="Version;BuildNet40">
     <ItemGroup>
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
-      <WP71Sdk Include="..\src\mobile\BrightstarDB.Mobile\bin\$(Configuration)\*.dll"/>
+	  <SdkTextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
     </ItemGroup>
     <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\SDK\NET40"/>
+	<Copy SourceFiles="@(SdkTextTemplates)" DestinationFolder="InstallerTmp\SDK\EntityFramework"/>
   </Target>
 
   <Target Name="CleanInstallerTmp">
