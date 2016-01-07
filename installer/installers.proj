@@ -328,7 +328,7 @@
     <Copy SourceFiles="@(PortableIOS)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\Xamarin.iOS10" Condition="$(BuildXamarin) And $(BuildIOS)" />
     <Copy SourceFiles="@(PortableUniversal81)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\portable-netcore451+wpa81" />
     <Copy SourceFiles="@(ForceReference)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\content"/>
-    <Warning Text="The Andorid platform assembly is not included in this build." Condition="!($(BuildXamarin) And $(BuildAndroid))" />
+    <Warning Text="The Android platform assembly is not included in this build." Condition="!($(BuildXamarin) And $(BuildAndroid))" />
     <Warning Text="The iOS platform assembly is not included in this build." Condition="!($(BuildXamarin) And $(BuildIOS))" />
 	
     <Exec Command="..\nuget\NuGet pack nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" WorkingDirectory="$(OutputPath)" />
