@@ -122,7 +122,7 @@
     </ItemGroup>
     
     <Copy SourceFiles="@(Docs)" DestinationFolder="InstallerTmp\Docs" Condition="!$(NoDocs)"/>
-	<Copy SourceFiles="@(HtmlDocs)" DestinationFiles="@(HtmlDocs->'InstallerTmp\Docs\Guide\%(recursivedir)%(filename)%(extension)')"/>
+	<Copy SourceFiles="@(HtmlDocs)" DestinationFiles="@(HtmlDocs->'InstallerTmp\Docs\Guide\%(recursivedir)%(filename)%(extension)')" Condition="!$(NoDocs)"/>
     <Copy SourceFiles="@(VisualStudio)" DestinationFolder="InstallerTmp\VisualStudio"/>
     <Copy SourceFiles="@(Root)" DestinationFolder="InstallerTmp"/>
     <Copy SourceFiles="@(Service)" DestinationFolder="InstallerTmp\Service"/>
