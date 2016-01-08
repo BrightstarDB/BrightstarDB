@@ -96,6 +96,38 @@ namespace BrightstarDB.Tests
         }
 
         [Test]
+        public void TestNonNegativeIntegerParsing()
+        {
+            const int v = 123456789;
+            var bsParsed = (int)RdfDatatypes.ParseLiteralString("123456789", RdfDatatypes.NonNegativeInteger, null);
+            Assert.That(bsParsed, Is.EqualTo(v));
+        }
+
+        [Test]
+        public void TestPositiveIntegerParsing()
+        {
+            const int v = 123456789;
+            var bsParsed = (int)RdfDatatypes.ParseLiteralString("123456789", RdfDatatypes.PositiveInteger, null);
+            Assert.That(bsParsed, Is.EqualTo(v));
+        }
+
+        [Test]
+        public void TestNonPositiveIntegerParsing()
+        {
+            const int v = -123456789;
+            var bsParsed = (int)RdfDatatypes.ParseLiteralString("-123456789", RdfDatatypes.NonPositiveInteger, null);
+            Assert.That(bsParsed, Is.EqualTo(v));
+        }
+
+        [Test]
+        public void TestNegativeIntegerParsing()
+        {
+            const int v = -123456789;
+            var bsParsed = (int)RdfDatatypes.ParseLiteralString("-123456789", RdfDatatypes.NegativeInteger, null);
+            Assert.That(bsParsed, Is.EqualTo(v));
+        }
+
+        [Test]
         public void TestFloatRoundtrip()
         {
             const float v = 1.12345F;
@@ -175,6 +207,18 @@ namespace BrightstarDB.Tests
             var bsString = RdfDatatypes.GetLiteralString(v);
             var bsParsed = (byte)RdfDatatypes.ParseLiteralString(bsString, RdfDatatypes.UnsignedByte, null);
             Assert.That(bsParsed, Is.EqualTo(v));
+        }
+
+        [Test]
+        public void TestParseStringDerivatives()
+        {
+            const string v = "HelloWorld";
+            var p = RdfDatatypes.ParseLiteralString(v, RdfDatatypes.NormalizedString, null);
+            Assert.That(p, Is.EqualTo(v));
+            p = RdfDatatypes.ParseLiteralString(v, RdfDatatypes.Token, null);
+            Assert.That(p, Is.EqualTo(v));
+            p = RdfDatatypes.ParseLiteralString(v, RdfDatatypes.Language, null);
+            Assert.That(p, Is.EqualTo(v));
         }
     }
 }

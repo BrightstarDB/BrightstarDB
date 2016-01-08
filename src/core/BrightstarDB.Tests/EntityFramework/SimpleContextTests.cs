@@ -2379,6 +2379,39 @@ where {
             }
         }
 
+        [TestCase]
+        public void TestReattachModifiedEntity()
+        {
+            var storeName = "TestReattachModifiedEntity_" + DateTime.Now.Ticks;
+            ITestEntity entity;
+            using (var context = CreateEntityContext(storeName))
+            {
+                entity = new TestEntity {Id="test", SomeString="Initial Value"};
+                context.TestEntities.Add(entity);
+                context.SaveChanges();
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                entity = context.TestEntities.FirstOrDefault(x => x.Id.Equals("test"));
+                ((BrightstarEntityObject)entity).Detach();
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                entity.SomeString = "Updated Value";
+                context.Add(entity);
+                context.SaveChanges();
+            }
+
+            using (var context = CreateEntityContext(storeName))
+            {
+                entity = context.TestEntities.FirstOrDefault(x => x.Id.Equals("test"));
+                Assert.That(entity, Is.Not.Null);
+                Assert.That(entity, Has.Property("SomeString").EqualTo("Updated Value"));
+            }
+        }
+
         MyEntityContext CreateEntityContext(string storeName)
         {
             return new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName);

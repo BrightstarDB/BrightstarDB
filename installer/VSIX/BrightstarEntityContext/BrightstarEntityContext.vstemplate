@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>Brightstar Entity Context</Name>
+    <Description>A project item that creates a strongly-typed EntityContext class and BrightstarDB persistence-aware classes.</Description>
+    <Icon>BrightstarEntityContext.ico</Icon>
+    <TemplateID>f1ab2807-b350-4098-9c08-17bf7bca43cc</TemplateID>
+    <ProjectType>CSharp</ProjectType>
+    <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <DefaultName>MyEntityContext.tt</DefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem ReplaceParameters="true">MyEntityContext.tt</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

@@ -17,5 +17,6 @@
     <dependencies>
         <dependency id="BrightstarDB.CodeGeneration" version="${VERSION}" />
     </dependencies>
+    <copyright>Copyright 2016 Khalil Ahmed, Graham Moore, and other contributors</copyright>
   </metadata>
 </package>

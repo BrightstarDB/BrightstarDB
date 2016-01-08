@@ -41,57 +41,61 @@ Creating a Context
 
 The **Brightstar Entity Context** is a text template that when run introspects the other 
 code elements in the project and generates a number of classes and a context in a single file 
-that can be found under the context file in Visual Studio. To add a new 
-BrightstarEntityContext add a new item to the project. Locate the item in the list called 
-Brightstar Entity Context, rename it if required, and add to the current project.
+that can be found under the context file in Visual Studio. The simplest way to get the latest
+version of this file is to add the BrightstarDB NuGet package to your project:
 
-.. image:: Images/getting-started-add-entity-context.png
+.. image:: Images/getting-started-add-nuget-package.png
+
+You can also install this package from the NuGet console with the command::
+
+	Install-Package BrightstarDB
+
+Alternatively if you have used the BrightstarDB Windows Installer that installer will provide
+two additional ways to access this text template. Firstly, if the machine you installed onto has
+Visual Stuio Professional (or above) then the text template will be installed as a Visual Studio
+C# item template which makes it possible to simply select "Add Item..." and then choose 
+"BrightstarDB Entity Context" from the list of C# items. Secondly, the installer will also
+place a copy of the text template in ``[INSTALLDIR]\\SDK\\EntityFramework``.
+
+The default name of the entity context template file is ``MyEntityContext.tt`` - this will generate
+a code file named ``MyEntityContext.cs`` and the context class will be named ``MyEntityContext``.
+By renaming the text template file you will change both the name of the generated C# source file
+and the name of the entity context class. You can also move this text template into a subfolder
+to change the namespace that the class is generated in.
 
 
 **Define Interfaces**
 
 Interfaces are used to define a data model contract. Only interfaces marked with the ``Entity`` 
-attribute will be processed by the text template. The following interfaces define a model that 
-captures the idea of people working for an company.::
+attribute will be processed by the text template. 
 
-  [Entity]
-  public interface IPerson
-  {
-      string Name { get; set; }
-      DateTime DateOfBirth { get; set; }
-      string CV { get; set; }
-      ICompany Employer { get; set; }
-  }
+The following interfaces define a model that captures the idea of people working for an company.
 
-  [Entity]
-  public interface ICompany
-  {
-      string Name { get; set; }
-      [InverseProperty("Employer")]
-      ICollection<IPerson> Employees { get; }
-  }
+.. code-block:: c#
 
-**Including a Brightstar Entity Definition Item**
+	[Entity]
+	public interface IPerson
+	{
+	   string Name { get; set; }
+	   DateTime DateOfBirth { get; set; }
+	   string CV { get; set; }
+	   ICompany Employer { get; set; }
+	}
 
-One quick way to include the outline of a BrightstarDB entity in a project is to right click 
-on the project in the solution explorer and click **Add New Item**. Then select the 
-**Brightstar Entity Definition** from the list and update the name.
-
-.. image:: Images/ef-include-entity-def.png
-
-This will add the following code file into the project.::
-
-  [Entity]
-  public interface IMyEntity1
-  {
-      /// <summary>
-      /// Get the persistent identifier for this entity
-      /// </summary>
-      string Id { get; }
+	[Entity]
+	public interface ICompany
+	{
+	   string Name { get; set; }
+	   [InverseProperty("Employer")]
+	   ICollection<IPerson> Employees { get; }
+	}
 
 
-      // TODO: Add other property references here
-  }
+.. note::
+	If you have installed with the Windows Installer, you will have the option to add the Visual Studio 
+	integration into Visual Studio Professional and above. This integration adds a simple C# item 
+	template for an entity definition which makes it possible to simply select "Add Item..." on your 
+	project and then choose "BrightstarDB Entity Definition" from the list of C# items.
 
 
 **Run the MyEntityContext.tt Custom Tool**
@@ -116,65 +120,77 @@ objects and is responsible for executing queries and committing transactions.
 A context can be opened with a connection string. If the store named does not exist it will be 
 created. See the :ref:`connection strings <Connection_Strings>` section for more information 
 on allowed configurations. The following code opens a new context connecting to an embedded 
-store::
+store:
 
-  var dataContext = new MyEntityContext("Type=embedded;StoresDirectory=c:\\brightstardb;StoreName=test");
+.. code-block:: c#
+
+	var dataContext = new MyEntityContext("Type=embedded;StoresDirectory=c:\\brightstardb;StoreName=test");
 
 The context exposes a collection for each entity type defined. For the types we defined above 
-the following collections are exposed on a context::
+the following collections are exposed on a context:
 
-  var people = dataContext.Persons;
-  var companies = dataContext.Companies;
+.. code-block:: c#
+
+	var people = dataContext.Persons;
+	var companies = dataContext.Companies;
 
 Each of these collections are in fact IQueryable and as such support LINQ queries over the 
-model. To get an entity by a given property the following can be used::
+model. To get an entity by a given property the following can be used:
 
-  var brightstardb = dataContext.Companies.Where(
-                         c => c.Name.Equals("BrightstarDB")).FirstOrDefault();
+.. code-block:: c#
+
+	var brightstardb = dataContext.Companies.Where(
+		c => c.Name.Equals("BrightstarDB")).FirstOrDefault();
 
 
-Once an entity has been retrieved it can be modified or related entities can be fetched::
+Once an entity has been retrieved it can be modified or related entities can be fetched:
 
-  // fetching employees
-  var employeesOfBrightstarDB = brightstardb.Employees;
+.. code-block:: c#
 
-  // update the company
-  brightstardb.Name = "BrightstarDB";
+	// fetching employees
+	var employeesOfBrightstarDB = brightstardb.Employees;
+
+	// update the company
+	brightstardb.Name = "BrightstarDB";
 
 
 New entities can be created either via the main collection; by using the ``new`` keyword 
-and attaching the object to the context; or by passing the context into the constructor::
+and attaching the object to the context; or by passing the context into the constructor:
 
-  // creating a new entity via the context collection
-  var bob = dataContext.Persons.Create();
-  bob.Name = "bob";
+.. code-block:: c#
 
-  // or created using new and attached to the context
-  var bob = new Person() { Name = "Bob" };
-  dataContext.Persons.Add(bob);
+	// creating a new entity via the context collection
+	var bob = dataContext.Persons.Create();
+	bob.Name = "bob";
 
-  // or created using new and passing the context into the constructor
-  var bob = new Person(dataContext) { Name = "Bob" };
-  
-  // Add multiple items from any IEnumerable<T> with AddRange
-  var newPeople = new Person[] { 
-    new Person() { Name = "Alice" },
-	new Person() { Name = "Carol" },
-	new Person() { Name = "Dave"}
-  }
-  dataContext.Persons.AddRange(newPeople);
-  
+	// or created using new and attached to the context
+	var bob = new Person() { Name = "Bob" };
+	dataContext.Persons.Add(bob);
+
+	// or created using new and passing the context into the constructor
+	var bob = new Person(dataContext) { Name = "Bob" };
+
+	// Add multiple items from any IEnumerable<T> with AddRange
+	var newPeople = new Person[] { 
+		new Person() { Name = "Alice" },
+		new Person() { Name = "Carol" },
+		new Person() { Name = "Dave"}
+	}
+	dataContext.Persons.AddRange(newPeople);
+ 
 
 In addition to the ``Add`` and ``AddRange`` methods on each entity set, there are also ``Add`` and ``AddRange``
 methods on the context. These methods introspect the objects being added to determine which 
-of the entity interfaces they implement and then add them to the appropriate collections::
+of the entity interfaces they implement and then add them to the appropriate collections:
 
-  var newItems = new object[] {
-    new Person() { Name = "Edith" },
-	new Company() { Name = "BigCorp" },
-	new Product() { Name = "BrightstarDB" }
-  }
-  dataContext.AddRange(newItems);
+.. code-block:: c#
+
+	var newItems = new object[] {
+		new Person() { Name = "Edith" },
+		new Company() { Name = "BigCorp" },
+		new Product() { Name = "BrightstarDB" }
+	}
+	dataContext.AddRange(newItems);
   
 .. note::
 	If you pass an item to the ``Add`` or ``AddRange`` methods on the context object that does not implement
@@ -188,30 +204,33 @@ of the entity interfaces they implement and then add them to the appropriate col
 
 Once a new object has been created it can be used in relationships with other objects. The 
 following adds a new person to the collection of employees. The same relationship could also 
-have been created by setting the ``Employer`` property on the person::
+have been created by setting the ``Employer`` property on the person:
 
-  // Adding a new relationship between entities
-  var bob = dataContext.Persons.Create();
-  bob.Name = "bob";
-  brightstardb.Employees.Add(bob);
+.. code-block:: c#
 
+	// Adding a new relationship between entities
+	var bob = dataContext.Persons.Create();
+	bob.Name = "bob";
+	brightstardb.Employees.Add(bob);
 
-  // The relationship can also be defined from the 'other side'.
-  var bob = dataContext.Persons.Create();
-  bob.Name = "bob";
-  bob.Employer = brightstardb;
+	// The relationship can also be defined from the 'other side'.
+	var bob = dataContext.Persons.Create();
+	bob.Name = "bob";
+	bob.Employer = brightstardb;
 
-  // You can also create relationships to previously constructed
-  // or retrieved objects in the constructor
-  var brightstardb = new Company(dataContext) { Name = "BrightstarDB" };
-  var bob = new Person(dataContext) { 
-                    Name = "Bob; 
-                    Employer = brightstardb 
-            };
+	// You can also create relationships to previously constructed
+	// or retrieved objects in the constructor
+	var brightstardb = new Company(dataContext) { Name = "BrightstarDB" };
+	var bob = new Person(dataContext) { 
+		Name = "Bob; 
+		Employer = brightstardb 
+	};
 
-Saving the changes that have occurred is easily done by calling a method on the context::
+Saving the changes that have occurred is easily done by calling a method on the context:
 
-  dataContext.SaveChanges();
+.. code-block:: c#
+
+	dataContext.SaveChanges();
 
 .. _Example_LINQ_Queries:
 
@@ -235,7 +254,8 @@ To retrieve several entities by their IDs
 
 .. code-block:: c#
 
-	var people = context.Persons.Where(x=>new []{"bob", "sue", "rita"}.Contains(x.Id));
+	var people = context.Persons.Where(
+		x=>new []{"bob", "sue", "rita"}.Contains(x.Id));
 
 A simple property filter
 ------------------------
@@ -258,23 +278,25 @@ Retrieving related items
 .. code-block:: c#
 
 	var fathers = context.Persons.Select(x=>x.Father);
-	var bartsFather = context.Persons.Where(x=>x.Id.Equals("bart")).FirstOrDefault(x=>x.Father);
+	var bartsFather = context.Persons.Where(x=>x.Id.Equals("bart"))
+	                                 .FirstOrDefault(x=>x.Father);
 	
 Return complex values as anonymous objects
 ------------------------------------------
 
 .. code-block:: c#
 
-    var stockInfo = from x in context.Companies select new {x.Name, x.TickerSymbol, x.Price};
+    var stockInfo = from x in context.Companies 
+	                select new {x.Name, x.TickerSymbol, x.Price};
 	
 Aggregates
 ----------
 
 .. code-block:: c#
 
-	var averageHeadcount = context.Companies.Average(x=>x.HeadCount);
-	var smallestCompanySize = context.Companies.Min(x=>x.HeadCount);
-	var largestCompanySize = context.Companies.Max(x=>x.HeadCount);
+  var averageHeadcount = context.Companies.Average(x=>x.HeadCount);
+  var smallestCompanySize = context.Companies.Min(x=>x.HeadCount);
+  var largestCompanySize = context.Companies.Max(x=>x.HeadCount);
 	
 
 .. _Annotations_Guide:
@@ -297,9 +319,11 @@ configure a base URI that is then used by all attributes. It is also possible to
 that do not have this attribute set.
 
 The type identifier prefix can be set in the AssemblyInfo.cs file. The example below shows how 
-to set this configuration property::
+to set this configuration property:
 
-  [assembly: TypeIdentifierPrefix("http://www.mydomain.com/types/")]
+.. code-block:: c#
+
+	[assembly: TypeIdentifierPrefix("http://www.mydomain.com/types/")]
 
 Entity Attribute
 ----------------
@@ -307,19 +331,21 @@ Entity Attribute
 The ``Entity`` attribute is used to indicate that the annotated interface should be included in 
 the generated model. Optionally, a full URI or a URI postfix can be supplied that defines the 
 identity of the class. The following examples show how to use the attribute. The example with 
-just the value 'Person' uses a default prefix if one is not specified as described above::
+just the value 'Person' uses a default prefix if one is not specified as described above:
 
-  // example 1.
-  [Entity] 
-  public interface IPerson { ... }
+.. code-block:: c#
 
-  // example 2.
-  [Entity("Person")] 
-  public interface IPerson { ... }
+	// example 1.
+	[Entity] 
+	public interface IPerson { ... }
 
-  // example 3.
-  [Entity("http://xmlns.com/foaf/0.1/Person")] 
-  public interface IPerson { ... }
+	// example 2.
+	[Entity("Person")] 
+	public interface IPerson { ... }
+
+	// example 3.
+	[Entity("http://xmlns.com/foaf/0.1/Person")] 
+	public interface IPerson { ... }
 
 Example 3. above can be used to map .NET models onto existing RDF vocabularies. This allows 
 the model to create data in a given vocabulary but it also allows models to be mapped onto 
@@ -331,13 +357,15 @@ Identity Property
 -----------------
 
 The Identity property can be used to get and set the underlying identity of an Entity. 
-The following example shows how this is defined::
+The following example shows how this is defined:
 
-  // example 1.
-  [Entity("Person")] 
-  public interface IPerson {
-    string Id { get; }
-  }
+.. code-block:: c#
+
+	// example 1.
+	[Entity("Person")] 
+	public interface IPerson {
+		string Id { get; }
+	}
 
 No annotation is required. It is also acceptable for the property to be called ``ID``, ``{Type}Id`` or 
 ``{Type}ID`` where ``{Type}`` is the name of the type. E.g: ``PersonId`` or ``PersonID``.
@@ -351,23 +379,25 @@ Id property values are URIs, but in some cases it is necessary to work with simp
 values such as GUIDs or numeric values. To do this the Id property can be decorated with the 
 identifier attribute. The identifier attribute requires a string property that is the 
 identifier prefix - this can be specified either as a URI string or as {prefix}:{rest of URI} 
-where {prefix} is a namespace prefix defined by the Namespace Declaration Attribute (see below)::
+where {prefix} is a namespace prefix defined by the Namespace Declaration Attribute (see below):
 
-  // example 1.
-  [Entity("Person")] 
-  public interface IPerson {
-    [Identifier("http://www.mydomain.com/people/")]
-    string Id { get; }
-  }
+.. code-block:: c#
 
-  // example 2.
-  [Entity]
-  public interface ISkill {
-    [Identifier("ex:skills#")]
-    string Id {get;}
-  }
-  // NOTE: For the above to work there must be an assembly attribute declared like this:
-  [assembly:NamespaceDeclaration("ex", "http://example.org/")]
+	// example 1.
+	[Entity("Person")] 
+	public interface IPerson {
+		[Identifier("http://www.mydomain.com/people/")]
+		string Id { get; }
+	}
+
+	// example 2.
+	[Entity]
+	public interface ISkill {
+		[Identifier("ex:skills#")]
+		string Id {get;}
+	}
+	// NOTE: For the above to work there must be an assembly attribute declared like this:
+	[assembly:NamespaceDeclaration("ex", "http://example.org/")]
   
 The ``Identifier`` attribute has additional arguments that enable you to specify a (composite)
 key for the type. For more information please refer to the section :ref:`Key_Properties_In_EF`.
@@ -376,34 +406,47 @@ From BrightstarDB release 1.9 it is possible to specify an empty string as the i
 When this is done, the value assigned to the Id property MUST be a absolute URI as it is used
 unaltered in the generated RDF triples. This gives your application complete control over the 
 URIs used in the RDF data, but it also requires that your application manages the generation
-of those URIs::
+of those URIs:
 
-  [Entity]
-  public interface ICompany {
-    [Identifier("")]
-    string Id {get;}
-  }
+.. code-block:: c#
+
+	[Entity]
+	public interface ICompany {
+		[Identifier("")]
+		string Id {get;}
+	}
   
-**NOTE**: When using an empty string identifier prefix like this, the ``Create()`` method on the
-context collection will automatically generate a URI with the prefix ``http://www.brightstardb.com/.well-known/genid/``.
-To avoid this, you should instead create the entity directly using the constructor and
-add it to the context. There are several ways in which this can be done::
+.. note::
+	When using an empty string identifier prefix like this, the ``Create()`` method on the
+	context collection will automatically generate a URI with the prefix ``http://www.brightstardb.com/.well-known/genid/``.
+	To avoid this, you should instead create the entity directly using the constructor and
+	add it to the context. There are several ways in which this can be done:
 
-    var co1 = context.Companies.Create();                           // This will get a BrightstarDB genid URI
-    
-    var co2 = new Company { Id = "http://contoso.com/" };           // Create an entity with the URI http://contoso.com
-    context.Companies.Add(co2);                                     // ...then add it to the context
-    
-    var co3 = new Company(context) { Id = "http://example.com" };   // Create and add in a single line
-    context.Companies.Add(
-        new Company { Id = "http://networkedplanet.com" } );        // Alternate single-line approach
+	.. code-block:: c#
+
+		// This will get a BrightstarDB genid URI
+		var co1 = context.Companies.Create();
+
+		// Create an entity with the URI http://contoso.com
+		var co2 = new Company { Id = "http://contoso.com/" };
+		// ...then add it to the context
+		context.Companies.Add(co2);
+
+		// Create and add in a single line
+		var co3 = new Company(context) { Id = "http://example.com" };
+		
+		// Alternate single-line approach
+		context.Companies.Add( 
+			new Company { Id = "http://networkedplanet.com" } );        
 
 
 Property Inclusion
 ------------------
 
 Any .NET property with a getter or setter is automatically included in the generated type, no 
-attribute annotation is required for this::
+attribute annotation is required for this:
+
+.. code-block:: c#
 
   // example 1.
   [Entity("Person")] 
@@ -416,7 +459,9 @@ Property Exclusion
 ------------------
 
 If you want BrightstarDB to ignore a property you can simply decorate it with an ``[Ignore]``
-attribute::
+attribute:
+
+.. code-block:: c#
 
   [Entity("Person")]
   public interface IPerson {
@@ -445,18 +490,21 @@ Inverse Property Attribute
 When two types reference each other via different properties that in fact reflect different 
 sides of the same association then it is necessary to declare this explicitly. This can be 
 done with the InverseProperty attribute. This attribute requires the name of the .NET property 
-on the referencing type to be specified::
+on the referencing type to be specified:
 
-  // example 1.
+.. code-block:: c#
+
   [Entity("Person")] 
   public interface IPerson {
     string Id { get; }
+   
     ICompany Employer { get; set; }
   }
 
   [Entity("Company")] 
   public interface ICompany {
     string Id { get; }
+   
     [InverseProperty("Employer")]
     ICollection<IPerson> Employees { get; set; }
   }
@@ -475,34 +523,42 @@ times if needed, to define namespace prefix mappings. The mapping takes a short 
 URI prefix to be used.
 
 The attribute can be used to specify the prefixes required (typically assembly attributes are 
-added to the AssemblyInfo.cs code file in the Properties folder of the project)::
+added to the ``AssemblyInfo.cs`` code file in the Properties folder of the project):
+
+.. code-block:: c#
 
   [assembly: NamespaceDeclaration("foaf", "http://xmlns.com/foaf/0.1/")]
 
 Then these prefixes can be used in property or type annotation using the CURIE syntax of 
-{prefix}:{rest of URI}::
+{prefix}:{rest of URI}:
+
+.. code-block:: c#
 
   [Entity("foaf:Person")]
   public interface IPerson  { ... }
 
 Namespace declarations defined in this way can also be retrieved programatically. The class
 ``BrightstarDB.EntityFramework.NamespaceDeclarations`` provides methods for retrieving 
-these declarations in a variety of formats::
+these declarations in a variety of formats:
+
+.. code-block:: c#
 
     // You can just iterate them as instances of 
     // BrightstarDB.EntityFramework.NamespaceDeclarationAttribute
-    foreach(var nsDecl in NamespaceDeclarations.ForAssembly(Assembly.GetExecutingAssembly()))
+    foreach(var nsDecl in NamespaceDeclarations.ForAssembly(
+		Assembly.GetExecutingAssembly()))
     {
         // prefix is in nsDecl.Prefix
         // Namespace URI is in nsDecl.Reference
     }
     
     // Or you can retrieve them as a dictionary:
-    var dict = NamespaceDeclarations.ForAssembly(Assembly.GetExecutingAssembly());
+    var dict = NamespaceDeclarations.ForAssembly(
+		Assembly.GetExecutingAssembly());
     foafUri = dict["foaf"];
     
-    // You can omit the Assembly parameter if you are calling from the assembly
-    // containing the delcarations.
+    // You can omit the Assembly parameter if you are calling from the 
+	// assembly containing the delcarations.
     
     // You can get the declarations formatted for use in SPARQL...
     // e.g. PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -521,7 +577,9 @@ to be mapped onto an existing RDF vocabulary then the PropertyType attribute can
 this. The PropertyType attribute requires a string property that is either an absolute or 
 relative URI. If it is a relative URI then it is appended to the URI defined by the 
 TypeIdentifierPrefix attribute or the default base type URI. Again, prefixes defined by a 
-NamespaceDeclaration attribute can also be used::
+NamespaceDeclaration attribute can also be used:
+
+.. code-block:: c#
 
   // Example 1. Explicit type declaration
   [PropertyType("http://www.mydomain.com/types/name")]
@@ -543,7 +601,9 @@ Inverse Property Type Attribute
 
 Allows inverse properties to be mapped to a given RDF predicate type rather than a .NET 
 property name. This is most useful when mapping existing RDF schemas to support the case where 
-the .NET data-binding only requires the inverse of the RDF property::
+the .NET data-binding only requires the inverse of the RDF property:
+
+.. code-block:: c#
 
   // Example 1. The following states that the collection of employees 
   // is found by traversing the "http://www.mydomain.com/types/employer"
@@ -555,11 +615,13 @@ Additional Custom Attributes
 ----------------------------
 
 Any custom attributes added to the entity interface that are not in the 
-BrightstarDB.EntityFramework namespace will be automatically copied through into the generated 
+``BrightstarDB.EntityFramework`` namespace will be automatically copied through into the generated 
 class. This allows you to easily make use of custom attributes for validation, property 
 annotation and other purposes. 
 
-As an example, the following interface code::
+As an example, the following interface code:
+
+.. code-block:: c#
 
   [Entity("http://xmlns.com/foaf/0.1/Person")]
   public interface IFoafPerson : IFoafAgent
@@ -578,7 +640,9 @@ As an example, the following interface code::
       string Name { get; set; }
   }
 
-would result in this generated class code::
+would result in this generated class code:
+
+.. code-block:: c#
 
       public partial class FoafPerson : BrightstarEntityObject, IFoafPerson 
       {
@@ -611,14 +675,16 @@ attributes that are allowed on both classes and interfaces can be added to the e
 interface and will be automatically copied through to the generated class in the same was as 
 custom attributes on properties. However, if you need to use a custom attribute that is 
 allowed on a class but not on an interface, then you must use the 
-BrightstarDB.EntityFramework.ClassAttribute attribute. This custom attribute can be added to 
+``BrightstarDB.EntityFramework.ClassAttribute`` attribute. This custom attribute can be added to 
 the entity interface and allows you to specify a different custom attribute that should be 
 added to the generated entity class. When using this custom attribute you should ensure that 
 you either import the namespace that contains the other custom attribute or reference the 
 other custom attribute using its fully-qualified type name to ensure that the generated class 
 code compiles successfully.
 
-For example, the following interface code::
+For example, the following interface code:
+
+.. code-block:: c#
 
   [Entity("http://xmlns.com/foaf/0.1/Person")]
   [ClassAttribute("[System.ComponentModel.DisplayName(\\"Person\\")]")]
@@ -627,7 +693,9 @@ For example, the following interface code::
     // ... interface definition here
   }
 
-would result in this generated class code::
+would result in this generated class code:
+
+.. code-block:: c#
 
   [System.ComponentModel.DisplayName("Person")]
   public partial class FoafPerson : BrightstarEntityObject, IFoafPerson 
@@ -636,11 +704,15 @@ would result in this generated class code::
   }
 
 
-Note that the DisplayName custom attribute is referenced using its fully-qualified type name 
+Note that the ``DisplayName`` custom attribute is referenced using its fully-qualified type name 
 (``System.ComponentModel.DisplayName``), as the generated context code will not include a 
 ``using System.ComponentModel;`` namespace import. Alternatively, this interface code would also 
-generate class code that compiles correctly::
+generate class code that compiles correctly:
 
+.. code-block:: c#
+
+  // import the System.ComponentModel namespace 
+  // this will be copied into the context class code
   using System.ComponentModel;
 
   [Entity("http://xmlns.com/foaf/0.1/Person")]
@@ -666,7 +738,9 @@ One-to-One
 
 Entities can have one-to-one relationships with other entities. An example of this would be 
 the link between a user and a the authorization to another social networking site. The 
-one-to-one relationship would be described in the interfaces as follows::
+one-to-one relationship would be described in the interfaces as follows:
+
+.. code-block:: c#
 
   [Entity]
   public interface IUser {
@@ -687,7 +761,9 @@ One-to-Many
 -----------
 
 A User entity can be modeled to have a one-to-many relationship with a set of Tweet entities, 
-by marking the properties in each interface as follows::
+by marking the properties in each interface as follows:
+
+.. code-block:: c#
 
   [Entity]
   public interface ITweet {
@@ -708,7 +784,9 @@ Many-to-Many
 ------------
 
 The Tweet entity can be modeled to have a set of zero or more Hash Tags. As any Hash Tag 
-entity could be used in more than one Tweet, this uses a many-to-many relationship pattern::
+entity could be used in more than one Tweet, this uses a many-to-many relationship pattern:
+
+.. code-block:: c#
 
   [Entity]
   public interface ITweet {
@@ -728,7 +806,9 @@ entity could be used in more than one Tweet, this uses a many-to-many relationsh
 Reflexive relationship
 ----------------------
 
-A reflexive relationship (that refers to itself) can be defined as in the example below::
+A reflexive relationship (that refers to itself) can be defined as in the example below:
+
+.. code-block:: c#
 
   [Entity]
   public interface IUser {
@@ -751,7 +831,9 @@ classes are generated as .NET partial classes. This means that another file can 
 additional method definitions. The following example shows how to add additional methods to a 
 generated class.
 
-Assume we have the following interface definition::
+Assume we have the following interface definition:
+
+.. code-block:: c#
 
   [Entity]
   public interface IPerson {
@@ -762,7 +844,9 @@ Assume we have the following interface definition::
 
 To add custom behaviour the new method signature should first be added to the interface. The 
 example below shows the same interface but with an added method signature to get a user's full 
-name::
+name:
+
+.. code-block:: c#
 
   [Entity]
   public interface IPerson {
@@ -776,7 +860,9 @@ name::
 
 After running the custom tool on the EntityContext.tt file there is a new class called Person. 
 To add additional methods add a new .cs file to the project and add the following class 
-declaration::
+declaration:
+
+.. code-block:: c#
 
   public partial class Person {
     public string GetFullName() {
@@ -806,7 +892,9 @@ Specifying Key Properties
 The ``KeyProperties`` argument accepts an array of strings that name
 the properties of the entity that should be combined to create a key value for the entity.
 The value of the named properties will be concatenated in the order that they are named
-in the ``KeyProperties`` array, with a slash ('/') between values::
+in the ``KeyProperties`` array, with a slash ('/') between values:
+
+.. code-block:: c#
 
     // An entity with a key generated from one of its properties.
     [Entity]
@@ -841,7 +929,9 @@ Key Separator
 -------------
 
 The ``KeySeparator`` argument of the ``Identifier`` attribute allows you to change the string
-used to concatenate multiple values into a single key::
+used to concatenate multiple values into a single key:
+
+.. code-block:: c#
 
     // An entity with a composite key
     [Entity]
@@ -881,7 +971,9 @@ the implementation type in the ``KeyConverterType`` argument of the ``Identifier
 Hierarchical Key Pattern
 ------------------------
 
-Using the default key conversion rules it is possible to construct hierarchical identifier schemes::
+Using the default key conversion rules it is possible to construct hierarchical identifier schemes:
+
+.. code-block:: c#
 
     [Entity]
     public interface IHierarchicalKeyEntity
@@ -929,7 +1021,7 @@ in the context.
     pre-conditions to be checked.
 
 .. note::
-	Key constraints are **not** validated if you use the AddOrUpdate method to add
+	Key constraints are **not** validated if you use the ``AddOrUpdate`` method to add
 	an item to the context. In this case, an existing item with the same key will
 	simply be overwritten by the item being added.
 	
@@ -984,12 +1076,16 @@ control over whether or not optimistic locking is enabled) or through code (givi
 to the programmer). 
 
 To enable optimistic locking in a connection string, simply add "optimisticLocking=true" to 
-the connection string. e.g. ::
+the connection string. For example:
+
+.. code-block:: c#
 
   type=rest;endpoint=http://localhost:8090/brightstar;storeName=myStore;optimisticLocking=true
 
 To enable optimistic locking from code, use the optional optimisticLocking parameter on the 
-constructor of the context class e.g.::
+constructor of the context class:
+
+.. code-block:: c#
 
   var myContext = new MyEntityContext(connectionString, true);
 
@@ -1025,7 +1121,9 @@ applied. The second parameter is the entity or collection of entities to which t
 to be applied. You apply different refresh strategies to different entities within the same 
 update if you wish. Once the conflicted entities are refreshed, you can then make a call to 
 the ``SaveChanges()`` method of the context once more. The code sample below shows this in 
-outline::
+outline:
+
+.. code-block:: c#
 
   try 
   {
@@ -1033,7 +1131,7 @@ outline::
   }
   catch(TransactionPreconditionsFailedException) 
   {
-    // Refresh the conflicted object(s) - in this case with the StoreWins mode
+    // Refresh the conflicted object(s)
     myContext.Refresh(RefreshMode.StoreWins, conflictedEntity);
     // Attempt the save again
     myContext.SaveChanges();
@@ -1175,9 +1273,12 @@ and cannot be used to modify the return value. For example you can test that
 +-----------------------------------------+--------------------------------------------------+
 
 The static method ``Regex.IsMatch()`` is supported when used to filter on a string property 
-in a LINQ query e.g.::
+in a LINQ query. For example:
 
-  context.Persons.Where(p => Regex.IsMatch(p.Name, "^a.*e$", RegexOptions.IgnoreCase));
+.. code-block:: c#
+
+  context.Persons.Where(
+    p => Regex.IsMatch(p.Name, "^a.*e$", RegexOptions.IgnoreCase));
 
 However, please note that the regular expression options that can be used is limited to a 
 combination of ``IgnoreCase``, ``Multiline``, ``Singleline`` and ``IgnorePatternWhitespace``.
@@ -1279,7 +1380,9 @@ you can use the ``TrackedObjects`` property of the context class to iterate thro
 that the context class has retrieved from the BrightstarDB store. Entities expose an ``IsModified`` 
 property which can be used to determine if the entity has been newly created or locally 
 modified. The sample code below uses this to update a ``Created`` and ``LastModified`` 
-timestamp on any entity that implements the ``ITrackable`` interface.::
+timestamp on any entity that implements the ``ITrackable`` interface.:
+
+.. code-block:: c#
 
   private static void UpdateTrackables(object sender, EventArgs e)
   {
@@ -1288,13 +1391,15 @@ timestamp on any entity that implements the ``ITrackable`` interface.::
     var context = sender as MyEntityContext;
 
 
-    // Iterate through just the tracked objects that implement the ITrackable interface
+    // Iterate through just the tracked objects that 
+    // implement the ITrackable interface
     foreach(var t in context.TrackedObjects
                     .Where(x=>x is ITrackable && x.IsModified)
                     .Cast<ITrackable>())
     {
-      // If the Created property is not yet set, it will have DateTime.MinValue as its defaulft value
-      // We can use this fact to determine if the Created property needs setting.
+      // If the Created property is not yet set, it will have 
+      // DateTime.MinValue as its defaulft value. We can use 
+	  // this fact to determine if the Created property needs setting.
       if (t.Created == DateTime.MinValue) t.Created = DateTime.Now;
 
       // The LastModified property should always be updated
@@ -1304,7 +1409,7 @@ timestamp on any entity that implements the ``ITrackable`` interface.::
 
 .. note::
 
-  The source code for this example can be found in [INSTALLDIR]\\Samples\\EntityFramework\\EntityFrameworkSamples.sln
+  The source code for this example can be found in ``[INSTALLDIR]\Samples\EntityFramework\EntityFrameworkSamples.sln``
 
 .. _Local_Change_Tracking:
 
@@ -1331,16 +1436,21 @@ Firstly, although the generated classes implement the ``INotifyPropertyChanged``
 code will typically use the interfaces. To attach a handler to the ``PropertyChanged`` event, you 
 need an instance of ``INotifyPropertyChanged`` in your code. There are two ways to achieve this - 
 either by casting or by adding ``INotifyPropertyChanged`` to your entity interface. If casting you 
-will need to write code like this::
+will need to write code like this:
+
+.. code-block:: c#
 
   // Get an entity to listen to
-  var person = _context.Persons.Where(x=>x.Name.Equals("Fred")).FirstOrDefault();
+  var person = _context.Persons.Where(x=>x.Name.Equals("Fred"))
+                            .FirstOrDefault();
 
   // Attach the NotifyPropertyChanged event handler
   (person as INotifyPropertyChanged).PropertyChanged += HandlePropertyChanged;
 
 Alternatively it can be easier to simply add the ``INotifyPropertyChanged`` interface to your 
-entity interface like this::
+entity interface like this:
+
+.. code-block:: c#
 
   [Entity]
   public interface IPerson : INotifyPropertyChanged 
@@ -1348,10 +1458,13 @@ entity interface like this::
     // Property definitions go here
   }
 
-This enables you to then write code without the cast::
+This enables you to then write code without the cast:
+
+.. code-block:: c#
 
   // Get an entity to listen to
-  var person = _context.Persons.Where(x=>x.Name.Equals("Fred")).FirstOrDefault();
+  var person = _context.Persons.Where(x=>x.Name.Equals("Fred"))
+                            .FirstOrDefault();
 
   // Attach the NotifyPropertyChanged event handler
   person.PropertyChanged += HandlePropertyChanged;
@@ -1389,15 +1502,17 @@ Please refer to the section :ref:`default_data_set` for more information about t
 default data set and its relationship to the ``defaultDataSet``, ``updateGraph``,
 and ``versionGraph`` parameters.
 
-To create a context that reads properties from the default graph and adds properties to a specific graph (e.g. for recording the results of inferences), use the following::
+To create a context that reads properties from the default graph and adds properties to a specific graph (e.g. for recording the results of inferences), use the following:
 
-    // Set storeName, prefixes and inferredGraphUri here
+.. code-block:: c#
+
+	// Set storeName, prefixes and inferredGraphUri here
 	var context = new MyEntityContext(
-	  connectionString,
-	  enableOptimisticLocking,
-	  "http://example.org/graphs/graphToUpdate",
-	  new string[] { Constants.DefaultGraphUri },
-	  Constants.DefaultGraphUri);
+		connectionString,
+		enableOptimisticLocking,
+		"http://example.org/graphs/graphToUpdate",
+		new string[] { Constants.DefaultGraphUri },
+		Constants.DefaultGraphUri);
 
 .. note::
 	Note that you need to be careful when using optimistic locking to ensure that you are 
@@ -1415,6 +1530,8 @@ Entity Framework a bit more difficult to use across multiple graphs. When
 writing an application that will regularly deal with different named graphs
 you may want to consider using the :ref:`Data Object Layer API <Data_Object_Layer>`
 and SPARQL or the low-level RDF API for update operations.
+
+.. _Roslyn_Code_Generation:
     
 Roslyn Code Generation
 ======================
@@ -1449,12 +1566,14 @@ the following command::
 Installing this package adds a solution-level tool to your package structure. You can then run this 
 tool with the following command::
 
-    BrightstarDB.CodeGeneration.Console [/EntityContext:ContextClassName] [/Language:VB|CS] ``path/to/MySolution.sln`` ``My.Context.Namespace`` ``Output.cs``
-    
+    BrightstarDB.CodeGeneration.Console [/EntityContext:ContextClassName] [/Language:VB|CS] [/InternalEntityClasses] ``path/to/MySolution.sln`` ``My.Context.Namespace`` ``Output.cs``
+
 This will scan the code in the specified solution and generate a new BrightstarDB entity context class in the namespace provided,
 writing the generated code to the specified output file. By default, the name of the entity context class is ``EntityContext``, but
 this can be changed by providing a value for the optional ``/EntityContext`` parameter (short name ``/CN``). The language used 
-in the output file will be based on the file extension, but you can override this with the optional ``/Langauge`` parameter.
+in the output file will be based on the file extension, but you can override this with the optional ``/Langauge`` parameter. To
+generate entity classes with internal visibility for public interfaces, you can add the optional ``/InternalEntityClasses`` flag
+(short name ``/IE``) to the command-line (see :ref:`Generated_Class_Visibility` for more information about this feature).
 
 T4 Template-based Generation
 ----------------------------
@@ -1469,3 +1588,30 @@ This will add a file named ``EntityContext.tt`` to your project. You can move th
 file around in the project and it will automatically use the appropriate namespace 
 for the generated context class. You can also rename this file to change the name 
 of the generated context class.
+
+
+.. _Generated_Class_Visibility:
+
+Generated Class Visibility
+==========================
+
+By default the Entity Framework code generators will generate entity classes that 
+implement each entity interface with the same visibility as the interface. This 
+means that by default a public interface will be implemented by a public generated class;
+whereas an internal interface will be implemented by an internal generated class.
+
+In some cases it is desirable to restrict the visibility of the generated entity classes,
+having a public entity interface and an internal implementation of that interface. This
+is now supported through a flag that can be either passed to the Roslyn console-based
+code generator or set by editing the T4 text template used for code generation.
+
+If you are using a T4 template to generate the entity context and entity classes,
+you can set this flag by finding the following code in the template::
+
+	var internalEntityClasses = false;
+
+and change it to::
+
+	var internalEntityClasses = true;
+
+This code is the same in both the standard and the Roslyn-based T4 templates.

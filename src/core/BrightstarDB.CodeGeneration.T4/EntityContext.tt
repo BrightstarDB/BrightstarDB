@@ -10,6 +10,8 @@
 <#
 // set this to either "CSharp" or "VisualBasic"
 var language = "CSharp";
+// set this to true to generate internal entity classes for public entity interfaces
+var internalEntityClasses = false;
 
 // you can move the .tt file to a different folder in your project to have the entity context's namespace change accordingly
 // or, you could just set it manually here
@@ -33,8 +35,8 @@ if (!this.DTE.Solution.Saved) {
 this.SetFileExtensionForLanguage(language);
 this.HookAssemblyResolution();
 var generator = Type.GetType("BrightstarDB.CodeGeneration.Generator, BrightstarDB.CodeGeneration");
-var generateMethod = generator.GetMethod("Generate");
-var result = (string)generateMethod.Invoke(null, new[] { language, solutionPath, contextNamespace, contextClassName, null, null, null });
+var generateMethod = generator.GetMethod("Generate2");
+var result = (string)generateMethod.Invoke(null, new object[] { language, solutionPath, contextNamespace, contextClassName, internalEntityClasses });
 
 this.WriteLine(result);
 #>

@@ -47,5 +47,10 @@
             get;
             set;
         }
+
+        [ArgDescription("Optionally generate internal classes when implementing public entity interfaces.")]
+        [ArgShortcut("IE")]
+        public bool InternalEntityClasses { get; set; }
+
     }
 }

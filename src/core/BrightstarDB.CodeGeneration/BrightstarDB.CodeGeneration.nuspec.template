@@ -10,6 +10,7 @@
     <projectUrl>http://brightstardb.com/</projectUrl>
 	<iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>Copyright 2016 Khalil Ahmed, Graham Moore, and other contributors</copyright>
     <description>
         A Roslyn-based code generator for BrightstarDB.
     </description>

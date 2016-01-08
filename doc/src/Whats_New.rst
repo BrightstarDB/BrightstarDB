@@ -13,6 +13,42 @@ This section gives a brief outline of what is new / changed in each official rel
 either data migration or code changes in client code, these are marked with **BREAKING**. New features are marked with NEW and fixes for issues are 
 marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
 
+
+****************************
+ BrightstarDB 1.13
+****************************
+	
+	- FIX: Job date/time stamps not displayed correctly in the browser HTML view. (#263)
+	
+	- FIX: Browser UI does not pass through the target graph URI when starting an import job (#262)
+	
+	- FIX: Polaris UI does not pass through the target graph URI when starting an import job (#261)
+	
+	- FIX: The status message for a Statistics Update job reports the percentage completed incorrectly. (#259)
+	
+	- Enhancement: The Windows Installer now includes a VSIX to install the Entity Context and Entity Definition C# item templates into Visual Studio 2015.
+	  The VSIX will be installed automatically if you select the option to add the Visual Studio 2015 integration. Thanks to LSMetag for prompting me to get 
+	  this done finally! (#265)
+	
+	- Enhancement: The Windows Installer now includes a local copy of this documentation as well as the API documentation.
+	
+	- Enhancement: The Windows Installer now includes a copy of the standard Entity Context T4 text template for those cases where it might be necessary to manually add the template to a project.
+
+	- Enhancement: JSON representation of Job status now includes a UTC date/time field that can be parsed more easily in Javascript. (#263)
+	
+	- Enhancement: The Entity Framework code generators have been updated to support generating internal classes to implement public interfaces. 
+	  For more information please refer to :ref:`Generated_Class_Visibility` . Thanks to nickdodd79 for the bug report. (#260)
+	
+	- Enhancement: Improvements to import to better alleviate low-memory conditions.
+	
+	- Enhancement: It is now possible to detach an entity from one context and attach it to another context while retaining any locally made (unsaved) property changes. (#231)
+	
+	- Enhancement: Added more of the XML Schema datatypes to the list of datatypes recognized and automatically converted by the Entity Framework. This enhancement adds support
+	  for xsd:int, xsd:positiveInteger, xsd:negativeInteger, xsd:nonPositiveInteger, xsd:nonNegativeInteger (which are all converted to Int32); xsd:normalizeString,
+	  xsd:token and xsd:language (which are all converted to String). (#244)
+
+	
+
 ****************************
  BrightstarDB 1.12
 ****************************

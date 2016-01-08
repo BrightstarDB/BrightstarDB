@@ -40,7 +40,7 @@
   
   <Target Name="BuildNet40">
 	<MSBuild Projects="..\src\core\core.sln"
-			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
+			 Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber);Prerelease=$(Prerelease)"
 			 Targets="Clean;Build"/>
   </Target>
 
@@ -57,6 +57,12 @@
 		     Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
 			 Targets="Build"/>
   </Target>
+
+  <Target Name="BuildVSIX">
+    <MSBuild Projects="VSIX\BrightstarDB.EntityFramework.sln"
+             Properties="Configuration=$(Configuration);BuildNumber=$(BuildNumber)"
+             Targets="Build"/>
+  </Target>
   
   <Target Name="BuildPolaris">
 	<MSBuild Projects="..\src\tools\Polaris\Polaris.sln" 
@@ -64,18 +70,21 @@
 	Targets="Clean;Build"/>
   </Target>
 
-  <Target Name="SamplesSDK" DependsOnTargets="PrepareSDK">
-    <ItemGroup>
-      <SdkFiles Include="InstallerTmp\SDK\**\*.*"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(SdkFiles)" DestinationFolder="..\samples\SDK\%(RecursiveDir)"/>
+  <Target Name="InstallerTmpDir">
+      <MakeDir Directories="InstallerTmp"/>
   </Target>
   
-  <Target Name="Prepare" DependsOnTargets="Version;BuildNet40;BuildVisualStudio;BuildPolaris;BuildDocs">
+  <Target Name="PrepareSdk" DependsOnTargets="InstallerTmpDir;Version;BuildNet40">
     <ItemGroup>
       <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
-      <Net40Dep Include="..\src\lib\unused_dependencies\*.dll;..\src\lib\Remotion.Linq.dll" />
-      <WP71Sdk Include="..\src\mobile\BrightstarDB.Mobile\bin\$(Configuration)\*.dll"/>
+	  <SdkTextTemplates Include="..\src\tools\EntityFrameworkGenerator\MyEntityContext.tt"/>
+    </ItemGroup>
+    <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\SDK\NET40"/>
+	<Copy SourceFiles="@(SdkTextTemplates)" DestinationFolder="InstallerTmp\SDK\EntityFramework"/>
+  </Target>
+
+  <Target Name="Prepare" DependsOnTargets="PrepareSdk;BuildVisualStudio;BuildVSIX;BuildPolaris;BuildDocs">
+    <ItemGroup>
       <Service Include="..\src\core\BrightstarDB.Server.Modules\bin\$(Configuration)\*.dll" />
 	  <Service Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.dll"/>
 	  <ServiceAssets Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\assets\**\*.*"/>
@@ -85,10 +94,12 @@
 	  <ServiceExe Include="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.config"
 			   Exclude="..\src\core\BrightstarDB.Server.Runner\bin\$(Configuration)\*.vshost.exe.config"/>
       <Docs Include="..\doc\build\api\BrightstarDB_API.chm"/>
+	  <HtmlDocs Include="..\doc\src\_build\html\**\*.*"/>
       <VisualStudio Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.vsi"/>
       <Root Include="PackageFiles\README.txt;PackageFiles\EULA.rtf;PackageFiles\NOTICE.txt"/>
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityContext.zip"/>
       <ItemTemplates Include="..\src\tools\EntityFrameworkGenerator\BrightstarEntityDefinition.zip"/>
+      <VSIX Include="VSIX\BrightstarDB.EntityFramework\bin\$(Configuration)\BrightstarDB.EntityFramework.vsix"/>
       <Polaris Include="..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\*.dll;
 			..\src\tools\Polaris\BrightstarDB.Polaris\bin\$(Configuration)\Polaris.exe"/>
       <AspNetServerBin Include="..\src\core\BrightstarDB.Server.Modules\bin\$(Configuration)\*.dll"/>
@@ -110,11 +121,8 @@
 			..\samples\Samples\**\Debug*.*"/>
     </ItemGroup>
     
-    <MakeDir Directories="InstallerTmp"/>
-
-    <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\SDK\NET40"/>
-    <Copy SourceFiles="@(Net40Dep)" DestinationFolder="InstallerTmp\SDK\NET40"/>
     <Copy SourceFiles="@(Docs)" DestinationFolder="InstallerTmp\Docs" Condition="!$(NoDocs)"/>
+	<Copy SourceFiles="@(HtmlDocs)" DestinationFiles="@(HtmlDocs->'InstallerTmp\Docs\Guide\%(recursivedir)%(filename)%(extension)')" Condition="!$(NoDocs)"/>
     <Copy SourceFiles="@(VisualStudio)" DestinationFolder="InstallerTmp\VisualStudio"/>
     <Copy SourceFiles="@(Root)" DestinationFolder="InstallerTmp"/>
     <Copy SourceFiles="@(Service)" DestinationFolder="InstallerTmp\Service"/>
@@ -122,20 +130,13 @@
     <Copy SourceFiles="@(ServiceViews)" DestinationFolder="InstallerTmp\Service\views" />
     <Copy SourceFiles="@(ServiceExe)" DestinationFolder="InstallerTmp\ServiceExe"/>
     <Copy SourceFiles="@(ItemTemplates)" DestinationFolder="InstallerTmp\ItemTemplates"/>
+    <Copy SourceFiles="@(VSIX)" DestinationFolder="InstallerTmp\VSIX"/>
     <Copy SourceFiles="@(Polaris)" DestinationFolder="InstallerTmp\Tools\Polaris"/>
     <Copy SourceFiles="@(Samples)" DestinationFiles="@(Samples->'InstallerTmp\Samples\%(recursivedir)%(filename)%(extension)')"/>
     <Copy SourceFiles="@(AspNetServerBin)" DestinationFolder="InstallerTmp\Webapp\bin" />
     <Copy SourceFiles="@(AspNetServerAssets)" DestinationFolder="InstallerTmp\Webapp\assets" />
     <Copy SourceFiles="@(AspNetServerViews)"  DestinationFolder="InstallerTmp\Webapp\views" />
     <Copy SourceFiles="@(AspNetServerConfig)" DestinationFolder="InstallerTmp\Webapp" />
-  </Target>
-
-  <Target Name="PrepareSdk" DependsOnTargets="Version;BuildNet40">
-    <ItemGroup>
-      <Net40Sdk Include="..\src\core\BrightstarDB\bin\$(Configuration)\*.dll"/>
-      <WP71Sdk Include="..\src\mobile\BrightstarDB.Mobile\bin\$(Configuration)\*.dll"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(Net40Sdk)" DestinationFolder="InstallerTmp\SDK\NET40"/>
   </Target>
 
   <Target Name="CleanInstallerTmp">
@@ -234,8 +235,15 @@
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDBLibs" />
     <MakeDir Directories="$(OutputPath)\nuget\BrightstarDB" />
 	<MakeDir Directories="$(OutputPath)\nuget\BrightstarDB.Platform" />
+	
+	<PropertyGroup>
+	    <PackageBuildNumber Condition="'$(Prerelease)' == ''">$(Major).$(Minor).$(Build)</PackageBuildNumber>
+		<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(Major).$(Minor).$(Build)-$(Prerelease)</PackageBuildNumber>
+	</PropertyGroup>
+
+
     <ItemGroup>
-        <Readme Include="nuget\README.txt" />
+        <Readme Include="PackageFiles\README.txt" />
         <ReleaseNotes Include="nuget\ReleaseNotes.txt"/>
         <NuspecTemplate Include="nuget\BrightstarDB.nuspec.template"/>
         <LibsNuspecTemplate Include="nuget\BrightstarDBLibs.nuspec.template" />
@@ -252,19 +260,14 @@
         <PortableIOS Include="..\src\portable\BrightstarDB.Portable.iOS\bin\iPhone\$(Configuration)\BrightstarDB.Portable.iOS.dll"/>
         <PortableMonoTouch Include="..\src\portable\BrightstarDB.Portable.MonoTouch\bin\iPhone\$(Configuration)\BrightstarDB.Portable.MonoTouch.dll"/>
         <PortableUniversal81 Include="..\src\portable\BrightstarDB.Portable.Universal81\bin\$(Configuration)\BrightstarDB.Portable.Universal81.dll" />
-        <CodeGenPackage Include="..\src\core\BrightstarDB.CodeGeneration\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.$(BuildNumber).nupkg" />
-		<CodeGenConsolePackage Include="..\src\core\BrightstarDB.CodeGeneration.Console\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.Console.$(BuildNumber).nupkg"/>
-        <CodeGenT4Package Include="..\src\core\BrightstarDB.CodeGeneration.T4\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.T4.$(BuildNumber).nupkg" />
+        <CodeGenPackage Include="..\src\core\BrightstarDB.CodeGeneration\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.$(PackageBuildNumber).nupkg" />
+		<CodeGenConsolePackage Include="..\src\core\BrightstarDB.CodeGeneration.Console\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.Console.$(PackageBuildNumber).nupkg"/>
+        <CodeGenT4Package Include="..\src\core\BrightstarDB.CodeGeneration.T4\bin\$(Configuration)\NuGet\BrightstarDB.CodeGeneration.T4.$(PackageBuildNumber).nupkg" />
     </ItemGroup>
     
     <Copy SourceFiles="@(NuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB\BrightstarDB.nuspec')" />
     <Copy SourceFiles="@(LibsNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec')" />
 	<Copy SourceFiles="@(PlatformNuspecTemplate)" DestinationFiles="@(NuspecTemplate->'$(OutputPath)\nuget\BrightstarDB.Platform\BrightstarDB.Platform.nuspec')" />
-
-    <PropertyGroup>
-	    <PackageBuildNumber Condition="'$(Prerelease)' == ''">$(BuildNumber)</PackageBuildNumber>
-		<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(BuildNumber)-$(Prerelease)</PackageBuildNumber>
-	</PropertyGroup>
 
    	
     <XmlPoke XmlInputPath="$(OutputPath)\nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec"
@@ -318,7 +321,7 @@
     <Copy SourceFiles="@(PortableIOS)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\Xamarin.iOS10" Condition="$(BuildXamarin) And $(BuildIOS)" />
     <Copy SourceFiles="@(PortableUniversal81)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\lib\portable-netcore451+wpa81" />
     <Copy SourceFiles="@(ForceReference)" DestinationFolder="$(OutputPath)\nuget\BrightstarDB.Platform\content"/>
-    <Warning Text="The Andorid platform assembly is not included in this build." Condition="!($(BuildXamarin) And $(BuildAndroid))" />
+    <Warning Text="The Android platform assembly is not included in this build." Condition="!($(BuildXamarin) And $(BuildAndroid))" />
     <Warning Text="The iOS platform assembly is not included in this build." Condition="!($(BuildXamarin) And $(BuildIOS))" />
 	
     <Exec Command="..\nuget\NuGet pack nuget\BrightstarDBLibs\BrightstarDBLibs.nuspec" WorkingDirectory="$(OutputPath)" />

@@ -61,7 +61,7 @@ namespace BrightstarDB.CodeGeneration.Tests
 {
     [System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")]
     [System.Runtime.CompilerServices.CompilerGenerated]
-    public partial class EmptyEntity : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IEmptyEntity
+    $ENTITYACCESS$ partial class EmptyEntity : global::BrightstarDB.EntityFramework.BrightstarEntityObject, global::BrightstarDB.CodeGeneration.Tests.IEmptyEntity
     {
         public EmptyEntity()
         {

@@ -44,7 +44,9 @@ of users that this user follows, the other end of this relationship is shown in 
 'Followers' property, this is marked with the 'InverseProperty' attribute to tell BrightstarDB 
 that Followers is the other end of the Following relationship. The final property is a list of 
 tweets that the user has authored, this is the other end of the relationship from the ITweet 
-interface (described below)::
+interface (described below):
+
+.. code-block:: c#
 
   [Entity]
   public interface IUser
@@ -65,7 +67,9 @@ interface (described below)::
 The ITweet interface represents a tweet on twitter, and has simple properties for the tweet 
 content and the date and time it was published. The Tweet has an IUser property ('Author') to 
 relate it to the user who wrote it (the other end of this relationship is described above). 
-ITweet also contains a collection of Hashtags that appear in the tweet (described below)::
+ITweet also contains a collection of Hashtags that appear in the tweet (described below):
+
+.. code-block:: c#
 
   [Entity]
   public interface ITweet
@@ -82,7 +86,9 @@ ITweet also contains a collection of Hashtags that appear in the tweet (describe
 
 A hashtag is a keyword that is contained in a tweet. The same hashtag may appear in more than 
 one tweet, and so the collection of Tweets is marked with the 'InverseProperty' attribute to 
-show that it is the other end of the collection of HashTags in the ITweet interface::
+show that it is the other end of the collection of HashTags in the ITweet interface:
+
+.. code-block:: c#
 
   [Entity]
   public interface IHashTag
@@ -97,16 +103,24 @@ show that it is the other end of the collection of HashTags in the ITweet interf
 Initialising the BrightstarDB Context
 -------------------------------------
 
-The BrightstarDB context can be initialised using a connection string::
+The BrightstarDB context can be initialised using a connection string:
 
-  var connectionString = "Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox";
+.. code-block:: c#
+
+  var connectionString = 
+      "Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox";
   var context = new TweetBoxContext(connectionString);
 
-If you have added the connection string into the Config file::
+If you have added the connection string into the Config file:
 
-  <add key="BrightstarDB.ConnectionString" value="Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox" />
+.. code-block:: xml
 
-then you can initialise the content with a simple::
+  <add key="BrightstarDB.ConnectionString" 
+       value="Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Tweetbox" />
+
+then you can initialise the content with a simple:
+
+.. code-block:: c#
 
   var context = new TweetBoxContext();
 
@@ -117,7 +131,9 @@ For more information about connection strings, please read the
 Creating a new User entity
 --------------------------
 
-Method 1::
+Method 1:
+
+.. code-block:: c#
 
   var jo = context.Users.Create();
   jo.Username = "JoBloggs79";
@@ -125,7 +141,9 @@ Method 1::
   jo.DateRegistered = DateTime.Now;
   context.SaveChanges();
 
-Method 2::
+Method 2:
+
+.. code-block:: c#
 
   var jo = new User {
                    Username = "JoBloggs79",
@@ -141,7 +159,9 @@ Relationships between entities
 The following code snippets show the creation of relationships between entities by simply 
 setting properties.
 
-**Users to Users**::
+**Users to Users**:
+
+.. code-block:: c#
 
   var trevor = context.Users.Create();
   trevor.Username = "TrevorSims82";
@@ -150,7 +170,9 @@ setting properties.
   trevor.Following.Add(jo);
   context.SaveChanges();
 
-**Tweets to Tweeter**::
+**Tweets to Tweeter**:
+
+.. code-block:: c#
 
   var tweet = context.Tweets.Create();
   tweet.Content = "My first tweet";
@@ -158,15 +180,19 @@ setting properties.
   tweet.Tweeter = trevor;
   context.SaveChanges();
 
-**Tweets to HashTags:**::
+**Tweets to HashTags:**:
 
-  var nosql = context.HashTags.Where(ht => ht.Value.Equals("nosql").FirstOrDefault();
+.. code-block:: c#
+
+  var nosql = context.HashTags.Where(
+	ht => ht.Value.Equals("nosql").FirstOrDefault();
   if (nosql == null)
   {
       nosql = context.HashTags.Create();
       nosql.Value = "nosql";
   }
-  var  brightstardb = context.HashTags.Where(ht => ht.Value.Equals("brightstardb").FirstOrDefault();
+  var  brightstardb = context.HashTags.Where(
+	ht => ht.Value.Equals("brightstardb").FirstOrDefault();
   if (brightstardb == null)
   {
       brightstardb = context.HashTags.Create();
@@ -210,7 +236,7 @@ MVC Nerd Dinner
 .. note::
 
   The source code for this example can be found in the solution 
-  [INSTALLDIR]\\Samples\\NerdDinner\\BrightstarDB.Samples.NerdDinner.sln
+  ``[INSTALLDIR]\Samples\NerdDinner\BrightstarDB.Samples.NerdDinner.sln``
 
 
 To demonstrate the ease of using BrightstarDB with ASP.NET MVC, we will use the well-known 
@@ -227,7 +253,7 @@ basis for a .NET custom membership and role provider.
 
 This tutorial is quite long, but is broken up into a number of separate sections each of which 
 you can follow along with in code, or you can refer to the complete sample application which 
-can be found in [INSTALLDIR]\\Samples\\NerdDinner.
+can be found in ``[INSTALLDIR]\Samples\NerdDinner``.
 
   - :ref:`Creating The Basic Data Model <Creating_The_Basic_Data_Model>` - creates the initial 
     application and code-first data model
@@ -281,15 +307,19 @@ purposes of this example project it is not needed.
 
 **Step 2: Add references to BrightstarDB**
 
-Add a reference in your project to the BrightstarDB DLL from the BrightstarDB SDK.
+Install the BrightstarDB package from NuGet, either using the GUI tool or from the NuGet console with the command::
+
+	Install-Package BrightstarDB
 
 **Step 3: Add a connection string to your BrightstarDB location**
 
 Open the web.config file in the root directory your new project, and add a connection string 
 to the location of your BrightstarDB store. There is no setup required - you can name a store 
 that does not exist and it will be created the first time that you try to connect to it from 
-the application. The only thing you will need to ensure is that if you are using an HTTP, TCP 
-or Named Pipe connection, the BrightstarDB service must be running::
+the application. The only thing you will need to ensure is that if you are using a REST connection,
+the BrightstarDB service must be running:
+
+.. code-block:: xml
 
   <appSettings>
     ...
@@ -301,10 +331,10 @@ or Named Pipe connection, the BrightstarDB service must be running::
 For more information about connection strings, please read the :ref:`"Connection Strings" 
 <Connection_Strings>` topic.
 
-**Step 4: Add the Brightstar Entity Context into your project**
+**Step 4: Rename the Brightstar Entity Context in your project**
 
-Select **Add > New Item** on the Models folder, and select **Brightstar Entity Context** from the 
-Data category. Rename it to NerdDinnerContext.tt
+The NuGet package will have installed a text template file named ``MyEntityContext.tt``. 
+Rename it to ``NerdDinnerContext.tt``.
 
 .. image:: Images/mvc2.png
 
@@ -317,7 +347,9 @@ a set of “RSVP”s that are used to track a person’s interest in attending a
 
 We create the two interfaces as shown below in the Models folder of our project.
 
-IDinner.cs::
+IDinner.cs:
+
+.. code-block:: c#
 
   using System;
   using System.Collections.Generic;
@@ -358,7 +390,9 @@ IDinner.cs::
       }
   }
 
-IRSVP.cs:::
+IRSVP.cs:
+
+.. code-block:: c#
 
   using System.ComponentModel.DataAnnotations;
   using BrightstarDB.EntityFramework;
@@ -444,7 +478,9 @@ let the MVC framework handle the data binding for us - for the Delete action it 
 really matter as we are not concerned with the value posted back by that action in this sample 
 application.
 
-Before we start editing the Actions, we add the following line to the HomeController class::
+Before we start editing the Actions, we add the following line to the HomeController class:
+
+.. code-block:: c#
 
   public class HomeController : Controller
   {        
@@ -458,7 +494,9 @@ framework context.
 **Index**
 
 This view will show a list of all dinners in the system, it’s a simple case of using LINQ to 
-return a list of all dinners:::
+return a list of all dinners:
+
+.. code-block:: c#
 
   public ActionResult Index()
   {
@@ -474,7 +512,9 @@ store for a dinner with a particular Id. Note that we have changed the type of t
 parameter from int to string. The LINQ query here uses FirstOrDefault() which means that if 
 there is no dinner with the specified ID, we will get a null value returned by the query. If 
 that is the case, we return the user to a "404" view to display a "Not found" message in the 
-browser, otherwise we return the default Details view.::
+browser, otherwise we return the default Details view.
+
+.. code-block:: c#
 
   public ActionResult Details(string id)
   {
@@ -487,7 +527,9 @@ browser, otherwise we return the default Details view.::
 The controller has two methods to deal with the Edit action, the first handles a get request 
 and is similar to the Details method above, but the view loads the property values into a form 
 ready to be edited. As with the previous method, the type of the id parameter has been changed 
-to string::
+to string:
+
+.. code-block:: c#
 
   public ActionResult Edit(string id)
   {
@@ -503,7 +545,9 @@ from our IDinner data model interface and the MVC framework can automatically da
 values in the edit form to a new Dinner instance before invoking our Edit method. This 
 automatic data binding makes the code to save the edited dinner much simpler and shorter - we 
 just need to attach the Dinner object to the _nerdDinners context and then call SaveChanges() 
-on the context to persist the updated entity::
+on the context to persist the updated entity:
+
+.. code-block:: c#
 
   [HttpPost]
   public ActionResult Edit(Dinner dinner)
@@ -522,7 +566,9 @@ on the context to persist the updated entity::
 
 Like the Edit method, Create displays a form on the initial view, and then accepts the 
 HttpPost that gets sent back after a user clicks “Save”. To make things slight easier for the 
-user we are pre-filling the “EventDate” property with a date one week in the future::
+user we are pre-filling the “EventDate” property with a date one week in the future:
+
+.. code-block:: c#
 
   public ActionResult Create()
   {
@@ -531,7 +577,9 @@ user we are pre-filling the “EventDate” property with a date one week in the
   }
 
 When the user has entered the rest of the dinner details, we add the Dinner object to the 
-Dinners collection in the context and then call SaveChanges()::
+Dinners collection in the context and then call SaveChanges():
+
+.. code-block:: c#
 
   [HttpPost]
   public ActionResult Create(Dinner dinner)
@@ -548,7 +596,9 @@ Dinners collection in the context and then call SaveChanges()::
 **Delete**
 
 The first stage of the Delete method displays the details of the dinner about to be deleted to 
-the user for confirmation::
+the user for confirmation:
+
+.. code-block:: c#
 
   public ActionResult Delete(string id)
   {
@@ -556,8 +606,9 @@ the user for confirmation::
       return dinner == null ? View("404") : View(dinner);
   }
 
+When the user has confirmed the object is Deleted from the store:
 
-When the user has confirmed the object is Deleted from the store::
+.. code-block:: c#
 
   [HttpPost, ActionName("Delete")]
   public ActionResult DeleteConfirmed(string id, FormCollection collection)
@@ -675,7 +726,9 @@ to HomeController.cs.
 
 This is the code for the first part of AddAttendee action - it is a similar pattern that we 
 have seen else where. We retrieve the dinner entity by its ID and pass it through to the view 
-so we can show the user some details about the dinner they have chosen to attend::
+so we can show the user some details about the dinner they have chosen to attend:
+
+.. code-block:: c#
 
   public ActionResult AddAttendee(string id)
   {
@@ -712,7 +765,9 @@ type but choose the Empty scaffold  and check "Create as partial view" and then
 Note the use of a hidden field in the form that carries the Dinner ID so that when we handle 
 the POST we know which dinner to connect the response to.
 
-This is the code to handle the second part of the action::
+This is the code to handle the second part of the action:
+
+.. code-block:: c#
 
   [HttpPost]
   public ActionResult AddAttendee(FormCollection form)
@@ -880,7 +935,9 @@ Fortunately it is easy to modify the persistent data model with BrightstarDB.
 As an example we are going to add the requirement for dinners to have a specific City field 
 (perhaps to allow grouping of dinners by the city the occur in for example).
 
-The first step is to modify the IDinner interface to add a City property::
+The first step is to modify the IDinner interface to add a City property:
+
+.. code-block:: c#
 
       [Entity]
       public interface IDinner
@@ -951,7 +1008,7 @@ Adding the Custom Membership Provider and login Entity
      simpler string values rather than the full URI that is generated by BrightstarDB (for more 
      information, please read the Entity Framework Documentation).
 
-::
+.. code-block:: c#
 
   [Entity]
   public interface INerdDinnerLogin
@@ -982,7 +1039,9 @@ Configuring the application to use the Brightstar Membership Provider
 To configure your web application to use this custom Membership Provider, we simply need to 
 change the configuration values in the Web.config file in the root directory of the 
 application. Change the membership node contained within the <system.web> to the 
-snippet below::
+snippet below:
+
+.. code-block:: xml
 
   <membership defaultProvider="BrightstarMembershipProvider">
     <providers>
@@ -998,11 +1057,13 @@ snippet below::
     </providers>
   </membership> 
 
-Note that if the name of your project is not BrightstarDB.Samples.NerdDinner, you will have to 
-change the type="" attribute to the correct full type reference. 
+Note that if the name of your project is not ``BrightstarDB.Samples.NerdDinner``, you will have to 
+change the ``type=""`` attribute to the correct full type reference. 
 
 We must also change the authentication method for the web application to Forms authentication. 
-This is done by adding the following inside the <system.web> section of the Web.config file::
+This is done by adding the following inside the <system.web> section of the Web.config file:
+
+.. code-block:: xml
 
   <authentication mode="Forms"/>
 
@@ -1012,12 +1073,9 @@ If after making these changes you see an error message like this in the browser:
   allowDefinition='MachineToApplication' beyond application level.  This error can be caused by 
   a virtual directory not being configured as an application in IIS.
 
-The most likely problem is that you have added the <membership> and <authentication> tags into 
+The most likely problem is that you have added the ``<membership>`` and ``<authentication>`` tags into 
 the Web.config file contained in the Views folder. These configuration elements must ONLY go 
 in the Web.config file located in the project's root directory.
-
-
-
 
 
 Adding functionality to the Custom Membership Provider
@@ -1070,7 +1128,7 @@ looked up in the BrightstarDB store by username, and then the password is checke
 checks pass successfully then it returns a true value which enables the user to successfully 
 login.
 
-::
+.. code-block:: c#
 
   using System;
   using System.Collections.Specialized;
@@ -1084,10 +1142,7 @@ login.
   {
       public class BrightstarMembershipProvider : MembershipProvider
       {
-
-
           #region Configuration and Initialization
-
 
           private string _applicationName;
           private const bool _requiresUniqueEmail = true;
@@ -1099,24 +1154,19 @@ login.
           private string _passwordStrengthRegularExpression;
           private MembershipPasswordFormat _passwordFormat = MembershipPasswordFormat.Hashed;
 
-
           private string GetConfigValue(string configValue, string defaultValue)
           {
               if (string.IsNullOrEmpty(configValue))
                   return defaultValue;
 
-
               return configValue;
           }
-
 
           public override void Initialize(string name, NameValueCollection config)
           {
               if (config == null) throw new ArgumentNullException("config");
 
-
               if (string.IsNullOrEmpty(name)) name = "BrightstarMembershipProvider";
-
 
               if (String.IsNullOrEmpty(config["description"]))
               {
@@ -1124,9 +1174,7 @@ login.
                   config.Add("description", "BrightstarDB Membership Provider");
               }
 
-
               base.Initialize(name, config);
-
 
               _applicationName = GetConfigValue(config["applicationName"],
                             System.Web.Hosting.HostingEnvironment.ApplicationVirtualPath);
@@ -1143,15 +1191,11 @@ login.
                             GetConfigValue(config["enablePasswordReset"], "true"));
               _passwordStrengthRegularExpression = Convert.ToString(
                              GetConfigValue(config["passwordStrengthRegularExpression"], ""));
-
-
           }
           
           #endregion
 
-
           #region Properties
-
 
           public override string ApplicationName
           {
@@ -1202,9 +1246,7 @@ login.
           }
           #endregion
 
-
           #region Private Methods
-
 
           private static string CreateSalt()
           {
@@ -1220,8 +1262,6 @@ login.
               var snp = string.Concat(password, salt);
               var hashed = FormsAuthentication.HashPasswordForStoringInConfigFile(snp, "sha1");
               return hashed;
-
-
           }
          
           /// <summary>
@@ -1239,19 +1279,17 @@ login.
               return user;
           }
 
-
           #endregion
 
-
           public override MembershipUser CreateUser(
-                                            string username, 
-											string password, 
-											string email, 
-											string passwordQuestion, 
-											string passwordAnswer, 
-											bool isApproved, 
-											object providerUserKey, 
-											out MembershipCreateStatus status)
+				string username, 
+				string password, 
+				string email, 
+				string passwordQuestion, 
+				string passwordAnswer, 
+				bool isApproved, 
+				object providerUserKey, 
+				out MembershipCreateStatus status)
           {
               var args = new ValidatePasswordEventArgs(email, password, true);
 
@@ -1323,7 +1361,6 @@ login.
                   return null;
               }
 
-
               status = MembershipCreateStatus.DuplicateUserName;
               return null;
           }
@@ -1386,7 +1423,6 @@ login.
               }
               return false;
           }
-
 
           #region MembershipProvider properties and methods not implemented for this tutorial
   ...
@@ -1459,9 +1495,10 @@ can restrict certain areas from users who are not members of the appropriate rol
 Adding the Custom Role Provider
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  1. Add the following line to the INerdDinnerLogin interface's properties::
-
-      ICollection<string> Roles { get; set; }
+  1. Add the following line to the INerdDinnerLogin interface's properties:
+	 .. code-block:: c#
+	 
+	    ICollection<string> Roles { get; set; }
 
   2. To update the context classes, right click on the NerdDinnerContext.tt file and select “Run Custom Tool” from the context menu.
 
@@ -1477,18 +1514,23 @@ Configuring the application to use the Brightstar Membership Provider
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To configure your web application to use the Custom Role Provider, add the following to your 
-Web.config, inside the <system.web> section::
+Web.config, inside the <system.web> section:
+
+.. code-block:: xml
 
   <roleManager  enabled="true" defaultProvider="BrightstarRoleProvider">
     <providers>
       <clear/>
       <add name="BrightstarRoleProvider" 
-           type="BrightstarDB.Samples.NerdDinner.BrightstarRoleProvider" applicationName="/" />
+           type="BrightstarDB.Samples.NerdDinner.BrightstarRoleProvider" 
+		   applicationName="/" />
     </providers>
   </roleManager>
 
 To set up the default login path for the web application, replace the <authentication> element 
-in the Web.config file with the following::
+in the Web.config file with the following:
+
+.. code-block:: xml
 
   <authentication mode="Forms">
     <forms loginUrl="/Account/LogOn"/>
@@ -1535,7 +1577,7 @@ passed back.
 BrightstarDB is queried for all logins that contain the supplied role name in their Roles 
 collection.
 
-::
+.. code-block:: c#
 
   using System;
   using System.Collections.Generic;
@@ -1553,27 +1595,19 @@ collection.
           
           private string _applicationName;
 
-
           private static string GetConfigValue(string configValue, string defaultValue)
           {
               if (string.IsNullOrEmpty(configValue))
                   return defaultValue;
-
-
               return configValue;
           }
-
 
           public override void Initialize(string name, 
                              System.Collections.Specialized.NameValueCollection config)
           {
               if (config == null) throw new ArgumentNullException("config");
-
-
               if (string.IsNullOrEmpty(name)) name = "NerdDinnerRoleProvider";
-
-
-              if (String.IsNullOrEmpty(config["description"]))
+              if (string.IsNullOrEmpty(config["description"]))
               {
                   config.Remove("description");
                   config.Add("description", "Nerd Dinner Membership Provider");
@@ -1597,12 +1631,14 @@ collection.
           /// <param name="username">The user to return a list of roles for.</param>
           public override string[] GetRolesForUser(string username)
           {
-              if (string.IsNullOrEmpty(username)) throw new ArgumentNullException("username");
+              if (string.IsNullOrEmpty(username)) 
+				throw new ArgumentNullException("username");
               //create a new BrightstarDB context using the values in Web.config
               var context = new NerdDinnerContext();
               //find a match for the username
-              var login = context.NerdDinnerLogins.Where(l => 
-                                               l.Username.Equals(username)).FirstOrDefault();
+              var login = context.NerdDinnerLogins
+						.Where(l => l.Username.Equals(username))
+						.FirstOrDefault();
               if (login == null) return null;
               //return the Roles collection
               return login.Roles.ToArray();
@@ -1626,8 +1662,9 @@ collection.
               foreach (var username in usernames)
               {
                   //find the match for the username
-                  var login = context.NerdDinnerLogins.Where(l => 
-                                       l.Username.Equals(username)).FirstOrDefault();
+                  var login = context.NerdDinnerLogins
+								.Where(l => l.Username.Equals(username))
+								.FirstOrDefault();
                   if (login == null) continue;
                   foreach (var role in roleNames)
                   {
@@ -1658,8 +1695,9 @@ collection.
               foreach (var username in usernames)
               {
                   //find the match for the username
-                  var login = context.NerdDinnerLogins.Where(l => 
-                                             l.Username.Equals(username)).FirstOrDefault();
+                  var login = context.NerdDinnerLogins
+									.Where(l => l.Username.Equals(username))
+									.FirstOrDefault();
                   if (login == null) continue;
                   foreach (var role in roleNames)
                   {
@@ -1689,8 +1727,9 @@ collection.
                   //create a new BrightstarDB context using the values in Web.config
                   var context = new NerdDinnerContext();
                   //find a match for the username
-                  var login = context.NerdDinnerLogins.Where(l => 
-                                             l.Username.Equals(username)).FirstOrDefault();
+                  var login = context.NerdDinnerLogins
+								.Where(l => l.Username.Equals(username))
+								.FirstOrDefault();
                   if (login == null || login.IsLockedOut || !login.IsActivated)
                   {
                       // no match or inactive automatically returns false
@@ -1721,8 +1760,10 @@ collection.
               //create a new BrightstarDB context using the values in Web.config
               var context = new NerdDinnerContext();
               //search for all logins who have the supplied roleName in their Roles collection
-              var usersInRole = context.NerdDinnerLogins.Where(l => 
-                         l.Roles.Contains(roleName.ToLower())).Select(l => l.Username).ToList();
+              var usersInRole = context.NerdDinnerLogins
+								.Where(l => l.Roles.Contains(roleName.ToLower()))
+								.Select(l => l.Username)
+								.ToList();
               return usersInRole.ToArray();
           }
           
@@ -1843,14 +1884,13 @@ To display the functionality of the new Custom Role Provider, add 2 new ViewResu
 the Home Controller. Notice that the [Authorize] MVC attribute has been added to each of the 
 methods to restrict access to users in those roles only.
 
-::
+.. code-block:: c#
 
   [Authorize(Roles = "editor")]
   public ViewResult SecureEditorSection()
   {
       return View();
   }
-
 
   [Authorize(Roles = "admin")]
   public ViewResult SecureAdminSection()
@@ -1948,7 +1988,9 @@ Right-click on the Controllers folder and choose Add > Controller. In the dialog
 displayed, change the controller name to ``SparqlController``, and choose the **Empty MVC Controller** 
 template option from the drop-down list.
 
-Edit the ``SparqlController.cs`` file to add the following two methods to the class::
+Edit the ``SparqlController.cs`` file to add the following two methods to the class:
+
+.. code-block:: c#
 
   public ViewResult Index()
   {
@@ -2029,19 +2071,20 @@ example we add to the NerdDinner MVC Web Application project).
   2. Change the class inheritance from DataService to ``EntityDataService``, and add the name of the 
      BrightstarEntityContext to the type argument.
 
-  3. Edit the body of the method with the following configuration settings::
+  3. Edit the body of the method with the following configuration settings:
+	 .. code-block:: c#
 
-       public class OData : EntityDataService<NerdDinnerContext>
-       {
-         // This method is called only once to initialize service-wide policies.
-         public static void InitializeService(DataServiceConfiguration config)
-         {
-           config.SetEntitySetAccessRule("*", EntitySetRights.AllRead);
-           config.SetEntitySetAccessRule("NerdDinnerLogin", EntitySetRights.None); 
-           config.SetServiceOperationAccessRule("*", ServiceOperationRights.All);
-           config.DataServiceBehavior.MaxProtocolVersion = DataServiceProtocolVersion.V2;
-         }
-       }
+		public class OData : EntityDataService<NerdDinnerContext>
+		{
+			// This method is called only once to initialize service-wide policies.
+			public static void InitializeService(DataServiceConfiguration config)
+			{
+				config.SetEntitySetAccessRule("*", EntitySetRights.AllRead);
+				config.SetEntitySetAccessRule("NerdDinnerLogin", EntitySetRights.None); 
+				config.SetServiceOperationAccessRule("*", ServiceOperationRights.All);
+				config.DataServiceBehavior.MaxProtocolVersion = DataServiceProtocolVersion.V2;
+			}
+		}
 
      .. note::
      
@@ -2109,7 +2152,7 @@ Mapping to Existing RDF Data
 .. note::
 
   The source code for this example can be found in 
-  [INSTALLDIR]\\Samples\\EntityFramework\\EntityFrameworkSamples.sln
+  ``[INSTALLDIR]\Samples\EntityFramework\EntityFrameworkSamples.sln``
 
 
 One of the things that makes BrightstarDB unique is the ability to map multiple object models 
@@ -2155,14 +2198,18 @@ attribute ``[PropertyType("http://xmlns.com/foaf/0.1/name")].``
 
 We can add a ``NamespaceDeclaration`` assembly attribute to the project's AssemblyInfo.cs file 
 to shorten the URIs used in the attributes. The NamespaceDeclaration attribute allows us to define
-a short code for a URI prefix. For example::
+a short code for a URI prefix. For example:
+
+.. code-block:: c#
 
   [assembly: NamespaceDeclaration("foaf", "http://xmlns.com/foaf/0.1/")]
 
 With this ``NamespaceDeclaration`` attribute in the project, the ``PropertyType`` attribute can 
 be shortened to ``[PropertyType("foaf:name")]``
 
-The RDF example given above would be mapped to an entity as given below:::
+The RDF example given above would be mapped to an entity as given below:
+
+.. code-block:: c#
 
   [Entity("http://xmlns.com/foaf/0.1/Person")]
   public interface IPerson
@@ -2196,18 +2243,22 @@ Once there is RDF data in the store, and an interface that maps an entity to the
 data can then be accessed easy using the Entity Framework by using the correct connection 
 string to directly access the store.
 
-::
+.. code-block:: c#
 
   var connectionString = "Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Foaf";
   var context = new FoafContext(connectionString);
 
 
-If you have added the connection string into the Config file::
+If you have added the connection string into the Config file:
+
+.. code-block:: xml
 
   <add key="BrightstarDB.ConnectionString" 
        value="Type=rest;endpoint=http://localhost:8090/brightstar;StoreName=Foaf" />
 
-Then you can initialise the content with a simple::
+Then you can initialise the content with a simple:
+
+.. code-block:: c#
 
   var context = new FoafContext();
 
@@ -2218,7 +2269,7 @@ topic <Connection_Strings>`
 The code below connects to the store to access all the people in the RDF data, it then writes 
 their name and place of employment, along with all the people they know or are known by.
 
-::
+.. code-block:: c#
 
   var context = new FoafContext(connectionString);
   var people = context.Persons.ToList();

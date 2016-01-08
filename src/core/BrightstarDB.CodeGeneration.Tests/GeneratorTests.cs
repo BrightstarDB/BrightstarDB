@@ -14,17 +14,21 @@
     public class GeneratorTests
     {
         [Test]
-        [TestCase("EmptyEntity", Language.CSharp)]
-        [TestCase("EmptyEntity", Language.VisualBasic)]
-        [TestCase("IdentifierPrecedence", Language.CSharp)]
-        [TestCase("IdentifierPrecedence", Language.VisualBasic)]
-        [TestCase("SupportedScalarPropertyTypes", Language.CSharp)]
-        [TestCase("SupportedScalarPropertyTypes", Language.VisualBasic)]
-        [TestCase("Relationships", Language.CSharp)]
-        [TestCase("Relationships", Language.VisualBasic)]
-        [TestCase("AttributePropagation", Language.CSharp)]
-        [TestCase("AttributePropagation", Language.VisualBasic)]
-        public async Task TestCodeGeneration(string resourceBaseName, Language language)
+        [TestCase("EmptyEntity", false, Language.CSharp)]
+        [TestCase("EmptyEntity", false, Language.VisualBasic)]
+        [TestCase("EmptyEntity", true, Language.CSharp)]
+        [TestCase("EmptyEntity", true, Language.VisualBasic)]
+        [TestCase("InternalEntity", false, Language.CSharp)]
+        [TestCase("InternalEntity", true, Language.CSharp)]
+        [TestCase("IdentifierPrecedence", false, Language.CSharp)]
+        [TestCase("IdentifierPrecedence", false, Language.VisualBasic)]
+        [TestCase("SupportedScalarPropertyTypes", false, Language.CSharp)]
+        [TestCase("SupportedScalarPropertyTypes", false, Language.VisualBasic)]
+        [TestCase("Relationships", false, Language.CSharp)]
+        [TestCase("Relationships", false, Language.VisualBasic)]
+        [TestCase("AttributePropagation", false, Language.CSharp)]
+        [TestCase("AttributePropagation", false, Language.VisualBasic)]
+        public async Task TestCodeGeneration(string resourceBaseName, bool internalEntityClasses, Language language)
         {
             var inputResourceName = "BrightstarDB.CodeGeneration.Tests.GeneratorTestsResources." + resourceBaseName + "Input_" + language.ToString() + ".txt";
             var outputResourceName = "BrightstarDB.CodeGeneration.Tests.GeneratorTestsResources." + resourceBaseName + "Output_" + language.ToString() + ".txt";
@@ -57,7 +61,8 @@
                         language,
                         solution,
                         "BrightstarDB.CodeGeneration.Tests",
-                        interfacePredicate: x => true);
+                        interfacePredicate: x => true,
+                        entityAccessibilitySelector: internalEntityClasses ? (Func<INamedTypeSymbol, Accessibility>) Generator.InteralyEntityAccessibilitySelector : Generator.DefaultEntityAccessibilitySelector);
                 var result = results
                     .Aggregate(
                         new StringBuilder(),
@@ -68,6 +73,10 @@
 
                 // make sure version changes don't break the tests
                 expectedCode = expectedCode.Replace("$VERSION$", typeof(BrightstarException).Assembly.GetName().Version.ToString());
+                expectedCode = expectedCode.Replace("$ENTITYACCESS$",
+                    language == Language.VisualBasic
+                        ? (internalEntityClasses ? "Friend" : "Public")
+                        : (internalEntityClasses ? "internal" : "public"));
 
                 //// useful when converting generated code to something that can be pasted into an expectation file
                 //var sanitisedResult = result.Replace("1.10.0.0", "$VERSION$");

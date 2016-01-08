@@ -46,6 +46,22 @@ namespace BrightstarDB.Rdf
         public const string String = XsdNamespace + "string";
 
         /// <summary>
+        /// The XML Schema normalizedString datatype URI
+        /// </summary>
+        public const string NormalizedString = XsdNamespace + "normalizedString";
+
+        /// <summary>
+        /// The XML Schema token datatype URI
+        /// </summary>
+        public const string Token = XsdNamespace + "token";
+
+        /// <summary>
+        /// The XML Schema language datatype URI
+        /// </summary>
+        public const string Language = XsdNamespace + "language";
+
+
+        /// <summary>
         /// The XML Schema bool datatype URI
         /// </summary>
         public const string Boolean = XsdNamespace + "boolean";
@@ -69,6 +85,31 @@ namespace BrightstarDB.Rdf
         /// The XML Schema integer datatype URI
         /// </summary>
         public const string Integer = XsdNamespace + "integer";
+
+        /// <summary>
+        /// The XML Schema nonNegativeInteger datatype URI
+        /// </summary>
+        public const string NonNegativeInteger = XsdNamespace + "nonNegativeInteger";
+
+        /// <summary>
+        /// The XML Schema positiveInteger datatype URI
+        /// </summary>
+        public const string PositiveInteger = XsdNamespace + "positiveInteger";
+
+        /// <summary>
+        /// The XML Schema nonPositiveInteger datatype URI
+        /// </summary>
+        public const string NonPositiveInteger = XsdNamespace + "nonPositiveInteger";
+
+        /// <summary>
+        /// The XML Schema negativeInteger datatype URI
+        /// </summary>
+        public const string NegativeInteger = XsdNamespace + "negativeInteger";
+
+        /// <summary>
+        /// The XML Schema int datatye URI
+        /// </summary>
+        public const string Int = XsdNamespace + "int";
 
         /// <summary>
         /// The XML Schema float datatype URI
@@ -129,6 +170,9 @@ namespace BrightstarDB.Rdf
 
         #region Rdf Datatype Definitions
         private static readonly RdfDatatype RdfString = new RdfDatatype(String, (o => o as string), ((s,l)=>s));
+        private static readonly RdfDatatype RdfNormalizedString = new RdfDatatype(NormalizedString, (o => o as string), ((s, l) => s));
+        private static readonly RdfDatatype RdfToken = new RdfDatatype(Token, (o => o as string), ((s, l) => s));
+        private static readonly RdfDatatype RdfLanguage = new RdfDatatype(Language, (o => o as string), ((s, l) => s));
 
         private static readonly RdfDatatype RdfPlainLiteral = new RdfDatatype(
             PlainLiteral,
@@ -158,6 +202,31 @@ namespace BrightstarDB.Rdf
         private static readonly RdfDatatype RdfInteger = new RdfDatatype(
             Integer,
             (o => ((int) o).ToString(CultureInfo.InvariantCulture)),
+            (s, l) => Convert.ToInt32(s, CultureInfo.InvariantCulture));
+
+        private static readonly RdfDatatype RdfNonNegativeInteger = new RdfDatatype(
+            NonNegativeInteger,
+            (o => ((int)o).ToString(CultureInfo.InvariantCulture)),
+            (s, l) => Convert.ToInt32(s, CultureInfo.InvariantCulture));
+
+        private static readonly RdfDatatype RdfPositiveInteger = new RdfDatatype(
+            PositiveInteger,
+            (o => ((int)o).ToString(CultureInfo.InvariantCulture)),
+            (s, l) => Convert.ToInt32(s, CultureInfo.InvariantCulture));
+
+        private static readonly RdfDatatype RdfNonPositiveInteger = new RdfDatatype(
+            NonPositiveInteger,
+            (o => ((int)o).ToString(CultureInfo.InvariantCulture)),
+            (s, l) => Convert.ToInt32(s, CultureInfo.InvariantCulture));
+
+        private static readonly RdfDatatype RdfNegativeInteger = new RdfDatatype(
+            NegativeInteger,
+            (o => ((int)o).ToString(CultureInfo.InvariantCulture)),
+            (s, l) => Convert.ToInt32(s, CultureInfo.InvariantCulture));
+
+        private static readonly RdfDatatype RdfInt = new RdfDatatype(
+            Int,
+            (o => ((int)o).ToString(CultureInfo.InvariantCulture)),
             (s, l) => Convert.ToInt32(s, CultureInfo.InvariantCulture));
 
         private static readonly RdfDatatype RdfFloat = new RdfDatatype(
@@ -268,11 +337,19 @@ namespace BrightstarDB.Rdf
                 {
                     {PlainLiteral, RdfPlainLiteral},
                     {String, RdfString},
+                    {NormalizedString, RdfNormalizedString },
+                    {Token, RdfToken },
+                    {Language, RdfLanguage },
                     {Boolean, RdfBoolean},
                     {DateTime, RdfDateTime},
                     {Date, RdfDate},
                     {Double, RdfDouble},
                     {Integer, RdfInteger},
+                    {NonNegativeInteger, RdfNonNegativeInteger },
+                    {PositiveInteger, RdfPositiveInteger },
+                    {NonPositiveInteger, RdfNonPositiveInteger },
+                    {NegativeInteger, RdfNegativeInteger },
+                    {Int, RdfInt },
                     {Float, RdfFloat},
                     {Long, RdfLong},
                     {Byte, RdfByte},
@@ -300,7 +377,7 @@ namespace BrightstarDB.Rdf
             if (systemType == null || systemType == typeof(BrightstarDB.Rdf.PlainLiteral)) return PlainLiteral;
             RdfDatatype ret;
             if (SystemTypeToRdfType.TryGetValue(systemType, out ret)) return ret.DatatypeUri;
-            throw new ArgumentException(System.String.Format("The type {0} is not mapped to any known RDF datatype", systemType.FullName), "systemType");
+            throw new ArgumentException(string.Format("The type {0} is not mapped to any known RDF datatype", systemType.FullName), nameof(systemType));
         }
 
         ///<summary>
@@ -311,10 +388,10 @@ namespace BrightstarDB.Rdf
         ///<exception cref="ArgumentException">Thrown if <paramref name="value"/> is not of a type that can be mapped to an RDF datatype by this class</exception>
         public static string GetLiteralString(object value)
         {
-            if (value == null) return System.String.Empty;
+            if (value == null) return string.Empty;
             RdfDatatype ret;
             if (SystemTypeToRdfType.TryGetValue(value.GetType(), out ret)) return ret.FormatLiteral(value);
-            throw new ArgumentException(System.String.Format("The type {0} is not mapped to any known RDF datatype", value.GetType().FullName), "value");
+            throw new ArgumentException(string.Format("The type {0} is not mapped to any known RDF datatype", value.GetType().FullName), nameof(value));
         }
 
         /// <summary>
@@ -326,7 +403,7 @@ namespace BrightstarDB.Rdf
         public static string GetLiteralLanguageTag(object value)
         {
             var pl = value as PlainLiteral;
-            return pl != null ? pl.Language : null;
+            return pl?.Language;
         }
 
         /// <summary>
@@ -345,7 +422,7 @@ namespace BrightstarDB.Rdf
             {
                 return datatype.ParseLiteral(literalString, literalLanguageTag);
             }
-            throw new ArgumentException(System.String.Format("The datatype URI {0} is not mapped to any known RDF datatype", literalDatatype), "literalDatatype");
+            throw new ArgumentException(string.Format("The datatype URI {0} is not mapped to any known RDF datatype", literalDatatype), nameof(literalDatatype));
         }
 
         /// <summary>

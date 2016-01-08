@@ -142,6 +142,11 @@
 	<CallTarget Targets="Package" />
   </Target>
   
+  <PropertyGroup>
+	<PackageBuildNumber Condition="'$(Prerelease)' == ''">$(Major).$(Minor).$(Build)</PackageBuildNumber>
+	<PackageBuildNumber Condition="'$(Prerelease)' != ''">$(Major).$(Minor).$(Build)-$(Prerelease)</PackageBuildNumber>
+  </PropertyGroup>
+  
   <Target Name="Package" DependsOnTargets="CheckPrerequisites">
 	<MakeDir
 		Condition="!Exists('$(OutputPath)\NuGet\tools')"
@@ -160,7 +165,7 @@
 	<XmlPoke XmlInputPath="$(OutputPath)\NuGet\BrightstarDB.CodeGeneration.Console.nuspec"
 			 Namespaces="$(NuSpecNamespaces)"
 			 Query="/ns:package/ns:metadata/ns:version"
-			 Value="$(Major).$(Minor).$(Build).$(Revision)" />
+			 Value="$(PackageBuildNumber)" />
 
 	<Exec
 		Command='$(NuGetCommand) pack "$(SrcDir)core\BrightstarDB.CodeGeneration.Console\$(OutputPath)NuGet\BrightstarDB.CodeGeneration.Console.nuspec"'

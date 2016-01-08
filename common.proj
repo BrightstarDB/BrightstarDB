@@ -5,7 +5,7 @@
   <PropertyGroup>
     <AssemblyProduct>BrightstarDB</AssemblyProduct>
     <AssemblyCompany></AssemblyCompany>
-    <AssemblyCopyright>Copyright (c) 2015 Khalil Ahmed, Graham Moore, and other contributors</AssemblyCopyright>
+    <AssemblyCopyright>Copyright (c) 2016 Khalil Ahmed, Graham Moore, and other contributors</AssemblyCopyright>
     <AssemblyTrademark>All rights reserved</AssemblyTrademark>
     <AssemblyTitle></AssemblyTitle>
   </PropertyGroup>
@@ -14,7 +14,7 @@
        with the MSBuild Community Tasks Version task under monodevelop  -->
   <PropertyGroup>
     <Major>1</Major>
-    <Minor>12</Minor>
+    <Minor>13</Minor>
     <Build>0</Build>
     <Revision>0</Revision>
   </PropertyGroup>

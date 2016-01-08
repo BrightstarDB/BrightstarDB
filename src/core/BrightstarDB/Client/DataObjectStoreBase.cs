@@ -286,6 +286,31 @@ namespace BrightstarDB.Client
             DeregisterDataObject(dataObject.Identity);
         }
 
+        public IDataObject CopyDataObject(IDataObject dataObject)
+        {
+            if (_managedProxies.ContainsKey(dataObject.Identity))
+            {
+                // Already tracked
+                return _managedProxies[dataObject.Identity];
+            }
+            IDataObject ret = GetDataObject(dataObject.Identity);
+            // Do a full refresh of the data object propertyies
+            foreach (var propertyType in dataObject.GetPropertyTypes())
+            {
+                _deletePatterns.Add(new Triple
+                {
+                    Subject = dataObject.Identity,
+                    Predicate = propertyType.Identity,
+                    Object = Constants.WildcardUri,
+                    Graph = _updateGraphUri
+                });
+                foreach (var propertyValue in dataObject.GetPropertyValues(propertyType))
+                {
+                    ret.AddProperty(propertyType, propertyValue);
+                }
+            }
+            return ret;
+        }
         public void Refresh(RefreshMode mode, IDataObject dataObject)
         {
             if (dataObject == null) throw new ArgumentNullException("dataObject");

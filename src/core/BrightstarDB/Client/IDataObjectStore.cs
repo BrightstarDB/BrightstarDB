@@ -86,6 +86,13 @@ namespace BrightstarDB.Client
         void DetachDataObject(IDataObject dataObject);
 
         /// <summary>
+        /// Copies the properties of the specified data object (from another data object store) to a new data object with the same identity in the store.
+        /// </summary>
+        /// <param name="dataObject">The dat</param>
+        /// <returns>The copied data object in this store</returns>
+        IDataObject CopyDataObject(IDataObject dataObject);
+
+        /// <summary>
         /// Updates a single object in the object context with data from the data source
         /// </summary>
         /// <param name="mode">A <see cref="RefreshMode"/> value that indicates whether property changes

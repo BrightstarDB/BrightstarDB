@@ -56,7 +56,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 
     <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
-    Public Partial Class MyEmptyEntity
+    $ENTITYACCESS$ Partial Class MyEmptyEntity
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
         Implements Global.BrightstarDB.CodeGeneration.Tests.IMyEmptyEntity
 

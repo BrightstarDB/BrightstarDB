@@ -814,10 +814,12 @@ namespace BrightstarDB.EntityFramework
                     }
                 }
             }
-//            if (DataObject != null)
-//            {
-                _context.TrackObject(this);
-//            }
+            else if (DataObject != null)
+            {
+                // Refresh the data object as a copy created in this context
+                _context.AttachDataObject(this);
+            }
+            _context.TrackObject(this);
 
             if (_currentItemValues != null)
             {
