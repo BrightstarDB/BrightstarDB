@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using BrightstarDB.Client;
+using BrightstarDB.Dto;
 using BrightstarDB.Storage;
 using BrightstarDB.Update;
 using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 using VDS.RDF.Query.Datasets;
+using VDS.RDF.Query.Optimisation;
 
 namespace BrightstarDB.Query
 {
@@ -16,6 +19,7 @@ namespace BrightstarDB.Query
         private readonly List<Uri> _defaultGraphUris;
         private readonly SparqlResultsFormat _sparqlResultsFormat = SparqlResultsFormat.Xml;
         private readonly RdfFormat _rdfFormat = RdfFormat.RdfXml;
+        private readonly IStoreStatistics _storeStatistics;
 
         public SparqlQueryHandler()
         {
@@ -32,7 +36,8 @@ namespace BrightstarDB.Query
         }
 
         public SparqlQueryHandler(ISerializationFormat targetFormat,
-                                  IEnumerable<string> defaultGraphUris)
+                                  IEnumerable<string> defaultGraphUris,
+                                  IStoreStatistics storeStatistics = null)
         {
             if (targetFormat is SparqlResultsFormat)
             {
@@ -46,6 +51,7 @@ namespace BrightstarDB.Query
             {
                 _defaultGraphUris = defaultGraphUris.Select(g => new Uri(g)).ToList();
             }
+            _storeStatistics = storeStatistics;
         }
 
         private static ISparqlDataset MakeDataset(IStore store)
@@ -62,11 +68,17 @@ namespace BrightstarDB.Query
             try
             {
                 EnsureValidResultFormat(query);
-
                 var dataset = MakeDataset(store);
                 if (_defaultGraphUris != null)
                 {
                     dataset.SetDefaultGraph(_defaultGraphUris);
+                }
+
+                var vsd = dataset as VirtualizingSparqlDataset;
+                if (vsd != null)
+                {
+                    query.AlgebraOptimisers = new [] {vsd.AlgebraOptimiser};
+                    Options.AlgebraOptimisation = true;
                 }
 
                 var queryProcessor = new BrightstarQueryProcessor(store, dataset);

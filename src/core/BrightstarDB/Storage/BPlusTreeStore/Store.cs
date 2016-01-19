@@ -98,9 +98,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         }
 
         public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream,
-            IEnumerable<string> defaultGraphUris )
+            IEnumerable<string> defaultGraphUris, IStoreStatistics storeStatistics )
         {
-            var queryHandler = new SparqlQueryHandler(targetFormat, defaultGraphUris);
+            var queryHandler = new SparqlQueryHandler(targetFormat, defaultGraphUris, storeStatistics);
             // NOTE: streamWriter is not wrapped in a using because we don't want to close resultStream at this point
             
             var streamWriter = new StreamWriter(resultsStream, targetFormat.Encoding);

@@ -5,8 +5,14 @@ using System.Text;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage;
 using VDS.RDF;
+using VDS.RDF.Query;
+using VDS.RDF.Query.Algebra;
 using VDS.RDF.Query.Datasets;
+using VDS.RDF.Query.Expressions;
+using VDS.RDF.Query.Optimisation;
+using VDS.RDF.Query.Patterns;
 using VDS.RDF.Storage.Virtualisation;
+using VDS.RDF.Update;
 
 namespace BrightstarDB.Query
 {
@@ -29,10 +35,13 @@ namespace BrightstarDB.Query
         private List<string> _graphUris = new List<string>{Constants.DefaultGraphUri};
         private List<string> _defaultGraphUris = new List<string>{Constants.DefaultGraphUri};
 
+        public IAlgebraOptimiser AlgebraOptimiser { get; private set; }
+
         public VirtualizingSparqlDataset(IStore store)
         {
             _store = store;
             _rdfProvider = new BrightstarRdfProvider(_store);
+            AlgebraOptimiser = new BrightstarVirtualAlgebraOptimiser(_rdfProvider);
         }
 
         public void SetActiveGraph(IEnumerable<Uri> graphUris)
@@ -113,9 +122,9 @@ namespace BrightstarDB.Query
 
         public bool ContainsTriple(Triple t)
         {
-            var objLit = t.Object as ILiteralNode;
-            if (objLit != null)
+            if (t.Object.NodeType == NodeType.Literal)
             {
+                var objLit = t.Object as ILiteralNode;
                 var dataType = RdfDatatypes.PlainLiteral;
                 if (objLit.DataType != null) dataType = objLit.DataType.ToString();
                 return
@@ -410,5 +419,7 @@ namespace BrightstarDB.Query
                 return _store.GetBindings(null, null, null, false, null, null, _graphUris).Select(MakeVdsTriple);
             }
         }
+
+        
     }
 }

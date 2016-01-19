@@ -31,6 +31,13 @@ namespace BrightstarDB.Query
             _provider = provider;
         }
 
+        public BrightstarVirtualNode(ulong nodeId, IVirtualRdfProvider<ulong, int> provider, INode value)
+        {
+            _nodeId = nodeId;
+            _provider = provider;
+            _value = value;
+        }
+
         protected void MaterialiseValue()
         {
             if (_value == null)

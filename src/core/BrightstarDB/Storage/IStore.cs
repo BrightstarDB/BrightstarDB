@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using BrightstarDB.Client;
 using BrightstarDB.Model;
 using BrightstarDB.Profiling;
 using BrightstarDB.Query;
@@ -34,8 +35,10 @@ namespace BrightstarDB.Storage
         /// <param name="targetFormat">The requested results format</param>
         /// <param name="resultsStream">The stream to write the query results to</param>
         /// <param name="defaultGraphUris">OPTIONAL: An enumeration of the URIs of the graphs to be treated as the default graph in the SPARQL dataset</param>
+        /// <param name="storeStatistics">OPTIONAL: A statistics object to use for query optimisation purposes.</param>
         /// <returns>The SPARQL query results in the requested format</returns>
-        BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, IEnumerable<string> defaultGraphUris = null);
+        BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat,
+            Stream resultsStream, IEnumerable<string> defaultGraphUris = null, IStoreStatistics storeStatistics = null);
 
         /// <summary>
         /// Insert a triple into the store

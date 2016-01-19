@@ -47,6 +47,7 @@ namespace BrightstarDB
         private const string StatsUpdateTimeSpanName = "BrightstarDB.StatsUpdate.TimeSpan";
         private const string QueryExecutionTimeoutName = "BrightstarDB.QueryExecutionTimeout";
         private const string UpdateExecutionTimeoutName = "BrightstarDB.UpdateExecutionTimeout";
+        private const string EnableVirtualizedQueriesName = "BrightstarDB.EnableVirtualizedQueries";
 
         private const string PersistenceTypeAppendOnly = "appendonly";
         private const string PersistenceTypeRewrite = "rewrite";
@@ -126,7 +127,8 @@ namespace BrightstarDB
             QueryCacheDirectory = appSettings.Get(QueryCacheDirectoryName);
             QueryCache = GetQueryCache();
 
-
+            // Virtualized queries
+            EnableVirtualizedQueries = GetApplicationSetting(EnableVirtualizedQueriesName, false);
 
             // StatsUpdate properties
             StatsUpdateTransactionCount = GetApplicationSetting(StatsUpdateTransactionCountName, 0);
@@ -412,6 +414,14 @@ namespace BrightstarDB
 #else
             return ConfigurationManager.AppSettings.Get(key);
 #endif
+        }
+
+        private static bool GetApplicationSetting(string key, bool defaultValue)
+        {
+            var setting = GetApplicationSetting(key);
+            bool value;
+            if (!string.IsNullOrEmpty(setting) && bool.TryParse(setting, out value)) return value;
+            return defaultValue;
         }
 
         private static int GetApplicationSetting(string key, int defaultValue)
