@@ -8,9 +8,11 @@ using BrightstarDB.Config;
 using BrightstarDB.Query;
 using BrightstarDB.Storage;
 using System.Threading;
+using BrightstarDB.Query.Processor;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 using VDS.RDF.Query.Algebra;
+using VDS.RDF.Query.Optimisation;
 using ITransactionInfo = BrightstarDB.Storage.ITransactionInfo;
 using TransactionType = BrightstarDB.Dto.TransactionType;
 using Triple = BrightstarDB.Model.Triple;
@@ -34,6 +36,14 @@ namespace BrightstarDB.Server
         private readonly ICache _queryCache;
 
         private readonly bool _enableTransactionLogging;
+
+        static ServerCore()
+        {
+            SparqlOptimiser.QueryOptimiser = new NoReorderOptimiser();
+            SparqlOptimiser.AddOptimiser(new VariableEqualsOptimizer());
+            SparqlOptimiser.AddOptimiser(new JoinOptimiser());
+
+        }
 
         public ServerCore(string baseLocation, ICache queryCache, PersistenceType persistenceType, bool enableTransactionLoggingOnNewStores)
         {

@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using BrightstarDB.Client;
-using BrightstarDB.Storage;
 using BrightstarDB.Storage.Statistics;
 using VDS.RDF;
 using VDS.RDF.Query.Optimisation;
 using VDS.RDF.Query.Patterns;
 
-namespace BrightstarDB.Query
+namespace BrightstarDB.Query.Processor
 {
     /// <summary>
     /// Code based on the dotNetRDF WeightedOptimiser to perform triple pattern reordering based on computed pattern weight,
@@ -55,6 +51,7 @@ namespace BrightstarDB.Query
         {
             return new StoreWeightingComparer(_weights);
         }
+
     }
 
     internal class StoreWeightings
@@ -171,7 +168,7 @@ namespace BrightstarDB.Query
                 c = x.CompareTo(y);
             }
 
-            Logging.LogInfo("Compare: {0} - {1} = {2}", x.ToString(), y.ToString(), c);
+            Logging.LogInfo("Compare: {0}[{1}] - {2}[{3}] = {4}", x.ToString(), xSel, y.ToString(), ySel, c);
             return c;
         }
 

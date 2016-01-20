@@ -9,6 +9,7 @@ using BrightstarDB.Client;
 using BrightstarDB.Model;
 using BrightstarDB.Profiling;
 using BrightstarDB.Query;
+using BrightstarDB.Query.Processor;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage.BPlusTreeStore.GraphIndex;
 using BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex;
@@ -16,6 +17,7 @@ using BrightstarDB.Storage.BPlusTreeStore.ResourceIndex;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Storage.Statistics;
 using BrightstarDB.Utils;
+using VDS.RDF.Parsing;
 using VDS.RDF.Query;
 
 namespace BrightstarDB.Storage.BPlusTreeStore
@@ -102,15 +104,20 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream,
             IEnumerable<string> defaultGraphUris, StoreStatistics storeStatistics )
         {
-            //if (storeStatistics != null)
-            //{
-            //    var sw = new Stopwatch();
-            //    sw.Start();
-            //    query.Optimise(new BrightstarWeightedOptimiser(storeStatistics));
-            //    sw.Stop();
-            //    Logging.LogInfo("Stats optimisation took {0}ms", sw.ElapsedMilliseconds);
-            //    Logging.LogInfo("Optimised query is: {0}", query.ToString());
-            //}
+            if (storeStatistics != null)
+            {
+                var sw = new Stopwatch();
+                sw.Start();
+                SparqlQueryParser parser  =new SparqlQueryParser();
+                var expressionFactories = parser.ExpressionFactories.ToList();
+                expressionFactories.Add(new BrightstarFunctionFactory());
+                parser.ExpressionFactories = expressionFactories;
+                parser.QueryOptimiser = new BrightstarWeightedOptimiser(storeStatistics);
+                parser.Parse(new StringReader(query.ToString()));
+                sw.Stop();
+                Logging.LogInfo("Stats optimisation took {0}ms", sw.ElapsedMilliseconds);
+                Logging.LogInfo("Optimised query is: {0}", query.ToString());
+            }
 
             var queryHandler = new SparqlQueryHandler(targetFormat, defaultGraphUris);
             // NOTE: streamWriter is not wrapped in a using because we don't want to close resultStream at this point

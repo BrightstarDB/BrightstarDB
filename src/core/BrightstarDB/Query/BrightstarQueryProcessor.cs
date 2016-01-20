@@ -15,6 +15,7 @@ namespace BrightstarDB.Query
 
         static BrightstarQueryProcessor()
         {
+            SparqlOptimiser.QueryOptimiser = new NoReorderOptimiser();
             SparqlOptimiser.AddOptimiser(new VariableEqualsOptimizer());
             SparqlOptimiser.AddOptimiser(new JoinOptimiser());
         }

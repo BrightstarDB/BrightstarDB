@@ -209,7 +209,8 @@
     <Compile Include="Query\BrightstarRdfProvider.cs" />
     <Compile Include="Query\BrightstarVirtualAlgebraOptimiser.cs" />
     <Compile Include="Query\BrightstarVirtualNode.cs" />
-    <Compile Include="Query\BrightstarWeightedOptimiser.cs" />
+    <Compile Include="Query\Processor\BrightstarWeightedOptimiser.cs" />
+    <Compile Include="Query\Processor\BaseQueryOptimiser.cs" />
     <Compile Include="Query\Processor\JoinOptimiser.cs" />
     <Compile Include="Query\VirtualizingSparqlDataset.cs" />
     <Compile Include="RdfFormat.cs" />
