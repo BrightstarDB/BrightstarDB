@@ -19,7 +19,6 @@ namespace BrightstarDB.Query
         private readonly List<Uri> _defaultGraphUris;
         private readonly SparqlResultsFormat _sparqlResultsFormat = SparqlResultsFormat.Xml;
         private readonly RdfFormat _rdfFormat = RdfFormat.RdfXml;
-        private readonly IStoreStatistics _storeStatistics;
 
         public SparqlQueryHandler()
         {
@@ -36,8 +35,7 @@ namespace BrightstarDB.Query
         }
 
         public SparqlQueryHandler(ISerializationFormat targetFormat,
-                                  IEnumerable<string> defaultGraphUris,
-                                  IStoreStatistics storeStatistics = null)
+                                  IEnumerable<string> defaultGraphUris)
         {
             if (targetFormat is SparqlResultsFormat)
             {
@@ -51,7 +49,6 @@ namespace BrightstarDB.Query
             {
                 _defaultGraphUris = defaultGraphUris.Select(g => new Uri(g)).ToList();
             }
-            _storeStatistics = storeStatistics;
         }
 
         private static ISparqlDataset MakeDataset(IStore store)

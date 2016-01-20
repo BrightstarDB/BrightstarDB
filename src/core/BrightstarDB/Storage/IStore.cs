@@ -7,6 +7,7 @@ using BrightstarDB.Profiling;
 using BrightstarDB.Query;
 using BrightstarDB.Storage.BPlusTreeStore.ResourceIndex;
 using BrightstarDB.Storage.Persistence;
+using BrightstarDB.Storage.Statistics;
 using VDS.RDF.Query;
 
 namespace BrightstarDB.Storage
@@ -38,7 +39,7 @@ namespace BrightstarDB.Storage
         /// <param name="storeStatistics">OPTIONAL: A statistics object to use for query optimisation purposes.</param>
         /// <returns>The SPARQL query results in the requested format</returns>
         BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat,
-            Stream resultsStream, IEnumerable<string> defaultGraphUris = null, IStoreStatistics storeStatistics = null);
+            Stream resultsStream, IEnumerable<string> defaultGraphUris = null, StoreStatistics storeStatistics = null);
 
         /// <summary>
         /// Insert a triple into the store

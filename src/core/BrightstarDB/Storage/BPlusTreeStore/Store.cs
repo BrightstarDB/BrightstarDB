@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -13,6 +14,7 @@ using BrightstarDB.Storage.BPlusTreeStore.GraphIndex;
 using BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex;
 using BrightstarDB.Storage.BPlusTreeStore.ResourceIndex;
 using BrightstarDB.Storage.Persistence;
+using BrightstarDB.Storage.Statistics;
 using BrightstarDB.Utils;
 using VDS.RDF.Query;
 
@@ -98,9 +100,19 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         }
 
         public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream,
-            IEnumerable<string> defaultGraphUris, IStoreStatistics storeStatistics )
+            IEnumerable<string> defaultGraphUris, StoreStatistics storeStatistics )
         {
-            var queryHandler = new SparqlQueryHandler(targetFormat, defaultGraphUris, storeStatistics);
+            //if (storeStatistics != null)
+            //{
+            //    var sw = new Stopwatch();
+            //    sw.Start();
+            //    query.Optimise(new BrightstarWeightedOptimiser(storeStatistics));
+            //    sw.Stop();
+            //    Logging.LogInfo("Stats optimisation took {0}ms", sw.ElapsedMilliseconds);
+            //    Logging.LogInfo("Optimised query is: {0}", query.ToString());
+            //}
+
+            var queryHandler = new SparqlQueryHandler(targetFormat, defaultGraphUris);
             // NOTE: streamWriter is not wrapped in a using because we don't want to close resultStream at this point
             
             var streamWriter = new StreamWriter(resultsStream, targetFormat.Encoding);

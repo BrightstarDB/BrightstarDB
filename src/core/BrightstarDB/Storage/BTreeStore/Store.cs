@@ -9,6 +9,7 @@ using BrightstarDB.Query;
 using BrightstarDB.Rdf;
 using BrightstarDB.Storage.BPlusTreeStore.ResourceIndex;
 using BrightstarDB.Storage.Persistence;
+using BrightstarDB.Storage.Statistics;
 using VDS.RDF;
 using VDS.RDF.Query;
 using Triple = BrightstarDB.Model.Triple;
@@ -308,7 +309,7 @@ namespace BrightstarDB.Storage.BTreeStore
 
 
         public BrightstarSparqlResultsType ExecuteSparqlQuery(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream,
-                                                              IEnumerable<string> defaultGraphUris = null, IStoreStatistics storeStatistics = null)
+                                                              IEnumerable<string> defaultGraphUris = null, StoreStatistics storeStatistics = null)
         {
             throw new NotImplementedException();
         }

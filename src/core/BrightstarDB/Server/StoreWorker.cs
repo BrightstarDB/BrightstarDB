@@ -294,8 +294,8 @@ namespace BrightstarDB.Server
         {
             Logging.LogDebug("Query {0}", query);
             try
-            {
-                return ReadStore.ExecuteSparqlQuery(query, targetFormat, resultsStream, defaultGraphUris);
+            {                
+                return ReadStore.ExecuteSparqlQuery(query, targetFormat, resultsStream, defaultGraphUris, StoreStatistics.GetStatistics().FirstOrDefault());
             }
             catch (ReadWriteStoreModifiedException)
             {
