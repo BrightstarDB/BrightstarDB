@@ -132,6 +132,30 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
             return Scan(0ul, ulong.MaxValue, profiler).Select(entry => entry.Key);
         }
 
+        public Tuple<ulong, ulong> CountPredicateRelationshipsEx(ulong predicateId, BrightstarProfiler profiler)
+        {
+            PredicateRelatedResourceIndex predicateIndex = GetPredicateIndex(predicateId, profiler);
+            if (predicateIndex != null)
+            {
+                ulong relCount = 0;
+                ulong resourceCount = 0;
+                byte[] resourceId = new[]
+                {(byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
+                foreach (var entry in predicateIndex.Scan(MakePredicateIndexKey(0, 0, 0),
+                    MakePredicateIndexKey(ulong.MaxValue, int.MaxValue, ulong.MaxValue), profiler))
+                {
+                    if (!entry.Key.Skip(12).SequenceEqual(resourceId))
+                    {
+                        resourceCount++;
+                        Array.Copy(entry.Key, 12, resourceId, 0, 8);
+                    }
+                    relCount++;
+                }
+                return new Tuple<ulong, ulong>(relCount, resourceCount);
+            }
+            return new Tuple<ulong, ulong>(0UL, 0UL);
+        }
+
         public ulong CountPredicateRelationships(ulong predicateId, BrightstarProfiler profiler)
         {
             PredicateRelatedResourceIndex predicateIndex = GetPredicateIndex(predicateId, profiler);

@@ -146,6 +146,16 @@ namespace BrightstarDB.Storage
         ulong GetTripleCount(string predicateUri, BrightstarProfiler profiler = null);
 
         /// <summary>
+        /// Returns a 3-tuple giving the total # of statements with the specified predicate;
+        /// the total number of distint subjects of those statements and the total # of
+        /// distinct objects of thoe statements
+        /// </summary>
+        /// <param name="predicateUri"></param>
+        /// <param name="profiler"></param>
+        /// <returns></returns>
+        PredicateStatistics GetPredicateStatistics(string predicateUri, BrightstarProfiler profiler = null);
+
+        /// <summary>
         /// Preload data pages used by this store into the cache
         /// </summary>
         /// <param name="pagesToPreload">The maximum number of pages to load</param>

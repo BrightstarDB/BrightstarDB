@@ -66,6 +66,15 @@ namespace BrightstarDB.Storage.BPlusTreeStore.RelatedResourceIndex
         ulong CountPredicateRelationships(ulong predicateId, BrightstarProfiler profiler);
 
         /// <summary>
+        /// Returns a 2-tuple of the number of relationships in the index for the specified predicate
+        /// and the number of distinct key resource ids for the specified predicate
+        /// </summary>
+        /// <param name="predicateId"></param>
+        /// <param name="profiler"></param>
+        /// <returns></returns>
+        Tuple<ulong, ulong> CountPredicateRelationshipsEx(ulong predicateId, BrightstarProfiler profiler);
+
+        /// <summary>
         /// Enumerates all of the related resources stored for a single predicate
         /// </summary>
         /// <param name="predicateId"></param>

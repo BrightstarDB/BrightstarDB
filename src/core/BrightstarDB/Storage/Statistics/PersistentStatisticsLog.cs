@@ -46,10 +46,13 @@ namespace BrightstarDB.Storage.Statistics
                             var header = StoreStatisticsHeaderRecord.Load(headerReader);
                             recordStream.Seek(header.StartOffset, SeekOrigin.Begin); 
                             var recordReader = new StreamReader(recordStream);
-                            var record = StoreStatisticsRecord.Load(recordReader);
+                            var record = StoreStatisticsRecord.Load(recordReader, header.Version);
                             yield return
-                                new StoreStatistics(header.CommitNumber, header.Timestamp, record.TotalTripleCount,
-                                                    record.PredicateTripleCounts);
+                                record.PredicateStatistics != null
+                                    ? new StoreStatistics(header.CommitNumber, header.Timestamp, record.TotalTripleCount,
+                                        record.PredicateStatistics)
+                                    : new StoreStatistics(header.CommitNumber, header.Timestamp, record.TotalTripleCount,
+                                        record.PredicateTripleCounts);
                             offset -= StoreStatisticsHeaderRecord.RecordSize;
                         }
                     }
@@ -70,7 +73,7 @@ namespace BrightstarDB.Storage.Statistics
                 {
                     var recordStart = recordWriter.BaseStream.Position;
                     var record = new StoreStatisticsRecord(statistics.CommitNumber, statistics.TripleCount,
-                                                           statistics.PredicateTripleCounts);
+                                                           statistics.PredicateStatistics);
                     var header = new StoreStatisticsHeaderRecord(statistics.CommitNumber, statistics.CommitTime,
                                                                  recordStart);
                     record.Save(recordWriter);

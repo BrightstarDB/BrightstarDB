@@ -7,6 +7,18 @@ using VDS.RDF.Query.Patterns;
 
 namespace BrightstarDB.Query.Processor
 {
+    /* TODO:
+        This still produces some suboptimal (even harmful) triple pattern orderings.
+        It looks like the problem is that the ordering here treats each pattern independently
+        rather than taking into account variables that are bound by preceeding triple patterns
+        in the same BGP.
+        The solution could be to first find the triple pattern that is the most specific,
+        and then incrementally select the most specific of the remaining patterns given the
+        variables bound in the previous ones.
+        This would be a completely different approach to the DNR BaseQueryOptimiser.
+    */
+
+
     /// <summary>
     /// Code based on the dotNetRDF WeightedOptimiser to perform triple pattern reordering based on computed pattern weight,
     /// using an IStoreStatistics object to provide predicate counts
@@ -56,7 +68,7 @@ namespace BrightstarDB.Query.Processor
 
     internal class StoreWeightings
     {
-        private readonly Dictionary<string, ulong> _predicateWeightings = new Dictionary<string, ulong>();
+        private StoreStatistics _statistics;
 
         private double _defSubjWeight = WeightedOptimiser.DefaultSubjectWeight;
         private double _defPredWeight = WeightedOptimiser.DefaultPredicateWeight;
@@ -66,40 +78,50 @@ namespace BrightstarDB.Query.Processor
         public StoreWeightings(StoreStatistics s)
         {
             if (s == null) return;
-
-            foreach (var entry in s.PredicateTripleCounts)
-            {
-                SetPredicateCount(entry.Key, entry.Value);
-            }
-        }
-
-
-        public void SetPredicateCount(string uri, ulong count)
-        {
-            ulong current;
-            if (_predicateWeightings.TryGetValue(uri, out current))
-            {
-                _predicateWeightings[uri] = Math.Max(current, count);
-            }
-            else
-            {
-                _predicateWeightings.Add(uri, count);
-            }
+            _statistics = s;
         }
 
 
         public double PredicateWeighting(INode n)
         {
             var u = n as IUriNode;
-            ulong temp = 1;
-            if (u != null && _predicateWeightings.TryGetValue(u.Uri.ToString(), out temp))
+            PredicateStatistics temp;
+            if (u != null && _statistics.PredicateStatistics.TryGetValue(u.Uri.ToString(), out temp))
             {
-                temp = Math.Max(1, temp);
-                return 1d - (1d/temp);
+                return (double)temp.TripleCount/_statistics.TripleCount;
             }
             else
             {
-                return 1d - this._defPredWeight;
+                // Note: this assumes stats are complete and therefore this predicate will never match
+                return 0d;
+            }
+        }
+
+        public double PredicateObjectWeighting(INode n)
+        {
+            var u = n as IUriNode;
+            PredicateStatistics temp;
+            if (u != null && _statistics.PredicateStatistics.TryGetValue(u.Uri.ToString(), out temp))
+            {
+                return (temp.ObjectPredicateTripleCount) / _statistics.TripleCount;
+            }
+            else
+            {
+                return 0d;
+            }
+        }
+
+        public double PredicateSubjectWeighting(INode n)
+        {
+            var u = n as IUriNode;
+            PredicateStatistics temp;
+            if (u != null && _statistics.PredicateStatistics.TryGetValue(u.Uri.ToString(), out temp))
+            {
+                return temp.SubjectPredicateTripleCount / _statistics.TripleCount;
+            }
+            else
+            {
+                return 0d;
             }
         }
 
@@ -167,8 +189,9 @@ namespace BrightstarDB.Query.Processor
                 //Fall back to standard ordering if selectivities are equal
                 c = x.CompareTo(y);
             }
-
+#if DEBUG
             Logging.LogInfo("Compare: {0}[{1}] - {2}[{3}] = {4}", x.ToString(), xSel, y.ToString(), ySel, c);
+#endif
             return c;
         }
 
@@ -181,14 +204,13 @@ namespace BrightstarDB.Query.Processor
                     switch (p.IndexType)
                     {
                         case TripleIndexType.NoVariables:
-                            subj = this._weights.SubjectWeighting(((NodeMatchPattern) p.Subject).Node);
-                            pred = this._weights.PredicateWeighting(((NodeMatchPattern) p.Predicate).Node);
-                            obj = this._weights.ObjectWeighting(((NodeMatchPattern) p.Object).Node);
+                            // Most selective
+                            subj = pred = obj = 0d;
                             break;
                         case TripleIndexType.Object:
                             subj = this._weights.DefaultVariableWeighting;
                             pred = this._weights.DefaultVariableWeighting;
-                            obj = this._weights.ObjectWeighting(((NodeMatchPattern) p.Object).Node);
+                            obj = this._weights.DefaultObjectWeighting;
                             break;
                         case TripleIndexType.Predicate:
                             subj = this._weights.DefaultVariableWeighting;
@@ -197,22 +219,22 @@ namespace BrightstarDB.Query.Processor
                             break;
                         case TripleIndexType.PredicateObject:
                             subj = this._weights.DefaultVariableWeighting;
-                            pred = this._weights.PredicateWeighting(((NodeMatchPattern) p.Predicate).Node);
-                            obj = this._weights.ObjectWeighting(((NodeMatchPattern) p.Object).Node);
+                            pred = this._weights.PredicateObjectWeighting(((NodeMatchPattern) p.Predicate).Node);
+                            obj = 1d;
                             break;
                         case TripleIndexType.Subject:
-                            subj = this._weights.SubjectWeighting(((NodeMatchPattern) p.Subject).Node);
+                            subj = this._weights.DefaultSubjectWeighting;
                             pred = this._weights.DefaultVariableWeighting;
                             obj = this._weights.DefaultVariableWeighting;
                             break;
                         case TripleIndexType.SubjectObject:
-                            subj = this._weights.SubjectWeighting(((NodeMatchPattern) p.Subject).Node);
+                            subj = this._weights.DefaultSubjectWeighting;
                             pred = this._weights.DefaultVariableWeighting;
-                            obj = this._weights.PredicateWeighting(((NodeMatchPattern) p.Object).Node);
+                            obj = this._weights.DefaultObjectWeighting;
                             break;
                         case TripleIndexType.SubjectPredicate:
-                            subj = this._weights.SubjectWeighting(((NodeMatchPattern) p.Subject).Node);
-                            pred = this._weights.PredicateWeighting(((NodeMatchPattern) p.Predicate).Node);
+                            subj = 1d;
+                            pred = this._weights.PredicateSubjectWeighting(((NodeMatchPattern) p.Predicate).Node);
                             obj = this._weights.DefaultVariableWeighting;
                             break;
                         default:

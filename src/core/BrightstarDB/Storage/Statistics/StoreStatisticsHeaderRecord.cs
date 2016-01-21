@@ -24,7 +24,7 @@ namespace BrightstarDB.Storage.Statistics
         private StoreStatisticsHeaderRecord() {  }
         public int Save(BinaryWriter dataStream)
         {
-            dataStream.Write(1);
+            dataStream.Write(2);
             dataStream.Write(CommitNumber);
             dataStream.Write(Timestamp.Ticks);
             dataStream.Write(StartOffset);
@@ -44,7 +44,7 @@ namespace BrightstarDB.Storage.Statistics
         private void Read(BinaryReader dataStream)
         {
             Version = dataStream.ReadInt32();
-            if (Version == 1)
+            if (Version == 1 || Version == 2)
             {
                 CommitNumber = dataStream.ReadUInt64();
                 Timestamp = new DateTime(dataStream.ReadInt64());

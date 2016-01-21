@@ -16,14 +16,14 @@ namespace BrightstarDB.Server
             try
             {
                 var jobStatus = StoreWorker.GetJobStatus(JobId.ToString());
-                var predicateTripleCounts = new Dictionary<string, ulong>();
+                var predicateStatistics = new Dictionary<string, PredicateStatistics>();
                 ulong totalTripleCount = 0;
                 var predicates = StoreWorker.ReadStore.GetPredicates().ToList();
                 for (var i = 0; i < predicates.Count; i++)
                 {
-                    var tripleCount = StoreWorker.ReadStore.GetTripleCount(predicates[i]);
-                    totalTripleCount += tripleCount;
-                    predicateTripleCounts[predicates[i]] = tripleCount;
+                    var stats = StoreWorker.ReadStore.GetPredicateStatistics(predicates[i]);
+                    totalTripleCount += stats.TripleCount;
+                    predicateStatistics[predicates[i]] = stats;
                     jobStatus.Information =
                         string.Format("Count completed for {0}/{1} predicates. Approximately {2:P1} percent complete",
                                       i + 1, predicates.Count, (i + 1.0)/predicates.Count);
@@ -34,7 +34,7 @@ namespace BrightstarDB.Server
                     new StoreStatistics(
                         currentCommitPoint.LocationOffset,
                         currentCommitPoint.CommitTime, totalTripleCount,
-                        predicateTripleCounts));
+                        predicateStatistics));
             }
             catch (Exception ex)
             {

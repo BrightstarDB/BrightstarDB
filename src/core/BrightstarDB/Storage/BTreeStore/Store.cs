@@ -678,6 +678,11 @@ namespace BrightstarDB.Storage.BTreeStore
             throw new NotImplementedException();
         }
 
+        public PredicateStatistics GetPredicateStatistics(string predicateUri, BrightstarProfiler profiler = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public void WarmupPageCache(int pagesToPreload, BrightstarProfiler profiler = null)
         {
             throw new NotImplementedException();

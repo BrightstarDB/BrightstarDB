@@ -113,7 +113,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 expressionFactories.Add(new BrightstarFunctionFactory());
                 parser.ExpressionFactories = expressionFactories;
                 parser.QueryOptimiser = new BrightstarWeightedOptimiser(storeStatistics);
-                parser.Parse(new StringReader(query.ToString()));
+                query = parser.Parse(new StringReader(query.ToString()));
                 sw.Stop();
                 Logging.LogInfo("Stats optimisation took {0}ms", sw.ElapsedMilliseconds);
                 Logging.LogInfo("Optimised query is: {0}", query.ToString());
@@ -489,6 +489,15 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             var predicateId = _resourceIndex.GetResourceId(_prefixManager.MakePrefixedUri(predicateUri));
             if (predicateId == StoreConstants.NullUlong) return 0L;
             return _subjectRelatedResourceIndex.CountPredicateRelationships(predicateId, profiler);
+        }
+
+        public PredicateStatistics GetPredicateStatistics(string predicateUri, BrightstarProfiler profiler = null)
+        {
+            var prediateId = _resourceIndex.GetResourceId(_prefixManager.MakePrefixedUri(predicateUri));
+            if (prediateId == StoreConstants.NullUlong) return new PredicateStatistics(0UL, 0UL, 0UL);
+            var subjCount = _subjectRelatedResourceIndex.CountPredicateRelationshipsEx(prediateId, profiler);
+            var objCount = _objectRelatedResourceIndex.CountPredicateRelationshipsEx(prediateId, profiler);
+            return new PredicateStatistics(subjCount.Item1, subjCount.Item2, objCount.Item2);
         }
 
         public void WarmupPageCache(int pagesToPreload, BrightstarProfiler profiler = null)

@@ -749,7 +749,7 @@ namespace BrightstarDB.Client
                             CommitId = s.CommitNumber,
                             CommitTimestamp = s.CommitTime,
                             TotalTripleCount = s.TripleCount,
-                            PredicateTripleCounts = s.PredicateTripleCounts
+                            PredicateTripleCounts = s.PredicateStatistics.ToDictionary(x=>x.Key, x=>x.Value.TripleCount),
                         }
                     ).FirstOrDefault();
             }
@@ -788,7 +788,7 @@ namespace BrightstarDB.Client
                                           CommitId = s.CommitNumber,
                                           CommitTimestamp = s.CommitTime,
                                           TotalTripleCount = s.TripleCount,
-                                          PredicateTripleCounts = s.PredicateTripleCounts
+                                          PredicateTripleCounts = s.PredicateStatistics.ToDictionary(x=>x.Key, x=>x.Value.TripleCount)
                                       }).Cast<IStoreStatistics>();
                 // ReSharper restore RedundantEnumerableCastCall
             }
