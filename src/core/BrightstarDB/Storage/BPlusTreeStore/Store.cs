@@ -28,6 +28,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
         private IPageStoreRelatedResourceIndex _objectRelatedResourceIndex;
         private IPageStorePrefixManager _prefixManager;
         private readonly IResourceTable _resourceTable;
+        private LruCache<string, Tuple<ulong, ulong, ulong, int>[]> _bindingCache;
 
         public Store(string storeLocation, IPageStore dataPageStore, IResourceTable resourceTable, ulong storePageId, BrightstarProfiler profiler)
         {
@@ -38,6 +39,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                 _resourceTable = resourceTable;
                 var storePage = _pageStore.Retrieve(storePageId, profiler);
                 Load(storePage, profiler);
+                _bindingCache = new LruCache<string, Tuple<ulong, ulong, ulong, int>[]>(1000);
             }
         }
 
@@ -51,6 +53,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             _prefixManager = new PrefixManager(_pageStore);
             _resourceTable = resourceTable;
             _resourceIndex = new ResourceIndex.ResourceIndex(1, _pageStore, _resourceTable);
+            _bindingCache = new LruCache<string, Tuple<ulong, ulong, ulong, int>[]>(1000);
         }
 
         #region Implementation of IStore
@@ -708,7 +711,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             if (oid == StoreConstants.NullUlong && !String.IsNullOrEmpty(obj)) return new Tuple<ulong, ulong, ulong, int>[0];
             if (gids.Count == 0) return new Tuple<ulong, ulong, ulong, int>[0];
 
-            return Bind(sid, pid, oid, gids);
+            return GetBindings(sid, pid, oid, gids);
         }
 
         public IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(ulong? subjNodeId, string subjValue, ulong? predNodeId, string predValue, ulong? objNodeId,
@@ -727,10 +730,32 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             if (oid == StoreConstants.NullUlong && !String.IsNullOrEmpty(objValue)) return new Tuple<ulong, ulong, ulong, int>[0];
             if (gids.Count == 0) return new Tuple<ulong, ulong, ulong, int>[0];
 
-            return Bind(sid, pid, oid, gids);
+            return GetBindings(sid, pid, oid, gids);
+        }
+
+        private IEnumerable<Tuple<ulong, ulong, ulong, int>> GetBindings(ulong sid, ulong pid, ulong oid, List<int> gids)
+        {
+            var cacheKey = CreateBindingCacheKey(sid, pid, oid, gids);
+            Tuple<ulong, ulong, ulong, int>[] cachedResult;
+            if (!_bindingCache.TryLookup(cacheKey, out cachedResult))
+            {
+                cachedResult = Bind(sid, pid, oid, gids).ToArray();
+                _bindingCache.InsertOrUpdate(cacheKey, cachedResult);
+            }
+            return cachedResult;
         }
 
         #region Triple Pattern Binding
+
+        private string CreateBindingCacheKey(ulong s, ulong p, ulong o, List<int> gids)
+        {
+            var triple_key = string.Join("_", s, p, o);
+            gids.Sort();
+            var graph_key = string.Join("_", gids);
+
+            return triple_key + ":" + graph_key;
+        }
+
         private IEnumerable<Tuple<ulong, ulong, ulong, int>> Bind(ulong s = StoreConstants.NullUlong, ulong p = StoreConstants.NullUlong,
                                                                     ulong o = StoreConstants.NullUlong,
                                                                     List<int> graphs = null)
