@@ -51,6 +51,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
@@ -59,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppendOnlyStorageStressTest.cs" />
+    <Compile Include="PageCachePerformance.cs" />
     <Compile Include="RewriteStorageStressTest.cs" />
     <Compile Include="Model\IArticle.cs" />
     <Compile Include="Model\IDepartment.cs" />
@@ -81,6 +83,9 @@
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="data\samples.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Model\MyEntityContext.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
