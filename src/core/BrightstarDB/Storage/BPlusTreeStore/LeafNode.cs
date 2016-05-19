@@ -48,6 +48,10 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 #if DEBUG_BTREE
             _config.BTreeDebug("+Leaf2 {0}", _page.Id);
 #endif
+            if (_keyCount > _config.LeafLoadFactor)
+            {
+                throw new BrightstarInternalException($"Problem at leaf node {page.Id} - key count ({_keyCount}) exceeds load factor ({_config.LeafLoadFactor}).");
+            }
         }
 
         public LeafNode(IPage page, ulong prevPointer, ulong nextPointer,
@@ -72,6 +76,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 #if DEBUG_BTREE
             _config.BTreeDebug("+Leaf3 {0}", _page.Id);
 #endif
+            if (_keyCount > _config.LeafLoadFactor)
+            {
+                throw new Exception($"Problem at leaf node {page.Id} - key count ({_keyCount}) exceeds load factor ({_config.LeafLoadFactor}).");
+            }
+
         }
 
         public ulong Prev
