@@ -654,6 +654,12 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 #if DEBUG
             if (ret == null && resourceId != StoreConstants.NullUlong)
             {
+                // Try again for the debugger...
+                ret = _resourceIndex.GetResource(resourceId);
+                if (ret != null)
+                {
+                    return ret;
+                }
                 throw new Exception(String.Format("Could not resolve resource id {0}", resourceId));
             }
 #endif

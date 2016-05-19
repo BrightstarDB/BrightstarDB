@@ -15,15 +15,19 @@ namespace BrightstarDB.Storage.Persistence
         public bool IsWriteable { get; private set; }
         private readonly int _nominalPageSize;
 
+        private static readonly object LoadLock = new object();
+
         public BinaryFilePage(Stream inputStream, ulong pageId, int nominalPageSize, ulong currentTxnId, bool isWriteable)
         {
             _nominalPageSize = nominalPageSize;
             Id = pageId;
-            long startOffset = nominalPageSize*2*((long) pageId - 1);
-            long seekOffset = startOffset - inputStream.Position;
-            inputStream.Seek(seekOffset, SeekOrigin.Current);
-            var pages = new byte[nominalPageSize*2];
-            inputStream.Read(pages, 0, nominalPageSize*2);
+            var pages = new byte[nominalPageSize * 2];
+            var startOffset = nominalPageSize*2*((long) pageId - 1);
+            lock (LoadLock)
+            {
+                inputStream.Seek(startOffset, SeekOrigin.Begin);
+                inputStream.Read(pages, 0, nominalPageSize*2);
+            }
             FirstTransactionId = BitConverter.ToUInt64(pages, 0);
             SecondTransactionId = BitConverter.ToUInt64(pages, nominalPageSize);
             FirstBuffer = new byte[nominalPageSize-8];
@@ -51,6 +55,21 @@ namespace BrightstarDB.Storage.Persistence
             Logging.LogDebug("BinaryFilePage: Create {0} [{1}|{2}] @ txn {3}", Id, FirstTransactionId, SecondTransactionId, currentTxnId);
         }
 
+        private BinaryFilePage(BinaryFilePage readOnlyPage, ulong writeTxnId)
+        {
+            _nominalPageSize = readOnlyPage._nominalPageSize;
+            Id = readOnlyPage.Id;
+            FirstTransactionId = readOnlyPage.FirstTransactionId;
+            SecondTransactionId = readOnlyPage.SecondTransactionId;
+            FirstBuffer = new byte[_nominalPageSize-8];
+            SecondBuffer = new byte[_nominalPageSize-8];
+            Array.Copy(readOnlyPage.FirstBuffer, FirstBuffer, _nominalPageSize-8);
+            Array.Copy(readOnlyPage.SecondBuffer, SecondBuffer, _nominalPageSize-8);
+            _MakeWriteable(writeTxnId);
+            Logging.LogDebug("BinaryFilePage: Create writeable copy {0} [{1}|{2}] @ {3}", Id, FirstTransactionId, SecondTransactionId, writeTxnId);
+        }
+
+
         public byte[] GetCurrentBuffer(ulong currentTransactionId)
         {
             if (FirstTransactionId > currentTransactionId && SecondTransactionId > currentTransactionId)
@@ -75,15 +94,20 @@ namespace BrightstarDB.Storage.Persistence
             return FirstBuffer;
         }
 
-        public void MakeWriteable(ulong writeTransactionId)
+        public BinaryFilePage MakeWriteable(ulong writeTransactionId)
         {
-            if (IsWriteable) return;
+            return IsWriteable ? this : new BinaryFilePage(this, writeTransactionId);
+        }
+
+        private void _MakeWriteable(ulong writeTransactionId)
+        {
+
             var readTransactionId = writeTransactionId - 1;
             byte[] srcBuffer, destBuffer;
             if (FirstTransactionId > readTransactionId && SecondTransactionId > readTransactionId)
             {
                 // This is an error condition that can happen if a store is kept open while two successive writes are committed
-                throw new ReadWriteStoreModifiedException();                
+                throw new ReadWriteStoreModifiedException();
             }
 
             // Figure out which buffer we will write to and update its transaction id
@@ -113,7 +137,7 @@ namespace BrightstarDB.Storage.Persistence
                     SecondTransactionId = writeTransactionId;
                 }
             }
-            
+
             // Figure out which way round to do the copy
             if (FirstTransactionId == writeTransactionId)
             {
@@ -133,7 +157,8 @@ namespace BrightstarDB.Storage.Persistence
                 IsWriteable = true;
             }
 
-            Logging.LogDebug("BinaryFilePage: MakeWriteable {0} [{1}|{2}] @ writeTxn {3}", Id, FirstTransactionId, SecondTransactionId, writeTransactionId);
+            Logging.LogDebug("BinaryFilePage: MakeWriteable {0} [{1}|{2}] @ writeTxn {3}", Id, FirstTransactionId,
+                SecondTransactionId, writeTransactionId);
         }
 
         public byte[] Data { get; private set; }
