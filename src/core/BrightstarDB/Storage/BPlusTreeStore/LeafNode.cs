@@ -78,7 +78,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
 #endif
             if (_keyCount > _config.LeafLoadFactor)
             {
-                throw new Exception($"Problem at leaf node {page.Id} - key count ({_keyCount}) exceeds load factor ({_config.LeafLoadFactor}).");
+                throw new BrightstarInternalException($"Problem at leaf node {page.Id} - key count ({_keyCount}) exceeds load factor ({_config.LeafLoadFactor}).");
             }
 
         }
