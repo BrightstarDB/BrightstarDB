@@ -236,8 +236,9 @@ namespace BrightstarDB.Storage.Persistence
             {
                 return p;
             }
-            p.MakeWriteable(commitId);
-            return p;
+            var writeable = p.MakeWriteable(commitId);
+            PageCache.Instance.InsertOrUpdate(_partitionId, writeable);
+            return writeable;
         }
 
         public void Close()
@@ -347,7 +348,7 @@ namespace BrightstarDB.Storage.Persistence
 
         private void UpdatePartitionId()
         {
-            _partitionId = _filePath + "." + (CanWrite ? _writeTxnId : _readTxnId);
+            _partitionId = _filePath + "." + (CanWrite ? ("w" + _writeTxnId) : _readTxnId.ToString());
         }
 
         private void OpenInputStream()
