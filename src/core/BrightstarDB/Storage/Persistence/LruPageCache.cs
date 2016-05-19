@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using BrightstarDB.Utils;
 
 namespace BrightstarDB.Storage.Persistence
 {
@@ -16,7 +18,10 @@ namespace BrightstarDB.Storage.Persistence
 
         private readonly Dictionary<string, LinkedListNode<KeyValuePair<string, IPageCacheItem>>> _cacheItems;
         private readonly LinkedList<KeyValuePair<string, IPageCacheItem>> _accessList;
- 
+#if DEBUG
+        private readonly Dictionary<string, byte[]> _itemHashes;
+#endif
+
         public event PreEvictionDelegate BeforeEvict;
         public event PostEvictionDelegate AfterEvict;
         public event EvictionCompletedDelegate EvictionCompleted;
@@ -32,15 +37,22 @@ namespace BrightstarDB.Storage.Persistence
             _lowWaterMark = (int) (limit*0.80);
             _cacheItems = new Dictionary<string, LinkedListNode<KeyValuePair<string, IPageCacheItem>>>(limit);
             _accessList = new LinkedList<KeyValuePair<string, IPageCacheItem>>();
+#if DEBUG
+            _itemHashes = new Dictionary<string, byte[]>();
+#endif
         }
 
         public void InsertOrUpdate(string partition, IPageCacheItem page)
         {
             var cacheKey = MakeCacheKey(partition, page.Id);
             var cacheEntry = new KeyValuePair<string, IPageCacheItem>(partition, page);
+
             LinkedListNode<KeyValuePair<string, IPageCacheItem>> cacheNode;
             lock (_updateLock)
             {
+#if DEBUG
+                _itemHashes[cacheKey] = CalculateHash(page);
+#endif
                 if (_cacheItems.TryGetValue(cacheKey, out cacheNode))
                 {
                     cacheNode.Value = cacheEntry;
@@ -84,6 +96,9 @@ namespace BrightstarDB.Storage.Persistence
                 LinkedListNode<KeyValuePair<string, IPageCacheItem>> cacheNode;
                 if (_cacheItems.TryGetValue(cacheKey, out cacheNode))
                 {
+#if DEBUG
+                    ValidateHash(cacheNode, cacheKey);
+#endif
                     _accessList.Remove(cacheNode);
                     _accessList.AddFirst(cacheNode);
                     return cacheNode.Value.Value;
@@ -91,6 +106,7 @@ namespace BrightstarDB.Storage.Persistence
             }
             return null;
         }
+
 
         public void Clear(string partition)
         {
@@ -236,7 +252,33 @@ namespace BrightstarDB.Storage.Persistence
             return String.Format("{0}:{1}", partition, pageId);
         }
 
+#if DEBUG // Support methods for cache page modification detection
 
+        private byte[] CalculateHash(IPageCacheItem cacheItem)
+        {
+            var page = cacheItem as IPage;
+            return page != null ? MD5.Create().ComputeHash(page.Data) : new byte[0];
+        }
+
+        private void ValidateHash(LinkedListNode<KeyValuePair<string, IPageCacheItem>> cacheNode, string cacheKey)
+        {
+            var valueHash = CalculateHash(cacheNode.Value.Value);
+            byte[] expectedHash;
+            if (!_itemHashes.TryGetValue(cacheKey, out expectedHash))
+            {
+                throw new Exception($"Did not find entry in the hash table for key {cacheKey}");
+            }
+            if (expectedHash.Compare(valueHash) != 0)
+            {
+                var page = cacheNode.Value.Value as IPage;
+                if (page != null && !page.IsDirty)
+                {
+                    throw new Exception(
+                        $"Content hash code has changed since last cache insert/update for key {cacheKey} and page is not marked as dirty");
+                }
+            }
+        }
+#endif
     }
 
 }
