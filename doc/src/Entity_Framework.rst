@@ -1215,10 +1215,10 @@ and cannot be used to modify the return value. For example you can test that
 +-----------------------------------------+--------------------------------------------------+
 | p0.EndsWith(string s)                   | STRENDS(p0, s)                                   |
 +-----------------------------------------+--------------------------------------------------+
-| p0.StartsWith(string s, bool ignoreCase,| REGEX(p0, s + "$", "i") if ignoreCase is true;   |
+| p0.EndsWith(string s, bool ignoreCase,  | REGEX(p0, s + "$", "i") if ignoreCase is true;   |
 |  CultureInfo culture)                   | STRENDS(p0, s) if ignoreCase is false            |
 +-----------------------------------------+--------------------------------------------------+
-| p0.StartsWith(string s, StringComparison| REGEX(p0, s + "$", "i") if comparisonOptions is  |
+| p0.EndsWith(string s, StringComparison  | REGEX(p0, s + "$", "i") if comparisonOptions is  |
 |  comparisonOptions)                     | StringComparison.CurrentCultureIgnoreCase,       |
 |                                         | StringComparison.InvariantCultureIgnoreCase or   |
 |                                         | StringComparison.OrdinalIgnoreCase;              |
