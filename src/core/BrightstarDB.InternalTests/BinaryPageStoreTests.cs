@@ -61,7 +61,7 @@ namespace BrightstarDB.InternalTests
             byte[] pageData = MakeTestPage(1, 1, 0, 0);
             var ms = new MemoryStream(pageData);
             var p = new BinaryFilePage(ms, 1ul, 16, 2ul, false);
-            p.MakeWriteable(2ul);
+            p = p.MakeWriteable(2ul);
             // Data in first buffer should be copied to second buffer
             Assert.That(p.FirstTransactionId, Is.EqualTo(1ul));
             Assert.That(BitConverter.ToUInt64(p.FirstBuffer, 0), Is.EqualTo(1ul));
@@ -75,7 +75,7 @@ namespace BrightstarDB.InternalTests
             byte[] pageData = MakeTestPage(1, 1, 0, 0);
             var ms = new MemoryStream(pageData);
             var p = new BinaryFilePage(ms, 1ul, 16, 2ul, false);
-            p.MakeWriteable(2ul);
+            p = p.MakeWriteable(2ul);
             p.SetData(BitConverter.GetBytes(2ul));
             // Data should get written into the second buffer
             Assert.That(BitConverter.ToUInt64(p.SecondBuffer, 0), Is.EqualTo(2ul));
