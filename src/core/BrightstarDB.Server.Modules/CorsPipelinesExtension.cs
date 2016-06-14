@@ -18,6 +18,7 @@ namespace BrightstarDB.Server.Modules
             {
                 UpdateResponseHeaders(ctx.Request, ctx.Response, corsConfiguration);
             });
+
             pipelines.OnError.AddItemToEndOfPipeline((ctx, exception) =>
             {
                 if (exception == null)

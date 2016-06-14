@@ -74,11 +74,10 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
-        [ExpectedException(typeof (ArgumentNullException))]
         public void TestAddRaisesArgumentNullException()
         {
             var c = new TripleCollection();
-            c.Add(null);
+            Assert.Throws<ArgumentNullException>(()=>c.Add(null));
         }
 
         [Test]

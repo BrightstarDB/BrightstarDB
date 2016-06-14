@@ -43,7 +43,6 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
-        [ExpectedException(typeof(UniqueConstraintViolationException))]
         public void TestUniqueConstraintViolationThrownWhenKeyChanges()
         {
             using (var context = GetContext())
@@ -51,12 +50,11 @@ namespace BrightstarDB.Tests.EntityFramework
                 var entity1 = context.StringKeyEntities.Create();
                 entity1.Name = "A";
                 var entity2 = context.StringKeyEntities.Create();
-                entity2.Name = "A";
+                Assert.Throws<UniqueConstraintViolationException>(() => entity2.Name = "A");
             }
         }
 
         [Test]
-        [ExpectedException(typeof (UniqueConstraintViolationException))]
         public void TestUniqueConstraintViolationThrownWhenSavingChanges()
         {
             using (var context = GetContext())
@@ -70,7 +68,7 @@ namespace BrightstarDB.Tests.EntityFramework
             {
                 var entity2 = context.StringKeyEntities.Create();
                 entity2.Name = "B";
-                context.SaveChanges();
+                Assert.Throws<UniqueConstraintViolationException>(()=>context.SaveChanges());
             }
         }
     }

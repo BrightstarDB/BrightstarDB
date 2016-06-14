@@ -1,7 +1,10 @@
-﻿namespace BrightstarDB.InternalTests
+﻿using System.IO;
+using NUnit.Framework;
+
+namespace BrightstarDB.InternalTests
 {
     internal static class TestPaths
     {
-        public const string DataPath = "..\\..\\..\\BrightstarDB.Tests\\Data\\";
+        public static string DataPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "..\\..\\..\\BrightstarDB.Tests\\Data\\");
     }
 }

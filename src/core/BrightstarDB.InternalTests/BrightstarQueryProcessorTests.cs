@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace BrightstarDB.InternalTests
 {
     [TestFixture]
-    [Ignore]
+    [Ignore("")]
     public class BrightstarQueryProcessorTests
     {
         private readonly IStoreManager _storeManager;

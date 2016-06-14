@@ -786,7 +786,6 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
-        [ExpectedException(typeof(TransactionPreconditionsFailedException))]
         public void TestOptimisticLocking()
         {
             IDataObjectContext context = new EmbeddedDataObjectContext(new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation + "\\"));
@@ -816,7 +815,7 @@ namespace BrightstarDB.InternalTests
             store1.SaveChanges();
 
             e2.SetProperty("http://www.np.com/types/label", "gra");
-            store2.SaveChanges();
+            Assert.Throws<TransactionPreconditionsFailedException>(() => store2.SaveChanges());
         }
 
         [Test]

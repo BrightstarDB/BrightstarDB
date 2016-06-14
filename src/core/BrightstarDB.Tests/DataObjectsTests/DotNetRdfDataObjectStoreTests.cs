@@ -12,19 +12,17 @@ namespace BrightstarDB.Tests.DataObjectsTests
     public class DotNetRdfDataObjectStoreTests
     {
         [Test]
-        [ExpectedException(typeof(FormatException))]
         public void TestDnrConnectionRequiresConfigurationProperty()
         {
-            BrightstarService.GetDataObjectContext("type=dotnetrdf;storename=foo");
+            Assert.Throws<FormatException>(() => BrightstarService.GetDataObjectContext("type=dotnetrdf;storename=foo"));
         }
 
         [Test]
-        [ExpectedException(typeof(BrightstarClientException))]
         public void TestCannotInitializeBrightstarClientWithDnrConnection()
         {
-            var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
+            var configFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation + "dataObjectStoreConfig.ttl");
             var connectionString = "type=dotNetRdf;configuration=" + configFilePath + ";storeName=example";
-            BrightstarService.GetClient(connectionString);
+            Assert.Throws<BrightstarClientException>(() => BrightstarService.GetClient(connectionString));
         }
 
         [Test]
@@ -33,7 +31,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
 #endif
         public void TestInitializeFromInMemoryStore()
         {
-            var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
+            var configFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation + "dataObjectStoreConfig.ttl");
             var connectionString = "type=dotNetRdf;configuration=" + configFilePath;
             var namespaceMappings = new Dictionary<string, string>
                 {
@@ -56,7 +54,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
 #endif
         public void TestInitializeFromFusekiStorageProvider()
         {
-            var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
+            var configFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation + "dataObjectStoreConfig.ttl");
             var connectionString = "type=dotNetRdf;configuration=" + configFilePath;
             var doContext = BrightstarService.GetDataObjectContext(connectionString);
             Assert.That(doContext.DoesStoreExist("http://www.brightstardb.com/tests#fuseki"));
@@ -66,7 +64,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
         [Test]
         public void TestInitializeFromDnrSparqlEndpoints()
         {
-            var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
+            var configFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation + "dataObjectStoreConfig.ttl");
             var connectionString = "type=dotNetRdf;configuration=" + configFilePath +
                                    ";query=http://example.org/configuration#sparqlQuery;update=http://example.org/configuration#sparqlUpdate";
             var doContext = BrightstarService.GetDataObjectContext(connectionString);

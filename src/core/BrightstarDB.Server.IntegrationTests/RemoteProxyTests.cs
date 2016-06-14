@@ -297,9 +297,8 @@ namespace BrightstarDB.Server.IntegrationTests
         }
 
         [Test]
-        [Ignore]
         [Category("RemoteProxyTests")]
-        public void TestDataObjectFluids()
+        public void TestDataObjectFluentApi()
         {
             IDataObjectContext context = new RestDataObjectContext(_connectionString);
             var storeId = Guid.NewGuid().ToString();
@@ -323,7 +322,7 @@ namespace BrightstarDB.Server.IntegrationTests
                                         store.MakeDataObject("http://www.networkedplanet.com/companies/np")
                                             .SetProperty("rdfs:label", "Networked Planet")
                                      )
-                        .SetProperty("ont:email", new List<string> { "kal@networkedplanet.com" });
+                        .SetProperty("ont:email", "kal@networkedplanet.com");
 
             store.SaveChanges();
         }

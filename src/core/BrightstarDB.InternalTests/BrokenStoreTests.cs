@@ -18,7 +18,7 @@ namespace BrightstarDB.InternalTests
      */
     
     [TestFixture]
-    [Ignore]
+    [Ignore("This was a test to introspect backwards through a broken store. ")]
     public class BrokenStoreTests
     {
         private const string TestQuery =

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BrightstarDB.Client;
 using NUnit.Framework;
@@ -21,7 +22,7 @@ namespace BrightstarDB.InternalTests
         [TestFixtureSetUp]
         public void SetUp()
         {
-            _config = ConfigurationLoader.LoadConfiguration(TestConfiguration.DataLocation + "dataObjectStoreConfig.ttl");
+            _config = ConfigurationLoader.LoadConfiguration(Path.Combine(TestContext.CurrentContext.TestDirectory, TestConfiguration.DataLocation , "dataObjectStoreConfig.ttl"));
             ConfigurationLoader.PathResolver = new LocalPathResolver();
         }
 
@@ -162,7 +163,7 @@ namespace BrightstarDB.InternalTests
     {
         public string ResolvePath(string path)
         {
-            return System.IO.Path.GetFullPath(TestConfiguration.DataLocation + path);
+            return Path.Combine(TestContext.CurrentContext.TestDirectory, TestConfiguration.DataLocation + path);
         }
     }
 }

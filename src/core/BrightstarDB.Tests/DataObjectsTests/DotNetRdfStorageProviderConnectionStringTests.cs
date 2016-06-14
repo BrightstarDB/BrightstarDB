@@ -1,4 +1,5 @@
-﻿using BrightstarDB.Client;
+﻿using System.IO;
+using BrightstarDB.Client;
 using NUnit.Framework;
 
 namespace BrightstarDB.Tests.DataObjectsTests
@@ -10,7 +11,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
         public void TestCanConnectToConfiguredStorageProvider()
         {
             var doContext =
-                BrightstarService.GetDataObjectContext("type=dotNetRdf;configuration=" + Configuration.DataLocation +
+                BrightstarService.GetDataObjectContext("type=dotNetRdf;configuration=" + Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation) +
                                                        "dataObjectStoreConfig.ttl");
             // Configuration contains a single store
             var store = doContext.OpenStore("http://www.brightstardb.com/tests#people");
@@ -18,21 +19,18 @@ namespace BrightstarDB.Tests.DataObjectsTests
         }
 
         [Test]
-        [ExpectedException(typeof(BrightstarClientException), 
-            ExpectedMessage = "The store 'http://www.brightstardb.com/tests#peopleStore' does not exist or cannot be accessed.")]
         public void TestConnectToInvalidResourceThrowsException()
         {
-            var doContext = BrightstarService.GetDataObjectContext("type=dotNetRdf;configuration=" + Configuration.DataLocation +
+            var doContext = BrightstarService.GetDataObjectContext("type=dotNetRdf;configuration=" + Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation) +
                                                                    "dataObjectStoreConfig.ttl");
-
-            doContext.OpenStore("http://www.brightstardb.com/tests#peopleStore");
+            Assert.Throws<BrightstarClientException>(()=> doContext.OpenStore("http://www.brightstardb.com/tests#peopleStore"), "The store 'http://www.brightstardb.com/tests#peopleStore' does not exist or cannot be accessed.");
         }
 
         [Test]
         public void TestBasicConfigurationDoesStoreExist()
         {
             var doContext =
-                BrightstarService.GetDataObjectContext("type=dotNetRdf;configuration=" + Configuration.DataLocation +
+                BrightstarService.GetDataObjectContext("type=dotNetRdf;configuration=" + Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation) +
                                                        "dataObjectStoreConfig.ttl");
             // Configuration contains a single store
             Assert.IsTrue(doContext.DoesStoreExist("http://www.brightstardb.com/tests#people"));
@@ -49,7 +47,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
         public void TestConfigurationWithMultipleStores()
         {
             var doContext = BrightstarService.GetDataObjectContext(
-                "type=dotNetRdf;configuration=" + Configuration.DataLocation +
+                "type=dotNetRdf;configuration=" + Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation) +
                 "multipleObjectStoreConfiguration.ttl");
 
             Assert.IsTrue(doContext.DoesStoreExist("#emptyStore"));

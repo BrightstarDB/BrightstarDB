@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace BrightstarDB.Server.IntegrationTests
 {
     [TestFixture]
-    [Ignore]
+    [Ignore("")]
     public class RemoteScalingTests : ClientTestBase
     {
         private static string _importDirPath;

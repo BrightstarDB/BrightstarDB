@@ -296,7 +296,7 @@ namespace BrightstarDB.InternalTests.SparqlTestSuite {
 		}
 
 		[Test]
-        [Ignore]
+        [Ignore("")]
 		public void BasicTerm6() {
 	
 					ImportData(@"data-r2/basic/data-4.ttl");
@@ -309,7 +309,7 @@ namespace BrightstarDB.InternalTests.SparqlTestSuite {
 		}
 
 		[Test]
-        [Ignore]
+        [Ignore("")]
 		public void BasicTerm7() {
 	
 					ImportData(@"data-r2/basic/data-4.ttl");
@@ -465,7 +465,7 @@ namespace BrightstarDB.InternalTests.SparqlTestSuite {
 	
 		}
 
-		[Test, Ignore, Description("VariableEqualsOptimiser removes the static variable value from the results set")]
+		[Test, Ignore(""), Description("VariableEqualsOptimiser removes the static variable value from the results set")]
 		public void OpenEq05() {
 	
 					ImportData(@"data-r2/open-world/data-1.ttl");
@@ -591,8 +591,8 @@ namespace BrightstarDB.InternalTests.SparqlTestSuite {
          * expect it. This also affects OpenCmp01 and OpenCmp02 tests.
          */
 		[Test]
-        [Ignore]
-		public void Date3() {
+        [Ignore("Known to fail because date is compared to dateTime internally")]
+        public void Date3() {
 	
 					ImportData(@"data-r2/open-world/data-3.ttl");
 		

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
@@ -20,10 +21,10 @@ namespace BrightstarDB.Tests.EntityFramework
 
         private string GetConnectionString(string testName)
         {
-            return String.Format(_connectionStringTemplate,
-                                 Configuration.DataLocation,
-                                 Configuration.StoreLocation,
-                                 testName + "_" + DateTime.Now.Ticks);
+            return string.Format(_connectionStringTemplate,
+                Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation),
+                Configuration.StoreLocation,
+                testName + "_" + DateTime.Now.Ticks);
         }
 
         [Test]
@@ -560,7 +561,6 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void TestLinqFirstFail()
         {
             var connectionString = GetConnectionString("TestLinqFirstFail");
@@ -586,11 +586,14 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.IsNotNull(first);
             Assert.AreEqual("Annie", first.Name);
 
-            var notfound = context.Persons.Where(p => p.Name.Equals("Jo")).First();
-            Assert.IsNull(notfound);
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                var notfound = context.Persons.Where(p => p.Name.Equals("Jo")).First();
+                Assert.IsNull(notfound);
+            });
         }
 
-        [Ignore]
+        [Ignore("")]
         [Test]
         public void TestLinqGroupBy()
         {
@@ -1115,16 +1118,17 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void TestLinqSingleFail()
         {
             var connectionString = GetConnectionString("TestLinqSingleFail");
             var context = new MyEntityContext(connectionString);
-            var sod = context.TestEntities.Single();
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                var sod = context.TestEntities.Single();
+            });
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void TestLinqSingleFail2()
         {
             var connectionString = GetConnectionString("TestLinqSingleFail2");
@@ -1138,7 +1142,10 @@ namespace BrightstarDB.Tests.EntityFramework
             context.SaveChanges();
             Assert.AreEqual(10, context.TestEntities.Count());
 
-            var singleFail = context.TestEntities.Single();
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                var singleFail = context.TestEntities.Single();
+            });
         }
 
         [Test]
@@ -1173,7 +1180,6 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void TestLinqSingleOrDefaultFail()
         {
             var connectionString = GetConnectionString("TestLinqSingleOrDefaultFail");
@@ -1190,8 +1196,10 @@ namespace BrightstarDB.Tests.EntityFramework
             context.SaveChanges();
             Assert.AreEqual(10, context.TestEntities.Count());
 
-            var sod2 = context.TestEntities.SingleOrDefault();
-            
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                var sod2 = context.TestEntities.SingleOrDefault();
+            });
         }
 
         [Test]

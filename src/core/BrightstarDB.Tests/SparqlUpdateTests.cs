@@ -358,7 +358,9 @@ INSERT DATA
         {
 #if !WINDOWS_PHONE && !PORTABLE
             var storeName = CreateStore("TestGraphLoad");
-            var importFile = new FileInfo(Configuration.DataLocation+"simple.txt");
+            var importFile =
+                new FileInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation,
+                    "simple.txt"));
             Assert.IsTrue(importFile.Exists);
             var importUri = new Uri(importFile.FullName).ToString().Replace(" ", "%20");
 

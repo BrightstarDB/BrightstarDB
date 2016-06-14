@@ -33,10 +33,10 @@ namespace BrightstarDB.Tests
         }
 
         [Test]
-        [ExpectedException(typeof (RdfParseException))]
         public void TestEvaluateInvalidQueryThrowsRdfParseException()
         {
-            SparqlQueryHelper.GetResultModel("BAD SPARQL QUERY");
+            Assert.Throws<RdfParseException>(() =>
+                SparqlQueryHelper.GetResultModel("BAD SPARQL QUERY"));
         }
     }
 }

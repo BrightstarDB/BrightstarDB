@@ -52,7 +52,8 @@ namespace BrightstarDB.Tests
                 }
             }
 #else
-            var importFile = new FileInfo(Path.Combine(Configuration.DataLocation, testDataFileName));
+            
+            var importFile = new FileInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation, testDataFileName));
             var targetDir = new DirectoryInfo(Path.Combine(Configuration.StoreLocation, "import"));
             if (!targetDir.Exists)
             {
@@ -153,14 +154,13 @@ namespace BrightstarDB.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(BrightstarClientException))]
         public void TestCreateDuplicateStoreFails()
         {
 
             var bc = GetClient();
             var sid = Guid.NewGuid().ToString();
             bc.CreateStore(sid);
-            bc.CreateStore(sid);
+            Assert.Throws<BrightstarClientException>(() => bc.CreateStore(sid));
         }
 
         [Test]

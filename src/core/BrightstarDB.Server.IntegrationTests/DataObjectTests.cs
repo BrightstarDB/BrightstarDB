@@ -50,7 +50,6 @@ namespace BrightstarDB.Server.IntegrationTests
         }
 
         [Test]
-        [ExpectedException(typeof(BrightstarClientException))]
         public void TestGetHttpDataContextDeleteStore()
         {
             var context = GetContext();
@@ -60,7 +59,7 @@ namespace BrightstarDB.Server.IntegrationTests
             Assert.IsNotNull(store);
             context.DeleteStore(storeId);
             Thread.Sleep(1000); // Slight delay to allow time for the shutdown to be processed
-            context.OpenStore(storeId);
+            Assert.Throws<BrightstarClientException>(() => context.OpenStore(storeId));
         }
 
         [Test]

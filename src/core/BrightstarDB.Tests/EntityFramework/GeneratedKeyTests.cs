@@ -198,24 +198,26 @@ namespace BrightstarDB.Tests.EntityFramework
         }
 
         [Test]
-        [ExpectedException(typeof(EntityKeyRequiredException))]
         public void TestEntityKeyRequiredExceptionWhenIdIsNull()
         {
             using (var context = GetContext())
             {
                 var entity = new StringKeyEntity();
-                context.StringKeyEntities.Add(entity);
+                Assert.Throws<EntityKeyRequiredException>(() =>
+                    context.StringKeyEntities.Add(entity));
             }
         }
 
         [Test]
-        [ExpectedException(typeof (EntityKeyRequiredException))]
         public void TestEntityKeyRequiredExceptionWhenIdIsEmptyString()
         {
             using (var context = GetContext())
             {
-                var entity = new StringKeyEntity{Name=""};
-                context.StringKeyEntities.Add(entity);
+                Assert.Throws<EntityKeyRequiredException>(() =>
+                {
+                    var entity = new StringKeyEntity {Name = ""};
+                    context.StringKeyEntities.Add(entity);
+                });
             }
             
         }

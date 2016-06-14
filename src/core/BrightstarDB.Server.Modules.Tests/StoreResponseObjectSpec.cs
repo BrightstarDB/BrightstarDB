@@ -11,12 +11,19 @@ namespace BrightstarDB.Server.Modules.Tests
     [TestFixture]
     public class StoreResponseObjectSpec
     {
-        [TestCase(null, ExpectedException = typeof(ArgumentNullException))]
-        [TestCase("", ExpectedException = typeof(ArgumentException))]
-        [TestCase(" ", ExpectedException = typeof(ArgumentException))]
-        public StoreResponseModel TestConstructorThrowsOnInvalidInput(string storeName)
+        public void TestConstructorThrowsOnNullInput()
         {
-            return new StoreResponseModel(storeName);
+            Assert.Throws<ArgumentNullException>(() => new StoreResponseModel(null));
+        }
+
+        public void TestConstructorThrowsOnEmptyInput()
+        {
+            Assert.Throws<ArgumentException>(() => new StoreResponseModel(""));
+        }
+
+        public void TestConstructorThrowsOnWhitespaceInput()
+        {
+            Assert.Throws<ArgumentException>(() => new StoreResponseModel(" "));
         }
 
         [Test]

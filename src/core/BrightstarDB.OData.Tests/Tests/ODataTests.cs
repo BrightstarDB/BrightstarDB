@@ -258,7 +258,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
         #region Test Collections
 
-        [Ignore]
+        [Ignore("")]
         [Test]
         public void TestGetArticles()
         {
@@ -1182,7 +1182,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [Ignore] //unsupported
+        [Ignore("unsupported")]
         [Test]
         public void TestFilterMod()
         {
@@ -1302,7 +1302,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, results.Count(), "Expected number of entries not met");
         }
 
-        [Ignore] //unsupported
+        [Ignore("unsupported")]
         [Test]
         public void TestFilterStringIndexOf()
         {
@@ -1322,7 +1322,7 @@ namespace BrightstarDB.OData.Tests.Tests
         }
 
         [Test]
-        [Ignore] // BUG 5690 : Currently not working - may be a reflection provider issue
+        [Ignore("BUG 5690 : Currently not working - may be a reflection provider issue")]
         public void TestFilterStringReplace()
         {
             var doc = Get("Company");
@@ -1434,7 +1434,7 @@ namespace BrightstarDB.OData.Tests.Tests
 
         #endregion
 
-        [Ignore]
+        [Ignore("")]
         [Test]
         public void TestExpand()
         {
@@ -1463,7 +1463,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(5, persons.Count());
         }
 
-        [Ignore] //bug 5376 - [documented for now]
+        [Ignore("bug 5376 - [documented for now]")]
         [Test]
         public void TestExpand2()
         {
@@ -1501,7 +1501,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual(1, skills.Count());
         }
 
-        [Ignore]
+        [Ignore("")]
         [Test]
         public void TestSelect()
         {
@@ -1540,7 +1540,7 @@ namespace BrightstarDB.OData.Tests.Tests
             CheckProperties(item, expectedProperties);
         }
 
-        [Ignore]
+        [Ignore("")]
         [Test]
         public void TestSelectAndExpand()
         {
@@ -1879,7 +1879,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual("application/atom+xml", contentType);
         }
 
-        [Ignore] //not supported - bug 5328
+        [Ignore("not supported - bug 5328")]
         [Test]
         public void TestFormatJson()
         {
@@ -1900,7 +1900,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.IsNotNull(json);
         }
 
-        [Ignore] //not supported - bug 5328
+        [Ignore("not supported - bug 5328")]
         [Test]
         public void TestFormatXml()
         {
@@ -1914,7 +1914,7 @@ namespace BrightstarDB.OData.Tests.Tests
             Assert.AreEqual("application/xml", contentType);
         }
 
-        [Ignore]
+        [Ignore("")]
         [Test]
         public void TestFormatXmlUsingAcceptHeaders()
         {

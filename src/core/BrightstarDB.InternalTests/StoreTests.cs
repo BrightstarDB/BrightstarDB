@@ -1,4 +1,5 @@
-﻿using BrightstarDB.Storage;
+﻿using System.Security.Cryptography.X509Certificates;
+using BrightstarDB.Storage;
 using NUnit.Framework;
 
 namespace BrightstarDB.InternalTests
@@ -23,10 +24,9 @@ namespace BrightstarDB.InternalTests
         #endregion
 
         [Test]
-        [ExpectedException(typeof (StoreManagerException))]
         public override void TestOpenStoreFailure()
         {
-            base.TestOpenStoreFailure();
+            Assert.Throws<StoreManagerException>( () => base.TestOpenStoreFailure());
         }
 
         [Test]

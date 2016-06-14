@@ -35,7 +35,7 @@ namespace BrightstarDB.Tests
 #if PORTABLE
             using (var srcStream = _persistenceManager.GetInputStream(Configuration.DataLocation + testDataFileName))
             {
-                var targetDir = Path.Combine(Configuration.StoreLocation, "import");
+                var targetDir = Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.StoreLocation, "import");
                 var targetPath = Path.Combine(targetDir, (targetFileName ?? testDataFileName));
                 if (!_persistenceManager.DirectoryExists(targetDir)) _persistenceManager.CreateDirectory(targetDir);
                 if (_persistenceManager.FileExists(targetPath)) _persistenceManager.DeleteFile(targetPath);
@@ -45,7 +45,7 @@ namespace BrightstarDB.Tests
                 }
             }
 #else
-            var importFile = new FileInfo(Path.Combine(Configuration.DataLocation, testDataFileName));
+            var importFile = new FileInfo(Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation, testDataFileName));
             var targetDir = new DirectoryInfo(Path.Combine(Configuration.StoreLocation,"import"));
             if (!targetDir.Exists)
             {

@@ -115,14 +115,12 @@ namespace BrightstarDB.Server.IntegrationTests
         }
 
         [Test]
-        [ExpectedException(typeof(BrightstarClientException))]
         public void TestCreateDuplicateStoreFails()
         {
-
             var bc = GetClient();
             var sid = Guid.NewGuid().ToString();
             bc.CreateStore(sid);
-            bc.CreateStore(sid);
+            Assert.Throws<BrightstarClientException>(() => bc.CreateStore(sid));
         }
 
         [Test]

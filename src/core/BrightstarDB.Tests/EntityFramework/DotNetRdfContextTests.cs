@@ -14,7 +14,7 @@ namespace BrightstarDB.Tests.EntityFramework
 #endif
         public void TestInitializeWithStoreConfiguration()
         {
-            var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
+            var configFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation + "dataObjectStoreConfig.ttl");
             var connectionString = "type=dotNetRdf;configuration=" + configFilePath + ";storeName=http://www.brightstardb.com/tests#people";
             const string baseGraph = "http://example.org/people";
 
@@ -59,7 +59,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         private static string MakeStoreConnectionString(string storeName)
         {
-            var configFilePath = Path.GetFullPath(Configuration.DataLocation + "dataObjectStoreConfig.ttl");
+            var configFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, Configuration.DataLocation + "dataObjectStoreConfig.ttl");
             return string.Format("type=dotNetRdf;configuration={0};storeName={1}", configFilePath, storeName);
         }
     }

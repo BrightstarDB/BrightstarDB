@@ -83,19 +83,17 @@ namespace BrightstarDB.Server.IntegrationTests
         }
 
         [Test]
-        [ExpectedException(typeof(BrightstarClientException))]
         public void TestAccessRequiresAuthentication()
         {
             var client = GetClient();
-            client.ListStores();
+            Assert.Throws<BrightstarClientException>(() => client.ListStores());
         }
 
         [Test]
-        [ExpectedException(typeof (BrightstarClientException))]
         public void TestPasswordValidation()
         {
             var client = GetClient("alice", "invalidpassword");
-            client.ListStores();
+            Assert.Throws<BrightstarClientException>(() => client.ListStores());
         }
 
         [Test]
@@ -106,11 +104,10 @@ namespace BrightstarDB.Server.IntegrationTests
         }
 
         [Test]
-        [ExpectedException(typeof(BrightstarClientException))]
         public void TestSystemPermissionsChecked()
         {
             var client = GetClient("alice", "password");
-            client.CreateStore("AlicesStore_" + DateTime.Now.Ticks);
+            Assert.Throws<BrightstarClientException>(() => client.CreateStore("AlicesStore_" + DateTime.Now.Ticks));
         }
 
         [Test]

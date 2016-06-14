@@ -487,7 +487,7 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
-        [Ignore]
+        [Ignore("")]
         public void TestConsolidateStore()
         {
             // create a store

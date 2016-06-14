@@ -27,10 +27,9 @@ namespace BrightstarDB.InternalTests
         #endregion
 
         [Test]
-        [ExpectedException(typeof(StoreManagerException))]
         public override void TestOpenStoreFailure()
         {
-            base.TestOpenStoreFailure();
+            Assert.Throws<StoreManagerException>(() => base.TestOpenStoreFailure());
         }
 
         [Test]
@@ -172,10 +171,9 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
-        [ExpectedException(typeof(Client.BrightstarClientException))]
         public override void TestRevertToCommitPoint()
         {
-            base.TestRevertToCommitPoint();
+            Assert.Throws<Client.BrightstarClientException>(() => base.TestRevertToCommitPoint());
         }
 
         [Test]
@@ -185,10 +183,9 @@ namespace BrightstarDB.InternalTests
         }
 
         [Test]
-        [ExpectedException(typeof(Client.BrightstarClientException))]
         public override void TestQueryAtCommitPoint()
         {
-            base.TestQueryAtCommitPoint();
+            Assert.Throws<Client.BrightstarClientException>(() => base.TestQueryAtCommitPoint());
         }
 
         [Test]

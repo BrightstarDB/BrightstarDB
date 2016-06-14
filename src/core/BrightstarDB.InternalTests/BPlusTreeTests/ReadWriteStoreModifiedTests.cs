@@ -13,58 +13,74 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
     public class ReadWriteStoreModifiedTests
     {
         [Test]
-        [ExpectedException(typeof (ReadWriteStoreModifiedException))]
         public void TestStoreModifiedExceptionThrown()
         {
-            ulong pageId;
-            IPage page;
-            byte[] buffer1 = new byte[] {1, 1, 1, 1};
-            byte[] buffer2 = new byte[] {2, 2, 2, 2};
-            using (
-                var pageStore = TestUtils.CreateEmptyPageStore("TestStoreModifiedExceptionThrown.data",
-                                                               PersistenceType.Rewrite))
+            Assert.Throws<ReadWriteStoreModifiedException>(() =>
             {
-                page = pageStore.Create(2);
-                pageId = page.Id;
-                page.SetData(buffer1, 0, 0, 4);
-                pageStore.MarkDirty(2, pageId);
-                pageStore.Commit(2, null);
-            }
-
-            using (
-                var readStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
-                                                        "TestStoreModifiedExceptionThrown.data",
-                                                        BPlusTreeStoreManager.PageSize, true, 2, 3, false))
-            {
+                ulong pageId;
+                IPage page;
+                byte[] buffer1 = new byte[] {1, 1, 1, 1};
+                byte[] buffer2 = new byte[] {2, 2, 2, 2};
                 using (
-                    var writeStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
-                                                             "TestStoreModifiedExceptionThrown.data",
-                                                             BPlusTreeStoreManager.PageSize, false, 2, 3, false))
+                    var pageStore = TestUtils.CreateEmptyPageStore("TestStoreModifiedExceptionThrown.data",
+                        PersistenceType.Rewrite))
                 {
-                    var writePage = writeStore.Retrieve(pageId, null);
-                    Assert.IsFalse(writeStore.IsWriteable(writePage));
-                    writePage =  writeStore.GetWriteablePage(3, writePage);
-                    writePage.SetData(buffer2, 0, 0, 4);
-                    writeStore.MarkDirty(3, pageId);
-                    writeStore.Commit(3, null);
+                    page = pageStore.Create(2);
+                    pageId = page.Id;
+                    page.SetData(buffer1, 0, 0, 4);
+                    pageStore.MarkDirty(2, pageId);
+                    pageStore.Commit(2, null);
                 }
 
                 using (
-                    var writeStore = new BinaryFilePageStore(TestUtils.PersistenceManager,
-                                                             "TestStoreModifiedExceptionThrown.data",
-                                                             BPlusTreeStoreManager.PageSize, false, 3, 4, false))
+                    var readStore =
+                        new BinaryFilePageStore(
+                            TestUtils.PersistenceManager,
+                            "TestStoreModifiedExceptionThrown.data",
+                            BPlusTreeStoreManager.PageSize, true, 2,
+                            3, false))
                 {
-                    var writePage = writeStore.Retrieve(pageId, null);
-                    writePage = writeStore.GetWriteablePage(4, writePage);
-                    writePage.SetData(buffer2, 0, 0, 4);
-                    writeStore.MarkDirty(4, pageId);
-                    writeStore.Commit(4, null);
-                }
+                    using (
+                        var writeStore =
+                            new BinaryFilePageStore(
+                                TestUtils.PersistenceManager,
+                                "TestStoreModifiedExceptionThrown.data",
+                                BPlusTreeStoreManager.PageSize,
+                                false, 2, 3, false))
+                    {
+                        var writePage = writeStore.Retrieve(pageId,
+                            null);
+                        Assert.IsFalse(
+                            writeStore.IsWriteable(writePage));
+                        writePage = writeStore.GetWriteablePage(3,
+                            writePage);
+                        writePage.SetData(buffer2, 0, 0, 4);
+                        writeStore.MarkDirty(3, pageId);
+                        writeStore.Commit(3, null);
+                    }
 
-                page = readStore.Retrieve(1, null);
-                Assert.AreEqual(1, page.Data[0]);
-                // We should not reach this assert because the ReadWriteStoreModifiedException should get thrown
-            }
+                    using (
+                        var writeStore =
+                            new BinaryFilePageStore(
+                                TestUtils.PersistenceManager,
+                                "TestStoreModifiedExceptionThrown.data",
+                                BPlusTreeStoreManager.PageSize,
+                                false, 3, 4, false))
+                    {
+                        var writePage = writeStore.Retrieve(pageId,
+                            null);
+                        writePage = writeStore.GetWriteablePage(4,
+                            writePage);
+                        writePage.SetData(buffer2, 0, 0, 4);
+                        writeStore.MarkDirty(4, pageId);
+                        writeStore.Commit(4, null);
+                    }
+
+                    page = readStore.Retrieve(1, null);
+                    Assert.AreEqual(1, page.Data[0]);
+                    // We should not reach this assert because the ReadWriteStoreModifiedException should get thrown
+                }
+            });
         }
 
         [Test]

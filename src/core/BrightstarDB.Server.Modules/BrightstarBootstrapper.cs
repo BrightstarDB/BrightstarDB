@@ -179,15 +179,20 @@ namespace BrightstarDB.Server.Modules
             {
                 authenticationProvider.Enable(pipelines);
             }
+            if (!_corsConfiguration.DisableCors)
+            {
+                pipelines.EnableCors(_corsConfiguration);
+            }
+        }
+
+        protected override NancyInternalConfiguration InternalConfiguration
+        {
+            get { return NancyInternalConfiguration.WithOverrides(config => config.StatusCodeHandlers.Clear()); }
         }
 
         protected override void RequestStartup(TinyIoCContainer container, IPipelines pipelines, NancyContext context)
         {
             base.RequestStartup(container, pipelines, context);
-            if (!_corsConfiguration.DisableCors)
-            {
-                pipelines.EnableCors(_corsConfiguration);
-            }
         }
     }
 }

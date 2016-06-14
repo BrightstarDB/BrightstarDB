@@ -16,21 +16,20 @@ namespace BrightstarDB.Server.Modules.Tests
             _expectedRegex = new Regex("<" + Regex.Escape(uri) + @">\s*;\s*rel\s*=\s*" + Regex.Escape(rel));
         }
 
-
-        public override bool Matches(object actual)
+        public override ConstraintResult ApplyTo<TActual>(TActual actual)
         {
-            base.actual = actual;
             if (actual is string)
             {
-                return _expectedRegex.IsMatch(actual as string);
+                var isMatch = _expectedRegex.IsMatch(actual as string);
+                if (isMatch) return new ConstraintResult(this, actual, ConstraintStatus.Success);
             }
-            return false;
+            var result = new ConstraintResult(this, actual, ConstraintStatus.Failure);
+            return result;
         }
 
-        public override void WriteDescriptionTo(MessageWriter writer)
-        {
-            writer.Write("Link header containing link with ");
-            writer.WriteExpectedValue("rel=" + _expectedRel + " and location=<"+_expectedUri+ ">");
-        }
+        public override string Description => "Link header containing link with rel=" + _expectedRel + " and location=<" + _expectedUri + ">";
+
     }
+
+    
 }

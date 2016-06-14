@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace BrightstarDB.InternalTests.BPlusTreeTests
 {
     [TestFixture]
-    [Ignore]
+    [Ignore("")]
     public class PerformanceTests
     {
         [Test]

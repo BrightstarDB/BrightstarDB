@@ -16,7 +16,7 @@ using NUnit.Framework;
 namespace BrightstarDB.InternalTests
 {
     [TestFixture]
-    [Ignore]
+    [Ignore("")]
     public class ScalingTests
     {
         private IStoreManager _storeManager;

@@ -4,6 +4,7 @@ using BrightstarDB.Server.Modules.Authentication;
 using BrightstarDB.Server.Modules.Configuration;
 using BrightstarDB.Server.Modules.Permissions;
 using Nancy;
+using Nancy.Bootstrapper;
 
 namespace BrightstarDB.Server.Modules.Tests
 {
@@ -64,13 +65,18 @@ namespace BrightstarDB.Server.Modules.Tests
             }
         }
 
+        protected override NancyInternalConfiguration InternalConfiguration
+        {
+            get { return NancyInternalConfiguration.WithOverrides(config => config.StatusCodeHandlers.Clear()); }
+        }
+
         protected override void ApplicationStartup(Nancy.TinyIoc.TinyIoCContainer container, Nancy.Bootstrapper.IPipelines pipelines)
         {
             if (_authenticationProvider != null)
             {
                 _authenticationProvider.Enable(pipelines);
             }
-            pipelines.EnableCors(new CorsConfiguration());
+            pipelines.EnableCors(new CorsConfiguration {AllowOrigin = "*", DisableCors = false});
         }
     }
 }

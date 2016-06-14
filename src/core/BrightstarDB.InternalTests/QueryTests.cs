@@ -206,7 +206,7 @@ SELECT ?entry ?sector WHERE {
         }
 
         [Test]
-        [Ignore]
+        [Ignore("")]
         public void TestSparqlLimit()
         {
             var sid = Guid.NewGuid().ToString();

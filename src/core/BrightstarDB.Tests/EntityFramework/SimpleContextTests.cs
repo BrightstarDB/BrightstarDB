@@ -172,7 +172,6 @@ namespace BrightstarDB.Tests.EntityFramework
 
 
         [Test]
-        [ExpectedException(typeof(EntityKeyRequiredException))]
         [NUnit.Framework.Ignore("Behaviour is changed - an entity can be created, but will not be tracked or saved until its identity is set")]
         public void TestCannotCreateEntityWithKey()
         {
@@ -181,9 +180,12 @@ namespace BrightstarDB.Tests.EntityFramework
             {
                 using (var context = new MyEntityContext(dataObjectStore))
                 {
-                    // Should throw an exception as the Name property is required to generate the key
-                    context.StringKeyEntities.Create();
-                    context.SaveChanges();
+                    Assert.Throws<EntityKeyRequiredException>(() =>
+                    {
+                        // Should throw an exception as the Name property is required to generate the key
+                        context.StringKeyEntities.Create();
+                        context.SaveChanges();
+                    });
                 }
             }
         }
@@ -788,7 +790,6 @@ where {
 
         
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void TestSetRelatedEntitiesToNullThrowsArgumentNullException()
         {
             var storeName = "TestSetRelatedEntitiesToNullThrowsArgumentNullException_" + DateTime.Now.Ticks;
@@ -810,8 +811,7 @@ where {
                 var alice = context.Persons.FirstOrDefault(p => p.Id.Equals(aliceId));
                 Assert.IsNotNull(alice);
                 Assert.AreEqual(2, alice.Friends.Count);
-
-                alice.Friends = null; // throws
+                Assert.Throws<ArgumentNullException>(() => alice.Friends = null);
             }
         }
 
@@ -1927,7 +1927,6 @@ where {
         }
 
         [Test]
-        [ExpectedException(typeof(TransactionPreconditionsFailedException))]
         public void TestOptimisticLocking()
         {
             var storeName = "TestOptimisticLocking_" + DateTime.Now.Ticks;
@@ -1961,7 +1960,7 @@ where {
                     person2.Name = "berby";
 
                     context1.SaveChanges();
-                    context2.SaveChanges();
+                    Assert.Throws<TransactionPreconditionsFailedException>(() => context2.SaveChanges());
                 }
             }
         }
