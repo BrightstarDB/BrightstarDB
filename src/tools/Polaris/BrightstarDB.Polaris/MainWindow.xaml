@@ -291,7 +291,26 @@
                     </i:Interaction.Triggers>
                     <Image Source="/Polaris;component/Resources/control_play_blue.png"></Image>
                 </Button>
+                <Button ToolTip="Save SPARQL Results" IsEnabled="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.HasResults, Mode=OneWay}" ToolTipService.ShowOnDisabled="True">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <Command:EventToCommand Command="{Binding ElementName=TabControl, Path=SelectedItem.Content.DataContext.SaveResultsCommand, Mode=OneWay}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Image Source="/Polaris;component/Resources/table_save.png">
+                        <Image.Style>
+                            <Style TargetType="Image">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.5" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                          </Image.Style>
+                    </Image>
+                </Button>
             </ToolBar>
+            
 
             <ToolBar Band="0" BandIndex="3" x:Name="SparqlUpdateToolbar" Visibility="Collapsed">
                 <Button ToolTip="Run the SPARQL update">

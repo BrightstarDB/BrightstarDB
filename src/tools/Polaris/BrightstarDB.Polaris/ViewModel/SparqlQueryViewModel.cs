@@ -14,7 +14,10 @@ using BrightstarDB.Polaris.Configuration;
 using BrightstarDB.Polaris.Messages;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using VDS.RDF;
 using VDS.RDF.Parsing;
+using VDS.RDF.Query;
+using VDS.RDF.Writing;
 
 namespace BrightstarDB.Polaris.ViewModel
 {
@@ -29,6 +32,8 @@ namespace BrightstarDB.Polaris.ViewModel
         private string _summaryMessage;
         private CommitPointViewModel _targetCommitPoint;
         private long _timeTaken;
+        private XDocument _sparqlResults;
+        private bool _hasResults;
 
         public SparqlQueryViewModel(Store store, IEnumerable<PrefixConfiguration> prefixes)
             : base(store)
@@ -37,6 +42,7 @@ namespace BrightstarDB.Polaris.ViewModel
             KeyUpCommand = new RelayCommand<KeyEventArgs>(HandleKeyUp);
             LoadCommand = new RelayCommand(LoadQuery);
             SaveCommand = new RelayCommand(SaveQuery);
+            SaveResultsCommand = new RelayCommand(SaveResults);
             ResultColumnNames = new ObservableCollection<string>();
             SparqlQueryString = String.Join("\n",
                                             prefixes.Select(p => String.Format("PREFIX {0}: <{1}>", p.Prefix, p.Uri)));
@@ -131,9 +137,26 @@ namespace BrightstarDB.Polaris.ViewModel
             }
         }
 
+        public bool HasResults
+        {
+            get { return _hasResults; }
+            set { _hasResults = value; RaisePropertyChanged("HasResults"); }
+        }
+
         public RelayCommand ExecuteCommand { get; private set; }
         public RelayCommand LoadCommand { get; private set; }
         public RelayCommand SaveCommand { get; private set; }
+        public RelayCommand SaveResultsCommand { get; private set; }
+
+        public XDocument SparqlResults
+        {
+            get { return _sparqlResults; }
+            set
+            {
+                _sparqlResults = value;
+                HasResults = (value != null);
+            }
+        }
 
         private void HandleKeyUp(KeyEventArgs e)
         {
@@ -161,12 +184,11 @@ namespace BrightstarDB.Polaris.ViewModel
 
         private void RunSparqlQuery(object o)
         {
-            XDocument sparqlResults;
             try
             {
                 var timer = new Stopwatch();
                 timer.Start();
-                sparqlResults =
+                SparqlResults =
                     Store.ExecuteSparql(
                         String.IsNullOrEmpty(SelectedQueryString) ? SparqlQueryString : SelectedQueryString,
                         TargetCommitPoint);
@@ -193,15 +215,15 @@ namespace BrightstarDB.Polaris.ViewModel
                 return;
             }
 
-            if (sparqlResults != null)
+            if (SparqlResults != null)
             {
                 var resultsTable = new DataTable();
-                SparqlQueryResultsString = sparqlResults.ToString();
-                RowsReturned = sparqlResults.SparqlResultRows().Count();
-                if (sparqlResults.Root != null)
+                SparqlQueryResultsString = SparqlResults.ToString();
+                RowsReturned = SparqlResults.SparqlResultRows().Count();
+                if (SparqlResults.Root != null)
                 {
-                    XElement sparqlQueryResults = sparqlResults.Root.Element(SparqlResultsNs + "results");
-                    XElement head = sparqlResults.Root.Element(SparqlResultsNs + "head");
+                    XElement sparqlQueryResults = SparqlResults.Root.Element(SparqlResultsNs + "results");
+                    XElement head = SparqlResults.Root.Element(SparqlResultsNs + "head");
                     if (sparqlQueryResults != null && head != null)
                     {
                         foreach (
@@ -220,7 +242,7 @@ namespace BrightstarDB.Polaris.ViewModel
                     if (ResultColumnNames.Count > 0)
                     {
                         int colCount = resultsTable.Columns.Count;
-                        foreach (XElement row in sparqlResults.SparqlResultRows())
+                        foreach (XElement row in SparqlResults.SparqlResultRows())
                         {
                             var rowData = new object[colCount];
                             for (int i = 0; i < colCount; i++)
@@ -296,6 +318,47 @@ namespace BrightstarDB.Polaris.ViewModel
             }
         }
 
+        private void SaveResults()
+        {
+            var targetPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (SparqlResults == null) return;
+            if (SparqlResults.Root?.Element(SparqlResultsNs + "results") != null)
+            {
+                Messenger.Default.Send(new ShowFileDialogMessage
+                {
+                    Title = "Save SPARQL Results Table",
+                    Directory = targetPath,
+                    DefaultExt = ".srx",
+                    Filter = GetFileDialogFilter(MimeTypesHelper.GetDefinitions(MimeTypesHelper.Any).Where(d=>d.CanWriteSparqlResults)),
+                    IsSave = true,
+                    Continuation = SaveSparqlResultsTable
+                });
+            }
+            else
+            {
+                Messenger.Default.Send(new ShowFileDialogMessage
+                {
+                    Title = "Save Results RDF",
+                    Directory = targetPath,
+                    DefaultExt = "*.rdf",
+                    Filter = GetFileDialogFilter(MimeTypesHelper.GetDefinitions(MimeTypesHelper.Any).Where(d=>d.CanWriteRdf)),
+                    IsSave = true,
+                    Continuation = SaveGraphResults
+                });
+            }
+        }
+
+        private static string GetFileDialogFilter(IEnumerable<MimeTypeDefinition> mimeTypeDefinitions)
+        {
+            return string.Join("|",
+                mimeTypeDefinitions
+                    .OrderBy(m => m.SyntaxName)
+                    .Select(
+                        m =>
+                            string.Format(m.SyntaxName + "(*." + m.CanonicalFileExtension + ")|" +
+                                          string.Join(",", m.FileExtensions.Select(ext => "*." + ext)))));
+        }
+
         private void HandleFolderCreateDialogResult(MessageBoxResult dialogResult)
         {
             if (dialogResult == MessageBoxResult.No)
@@ -331,6 +394,42 @@ namespace BrightstarDB.Polaris.ViewModel
         private void SaveSparqlQuery(string fileName)
         {
             File.WriteAllText(fileName, SparqlQueryString);
+        }
+
+        private void SaveGraphResults(string fileName)
+        {
+            var graph = new Graph();
+            graph.LoadFromString(_resultsString, new RdfXmlParser());
+            var fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? ".rdf";
+            IRdfWriter writer;
+            try
+            {
+                writer = MimeTypesHelper.GetWriterByFileExtension(fileExt);
+            }
+            catch (RdfWriterSelectionException)
+            {
+                writer = new RdfXmlWriter();
+            }
+            graph.SaveToFile(fileName, writer);
+        }
+
+        private void SaveSparqlResultsTable(string fileName)
+        {
+            var resultsTable = new SparqlResultSet();
+            var parser = new SparqlXmlParser();
+            parser.Load(resultsTable, new StringReader(_resultsString));
+
+            var fileExt = Path.GetExtension(fileName)?.ToLowerInvariant() ?? ".srx";
+            ISparqlResultsWriter writer;
+            try
+            {
+                writer = MimeTypesHelper.GetSparqlWriterByFileExtension(fileExt) ?? new SparqlXmlWriter();
+            }
+            catch (RdfWriterSelectionException)
+            {
+                writer = new SparqlXmlWriter();
+            }
+            writer.Save(resultsTable, fileName);
         }
     }
 }
