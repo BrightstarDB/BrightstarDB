@@ -36,8 +36,8 @@
                           ItemsSource="{Binding QueryResultsTable}" VirtualizingStackPanel.IsVirtualizing="True" />
             </TabItem>
             <TabItem Header="Results XML">
-                <ScrollViewer>
-                    <TextBox Text="{Binding SparqlQueryResultsString}" />
+                <ScrollViewer Grid.Row="0">
+                    <TextBox Text="{Binding SparqlQueryResultsString}" IsReadOnly="True"  />
                 </ScrollViewer>
             </TabItem>
         </TabControl>

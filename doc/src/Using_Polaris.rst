@@ -204,6 +204,7 @@ the server. It is not possible to undo this operation once it is confirmed.
 .. |runquery| image:: Images/polaris_runquerybutton.png
 .. |save| image:: Images/disk.png
 .. |load| image:: Images/folder.png
+.. |saveresults| image:: Images/table_save.png
 
 ***********************
  Running SPARQL Queries
@@ -221,8 +222,9 @@ screenshot below.
 The toolbars added to the Menu area allow you to change the store that the 
 query will execute against by selecting the server and the store from the 
 drop-down lists. The query is executed either by pressing the F5 key or by 
-clicking on the |runquery| button 
-in the tool bar. 
+clicking on the |runquery| button in the tool bar. After a query has been
+executed successfully, the results of the query can be saved by clicking
+on the |saveresults| button in the tool bar.
 
 
 The tab itself is divided into a top area where you can write your SPARQL 
