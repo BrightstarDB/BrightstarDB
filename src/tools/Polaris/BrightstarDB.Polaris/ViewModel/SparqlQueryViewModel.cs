@@ -336,12 +336,14 @@ namespace BrightstarDB.Polaris.ViewModel
             }
             else
             {
+                var filter =
+                    GetFileDialogFilter(MimeTypesHelper.GetDefinitions(MimeTypesHelper.Any).Where(d => d.CanWriteRdf));
                 Messenger.Default.Send(new ShowFileDialogMessage
                 {
                     Title = "Save Results RDF",
                     Directory = targetPath,
                     DefaultExt = "*.rdf",
-                    Filter = GetFileDialogFilter(MimeTypesHelper.GetDefinitions(MimeTypesHelper.Any).Where(d=>d.CanWriteRdf)),
+                    Filter = filter,
                     IsSave = true,
                     Continuation = SaveGraphResults
                 });
@@ -355,8 +357,8 @@ namespace BrightstarDB.Polaris.ViewModel
                     .OrderBy(m => m.SyntaxName)
                     .Select(
                         m =>
-                            string.Format(m.SyntaxName + "(*." + m.CanonicalFileExtension + ")|" +
-                                          string.Join(",", m.FileExtensions.Select(ext => "*." + ext)))));
+                            string.Format(m.SyntaxName + "(" + string.Join(", ", m.FileExtensions.Select(ext => "*." + ext)) + ")|" +
+                                          string.Join(";", m.FileExtensions.Select(ext => "*." + ext)))));
         }
 
         private void HandleFolderCreateDialogResult(MessageBoxResult dialogResult)
