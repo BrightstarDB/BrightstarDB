@@ -7,6 +7,7 @@
 
 .. _SPARQL 1.1: http://www.w3.org/TR/sparql11-query/
 .. _SPARQL XML Query Results Format: http://www.w3.org/TR/rdf-sparql-XMLres/
+.. _dotNetRDF User Guide: https://github.com/dotnetrdf/dotnetrdf/wiki/UserGuide-Querying-With-SPARQL#accessing-results
 
 
 The Data Object Layer is a simple generic object wrapper for the underlying RDF data in 
@@ -214,20 +215,9 @@ Querying data using SPARQL
 BrightstarDB supports `SPARQL 1.1`_ for querying the data in the store. These queries can be 
 executed via the Data Object store using the ``ExecuteSparql()`` method. 
 
-The SparqlResult returned has the results of the SPARQL query in the ResultDocument property 
-which is an XML document formatted according to the `SPARQL XML Query Results Format`_. The
-BrightstarDB libraries provide some helpful extension methods for accessing the contents of
-a SPARQL XML results document::
-
-  var query = "SELECT ?skill WHERE { " +
-              "<http://example.org/people/fred> <http://example.org/schemas/person/skill> ?skill " +
-              "}";
-  var sparqlResult = store.ExecuteSparql(query);
-  foreach (var sparqlResultRow in sparqlResult.ResultDocument.SparqlResultRows())
-  {
-      var val = sparqlResultRow.GetColumnValue("skill");
-      Console.WriteLine("Skill is " + val);
-  }
+The SparqlResult returned has the results of the SPARQL query in the ResultSet property 
+which is a dotNetRDF SparqlResultSet. For information about how to work with a SparqlResultSet,
+please see the `dotNetRDF User Guide`_.
 
 Binding SPARQL Results To Data Objects
 ======================================
