@@ -1,11 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-#if SILVERLIGHT || PORTABLE || NETCORE
-using Polenter.Serialization;
-#else
-using System.Runtime.Serialization.Formatters.Binary;
-#endif
 
 namespace BrightstarDB.Caching
 {
@@ -56,8 +50,8 @@ namespace BrightstarDB.Caching
         /// <param name="cachePriority">The priority of the item in the cache</param>
         public void Insert(string key, byte[] data, CachePriority cachePriority)
         {
-            if (key == null) throw new ArgumentNullException("key");
-            if (data == null) throw new ArgumentNullException("data");
+            if (key == null) throw new ArgumentNullException(nameof(key));
+            if (data == null) throw new ArgumentNullException(nameof(data));
             Remove(key);
             if (CacheSize + data.Length > _highwaterMark)
             {
@@ -86,7 +80,7 @@ namespace BrightstarDB.Caching
         /// <returns>The bytes for the cached item or null if the item is not found in the cache</returns>
         public byte[] Lookup(string key)
         {
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null) throw new ArgumentNullException(nameof(key));
             var cacheEntry = GetEntry(key);
             if (cacheEntry == null) return null;
             CacheEvictionPolicy.NotifyLookup(key);
@@ -100,7 +94,7 @@ namespace BrightstarDB.Caching
         /// <param name="key">The key of the cache entry to be removed</param>
         public void Remove(string key)
         {
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null) throw new ArgumentNullException(nameof(key));
             long entrySize = RemoveEntry(key);
             lock(_cacheLock)
             {
@@ -116,7 +110,7 @@ namespace BrightstarDB.Caching
         /// <returns>True if an entry with this key is in the cache, false otherwise</returns>
         public bool ContainsKey(string key)
         {
-            if (key == null) throw new ArgumentNullException(key);
+            if (key == null) throw new ArgumentNullException(nameof(key));
             return GetEntry(key) != null;
         }
 
@@ -150,7 +144,7 @@ namespace BrightstarDB.Caching
         /// <remarks>This method calls the protected RemoveEntry method and then updates the local cache size counter</remarks>
         public long EvictEntry(string key)
         {
-            if (key == null) throw new ArgumentNullException("key");
+            if (key == null) throw new ArgumentNullException(nameof(key));
             long bytesEvicted = RemoveEntry(key);
             lock (_cacheLock)
             {
@@ -166,77 +160,5 @@ namespace BrightstarDB.Caching
         /// <returns>The number of bytes of data evicted from the cache as a result of this operation. May be 0 if the key was not found in the cache.</returns>
         protected abstract long RemoveEntry(string key);
 
-        /// <summary>
-        /// Deserialize an object from a byte array
-        /// </summary>
-        /// <typeparam name="T">The type of object to deserialize</typeparam>
-        /// <param name="buff">The byte array to deserialize from</param>
-        /// <returns>The deserialized object</returns>
-        protected virtual T Deserialize<T>(byte[] buff)
-        {
-            try
-            {
-#if SILVERLIGHT || PORTABLE
-                var settings = new SharpSerializerBinarySettings(BinarySerializationMode.Burst);
-                var ms = new MemoryStream(buff);
-                var ser = new SharpSerializer(settings);
-                var deserialized = ser.Deserialize(ms);
-                return (T)deserialized;
-#else
-                if(typeof(IBinarySerializable).IsAssignableFrom(typeof(T)))
-                {
-                    var instance = Activator.CreateInstance<T>();
-                    using (var srcStream = new MemoryStream(buff))
-                    {
-                        (instance as IBinarySerializable).Read(srcStream);
-                    }
-                    return instance;
-                }
-                var ms = new MemoryStream(buff);
-                var bf = new BinaryFormatter();
-                return (T) bf.Deserialize(ms);
-#endif
-            }
-            catch (Exception ex)
-            {
-                Logging.LogError(BrightstarEventId.CacheError, "Error deserializing cached object: {0}", ex);
-                return default(T);
-            }
-        }
-
-        /// <summary>
-        /// Serialize an object to a byte array
-        /// </summary>
-        /// <param name="o">The object to be serialized</param>
-        /// <returns>The serialized form of the object</returns>
-        protected virtual byte[] Serialize(object o)
-        {
-            try
-            {
-#if SILVERLIGHT || PORTABLE
-            var settings = new SharpSerializerBinarySettings(BinarySerializationMode.Burst);
-            var ser = new SharpSerializer(settings);
-            var ms = new MemoryStream();
-            ser.Serialize(o, ms);
-            ms.Close();
-#if SILVERLIGHT
-            return ms.GetBuffer();
-#else
-            return ms.ToArray();
-#endif
-#else
-                var ms = new MemoryStream();
-                var bf = new BinaryFormatter();
-                bf.Serialize(ms, o);
-                ms.Close();
-                return ms.GetBuffer();
-#endif
-            }
-            catch (Exception ex)
-            {
-                Logging.LogError(BrightstarEventId.CacheError, "Error serializing object for cache: {0}", ex);
-                return null;
-            }
-        }
     }
 }
