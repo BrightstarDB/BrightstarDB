@@ -6,9 +6,6 @@ using System.Text;
 
 namespace BrightstarDB.Server
 {
-#if !PORTABLE && !SILVERLIGHT
-    [Serializable]
-#endif
     internal class QueryCacheEntry
     {
         public QueryCacheEntry(byte[] data)

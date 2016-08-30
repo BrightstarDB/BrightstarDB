@@ -283,12 +283,14 @@ namespace BrightstarDB.Client
                 }
                 if (resultsFormat != null)
                 {
-                    cachedResult = _clientCache.Lookup<CachedQueryResult>(cacheKey + "_" + resultsFormat);
+                    var cachedResultBytes = _clientCache.Lookup(cacheKey + "_" + resultsFormat);
+                    cachedResult = cachedResultBytes == null ? null : CachedQueryResult.FromBinary(cachedResultBytes);
                     if (cachedResult != null) cachedResultFormat = resultsFormat;
                 }
                 if (cachedResult == null && graphFormat != null)
                 {
-                    cachedResult = _clientCache.Lookup<CachedQueryResult>(cacheKey + "_" + graphFormat);
+                    var cachedResultBytes = _clientCache.Lookup(cacheKey + "_" + graphFormat);
+                    cachedResult = cachedResultBytes == null ? null : CachedQueryResult.FromBinary(cachedResultBytes);
                     if (cachedResult != null) cachedResultFormat = graphFormat;
                 }
                 if (cachedResult != null)
@@ -341,7 +343,8 @@ namespace BrightstarDB.Client
                 {
                     var resultString = streamReader.ReadToEnd();
                     cachedResult = new CachedQueryResult(LastResponseTimestamp.Value, resultString);
-                    _clientCache.Insert(cacheKey + "_" + streamFormat, cachedResult, CachePriority.Normal);
+
+                    _clientCache.Insert(cacheKey + "_" + streamFormat, cachedResult.ToBinary(), CachePriority.Normal);
                     return new MemoryStream(streamReader.CurrentEncoding.GetBytes(cachedResult.Result));
                 }
             }

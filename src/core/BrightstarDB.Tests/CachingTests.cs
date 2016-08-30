@@ -19,27 +19,17 @@ namespace BrightstarDB.Tests
         private static void RunCacheTests(ICache cache)
         {
             cache.Insert("ByteArray", new byte[] {0, 1, 2, 3}, CachePriority.Normal);
-            cache.Insert("String", "Hello World", CachePriority.Normal);
-            cache.Insert("Object", new TestObject("Test Object", 1234), CachePriority.Normal);
+            cache.Insert("Object", new byte[] {3,2,1,0}, CachePriority.Normal);
 
             var byteArray = cache.Lookup("ByteArray");
             Assert.IsNotNull(byteArray);
             Assert.AreEqual(4, byteArray.Length);
             for (int i = 0; i < 4; i++) Assert.AreEqual(i, byteArray[i]);
 
-            var cachedString = cache.Lookup<string>("String");
-            Assert.IsNotNull(cachedString);
-            Assert.AreEqual("Hello World", cachedString);
-
-            var cachedObject = cache.Lookup<TestObject>("Object");
-            Assert.IsNotNull(cachedObject);
-            Assert.AreEqual("Test Object", cachedObject.StringValue);
-            Assert.AreEqual(1234, cachedObject.LongValue);
-
             cache.Remove("Object");
             Assert.IsNull(cache.Lookup("Object"));
             Assert.IsFalse(cache.ContainsKey("Object"));
-            Assert.IsTrue(cache.ContainsKey("String"));
+            Assert.IsTrue(cache.ContainsKey("ByteArray"));
         }
 
 #if !SILVERLIGHT && !PORTABLE
@@ -55,10 +45,10 @@ namespace BrightstarDB.Tests
             Assert.AreEqual(4, byteArray.Length);
             for (int i = 0; i < 4; i++) Assert.AreEqual(i, byteArray[i]);
 
-            var cachedString = cache.Lookup<string>("String");
-            Assert.IsNotNull(cachedString);
-            Assert.AreEqual("Hello World", cachedString);
-            Assert.IsFalse(reopenedCache.ContainsKey("Object"));           
+            Assert.IsFalse(reopenedCache.ContainsKey("Object"));   
+            Assert.IsNull(reopenedCache.Lookup("Object"));        
+            Assert.IsFalse(reopenedCache.ContainsKey("NeverInserted"));
+            Assert.IsNull(reopenedCache.Lookup("NeverInserted"));
         }
 #endif
 

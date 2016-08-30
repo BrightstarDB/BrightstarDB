@@ -80,47 +80,6 @@ namespace BrightstarDB.Caching
         }
 
         /// <summary>
-        /// Adds an object to the cache
-        /// </summary>
-        /// <param name="key">The cache key for the object</param>
-        /// <param name="o">The object to be stored. Must be serializable.</param>
-        /// <param name="cachePriority">The priority of the item in the cache</param>
-        public void Insert(string key, object o, CachePriority cachePriority)
-        {
-            if (key == null)
-            {
-                throw new ArgumentNullException("key");
-            }
-            if (o == null)
-            {
-                throw new ArgumentNullException("o");
-            }
-            byte[] buff;
-            if (o is IBinarySerializable)
-            {
-                using (var ms = new MemoryStream())
-                {
-                    (o as IBinarySerializable).Save(ms);
-                    ms.Close();
-#if PORTABLE
-                    buff = ms.ToArray();
-#else
-                    buff = ms.GetBuffer();
-#endif
-                }
-            }
-            else
-            {
-                buff = Serialize(o);
-            }
-
-            if (buff != null)
-            {
-                Insert(key, buff, cachePriority);
-            }
-        }
-
-        /// <summary>
         /// Looks for an item in the cache and returns the bytes for that item
         /// </summary>
         /// <param name="key">The cache key of the item</param>
@@ -132,33 +91,6 @@ namespace BrightstarDB.Caching
             if (cacheEntry == null) return null;
             CacheEvictionPolicy.NotifyLookup(key);
             return cacheEntry.GetBytes();
-        }
-
-        /// <summary>
-        /// Looks up an object in the cache
-        /// </summary>
-        /// <typeparam name="T">The type of the object to look up</typeparam>
-        /// <param name="key">The cache key of the object</param>
-        /// <returns>The object found or null if the object was not found or does not match the specified type.</returns>
-        public T Lookup<T>(string key)
-        {
-            if (key == null) throw new ArgumentNullException(key);
-            var cacheEntry = GetEntry(key);
-            if (cacheEntry == null)
-            {
-                return default(T);
-            }
-            try
-            {
-                var ret = Deserialize<T>(cacheEntry.GetBytes());
-                CacheEvictionPolicy.NotifyLookup(key);
-                return ret;
-            }
-            catch (Exception ex)
-            {
-                Logging.LogError(BrightstarEventId.CacheError, "Error reading object from cache: {0}", ex);
-                return default(T);
-            }
         }
 
 

@@ -260,14 +260,14 @@ namespace BrightstarDB.Server
 
         private QueryCacheEntry GetCachedResult(string key)
         {
-            return _queryCache.Lookup<QueryCacheEntry>(key);
+            var cacheData = _queryCache.Lookup(key);
+            return cacheData == null ? null : new QueryCacheEntry(_queryCache.Lookup(key));
         }
 
         private QueryCacheEntry CacheResult(string key, byte[] data)
         {
-            var entry = new QueryCacheEntry(data);
-            _queryCache.Insert(key, entry, CachePriority.Normal);
-            return entry;
+            _queryCache.Insert(key, data, CachePriority.Normal);
+            return new QueryCacheEntry(data);
         }
 
         #endregion

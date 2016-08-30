@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BrightstarDB.Caching
+﻿namespace BrightstarDB.Caching
 {
     /// <summary>
     /// A cache implementation that wraps two separate caches, one acts as the primary cache (typically 
@@ -37,18 +35,6 @@ namespace BrightstarDB.Caching
         }
 
         /// <summary>
-        /// Adds an object to the cache
-        /// </summary>
-        /// <param name="key">The cache key for the object</param>
-        /// <param name="o">The object to be stored. Must be serializable.</param>
-        /// <param name="cachePriority">The priority of the item in the cache</param>
-        public void Insert(string key, object o, CachePriority cachePriority)
-        {
-            _primaryCache.Insert(key, o, cachePriority);
-            _secondaryCache.Insert(key, o, cachePriority);
-        }
-
-        /// <summary>
         /// Looks for an item in the cache and returns the bytes for that item
         /// </summary>
         /// <param name="key">The cache key of the item</param>
@@ -56,35 +42,6 @@ namespace BrightstarDB.Caching
         public byte[] Lookup(string key)
         {
             var ret = _primaryCache.Lookup(key) ?? _secondaryCache.Lookup(key);
-            return ret;
-        }
-
-        /// <summary>
-        /// Looks up an object in the cache
-        /// </summary>
-        /// <typeparam name="T">The type of the object to look up</typeparam>
-        /// <param name="key">The cache key of the object</param>
-        /// <returns>The object found or null if the object was not found or does not match the specified type.</returns>
-        public T Lookup<T>(string key)
-        {
-            var ret = _primaryCache.Lookup<T>(key);
-            if (typeof(T).IsValueType)
-            {
-                if (ret.Equals(Activator.CreateInstance(typeof(T))))
-                {
-                    ret = _secondaryCache.Lookup<T>(key);
-                    _primaryCache.Insert(key, ret, CachePriority.Normal);
-                }
-                return ret;
-            }
-            if (ret == null)
-            {
-                ret = _secondaryCache.Lookup<T>(key);
-                if(ret != null)
-                {
-                    _primaryCache.Insert(key, ret, CachePriority.Normal);
-                }
-            }
             return ret;
         }
 

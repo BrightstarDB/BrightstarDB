@@ -39,7 +39,8 @@ namespace BrightstarDB.Server.IntegrationTests
             client.ExecuteQuery(storeName, query);
             var cacheKey = storeName + "_" + query.GetHashCode() + "_" + SparqlResultsFormat.Xml;
             Assert.IsTrue(testCache.ContainsKey(cacheKey));
-            testCache.Insert(cacheKey, new CachedQueryResult(DateTime.UtcNow, "This is a test"), CachePriority.Normal);
+            var timestamp = DateTime.UtcNow;
+            testCache.Insert(cacheKey, new CachedQueryResult(timestamp, "This is a test").ToBinary(), CachePriority.Normal);
             var resultStream = client.ExecuteQuery(storeName, query);
             string result;
             using (var resultReader = new StreamReader(resultStream))
@@ -66,7 +67,8 @@ namespace BrightstarDB.Server.IntegrationTests
             Assert.AreNotEqual("This is a test", result);
 
             // The cache should have been updated with the result received from the server.
-            var cacheResult = testCache.Lookup<CachedQueryResult>(cacheKey);
+            var cacheResultBytes = testCache.Lookup(cacheKey);
+            var cacheResult = CachedQueryResult.FromBinary(cacheResultBytes);
             Assert.AreEqual(result, cacheResult.Result);
         }
 
