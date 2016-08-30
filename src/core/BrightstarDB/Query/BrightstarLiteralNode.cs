@@ -3,7 +3,7 @@ using BrightstarDB.Rdf;
 
 namespace BrightstarDB.Query
 {
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !NETCORE
     [Serializable]
 #endif
     internal class BrightstarLiteralNode : VDS.RDF.LiteralNode

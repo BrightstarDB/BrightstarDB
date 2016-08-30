@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-#if SILVERLIGHT || PORTABLE
+#if SILVERLIGHT || PORTABLE || NETCORE
 using Polenter.Serialization;
 #else
 using System.Runtime.Serialization.Formatters.Binary;

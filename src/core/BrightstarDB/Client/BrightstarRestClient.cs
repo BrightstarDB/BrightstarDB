@@ -10,7 +10,7 @@ using System.Threading;
 using BrightstarDB.Server;
 using VDS.RDF;
 using VDS.RDF.Query;
-#if !PORTABLE && !WINDOWS_PHONE
+#if !PORTABLE && !WINDOWS_PHONE && !NETCORE
 using System.ServiceModel.Security.Tokens;
 using System.Web.Script.Serialization;
 #endif
@@ -439,7 +439,7 @@ namespace BrightstarDB.Client
 
         private static DateTime? GetLastModified(HttpWebResponse r)
         {
-#if PORTABLE || WINDOWS_PHONE
+#if PORTABLE || WINDOWS_PHONE || NETCORE
             var headerVal = r.Headers["Last-Modified"];
             DateTime lastModified;
             if (!String.IsNullOrEmpty(headerVal) && DateTime.TryParse(headerVal, out lastModified))
@@ -1107,7 +1107,11 @@ namespace BrightstarDB.Client
             // property in PCL - trying to set the httpWebRequest.Headers
             // directly results in a runtime error
 #if !PORTABLE
+#if NETCORE
+            httpWebRequest.Headers[HttpRequestHeader.Date] = DateTime.UtcNow.ToString("R");
+#else
             httpWebRequest.Date = DateTime.UtcNow;
+#endif
 #endif
         }
 
