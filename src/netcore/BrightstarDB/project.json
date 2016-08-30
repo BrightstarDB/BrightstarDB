@@ -15,7 +15,8 @@
 
   "buildOptions": {
     "compile": {
-      "include": [ "../../core/BrightstarDB/**/*.cs" ]
+      "include": [ "../../core/BrightstarDB/**/*.cs" ],
+      "exclude": ["../../core/BrightstarDB/OData/**/*.cs"]
     },
     "define": ["NETCORE", "NETSTANDARD16"],
     "outputName": "BrightstarDB"

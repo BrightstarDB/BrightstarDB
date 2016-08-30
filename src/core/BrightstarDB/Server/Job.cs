@@ -1,7 +1,7 @@
 ﻿using System;
 using BrightstarDB.Dto;
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !NETCORE
 using System.ServiceModel;
 #endif
 

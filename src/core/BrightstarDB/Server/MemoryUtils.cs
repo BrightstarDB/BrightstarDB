@@ -2,7 +2,7 @@
 
 namespace BrightstarDB.Server
 {
-#if !PORTABLE
+#if !PORTABLE && !NETCORE
     internal class MemoryUtils
     {
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]

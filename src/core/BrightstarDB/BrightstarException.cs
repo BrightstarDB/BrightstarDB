@@ -2,7 +2,7 @@
 
 namespace BrightstarDB
 {
-#if !SILVERLIGHT && !PORTABLE
+#if !SILVERLIGHT && !PORTABLE && !NETCORE
     /// <summary>
     /// The base class for all custom exception types raised by Brightstar
     /// </summary>

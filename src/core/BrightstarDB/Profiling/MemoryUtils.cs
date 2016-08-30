@@ -1,4 +1,4 @@
-﻿#if !PORTABLE
+﻿#if !PORTABLE && !NETCORE
 using System;
 using System.Collections.Generic;
 using System.Linq;
