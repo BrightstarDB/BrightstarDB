@@ -360,21 +360,13 @@ namespace BrightstarDB.EntityFramework
             if (_loadedObjects == null)
             {
                 // Still do the notification, even if the collection is not loaded
-#if WINDOWS_PHONE || PORTABLE
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, o, 0));
-#else
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, o));
-#endif
                 return;
             }
             if (!_loadedObjects.Any(x => x.DataObject.Identity.Equals(o.DataObject.Identity)))
             {
                 _loadedObjects.Add(o);
-#if WINDOWS_PHONE || PORTABLE
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, o, 0));
-#else
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, o));
-#endif
             }
         }
 
@@ -395,24 +387,15 @@ namespace BrightstarDB.EntityFramework
                 }
                 else
                 {
-#if WINDOWS_PHONE || PORTABLE
                     OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
                                                                              removedItem, 0));
-#else
-                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
-                                                            removedItem));
-
-#endif
                 }
                 return;
             }
+            var removeIx = _loadedObjects.FindIndex(o => o.DataObject.Identity.Equals(identity));
             var toRemove = _loadedObjects.Where(o => o.DataObject.Identity.Equals(identity)).ToList();
             _loadedObjects.RemoveAll(o => o.DataObject.Identity.Equals(identity));
-#if WINDOWS_PHONE || PORTABLE
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, toRemove, 0));
-#else
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, toRemove));
-#endif
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, toRemove, removeIx));
         }
 
         /// <summary>
