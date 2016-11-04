@@ -395,7 +395,15 @@ namespace BrightstarDB.EntityFramework
             var removeIx = _loadedObjects.FindIndex(o => o.DataObject.Identity.Equals(identity));
             var toRemove = _loadedObjects.Where(o => o.DataObject.Identity.Equals(identity)).ToList();
             _loadedObjects.RemoveAll(o => o.DataObject.Identity.Equals(identity));
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, toRemove, removeIx));
+            if (removeIx < 0)
+            {
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            }
+            else
+            {
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, toRemove,
+                    removeIx));
+            }
         }
 
         /// <summary>
