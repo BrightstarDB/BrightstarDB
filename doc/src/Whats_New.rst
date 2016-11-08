@@ -14,6 +14,12 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
 
 ****************************
+ BrightstarDB 1.13.2
+****************************
+
+	- FIX: Additional fix to the invocation of the CollectionChanged event in the EntityFramework. (#288)
+
+****************************
  BrightstarDB 1.13.1
 ****************************
 
