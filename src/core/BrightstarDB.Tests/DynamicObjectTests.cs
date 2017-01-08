@@ -303,20 +303,18 @@ namespace BrightstarDB.Tests
             brightstar = dynaStore.GetDataObject(id);
 
             // property values are ALWAYS collections.
-            var name = brightstar.Name.FirstOrDefault();
-            Console.WriteLine("Name = " + name);
+            var name = brightstar.name.FirstOrDefault();
+            Assert.AreEqual("BrightstarDB", name);
 
             // they can be enumerated without a cast
             foreach (var l in brightstar.rdfs__label)
             {
-                Console.WriteLine("Label = " + l);
+                Assert.IsTrue(l.Equals("BrightstarDB") || l.Equals("NoSQL Database"));
             }
 
             // object relationships are navigated in the same way
             var p = brightstar.rdfs__type.FirstOrDefault();
-            Console.WriteLine(p.rdfs__label.FirstOrDefault());
-
-            Console.ReadLine();
+            Assert.AreEqual("Product", p.rdfs__label.FirstOrDefault());
         }
     }
 }

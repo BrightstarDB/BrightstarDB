@@ -1999,6 +1999,39 @@ where {
             }
         }
 
+        public void TestDeletedEntityRetainsItsHashcode()
+        {
+            var storeName = "DeletedEntityRetainsHashcode_" + DateTime.Now.Ticks;
+            IPerson p;
+            int hashCode;
+            string jenId;
+
+            using (
+                var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
+            )
+            {
+                p = context.Persons.Create();
+                p.Name = "jen";
+                context.SaveChanges();
+                jenId = p.Id;
+                hashCode = p.GetHashCode();
+            }
+            using (
+                var context = new MyEntityContext("type=embedded;storesdirectory=c:\\brightstar;storename=" + storeName)
+            )
+            {
+                p = context.Persons.FirstOrDefault(x => x.Id.Equals(jenId));
+                Assert.NotNull(p);
+                Assert.Equals(hashCode, p.GetHashCode());
+                context.DeleteObject(p);
+                Assert.Equals(hashCode, p.GetHashCode());
+                context.SaveChanges();
+            }
+            // Even after closing the context the deleted object should retain its hashcode,
+            // this enables implementation of observable object collections on top of B*
+            Assert.Equals(hashCode, p.GetHashCode());
+        }
+
         [Test]
         public void TestDeleteEntityInSameContext()
         {
