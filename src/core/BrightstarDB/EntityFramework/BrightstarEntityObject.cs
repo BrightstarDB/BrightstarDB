@@ -15,7 +15,18 @@ namespace BrightstarDB.EntityFramework
     {
         private BrightstarEntityContext _context;
         private string _identity;
-        internal IDataObject DataObject { get; set; }
+        private IDataObject _dataObject;
+
+        internal IDataObject DataObject
+        {
+            get { return _dataObject; }
+            set
+            {
+                if (value != null) _identity = value.Identity;
+                _dataObject = value;
+            }
+        }
+
         private readonly Dictionary<string, object> _currentItemValues = new Dictionary<string, object>();
         private readonly Dictionary<string, BrightstarEntityObject> _currentPropertyValues = new Dictionary<string, BrightstarEntityObject>();
         private readonly Dictionary<string, IBrightstarEntityCollection> _currentPropertyCollections = new Dictionary<string, IBrightstarEntityCollection>();
@@ -115,7 +126,7 @@ namespace BrightstarDB.EntityFramework
         /// property with the object attached to a context.</exception>
         protected string Identity
         {
-            get { return DataObject != null ? DataObject.Identity : _identity; }
+            get { return  _identity; }
             set
             {
                 if (value == _identity) return;
@@ -468,7 +479,7 @@ namespace BrightstarDB.EntityFramework
                         foreach (var trackedObject in _context.GetTrackedObjects(existingDataObject))
                         {
                             var otherCollection = p.GetValue(trackedObject, null) as IBrightstarEntityCollection;
-                            if (otherCollection != null) otherCollection.RemoveFromLoadedObjects(DataObject.Identity);
+                            if (otherCollection != null) otherCollection.RemoveFromLoadedObjects(_identity);
                         }
                     }
                 }
@@ -486,7 +497,7 @@ namespace BrightstarDB.EntityFramework
                         foreach (var p in props)
                         {
                             var collection = p.GetValue(trackedObject, null) as IBrightstarEntityCollection;
-                            if (collection != null) collection.RemoveFromLoadedObjects(this.DataObject.Identity);
+                            if (collection != null) collection.RemoveFromLoadedObjects(_identity);
                         }
                     }
                 }
@@ -883,7 +894,7 @@ namespace BrightstarDB.EntityFramework
         /// <filterpriority>2</filterpriority>
         public override int GetHashCode()
         {
-            return DataObject.Identity.GetHashCode();
+            return _identity.GetHashCode();
         }
 
         /// <summary>
@@ -896,7 +907,7 @@ namespace BrightstarDB.EntityFramework
         public override bool Equals(object obj)
         {
             var other = obj as BrightstarEntityObject;
-            return other != null && IsAttached && other.IsAttached && other.DataObject.Identity.Equals(DataObject.Identity);
+            return other != null && IsAttached && other.IsAttached && other._identity.Equals(_identity);
         }
         #endregion
 
