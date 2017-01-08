@@ -14,6 +14,12 @@ either data migration or code changes in client code, these are marked with **BR
 marked with FIX. A number in brackets like this (#123) refers to the relevant issue number in our GitHub issue tracker.
 
 ****************************
+ BrightstarDB 1.13.3
+****************************
+
+	- FIX: Another fix to the EntityFramework to ensure that an object's hashcode remains stable after it is deleted. This is needed to support wrapping entity collections as observable collections in MvvmLight ()
+
+****************************
  BrightstarDB 1.13.2
 ****************************
 
