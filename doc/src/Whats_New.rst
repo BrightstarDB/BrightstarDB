@@ -17,7 +17,7 @@ marked with FIX. A number in brackets like this (#123) refers to the relevant is
  BrightstarDB 1.13.3
 ****************************
 
-	- FIX: Another fix to the EntityFramework to ensure that an object's hashcode remains stable after it is deleted. This is needed to support wrapping entity collections as observable collections in MvvmLight ()
+	- FIX: Another fix to the EntityFramework to ensure that an object's hashcode remains stable after it is deleted. This is needed to support wrapping entity collections as observable collections in MvvmLight (#290)
 
 ****************************
  BrightstarDB 1.13.2
