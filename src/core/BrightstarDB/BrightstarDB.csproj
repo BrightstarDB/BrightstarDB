@@ -116,7 +116,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="VDS.Common, Version=1.6.4.0, Culture=neutral, PublicKeyToken=ab5f4eb908061bf0, processorArchitecture=MSIL">
-      <HintPath>..\..\tools\Polaris\packages\VDS.Common.1.6.4\lib\net40-client\VDS.Common.dll</HintPath>
+      <HintPath>..\packages\VDS.Common.1.6.4\lib\net40-client\VDS.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
