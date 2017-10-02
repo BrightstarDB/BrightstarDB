@@ -19,7 +19,7 @@
     <PackageCertificateKeyFile>BrightstarDB.Portable.Store.Tests_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxBundle>Never</AppxBundle>
     <AllowCrossPlatformRetargeting>False</AllowCrossPlatformRetargeting>
-    <PackageCertificateThumbprint>C87073D3F19CAF4CB5A3752B391563580A0D7C31</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>1292127E2A605FCAB65CCED9D16FC6BBC4561373</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
