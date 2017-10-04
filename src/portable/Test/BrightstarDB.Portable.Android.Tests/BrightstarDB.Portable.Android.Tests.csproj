@@ -16,7 +16,7 @@
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <AssemblyName>BrightstarDB.Portable.Android.Tests</AssemblyName>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <AndroidSupportedAbis>armeabi,armeabi-v7a,x86</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions />
