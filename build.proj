@@ -56,7 +56,6 @@
             <AndroidLib Include="src\portable\BrightstarDB.Portable.Android\bin\$(Configuration)\BrightstarDB.Portable.Android.dll" />
             <DesktopLib Include="src\portable\BrightstarDB.Portable.Desktop\bin\$(Configuration)\BrightstarDB.Portable.Desktop.dll" />
             <iOSLib Include="src\portable\BrightstarDB.Portable.iOS\bin\iPhone\$(Configuration)\BrightstarDB.Portable.iOS.dll" />
-            <MonoTouchLib Include="src\portable\BrightstarDB.Portable.MonoTouch\bin\iPhone\$(Configuration)\BrightstarDB.Portable.MonoTouch.dll" />
             <WindowsPhoneLib Include="src\portable\BrightstarDB.Portable.Phone\bin\$(Configuration)\BrightstarDB.Portable.Phone.dll" />
             <SilverlightLib Include="src\portable\BrightstarDB.Portable.Silverlight\bin\$(Configuration)\BrightstarDB.Portable.Silverlight.dll" />
             <StoreLib Include="src\portable\BrightstarDB.Portable.Store\bin\$(Configuration)\BrightstarDB.Portable.Store.dll" />
@@ -64,7 +63,7 @@
             <Storex86Lib Include="src\portable\BrightstarDB.Portable.Store\bin\x86\$(Configuration)\*.dll" />
         </ItemGroup>
         <Copy SourceFiles="@(PortableSDK)" DestinationFolder="build\sdk\pcl" />
-        <Copy SourceFiles="@(AndroidLib);@(DesktopLib);@(iOSLib);@(MonoTouchLib);@(WindowsPhoneLib);@(SilverlightLib);@(StoreLib)"
+        <Copy SourceFiles="@(AndroidLib);@(DesktopLib);@(iOSLib);@(WindowsPhoneLib);@(SilverlightLib);@(StoreLib)"
               DestinationFolder="build\sdk\pcl\platforms"/>
         <Copy SourceFiles="@(StoreARMLib)" DestinationFolder="build\sdk\pcl_ARM"/>
         <Copy SourceFiles="@(Storex86Lib)" DestinationFolder="build\sdk\pcl_x86"/>
@@ -127,7 +126,6 @@
 			      CompilePortableAndroid;
 			      CompilePortableDesktop;
 			      CompilePortableiOS;
-			      CompilePortableMonoTouch;
 			      CompilePortablePhone;
 			      CompilePortableSilverlight;
 			      CompilePortableStore"/>
@@ -152,13 +150,6 @@
       <MSBuild Projects="src\portable\BrightstarDB.Portable.iOS\BrightstarDB.Portable.iOS.csproj"
 	       Targets="Build"
            Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
-    </Target>
-
-    <Target Name="CompilePortableMonoTouch"
-	    Condition="!$(NoXamarin) AND !$(NoiOS) AND Exists('$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.MonoTouch.CSharp.targets')">
-      <MSBuild Projects="src\portable\BrightstarDB.Portable.MonoTouch\BrightstarDB.Portable.MonoTouch.csproj"
-               Targets="Build"
-               Properties="Configuration=$(Configuration);Platform=AnyCPU"/>
     </Target>
 
     <Target Name="CompilePortablePhone">
