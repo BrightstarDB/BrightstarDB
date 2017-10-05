@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-  <Metadata>
-    <Identity Id="BrightstarDB.EntityFramework.Kal Ahmed.1fc42aaa-e5df-41b9-a34e-cfa06f8a990e" Version="1.0" Language="en-US" Publisher="Kal Ahmed" />
-    <DisplayName>BrightstarDB EntityFramework Item Templates</DisplayName>
-    <Description xml:space="preserve">This VSIX contains C# item templates to make it easy to add BrightstarDB Entity Framework code to your project.</Description>
-    <MoreInfo>http://brighstardb.com/</MoreInfo>
-    <License>LICENSE.txt</License>
-    <GettingStartedGuide>http://brightstardb.readthedocs.org/en/latest/Developer_Quick_Start/</GettingStartedGuide>
-    <Icon>BrightstarDB.EntityFramework.png</Icon>
-    <Tags>brightstardb</Tags>
-  </Metadata>
-  <Installation>
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0]" />
-  </Installation>
-  <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-  </Dependencies>
-  <Assets>
-    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="BrightstarEntityContext" d:TargetPath="|BrightstarEntityContext;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
-    <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="BrightstarEntityDefinition" d:TargetPath="|BrightstarEntityDefinition;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
-  </Assets>
+    <Metadata>
+        <Identity Id="BrightstarDB.EntityFramework.Kal Ahmed.1fc42aaa-e5df-41b9-a34e-cfa06f8a990e" Version="1.0" Language="en-US" Publisher="BrightstarDB Project" />
+        <DisplayName>BrightstarDB EntityFramework Item Templates</DisplayName>
+        <Description xml:space="preserve">This VSIX contains C# item templates to make it easy to add BrightstarDB Entity Framework code to your project.</Description>
+        <MoreInfo>http://brighstardb.com/</MoreInfo>
+        <License>LICENSE.txt</License>
+        <GettingStartedGuide>http://brightstardb.readthedocs.org/en/latest/Developer_Quick_Start/</GettingStartedGuide>
+        <Icon>BrightstarDB.EntityFramework.png</Icon>
+        <Tags>brightstardb</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0, 15.0]" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+    </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="BrightstarEntityContext" d:TargetPath="|BrightstarEntityContext;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+        <Asset Type="Microsoft.VisualStudio.ItemTemplate" d:Source="Project" d:ProjectName="BrightstarEntityDefinition" d:TargetPath="|BrightstarEntityDefinition;TemplateProjectOutputGroup|" Path="ItemTemplates" d:VsixSubPath="ItemTemplates" />
+    </Assets>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[14.0,16.0)" DisplayName="Visual Studio core editor" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.Roslyn.LanguageServices" Version="[14.0,16.0)" DisplayName="C# and Visual Basic" />
+        <Prerequisite Id="Microsoft.VisualStudio.Component.TextTemplating" Version="[14.0,16.0)" DisplayName="Text Template Transformation" />
+    </Prerequisites>
 </PackageManifest>

@@ -9,6 +9,7 @@
     <RequiredFrameworkVersion>2.0</RequiredFrameworkVersion>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <DefaultName>MyEntityContext.tt</DefaultName>
+    <ShowByDefault>true</ShowByDefault>
   </TemplateData>
   <TemplateContent>
     <ProjectItem ReplaceParameters="true">MyEntityContext.tt</ProjectItem>

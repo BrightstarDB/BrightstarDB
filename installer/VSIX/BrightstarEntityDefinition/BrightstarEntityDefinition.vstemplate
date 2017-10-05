@@ -9,6 +9,7 @@
     <RequiredFrameworkVersion>4.0</RequiredFrameworkVersion>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <DefaultName>IMyEntity.cs</DefaultName>
+    <ShowByDefault>true</ShowByDefault>
   </TemplateData>
   <TemplateContent>
     <References>
