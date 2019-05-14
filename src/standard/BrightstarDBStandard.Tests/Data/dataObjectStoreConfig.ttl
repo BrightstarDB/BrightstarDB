@@ -1,0 +1,28 @@
+﻿@prefix dnr: <http://www.dotnetrdf.org/configuration#> .
+@prefix bst: <http://www.brightstardb.com/tests#> .
+@prefix : <http://example.org/configuration#>.
+
+bst:people a dnr:StorageProvider;
+	dnr:type "VDS.RDF.Storage.InMemoryManager" ;
+	dnr:usingStore _:peopleStore.
+
+_:peopleStore a dnr:TripleStore;
+	dnr:type "VDS.RDF.TripleStore" ;
+	dnr:usingGraph bst:peopleGraph ;
+	dnr:usingGraph bst:addGraph .
+
+bst:empty a dnr:StorageProvider;
+	dnr:type "VDS.RDF.Storage.InMemoryManager" .
+
+bst:peopleGraph a dnr:Graph ;
+	dnr:type "VDS.RDF.Graph" ;
+	dnr:fromFile "people.ttl" ;
+	dnr:assignUri <http://example.org/people> .
+
+bst:addGraph a dnr:Graph ;
+	dnr:type "VDS.RDF.Graph" ;
+	dnr:assignUri <http://example.org/addGraph> .
+
+bst:fuseki a dnr:StorageProvider ;
+	dnr:type "VDS.RDF.Storage.FusekiConnector" ;
+	dnr:server "http://localhost:3030/ds/data" .

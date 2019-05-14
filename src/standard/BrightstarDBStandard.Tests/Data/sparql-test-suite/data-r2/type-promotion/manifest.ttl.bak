@@ -1,0 +1,405 @@
+# $Id: manifest.ttl,v 1.2 2007/07/25 20:07:27 lfeigenb Exp $
+
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dawgt:   <http://www.w3.org/2001/sw/DataAccess/tests/test-dawg#> .
+@prefix mf:     <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
+@prefix qt:     <http://www.w3.org/2001/sw/DataAccess/tests/test-query#> .
+
+<>  rdf:type mf:Manifest ;
+    rdfs:comment "Type Promotion Tests" ;
+    mf:entries
+    (
+      <#type-promotion-01>
+      <#type-promotion-02>
+      <#type-promotion-03>
+      <#type-promotion-04>
+      <#type-promotion-05>
+      <#type-promotion-06>
+      <#type-promotion-07>
+      <#type-promotion-08>
+      <#type-promotion-09>
+      <#type-promotion-10>
+      <#type-promotion-11>
+      <#type-promotion-12>
+      <#type-promotion-13>
+      <#type-promotion-14>
+      <#type-promotion-15>
+      <#type-promotion-16>
+      <#type-promotion-17>
+      <#type-promotion-18>
+      <#type-promotion-19>
+      <#type-promotion-20>
+      <#type-promotion-21>
+      <#type-promotion-22>
+      <#type-promotion-23>
+      <#type-promotion-24>
+      <#type-promotion-25>
+      <#type-promotion-26>
+      <#type-promotion-27>
+      <#type-promotion-28>
+      <#type-promotion-29>
+      <#type-promotion-30>
+    ) .
+
+
+<#type-promotion-01>
+        mf:name    "tP-double-double" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-double-double.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-02>
+        mf:name    "tP-double-float" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-double-float.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-03>
+        mf:name    "tP-double-decimal" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-double-decimal.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-04>
+        mf:name    "tP-float-float" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-float-float.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-05>
+        mf:name    "tP-float-decimal" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-float-decimal.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-06>
+        mf:name    "tP-decimal-decimal" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-decimal-decimal.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-07>
+        mf:name    "tP-integer-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-integer-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-08>
+        mf:name    "tP-nonPositiveInteger-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-nonPositiveInteger-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-09>
+        mf:name    "tP-negativeInteger-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-negativeInteger-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-10>
+        mf:name    "tP-long-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-long-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-11>
+        mf:name    "tP-int-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-int-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-12>
+        mf:name    "tP-short-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-short-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-13>
+        mf:name    "tP-byte-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-byte-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-14>
+        mf:name    "tP-nonNegativeInteger-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-nonNegativeInteger-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-15>
+        mf:name    "tP-unsignedLong-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-unsignedLong-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-16>
+        mf:name    "tP-unsignedInt-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-unsignedInt-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-17>
+        mf:name    "tP-unsignedShort-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-unsignedShort-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-18>
+        mf:name    "tP-unsignedByte-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-unsignedByte-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-19>
+        mf:name    "tP-positiveInteger-short" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-positiveInteger-short.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-20>
+        mf:name    "tP-short-double" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-short-double.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-21>
+        mf:name    "tP-short-float" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-short-float.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-22>
+        mf:name    "tP-short-decimal" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-short-decimal.rq> ] ;
+        mf:result  <true.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-23>
+        mf:name    "tP-short-short-fail" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-short-short-fail.rq> ] ;
+        mf:result  <false.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-24>
+        mf:name    "tP-byte-short-fail" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-byte-short-fail.rq> ] ;
+        mf:result  <false.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-25>
+        mf:name    "tP-short-long-fail" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-short-long-fail.rq> ] ;
+        mf:result  <false.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-26>
+        mf:name    "tP-short-int-fail" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-short-int-fail.rq> ] ;
+        mf:result  <false.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-27>
+        mf:name    "tP-short-byte-fail" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-short-byte-fail.rq> ] ;
+        mf:result  <false.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-28>
+        mf:name    "tP-double-float-fail" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-double-float-fail.rq> ] ;
+        mf:result  <false.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-29>
+        mf:name    "tP-double-decimal-fail" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-double-decimal-fail.rq> ] ;
+        mf:result  <false.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .
+<#type-promotion-30>
+        mf:name    "tP-float-decimal-fail" ;
+    dawgt:approval dawgt:Approved ;
+    dawgt:approvedBy <http://www.w3.org/2007/07/17-dawg-minutes> ;
+        rdfs:comment
+            "Positive test: product of type promotion within the xsd:decimal type tree." ;
+        mf:action
+            [ qt:data   <tP.ttl> ;
+              qt:query  <tP-float-decimal-fail.rq> ] ;
+        mf:result  <false.ttl> ;
+        dawgt:approval dawgt:NotApproved
+     .

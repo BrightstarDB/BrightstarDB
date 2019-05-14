@@ -1,0 +1,27 @@
+<http://example.org/resource1> <http://example.org/property> <http://example.org/resource2> <http://www.np.com/graph1> .
+_:anon <http://example.org/property> <http://example.org/resource2> <http://www.np.com/graph1> .
+<http://example.org/resource2> <http://example.org/property> _:anon <http://www.np.com/graph1> .
+
+# spaces and tabs throughout:
+ 	 <http://example.org/resource3> 	 <http://example.org/property>	 <http://example.org/resource2>	 	 <http://www.np.com/graph1> 	.	 
+
+# line ending with CR NL (ASCII 13, ASCII 10)
+<http://example.org/resource4> <http://example.org/property> <http://example.org/resource2> <http://www.np.com/graph1> .
+
+# 2 statement lines separated by single CR (ASCII 10)
+<http://example.org/resource5> <http://example.org/property> <http://example.org/resource2> <http://www.np.com/graph1> .
+
+# All literal escapes
+<http://example.org/resource7> <http://example.org/property> "simple literal" <http://www.np.com/graph1>.
+
+# Space is optional before final .
+<http://example.org/resource13> <http://example.org/property> <http://example.org/resource2>.
+<http://example.org/resource14> <http://example.org/property> "x" <http://www.np.com/graph1>.
+<http://example.org/resource15> <http://example.org/property> _:anon <http://www.np.com/graph1>.
+
+# XML Literals as Datatyped Literals
+<http://example.org/resource21> <http://example.org/property> ""^^<http://www.w3.org/2000/01/rdf-schema#XMLLiteral> <http://www.np.com/graph1>.
+<http://example.org/resource31> <http://example.org/property> "chat"@en <http://www.np.com/graph1>.
+<http://example.org/resource32> <http://example.org/property> "abc"^^<http://example.org/datatype1> <http://www.np.com/graph1>.
+
+

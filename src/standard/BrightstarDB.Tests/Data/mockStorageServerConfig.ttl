@@ -1,0 +1,10 @@
+﻿@prefix <http://www.dotnetrdf.org/configuration#> .
+
+_:factory a dnr:ObjectFactory ;
+	dnr:type "BrightstarDB.Tests.DataObjectsTests.MockStorageServerFactory, BrightstarDB.Tests".
+
+:server a dnr:StorageServer ;
+  dnr:type "BrightstarDB.Tests.DataObjectsTests.MockStorageServer" ;
+  dnr:server "http://sesame.example.com" ;
+  dnr:storeId "foo";
+  dnr:storeId "bar".

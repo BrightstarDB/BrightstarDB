@@ -1,0 +1,229 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4EB8BF43-94B1-4264-B2C9-9EE1BAB7F094}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BrightstarDB.Tests</RootNamespace>
+    <AssemblyName>BrightstarDB.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\key\brightstardb.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="dotNetRDF, Version=1.0.12.0, Culture=neutral, PublicKeyToken=6055ffe4c97cc780, processorArchitecture=MSIL">
+      <HintPath>..\packages\dotNetRDF.1.0.12\lib\net40\dotNetRDF.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net40\HtmlAgilityPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Moq, Version=4.2.1507.118, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.2.1507.0118\lib\net40\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nancy, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nancy.1.4.3\lib\net40\Nancy.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Nancy.Hosting.Self, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nancy.Hosting.Self.1.4.1\lib\net40\Nancy.Hosting.Self.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.2.1\lib\net40\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Remotion.Linq, Version=1.13.102.1, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Remotion.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.Services" />
+    <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Activation" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="VDS.Common, Version=1.6.4.0, Culture=neutral, PublicKeyToken=ab5f4eb908061bf0, processorArchitecture=MSIL">
+      <HintPath>..\packages\VDS.Common.1.6.4\lib\net40-client\VDS.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <CodeAnalysisDependentAssemblyPaths Condition=" '$(VS100COMNTOOLS)' != '' " Include="$(VS100COMNTOOLS)..\IDE\PrivateAssemblies">
+      <Visible>False</Visible>
+    </CodeAnalysisDependentAssemblyPaths>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CachingTests.cs" />
+    <Compile Include="ClientTestBase.cs" />
+    <Compile Include="ClientTests.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="ConnectionStringTests.cs" />
+    <Compile Include="DataObjectsTests\BasicDataObjectsTests.cs" />
+    <Compile Include="DataObjectsTests\DotNetRdfDataObjectStoreTests.cs" />
+    <Compile Include="DataObjectsTests\DotNetRdfStorageProviderConnectionStringTests.cs" />
+    <Compile Include="DataObjectsTests\DotNetRdfStorageServerConnectionStringTests.cs" />
+    <Compile Include="DataObjectsTests\LiteralPropertiesTests.cs" />
+    <Compile Include="DataObjectsTests\MockStorageServerFactory.cs" />
+    <Compile Include="DataObjectsTests\SparqlConnectionStringTests.cs" />
+    <Compile Include="DataObjectsTests\StoreCallbackTests.cs" />
+    <Compile Include="DynamicObjectTests.cs" />
+    <Compile Include="EmbeddedClientTests.cs" />
+    <Compile Include="EntityFrameworkAssemblyAttributes.cs" />
+    <Compile Include="EntityFramework\ContextCallbackTests.cs" />
+    <Compile Include="EntityFramework\DotNetRdfContextTests.cs" />
+    <Compile Include="EntityFramework\EmbeddedOptimisticLockingTests.cs" />
+    <Compile Include="EntityFramework\EntityFrameworkGraphTargetingTests.cs" />
+    <Compile Include="EntityFramework\GeneratedKeyTests.cs" />
+    <Compile Include="EntityFramework\IArticle.cs" />
+    <Compile Include="EntityFramework\EFClientTests.cs" />
+    <Compile Include="EntityFramework\DataTypeTests.cs" />
+    <Compile Include="EntityFramework\IChildEntity2.cs" />
+    <Compile Include="EntityFramework\IParentEntity2.cs" />
+    <Compile Include="EntityFramework\TestEntity.cs" />
+    <Compile Include="EntityFramework\ExtendedContextTests.cs" />
+    <Compile Include="EntityFramework\IChildEntity.cs" />
+    <Compile Include="EntityFramework\INoId.cs" />
+    <Compile Include="EntityFramework\InversePropertyTests.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IPerformance.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IPhoto.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IProduction.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IProductionMember.cs" />
+    <Compile Include="EntityFramework\InverseProperty\IProductionPerson.cs" />
+    <Compile Include="EntityFramework\IParentEntity.cs" />
+    <Compile Include="EntityFramework\IStringKeyEntity.cs" />
+    <Compile Include="EntityFramework\IBaseEntity.cs" />
+    <Compile Include="EntityFramework\IChildKeyEntity.cs" />
+    <Compile Include="EntityFramework\ICompany.cs" />
+    <Compile Include="EntityFramework\ICompositeKeyEntity.cs" />
+    <Compile Include="EntityFramework\IConcept.cs" />
+    <Compile Include="EntityFramework\IDBPediaPerson.cs" />
+    <Compile Include="EntityFramework\IdentifierEncodingTests.cs" />
+    <Compile Include="EntityFramework\IDepartment.cs" />
+    <Compile Include="EntityFramework\IDerivedEntity.cs" />
+    <Compile Include="EntityFramework\ITestEntity.cs" />
+    <Compile Include="EntityFramework\IFoafAgent.cs" />
+    <Compile Include="EntityFramework\IFoafPerson.cs" />
+    <Compile Include="EntityFramework\IHierarchicalKeyEntity.cs" />
+    <Compile Include="EntityFramework\IIdentityClashTest.cs" />
+    <Compile Include="EntityFramework\IJobRole.cs" />
+    <Compile Include="EntityFramework\ILowerKeyEntity.cs" />
+    <Compile Include="EntityFramework\IMarket.cs" />
+    <Compile Include="EntityFramework\ISession.cs" />
+    <Compile Include="EntityFramework\ITrackable.cs" />
+    <Compile Include="EntityFramework\IUriEntity.cs" />
+    <Compile Include="EntityFramework\LinqTests.cs" />
+    <Compile Include="EntityFramework\IAnimal.cs" />
+    <Compile Include="EntityFramework\IPerson.cs" />
+    <Compile Include="EntityFramework\ISkill.cs" />
+    <Compile Include="EntityFramework\LowercaseKeyConverter.cs" />
+    <Compile Include="EntityFramework\MyEntityContext.cs">
+      <DependentUpon>MyEntityContext.tt</DependentUpon>
+      <SubType>Code</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="EntityFramework\NoIdPropertyTests.cs" />
+    <Compile Include="EntityFramework\OptimisticLockingTestsBase.cs" />
+    <Compile Include="EntityFramework\PlainLiteralTests.cs" />
+    <Compile Include="EntityFramework\PropertyChangeNotificationTests.cs" />
+    <Compile Include="EntityFramework\QueryableCollectionsTests.cs" />
+    <Compile Include="EntityFramework\SimpleContextTests.cs" />
+    <Compile Include="EntityFramework\InterfaceInheritanceTests.cs" />
+    <Compile Include="EntityFramework\SparqlContextTests.cs" />
+    <Compile Include="EntityFramework\StringComparisonTests.cs" />
+    <Compile Include="EntityFramework\UniqueKeyConstraintTests.cs" />
+    <Compile Include="NamespaceDeclarationTests.cs" />
+    <Compile Include="RdfDatatypesTests.cs" />
+    <Compile Include="SparqlQueryHelperTests.cs" />
+    <Compile Include="TestHelper.cs" />
+    <Compile Include="GraphTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SparqlDawgTests\ManifestAll.cs" />
+    <Compile Include="SparqlDawgTests\SparqlTest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SparqlExtensionTests.cs" />
+    <Compile Include="SparqlUpdateTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\nquads.txt" />
+    <Content Include="Data\ntriples.txt" />
+    <Content Include="Data\simple.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Data\bsbm_370k.nt" />
+    <None Include="Data\dataObjectStoreConfig.ttl" />
+    <None Include="Data\mockStorageServerConfig.ttl" />
+    <None Include="Data\multipleObjectStoreConfiguration.ttl" />
+    <None Include="Data\people.ttl" />
+    <None Include="Data\persondata_en_subset.nt" />
+    <None Include="Data\escaping.nt" />
+    <None Include="EntityFramework\MyEntityContext.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MyEntityContext.cs</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BrightstarDBStandard\BrightstarDBStandard.csproj">
+      <Project>{ff9d2fe0-b440-4097-adb2-7326fb3cfd8a}</Project>
+      <Name>BrightstarDBStandard</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Target Name="BeforeBuild">
+    <Copy SourceFiles="..\..\tools\EntityFrameworkGenerator\MyEntityContext.tt" DestinationFiles="EntityFramework\MyEntityContext.tt" />
+  </Target>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+</Project>

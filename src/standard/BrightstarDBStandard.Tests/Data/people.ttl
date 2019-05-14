@@ -1,0 +1,12 @@
+﻿@prefix : <http://www.networkedplanet.com/people/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+:alice a foaf:Person ;
+	foaf:name "Alice"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	foaf:mbox "alice@example.org"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	foaf:knows :bob .
+
+:bob a foaf:Person ;
+	foaf:name "Bob"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	foaf:mbox "bob@example.org"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	foaf:knows :alice .

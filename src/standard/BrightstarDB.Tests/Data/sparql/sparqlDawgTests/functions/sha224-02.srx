@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+<head>
+	<variable name="hash"/>
+</head>
+<results>
+		<result>
+			<binding name="hash"><literal>bc87594422245daa99969102aa30bba1f5a67cf2d24db29af0696b5e</literal></binding>
+		</result>
+</results>
+</sparql>
