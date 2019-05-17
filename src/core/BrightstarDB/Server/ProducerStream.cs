@@ -1,5 +1,4 @@
-﻿#if !PORTABLE
-using System;
+﻿using System;
 using System.IO;
 
 namespace BrightstarDB.Server
@@ -13,12 +12,19 @@ namespace BrightstarDB.Server
             _connectionStream = connectionStream;
         }
 
+#if NETSTANDARD16
+        public void Close()
+        {
+            _connectionStream.IsProducerClosed = true;
+        }
+#else
         public override void Close()
         {
             _connectionStream.IsProducerClosed = true;
         }
+#endif
 
-        #region Overrides of Stream
+#region Overrides of Stream
 
         /// <summary>
         /// When overridden in a derived class, clears all buffers for this stream and causes any buffered data to be written to the underlying device.
@@ -131,7 +137,6 @@ namespace BrightstarDB.Server
             set { throw new NotSupportedException(); }
         }
 
-        #endregion
+#endregion
     }
 }
-#endif

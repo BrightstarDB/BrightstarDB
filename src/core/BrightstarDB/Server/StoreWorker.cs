@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using BrightstarDB.Dto;
 using BrightstarDB.Model;
 #if PORTABLE
@@ -16,9 +17,6 @@ using BrightstarDB.Query;
 using BrightstarDB.Storage;
 using BrightstarDB.Storage.Persistence;
 using VDS.RDF.Query;
-#if !SILVERLIGHT
-using System.ServiceModel;
-#endif
 
 namespace BrightstarDB.Server
 {
@@ -108,6 +106,7 @@ namespace BrightstarDB.Server
         /// </summary>
         public void Start()
         {
+            
             ThreadPool.QueueUserWorkItem(ProcessJobs);
         }
 
@@ -150,7 +149,7 @@ namespace BrightstarDB.Server
                                 var st = DateTime.UtcNow;
                                 job.Run();
                                 var et = DateTime.UtcNow;
-#if SILVERLIGHT || PORTABLE
+#if NETSTANDARD16
                                 Logging.LogInfo("Job completed in {0}", et.Subtract(st).TotalMilliseconds);
 #else
                                 Logging.LogInfo("Job completed in {0} : Current memory usage : {1}",et.Subtract(st).TotalMilliseconds, System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 );

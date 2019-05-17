@@ -1,10 +1,6 @@
 ﻿using System;
 using BrightstarDB.Dto;
 
-#if !SILVERLIGHT && !NETCORE
-using System.ServiceModel;
-#endif
-
 namespace BrightstarDB.Server
 {
     internal abstract class Job

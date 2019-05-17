@@ -1,14 +1,10 @@
-﻿#if !PORTABLE
+﻿
+using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 using BrightstarDB.Caching;
 using BrightstarDB.Config;
 using BrightstarDB.Storage;
-using System.Configuration;
-
-#if SILVERLIGHT
-using System.IO.IsolatedStorage;
-#endif
 
 namespace BrightstarDB
 {
@@ -59,51 +55,29 @@ namespace BrightstarDB
         private const long DefaultQueryExecutionTimeout =  180000;
         private const long DefaultUpdateExecutionTimeout = 180000;
         
-#if WINDOWS_PHONE
-        private const int DefaultPageCacheSize = 4; // in MB
-        private const int DefaultResourceCacheLimit = 10000; // number of entries
-#else
         private const int DefaultPageCacheSize = 2048; // in MB
         private const int DefaultQueryCacheMemory = 256; // in MB
         private const int DefaultResourceCacheLimit = 1000000; // number of entries
-#endif
 
         static Configuration()
         {
             IsRunningOnMono = (Type.GetType("Mono.Runtime") != null);
-#if WINDOWS_PHONE
-            var store = IsolatedStorageFile.GetUserStoreForApplication();
-            if (!store.DirectoryExists("brightstar"))
-            {
-                store.CreateDirectory("brightstar");
-            }
-            StoreLocation = "brightstar";
-            TransactionFlushTripleCount = 1000;
-            QueryCache = new NullCache();
-#elif PORTABLE
-            StoreLocation = "brightstar";
-            TransactionFlushTripleCount = 1000;
-            PageCacheSize = DefaultPageCacheSize;
-            ResourceCacheLimit = DefaultResourceCacheLimit;
-            EnableOptimisticLocking = false;
-            EnableQueryCache = false;
-            PersistenceType = DefaultPersistenceType;
-            QueryCache = new NullCache();
-#else
-            var appSettings = ConfigurationManager.AppSettings;
-            StoreLocation = appSettings.Get(StoreLocationPropertyName);
+            var configuration = new ConfigurationBuilder();
+            configuration.AddXmlFile("app.config")
+                .AddJsonFile("appSettings.json");
+            var appSettings = configuration.Build();
+            StoreLocation = appSettings[StoreLocationPropertyName];
 
             // Transaction Flushing
-            TransactionFlushTripleCount = GetApplicationSetting(TxnFlushTriggerPropertyName, 10000);
+            TransactionFlushTripleCount = GetApplicationSetting(appSettings, TxnFlushTriggerPropertyName, 10000);
 
             // Read Store cache
             // TODO : Remove this if it is no longer in use.
-            var readStoreObjectCacheSizeString = appSettings.Get(ReadStoreObjectCacheSizeName);
+            var readStoreObjectCacheSizeString = appSettings[ReadStoreObjectCacheSizeName];
             ReadStoreObjectCacheSize = 10000;
             if (!string.IsNullOrEmpty(readStoreObjectCacheSizeString))
             {
-                int val;
-                if (int.TryParse(readStoreObjectCacheSizeString, out val))
+                if (int.TryParse(readStoreObjectCacheSizeString, out var val))
                 {
                     if (val > 0)
                     {
@@ -113,38 +87,35 @@ namespace BrightstarDB
             }
 
             // Connection String
-            ConnectionString = appSettings.Get(ConnectionStringPropertyName);
+            ConnectionString = appSettings[ConnectionStringPropertyName];
 
             // Query Caching
-            var enableQueryCacheString = appSettings.Get(EnableQueryCacheName);
+            var enableQueryCacheString = appSettings[EnableQueryCacheName];
             EnableQueryCache = true;
             if (!string.IsNullOrEmpty(enableQueryCacheString))
             {
                 EnableQueryCache = bool.Parse(enableQueryCacheString);
             }
-            QueryCacheMemory = GetApplicationSetting(QueryCacheMemoryName, DefaultQueryCacheMemory);
-            QueryCacheDiskSpace = GetApplicationSetting(QueryCacheDiskSpaceName, DefaultQueryCacheDiskSpace);
-            QueryCacheDirectory = appSettings.Get(QueryCacheDirectoryName);
+            QueryCacheMemory = GetApplicationSetting(appSettings, QueryCacheMemoryName, DefaultQueryCacheMemory);
+            QueryCacheDiskSpace = GetApplicationSetting(appSettings, QueryCacheDiskSpaceName, DefaultQueryCacheDiskSpace);
+            QueryCacheDirectory = appSettings[QueryCacheDirectoryName];
             QueryCache = GetQueryCache();
 
             // Virtualized queries
-            EnableVirtualizedQueries = GetApplicationSetting(EnableVirtualizedQueriesName, false);
+            EnableVirtualizedQueries = GetApplicationSetting(appSettings, EnableVirtualizedQueriesName, false);
 
             // StatsUpdate properties
-            StatsUpdateTransactionCount = GetApplicationSetting(StatsUpdateTransactionCountName, 0);
-            StatsUpdateTimespan = GetApplicationSetting(StatsUpdateTimeSpanName, 0);
+            StatsUpdateTransactionCount = GetApplicationSetting(appSettings, StatsUpdateTransactionCountName, 0);
+            StatsUpdateTimespan = GetApplicationSetting(appSettings, StatsUpdateTimeSpanName, 0);
 
             // Advanced embedded application settings - read from the brightstar section of the app/web.config
-            EmbeddedServiceConfiguration = ConfigurationManager.GetSection("brightstar") as EmbeddedServiceConfiguration ??
-                                           new EmbeddedServiceConfiguration();
+            EmbeddedServiceConfiguration = appSettings.GetSection("brightstar").Get<EmbeddedServiceConfiguration>();
 
-#endif
-#if !PORTABLE
             // ResourceCacheLimit
-            ResourceCacheLimit = GetApplicationSetting(ResourceCacheLimitName, DefaultResourceCacheLimit);
+            ResourceCacheLimit = GetApplicationSetting(appSettings, ResourceCacheLimitName, DefaultResourceCacheLimit);
 
             // Persistence Type
-            var persistenceTypeSetting = GetApplicationSetting(PersistenceTypeName);
+            var persistenceTypeSetting = GetApplicationSetting(appSettings, PersistenceTypeName);
             if (!String.IsNullOrEmpty(persistenceTypeSetting))
             {
                 switch (persistenceTypeSetting.ToLowerInvariant())
@@ -166,9 +137,8 @@ namespace BrightstarDB
             }
 
             // Page Cache Size
-            var pageCacheSizeSetting = GetApplicationSetting(PageCacheSizeName);
-            int pageCacheSize;
-            if (!String.IsNullOrEmpty(pageCacheSizeSetting) && Int32.TryParse(pageCacheSizeSetting, out pageCacheSize))
+            var pageCacheSizeSetting = GetApplicationSetting(appSettings, PageCacheSizeName);
+            if (!String.IsNullOrEmpty(pageCacheSizeSetting) && Int32.TryParse(pageCacheSizeSetting, out var pageCacheSize))
             {
                 PageCacheSize = pageCacheSize;
             }
@@ -177,12 +147,10 @@ namespace BrightstarDB
                 PageCacheSize = DefaultPageCacheSize;
             }
 
-#if !WINDOWS_PHONE
             // Clustering
-            var clusterNodePortSetting = GetApplicationSetting(ClusterNodePortName);
-            int clusterNodePort;
+            var clusterNodePortSetting = GetApplicationSetting(appSettings, ClusterNodePortName);
             if (!String.IsNullOrEmpty(clusterNodePortSetting) &&
-                Int32.TryParse(clusterNodePortSetting, out clusterNodePort))
+                Int32.TryParse(clusterNodePortSetting, out var clusterNodePort))
             {
                 ClusterNodePort = clusterNodePort;
             }
@@ -190,10 +158,9 @@ namespace BrightstarDB
             {
                 ClusterNodePort = 10001;
             }
-#endif
-#endif
-            QueryExecutionTimeout = GetApplicationSetting(QueryExecutionTimeoutName, DefaultQueryExecutionTimeout);
-            UpdateExecutionTimeout = GetApplicationSetting(UpdateExecutionTimeoutName, DefaultUpdateExecutionTimeout);
+
+            QueryExecutionTimeout = GetApplicationSetting(appSettings, QueryExecutionTimeoutName, DefaultQueryExecutionTimeout);
+            UpdateExecutionTimeout = GetApplicationSetting(appSettings, UpdateExecutionTimeoutName, DefaultUpdateExecutionTimeout);
         }
 
         /// <summary>
@@ -238,7 +205,7 @@ namespace BrightstarDB
         /// </summary>
         public static bool EnableQueryCache
         {
-            get { return _enableQueryCache; }
+            get => _enableQueryCache;
             set
             {
                 if (value == _enableQueryCache) return;
@@ -252,7 +219,7 @@ namespace BrightstarDB
         /// </summary>
         public static string QueryCacheDirectory
         {
-            get { return _queryCacheDirectory; }
+            get => _queryCacheDirectory;
             set
             {
                 if (value == _queryCacheDirectory) return;
@@ -266,7 +233,7 @@ namespace BrightstarDB
         /// </summary>
         public static int QueryCacheMemory
         {
-            get { return _queryCacheMemory; }
+            get => _queryCacheMemory;
             set
             {
                 if (value == _queryCacheMemory) return;
@@ -280,7 +247,7 @@ namespace BrightstarDB
         /// </summary>
         public static int QueryCacheDiskSpace
         {
-            get { return _queryCacheDiskSpace; }
+            get => _queryCacheDiskSpace;
             set
             {
                 if (value == _queryCacheDiskSpace) return;
@@ -294,8 +261,8 @@ namespace BrightstarDB
         /// </summary>
         public static ICache QueryCache
         {
-            get { return _queryCache ?? (_queryCache = GetQueryCache()); }
-            private set { _queryCache = value; }
+            get => _queryCache ?? (_queryCache = GetQueryCache());
+            private set => _queryCache = value;
         }
 
 
@@ -367,10 +334,10 @@ namespace BrightstarDB
         /// by the server.</remarks>
         public static long UpdateExecutionTimeout
         {
-            get { return VDS.RDF.Options.UpdateExecutionTimeout; }
-            set { VDS.RDF.Options.UpdateExecutionTimeout = value; }
+            get => VDS.RDF.Options.UpdateExecutionTimeout;
+            set => VDS.RDF.Options.UpdateExecutionTimeout = value;
         }
-#if !PORTABLE
+
         private static ICache GetQueryCache()
         {
             if (EnableQueryCache == false)
@@ -399,55 +366,38 @@ namespace BrightstarDB
                 return memoryCache;
             }
         }
-#endif
 
-#if !PORTABLE
-        private static string GetApplicationSetting(string key)
+        private static string GetApplicationSetting(IConfiguration config, string key)
         {
-#if WINDOWS_PHONE
-            string value;
-            if (IsolatedStorageSettings.ApplicationSettings.TryGetValue(key, out value))
-            {
-                return value;
-            }
-            return null;
-#else
-            return ConfigurationManager.AppSettings.Get(key);
-#endif
+            return config[key];
         }
 
-        private static bool GetApplicationSetting(string key, bool defaultValue)
+        private static bool GetApplicationSetting(IConfiguration config, string key, bool defaultValue)
         {
-            var setting = GetApplicationSetting(key);
-            bool value;
-            if (!string.IsNullOrEmpty(setting) && bool.TryParse(setting, out value)) return value;
+            var setting = GetApplicationSetting(config, key);
+            if (!string.IsNullOrEmpty(setting) && bool.TryParse(setting, out var value)) return value;
             return defaultValue;
         }
 
-        private static int GetApplicationSetting(string key, int defaultValue)
+        private static int GetApplicationSetting(IConfiguration config, string key, int defaultValue)
         {
-            var setting = GetApplicationSetting(key);
-            int intValue;
-            if (!String.IsNullOrEmpty(setting) && Int32.TryParse(setting, out intValue))
+            var setting = GetApplicationSetting(config, key);
+            if (!string.IsNullOrEmpty(setting) && int.TryParse(setting, out var intValue))
             {
                 return intValue;
             }
             return defaultValue;
         }
 
-        private static long GetApplicationSetting(string key, long defaultValue)
+        private static long GetApplicationSetting(IConfiguration config, string key, long defaultValue)
         {
-            var setting = GetApplicationSetting(key);
-            long longValue;
-            if (!String.IsNullOrEmpty(setting) && Int64.TryParse(setting, out longValue))
+            var setting = GetApplicationSetting(config, key);
+            if (!string.IsNullOrEmpty(setting) && long.TryParse(setting, out var longValue))
             {
                 return longValue;
             }
             return defaultValue;
         }
 
-#endif
-
     }
 }
-#endif

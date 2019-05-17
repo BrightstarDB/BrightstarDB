@@ -7,17 +7,12 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using BrightstarDB.Server;
-using VDS.RDF;
-using VDS.RDF.Query;
-#if !PORTABLE && !WINDOWS_PHONE && !NETCORE
-using System.ServiceModel.Security.Tokens;
-using System.Web.Script.Serialization;
-#endif
+using System.Threading.Tasks;
 using BrightstarDB.Caching;
 using BrightstarDB.Client.RestSecurity;
 using BrightstarDB.Dto;
 using BrightstarDB.Storage;
+using VDS.RDF;
 
 namespace BrightstarDB.Client
 {
@@ -1079,6 +1074,7 @@ namespace BrightstarDB.Client
 
         #endregion
 
+#if NET40
         private HttpWebResponse AuthenticatedGet(string relativePath)
         {
             var uri = new Uri(_serviceEndpoint, relativePath);
@@ -1103,6 +1099,37 @@ namespace BrightstarDB.Client
                 throw new BrightstarClientException(webExceptionDetail, wex);
             }
         }
+#else
+        private HttpWebResponse AuthenticatedGet(string relativePath)
+        {
+            return AuthenticatedGetAsync(relativePath).GetAwaiter().GetResult();
+        }
+
+        private async Task<HttpWebResponse> AuthenticatedGetAsync(string relativePath)
+        {
+            var uri = new Uri(_serviceEndpoint, relativePath);
+            var getRequest = WebRequest.Create(uri.ToString()) as HttpWebRequest;
+            if (getRequest == null) throw new ArgumentException(Strings.NotAnHttpRequest);
+            getRequest.Accept = JsonContentType;
+            SetDateHeader(getRequest);
+            _requestAuthenticator.Authenticate(getRequest);
+
+            try
+            {
+                var ret = (await getRequest.GetResponseAsync()) as HttpWebResponse;
+                if (ret != null)
+                {
+                    LastResponseTimestamp = DateTime.Now;
+                }
+                return ret;
+            }
+            catch (WebException wex)
+            {
+                var webExceptionDetail = GetAndLogWebExceptionDetail("GET", relativePath, wex);
+                throw new BrightstarClientException(webExceptionDetail, wex);
+            }
+        }
+#endif
 
         private void SetDateHeader(HttpWebRequest httpWebRequest)
         {

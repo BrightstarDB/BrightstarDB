@@ -1,4 +1,56 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.6;net451;netstandard2.0</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\key\brightstardb.snk</AssemblyOriginatorKeyFile>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="dotNetRDF" Version="2.2.0" />
+    <PackageReference Include="Remotion.Linq" Version="2.2.0" />
+    <PackageReference Include="Serilog" Version="2.*"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.*" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.*" />
+  </ItemGroup>
+  
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
+    <DefineConstants>$(DefineConstants);NETSTANDARD16</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.6'">
+    <Compile Include="**\*.cs" Exclude="obj\**\*.cs;**\*.NetFull.cs;OData\*.cs" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="1.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="[1,2)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="[1,2)" />
+    <PackageReference Include="System.Threading.ThreadPool" Version="4.*" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <Compile Include="**\*.cs" Exclude="obj\**\*.cs;OData\*.cs" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="2.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
+    <Compile Include="**\*.cs" Exclude="obj\**\*.cs;OData\*.cs" />
+    <Reference Include="System.Xml" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="1.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="[1,2)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="[1,2)" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net451'">
+    <DefineConstants>$(DefineConstants);NET451</DefineConstants>
+  </PropertyGroup>
+  
+</Project>
+<!--
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -518,3 +570,4 @@
   </Target>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
 </Project>
+-->
