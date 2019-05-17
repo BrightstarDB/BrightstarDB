@@ -1,4 +1,4 @@
-﻿#if !PORTABLE && !WINDOWS_PHONE
+﻿#if NET451
 using System;
 using System.Collections.Generic;
 using System.Configuration;

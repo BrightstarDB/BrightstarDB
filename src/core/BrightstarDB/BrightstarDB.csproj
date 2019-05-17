@@ -23,6 +23,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="1.*" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="[1,2)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="[1,2)" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.*"/>
     <PackageReference Include="System.Threading.ThreadPool" Version="4.*" />
   </ItemGroup>
 

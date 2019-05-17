@@ -75,7 +75,7 @@ namespace BrightstarDB.Client
             stringToSign.AppendLine(request.Method.ToUpperInvariant())
                 .AppendLine(request.Headers[HttpRequestHeader.ContentEncoding])
                 .AppendLine(request.Headers[HttpRequestHeader.ContentLanguage])
-                .AppendLine(request.ContentLength >= 0 ? request.ContentLength.ToString(CultureInfo.InvariantCulture) : string.Empty)
+                .AppendLine(request.Headers[HttpRequestHeader.ContentLength])
                 .AppendLine(request.Headers[HttpRequestHeader.ContentMd5])
                 .AppendLine(request.Headers[HttpRequestHeader.ContentType])
                 .AppendLine(request.Headers[HttpRequestHeader.Date])

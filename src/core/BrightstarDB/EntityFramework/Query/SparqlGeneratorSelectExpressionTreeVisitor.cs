@@ -15,7 +15,7 @@ namespace BrightstarDB.EntityFramework.Query
         public static void GetSparqlExpression(Expression expression, SparqlQueryBuilder queryBuilder)
         {
             var visitor = new SparqlGeneratorSelectExpressionTreeVisitor(queryBuilder);
-            var resultExpression = visitor.VisitExpression(expression);
+            var resultExpression = visitor.Visit(expression);
             if (resultExpression is SelectIdentifierVariableNameExpression)
             {
                 var selectId = resultExpression as SelectIdentifierVariableNameExpression;
@@ -34,7 +34,7 @@ namespace BrightstarDB.EntityFramework.Query
             _queryBuilder = queryBuilder;
         }
 
-        protected override Expression VisitMemberExpression(MemberExpression expression)
+        protected override Expression VisitMember(MemberExpression expression)
         {
             string sourceVarName = null;
             if (expression.Expression is QuerySourceReferenceExpression)
@@ -49,7 +49,7 @@ namespace BrightstarDB.EntityFramework.Query
             }
             else if (expression.Expression is MemberExpression)
             {
-                var memberExpression = VisitExpression(expression.Expression);
+                var memberExpression = Visit(expression.Expression);
                 if (memberExpression is SelectVariableNameExpression)
                 {
                     sourceVarName = (memberExpression as SelectVariableNameExpression).Name;
@@ -69,11 +69,11 @@ namespace BrightstarDB.EntityFramework.Query
                         if (targetType.IsAssignableFrom(itemType))
                         {
                             expression = Expression.MakeMemberAccess(unary.Operand, expression.Member);
-                            return VisitExpression(expression);
+                            return Visit(expression);
                         }
                     }
                 }
-                var updatedExpression = VisitExpression(expression.Expression) as UnaryExpression;
+                var updatedExpression = Visit(expression.Expression) as UnaryExpression;
                 if (updatedExpression != null && updatedExpression.Operand is SelectVariableNameExpression)
                 {
 #if WINDOWS_PHONE || PORTABLE
@@ -159,16 +159,16 @@ namespace BrightstarDB.EntityFramework.Query
                     }
                 }
             }
-            return base.VisitMemberExpression(expression);
+            return base.VisitMember(expression);
         }
 
-        protected override Expression VisitMemberInitExpression(MemberInitExpression expression)
+        protected override Expression VisitMemberInit(MemberInitExpression expression)
         {
             _queryBuilder.MemberInitExpression = expression;
             _queryBuilder.Constructor = expression.NewExpression.Constructor;
             foreach(var a in expression.NewExpression.Arguments)
             {
-                var mappedExpression = VisitExpression(a);
+                var mappedExpression = Visit(a);
                 if (mappedExpression is SelectVariableNameExpression)
                 {
                     _queryBuilder.ConstructorArgs.Add((mappedExpression as SelectVariableNameExpression).Name);
@@ -217,7 +217,7 @@ namespace BrightstarDB.EntityFramework.Query
                             {
                                 // QuerySourceReferenceExpression should resolve to a resource that will be returned by the query
                                 var qsr = memberExpresion.Expression as QuerySourceReferenceExpression;
-                                var updatedQuerySourceExpression = VisitExpression(qsr);
+                                var updatedQuerySourceExpression = Visit(qsr);
                                 if (updatedQuerySourceExpression is SelectVariableNameExpression)
                                 {
                                     if ((updatedQuerySourceExpression as SelectVariableNameExpression).BindingType == VariableBindingType.Resource)
@@ -236,7 +236,7 @@ namespace BrightstarDB.EntityFramework.Query
                     else
                     {
                         // Handle a single property
-                        var valueExpression = VisitExpression(ma.Expression);
+                        var valueExpression = Visit(ma.Expression);
                         if (valueExpression is SelectVariableNameExpression)
                         {
                             _queryBuilder.MembersMap.Add(new Tuple<MemberInfo, string>(ma.Member,
@@ -271,28 +271,28 @@ namespace BrightstarDB.EntityFramework.Query
 #endif
         }
 
-        protected override MemberBinding VisitMemberAssignment(MemberAssignment memberAssignment)
+        protected override MemberAssignment VisitMemberAssignment(MemberAssignment memberAssignment)
         {
 #if WINDOWS_PHONE || PORTABLE
             return Expression.Bind(memberAssignment.Member, VisitExpression(memberAssignment.Expression));
 #else
-            return memberAssignment.Update(VisitExpression(memberAssignment.Expression));
+            return memberAssignment.Update(Visit(memberAssignment.Expression));
 #endif
         }
 
-        protected override Expression VisitConditionalExpression(ConditionalExpression expression)
+        protected override Expression VisitConditional(ConditionalExpression expression)
         {
 #if WINDOWS_PHONE || PORTABLE
             return Expression.Condition(VisitExpression(expression.Test),
                                         VisitExpression(expression.IfTrue),
                                         VisitExpression(expression.IfFalse));
 #else
-            return expression.Update(VisitExpression(expression.Test), VisitExpression(expression.IfTrue),
-                              VisitExpression(expression.IfFalse));
+            return expression.Update(Visit(expression.Test), Visit(expression.IfTrue),
+                              Visit(expression.IfFalse));
 #endif
         }
 
-        protected override Expression VisitBinaryExpression(BinaryExpression expression)
+        protected override Expression VisitBinary(BinaryExpression expression)
         {
 #if WINDOWS_PHONE || PORTABLE
             return Expression.MakeBinary(expression.NodeType,
@@ -381,12 +381,12 @@ namespace BrightstarDB.EntityFramework.Query
             }
              */
 #else
-            return expression.Update(VisitExpression(expression.Left), VisitExpression(expression.Conversion) as LambdaExpression,
-                                     VisitExpression(expression.Right));
+            return expression.Update(Visit(expression.Left), Visit(expression.Conversion) as LambdaExpression,
+                                     Visit(expression.Right));
 #endif
         }
 
-        protected override Expression VisitConstantExpression(ConstantExpression expression)
+        protected override Expression VisitConstant(ConstantExpression expression)
         {
             return expression;
         }
@@ -397,7 +397,7 @@ namespace BrightstarDB.EntityFramework.Query
             return expression;
         }
 
-        protected override Expression VisitQuerySourceReferenceExpression(QuerySourceReferenceExpression expression)
+        protected override Expression VisitQuerySourceReference(QuerySourceReferenceExpression expression)
         {
             Expression mappedExpression;
             if (_queryBuilder.TryGetQuerySourceMapping(expression.ReferencedQuerySource, out mappedExpression))
@@ -407,13 +407,13 @@ namespace BrightstarDB.EntityFramework.Query
                     _queryBuilder.AddSelectVariable((mappedExpression as SelectVariableNameExpression).Name);
                     return mappedExpression;
                 }
-                return VisitExpression(mappedExpression);
+                return Visit(mappedExpression);
             }
             else
             {
                 if (expression.ReferencedQuerySource is AdditionalFromClause)
                 {
-                    return VisitExpression((expression.ReferencedQuerySource as AdditionalFromClause).FromExpression);
+                    return Visit((expression.ReferencedQuerySource as AdditionalFromClause).FromExpression);
                 }
                 else
                 {
@@ -423,20 +423,20 @@ namespace BrightstarDB.EntityFramework.Query
             return expression;
         }
 
-        protected override Expression VisitUnaryExpression(UnaryExpression expression)
+        protected override Expression VisitUnary(UnaryExpression expression)
         {
             if (expression.NodeType == ExpressionType.Convert || expression.NodeType == ExpressionType.ConvertChecked)
             {
-                return VisitExpression(expression.Operand);
+                return Visit(expression.Operand);
             }
 #if WINDOWS_PHONE || PORTABLE
             return Expression.MakeUnary(expression.NodeType, expression.Operand, expression.Type, expression.Method);
 #else
-            return expression.Update(VisitExpression(expression.Operand));
+            return expression.Update(Visit(expression.Operand));
 #endif
         }
 
-        protected override Expression VisitNewExpression(NewExpression expression)
+        protected override Expression VisitNew(NewExpression expression)
         {
             var members = expression.Members.ToArray();
             for (int i = 0; i < expression.Arguments.Count; i++)
@@ -444,7 +444,7 @@ namespace BrightstarDB.EntityFramework.Query
                 var argument = expression.Arguments[i];
                 var member = members[i];
                 _queryBuilder.StartOptional();
-                var resultExpression = VisitExpression(argument);
+                var resultExpression = Visit(argument);
                 _queryBuilder.EndOptional();
                 if (resultExpression is SelectVariableNameExpression)
                 {

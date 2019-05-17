@@ -243,8 +243,8 @@ namespace BrightstarDB.EntityFramework
                     .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                     .Where(
                         p =>
-                            p.PropertyType.IsGenericType &&
-                            p.PropertyType.UnderlyingSystemType.Name.Equals("IEntitySet`1")))
+                            p.PropertyType.IsGenericType() &&
+                            p.PropertyType.GetTypeInfo().UnderlyingSystemType.Name.Equals("IEntitySet`1")))
                 {
                     var entityType = p.PropertyType.GetGenericArguments()[0];
                     var entitySetInfo = new EntitySetInfo
@@ -622,7 +622,7 @@ namespace BrightstarDB.EntityFramework
                     var propertyType = propertyInfo.PropertyType;
                     var converter = GetStringConverter(propertyType);
                     if (converter == null) throw new EntityFrameworkException("No converter available for type '{0}'", propertyType.FullName);
-                    object defaultValue = propertyType.IsValueType ? Activator.CreateInstance(propertyType) : null;
+                    object defaultValue = propertyType.IsValueType() ? Activator.CreateInstance(propertyType) : null;
                     anonymousConstructorArgs.Add(new AnonymousConstructorArg
                     {
                         PropertyName = tuple.Item1,
@@ -847,12 +847,15 @@ namespace BrightstarDB.EntityFramework
 
         private static bool IsAnonymousType(Type type)
         {
+
             // HACK: The only way to detect anonymous types right now.
-            return Attribute.IsDefined(type, typeof(CompilerGeneratedAttribute), false)
-                       && type.IsGenericType && type.Name.Contains("AnonymousType")
-                       && (type.Name.StartsWith("<>", StringComparison.OrdinalIgnoreCase) ||
-                           type.Name.StartsWith("VB$", StringComparison.OrdinalIgnoreCase))
-                       && (type.Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic;
+
+            //return Attribute.IsDefined(type, typeof(CompilerGeneratedAttribute), false)
+            return type.GetTypeInfo().GetCustomAttributes(typeof(CompilerGeneratedAttribute)).Any()
+                   && type.IsGenericType() && type.Name.Contains("AnonymousType")
+                   && (type.Name.StartsWith("<>", StringComparison.OrdinalIgnoreCase) ||
+                       type.Name.StartsWith("VB$", StringComparison.OrdinalIgnoreCase))
+                   && (type.GetTypeInfo().Attributes & TypeAttributes.NotPublic) == TypeAttributes.NotPublic;
         }
 
         /// <summary>
@@ -863,7 +866,7 @@ namespace BrightstarDB.EntityFramework
         /// <param name="id">The identity string to be mapped</param>
         /// <returns>The mapped store resource identity</returns>
         /// <remarks>For Brightstar, the domain object's identity string is the
-        /// same as the Brightstar resoure identity, so this mapping is an identity mapping.</remarks>
+        /// same as the Brightstar resource identity, so this mapping is an identity mapping.</remarks>
         public override string MapIdToUri(PropertyInfo identifierProperty, string id)
         {
             var entityType = identifierProperty.DeclaringType;

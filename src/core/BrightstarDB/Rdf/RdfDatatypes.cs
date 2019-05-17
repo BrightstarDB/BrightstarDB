@@ -284,7 +284,7 @@ namespace BrightstarDB.Rdf
             (s, l) => System.Guid.Parse(s));
 
 
-#if PORTABLE
+#if NETSTANDARD16
         private static readonly RdfDatatype RdfChar = new RdfDatatype(
             Char, 
             o=>((char)o).ToString(), 

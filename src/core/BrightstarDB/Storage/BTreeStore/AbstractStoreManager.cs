@@ -5,8 +5,8 @@ using System.Linq;
 using BrightstarDB.Storage.Persistence;
 using BrightstarDB.Storage.Statistics;
 using BrightstarDB.Storage.TransactionLog;
-#if PORTABLE
-using BrightstarDB.Portable.Compatibility;
+#if NETSTANDARD16
+using BrightstarDB.Utils;
 #endif
 
 namespace BrightstarDB.Storage.BTreeStore

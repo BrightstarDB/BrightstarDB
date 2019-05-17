@@ -68,7 +68,7 @@ namespace BrightstarDB.EntityFramework.Query
 
         #endregion
 
-        protected override Expression VisitMemberExpression(MemberExpression expression)
+        protected override Expression VisitMember(MemberExpression expression)
         {
             bool inAppendMode = _appendExpressionVariable;
             _appendExpressionVariable = false;
@@ -84,7 +84,7 @@ namespace BrightstarDB.EntityFramework.Query
 #endif
                 {
                     var propertyInfo = expression.Member as PropertyInfo;
-                    if (propertyInfo == null) return base.VisitMemberExpression(expression);
+                    if (propertyInfo == null) return base.VisitMember(expression);
 
                     var hint = QueryBuilder.Context.GetPropertyHint(propertyInfo);
                     if (hint != null)
@@ -231,12 +231,12 @@ namespace BrightstarDB.EntityFramework.Query
                     }
                 }
             }
-            return base.VisitMemberExpression(expression);
+            return base.VisitMember(expression);
         }
 
         
 
-        protected override Expression VisitConstantExpression(ConstantExpression expression)
+        protected override Expression VisitConstant(ConstantExpression expression)
         {
             try
             {
@@ -248,7 +248,7 @@ namespace BrightstarDB.EntityFramework.Query
                 // Failed to handle the provided expression.
                 // TODO: Log the exception?
             }
-            return base.VisitConstantExpression(expression);
+            return base.VisitConstant(expression);
         }
 
         internal string MakeSparqlConstant(object o)
@@ -291,7 +291,7 @@ namespace BrightstarDB.EntityFramework.Query
             return QueryBuilder.MakeSparqlConstant(o, _regexEscaping);
         }
 
-        protected override Expression VisitMethodCallExpression(MethodCallExpression expression)
+        protected override Expression VisitMethodCall(MethodCallExpression expression)
         {
             var currentlyInBooleanExpression = InBooleanExpression;
             InBooleanExpression = false;
@@ -310,9 +310,9 @@ namespace BrightstarDB.EntityFramework.Query
                     if (expression.Arguments[0].NodeType == ExpressionType.Constant)
                     {
                         _filterExpressionBuilder.Append("sameterm(");
-                        VisitExpression(expression.Object);
+                        Visit(expression.Object);
                         _filterExpressionBuilder.Append(",");
-                        VisitExpression(expression.Arguments[0]);
+                        Visit(expression.Arguments[0]);
                         _filterExpressionBuilder.Append(")");
                         return expression;
                     }
@@ -335,7 +335,7 @@ namespace BrightstarDB.EntityFramework.Query
                                         "Entity ID properties can only be compared to constant values");
                                 }
                                 _filterExpressionBuilder.Append("sameterm(");
-                                VisitExpression(expression.Object);
+                                Visit(expression.Object);
                                 _filterExpressionBuilder.Append(",");
                                 _filterExpressionBuilder.AppendFormat(
                                     "<{0}>",
@@ -348,9 +348,9 @@ namespace BrightstarDB.EntityFramework.Query
                     }
                 }
                 _filterExpressionBuilder.Append('(');
-                VisitExpression(expression.Object);
+                Visit(expression.Object);
                 _filterExpressionBuilder.Append("=");
-                VisitExpression(expression.Arguments[0]);
+                Visit(expression.Arguments[0]);
                 _filterExpressionBuilder.Append(')');
                 return expression;
             }
@@ -511,16 +511,16 @@ namespace BrightstarDB.EntityFramework.Query
                     }
                 }
             }
-            return base.VisitMethodCallExpression(expression);
+            return base.VisitMethodCall(expression);
         }
 
-        protected override Expression VisitUnaryExpression(UnaryExpression expression)
+        protected override Expression VisitUnary(UnaryExpression expression)
         {
             switch (expression.NodeType)
             {
                 case ExpressionType.Not:
                     _filterExpressionBuilder.Append("(!(");
-                    VisitExpression(expression.Operand);
+                    Visit(expression.Operand);
                     _filterExpressionBuilder.Append("))");
                     return expression;
             }
@@ -528,13 +528,13 @@ namespace BrightstarDB.EntityFramework.Query
             {
                 // We will get here if a member property is an Enum as LINQ will require it to be cast to its underlying type
                 // Ignore the conversion (it should be handled elsewhere)
-                VisitExpression(expression.Operand);
+                Visit(expression.Operand);
                 return expression;
             }
-            return base.VisitUnaryExpression(expression);
+            return base.VisitUnary(expression);
         }
 
-        protected override Expression VisitQuerySourceReferenceExpression(QuerySourceReferenceExpression expression)
+        protected override Expression VisitQuerySourceReference(QuerySourceReferenceExpression expression)
         {
             Expression mappedExpression;
             if (QueryBuilder.TryGetQuerySourceMapping(expression.ReferencedQuerySource, out mappedExpression))
@@ -546,17 +546,17 @@ namespace BrightstarDB.EntityFramework.Query
                 }
                 return VisitExpression(mappedExpression);
 #else
-                return VisitExpression(mappedExpression);
+                return Visit(mappedExpression);
 #endif
             }
-            return base.VisitQuerySourceReferenceExpression(expression);
+            return base.VisitQuerySourceReference(expression);
         }
 
 #if !WINDOWS_PHONE && !PORTABLE
-        protected override Expression VisitExtensionExpression(ExtensionExpression expression)
+        protected override Expression VisitExtension(Expression expression)
         {
             var selectVariableNameExpression = expression as SelectVariableNameExpression;
-            return selectVariableNameExpression != null ? VisitSelectVariableNameExpression(selectVariableNameExpression) : base.VisitExtensionExpression(expression);
+            return selectVariableNameExpression != null ? VisitSelectVariableNameExpression(selectVariableNameExpression) : base.VisitExtension(expression);
         }
 #endif
 
@@ -566,15 +566,15 @@ namespace BrightstarDB.EntityFramework.Query
             return expression;
         }
 
-        protected override Expression VisitBinaryExpression(BinaryExpression expression)
+        protected override Expression VisitBinary(BinaryExpression expression)
         {
-            return _parent.VisitExpression(expression, this.InBooleanExpression);
+            return _parent.VisitBinary(expression, this.InBooleanExpression);
         }
 
         public void WriteInFilter(Expression itemExpression, Expression fromExpression)
         {
             _filterExpressionBuilder.Append("(");
-            var expr = VisitExpression(itemExpression);
+            var expr = Visit(itemExpression);
             if (expr is SelectVariableNameExpression &&
                 ((expr) as SelectVariableNameExpression).BindingType == VariableBindingType.Resource)
             {
@@ -583,7 +583,7 @@ namespace BrightstarDB.EntityFramework.Query
                 //_identifierPrefix = EntityMappingStore.GetIdentifierPrefix(((SelectVariableNameExpression)expr).
             }
             _filterExpressionBuilder.Append(" IN (");
-            VisitExpression(fromExpression);
+            Visit(fromExpression);
             _filterExpressionBuilder.Append("))");
             _castAsResourceType = false;
         }
@@ -591,7 +591,7 @@ namespace BrightstarDB.EntityFramework.Query
         public void WriteRegexFilter(Expression expression, string s, string flags =null)
         {
             _filterExpressionBuilder.Append("(regex(");
-            VisitExpression(expression);
+            Visit(expression);
             _filterExpressionBuilder.Append(", ");
             _filterExpressionBuilder.Append(MakeSparqlConstant(s));
             if (flags != null)
@@ -614,7 +614,7 @@ namespace BrightstarDB.EntityFramework.Query
             for(int i =0;i < args.Length;i++)
             {
                 if (i > 0) _filterExpressionBuilder.Append(", ");
-                VisitExpression(args[i]);
+                Visit(args[i]);
             }
             _filterExpressionBuilder.Append("))");
         }
@@ -624,7 +624,7 @@ namespace BrightstarDB.EntityFramework.Query
             _filterExpressionBuilder.Append("(!(");
             bool appendMode = _appendExpressionVariable;
             _appendExpressionVariable = true;
-            VisitExpression(predicate);
+            Visit(predicate);
             _appendExpressionVariable = appendMode;
             _filterExpressionBuilder.Append("))");
         }

@@ -7,12 +7,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using BrightstarDB.Rdf;
 using Remotion.Linq.Clauses.Expressions;
-using Remotion.Linq.Clauses.ExpressionTreeVisitors;
 using Remotion.Linq.Parsing;
 
 namespace BrightstarDB.EntityFramework.Query
 {
-    internal abstract class ExpressionTreeVisitorBase : ThrowingExpressionTreeVisitor
+    internal abstract class ExpressionTreeVisitorBase : ThrowingExpressionVisitor
     {
         protected SparqlQueryBuilder QueryBuilder;
 
@@ -24,7 +23,8 @@ namespace BrightstarDB.EntityFramework.Query
         protected string FormatUnhandledItem<T>(T unhandledItem)
         {
             var itemAsExpression = unhandledItem as Expression;
-            return itemAsExpression != null ? FormattingExpressionTreeVisitor.Format(itemAsExpression) : unhandledItem.ToString();
+            //return itemAsExpression != null ? FormattingExpressionTreeVisitor.Format(itemAsExpression) : unhandledItem.ToString();
+            return itemAsExpression == null ? unhandledItem.ToString() : itemAsExpression.ToString();
         }
 
         protected PropertyHint GetPropertyHint(Expression expression)
@@ -86,7 +86,7 @@ namespace BrightstarDB.EntityFramework.Query
             else if (expression.Expression is MemberExpression)
             {
 
-                var memberExpression = VisitExpression(expression.Expression);
+                var memberExpression = Visit(expression.Expression);
                 if (memberExpression is SelectVariableNameExpression)
                 {
                     sourceVarName = (memberExpression as SelectVariableNameExpression).Name;
@@ -126,7 +126,7 @@ namespace BrightstarDB.EntityFramework.Query
                 }
                 else
                 {
-                    var visitResult = VisitMemberExpression(m);
+                    var visitResult = VisitMember(m);
                     if (visitResult is SelectVariableNameExpression)
                     {
                         itemName = (visitResult as SelectVariableNameExpression).Name;

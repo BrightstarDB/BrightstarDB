@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+#if NETSTANDARD16
+using BrightstarDB.Utils;
+#endif
 #if PORTABLE
 using System.Linq;
 #endif

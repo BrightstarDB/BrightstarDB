@@ -21,7 +21,7 @@ namespace BrightstarDB.EntityFramework.Query
             var visitor = new SparqlGeneratorQueryModelVisitor(context);
             visitor.VisitQueryModel(queryModel);
             var resultType = queryModel.GetResultType();
-            if (resultType.IsGenericType)
+            if (resultType.IsGenericType())
             {
                 resultType = resultType.GetGenericArguments()[0];
             }

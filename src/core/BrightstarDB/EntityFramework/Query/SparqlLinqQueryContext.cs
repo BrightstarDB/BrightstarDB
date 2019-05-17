@@ -88,7 +88,7 @@ namespace BrightstarDB.EntityFramework.Query
         public object ApplyMemberInitExpression<T>(Dictionary<string, object> parameters, Func<string, string, Type, object> converter )
         {
             var exprBuilder = new SparqlGeneratorSelectExpressionBuilder(parameters, converter);
-            var expressionBody = exprBuilder.VisitExpression(_memberInitExpression);
+            var expressionBody = exprBuilder.Visit(_memberInitExpression);
             Expression<Func<T>> lambdaWithoutParameters = Expression.Lambda<Func<T>>(expressionBody);
             return lambdaWithoutParameters.Compile()();
         }
@@ -120,7 +120,7 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     if (values.ContainsKey(mapping.Item2))
                     {
-#if PORTABLE
+#if NETSTANDARD16
                         var memberInfo =
                             Constructor.DeclaringType.GetMember(mapping.Item1.Name, BindingFlags.Public).FirstOrDefault();
                         if (memberInfo != null)

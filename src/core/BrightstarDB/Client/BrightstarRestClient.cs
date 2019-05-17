@@ -437,7 +437,7 @@ namespace BrightstarDB.Client
 
         private static DateTime? GetLastModified(HttpWebResponse r)
         {
-#if PORTABLE || WINDOWS_PHONE || NETCORE
+#if NETSTANDARD16
             var headerVal = r.Headers["Last-Modified"];
             DateTime lastModified;
             if (!String.IsNullOrEmpty(headerVal) && DateTime.TryParse(headerVal, out lastModified))
@@ -1137,7 +1137,7 @@ namespace BrightstarDB.Client
             // property in PCL - trying to set the httpWebRequest.Headers
             // directly results in a runtime error
 #if !PORTABLE
-#if NETCORE
+#if NETSTANDARD16
             httpWebRequest.Headers[HttpRequestHeader.Date] = DateTime.UtcNow.ToString("R");
 #else
             httpWebRequest.Date = DateTime.UtcNow;

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-#if PORTABLE
-using BrightstarDB.Portable.Adaptation;
-using BrightstarDB.Portable.Compatibility;
-using BrightstarDB.Storage;
+#if NETSTANDARD16
+using BrightstarDB.Utils;
 #endif
 using System.Xml;
 using BrightstarDB.Client;

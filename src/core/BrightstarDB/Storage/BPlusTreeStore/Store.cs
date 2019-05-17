@@ -504,7 +504,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             using (profiler.Step("Store.Load"))
             {
                 // Validate the hash for the index bloc
+#if NETSTANDARD16
+                using (var sha1 = SHA1.Create())
+#else
                 using (var sha1 = new SHA1Managed())
+#endif
                 {
                     var recordedHash = new byte[20];
                     Array.Copy(storePage.Data, 108, recordedHash, 0, 20);
@@ -565,7 +569,11 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             var buff = new byte[128];
             BitConverter.GetBytes(1).CopyTo(buff, 0);
 
+#if NETSTANDARD16
+            using(var sha1 = SHA1.Create())
+#else
             using (var sha1 = new SHA1Managed())
+#endif
             {
                 BitConverter.GetBytes(_currentTxnId + 1).CopyTo(buff, 4);
                 BitConverter.GetBytes(graphIndexId).CopyTo(buff, 12);
@@ -579,7 +587,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return buff;
         }
 
-        #endregion
+#endregion
 
         private ulong FindResourceId(string resourceValue, bool isLiteral = false, string dataType = null,
                                      string langCode = null)
@@ -736,7 +744,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             return Bind(sid, pid, oid, gids);
         }
 
-        #region Triple Pattern Binding
+#region Triple Pattern Binding
         private IEnumerable<Tuple<ulong, ulong, ulong, int>> Bind(ulong s = StoreConstants.NullUlong, ulong p = StoreConstants.NullUlong,
                                                                     ulong o = StoreConstants.NullUlong,
                                                                     List<int> graphs = null)
@@ -949,9 +957,9 @@ namespace BrightstarDB.Storage.BPlusTreeStore
                     r => new Tuple<ulong, ulong, ulong, int>(r.ResourceId, r.PredicateId, r.RelatedResource, r.GraphId));
         }
 
-        #endregion
+#endregion
 
-        #region Implementation of IDisposable
+#region Implementation of IDisposable
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -963,7 +971,7 @@ namespace BrightstarDB.Storage.BPlusTreeStore
             GC.SuppressFinalize(this);
         }
 
-        #endregion
+#endregion
 
         private bool _disposed;
         private void Dispose(bool disposing)

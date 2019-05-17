@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework.Query;
 #if PORTABLE
@@ -290,7 +291,7 @@ namespace BrightstarDB.EntityFramework
         /// <param name="toRemove"></param>
         internal void InternalRemove(IEntityObject toRemove)
         {
-            if (!typeof(T).IsAssignableFrom(toRemove.GetType()))
+            if (!typeof(T).IsInstanceOfType(toRemove))
             {
                 throw new ArgumentException(String.Format(Strings.InvalidEntityType, typeof(T).FullName), "toRemove");
             }

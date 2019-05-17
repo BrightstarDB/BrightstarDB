@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -8,6 +9,38 @@ namespace BrightstarDB.EntityFramework
     /// </summary>
     public static class TypeExtensions
     {
+#if NETSTANDARD16
+        public static bool IsValueType(this Type t)
+        {
+            return t.GetTypeInfo().IsValueType;
+        }
+
+        public static bool IsGenericType(this Type t)
+        {
+            return t.GetTypeInfo().IsGenericType;
+        }
+
+        public static bool IsPublic(this Type t)
+        {
+            return t.GetTypeInfo().IsPublic;
+        }
+#else
+        public static bool IsValueType(this Type t)
+        {
+            return t.IsValueType;
+        }
+
+        public static bool IsGenericType(this Type t)
+        {
+            return t.IsGenericType;
+        }
+
+        public static bool IsPublic(this Type t)
+        {
+            return t.IsPublic;
+        }
+#endif
+
         /// <summary>
         /// Returns true of <paramref name="t"/> is a generic collection type
         /// </summary>
@@ -15,7 +48,7 @@ namespace BrightstarDB.EntityFramework
         /// <returns>True if the type is a generic collection, false otherwise</returns>
         public static bool IsGenericCollection(this Type t)
         {
-            return (t.IsGenericType && typeof (IEnumerable<>).IsAssignableFrom(t.GetGenericTypeDefinition()));
+            return (t.IsGenericType() && typeof (IEnumerable<>).IsAssignableFrom(t.GetGenericTypeDefinition()));
         }
 
         /// <summary>
@@ -25,7 +58,7 @@ namespace BrightstarDB.EntityFramework
         /// <returns>True if the type is a generic nullable, false otherwise</returns>
         public static bool IsNullable(this Type t)
         {
-            return t.IsGenericType && typeof (Nullable<>).IsAssignableFrom(t.GetGenericTypeDefinition());
+            return t.IsGenericType() && typeof (Nullable<>).IsAssignableFrom(t.GetGenericTypeDefinition());
         }
 
         ///<summary>
@@ -35,18 +68,20 @@ namespace BrightstarDB.EntityFramework
         ///<exception cref="ArgumentException"></exception>
         public static object GetDefaultValue(this Type t)
         {
-            if (t == null || !t.IsValueType || t == typeof(void)) return null;
+            if (t == null || !t.IsValueType() || t == typeof(void)) return null;
             if (t.IsNullable()) return null;
-            if (t.IsValueType || !t.IsPublic)
+            if (t.IsValueType() || !t.IsPublic())
             {
                 try
                 {
                     return Activator.CreateInstance(t);
-                } catch(Exception e)
+                }
+                catch (Exception e)
                 {
                     throw new ArgumentException("Could not create a default instance of the type " + t.FullName, e);
                 }
             }
+
             throw new ArgumentException("Could not determine default value of the type " + t.FullName);
         }
     }

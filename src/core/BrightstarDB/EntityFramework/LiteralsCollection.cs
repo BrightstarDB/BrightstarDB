@@ -83,7 +83,7 @@ namespace BrightstarDB.EntityFramework
         /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
         public void Add(T item)
         {
-            if (!typeof(T).IsValueType && item == null) throw new ArgumentNullException("item");
+            if (!typeof(T).IsValueType() && item == null) throw new ArgumentNullException("item");
             if (_isAttached)
             {
                 _beo.DataObject.AddProperty(_propertyTypeUri, item);

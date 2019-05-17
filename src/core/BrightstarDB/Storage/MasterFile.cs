@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using BrightstarDB.Client;
 
+#if NETSTANDARD16
+using BrightstarDB.Utils;
+#endif
 #if PORTABLE 
 using BrightstarDB.Portable.Compatibility;
 using Array = BrightstarDB.Portable.Compatibility.Array;
