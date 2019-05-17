@@ -11,7 +11,7 @@ namespace BrightstarDB.InternalTests
     [TestFixture]
     public class PreloadTests
     {
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             if (Directory.Exists("preload_test"))

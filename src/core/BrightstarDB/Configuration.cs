@@ -63,8 +63,8 @@ namespace BrightstarDB
         {
             IsRunningOnMono = (Type.GetType("Mono.Runtime") != null);
             var configuration = new ConfigurationBuilder();
-            configuration.AddXmlFile("app.config")
-                .AddJsonFile("appSettings.json");
+            configuration.AddXmlFile("app.config",true)
+                .AddJsonFile("appSettings.json", true);
             var appSettings = configuration.Build();
             StoreLocation = appSettings[StoreLocationPropertyName];
 

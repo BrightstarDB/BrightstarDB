@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 #if NETSTANDARD16
-using VDS.RDF;
 using BrightstarDB.Utils;
 #endif
 

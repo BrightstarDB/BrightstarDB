@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BrightstarDB.Server;
 using NUnit.Framework;
+using BrightstarDB.Utils;
 
 namespace BrightstarDB.InternalTests
 {
@@ -19,9 +20,11 @@ namespace BrightstarDB.InternalTests
 
             var t = new Task(() =>
                                  {
-                                     var streamWriter = new StreamWriter(producerStream);
-                                     streamWriter.WriteLine("mother fucking stream crap");
-                                     streamWriter.Close();
+                                     using (var streamWriter = new StreamWriter(producerStream))
+                                     {
+                                         streamWriter.WriteLine("mother fucking stream crap");
+                                         streamWriter.Close();
+                                     }
                                  });
 
             t.Start();

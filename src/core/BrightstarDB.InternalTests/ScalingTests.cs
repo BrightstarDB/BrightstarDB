@@ -602,7 +602,7 @@ namespace BrightstarDB.InternalTests
             public void Run()
             {
                 var p = new NTriplesParser();
-                using (var fileReader = new StreamReader(_srcPath))
+                using (var fileReader = new StreamReader(new FileStream(_srcPath, FileMode.Open, FileAccess.Read)))
                 {
                     p.Parse(fileReader, this, Constants.DefaultGraphUri);
                 }

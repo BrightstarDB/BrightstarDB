@@ -16,6 +16,14 @@ namespace BrightstarDB.Utils
         {
         }
 
+        public static void Close(this StreamWriter writer)
+        {
+        }
+
+        public static void Close(this StreamReader reader)
+        {
+        }
+
         public static void Close(this XmlWriter writer)
         {
         }
