@@ -215,10 +215,6 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BrightstarDB.Server.Modules\BrightstarDB.Server.Modules.csproj">
-      <Project>{A6A05324-BA02-4C82-9199-AD19BC442C60}</Project>
-      <Name>BrightstarDB.Server.Modules</Name>
-    </ProjectReference>
     <ProjectReference Include="..\BrightstarDB\BrightstarDB.csproj">
       <Project>{00BECF1C-ED86-4773-98C6-463950D0E55E}</Project>
       <Name>BrightstarDB</Name>
