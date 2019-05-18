@@ -12,6 +12,14 @@
   <ItemGroup>
     <ProjectReference Include="..\BrightstarDB\BrightstarDB.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="appSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp1.0'">
     <DefineConstants>$(DefineConstants);NETCOREAPP10</DefineConstants>
