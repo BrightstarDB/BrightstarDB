@@ -5,6 +5,6 @@ namespace BrightstarDB.InternalTests
 {
     internal static class TestPaths
     {
-        public static string DataPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "..\\..\\..\\BrightstarDB.Tests\\Data\\");
+        public static string DataPath => Path.Combine(TestContext.CurrentContext.TestDirectory, "..\\..\\..\\..\\BrightstarDB.Tests\\Data\\");
     }
 }
