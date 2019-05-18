@@ -18,32 +18,32 @@ namespace BrightstarDB
         private static int _queryCacheMemory;
         private static int _queryCacheDiskSpace;
         private static ICache _queryCache;
-        private const string StoreLocationPropertyName = "BrightstarDB.StoreLocation";
-        private const string TxnFlushTriggerPropertyName = "BrightstarDB.TxnFlushTripleCount";
-        private const string ConnectionStringPropertyName = "BrightstarDB.ConnectionString";
+        private const string StoreLocationPropertyName = "BrightstarDB:StoreLocation";
+        private const string TxnFlushTriggerPropertyName = "BrightstarDB:TxnFlushTripleCount";
+        private const string ConnectionStringPropertyName = "BrightstarDB:ConnectionString";
 
         /// <summary>
         /// The size of the page cache managed by the server (in MB)
         /// </summary>
-        private const string PageCacheSizeName = "BrightstarDB.PageCacheSize";
+        private const string PageCacheSizeName = "BrightstarDB:PageCacheSize";
 
         /// <summary>
         /// OBSOLETE: The number of objects to hold in the BTreeStore's object cache.
         /// </summary>
-        private const string ReadStoreObjectCacheSizeName = "BrightstarDB.ReadStoreObjectCacheSize";
+        private const string ReadStoreObjectCacheSizeName = "BrightstarDB:ReadStoreObjectCacheSize";
 
-        private const string EnableQueryCacheName = "BrightstarDB.EnableQueryCache";
-        private const string QueryCacheDirectoryName = "BrightstarDB.QueryCacheDirectory";
-        private const string QueryCacheMemoryName = "BrightstarDB.QueryCacheMemory";
-        private const string QueryCacheDiskSpaceName = "BrightstarDB.QueryCacheDisk";
-        private const string PersistenceTypeName = "BrightstarDB.PersistenceType";
-        private const string ClusterNodePortName = "BrightstarDB.ClusterNodePort";
-        private const string ResourceCacheLimitName = "BrightstarDB.ResourceCacheLimit";
-        private const string StatsUpdateTransactionCountName = "BrightstarDB.StatsUpdate.TransactionCount";
-        private const string StatsUpdateTimeSpanName = "BrightstarDB.StatsUpdate.TimeSpan";
-        private const string QueryExecutionTimeoutName = "BrightstarDB.QueryExecutionTimeout";
-        private const string UpdateExecutionTimeoutName = "BrightstarDB.UpdateExecutionTimeout";
-        private const string EnableVirtualizedQueriesName = "BrightstarDB.EnableVirtualizedQueries";
+        private const string EnableQueryCacheName = "BrightstarDB:QueryCache:Enabled";
+        private const string QueryCacheDirectoryName = "BrightstarDB:QueryCache:Directory";
+        private const string QueryCacheMemoryName = "BrightstarDB:QueryCache:MemoryQuota";
+        private const string QueryCacheDiskSpaceName = "BrightstarDB:QueryCache:DiskQuota";
+        private const string PersistenceTypeName = "BrightstarDB:PersistenceType";
+        private const string ClusterNodePortName = "BrightstarDB:Cluster:NodePort";
+        private const string ResourceCacheLimitName = "BrightstarDB:ResourceCacheLimit";
+        private const string StatsUpdateTransactionCountName = "BrightstarDB:StatsUpdate:TransactionCount";
+        private const string StatsUpdateTimeSpanName = "BrightstarDB:StatsUpdate:TimeSpan";
+        private const string QueryExecutionTimeoutName = "BrightstarDB:QueryExecutionTimeout";
+        private const string UpdateExecutionTimeoutName = "BrightstarDB:UpdateExecutionTimeout";
+        private const string EnableVirtualizedQueriesName = "BrightstarDB:EnableVirtualizedQueries";
 
         private const string PersistenceTypeAppendOnly = "appendonly";
         private const string PersistenceTypeRewrite = "rewrite";
@@ -109,7 +109,9 @@ namespace BrightstarDB
             StatsUpdateTimespan = GetApplicationSetting(appSettings, StatsUpdateTimeSpanName, 0);
 
             // Advanced embedded application settings - read from the brightstar section of the app/web.config
-            EmbeddedServiceConfiguration = appSettings.GetSection("brightstar").Get<EmbeddedServiceConfiguration>();
+            EmbeddedServiceConfiguration =
+                appSettings.GetSection("Brightstar:Embedded").Get<EmbeddedServiceConfiguration>() ??
+                new EmbeddedServiceConfiguration();
 
             // ResourceCacheLimit
             ResourceCacheLimit = GetApplicationSetting(appSettings, ResourceCacheLimitName, DefaultResourceCacheLimit);
