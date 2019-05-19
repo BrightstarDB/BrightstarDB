@@ -1,4 +1,6 @@
-﻿#if !PORTABLE
+﻿// TODO: Reinstate this test fixture when the REST service is reinstated
+/*
+#if NETCOREAPP20
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,13 +13,12 @@ using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestFixture]
-    [Ignore]
+    [Ignore("Move these tests to performance test suite")]
     public class RemoteScalingTests : ClientTestBase
     {
         private static string _importDirPath;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             StartService();
@@ -29,7 +30,7 @@ namespace BrightstarDB.Tests
             _importDirPath = importDir;
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             CloseService();
@@ -200,3 +201,4 @@ namespace BrightstarDB.Tests
     }
 }
 #endif
+*/

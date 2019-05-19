@@ -1,20 +1,12 @@
-﻿#if !PORTABLE
-using System.Xml.Linq;
-using BrightstarDB.Server.Modules.Configuration;
+﻿using System.Xml.Linq;
 using NUnit.Framework;
-using System;
 using BrightstarDB.Client;
-using BrightstarDB.Server.Modules;
-using BrightstarDB.Server.Modules.Authentication;
-using BrightstarDB.Server.Modules.Permissions;
-using Nancy.Hosting.Self;
-
 
 namespace BrightstarDB.Tests
 {
     public class ClientTestBase
     {
-        private static NancyHost _serviceHost;
+        //private static NancyHost _serviceHost;
         private static bool _closed;
         private static readonly object HostLock = new object();
 
@@ -27,7 +19,7 @@ namespace BrightstarDB.Tests
         {
             lock (HostLock)
             {
-                _serviceHost.Stop();
+                //_serviceHost.Stop();
                 _closed = true;
             }
         }
@@ -39,18 +31,18 @@ namespace BrightstarDB.Tests
 #if SDK_TESTS
     // We assume that the test framework starts up the service for us.
 #else
-                if (_serviceHost == null || _closed)
-                {
-                    _serviceHost = new NancyHost(new BrightstarBootstrapper(
-                        BrightstarService.GetClient(),
-                        new IAuthenticationProvider[] {new NullAuthenticationProvider()},
-                        new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
-                        new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All),
-                        new CorsConfiguration()),
-                        new HostConfiguration {AllowChunkedEncoding = false},
-                        new Uri("http://localhost:8090/brightstar/"));
-                    _serviceHost.Start();
-                }
+                //if (_serviceHost == null || _closed)
+                //{
+                //    _serviceHost = new NancyHost(new BrightstarBootstrapper(
+                //        BrightstarService.GetClient(),
+                //        new IAuthenticationProvider[] {new NullAuthenticationProvider()},
+                //        new FallbackStorePermissionsProvider(StorePermissions.All, StorePermissions.All),
+                //        new FallbackSystemPermissionsProvider(SystemPermissions.All, SystemPermissions.All),
+                //        new CorsConfiguration()),
+                //        new HostConfiguration {AllowChunkedEncoding = false},
+                //        new Uri("http://localhost:8090/brightstar/"));
+                //    _serviceHost.Start();
+                //}
 #endif
             }
         }
@@ -88,23 +80,3 @@ namespace BrightstarDB.Tests
         }
     }
 }
-
-#else
-
-namespace BrightstarDB.Tests
-{
-    public class ClientTestBase
-    {
-        protected static void StartService()
-        {
-            // The test framework will have to control the service for us
-        }
-
-        protected static void CloseService()
-        {
-            // The test framework will have to control the service for us
-        }
-    }
-}
-
-#endif

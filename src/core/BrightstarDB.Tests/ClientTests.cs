@@ -16,7 +16,8 @@ using NTriplesParser = BrightstarDB.Rdf.NTriplesParser;
 
 namespace BrightstarDB.Tests
 {
-    [TestFixture("type=rest;endpoint=http://localhost:8090/brightstar")]
+    // TODO: Reinstate REST client tests when the REST server is back in the project again
+    //[TestFixture("type=rest;endpoint=http://localhost:8090/brightstar")]
     [TestFixture("type=embedded;storesDirectory={0}")]
     public class ClientTests : ClientTestBase
     {
@@ -62,7 +63,7 @@ namespace BrightstarDB.Tests
             importFile.CopyTo(Path.Combine(targetDir.FullName, targetFileName ?? testDataFileName), true);
 #endif
         }
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             if (_connectionString.Contains("type=rest"))
@@ -76,7 +77,7 @@ namespace BrightstarDB.Tests
 
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             if (_connectionString.Contains("type=rest"))

@@ -1,8 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
-    [Ignore] // Added ignore because the SERVICE tests make bad assumptions about the remote endpoint
+    [Ignore("SERVICE tests make bad assumptions about the remote endpoint")] // Added ignore because the SERVICE tests make bad assumptions about the remote endpoint
 	public partial class Service : SparqlTest {
 
         public Service() : base()
@@ -10,14 +9,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[OneTimeSetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [OneTimeTearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -26,7 +25,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void ServiceTest1() {
 	
 					ImportData(@"service/data01.ttl");
@@ -38,7 +37,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ServiceTest4() {
 	
 					ImportData(@"service/data04.ttl");
@@ -50,7 +49,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ServiceTest5() {
 	
 					ImportData(@"service/data05.ttl");
@@ -62,7 +61,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ServiceTest7() {
 	
 					ImportData(@"service/data07.ttl");

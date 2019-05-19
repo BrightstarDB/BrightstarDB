@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+
 	public partial class Drop : SparqlTest {
 
         public Drop() : base()
@@ -10,14 +10,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -26,7 +26,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void DropDefault() {
 				ImportData(@"drop/drop-default.ttl");
 					ImportGraph(@"drop/drop-g1.ttl", new Uri(@"http://example.org/g1"));
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DropGraph() {
 				ImportData(@"drop/drop-default.ttl");
 					ImportGraph(@"drop/drop-g1.ttl", new Uri(@"http://example.org/g1"));
@@ -48,7 +48,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DropNamed() {
 				ImportData(@"drop/drop-default.ttl");
 					ImportGraph(@"drop/drop-g1.ttl", new Uri(@"http://example.org/g1"));
@@ -58,7 +58,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DropAll() {
 				ImportData(@"drop/drop-default.ttl");
 					ImportGraph(@"drop/drop-g1.ttl", new Uri(@"http://example.org/g1"));

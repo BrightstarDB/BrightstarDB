@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+
 	public partial class DeleteData : SparqlTest {
 
         public DeleteData() : base()
@@ -10,14 +10,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -26,7 +26,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void SimpleDeleteData1() {
 				ImportData(@"delete-data/delete-pre-01.ttl");
 				ExecuteUpdate(@"delete-data/delete-data-01.ru");
@@ -34,7 +34,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void SimpleDeleteData2() {
 				ImportGraph(@"delete-data/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
 				ExecuteUpdate(@"delete-data/delete-data-02.ru");
@@ -42,7 +42,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void SimpleDeleteData3() {
 				ImportData(@"delete-data/delete-pre-01.ttl");
 				ExecuteUpdate(@"delete-data/delete-data-03.ru");
@@ -50,7 +50,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void SimpleDeleteData4() {
 				ImportGraph(@"delete-data/delete-pre-01.ttl", new Uri(@"http://example.org/g1"));
 				ExecuteUpdate(@"delete-data/delete-data-04.ru");
@@ -58,7 +58,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void GraphSpecificDeleteData1() {
 				ImportData(@"delete-data/delete-pre-01.ttl");
 					ImportGraph(@"delete-data/delete-pre-02.ttl", new Uri(@"http://example.org/g2"));
@@ -70,7 +70,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void GraphSpecificDeleteData2() {
 				ImportData(@"delete-data/delete-pre-01.ttl");
 					ImportGraph(@"delete-data/delete-pre-02.ttl", new Uri(@"http://example.org/g2"));

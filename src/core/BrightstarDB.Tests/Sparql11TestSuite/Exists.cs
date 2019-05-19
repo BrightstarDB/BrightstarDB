@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+
 	public partial class Exists : SparqlTest {
 
         public Exists() : base()
@@ -10,14 +10,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -26,7 +26,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void ExistsWithinGraphPattern() {
 	
 					ImportData(@"exists/exists01.ttl");
@@ -39,7 +39,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ExistsWithOneConstant() {
 	
 					ImportData(@"exists/exists01.ttl");
@@ -51,7 +51,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ExistsWithGroundTriple() {
 	
 					ImportData(@"exists/exists01.ttl");
@@ -63,7 +63,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void NestedPositiveExists() {
 	
 					ImportData(@"exists/exists01.ttl");
@@ -75,7 +75,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void NestedNegativeExistsInPositiveExists() {
 	
 					ImportData(@"exists/exists01.ttl");

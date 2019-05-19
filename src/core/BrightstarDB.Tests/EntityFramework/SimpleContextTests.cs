@@ -7,6 +7,7 @@ using BrightstarDB.EntityFramework;
 using BrightstarDB.EntityFramework.Query;
 using NUnit.Framework;
 using System.ComponentModel;
+using System.Reflection;
 using BrightstarDB.Query;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query.Algebra;
@@ -2127,10 +2128,10 @@ where {
         public void TestGeneratedPropertyAttributes()
         {
             var foafPerson = typeof(FoafPerson);
-            var nameProperty = foafPerson.GetProperty("Name");
+            var nameProperty = foafPerson.GetTypeInfo().GetProperty("Name");
             Assert.IsNotNull(nameProperty, "Could not find expected Name property on FoafPerson class");
             var generatedAttributes = nameProperty.GetCustomAttributes(false);
-            Assert.AreEqual(2, generatedAttributes.Length, "Expected 2 custom attributes on Name property of generated FoafPerson class");
+            Assert.AreEqual(2, generatedAttributes.Count(), "Expected 2 custom attributes on Name property of generated FoafPerson class");
             Assert.IsTrue(generatedAttributes.Any(a=>a.GetType() == typeof(RequiredAttribute)), "Could not find expected Required attribute of FoafPerson.Name property");
             var customValidation = generatedAttributes.FirstOrDefault(a => a is CustomValidationAttribute) as CustomValidationAttribute;
             Assert.IsNotNull(customValidation, "Could not find expected CustomValidation attribute on FoafPerson.Name property");
@@ -2141,7 +2142,7 @@ where {
             var nickNameProperty = foafPerson.GetProperty("Nickname");
             Assert.IsNotNull(nickNameProperty, "Could not find expected Nickname property on FoafPerson class");
             generatedAttributes = nickNameProperty.GetCustomAttributes(false);
-            Assert.AreEqual(1, generatedAttributes.Length);
+            Assert.AreEqual(1, generatedAttributes.Count());
             var displayName = generatedAttributes.FirstOrDefault(a => a.GetType() == typeof(DisplayNameAttribute)) as DisplayNameAttribute;
             Assert.IsNotNull(displayName, "Could not find expected DisplayName attribute of Foaf.Nickname property");
             Assert.AreEqual("Also Known As", displayName.DisplayName, "DisplayName.DisplayName property does not match expected value.");
@@ -2149,7 +2150,7 @@ where {
             var dobProperty = foafPerson.GetProperty("BirthDate");
             Assert.IsNotNull(dobProperty, "Could not find expected BirthDate property on FoafPerson class");
             generatedAttributes = dobProperty.GetCustomAttributes(false);
-            Assert.AreEqual(1, generatedAttributes.Length);
+            Assert.AreEqual(1, generatedAttributes.Count());
             var datatype = generatedAttributes.OfType<DataTypeAttribute>().FirstOrDefault();
             Assert.IsNotNull(datatype, "Could not find expected DataType attribute on Foaf.BirthDate property");
             Assert.AreEqual(DataType.Date, datatype.DataType);
@@ -2160,8 +2161,8 @@ where {
         public void TestGeneratedClassAttributes()
         {
             var foafPerson = typeof(FoafPerson);
-            var generatedAttributes = foafPerson.GetCustomAttributes(false);
-            Assert.AreEqual(1, generatedAttributes.Length, "Expected 1 custom attribute on the FoafPerson class");
+            var generatedAttributes = foafPerson.GetTypeInfo().GetCustomAttributes(false);
+            Assert.AreEqual(1, generatedAttributes.Count(), "Expected 1 custom attribute on the FoafPerson class");
             var displayAttribute = generatedAttributes.FirstOrDefault(a=>a.GetType() == typeof(DisplayNameAttribute)) as DisplayNameAttribute;
             Assert.IsNotNull(displayAttribute, "Could not find expected Display attribute on FoafPerson class");
             Assert.AreEqual("Person", displayAttribute.DisplayName);

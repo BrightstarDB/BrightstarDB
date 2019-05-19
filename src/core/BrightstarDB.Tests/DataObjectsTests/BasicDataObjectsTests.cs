@@ -9,7 +9,8 @@ using NUnit.Framework;
 namespace BrightstarDB.Tests.DataObjectsTests
 {
     [TestFixture("type=embedded;storesDirectory={0}", true)]
-    [TestFixture("type=rest;endpoint=http://localhost:8090/brightstar", true)]
+    // TODO: Reinstate REST client tests when REST service is reinstated
+    // [TestFixture("type=rest;endpoint=http://localhost:8090/brightstar", true)]
     /*[TestFixture(
         "type=dotnetrdf;configuration={1}dataObjectStoreConfig.ttl;storeName=http://www.brightstardb.com/tests#empty"
         , false)]*/
@@ -35,7 +36,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
             _isPersistent = isPersistent;
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
             if (_connectionString.Type == ConnectionType.Rest)
@@ -44,7 +45,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
             }
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TestFixtureTearDown()
         {
             if (_connectionString.Type == ConnectionType.Rest)

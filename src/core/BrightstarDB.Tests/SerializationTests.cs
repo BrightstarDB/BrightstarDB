@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace BrightstarDB.Tests
 {
-    [TestFixture]
+    [TestFixture("Does not meaningfully test any code")]
     public class SerializationTests
     {
         [Test]

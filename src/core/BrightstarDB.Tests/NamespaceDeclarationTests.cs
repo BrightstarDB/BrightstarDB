@@ -11,11 +11,16 @@ namespace BrightstarDB.Tests
     [TestFixture]
     public class NamespaceDeclarationTests
     {
+        private readonly Assembly _thisAssembly;
+        public NamespaceDeclarationTests()
+        {
+            _thisAssembly = typeof(NamespaceDeclarationTests).GetTypeInfo().Assembly;
+        }
         [Test]
         public void TestNamspaceDeclarationEnumeration()
         {
             // Lookup the namespace declarations in this assembly
-            var nsDeclarations = NamespaceDeclarations.ForAssembly().ToList();
+            var nsDeclarations = NamespaceDeclarations.ForAssembly(_thisAssembly).ToList();
             Assert.That(nsDeclarations, Is.All.Not.Null);
             Assert.That(nsDeclarations.Count, Is.EqualTo(3));
         }
@@ -23,7 +28,7 @@ namespace BrightstarDB.Tests
         [Test]
         public void TestNamespaceDeclarationsAsDictionary()
         {
-            var nsDeclarations = NamespaceDeclarations.ForAssembly().AsDictionary();
+            var nsDeclarations = NamespaceDeclarations.ForAssembly(_thisAssembly).AsDictionary();
             Assert.That(nsDeclarations.Count, Is.EqualTo(3));
             Assert.That(nsDeclarations.ContainsKey("dc"));
             Assert.That(nsDeclarations["dc"], Is.EqualTo("http://purl.org/dc/terms/"));
@@ -36,7 +41,7 @@ namespace BrightstarDB.Tests
         [Test]
         public void TestNamespaceDeclarationsAsSparql()
         {
-            var sparql = NamespaceDeclarations.ForAssembly().AsSparql();
+            var sparql = NamespaceDeclarations.ForAssembly(_thisAssembly).AsSparql();
             Assert.That(sparql.Contains("PREFIX dc: <http://purl.org/dc/terms/>"));
             Assert.That(sparql.Contains("PREFIX foaf: <http://xmlns.com/foaf/0.1/>"));
             Assert.That(sparql.Contains("PREFIX bsi: <http://brightstardb.com/instances/>"));
@@ -45,7 +50,7 @@ namespace BrightstarDB.Tests
         [Test]
         public void TestNamespaceDeclarationsAsTurtle()
         {
-            var turtle = NamespaceDeclarations.ForAssembly().AsTurtle();
+            var turtle = NamespaceDeclarations.ForAssembly(_thisAssembly).AsTurtle();
             Assert.That(turtle.Contains("@prefix dc: <http://purl.org/dc/terms/> ."));
             Assert.That(turtle.Contains("@prefix foaf: <http://xmlns.com/foaf/0.1/> ."));
             Assert.That(turtle.Contains("@prefix bsi: <http://brightstardb.com/instances/> ."));

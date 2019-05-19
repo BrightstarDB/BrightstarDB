@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BrightstarDB.Client;
 using BrightstarDB.EntityFramework;
@@ -128,7 +129,7 @@ namespace BrightstarDB.Tests.EntityFramework
                 {
                     context.SaveChanges();
                 }
-                catch (ApplicationException)
+                catch (FileNotFoundException)
                 {
                     // Expected
                 }
@@ -196,7 +197,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         private void ThrowOnChange(object sender, EventArgs e)
         {
-            throw new ApplicationException("Oh noes!");
+            throw new FileNotFoundException("Oh noes!");
         }
     }
 }

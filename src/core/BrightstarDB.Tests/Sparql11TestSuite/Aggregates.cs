@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+    
 	public partial class Aggregates : SparqlTest {
 
         public Aggregates() : base()
@@ -9,14 +9,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -25,7 +25,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void Count1() {
 	
 					ImportData(@"aggregates/agg01.ttl");
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Count2() {
 	
 					ImportData(@"aggregates/agg01.ttl");
@@ -49,7 +49,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Count3() {
 	
 					ImportData(@"aggregates/agg01.ttl");
@@ -61,7 +61,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Count4() {
 	
 					ImportData(@"aggregates/agg01.ttl");
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Count5() {
 	
 					ImportData(@"aggregates/agg01.ttl");
@@ -85,7 +85,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Count6() {
 	
 					ImportData(@"aggregates/agg01.ttl");
@@ -97,7 +97,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Count7() {
 	
 					ImportData(@"aggregates/agg01.ttl");
@@ -109,7 +109,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Count8b() {
 	
 					ImportData(@"aggregates/agg08.ttl");
@@ -121,7 +121,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ErrorInAvg() {
 	
 					ImportData(@"aggregates/agg-err-01.ttl");
@@ -133,8 +133,8 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
-        [Ignore] // Not currently working in dotNetRdf
+		[Test]
+        [Ignore("Not currently working in dotNetRdf")]
 		public void ProtectFromErrorInAvg() {
 	
 					ImportData(@"aggregates/agg-err-02.ttl");
@@ -146,7 +146,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Group_concat1() {
 	
 					ImportData(@"aggregates/agg-groupconcat-1.ttl");
@@ -158,7 +158,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Group_concat2() {
 	
 					ImportData(@"aggregates/agg-groupconcat-1.ttl");
@@ -170,7 +170,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Group_concatWithSeparator() {
 	
 					ImportData(@"aggregates/agg-groupconcat-1.ttl");
@@ -182,7 +182,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Avg() {
 	
 					ImportData(@"aggregates/agg-numeric.ttl");
@@ -194,8 +194,8 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
-        [Ignore] // Not working in dotNetRdf
+		[Test]
+        [Ignore("Not working in dotNetRdf")]
 		public void AvgWithGroupBy() {
 	
 					ImportData(@"aggregates/agg-numeric2.ttl");
@@ -207,7 +207,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Min() {
 	
 					ImportData(@"aggregates/agg-numeric.ttl");
@@ -219,8 +219,8 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
-        [Ignore] // Not working in dotNetRdf
+		[Test]
+        [Ignore("Not working in dotNetRdf")]
 		public void MinWithGroupBy() {
 	
 					ImportData(@"aggregates/agg-numeric.ttl");
@@ -232,7 +232,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Max() {
 	
 					ImportData(@"aggregates/agg-numeric.ttl");
@@ -244,7 +244,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void MaxWithGroupBy() {
 	
 					ImportData(@"aggregates/agg-numeric.ttl");
@@ -256,7 +256,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sum() {
 	
 					ImportData(@"aggregates/agg-numeric.ttl");
@@ -268,8 +268,8 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
-        [Ignore] // Not working in dotNetRdf
+		[Test]
+        [Ignore("Not working in dotNetRdf")]
 		public void SumWithGroupBy() {
 	
 					ImportData(@"aggregates/agg-numeric2.ttl");
@@ -281,7 +281,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sample() {
 	
 					ImportData(@"aggregates/agg-numeric.ttl");

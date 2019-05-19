@@ -1,23 +1,17 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
-	public partial class UpdateSilent : SparqlTest {
-
-        public UpdateSilent() : base()
-        {
-            
-        }
-
-		[TestInitialize]
+	public class UpdateSilent : SparqlTest {
+        
+        [SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -26,19 +20,19 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void LoadSilent() {
 			ExecuteUpdate(@"update-silent/load-silent.ru");
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void LoadSilentInto() {
 			ExecuteUpdate(@"update-silent/load-silent-into.ru");
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void ClearSilentGraphIri() {
 				ImportData(@"update-silent/spo.ttl");
 				ExecuteUpdate(@"update-silent/clear-silent.ru");
@@ -46,13 +40,13 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void ClearSilentDefault() {
 			ExecuteUpdate(@"update-silent/clear-default-silent.ru");
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void CreateSilentIri() {
 				ImportGraph(@"update-silent/spo.ttl", new Uri(@"http://example.org/g1"));
 				ExecuteUpdate(@"update-silent/create-silent.ru");
@@ -60,7 +54,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DropSilentGraphIri() {
 				ImportData(@"update-silent/spo.ttl");
 				ExecuteUpdate(@"update-silent/drop-silent.ru");
@@ -68,13 +62,13 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DropSilentDefault() {
 			ExecuteUpdate(@"update-silent/drop-default-silent.ru");
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void CopySilent() {
 				ImportGraph(@"update-silent/spo.ttl", new Uri(@"http://example.org/g2"));
 				ExecuteUpdate(@"update-silent/copy-silent.ru");
@@ -82,13 +76,13 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void CopySilentToDefault() {
 			ExecuteUpdate(@"update-silent/copy-to-default-silent.ru");
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void MoveSilent() {
 				ImportGraph(@"update-silent/spo.ttl", new Uri(@"http://example.org/g2"));
 				ExecuteUpdate(@"update-silent/move-silent.ru");
@@ -96,13 +90,13 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void MoveSilentToDefault() {
 			ExecuteUpdate(@"update-silent/move-to-default-silent.ru");
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void AddSilent() {
 				ImportGraph(@"update-silent/spo.ttl", new Uri(@"http://example.org/g2"));
 				ExecuteUpdate(@"update-silent/add-silent.ru");
@@ -110,7 +104,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void AddSilentToDefault() {
 			ExecuteUpdate(@"update-silent/add-to-default-silent.ru");
 			

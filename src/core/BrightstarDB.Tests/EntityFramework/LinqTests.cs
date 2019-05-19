@@ -1488,11 +1488,13 @@ namespace BrightstarDB.Tests.EntityFramework
             var endsWithE = context.Persons.Where(p => p.Name.EndsWith("e"));
             Assert.AreEqual(3, endsWithE.Count());
 
+#if !NETCOREAPP10
             endsWithE = context.Persons.Where(p => p.Name.EndsWith("E", true, CultureInfo.CurrentUICulture));
             Assert.AreEqual(3, endsWithE.Count());
 
             endsWithE = context.Persons.Where(p => p.Name.EndsWith("E", false, CultureInfo.CurrentUICulture));
             Assert.AreEqual(0, endsWithE.Count());
+#endif
 
             endsWithE = context.Persons.Where(p => p.Name.EndsWith("E", StringComparison.CurrentCultureIgnoreCase));
             Assert.AreEqual(3, endsWithE.Count());

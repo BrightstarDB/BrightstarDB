@@ -29,6 +29,7 @@ namespace BrightstarDB.Tests
 
     }
 
+#if !NETCOREAPP10
     [TestFixture("en-US")]
     [TestFixture("de")]
     [TestFixture("ja-JP")]
@@ -40,7 +41,7 @@ namespace BrightstarDB.Tests
 
         public LiteralRoundtripTests(string culture)
         {
-            _testCulture = CultureInfo.GetCultureInfo(culture);
+            _testCulture = new CultureInfo(culture);// CultureInfo.GetCultureInfo(culture);
         }
 
         [SetUp]
@@ -221,4 +222,5 @@ namespace BrightstarDB.Tests
             Assert.That(p, Is.EqualTo(v));
         }
     }
+#endif
 }

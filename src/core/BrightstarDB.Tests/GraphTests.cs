@@ -4,14 +4,8 @@ using System.Linq;
 using System.Xml.Linq;
 using BrightstarDB.Client;
 using NUnit.Framework;
-#if PORTABLE
-using BrightstarDB.Storage;
-using FileMode=BrightstarDB.Portable.Compatibility.FileMode;
-using System.Threading.Tasks;
-#else
 using System.Threading;
-#endif
-
+using BrightstarDB.Utils;
 namespace BrightstarDB.Tests
 {
     [TestFixture]
@@ -21,7 +15,7 @@ namespace BrightstarDB.Tests
         private IPersistenceManager _persistenceManager;
 #endif
 
-        [TestFixtureSetUp]
+        [SetUp]
         public void SetUp()
         {
 #if PORTABLE
@@ -169,7 +163,7 @@ namespace BrightstarDB.Tests
 #if PORTABLE
             using (var sr = new StreamReader(_persistenceManager.GetInputStream(exportFileName)))
 #else
-            using (var sr = new StreamReader(exportFileName))
+            using (var sr = new StreamReader(File.OpenRead(exportFileName)))
 #endif
             {
                 var content = sr.ReadToEnd();
@@ -189,7 +183,7 @@ namespace BrightstarDB.Tests
 #if PORTABLE
             using(var sr = new StreamReader(_persistenceManager.GetInputStream(exportFileName)))
 #else
-            using (var sr = new StreamReader(exportFileName))
+            using (var sr = new StreamReader(File.OpenRead(exportFileName)))
 #endif
             {
                 var content = sr.ReadToEnd();

@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+    
 	public partial class BasicUpdate : SparqlTest {
 
         public BasicUpdate() : base()
@@ -10,14 +10,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -26,21 +26,21 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void SimpleInsertData1() {
 			ExecuteUpdate(@"basic-update/insert-data-spo1.ru");
 					ValidateUnamedGraph(@"basic-update/spo.ttl");
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void SimpleInsertDataNamed1() {
 			ExecuteUpdate(@"basic-update/insert-data-named1.ru");
 					ValidateGraph(@"basic-update/spo.ttl", new Uri(@"http://example.org/g1"));
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void SimpleInsertDataNamed2() {
 				ImportGraph(@"basic-update/spo.ttl", new Uri(@"http://example.org/g1"));
 				ExecuteUpdate(@"basic-update/insert-data-named2.ru");
@@ -48,7 +48,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void SimpleInsertDataNamed3() {
 				ImportGraph(@"basic-update/spo.ttl", new Uri(@"http://example.org/g1"));
 				ExecuteUpdate(@"basic-update/insert-data-named1.ru");
@@ -56,7 +56,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void Insert01() {
 				ImportData(@"basic-update/insert-01-pre.ttl");
 				ExecuteUpdate(@"basic-update/insert-01.ru");
@@ -64,7 +64,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void Insert02() {
 				ImportData(@"basic-update/insert-02-pre.ttl");
 				ExecuteUpdate(@"basic-update/insert-02.ru");
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void Insert03() {
 				ImportData(@"basic-update/insert-03-pre.ttl");
 					ImportGraph(@"basic-update/insert-03-g1-pre.ttl", new Uri(@"http://example.org/g1"));
@@ -83,7 +83,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void Insert04() {
 				ImportData(@"basic-update/insert-04-pre.ttl");
 					ImportGraph(@"basic-update/insert-04-g1-pre.ttl", new Uri(@"http://example.org/g1"));
@@ -93,7 +93,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void InsertUsing01() {
 				ImportData(@"basic-update/insert-using-01-pre.ttl");
 					ImportGraph(@"basic-update/insert-using-01-g1-pre.ttl", new Uri(@"http://example.org/g1"));

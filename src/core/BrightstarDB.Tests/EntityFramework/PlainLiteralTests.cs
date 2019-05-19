@@ -15,7 +15,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
         private IDataObjectContext _dataObjectContext;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             var connectionString = new ConnectionString("type=embedded;storesDirectory=" + Configuration.StoreLocation);

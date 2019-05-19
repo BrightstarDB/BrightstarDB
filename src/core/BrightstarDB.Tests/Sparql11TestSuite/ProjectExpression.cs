@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+
 	public partial class ProjectExpression : SparqlTest {
 
         public ProjectExpression() : base()
@@ -9,14 +9,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -25,7 +25,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void ExpressionIsEquality() {
 	
 					ImportData(@"project-expression/projexp01.ttl");
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ExpressionRaiseAnError() {
 	
 					ImportData(@"project-expression/projexp02.ttl");
@@ -49,7 +49,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ReuseAProjectExpressionVariableInSelect() {
 	
 					ImportData(@"project-expression/projexp03.ttl");
@@ -61,7 +61,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ReuseAProjectExpressionVariableInOrderBy() {
 	
 					ImportData(@"project-expression/projexp04.ttl");
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ExpressionMayReturnNoValue() {
 	
 					ImportData(@"project-expression/projexp05.ttl");
@@ -85,7 +85,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ExpressionHasUndefinedVariable() {
 	
 					ImportData(@"project-expression/projexp06.ttl");
@@ -97,7 +97,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ExpressionHasVariableThatMayBeUnbound() {
 	
 					ImportData(@"project-expression/projexp07.ttl");

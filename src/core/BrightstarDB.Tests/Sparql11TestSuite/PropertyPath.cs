@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+
 	public partial class PropertyPath : SparqlTest {
 
         public PropertyPath() : base()
@@ -9,14 +9,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -25,7 +25,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void Pp01SimplePath() {
 	
 					ImportData(@"property-path/pp01.ttl");
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp02StarPath() {
 	
 					ImportData(@"property-path/pp01.ttl");
@@ -49,7 +49,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp03SimplePathWithLoop() {
 	
 					ImportData(@"property-path/pp03.ttl");
@@ -61,7 +61,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp04VariableLengthPathWithLoop() {
 	
 					ImportData(@"property-path/pp03.ttl");
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp05ZeroLengthPath() {
 	
 					ImportData(@"property-path/pp05.ttl");
@@ -85,7 +85,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp08ReversePath() {
 	
 					ImportData(@"property-path/pp08.ttl");
@@ -97,7 +97,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp09ReverseSequencePath() {
 	
 					ImportData(@"property-path/pp09.ttl");
@@ -109,7 +109,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp10PathWithNegation() {
 	
 					ImportData(@"property-path/pp10.ttl");
@@ -121,7 +121,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp11SimplePathAndTwoPathsToSameTargetNode() {
 	
 					ImportData(@"property-path/pp11.ttl");
@@ -133,7 +133,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp12VariableLengthPathAndTwoPathsToSameTargetNode() {
 	
 					ImportData(@"property-path/pp11.ttl");
@@ -145,7 +145,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp13ZeroLengthPathsWithLiterals() {
 	
 					ImportData(@"property-path/pp13.ttl");
@@ -157,7 +157,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp14StarPathOverFoafKnows() {
 	
 					ImportData(@"property-path/pp14.ttl");
@@ -169,7 +169,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp15ZeroLengthPathsOnAnEmptyGraph() {
 	
 					ImportData(@"property-path/empty.ttl");
@@ -181,7 +181,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp16DuplicatePathsAndCyclesThroughFoafKnows_Asterix_() {
 	
 					ImportData(@"property-path/pp16.ttl");
@@ -193,7 +193,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp20DiamondP2() {
 	
 					ImportData(@"property-path/data-diamond.ttl");
@@ -205,7 +205,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp21DiamondP_Plus_() {
 	
 					ImportData(@"property-path/data-diamond.ttl");
@@ -217,7 +217,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp22DiamondWithTailP3() {
 	
 					ImportData(@"property-path/data-diamond-tail.ttl");
@@ -229,7 +229,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp23DiamondWithTailP_Plus_() {
 	
 					ImportData(@"property-path/data-diamond-tail.ttl");
@@ -241,7 +241,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp24DiamondWithLoopP2() {
 	
 					ImportData(@"property-path/data-diamond-loop.ttl");
@@ -253,7 +253,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp25DiamondWithLoopP_Plus_() {
 	
 					ImportData(@"property-path/data-diamond-loop.ttl");
@@ -265,7 +265,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp26DiamondWithLoopP24() {
 	
 					ImportData(@"property-path/data-diamond-loop.ttl");
@@ -277,7 +277,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp27DiamondWithLoopP3() {
 	
 					ImportData(@"property-path/data-diamond-loop.ttl");
@@ -289,7 +289,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp28DiamondWithLoopPP_QuestionMark_() {
 	
 					ImportData(@"property-path/data-diamond-loop.ttl");
@@ -301,7 +301,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp29DiamondWithLoopP2() {
 	
 					ImportData(@"property-path/data-diamond-loop.ttl");
@@ -313,7 +313,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp30OperatorPrecedence1() {
 	
 					ImportData(@"property-path/path-p1.ttl");
@@ -325,7 +325,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp31OperatorPrecedence2() {
 	
 					ImportData(@"property-path/path-p1.ttl");
@@ -337,7 +337,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp32OperatorPrecedence3() {
 	
 					ImportData(@"property-path/path-p3.ttl");
@@ -349,7 +349,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Pp33OperatorPrecedence4() {
 	
 					ImportData(@"property-path/path-p3.ttl");
