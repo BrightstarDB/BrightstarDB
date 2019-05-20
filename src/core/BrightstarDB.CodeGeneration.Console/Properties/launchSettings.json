@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BrightstarDB.CodeGeneration.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "../../../../../benchmarking/benchmarking.sln BrightstarDB.PerformanceBenchmarks.Models ../../../../../benchmarking/BrightstarDB.PerformanceBenchmarks/Models/MyEntityContext.cs -ContextName MyEntityContext"
+    }
+  }
+}

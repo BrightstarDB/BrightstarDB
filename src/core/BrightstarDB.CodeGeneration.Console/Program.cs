@@ -24,7 +24,8 @@ namespace BrightstarDB.CodeGeneration.Console
                     arguments.SolutionFile,
                     arguments.ContextNamespace,
                     arguments.ContextName,
-                    entityAccessibilitySelector: entityAccessibilitySelector).Result;
+                    entityAccessibilitySelector: entityAccessibilitySelector,
+                    brightstarAssemblyPath:arguments.BrightstarAssemblyPath).Result;
                 var resultString = result
                     .Aggregate(new StringBuilder(), (sb, next) => sb.AppendLine(next.ToFullString()), x => x.ToString());
 
