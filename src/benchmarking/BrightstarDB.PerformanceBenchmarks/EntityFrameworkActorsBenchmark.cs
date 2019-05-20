@@ -157,7 +157,7 @@ namespace BrightstarDB.PerformanceBenchmarks
                 {
                     var targetName = Firstnames[rng.Next(Firstnames.Count)];
                     var results = context.FoafPersons.Where(p => p.GivenName.Equals(targetName)).ToList();
-                    if (results.Count == 0)
+                    if (results.Count() == 0)
                     {
                         throw new BenchmarkAssertionException(
                             "Expected at least one result from LINQ query on GivenName");

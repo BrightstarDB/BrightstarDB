@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>netcoreapp2.2</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="BrightstarDB">
+      <HintPath>..\..\core\BrightstarDB\bin\Debug\netstandard2.0\BrightstarDB.dll</HintPath>
+    </Reference>
+    <PackageReference Include="dotNetRDF" Version="2.2.0" />
+    <PackageReference Include="Remotion.Linq" Version="2.2.0" />
+    <PackageReference Include="Serilog" Version="2.*"/>
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.*" />
+    <PackageReference Include="Serilog.Sinks.File" Version="4.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="2.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.*" />
+  </ItemGroup>
+
+  <!--
+  <Target Name="GenerateEntityContext" BeforeTargets="BeforeBuild">
+    <Exec Command="dotnet ..\BrightstarDB.CodeGeneration.Console\bin\debug\netcoreapp2.1\BrightstarDB.CodeGeneration.Console.dll ..\core.sln BrightstarDB.PerformanceBenchmarks.Models EntityContext" />
+  </Target>
+  -->
+</Project>

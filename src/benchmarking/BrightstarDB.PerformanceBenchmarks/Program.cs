@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Xml.Serialization;
+using BrightstarDB.Utils;
 
 namespace BrightstarDB.PerformanceBenchmarks
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
@@ -19,7 +21,7 @@ namespace BrightstarDB.PerformanceBenchmarks
 
             // base directory for stores
             var storeFolder = args[0];
-            var connectionString = string.Format("type=embedded;storesDirectory={0}", storeFolder);
+            var connectionString = $"type=embedded;storesDirectory={storeFolder}";
 
             // base directory for reports
             var reportFolder = args[1];
@@ -53,7 +55,7 @@ namespace BrightstarDB.PerformanceBenchmarks
         private static IEnumerable<BenchmarkBase> GetBenchmarks()
         {
             var ret = new List<BenchmarkBase>();
-            foreach (var t in typeof(BenchmarkBase).Assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(BenchmarkBase)) && !t.IsAbstract))
+            foreach (var t in typeof(BenchmarkBase).GetTypeInfo().Assembly.GetTypes().Where(t => t.GetTypeInfo().IsSubclassOf(typeof(BenchmarkBase)) && !t.GetTypeInfo().IsAbstract))
             {
                 var ctor = t.GetConstructor(new Type[] { });
                 if (ctor != null)
@@ -83,12 +85,16 @@ namespace BrightstarDB.PerformanceBenchmarks
         {
             var ser = new XmlSerializer(typeof(BenchmarkReport));
             var reportFileName = Path.Combine(reportFolder, runName + "_" + benchmark.GetType().Name + ".xml");
+#if NETCOREAPP1_0
+            var writer = new StreamWriter(File.OpenWrite(reportFileName), Encoding.UTF8);
+#else
             var writer = new StreamWriter(reportFileName, false, Encoding.UTF8);
+#endif
             ser.Serialize(writer, benchmark.Report);
             writer.Close();
         }
 
-        static void Usage()
+        private static void Usage()
         {
             Console.WriteLine(@"Usage: BenchmarkRunner.exe [storeFolderPath] [reportPath] [benchmark scale (1-5)]");
         }
