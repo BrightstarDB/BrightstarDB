@@ -20,9 +20,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.*" />
   </ItemGroup>
 
-  <!--
   <Target Name="GenerateEntityContext" BeforeTargets="BeforeBuild">
-    <Exec Command="dotnet ..\BrightstarDB.CodeGeneration.Console\bin\debug\netcoreapp2.1\BrightstarDB.CodeGeneration.Console.dll ..\core.sln BrightstarDB.PerformanceBenchmarks.Models EntityContext" />
+    <Exec Command="dotnet ..\..\core\BrightstarDB.CodeGeneration.Console\bin\debug\netcoreapp2.1\BrightstarDB.CodeGeneration.Console.dll ..\benchmarking.sln BrightstarDB.PerformanceBenchmarks.Models Models\MyEntityContext.cs -ContextName MyEntityContext" />
   </Target>
-  -->
+  
 </Project>
