@@ -13,7 +13,6 @@ namespace BrightstarDB.Utils
 
         public static void Close(this BinaryWriter writer)
         {
-            writer.BaseStream.Close();
             writer.Dispose();
         }
 
@@ -24,7 +23,6 @@ namespace BrightstarDB.Utils
 
         public static void Close(this StreamWriter writer)
         {
-            writer.BaseStream.Close();
             writer.Dispose();
         }
 
