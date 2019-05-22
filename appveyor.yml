@@ -14,8 +14,7 @@ build_script:
     - gitversion /l console /output buildserver /updateassemblyinfo
     - dotnet build -c Release src/core/core.sln
 
-test_script:
-    - dotnet test -c Release src/core/BrightstarDB.InternalTests
-    - dotnet test -c Release src/core/BrightstarDB.CodeGeneration.Tests
-    - dotnet test -c Release src/core/BrightstarDB.EntityFramework.Tests
-    - dotnet test -c Release src/core/BrightstarDB.Tests
+test:
+    assemblies:
+        only:
+            - BrightstarDB.InternalTests.dll
