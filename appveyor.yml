@@ -12,8 +12,8 @@ build_script:
     - dotnet build -c Release src/core/core.sln
 
 test_script:
-    - nunit3-console src/core/BrightstarDB.InternalTests/BrightstarDB.InternalTests.csproj --framework net451 --result=BrightstarDB.InternalTests.Results.net451.xml;format=AppVeyor
-    - nunit3-console src/core/BrightstarDB.InternalTests/BrightstarDB.InternalTests.csproj --framework netcoreapp1.0 --result=BrightstarDB.InternalTests.Results.netcoreapp1.xml;format=AppVeyor
+    - nunit3-console src/core/BrightstarDB.InternalTests/BrightstarDB.InternalTests.csproj --framework=net451 --result=BrightstarDB.InternalTests.Results.net451.xml;format=AppVeyor
+    - nunit3-console src/core/BrightstarDB.InternalTests/BrightstarDB.InternalTests.csproj --framework=netcoreapp1.0 --result=BrightstarDB.InternalTests.Results.netcoreapp1.xml;format=AppVeyor
 
 #on_finish:
 #    - ps: |
