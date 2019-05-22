@@ -52,7 +52,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 {
                     sourceTree.Insert(txnId, (ulong)i, BitConverter.GetBytes((ulong)i));
                 }
-                sourceTree.DumpStructure();
                 srcRootId = sourceTree.Save(txnId, null);
                 store.Commit(txnId, null);
             }
@@ -65,7 +64,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 targetRootId = builder.Build(1, sourceTree.Scan(null));
                 
                 var targetTree = new BPlusTree(store, targetRootId);
-                targetTree.DumpStructure();
                 byte[] valueBuff = new byte[64];
                 for(int i =0 ; i < config.LeafLoadFactor; i++)
                 {
@@ -79,7 +77,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             {
                 var targetTree = new BPlusTree(store, targetRootId);
                 var config = targetTree.Configuration;
-                targetTree.DumpStructure();
                 byte[] valueBuff = new byte[64];
                 for (int i = 0; i < config.LeafLoadFactor; i++)
                 {
@@ -103,7 +100,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 {
                     sourceTree.Insert(txnId, (ulong)i, BitConverter.GetBytes((ulong)i));
                 }
-                sourceTree.DumpStructure();
                 srcRootId = sourceTree.Save(txnId, null);
                 store.Commit(txnId, null);
             }
@@ -115,7 +111,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 var builder = new BPlusTreeBuilder(store, config);
                 targetRootId = builder.Build(1, sourceTree.Scan(null));
                 var targetTree = new BPlusTree(store, targetRootId);
-                targetTree.DumpStructure();
                 byte[] valueBuff = new byte[64];
                 for (int i = 0; i < config.LeafLoadFactor + 1; i++)
                 {
@@ -130,7 +125,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 var targetTree = new BPlusTree(store, targetRootId);
                 var config = targetTree.Configuration;
 
-                targetTree.DumpStructure();
                 byte[] valueBuff = new byte[64];
                 for (int i = 0; i < config.LeafLoadFactor + 1; i++)
                 {

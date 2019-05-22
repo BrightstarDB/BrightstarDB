@@ -11,3 +11,15 @@ build_script:
     - gitversion /l console /output buildserver /updateassemblyinfo
     - dotnet build -c Release src/core/core.sln
 
+test_script:
+    - dotnet test -c Release --no-restore --no-build --logger "trx;LogFileName=BrightstarDB.InternalTests.Results.trx" src/core/BrightstarDB.InternalTests
+    - dotnet test -c Release --no-restore --no-build --logger "trx;LogFileName=BrightstarDB.Tests.Results.trx" src/core/BrightstarDB.Tests
+
+on_finish:
+    - ps: |
+        $wc = New-Object 'System.Net.WebClient'
+        $filenames = Get-ChildItem -Path ".\src\core" -Recurse -Include *.trx
+        foreach ($f in filenames) {
+        foreach ($f in $filenames) {
+            $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", $f.FullName)
+        } 
