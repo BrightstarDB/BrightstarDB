@@ -12,7 +12,8 @@ build_script:
     - dotnet build -c Release src/core/core.sln
 
 test:
-    - src/core/BrightstarDB.InternalTests/bin/Release/net451/BrightstarDB.InternalTests.dll
-    - src/core/BrightstarDB.InternalTests/bin/Release/netcoreapp1.0/BrightstarDB.InternalTests.dll
-    - src/core/BrightstarDB.InternalTests/bin/Release/netcoreapp2.0/BrightstarDB.InternalTests.dll
+    assemblies:
+        - src/core/BrightstarDB.InternalTests/bin/Release/net451/BrightstarDB.InternalTests.dll
+        - src/core/BrightstarDB.InternalTests/bin/Release/netcoreapp1.0/BrightstarDB.InternalTests.dll
+        - src/core/BrightstarDB.InternalTests/bin/Release/netcoreapp2.0/BrightstarDB.InternalTests.dll
 
