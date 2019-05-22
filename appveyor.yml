@@ -14,7 +14,8 @@ build_script:
     - gitversion /l console /output buildserver /updateassemblyinfo
     - dotnet build -c Release src/core/core.sln
 
-test:
-    assemblies:
-        only:
-            - BrightstarDB.InternalTests.dll
+test_script:
+    - dotnet test -c Release --no-restore --no-build --logger "trx;LogFileName=BrightstarDB.InternalTests.Results.xml" src/core/BrightstarDB.InternalTests
+    - ps: |
+        $wc = New-Object 'System.Net.WebClient'
+        $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\BrightstarDB.InternalTests.Results.xml))
