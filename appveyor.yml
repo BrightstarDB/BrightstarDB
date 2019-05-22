@@ -23,5 +23,5 @@ on_finish:
         $wc = New-Object 'System.Net.WebClient'
         $filenames = Get-ChildItem -Path ".\src\core" -Recurse -Include *.trx
         foreach ($f in $filenames) {
-            $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", $f.FullName)
+            $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$env:APPVEYOR_JOB_ID", $f.FullName)
         }
