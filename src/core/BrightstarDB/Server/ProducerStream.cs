@@ -13,8 +13,14 @@ namespace BrightstarDB.Server
         }
 
 #if NETSTANDARD16
-        public void Close()
+        /// <summary>
+        /// When the consumer stream is disposed, flag the stream as closed to the connection stream.
+        /// </summary>
+        /// <remarks>This override is required in .NET Standard 1.0 which does not provide an overridable Close method</remarks>
+        /// <param name="disposing"></param>
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
             _connectionStream.IsProducerClosed = true;
         }
 #else

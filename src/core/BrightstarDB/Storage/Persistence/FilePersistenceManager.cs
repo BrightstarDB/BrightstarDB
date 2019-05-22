@@ -41,7 +41,7 @@ namespace BrightstarDB.Storage.Persistence
         /// <param name="pathName"></param>
         public void CreateFile(string pathName)
         {
-            WrapSharingViolations(()=>File.Create(pathName).Close());
+            WrapSharingViolations(() => File.Create(pathName).Close());
         }
 
         /// <summary>
