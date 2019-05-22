@@ -1,8 +1,5 @@
 image: Visual Studio 2017
 
-environment:
-  NoPortable: True
-  
 install:
   - choco install gitversion.portable -pre -y
   
