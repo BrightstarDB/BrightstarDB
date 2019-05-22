@@ -1,5 +1,4 @@
 image: Visual Studio 2017
-version: 1.0.{build}
 
 environment:
   NoPortable: True
@@ -8,6 +7,7 @@ install:
   - choco install gitversion.portable -pre -y
   
 before_build:
+    - dotnet --version
     - dotnet restore src/core/core.sln
 
 build_script:
@@ -15,9 +15,12 @@ build_script:
     - dotnet build -c Release src/core/core.sln
 
 test_script:
-    - dotnet test -c Release --no-restore --no-build --logger "trx;LogFileName=BrightstarDB.InternalTests.Results.xml" src/core/BrightstarDB.InternalTests
+    - dotnet test -c Release --no-restore --no-build --logger "trx;LogFileName=BrightstarDB.InternalTests.Results.trx" src/core/BrightstarDB.InternalTests
 
-after_test:
+on_finish:
     - ps: |
         $wc = New-Object 'System.Net.WebClient'
-        $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\BrightstarDB.InternalTests.Results.xml))
+        $filenames = Get-ChildItem -Path ".\src\core" -Recurse -Include *.trx
+        foreach ($f in filenames) {
+            $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", $f.FullName)
+        }
