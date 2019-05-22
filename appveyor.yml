@@ -3,7 +3,7 @@ version: 1.0.{build}
 
 environment:
   NoPortable: True
-
+  
 install:
   - choco install gitversion.portable -pre -y
   
@@ -12,10 +12,10 @@ before_build:
 
 build_script:
     - gitversion /l console /output buildserver /updateassemblyinfo
-    - dotnet build -c $(CONFIGURATION) src/core/core.sln
+    - dotnet build -c Release src/core/core.sln
 
 test_script:
-    - dotnet test -C $(CONFIGURATION) src/core/BrightstarDB.InternalTests
-    - dotnet test -C $(CONFIGURATION) src/core/BrightstarDB.CodeGeneration.Tests
-    - dotnet test -C $(CONFIGURATION) src/core/BrightstarDB.EntityFramework.Tests
-    - dotnet test -C $(CONFIGURATION) src/core/BrightstarDB.Tests
+    - dotnet test -c Release src/core/BrightstarDB.InternalTests
+    - dotnet test -c Release src/core/BrightstarDB.CodeGeneration.Tests
+    - dotnet test -c Release src/core/BrightstarDB.EntityFramework.Tests
+    - dotnet test -c Release src/core/BrightstarDB.Tests
