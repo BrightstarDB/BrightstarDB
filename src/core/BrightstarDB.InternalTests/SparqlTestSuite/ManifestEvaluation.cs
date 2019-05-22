@@ -2347,7 +2347,10 @@ namespace BrightstarDB.InternalTests.SparqlTestSuite {
 		}
 
 		[Test]
-		public void DawgConstructOptional() {
+#if NETCOREAPP10
+        [Ignore("Test relies on a DTD entity declaration which cannot be parsed in .NET Standard 1.0")]
+#endif
+        public void DawgConstructOptional() {
 	
 					ImportData(@"data-r2/construct/data-opt.ttl");
 		
