@@ -13,11 +13,12 @@ build_script:
 
 before_test:
     - ps: |
-        cd src\core\BrightstarDB
+        pushd .\src\core\BrightstarDB.InternalTests
         nuget install Appveyor.TestLogger
+        popd
 
 test_script:
-    - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src/core/BrightstarDB.InternalTests 
+    - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.InternalTests\BrightstarDB.InternalTests.csproj
 
 #on_finish:
 #    - ps: |
