@@ -4,6 +4,8 @@ using System.Threading;
 using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
+using VDS.RDF;
+
 #if PORTABLE
 using VDS.RDF; // Pulls in the extension methods for Close() on streams
 #endif

@@ -11,7 +11,7 @@ namespace BrightstarDB.EntityFramework.Query
     /// <summary>
     /// Traverses the select expression tree converting SelectVariableNameExpressions to a lookup in an input dictionary
     /// </summary>
-    internal class SparqlGeneratorSelectExpressionBuilder : ExpressionTreeVisitor
+    internal class SparqlGeneratorSelectExpressionBuilder : ExpressionVisitor
     {
         private readonly Dictionary<string, object> _values;
         private readonly Func<string, string, Type, object> _converter; 
@@ -24,7 +24,7 @@ namespace BrightstarDB.EntityFramework.Query
 #if WINDOWS_PHONE || PORTABLE
         protected internal override Expression VisitExtensionExpression(ExtensionExpression expression)
 #else
-        protected override Expression  VisitExtensionExpression(ExtensionExpression expression)
+        protected override Expression  VisitExtension(Expression expression)
 #endif
         {
             if (expression is SelectIdentifierVariableNameExpression)
@@ -56,7 +56,7 @@ namespace BrightstarDB.EntityFramework.Query
             return expression;
         }
 
-        protected override Expression VisitMemberExpression(MemberExpression expression)
+        protected override Expression VisitMember(MemberExpression expression)
         {
             if (expression.Expression is SelectVariableNameExpression)
             {
@@ -70,7 +70,7 @@ namespace BrightstarDB.EntityFramework.Query
                     return Expression.Constant(value);
                 }
             }
-            return base.VisitMemberExpression(expression);
+            return base.VisitMember(expression);
         }
 
         protected override MemberBinding VisitMemberBinding(MemberBinding memberBinding)
@@ -93,9 +93,9 @@ namespace BrightstarDB.EntityFramework.Query
                 {
                     var propertyInfo = memberBinding.Member as PropertyInfo;
                     var assignment = memberBinding as MemberAssignment;
-                    if (assignment.Expression.Type.IsValueType && !propertyInfo.PropertyType.IsValueType)
+                    if (assignment.Expression.Type.IsValueType() && !propertyInfo.PropertyType.IsValueType())
                     {
-                        var valueExpression = Expression.TypeAs(VisitExpression(assignment.Expression), propertyInfo.PropertyType);
+                        var valueExpression = Expression.TypeAs(Visit(assignment.Expression), propertyInfo.PropertyType);
                         return Expression.Bind(memberBinding.Member, valueExpression);
                     }
                 }

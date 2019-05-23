@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using BrightstarDB.Storage.BPlusTreeStore;
 using BrightstarDB.Storage.Persistence;
 using NUnit.Framework;
+using BrightstarDB.Utils;
 
 namespace BrightstarDB.InternalTests.BPlusTreeTests
 {

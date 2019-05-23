@@ -1,4 +1,4 @@
-﻿#if !PORTABLE
+﻿#if !NETSTANDARD16
 using BrightstarDB.Storage.Persistence;
 
 namespace BrightstarDB.Storage.BTreeStore

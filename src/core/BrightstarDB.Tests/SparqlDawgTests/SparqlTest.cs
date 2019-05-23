@@ -226,7 +226,7 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                 resultsReader.Load(actualResultSet, tr);
             }
             var expectedResultSet = new SparqlResultSet();
-            resultsReader.Load(expectedResultSet, new StreamReader(expectedResultsPath));
+            resultsReader.Load(expectedResultSet, new StreamReader(File.OpenRead(expectedResultsPath)));
             var bnodeMap = new Dictionary<string, string>();
             CompareSparqlResults(actualResultSet, expectedResultSet, reduced, bnodeMap);
         }
@@ -366,7 +366,11 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                     if (!CompareValues(yl.Value, xl.Value, yl.DataType == null ? RdfDatatypes.PlainLiteral: yl.DataType.ToString())) return false;
                     var xlang = xl.Language ?? String.Empty;
                     var ylang = yl.Language ?? String.Empty;
+#if NETCOREAPP10
+                    if (!xlang.Equals(ylang, StringComparison.OrdinalIgnoreCase)) return false;
+#else
                     if (!xlang.Equals(ylang, StringComparison.InvariantCultureIgnoreCase)) return false;
+#endif
                     break;
                 case NodeType.Uri:
                     if (!actualNode.NodeType.Equals(expectedNode.NodeType)) return false;
@@ -404,6 +408,6 @@ namespace BrightstarDB.Tests.SparqlDawgTests
                 String.Join(",", actualTriples.Select(t => t.ToString())));
         }
 
-        #endregion
+#endregion
     }
 }

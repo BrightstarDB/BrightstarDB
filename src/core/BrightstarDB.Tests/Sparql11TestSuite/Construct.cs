@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+    
 	public partial class Construct : SparqlTest {
 
         public Construct() : base()
@@ -9,14 +9,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -25,7 +25,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void Constructwhere01ConstructWhere() {
 	
 					ImportData(@"construct/data.ttl");
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Constructwhere02ConstructWhere() {
 	
 					ImportData(@"construct/data.ttl");
@@ -49,7 +49,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Constructwhere03ConstructWhere() {
 	
 					ImportData(@"construct/data.ttl");

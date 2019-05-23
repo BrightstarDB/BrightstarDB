@@ -94,9 +94,15 @@ namespace BrightstarDB
                      .Select(p => p.Substring(8))
                      .FirstOrDefault();
 #else
+#if NETSTANDARD16
+            var encodingName =
+                parts.Where(p => p.ToLowerInvariant().StartsWith("charset=", StringComparison.OrdinalIgnoreCase)).Select(
+                    p => p.Substring(8)).FirstOrDefault();
+#else
             var encodingName =
                 parts.Where(p => p.StartsWith("charset=", StringComparison.InvariantCultureIgnoreCase)).Select(
                     p => p.Substring(8)).FirstOrDefault();
+#endif
 #endif
             var encoding = encodingName == null ? Encoding.UTF8 : Encoding.GetEncoding(encodingName);
             var mediaType = parts[0];

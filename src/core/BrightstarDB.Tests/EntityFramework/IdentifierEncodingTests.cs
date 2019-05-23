@@ -13,13 +13,13 @@ namespace BrightstarDB.Tests.EntityFramework
         private readonly string _connectionString =
             "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=IdentifierEncodingTests_" + DateTime.Now.Ticks;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             _myEntityContext = new MyEntityContext(_connectionString);
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             _myEntityContext.Dispose();

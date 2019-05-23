@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+    
 	public partial class Subquery : SparqlTest {
 
         public Subquery() : base()
@@ -10,14 +10,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -26,7 +26,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void Sq11SubqueryLimitPerResource() {
 	
 					ImportData(@"subquery/sq11.ttl");
@@ -38,7 +38,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sq12SubqueryInConstructWithBuiltIns() {
 	
 					ImportData(@"subquery/sq12.ttl");
@@ -50,7 +50,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sq13SubqueriesDonTInjectBindings() {
 	
 					ImportData(@"subquery/sq11.ttl");
@@ -62,7 +62,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sq04SubqueryWithinGraphPatternDefaultGraphDoesNotApply() {
 	
 					ImportData(@"subquery/sq04.rdf");
@@ -75,7 +75,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sq06SubqueryWithGraphPatternFromNamedApplies() {
 	
 					ImportData(@"subquery/sq05.rdf");
@@ -87,7 +87,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sq08SubqueryWithAggregate() {
 	
 					ImportData(@"subquery/sq08.rdf");
@@ -99,7 +99,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sq09NestedSubqueries() {
 	
 					ImportData(@"subquery/sq09.rdf");
@@ -111,7 +111,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sq10SubqueryWithExists() {
 	
 					ImportData(@"subquery/sq10.rdf");
@@ -123,7 +123,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sq14LimitByResource() {
 	
 					ImportData(@"subquery/sq14.ttl");

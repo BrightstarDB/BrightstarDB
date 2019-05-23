@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
-    [Ignore] // Ignore for now because we are not generating CSV/TSV results
+    
+    [Ignore("Ignore for now because we are not generating CSV/TSV results")]
 	public partial class CsvTsvResults : SparqlTest {
 
         public CsvTsvResults() : base()
@@ -10,14 +10,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -26,7 +26,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void Csv01CsvResultFormat() {
 	
 					ImportData(@"csv-tsv-results/data.ttl");
@@ -38,7 +38,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Cvs02CsvResultFormat() {
 	
 					ImportData(@"csv-tsv-results/data.ttl");
@@ -50,7 +50,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Csv03CsvResultFormat() {
 	
 					ImportData(@"csv-tsv-results/data2.ttl");
@@ -62,7 +62,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Tsv01TsvResultFormat() {
 	
 					ImportData(@"csv-tsv-results/data.ttl");
@@ -74,7 +74,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Tvs02TsvResultFormat() {
 	
 					ImportData(@"csv-tsv-results/data.ttl");
@@ -86,7 +86,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Tsv03TsvResultFormat() {
 	
 					ImportData(@"csv-tsv-results/data2.ttl");

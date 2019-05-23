@@ -142,8 +142,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 {
                     tree.Insert(txnId, (ulong) i, BitConverter.GetBytes(i));
                 }
-                Console.WriteLine("Tree after 100,000 inserts:");
-                tree.DumpStructure();
 
                 var buff = new byte[config.ValueSize];
                 for (int i = 100000; i > 0; i--)
@@ -326,8 +324,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
                 var findChildId = (rootNode as IInternalNode).GetChildNodeId(BitConverter.GetBytes(deleteFrom));
                 Assert.AreEqual(child.PageId, findChildId, "Incorrect node id returned for key {0}", deleteFrom);
 
-                tree.DumpStructure();
-
                 for (ulong i = 0; i < 4; i++)
                 {
                     var deleteKey = deleteFrom + i;
@@ -386,7 +382,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             using (var pageStore = TestUtils.OpenPageStore("TestValuelessBTree.data", false))
             {
                 var tree = new BPlusTree(pageStore, treeRoot, 16, 0);
-                tree.DumpStructure();
                 var buff = new byte[0];
                 foreach(var g in insertedValues)
                 {
@@ -494,8 +489,6 @@ namespace BrightstarDB.InternalTests.BPlusTreeTests
             using (var pageStore = TestUtils.OpenPageStore("TestInsertAndDeleteAllEntries.data", true))
             {
                 var tree = new BPlusTree(pageStore, rootPageId);
-                Console.WriteLine("After load\r\n");
-                tree.DumpStructure();
                 Assert.AreEqual(0, tree.Scan(null).Count(), "Expected an empty tree after deleting all odd-numbered entries");
             }
         }

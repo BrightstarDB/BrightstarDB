@@ -1,4 +1,28 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\key\brightstardb.snk</AssemblyOriginatorKeyFile>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ApplicationIcon />
+    <StartupObject>BrightstarDB.CodeGeneration.Console.Program</StartupObject>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build" Version="15.9.20" />
+    <PackageReference Include="PowerArgs" Version="3.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BrightstarDB\BrightstarDB.csproj" />
+    <ProjectReference Include="..\BrightstarDB.CodeGeneration\BrightstarDB.CodeGeneration.csproj" />
+    <EmbeddedResource Include="GeneratorTestsResources\*.txt" />
+  </ItemGroup>
+ 
+</Project>
+<!--
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -133,11 +157,11 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  -->
+  ->
   <Target Name="AfterBuild">
     <CallTarget Targets="Package" />
   </Target>
@@ -156,3 +180,4 @@
     <Exec Command="$(NuGetCommand) pack &quot;$(SrcDir)core\BrightstarDB.CodeGeneration.Console\$(OutputPath)NuGet\BrightstarDB.CodeGeneration.Console.nuspec&quot;" WorkingDirectory="$(SrcDir)core\BrightstarDB.CodeGeneration.Console\$(OutputPath)NuGet" />
   </Target>
 </Project>
+-->

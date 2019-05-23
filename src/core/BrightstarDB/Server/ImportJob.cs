@@ -4,18 +4,9 @@ using System.Linq;
 using BrightstarDB.Dto;
 using BrightstarDB.Profiling;
 using BrightstarDB.Rdf;
-using BrightstarDB.Storage;
 using VDS.RDF;
 using VDS.RDF.Parsing.Tokens;
 
-#if !SILVERLIGHT
-using System.ServiceModel;
-#endif
-
-#if PORTABLE
-using BrightstarDB.Portable.Adaptation;
-using Path = BrightstarDB.Portable.Compatibility.Path;
-#endif
 
 namespace BrightstarDB.Server
 {
@@ -89,22 +80,13 @@ namespace BrightstarDB.Server
 
         private Stream GetImportFileStream(string filePath)
         {
-#if PORTABLE
-            var persistenceManager = PlatformAdapter.Resolve<IPersistenceManager>();
-            if (!persistenceManager.FileExists(filePath))
-            {
-                ErrorMessage = String.Format("Cannot find file {0} in import directory", _contentFileName);
-                throw new FileNotFoundException(ErrorMessage);                
-            }
-            return persistenceManager.GetInputStream(filePath);
-#else
             if (!File.Exists(filePath))
-                {
-                    ErrorMessage = String.Format("Cannot find file {0} in import directory", _contentFileName);
-                    throw new FileNotFoundException(ErrorMessage);
-                }
-                return _fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-#endif
+            {
+                ErrorMessage = string.Format("Cannot find file {0} in import directory", _contentFileName);
+                throw new FileNotFoundException(ErrorMessage);
+            }
+
+            return _fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         }
 
         #region implementation of ILoggable
@@ -176,12 +158,8 @@ namespace BrightstarDB.Server
         {
             Options.DefaultTokenQueueMode = TokenQueueMode.SynchronousBufferDuringParsing;
             var fileExtension = MimeTypesHelper.GetTrueFileExtension(fileName);
-#if PORTABLE
             bool isGZiped =
                 fileExtension.ToLowerInvariant().EndsWith(MimeTypesHelper.DefaultGZipExtension.ToLowerInvariant());
-#else
-            bool isGZiped = fileExtension.EndsWith(MimeTypesHelper.DefaultGZipExtension, StringComparison.InvariantCultureIgnoreCase);
-#endif
             var parserDefinition = _importFormat == null
                 ? MimeTypesHelper.GetDefinitionsByFileExtension(fileExtension).FirstOrDefault(def => def.CanParseRdf)
                 : MimeTypesHelper.GetDefinitionsByFileExtension(_importFormat.DefaultExtension)

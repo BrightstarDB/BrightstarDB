@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿#if NETFRAMEWORK
 using System.Xml;
 using NUnit.Framework;
 using BrightstarDB.Config;
@@ -59,3 +54,4 @@ namespace BrightstarDB.InternalTests
         }
     }
 }
+#endif

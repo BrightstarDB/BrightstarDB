@@ -19,7 +19,7 @@ namespace BrightstarDB.InternalTests
     {
         private IGraph _config;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             _config = ConfigurationLoader.LoadConfiguration(Path.Combine(TestContext.CurrentContext.TestDirectory, TestConfiguration.DataLocation , "dataObjectStoreConfig.ttl"));

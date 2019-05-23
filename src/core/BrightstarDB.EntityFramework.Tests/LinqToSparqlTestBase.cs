@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Reflection;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 
 namespace BrightstarDB.EntityFramework.Tests
@@ -10,7 +11,7 @@ namespace BrightstarDB.EntityFramework.Tests
         protected void InitializeContext()
         {
             var rmp = new ReflectionMappingProvider();
-            rmp.AddMappingsForAssembly(EntityMappingStore.Instance, typeof(LinqToSparqlTests).Assembly);
+            rmp.AddMappingsForAssembly(EntityMappingStore.Instance, typeof(LinqToSparqlTests).GetTypeInfo().Assembly);
             Context = new MockContext();
         }
 

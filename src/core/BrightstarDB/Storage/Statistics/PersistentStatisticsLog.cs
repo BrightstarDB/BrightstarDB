@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-#if PORTABLE
-using BrightstarDB.Portable.Compatibility;
+#if NETSTANDARD16
+using BrightstarDB.Utils;
 #endif
 
 namespace BrightstarDB.Storage.Statistics

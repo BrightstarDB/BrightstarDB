@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using BrightstarDB.Storage;
+using BrightstarDB.Storage.BTreeStore;
 
 namespace BrightstarDB.Analysis
 {

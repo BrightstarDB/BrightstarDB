@@ -736,7 +736,7 @@ namespace BrightstarDB.InternalTests
 
         private static void InitializeStore(string storeId, string data)
         {
-            var dataStream = new MemoryStream(Encoding.Default.GetBytes(data));
+            var dataStream = new MemoryStream(Encoding.UTF8.GetBytes(data));
             using (var rawStore = StoreManagerFactory.GetStoreManager().CreateStore(Configuration.StoreLocation + "\\" + storeId))
             {
                 rawStore.Import(Guid.Empty, dataStream);

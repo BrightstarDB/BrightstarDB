@@ -107,10 +107,6 @@
       <Project>{121A81F3-EB1C-4228-81FB-0D7505A438FB}</Project>
       <Name>BrightstarDB</Name>
     </ProjectReference>
-    <ProjectReference Include="..\BrightstarDB.Server.Modules\BrightstarDB.Server.Modules.csproj">
-      <Project>{A6A05324-BA02-4C82-9199-AD19BC442C60}</Project>
-      <Name>BrightstarDB.Server.Modules</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

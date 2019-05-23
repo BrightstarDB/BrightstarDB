@@ -1,5 +1,6 @@
 using System.IO;
 using System.Reflection;
+using Microsoft.Build.Locator;
 
 namespace BrightstarDB.CodeGeneration
 {
@@ -11,7 +12,6 @@ namespace BrightstarDB.CodeGeneration
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
-    using Humanizer;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -123,6 +123,7 @@ namespace BrightstarDB.CodeGeneration
         /// A callback used to determine which interfaces should result in generated entities. If left as <see langword="null"/>, all interfaces marked with
         /// <see cref="EntityAttribute"/> are included.
         /// </param>
+        /// <param name="brightstarAssemblyPath">The path to the BrightstarDB assembly to be referenced by the generated code. If this parameter is null, the path to the assembly will be loaded from the solution.</param>
         /// <returns>
         /// A <see cref="SyntaxNode"/> for each generated class, with the entity context first in the list.
         /// </returns>
@@ -134,20 +135,32 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, string> entityNamespaceSelector = null,
             Func<INamedTypeSymbol, string> entityNameSelector = null,
             Func<INamedTypeSymbol, Accessibility> entityAccessibilitySelector = null,
-            Func<INamedTypeSymbol, bool> interfacePredicate = null)
+            Func<INamedTypeSymbol, bool> interfacePredicate = null,
+            string brightstarAssemblyPath = null)
         {
-            var workspace = MSBuildWorkspace.Create();
-            var solution = await workspace.OpenSolutionAsync(solutionPath);
+            MSBuildLocator.RegisterDefaults();
+            using (var workspace = MSBuildWorkspace.Create())
+            {
+                var solution = await workspace.OpenSolutionAsync(solutionPath);
+                if (workspace.Diagnostics.Any(d => d.Kind == WorkspaceDiagnosticKind.Failure))
+                {
+                    var errorMessages = workspace.Diagnostics.Select(d => $"{d.Kind}: {d.Message}");
+                    throw new CodeGeneratorException("There were one or more errors loading the workspace:\n\t" +
+                                                     string.Join("\n\t", errorMessages));
+                }
 
-            return await GenerateAsync(
-                language,
-                solution,
-                contextNamespace,
-                contextName,
-                entityNamespaceSelector,
-                entityNameSelector,
-                entityAccessibilitySelector,
-                interfacePredicate);
+                return await GenerateAsync(
+                    language,
+                    solution,
+                    contextNamespace,
+                    contextName,
+                    entityNamespaceSelector,
+                    entityNameSelector,
+                    entityAccessibilitySelector,
+                    interfacePredicate,
+                    brightstarAssemblyPath);
+
+            }
         }
 
         /// <summary>
@@ -181,6 +194,7 @@ namespace BrightstarDB.CodeGeneration
         /// A callback used to determine which interfaces should result in generated entities. If left as <see langword="null"/>, all interfaces marked with
         /// <see cref="EntityAttribute"/> are included.
         /// </param>
+        /// <param name="brightstarAssemblyPath">The path to the BrightstarDB assembly to be referenced by the generated code. If this parameter is null, the path to the assembly will be loaded from the solution.</param>
         /// <returns>
         /// A <see cref="SyntaxNode"/> for each generated class, with the entity context first in the list.
         /// </returns>
@@ -192,8 +206,14 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, string> entityNamespaceSelector = null,
             Func<INamedTypeSymbol, string> entityNameSelector = null,
             Func<INamedTypeSymbol, Accessibility> entityAccessibilitySelector = null,
-            Func<INamedTypeSymbol, bool> interfacePredicate = null)
+            Func<INamedTypeSymbol, bool> interfacePredicate = null, 
+            string brightstarAssemblyPath = null)
         {
+            if (brightstarAssemblyPath == null)
+            {
+                brightstarAssemblyPath = GetBrightstarAssemblyLocation(solution);
+            }
+
             entityNamespaceSelector = entityNamespaceSelector ?? (x => x.ContainingNamespace.ToDisplayString());
             interfacePredicate = interfacePredicate ?? (x => x.GetAttributes().Any(y => y.AttributeClass.ToString() == Constants.EntityAttribute));
             entityNameSelector = entityNameSelector ??
@@ -277,7 +297,8 @@ namespace BrightstarDB.CodeGeneration
                 contextName,
                 interfaceSymbols,
                 entityNamespaceSelector,
-                entityNameSelector);
+                entityNameSelector,
+                brightstarAssemblyPath);
 
             return new[] { context }
                 .Concat(entities)
@@ -332,10 +353,10 @@ namespace BrightstarDB.CodeGeneration
             string name,
             IImmutableList<INamedTypeSymbol> interfaceSymbols,
             Func<INamedTypeSymbol, string> entityNamespaceSelector,
-            Func<INamedTypeSymbol, string> entityNameSelector)
+            Func<INamedTypeSymbol, string> entityNameSelector,
+            string brightstarAssemblyPath)
         {
             Compilation compilation;
-            var brightstarAssemblyPath = GetBrightstarAssemblyLocation(solution);
             
             var references = new[]
             {

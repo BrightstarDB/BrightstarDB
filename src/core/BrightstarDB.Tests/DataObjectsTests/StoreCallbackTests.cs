@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 //using System.Xml.Linq;
 using BrightstarDB.Client;
@@ -71,7 +72,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
                 store.SaveChanges();
                 Assert.Fail("Expected ApplicationException");
             }
-            catch (ApplicationException)
+            catch (FileNotFoundException)
             {
                 // Expected
             }
@@ -82,7 +83,7 @@ namespace BrightstarDB.Tests.DataObjectsTests
 
         private void ThrowOnSave(object sender, EventArgs e)
         {
-            throw new ApplicationException("Oh noes");
+            throw new FileNotFoundException("Oh noes");
         }
 
         private void LogChanges(object sender, EventArgs e)

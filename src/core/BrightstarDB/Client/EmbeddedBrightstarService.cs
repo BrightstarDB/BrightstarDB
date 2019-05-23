@@ -33,7 +33,6 @@ namespace BrightstarDB.Client
         /// instances. You should ensure in your code that only one EmbeddedBrightstarService instance is connected to any given base location
         /// at a given time. For additional control over the service internals, it is recommended to use the overload of this constructor
         /// that accepts a <see cref="EmbeddedServiceConfiguration"/></remarks>
-        /// 
         public EmbeddedBrightstarService(string baseLocation)
             : this(baseLocation, Configuration.EmbeddedServiceConfiguration)
         {
@@ -50,6 +49,11 @@ namespace BrightstarDB.Client
         /// at a given time.</remarks>
         public EmbeddedBrightstarService(string baseLocation, EmbeddedServiceConfiguration serviceConfigurationOptions)
         {
+            if (baseLocation == null)
+            {
+                throw new ArgumentNullException(nameof(baseLocation));
+            }
+
             _serverCore = ServerCoreManager.GetServerCore(
                 baseLocation,
                 serviceConfigurationOptions ?? Configuration.EmbeddedServiceConfiguration);

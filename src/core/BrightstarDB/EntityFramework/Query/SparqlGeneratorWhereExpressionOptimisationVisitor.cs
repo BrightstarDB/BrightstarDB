@@ -9,7 +9,7 @@ using Remotion.Linq.Parsing;
 
 namespace BrightstarDB.EntityFramework.Query
 {
-    class SparqlGeneratorWhereExpressionOptimisationVisitor : ExpressionTreeVisitor
+    class SparqlGeneratorWhereExpressionOptimisationVisitor : ExpressionVisitor
     {
         private readonly SparqlQueryBuilder _queryBuilder;
         private bool _inBooleanExpression = false;
@@ -25,7 +25,7 @@ namespace BrightstarDB.EntityFramework.Query
         }
 
 
-        protected override Expression VisitBinaryExpression(BinaryExpression expression)
+        protected override Expression VisitBinary(BinaryExpression expression)
         {
             var currentlyInBooleanExpression = _inBooleanExpression;
             var ret = new BooleanFlagExpression(false);
@@ -43,8 +43,7 @@ namespace BrightstarDB.EntityFramework.Query
                             (expression.Left is MemberExpression && expression.Right is MemberExpression)
                             ) &&
                             // Check left and right expression content are optimisable
-                            IsTrue(VisitExpression(expression.Left)) &&
-                                                  IsTrue(VisitExpression(expression.Right)));
+                            IsTrue(Visit(expression.Left)) && IsTrue(Visit(expression.Right)));
                     break;
  
                 case ExpressionType.OrElse:
@@ -53,23 +52,22 @@ namespace BrightstarDB.EntityFramework.Query
                     ret = 
                         new BooleanFlagExpression(
                             // Check left and right expression content are optimisable
-                            IsTrue(VisitExpression(expression.Left)) &&
-                                                  IsTrue(VisitExpression(expression.Right)));
+                            IsTrue(Visit(expression.Left)) && IsTrue(Visit(expression.Right)));
                     break;
             }
             _inBooleanExpression = currentlyInBooleanExpression;
             return ret;
         }
 
-        protected override Expression VisitMethodCallExpression(MethodCallExpression expression)
+        protected override Expression VisitMethodCall(MethodCallExpression expression)
         {
             if (expression.Method.Name.Equals("Equals"))
             {
                 if (expression.Object is MemberExpression && expression.Arguments[0] is ConstantExpression)
                 {
                     return
-                        new BooleanFlagExpression(IsTrue(VisitExpression(expression.Object)) &&
-                                                  IsTrue(VisitExpression(expression.Arguments[0])));
+                        new BooleanFlagExpression(IsTrue(Visit(expression.Object)) &&
+                                                  IsTrue(Visit(expression.Arguments[0])));
                 }
             }
             return new BooleanFlagExpression(false);
@@ -86,7 +84,7 @@ namespace BrightstarDB.EntityFramework.Query
         //    }
         //}
 
-        protected override Expression VisitConstantExpression(ConstantExpression expression)
+        protected override Expression VisitConstant(ConstantExpression expression)
         {
             if (expression.Type == typeof (bool) && ((bool) expression.Value == false))
             {
@@ -96,7 +94,7 @@ namespace BrightstarDB.EntityFramework.Query
             return new BooleanFlagExpression(true);
         }
 
-        protected override Expression VisitMemberExpression(MemberExpression expression)
+        protected override Expression VisitMember(MemberExpression expression)
         {
             var propertyInfo = expression.Member as PropertyInfo;
             if (propertyInfo != null)
@@ -116,50 +114,22 @@ namespace BrightstarDB.EntityFramework.Query
         }
     }
 
-    internal class BooleanFlagExpression : ExtensionExpression 
+    internal class BooleanFlagExpression : Expression 
     {
-        public BooleanFlagExpression(bool value) : 
-#if WINDOWS_PHONE || PORTABLE
-            base(typeof(bool)) // Results in an Extension ExpressionType (according to the docs)
-#else
-            base(typeof(bool), ExpressionType.Extension)
-#endif
+        public BooleanFlagExpression(bool value)
         {
             Value = value;
+            Type = typeof(bool);
         }
 
         public bool Value { get; set; }
+        public override Type Type { get; }
 
-#if !WINDOWS_PHONE && !PORTABLE
-        public override ExpressionType NodeType
-        {
-            get
-            {
-                return ExpressionType.Extension;
-            }
-        }
-#endif
+        public override ExpressionType NodeType => ExpressionType.Extension;
 
         #region Overrides of ExtensionExpression
 
-        /// <summary>
-        /// Must be overridden by <see cref="T:Remotion.Linq.Clauses.Expressions.ExtensionExpression"/> subclasses by calling <see cref="M:Remotion.Linq.Parsing.ExpressionTreeVisitor.VisitExpression(System.Linq.Expressions.Expression)"/> on all 
-        ///             children of this extension node. 
-        /// </summary>
-        /// <param name="visitor">The visitor to visit the child nodes with.</param>
-        /// <returns>
-        /// This <see cref="T:Remotion.Linq.Clauses.Expressions.ExtensionExpression"/>, or an expression that should replace it in the surrounding tree.
-        /// </returns>
-        /// <remarks>
-        /// If the visitor replaces any of the child nodes, a new <see cref="T:Remotion.Linq.Clauses.Expressions.ExtensionExpression"/> instance should
-        ///             be returned holding the new child nodes. If the node has no children or the visitor does not replace any child node, the method should
-        ///             return this <see cref="T:Remotion.Linq.Clauses.Expressions.ExtensionExpression"/>. 
-        /// </remarks>
-#if WINDOWS_PHONE || PORTABLE
-        protected internal override Expression VisitChildren(ExpressionTreeVisitor visitor)
-#else
-        protected override Expression  VisitChildren(ExpressionTreeVisitor visitor)
-#endif
+        protected override Expression  VisitChildren(ExpressionVisitor visitor)
         {
             return this;
         }

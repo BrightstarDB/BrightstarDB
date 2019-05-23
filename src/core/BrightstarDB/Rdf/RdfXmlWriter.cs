@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Xml;
+#if NETSTANDARD16
+using BrightstarDB.Utils;
+#endif
 
 namespace BrightstarDB.Rdf
 {

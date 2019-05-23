@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BrightstarDB.Server;
 using NUnit.Framework;
+using BrightstarDB.Utils;
 
 namespace BrightstarDB.InternalTests
 {
@@ -19,16 +20,18 @@ namespace BrightstarDB.InternalTests
 
             var t = new Task(() =>
                                  {
-                                     var streamWriter = new StreamWriter(producerStream);
-                                     streamWriter.WriteLine("mother fucking stream crap");
-                                     streamWriter.Close();
+                                     using (var streamWriter = new StreamWriter(producerStream))
+                                     {
+                                         streamWriter.WriteLine("stream content");
+                                         streamWriter.Close();
+                                     }
                                  });
 
             t.Start();
 
             var sr = new StreamReader(consumerStream);
             var result = sr.ReadToEnd();
-            Assert.AreEqual("mother fucking stream crap\r\n", result);
+            Assert.AreEqual("stream content\r\n", result);
 
             Task.WaitAll(t);
         }
@@ -42,7 +45,7 @@ namespace BrightstarDB.InternalTests
             var t = new Task(() =>
             {
                 var streamWriter = new StreamWriter(producerStream);
-                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("mother fucking stream crap " + i);
+                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("stream content " + i);
                 streamWriter.Close();
             });
 
@@ -52,8 +55,8 @@ namespace BrightstarDB.InternalTests
 
             var sr = new StreamReader(consumerStream);                   
             var result = sr.ReadToEnd();
-            Assert.IsTrue(result.StartsWith("mother fucking stream crap 0"));
-            Assert.IsTrue(result.EndsWith("mother fucking stream crap 999\r\n"));
+            Assert.IsTrue(result.StartsWith("stream content 0"));
+            Assert.IsTrue(result.EndsWith("stream content 999\r\n"));
             
             Task.WaitAll(t);
         }
@@ -67,7 +70,7 @@ namespace BrightstarDB.InternalTests
             var t = new Task(() =>
             {
                 var streamWriter = new StreamWriter(producerStream);
-                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("mother fucking stream crap " + i);
+                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("stream content " + i);
                 streamWriter.Close();
             });
 
@@ -79,7 +82,7 @@ namespace BrightstarDB.InternalTests
             using (var sr = new StreamReader(consumerStream))
             {
                 var result = sr.ReadLine();
-                Assert.AreEqual(result, "mother fucking stream crap " + j);
+                Assert.AreEqual(result, "stream content " + j);
                 j++;
             }
 
@@ -96,7 +99,7 @@ namespace BrightstarDB.InternalTests
             var t = new Task(() =>
             {
                 var streamWriter = new StreamWriter(producerStream);
-                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("mother fucking stream crap " + i);
+                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("stream content " + i);
                 streamWriter.Close();
             });
 
@@ -119,7 +122,7 @@ namespace BrightstarDB.InternalTests
             var t = new Task(() =>
             {
                 var streamWriter = new StreamWriter(producerStream);
-                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("mother fucking stream crap " + i);
+                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("stream content " + i);
                 streamWriter.Close();
             });
 
@@ -129,7 +132,7 @@ namespace BrightstarDB.InternalTests
             {
                 // read one line
                 var line = sr.ReadLine();
-                Assert.AreEqual("mother fucking stream crap 0", line);
+                Assert.AreEqual("stream content 0", line);
             }
 
             Task.WaitAll(t);
@@ -144,7 +147,7 @@ namespace BrightstarDB.InternalTests
             var t = new Task(() =>
             {
                 var streamWriter = new StreamWriter(producerStream);
-                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("mother fucking stream crap " + i);
+                for (int i = 0; i < 1000; i++) streamWriter.WriteLine("stream content " + i);
                 streamWriter.Close();
             });
 
@@ -155,7 +158,7 @@ namespace BrightstarDB.InternalTests
             {
                 // read one line
                 var line = sr.ReadLine();
-                Assert.AreEqual("mother fucking stream crap 0", line);
+                Assert.AreEqual("stream content 0", line);
             }
 
         }

@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+    
 	public partial class Bind : SparqlTest {
 
         public Bind() : base()
@@ -9,14 +9,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -25,7 +25,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void Bind01Bind() {
 	
 					ImportData(@"bind/data.ttl");
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bind02Bind() {
 	
 					ImportData(@"bind/data.ttl");
@@ -49,7 +49,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bind03Bind() {
 	
 					ImportData(@"bind/data.ttl");
@@ -61,7 +61,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bind04Bind() {
 	
 					ImportData(@"bind/data.ttl");
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bind05Bind() {
 	
 					ImportData(@"bind/data.ttl");
@@ -85,7 +85,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bind06Bind() {
 	
 					ImportData(@"bind/data.ttl");
@@ -97,7 +97,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bind07Bind() {
 	
 					ImportData(@"bind/data.ttl");
@@ -109,7 +109,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bind08Bind() {
 	
 					ImportData(@"bind/data.ttl");
@@ -121,7 +121,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bind10BindScopingVariableInFilterNotInScope() {
 	
 					ImportData(@"bind/data.ttl");
@@ -133,7 +133,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bind11BindScopingVariableInFilterInScope() {
 	
 					ImportData(@"bind/data.ttl");

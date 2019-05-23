@@ -29,7 +29,7 @@ namespace BrightstarDB.Client.RestSecurity
         /// <param name="request">The request to be updated with authentication information</param>
         public void Authenticate(HttpWebRequest request)
         {
-#if PORTABLE || WINDOWS_PHONE
+#if NETSTANDARD16
             request.Headers[HttpRequestHeader.Authorization] =
                 "SharedKey " + _accountId + ":" +
                 RestClientHelper.GenerateSignature(request, SignatureType.SharedKey, _authKey);

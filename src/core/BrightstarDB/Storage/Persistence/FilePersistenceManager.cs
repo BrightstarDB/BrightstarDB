@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+#if NETSTANDARD16
+using BrightstarDB.Utils;
+#endif
 
 namespace BrightstarDB.Storage.Persistence
 {
@@ -38,7 +41,7 @@ namespace BrightstarDB.Storage.Persistence
         /// <param name="pathName"></param>
         public void CreateFile(string pathName)
         {
-            WrapSharingViolations(()=>File.Create(pathName).Close());
+            WrapSharingViolations(() => File.Create(pathName).Close());
         }
 
         /// <summary>

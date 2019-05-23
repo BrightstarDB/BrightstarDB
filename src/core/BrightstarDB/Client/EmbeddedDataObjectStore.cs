@@ -7,6 +7,10 @@ using BrightstarDB.EntityFramework.Query;
 using BrightstarDB.Model;
 using BrightstarDB.Rdf;
 using BrightstarDB.Server;
+#if NETSTANDARD16
+using VDS.RDF;
+using Triple = BrightstarDB.Model.Triple;
+#endif
 
 namespace BrightstarDB.Client
 {
@@ -185,7 +189,7 @@ namespace BrightstarDB.Client
 
         #endregion
 
-        private IEnumerable<Triple> GetFilteredResourceStatements(string storeId, string resourceUri)
+        private IEnumerable<ITriple> GetFilteredResourceStatements(string storeId, string resourceUri)
         {
             if (DataSetGraphUris == null)
             {

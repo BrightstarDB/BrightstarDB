@@ -164,15 +164,24 @@ namespace BrightstarDB.EntityFramework
 
         private IdentityInfo _GetIdentityInfo(Type type)
         {
-            IdentityInfo ret;
-            if (_identityInfo.TryGetValue(type, out ret)) return ret;
-            Type interfaceType;
-            if (_interfaceMappings.TryGetValue(type, out interfaceType))
+            Type baseType;
+            if (_identityInfo.TryGetValue(type, out var ret)) return ret;
+            if (_interfaceMappings.TryGetValue(type, out var interfaceType))
             {
-                if (_identityInfo.TryGetValue(interfaceType, out ret)) return ret;
-                if (interfaceType.BaseType != null) return _GetIdentityInfo(interfaceType.BaseType);
+                if (_identityInfo.TryGetValue(interfaceType, out ret))
+                {
+                    return ret;
+                }
+
+                baseType = interfaceType.GetTypeInfo().BaseType;
+                if (baseType != null)
+                {
+                    return _GetIdentityInfo(baseType);
+                }
             }
-            return type.BaseType != null ? _GetIdentityInfo(type.BaseType) : null;
+
+            baseType = type.GetTypeInfo().BaseType;
+            return baseType != null ? _GetIdentityInfo(baseType) : null;
         }
 
         /// <summary>

@@ -1,14 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using BrightstarDB.Profiling;
-#if PORTABLE
-using BrightstarDB.Portable.Compatibility;
-using Array = BrightstarDB.Portable.Compatibility.Array;
-#elif WINDOWS_PHONE
-using BrightstarDB.Mobile.Compatibility;
-#else
-using System.Collections.Concurrent;
+#if NETSTANDARD16
+using BrightstarDB.Utils;
 #endif
 
 namespace BrightstarDB.Storage.Persistence

@@ -29,7 +29,11 @@ namespace BrightstarDB.EntityFramework
         /// <filterpriority>1</filterpriority>
         public IEnumerator<NamespaceDeclarationAttribute> GetEnumerator()
         {
+#if NETSTANDARD16
+            return _assembly.GetCustomAttributes(typeof(NamespaceDeclarationAttribute)).Cast<NamespaceDeclarationAttribute>().GetEnumerator();
+#else
             return _assembly.GetCustomAttributes(typeof (NamespaceDeclarationAttribute), false).Cast<NamespaceDeclarationAttribute>().GetEnumerator();
+#endif
         }
 
         /// <summary>
@@ -44,6 +48,21 @@ namespace BrightstarDB.EntityFramework
             return GetEnumerator();
         }
 
+#if NETSTANDARD16
+        /// <summary>
+        /// Return the collection of namespace declarations declared by the specified assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly to search for namespace declarations.</param>
+        /// <remarks>This method finds all of the custom attributes of type <see cref="NamespaceDeclarationAttribute"/>
+        /// in <paramref name="assembly"/>.</remarks>
+        /// <returns>A <see cref="NamespaceDeclarations"/> instance that can be used to iterate or
+        /// to format the collection of namespace declarations found in <paramref name="assembly"/>.</returns>
+        public static NamespaceDeclarations ForAssembly(Assembly assembly)
+        {
+            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
+            return new NamespaceDeclarations(assembly);
+        }
+#else
         /// <summary>
         /// Return the collection of namespace declarations declared by the specified assembly.
         /// </summary>
@@ -52,12 +71,13 @@ namespace BrightstarDB.EntityFramework
         /// in <paramref name="assembly"/>. If <paramref name="assembly"/> is null then the method <see cref="Assembly.GetCallingAssembly"/>
         /// is used to retrieve the assembly of the method that calls this method.</remarks>
         /// <returns>A <see cref="NamespaceDeclarations"/> instance that can be used to iterate or
-        /// to format the colleciton of namespace declarations found in <paramref name="assembly"/>.</returns>
+        /// to format the collection of namespace declarations found in <paramref name="assembly"/>.</returns>
         public static NamespaceDeclarations ForAssembly(Assembly assembly = null)
         {
             if (assembly == null) assembly = Assembly.GetCallingAssembly();
             return new NamespaceDeclarations(assembly);
         }
+#endif
 
         /// <summary>
         /// Returns a string containing all of the namespace prefix declarations formatted

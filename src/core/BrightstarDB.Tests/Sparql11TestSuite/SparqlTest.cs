@@ -5,10 +5,11 @@ using System.Linq;
 using System.Threading;
 using BrightstarDB.Client;
 using BrightstarDB.Rdf;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using VDS.RDF;
 using VDS.RDF.Parsing;
 using VDS.RDF.Query;
+using VDS.RDF.Query.Datasets;
 using SparqlResult = VDS.RDF.Query.SparqlResult;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite
@@ -39,14 +40,20 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
 
         private Dictionary<string, string> _bnodeMappings;
 
+        private string ResolvePath(string relPath)
+        {
+            return Path.Combine(Configuration.DataLocation, "sparql11_tests", relPath);
+        }
+
         protected void ImportData(string dataPath, string defaultGraphUri = null)
         {
+            dataPath = ResolvePath(dataPath);
             var g = new Graph();
             var importId = Guid.NewGuid();
             FileLoader.Load(g, dataPath);
             _bnodeMappings = new Dictionary<string, string>();
             var sw = new StringWriter();
-            var ntWriter = new NQuadsWriter(sw, Constants.DefaultGraphUri);
+            var ntWriter = new NQuadsWriter(sw);
             foreach (var t in g.Triples)
             {
                 if (t.Object.NodeType == NodeType.Literal)
@@ -81,7 +88,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
                         );
                 }
             }
-            _service.ExecuteTransaction(_storeName, null, null, sw.ToString(), true);
+            _service.ExecuteTransaction(_storeName, null, null, sw.ToString(), Constants.DefaultGraphUri, true);
             //_store.Commit(Guid.NewGuid());
         }
 
@@ -119,6 +126,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
 
         protected string ExecuteQuery(string queryPath)
         {
+            queryPath = ResolvePath(queryPath);
             var queryExp = File.ReadAllText(queryPath);
             var resultsStream = _service.ExecuteQuery(_storeName, queryExp);
             using(var streamReader = new StreamReader(resultsStream))
@@ -131,6 +139,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
         protected void CheckResult(string results, string expectedResultPath, bool laxCardinality)
         {
             Assert.IsNotNull(results);
+            expectedResultPath = ResolvePath(expectedResultPath);
             var resultExtension = Path.GetExtension(expectedResultPath).ToLower();
             if (resultExtension.Equals(".srx"))
             {
@@ -148,6 +157,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
 
         protected void ValidateUnamedGraph(string dataPath)
         {
+            dataPath = ResolvePath(dataPath);
             var exportFileName = "export_default_" + _storeName;
             var exportJob = _service.StartExport(_storeName, exportFileName, Constants.DefaultGraphUri);
             while(!exportJob.JobCompletedOk && !exportJob.JobCompletedWithErrors)
@@ -162,6 +172,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
 
         protected void ValidateGraph(string dataPath, Uri graphUri)
         {
+            dataPath = ResolvePath(dataPath);
             var exportFileName = "export_" +graphUri.Segments[graphUri.Segments.Length-1] + _storeName;
             var exportJob = _service.StartExport(_storeName, exportFileName, graphUri.ToString());
             while (!exportJob.JobCompletedOk && !exportJob.JobCompletedWithErrors)
@@ -176,6 +187,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
 
         protected void ExecuteUpdate(string requestPath)
         {
+            requestPath = ResolvePath(requestPath);
             var updateExpression = File.ReadAllText(requestPath);
             var result = _service.ExecuteUpdate(_storeName, updateExpression, true);
             Assert.IsTrue(result.JobCompletedOk, "SPARQL Update failed for update from file path {0} : {1} : {2}", requestPath, result.StatusMessage, result.ExceptionInfo);
@@ -197,10 +209,10 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
 
         private void CompareResultGraphs(string results, string expectedResultsPath, bool reduced)
         {
-            var expectedResultGraph = new Graph();
-            FileLoader.Load(expectedResultGraph, expectedResultsPath);
-            var resultSet = expectedResultGraph.GetUriNode(new Uri("http://www.w3.org/2001/sw/DataAccess/tests/result-set#ResultSet"));
-            if (resultSet != null)
+            var expectedStore = new TripleStore();
+            expectedStore.LoadFromFile(expectedResultsPath);
+            var resultSetUri = new Uri("http://www.w3.org/2001/sw/DataAccess/tests/result-set#ResultSet");
+            if (expectedStore.Graphs.Any(g=>g.GetUriNode(resultSetUri)!=null))
             {
                 var rdfParser = new SparqlRdfParser();
                 var xmlParser = new SparqlXmlParser();
@@ -217,9 +229,15 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
             else
             {
                 // This is a constructed graph
-                var actualGraph = new Graph();
-                actualGraph.LoadFromString(results);
-                CompareTripleCollections(actualGraph.Triples, expectedResultGraph.Triples, reduced);
+                var actualStore = new TripleStore();
+                actualStore.LoadFromString(results);
+                foreach (var g in expectedStore.Graphs)
+                {
+                    if (actualStore.Graphs.Contains(g.BaseUri))
+                    {
+                        CompareTripleCollections(actualStore.Graphs[g.BaseUri].Triples, g.Triples, reduced);
+                    }
+                }
             }
         }
 
@@ -319,7 +337,11 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
                     if (!xd.Equals(yd)) return false;
                     var xlang = xl.Language ?? String.Empty;
                     var ylang = yl.Language ?? String.Empty;
+#if NETCOREAPP10
+                    if (!xlang.Equals(ylang, StringComparison.OrdinalIgnoreCase)) return false;
+#else
                     if (!xlang.Equals(ylang, StringComparison.InvariantCultureIgnoreCase)) return false;
+#endif
                     break;
                 case NodeType.Uri:
                     if (!actualNode.NodeType.Equals(expectedNode.NodeType)) return false;
@@ -469,6 +491,6 @@ namespace BrightstarDB.Tests.Sparql11TestSuite
         //    return n;
         //}
 
-        #endregion
+#endregion
     }
 }

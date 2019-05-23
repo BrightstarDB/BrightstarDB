@@ -1,7 +1,6 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
 	public partial class SyntaxFed : SparqlTest {
 
         public SyntaxFed() : base()
@@ -9,14 +8,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();

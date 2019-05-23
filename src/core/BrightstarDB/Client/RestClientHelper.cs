@@ -5,9 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-#if !PORTABLE && !WINDOWS_PHONE
-using System.Web;
-#endif
 
 namespace BrightstarDB.Client
 {
@@ -16,7 +13,6 @@ namespace BrightstarDB.Client
     /// </summary>
     public static class RestClientHelper
     {
-#if !PORTABLE && !WINDOWS_PHONE
         /// <summary>
         /// Extracts and parses the Authorization header from a B* REST API request
         /// </summary>
@@ -25,7 +21,7 @@ namespace BrightstarDB.Client
         /// <param name="account">The account ID specified in the request</param>
         /// <param name="signature">The request signature</param>
         /// <returns>True if the request has an Authorization header that was parsed successfully, false otherwise.</returns>
-        public static bool GetAuthorizationInfo(HttpRequestBase request, out SignatureType authType, out string account, out string signature)
+        public static bool GetAuthorizationInfo(WebRequest request, out SignatureType authType, out string account, out string signature)
         {
             authType = SignatureType.Unknown;
             string authHeader = request.Headers["Authorization"];
@@ -59,7 +55,6 @@ namespace BrightstarDB.Client
             signature = null;
             return false;
         }
-#endif
 
         /// <summary>
         /// Generates the authorization signatures for a B* REST API request
@@ -77,17 +72,10 @@ namespace BrightstarDB.Client
                 return secret;
             }
             var stringToSign = new StringBuilder();
-#if PORTABLE || WINDOWS_PHONE
-            var requestContentLength = RequestContentLength(request);
-#endif
             stringToSign.AppendLine(request.Method.ToUpperInvariant())
                 .AppendLine(request.Headers[HttpRequestHeader.ContentEncoding])
                 .AppendLine(request.Headers[HttpRequestHeader.ContentLanguage])
-#if PORTABLE || WINDOWS_PHONE
-                .AppendLine(requestContentLength >= 0 ? requestContentLength.ToString(CultureInfo.InvariantCulture) : String.Empty)
-#else
-.AppendLine(request.ContentLength >= 0 ? request.ContentLength.ToString(CultureInfo.InvariantCulture) : String.Empty)
-#endif
+                .AppendLine(request.Headers[HttpRequestHeader.ContentLength])
                 .AppendLine(request.Headers[HttpRequestHeader.ContentMd5])
                 .AppendLine(request.Headers[HttpRequestHeader.ContentType])
                 .AppendLine(request.Headers[HttpRequestHeader.Date])
@@ -105,19 +93,6 @@ namespace BrightstarDB.Client
             return signature;
         }
 
-#if PORTABLE || WINDOWS_PHONE
-        static long RequestContentLength(HttpWebRequest request)
-        {
-            long ret;
-            string szValue = request.Headers[HttpRequestHeader.ContentLength];
-            if (!String.IsNullOrEmpty(szValue) && Int64.TryParse(szValue, out ret)){
-                return ret;
-            }
-            return 0;
-        }
-#endif
-
-#if !PORTABLE && !WINDOWS_PHONE
         /// <summary>
         /// Generates the authorization signatures for a B* REST API request
         /// </summary>
@@ -125,7 +100,7 @@ namespace BrightstarDB.Client
         /// <param name="signatureType">The type of signature to apply.</param>
         /// <param name="secret">The shared secret used to generate the signature</param>
         /// <returns></returns>
-        public static string GenerateSignature(HttpRequestBase request, SignatureType signatureType, string secret)
+        public static string GenerateSignature(WebRequest request, SignatureType signatureType, string secret)
         {
             if (signatureType == SignatureType.Unknown) throw new ArgumentException("Invalid signature type", "signatureType");
             if (signatureType == SignatureType.PlainText)
@@ -133,7 +108,7 @@ namespace BrightstarDB.Client
                 return secret;
             }
             var stringToSign = new StringBuilder();
-            stringToSign.AppendLine(request.RequestType.ToUpperInvariant())
+            stringToSign.AppendLine(request.Method.ToUpperInvariant())
                 .AppendLine(request.Headers["Content-Encoding"])
                 .AppendLine(request.Headers["Content-Language"])
                 .AppendLine(request.Headers["Content-Length"])
@@ -145,13 +120,12 @@ namespace BrightstarDB.Client
                 .AppendLine(request.Headers["If-None-Match"])
                 .AppendLine(request.Headers["If-Unmodified-Since"])
                 .AppendLine(request.Headers["Range"])
-                .Append(CanonicalizedResource(request.Url));
+                .Append(CanonicalizedResource(request.RequestUri));
             var key = Convert.FromBase64String(secret);
             var hmac = new HMACSHA256(key);
             var signature = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(stringToSign.ToString())));
             return signature;
         }
-#endif
 
         /// <summary>
         /// Constructs the canonicalized resource string for B* REST API requests

@@ -5,9 +5,8 @@ using NUnit.Framework;
 namespace BrightstarDB.Tests.EntityFramework
 {
     [TestFixture("type=embedded;storesDirectory=c:\\brightstar;storeName={0}")]
-#if !PORTABLE
-    [TestFixture("type=rest;endpoint=http://localhost:8090/brightstar/;storeName={0}")]
-#endif
+    // TODO: Reinstate REST client tests when REST server is reinstated
+    // [TestFixture("type=rest;endpoint=http://localhost:8090/brightstar/;storeName={0}")]
     public class UniqueKeyConstraintTests : ClientTestBase
     {
         private readonly string _connectionString;
@@ -24,7 +23,7 @@ namespace BrightstarDB.Tests.EntityFramework
             return new MyEntityContext(_connectionString);
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             if (_connectionString.Contains("type=rest"))
@@ -33,7 +32,7 @@ namespace BrightstarDB.Tests.EntityFramework
             }
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             if (_connectionString.Contains("type=rest"))

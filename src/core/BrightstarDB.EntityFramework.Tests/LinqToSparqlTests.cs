@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using BrightstarDB.EntityFramework.Tests.ContextObjects;
 using NUnit.Framework;
 
@@ -26,17 +27,17 @@ namespace BrightstarDB.EntityFramework.Tests
         public void TestDinnerPropertyMappings()
         {
             var dinnerType = typeof (IDinner);
-            var id = dinnerType.GetProperty("Id");
+            var id = dinnerType.GetTypeInfo().GetProperty("Id");
             var hint = Context.GetPropertyHint(id);
             Assert.IsNotNull(hint);
             Assert.AreEqual(PropertyMappingType.Id, hint.MappingType);
-            var title = dinnerType.GetProperty("Title");
+            var title = dinnerType.GetTypeInfo().GetProperty("Title");
             hint = Context.GetPropertyHint(title);
             Assert.IsNotNull(hint);
             Assert.AreEqual(PropertyMappingType.Property, hint.MappingType);
             Assert.AreEqual("http://purl.org/dc/terms/title", hint.SchemaTypeUri);
 
-            var rsvps = dinnerType.GetProperty("Rsvps");
+            var rsvps = dinnerType.GetTypeInfo().GetProperty("Rsvps");
             hint = Context.GetPropertyHint(rsvps);
             Assert.IsNotNull(hint);
             Assert.AreEqual(PropertyMappingType.Arc, hint.MappingType);

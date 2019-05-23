@@ -26,6 +26,7 @@ namespace BrightstarDB.EntityFramework.Tests
 FILTER (STRSTARTS(?v0, 'Netw')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
 
+#if !NETCOREAPP10
             q = Context.Companies.Where(c => c.Name.StartsWith("Netw", true, CultureInfo.InvariantCulture)).Select(c => c.Id);
             results = q.ToList();
             AssertQuerySparql(
@@ -34,6 +35,7 @@ BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
 ?c <http://purl.org/dc/terms/title> ?v0 .
 FILTER (regex(?v0, '^Netw', 'i')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
+#endif
 
             q = Context.Companies.Where(c => c.Name.StartsWith("Netw", StringComparison.CurrentCultureIgnoreCase)).Select(c => c.Id);
             results = q.ToList();
@@ -44,6 +46,7 @@ BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
 FILTER (regex(?v0, '^Netw', 'i')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
 
+#if !NETCOREAPP10
             q = Context.Companies.Where(c => c.Name.StartsWith("Netw", StringComparison.InvariantCultureIgnoreCase)).Select(c => c.Id);
             results = q.ToList();
             AssertQuerySparql(
@@ -52,6 +55,7 @@ BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
 ?c <http://purl.org/dc/terms/title> ?v0 .
 FILTER (regex(?v0, '^Netw', 'i')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
+#endif
 
             q = Context.Companies.Where(c => c.Name.StartsWith("Netw", StringComparison.OrdinalIgnoreCase)).Select(c => c.Id);
             results = q.ToList();
@@ -76,6 +80,7 @@ BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
 FILTER (STRENDS(?v0, 'net')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
 
+#if !NETCOREAPP10
             q = Context.Companies.Where(c => c.Name.EndsWith("net", true, CultureInfo.CurrentCulture)).Select(c => c.Id);
             results = q.ToList();
             AssertQuerySparql(
@@ -84,6 +89,7 @@ BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
 ?c <http://purl.org/dc/terms/title> ?v0 .
 FILTER (regex(?v0, 'net$', 'i')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
+#endif
 
             q = Context.Companies.Where(c => c.Name.EndsWith("net", StringComparison.CurrentCulture)).Select(c => c.Id);
             results = q.ToList();
@@ -94,6 +100,7 @@ BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
 FILTER (regex(?v0, 'net$')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
 
+#if !NETCOREAPP10
             q = Context.Companies.Where(c => c.Name.EndsWith("net", StringComparison.InvariantCulture)).Select(c => c.Id);
             results = q.ToList();
             AssertQuerySparql(
@@ -102,6 +109,7 @@ BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
 ?c <http://purl.org/dc/terms/title> ?v0 .
 FILTER (regex(?v0, 'net$')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
+#endif
 
             q = Context.Companies.Where(c => c.Name.EndsWith("net", StringComparison.Ordinal)).Select(c => c.Id);
             results = q.ToList();
@@ -122,6 +130,7 @@ BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
 FILTER (regex(?v0, 'net$', 'i')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
 
+#if !NETCOREAPP10
             q = Context.Companies.Where(c => c.Name.EndsWith("net", StringComparison.InvariantCultureIgnoreCase)).Select(c => c.Id);
             results = q.ToList();
             AssertQuerySparql(
@@ -130,6 +139,7 @@ BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)
 ?c <http://purl.org/dc/terms/title> ?v0 .
 FILTER (regex(?v0, 'net$', 'i')).
 BIND(STRAFTER(STR(?c), 'http://www.brightstardb.com/.well-known/genid/') AS ?v1)}");
+#endif
 
             q = Context.Companies.Where(c => c.Name.EndsWith("net", StringComparison.OrdinalIgnoreCase)).Select(c => c.Id);
             results = q.ToList();

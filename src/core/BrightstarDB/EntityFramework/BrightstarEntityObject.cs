@@ -266,11 +266,11 @@ namespace BrightstarDB.EntityFramework
                 //return new T[0].FirstOrDefault(); // TODO : Find a better way to get the default value
             }
             var propertyType = GetPropertyUri(propertyName);
-            if (typeof(T).IsEnum)
+            if (typeof(T).GetTypeInfo().IsEnum)
             {
                 var enumValue = DataObject.GetPropertyValue(propertyType);
                 var valueDefinedByEnum = enumValue != null && Enum.IsDefined(typeof(T), enumValue);
-                var isFlagsEnum = typeof(T).GetCustomAttributes(typeof(FlagsAttribute), true).Any();
+                var isFlagsEnum = typeof(T).GetTypeInfo().GetCustomAttributes(typeof(FlagsAttribute), true).Any();
                 return (enumValue != null && (valueDefinedByEnum || isFlagsEnum))
                            ? (T)Enum.ToObject(typeof(T), DataObject.GetPropertyValue(propertyType))
                            : default(T);
@@ -281,18 +281,18 @@ namespace BrightstarDB.EntityFramework
                 object ret = value == null ? null : new Uri(value.Identity);
                 return (T) ret;
             }
-            if (typeof(T).IsNullable() && typeof(T).GetGenericArguments()[0].IsEnum)
+            if (typeof(T).IsNullable() && typeof(T).GetGenericArguments()[0].GetTypeInfo().IsEnum)
             {
                 var enumType = typeof (T).GetGenericArguments()[0];
                 var enumValue = DataObject.GetPropertyValue(propertyType);
                 var valueDefinedByEnum = enumValue!=null && Enum.IsDefined(enumType, enumValue);
-                var isFlagsEnum = enumType.GetCustomAttributes(typeof(FlagsAttribute), true).Any();
+                var isFlagsEnum = enumType.GetTypeInfo().GetCustomAttributes(typeof(FlagsAttribute), true).Any();
                 return (enumValue != null && (valueDefinedByEnum||isFlagsEnum))
                            ? (T) Enum.ToObject(enumType, enumValue)
                            : default(T);
             }
             object returnValue = DataObject.GetPropertyValue(propertyType);
-            if (returnValue == null && typeof(T).IsValueType) return default(T);
+            if (returnValue == null && typeof(T).IsValueType()) return default(T);
             if (typeof(T) == typeof(String) && returnValue!=null)
             {
                 object o = returnValue.ToString();
@@ -538,18 +538,18 @@ namespace BrightstarDB.EntityFramework
 
         private static bool IsCollectionType (Type t)
         {
-            if(t.IsGenericType)
+            if(t.IsGenericType())
             {
                 var typeDef = t.GetGenericTypeDefinition();
-                var ret = typeDef.IsSubclassOf(typeof (ICollection<>)) || typeDef.Equals(typeof(ICollection<>));
+                var ret = typeDef.GetTypeInfo().IsSubclassOf(typeof (ICollection<>)) || typeDef.Equals(typeof(ICollection<>));
                 return ret;
             }
-            return t.IsSubclassOf(typeof (ICollection));
+            return t.GetTypeInfo().IsSubclassOf(typeof (ICollection));
         }
 
         private static bool IsLiteralsCollection(Type t)
         {
-            if (t.IsGenericType)
+            if (t.IsGenericType())
             {
                 var typeDef = t.GetGenericTypeDefinition();
                 return typeDef.Equals(typeof(LiteralsCollection<>));

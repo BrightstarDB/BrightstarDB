@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+
 	public partial class Grouping : SparqlTest {
 
         public Grouping() : base()
@@ -9,14 +9,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -25,7 +25,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void Group1() {
 	
 					ImportData(@"grouping/group-data-1.ttl");
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Group2() {
 	
 					ImportData(@"grouping/group-data-1.ttl");
@@ -49,7 +49,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Group3() {
 	
 					ImportData(@"grouping/group-data-1.ttl");
@@ -61,7 +61,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Group4() {
 	
 					ImportData(@"grouping/group-data-1.ttl");
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Group5() {
 	
 					ImportData(@"grouping/group-data-2.ttl");

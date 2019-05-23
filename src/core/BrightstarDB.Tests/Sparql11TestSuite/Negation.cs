@@ -1,7 +1,6 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
 	public partial class Negation : SparqlTest {
 
         public Negation() : base()
@@ -9,14 +8,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[OneTimeSetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [OneTimeTearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -25,7 +24,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void SubsetsByExclusionNotExists() {
 	
 					ImportData(@"negation/subsetByExcl.ttl");
@@ -37,7 +36,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void SubsetsByExclusionMinus() {
 	
 					ImportData(@"negation/subsetByExcl.ttl");
@@ -49,7 +48,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void MedicalTemporalProximityByExclusionNotExists() {
 	
 					ImportData(@"negation/temporalProximity01.ttl");
@@ -61,8 +60,8 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
-        [Ignore] // Not working in dotNetRdf
+		[Test]
+        [Ignore("Test fails in dotNetRDF")] // Not working in dotNetRdf
 		public void MedicalTemporalProximityByExclusionMinus() {
 	
 					ImportData(@"negation/temporalProximity02.ttl");
@@ -74,7 +73,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void CalculateWhichSetsAreSubsetsOfOthersIncludeASubsetofA() {
 	
 					ImportData(@"negation/set-data.ttl");
@@ -86,7 +85,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void CalculateWhichSetsAreSubsetsOfOthersExcludeASubsetofA() {
 	
 					ImportData(@"negation/set-data.ttl");
@@ -98,7 +97,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void CalculateWhichSetsHaveTheSameElements() {
 	
 					ImportData(@"negation/set-data.ttl");
@@ -110,7 +109,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void CalculateProperSubset() {
 	
 					ImportData(@"negation/set-data.ttl");
@@ -122,7 +121,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void PositiveExists1() {
 	
 					ImportData(@"negation/set-data.ttl");
@@ -134,7 +133,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void PositiveExists2() {
 	
 					ImportData(@"negation/set-data.ttl");

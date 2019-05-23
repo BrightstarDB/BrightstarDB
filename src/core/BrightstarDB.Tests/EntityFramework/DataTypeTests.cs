@@ -11,7 +11,7 @@ namespace BrightstarDB.Tests.EntityFramework
 
         private readonly string _connectionString = "Type=embedded;StoresDirectory=c:\\brightstar;StoreName=" + Guid.NewGuid();
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             _myEntityContext = new MyEntityContext(_connectionString);

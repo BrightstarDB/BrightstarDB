@@ -4,21 +4,21 @@ using NUnit.Framework;
 
 namespace BrightstarDB.Tests.EntityFramework
 {
-    [TestFixture]
+    [TestFixture(Ignore = "Skipped until REST service is reinstated. NOTE: These tests were not part of the pre-migration test codebase")]
     public class HttpOptimisticLockingTests : OptimisticLockingTestsBase
     {
         private readonly string _storeName = "HttpOptimisticLockingTests_" + DateTime.Now.Ticks;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
-            StartService();
+            // StartService();
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
-            CloseService();
+            // CloseService();
         }
 
         #region Overrides of OptimisticLockingTestsBase

@@ -1,44 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BrightstarDB.PerformanceBenchmarks", "BrightstarDB.PerformanceBenchmarks\BrightstarDB.PerformanceBenchmarks.shproj", "{DB96CB78-D139-46FD-86D5-95597BB3B562}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.PerformanceBenchmarks.Desktop", "BrightstarDB.PerformanceBenchmarks.Desktop\BrightstarDB.PerformanceBenchmarks.Desktop.csproj", "{91814004-9BAD-418F-8562-923BBA70BF35}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB", "..\core\BrightstarDB\BrightstarDB.csproj", "{121A81F3-EB1C-4228-81FB-0D7505A438FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.PerformanceBenchmarks", "BrightstarDB.PerformanceBenchmarks\BrightstarDB.PerformanceBenchmarks.csproj", "{7B78FE08-6A7D-412E-A808-E54209281118}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		BrightstarDB.PerformanceBenchmarks\BrightstarDB.PerformanceBenchmarks.projitems*{91814004-9bad-418f-8562-923bba70bf35}*SharedItemsImports = 4
-		BrightstarDB.PerformanceBenchmarks\BrightstarDB.PerformanceBenchmarks.projitems*{db96cb78-d139-46fd-86d5-95597bb3b562}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		CloudDebug|Any CPU = CloudDebug|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-		Staging|Any CPU = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{91814004-9BAD-418F-8562-923BBA70BF35}.CloudDebug|Any CPU.ActiveCfg = Debug|Any CPU
-		{91814004-9BAD-418F-8562-923BBA70BF35}.CloudDebug|Any CPU.Build.0 = Debug|Any CPU
-		{91814004-9BAD-418F-8562-923BBA70BF35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{91814004-9BAD-418F-8562-923BBA70BF35}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{91814004-9BAD-418F-8562-923BBA70BF35}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{91814004-9BAD-418F-8562-923BBA70BF35}.Release|Any CPU.Build.0 = Release|Any CPU
-		{91814004-9BAD-418F-8562-923BBA70BF35}.Staging|Any CPU.ActiveCfg = Release|Any CPU
-		{91814004-9BAD-418F-8562-923BBA70BF35}.Staging|Any CPU.Build.0 = Release|Any CPU
-		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.CloudDebug|Any CPU.ActiveCfg = CloudDebug|Any CPU
-		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.CloudDebug|Any CPU.Build.0 = CloudDebug|Any CPU
-		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
-		{121A81F3-EB1C-4228-81FB-0D7505A438FB}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{7B78FE08-6A7D-412E-A808-E54209281118}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B78FE08-6A7D-412E-A808-E54209281118}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B78FE08-6A7D-412E-A808-E54209281118}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B78FE08-6A7D-412E-A808-E54209281118}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {74E2706E-9138-46FB-B503-2AAD72DE0CE1}
 	EndGlobalSection
 EndGlobal

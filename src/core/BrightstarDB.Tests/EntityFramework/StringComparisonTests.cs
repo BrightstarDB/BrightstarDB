@@ -10,7 +10,7 @@ namespace BrightstarDB.Tests.EntityFramework
     {
         private MyEntityContext _context;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             _context = new MyEntityContext("type=embedded;storesDirectory=" + Configuration.StoreLocation + ";storeName=EFStringComparisonTests_" + DateTime.Now.Ticks);
@@ -28,12 +28,14 @@ namespace BrightstarDB.Tests.EntityFramework
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("NetworkedPlanet",results[0].Name);
 
+#if !NETCOREAPP10 // No overload of StartsWith supports three arguments in .NET Core 1.0
             results = _context.Companies.Where(c => c.Name.StartsWith("net", true, CultureInfo.CurrentCulture)).ToList();
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("NetworkedPlanet", results[0].Name);
 
             results = _context.Companies.Where(c => c.Name.StartsWith("net", false, CultureInfo.CurrentCulture)).ToList();
             Assert.AreEqual(0, results.Count);
+#endif
 
             results = _context.Companies.Where(c => c.Name.StartsWith("net", StringComparison.CurrentCultureIgnoreCase)).ToList();
             Assert.AreEqual(1, results.Count);
@@ -42,14 +44,14 @@ namespace BrightstarDB.Tests.EntityFramework
             results = _context.Companies.Where(c => c.Name.StartsWith("net", StringComparison.CurrentCulture)).ToList();
             Assert.AreEqual(0, results.Count);
 
-#if !PORTABLE // InvariantCultureIgnoreCase is not supported by PCL
+#if !NETCOREAPP10 // InvariantCulture[IgnoreCase] is not supported by .NET Core 1.x
             results = _context.Companies.Where(c => c.Name.StartsWith("net", StringComparison.InvariantCultureIgnoreCase)).ToList();
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("NetworkedPlanet", results[0].Name);
-#endif
 
             results = _context.Companies.Where(c => c.Name.StartsWith("net", StringComparison.InvariantCulture)).ToList();
             Assert.AreEqual(0, results.Count);
+#endif
 
             results = _context.Companies.Where(c => c.Name.StartsWith("net", StringComparison.OrdinalIgnoreCase)).ToList();
             Assert.AreEqual(1, results.Count);
@@ -69,12 +71,14 @@ namespace BrightstarDB.Tests.EntityFramework
             results = _context.Companies.Where(c => c.Name.EndsWith("Net")).ToList();
             Assert.AreEqual(0, results.Count);
 
+#if !NETCOREAPP10 // No overload of EndsWith supports three arguments in .NET Core 1.0
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", true, CultureInfo.CurrentCulture)).ToList();
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("NetworkedPlanet", results[0].Name);
 
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", false, CultureInfo.CurrentCulture)).ToList();
             Assert.AreEqual(0, results.Count);
+#endif
 
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", StringComparison.CurrentCultureIgnoreCase)).ToList();
             Assert.AreEqual(1, results.Count);
@@ -83,14 +87,16 @@ namespace BrightstarDB.Tests.EntityFramework
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", StringComparison.CurrentCulture)).ToList();
             Assert.AreEqual(0, results.Count);
 
-#if !PORTABLE // InvariantCultureIgnoreCase is not supported by PCL
+#if !NETCOREAPP10 // InvariantCultureIgnoreCase is not supported by .NET Core 1.x
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", StringComparison.InvariantCultureIgnoreCase)).ToList();
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("NetworkedPlanet", results[0].Name);
 #endif
 
+#if !NETCOREAPP10
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", StringComparison.InvariantCulture)).ToList();
             Assert.AreEqual(0, results.Count);
+#endif
 
             results = _context.Companies.Where(c => c.Name.EndsWith("Net", StringComparison.OrdinalIgnoreCase)).ToList();
             Assert.AreEqual(1, results.Count);

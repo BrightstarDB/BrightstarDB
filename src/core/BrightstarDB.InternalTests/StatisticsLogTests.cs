@@ -15,7 +15,7 @@ namespace BrightstarDB.InternalTests
         private const string BaseDirectory = "StatisticsLogTests";
         private IPersistenceManager _persistenceManager;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             _persistenceManager = new FilePersistenceManager();

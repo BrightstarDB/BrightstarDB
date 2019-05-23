@@ -52,5 +52,8 @@
         [ArgShortcut("IE")]
         public bool InternalEntityClasses { get; set; }
 
+        [ArgDescription("Optionally set an explicit path to the BrightstarDB assembly")]
+        public string BrightstarAssemblyPath { get; set; }
+
     }
 }

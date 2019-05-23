@@ -1,8 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
-    [Ignore] // Ignore for now because we are not generating JSON results sets
+
+    [Ignore("Server does not currently provide SPARQL JSON result sets")] // Ignore for now because we are not generating JSON results sets
 	public partial class JsonRes : SparqlTest {
 
         public JsonRes() : base()
@@ -10,14 +10,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -26,7 +26,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void Jsonres01JsonResultFormat() {
 	
 					ImportData(@"json-res/data.ttl");
@@ -38,7 +38,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Jsonres02JsonResultFormat() {
 	
 					ImportData(@"json-res/data.ttl");
@@ -50,7 +50,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Jsonres03JsonResultFormat() {
 	
 					ImportData(@"json-res/data.ttl");
@@ -62,7 +62,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Jsonres04JsonResultFormat() {
 	
 					ImportData(@"json-res/data.ttl");

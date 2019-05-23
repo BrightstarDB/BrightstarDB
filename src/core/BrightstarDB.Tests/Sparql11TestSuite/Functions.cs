@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+
 	public partial class Functions : SparqlTest {
 
         public Functions() : base()
@@ -9,14 +9,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -25,7 +25,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void Plus1() {
 	
 					ImportData(@"functions/data-builtin-3.ttl");
@@ -37,7 +37,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Plus2() {
 	
 					ImportData(@"functions/data-builtin-3.ttl");
@@ -49,7 +49,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Strdt() {
 	
 					ImportData(@"functions/data.ttl");
@@ -61,7 +61,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void StrdtStr() {
 	
 					ImportData(@"functions/data.ttl");
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void StrdtTypeerrors() {
 	
 					ImportData(@"functions/data.ttl");
@@ -85,7 +85,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Strlang() {
 	
 					ImportData(@"functions/data.ttl");
@@ -97,7 +97,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void StrlangStr() {
 	
 					ImportData(@"functions/data.ttl");
@@ -109,7 +109,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void StrlangTypeerrors() {
 	
 					ImportData(@"functions/data.ttl");
@@ -121,7 +121,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Isnumeric() {
 	
 					ImportData(@"functions/data.ttl");
@@ -133,7 +133,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Abs() {
 	
 					ImportData(@"functions/data.ttl");
@@ -145,7 +145,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Ceil() {
 	
 					ImportData(@"functions/data.ttl");
@@ -157,7 +157,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Floor() {
 	
 					ImportData(@"functions/data.ttl");
@@ -169,7 +169,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Round() {
 	
 					ImportData(@"functions/data.ttl");
@@ -181,7 +181,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Concat() {
 	
 					ImportData(@"functions/data.ttl");
@@ -193,7 +193,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Concat2() {
 	
 					ImportData(@"functions/data2.ttl");
@@ -205,7 +205,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Substr3Argument() {
 	
 					ImportData(@"functions/data.ttl");
@@ -217,7 +217,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Substr2Argument() {
 	
 					ImportData(@"functions/data.ttl");
@@ -229,7 +229,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Strlen() {
 	
 					ImportData(@"functions/data.ttl");
@@ -241,7 +241,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Ucase() {
 	
 					ImportData(@"functions/data.ttl");
@@ -253,7 +253,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Lcase() {
 	
 					ImportData(@"functions/data.ttl");
@@ -265,7 +265,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Encode_for_uri() {
 	
 					ImportData(@"functions/data.ttl");
@@ -277,7 +277,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Contains() {
 	
 					ImportData(@"functions/data.ttl");
@@ -289,7 +289,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Strstarts() {
 	
 					ImportData(@"functions/data.ttl");
@@ -301,7 +301,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Strends() {
 	
 					ImportData(@"functions/data.ttl");
@@ -313,7 +313,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Md5() {
 	
 					ImportData(@"functions/data.ttl");
@@ -325,7 +325,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Md5OverUnicodeData() {
 	
 					ImportData(@"functions/data.ttl");
@@ -337,7 +337,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sha1() {
 	
 					ImportData(@"functions/data.ttl");
@@ -349,7 +349,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sha1OnUnicodeData() {
 	
 					ImportData(@"functions/hash-unicode.ttl");
@@ -361,7 +361,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sha256() {
 	
 					ImportData(@"functions/data.ttl");
@@ -373,7 +373,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sha256OnUnicodeData() {
 	
 					ImportData(@"functions/hash-unicode.ttl");
@@ -385,7 +385,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sha512() {
 	
 					ImportData(@"functions/data.ttl");
@@ -397,7 +397,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Sha512OnUnicodeData() {
 	
 					ImportData(@"functions/hash-unicode.ttl");
@@ -409,7 +409,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Hours() {
 	
 					ImportData(@"functions/data.ttl");
@@ -421,7 +421,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Minutes() {
 	
 					ImportData(@"functions/data.ttl");
@@ -433,7 +433,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Seconds() {
 	
 					ImportData(@"functions/data.ttl");
@@ -445,7 +445,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Year() {
 	
 					ImportData(@"functions/data.ttl");
@@ -457,7 +457,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Month() {
 	
 					ImportData(@"functions/data.ttl");
@@ -469,7 +469,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Day() {
 	
 					ImportData(@"functions/data.ttl");
@@ -481,7 +481,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Timezone() {
 	
 					ImportData(@"functions/data.ttl");
@@ -493,7 +493,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Tz() {
 	
 					ImportData(@"functions/data.ttl");
@@ -505,8 +505,8 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
-        [Ignore] // Not working in dotNetRdf
+		[Test]
+        [Ignore("Not working in dotNetRdf")]
 		public void BnodeStr() {
 	
 					ImportData(@"functions/data.ttl");
@@ -518,7 +518,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void In1() {
 	
 					ImportData(@"functions/data.ttl");
@@ -530,7 +530,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void In2() {
 	
 					ImportData(@"functions/data.ttl");
@@ -542,7 +542,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void NotIn1() {
 	
 					ImportData(@"functions/data.ttl");
@@ -554,7 +554,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void NotIn2() {
 	
 					ImportData(@"functions/data.ttl");
@@ -566,7 +566,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Now() {
 	
 					ImportData(@"functions/data.ttl");
@@ -578,7 +578,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Rand() {
 	
 					ImportData(@"functions/data.ttl");
@@ -590,7 +590,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Bnode() {
 	
 					ImportData(@"functions/data.ttl");
@@ -602,7 +602,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void IriUri() {
 	
 					ImportData(@"functions/data.ttl");
@@ -614,7 +614,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void If() {
 	
 					ImportData(@"functions/data2.ttl");
@@ -626,7 +626,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void IfErrorPropogation() {
 	
 					ImportData(@"functions/data2.ttl");
@@ -638,7 +638,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Coalesce() {
 	
 					ImportData(@"functions/data-coalesce.ttl");
@@ -650,7 +650,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Strbefore() {
 	
 					ImportData(@"functions/data2.ttl");
@@ -662,7 +662,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Strafter() {
 	
 					ImportData(@"functions/data2.ttl");
@@ -674,7 +674,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void Replace() {
 	
 					ImportData(@"functions/data3.ttl");
@@ -686,7 +686,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ReplaceWithOverlappingPattern() {
 	
 					ImportData(@"functions/data3.ttl");
@@ -698,7 +698,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 	
 		}
 
-		[TestMethod]
+		[Test]
 		public void ReplaceWithCapturedSubstring() {
 	
 					ImportData(@"functions/data3.ttl");

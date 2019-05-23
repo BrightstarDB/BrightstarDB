@@ -24,7 +24,7 @@ namespace BrightstarDB.Tests
             return "EmbeddedClientTests_" + testName + "_" + DateTime.UtcNow.Ticks;
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
             // Ensure a complete shutdown of embedded services before running these tests as they depend on re-initialization

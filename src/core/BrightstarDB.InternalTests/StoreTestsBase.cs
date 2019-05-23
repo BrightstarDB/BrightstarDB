@@ -686,6 +686,8 @@ namespace BrightstarDB.InternalTests
         {
             var storeLocation = Configuration.StoreLocation;
             Assert.AreEqual("c:\\brightstar", storeLocation);
+            Assert.IsNotNull(Configuration.ConnectionString);
+            Assert.AreEqual("Type=embedded;StoresDirectory=c:\\brightstar\\;StoreName=OdataTests", Configuration.ConnectionString);
         }
 #endif
 

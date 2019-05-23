@@ -1,7 +1,7 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace BrightstarDB.Tests.Sparql11TestSuite {
-    [TestClass]
+
 	public partial class DeleteInsert : SparqlTest {
 
         public DeleteInsert() : base()
@@ -9,14 +9,14 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
             
         }
 
-		[TestInitialize]
+		[SetUp]
 		public void SetUp()
 		{
 			CreateStore();
 		    
 		}
 
-        [TestCleanup]
+        [TearDown]
         public void TearDown()
         {
 			DeleteStore();
@@ -25,7 +25,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 
 		#region Test Methods
 
-		[TestMethod]
+		[Test]
 		public void DeleteInsert1() {
 				ImportData(@"delete-insert/delete-insert-pre-01.ttl");
 				ExecuteUpdate(@"delete-insert/delete-insert-01.ru");
@@ -33,7 +33,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DeleteInsert1b() {
 				ImportData(@"delete-insert/delete-insert-pre-01.ttl");
 				ExecuteUpdate(@"delete-insert/delete-insert-01b.ru");
@@ -41,7 +41,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DeleteInsert1c() {
 				ImportData(@"delete-insert/delete-insert-pre-01.ttl");
 				ExecuteUpdate(@"delete-insert/delete-insert-01c.ru");
@@ -49,7 +49,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DeleteInsert2() {
 				ImportData(@"delete-insert/delete-insert-pre-01.ttl");
 				ExecuteUpdate(@"delete-insert/delete-insert-02.ru");
@@ -57,7 +57,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DeleteInsert4() {
 				ImportData(@"delete-insert/delete-insert-pre-01.ttl");
 				ExecuteUpdate(@"delete-insert/delete-insert-04.ru");
@@ -65,7 +65,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DeleteInsert4b() {
 				ImportData(@"delete-insert/delete-insert-pre-01.ttl");
 				ExecuteUpdate(@"delete-insert/delete-insert-04b.ru");
@@ -73,7 +73,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DeleteInsert5b() {
 				ImportData(@"delete-insert/delete-insert-pre-01.ttl");
 				ExecuteUpdate(@"delete-insert/delete-insert-05b.ru");
@@ -81,7 +81,7 @@ namespace BrightstarDB.Tests.Sparql11TestSuite {
 			
 		}
 
-		[TestMethod]
+		[Test]
 		public void DeleteInsert6b() {
 				ImportData(@"delete-insert/delete-insert-pre-06.ttl");
 				ExecuteUpdate(@"delete-insert/delete-insert-05b.ru");
