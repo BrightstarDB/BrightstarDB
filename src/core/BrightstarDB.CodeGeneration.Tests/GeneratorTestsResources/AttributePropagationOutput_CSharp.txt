@@ -21,12 +21,12 @@
             this.InitializeContext();
         }
 
-        public EntityContext(string updateGraphUri, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris, string versionGraphUri) : base(updateGraphUri, datasetGraphUris, versionGraphUri)
+        public EntityContext(string updateGraphUri, global::System.Collections.Generic.IEnumerable<global::System.String> datasetGraphUris, string versionGraphUri) : base(updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             this.InitializeContext();
         }
 
-        public EntityContext(string connectionString, System.Boolean? enableOptimisticLocking = null, string updateGraphUri = null, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris = null, string versionGraphUri = null) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+        public EntityContext(string connectionString, global::System.Boolean? enableOptimisticLocking = null, string updateGraphUri = null, global::System.Collections.Generic.IEnumerable<global::System.String> datasetGraphUris = null, string versionGraphUri = null) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             this.InitializeContext();
         }
@@ -36,7 +36,8 @@
             this._AttributePropagations = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.IAttributePropagation>(this));
         }
 
-        public global::BrightstarDB.EntityFramework.IEntitySet<T> EntitySet<T>() where T : class
+        public global::BrightstarDB.EntityFramework.IEntitySet<T> EntitySet<T>()
+            where T : class
         {
             global::System.Type type = typeof(T);
             if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.IAttributePropagation)))
@@ -76,7 +77,7 @@ namespace BrightstarDB.CodeGeneration.Tests
         }
 
         [global::System.ComponentModel.BrowsableAttribute(true)]
-        public System.String Id
+        public global::System.String Id
         {
             get
             {
@@ -91,11 +92,11 @@ namespace BrightstarDB.CodeGeneration.Tests
 
         [global::System.ComponentModel.BrowsableAttribute(true)]
         [global::System.ComponentModel.DescriptionAttribute("This should carry through.")]
-        public System.Int32 Number
+        public global::System.Int32 Number
         {
             get
             {
-                return base.GetRelatedProperty<System.Int32>("Number");
+                return base.GetRelatedProperty<global::System.Int32>("Number");
             }
 
             set
