@@ -11,9 +11,13 @@ build_script:
     - gitversion /l console /output buildserver /updateassemblyinfo
     - dotnet build -c Release src/core/core.sln
 
+before_test:
+    - ps: |
+        cd src\core\BrightstarDB
+        nuget install Appveyor.TestLogger
+
 test_script:
-    - nunit3-console src/core/BrightstarDB.InternalTests/BrightstarDB.InternalTests.csproj --framework=net451 --result=BrightstarDB.InternalTests.Results.net451.xml;format=AppVeyor
-    - nunit3-console src/core/BrightstarDB.InternalTests/BrightstarDB.InternalTests.csproj --framework=netcoreapp1.0 --result=BrightstarDB.InternalTests.Results.netcoreapp1.xml;format=AppVeyor
+    - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src/core/BrightstarDB.InternalTests 
 
 #on_finish:
 #    - ps: |
