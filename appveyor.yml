@@ -16,14 +16,10 @@ before_test:
         pushd .\src\core\BrightstarDB.InternalTests
         nuget install Appveyor.TestLogger
         popd
+        pushd .\src\core\BrightstarDB.CodeGeneration.Tests
+        nuget install Appveyor.TestLogger
+        popd
 
 test_script:
     - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.InternalTests\BrightstarDB.InternalTests.csproj
-
-#on_finish:
-#    - ps: |
-#        $wc = New-Object 'System.Net.WebClient'
-#        $filenames = Get-ChildItem -Path ".\src\core" -Recurse -Include *.trx
-#        foreach ($f in $filenames) {
-#            $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", $f.FullName)
-#        } 
+    - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.CodeGeneration.Tests\BrightstarDB.CodeGeneration.Tests.csproj
