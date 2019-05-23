@@ -2,7 +2,7 @@
 
     <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
-    Public Partial Class EntityContext
+    Partial Public Class EntityContext
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityContext
 
         Shared Sub New()
@@ -56,7 +56,7 @@ Namespace BrightstarDB.CodeGeneration.Tests
 
     <System.CodeDom.Compiler.GeneratedCode("BrightstarDB.CodeGeneration", "$VERSION$")>
     <System.Runtime.CompilerServices.CompilerGenerated>
-    $ENTITYACCESS$ Partial Class MyEmptyEntity
+    Partial $ENTITYACCESS$ Class MyEmptyEntity
         Inherits Global.BrightstarDB.EntityFramework.BrightstarEntityObject
         Implements Global.BrightstarDB.CodeGeneration.Tests.IMyEmptyEntity
 
