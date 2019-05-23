@@ -120,7 +120,10 @@ namespace BrightstarDB.CodeGeneration.Tests
                     {
                         MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                         MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
-                        MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location)
+                        MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(BrowsableAttribute).Assembly.Location),
+                        MetadataReference.CreateFromFile(Assembly.Load("netstandard, Version=2.0.0.0").Location),
+                        MetadataReference.CreateFromFile(Assembly.Load("System.Runtime, Version=0.0.0.0").Location)
                     });
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));
