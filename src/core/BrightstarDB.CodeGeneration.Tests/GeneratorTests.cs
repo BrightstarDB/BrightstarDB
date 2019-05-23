@@ -1,4 +1,7 @@
-﻿namespace BrightstarDB.CodeGeneration.Tests
+﻿using System.ComponentModel;
+using System.Reflection;
+
+namespace BrightstarDB.CodeGeneration.Tests
 {
     using System;
     using System.IO;
@@ -50,8 +53,11 @@
                     {
                         MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                         MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
-                        MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location)
-                    });
+                        MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(BrowsableAttribute).Assembly.Location),
+                        MetadataReference.CreateFromFile(Assembly.Load("netstandard, Version=2.0.0.0").Location),
+                        MetadataReference.CreateFromFile(Assembly.Load("System.Runtime, Version=0.0.0.0").Location)
+            });
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));
                 var solution = workspace.CurrentSolution;
@@ -82,7 +88,7 @@
                 //var sanitisedResult = result.Replace("1.10.0.0", "$VERSION$");
                 //System.Diagnostics.Debug.WriteLine(sanitisedResult);
 
-                Assert.AreEqual(expectedCode, result);
+                Assert.AreEqual(expectedCode.Replace("\r\n", "\n"), result.Replace("\r\n", "\n"));
             }
         }
 
@@ -114,7 +120,10 @@
                     {
                         MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                         MetadataReference.CreateFromFile(typeof(Uri).Assembly.Location),
-                        MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location)
+                        MetadataReference.CreateFromFile(typeof(BrightstarException).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(BrowsableAttribute).Assembly.Location),
+                        MetadataReference.CreateFromFile(Assembly.Load("netstandard, Version=2.0.0.0").Location),
+                        MetadataReference.CreateFromFile(Assembly.Load("System.Runtime, Version=0.0.0.0").Location)
                     });
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));

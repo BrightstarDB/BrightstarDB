@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace BrightstarDB.CodeGeneration
 {
@@ -17,6 +18,10 @@ namespace BrightstarDB.CodeGeneration
             else if (singular.EndsWith("ch") || singular.EndsWith("sh"))
             {
                 suffix = "es";
+            }
+            else if (singular.EndsWith("es"))
+            {
+                suffix = string.Empty;
             }
             else
             {

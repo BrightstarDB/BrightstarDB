@@ -21,12 +21,12 @@
             this.InitializeContext();
         }
 
-        public EntityContext(string updateGraphUri, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris, string versionGraphUri) : base(updateGraphUri, datasetGraphUris, versionGraphUri)
+        public EntityContext(string updateGraphUri, global::System.Collections.Generic.IEnumerable<global::System.String> datasetGraphUris, string versionGraphUri) : base(updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             this.InitializeContext();
         }
 
-        public EntityContext(string connectionString, System.Boolean? enableOptimisticLocking = null, string updateGraphUri = null, global::System.Collections.Generic.IEnumerable<System.String> datasetGraphUris = null, string versionGraphUri = null) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
+        public EntityContext(string connectionString, global::System.Boolean? enableOptimisticLocking = null, string updateGraphUri = null, global::System.Collections.Generic.IEnumerable<global::System.String> datasetGraphUris = null, string versionGraphUri = null) : base(connectionString, enableOptimisticLocking, updateGraphUri, datasetGraphUris, versionGraphUri)
         {
             this.InitializeContext();
         }
@@ -36,7 +36,8 @@
             this._SupportedScalarPropertyTypes = (new global::BrightstarDB.EntityFramework.BrightstarEntitySet<global::BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes>(this));
         }
 
-        public global::BrightstarDB.EntityFramework.IEntitySet<T> EntitySet<T>() where T : class
+        public global::BrightstarDB.EntityFramework.IEntitySet<T> EntitySet<T>()
+            where T : class
         {
             global::System.Type type = typeof(T);
             if (type.Equals(typeof(global::BrightstarDB.CodeGeneration.Tests.ISupportedScalarPropertyTypes)))
@@ -75,7 +76,7 @@ namespace BrightstarDB.CodeGeneration.Tests
         {
         }
 
-        public System.String Id
+        public global::System.String Id
         {
             get
             {
@@ -88,11 +89,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Boolean Bool
+        public global::System.Boolean Bool
         {
             get
             {
-                return base.GetRelatedProperty<System.Boolean>("Bool");
+                return base.GetRelatedProperty<global::System.Boolean>("Bool");
             }
 
             set
@@ -101,11 +102,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Int16 Int16
+        public global::System.Int16 Int16
         {
             get
             {
-                return base.GetRelatedProperty<System.Int16>("Int16");
+                return base.GetRelatedProperty<global::System.Int16>("Int16");
             }
 
             set
@@ -114,11 +115,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Int32 Int32
+        public global::System.Int32 Int32
         {
             get
             {
-                return base.GetRelatedProperty<System.Int32>("Int32");
+                return base.GetRelatedProperty<global::System.Int32>("Int32");
             }
 
             set
@@ -127,11 +128,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Int64 Int64
+        public global::System.Int64 Int64
         {
             get
             {
-                return base.GetRelatedProperty<System.Int64>("Int64");
+                return base.GetRelatedProperty<global::System.Int64>("Int64");
             }
 
             set
@@ -140,11 +141,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.UInt16 UInt16
+        public global::System.UInt16 UInt16
         {
             get
             {
-                return base.GetRelatedProperty<System.UInt16>("UInt16");
+                return base.GetRelatedProperty<global::System.UInt16>("UInt16");
             }
 
             set
@@ -153,11 +154,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.UInt32 UInt32
+        public global::System.UInt32 UInt32
         {
             get
             {
-                return base.GetRelatedProperty<System.UInt32>("UInt32");
+                return base.GetRelatedProperty<global::System.UInt32>("UInt32");
             }
 
             set
@@ -166,11 +167,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.UInt64 UInt64
+        public global::System.UInt64 UInt64
         {
             get
             {
-                return base.GetRelatedProperty<System.UInt64>("UInt64");
+                return base.GetRelatedProperty<global::System.UInt64>("UInt64");
             }
 
             set
@@ -179,11 +180,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.String String
+        public global::System.String String
         {
             get
             {
-                return base.GetRelatedProperty<System.String>("String");
+                return base.GetRelatedProperty<global::System.String>("String");
             }
 
             set
@@ -192,11 +193,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Decimal Decimal
+        public global::System.Decimal Decimal
         {
             get
             {
-                return base.GetRelatedProperty<System.Decimal>("Decimal");
+                return base.GetRelatedProperty<global::System.Decimal>("Decimal");
             }
 
             set
@@ -205,11 +206,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Double Double
+        public global::System.Double Double
         {
             get
             {
-                return base.GetRelatedProperty<System.Double>("Double");
+                return base.GetRelatedProperty<global::System.Double>("Double");
             }
 
             set
@@ -218,11 +219,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Single Single
+        public global::System.Single Single
         {
             get
             {
-                return base.GetRelatedProperty<System.Single>("Single");
+                return base.GetRelatedProperty<global::System.Single>("Single");
             }
 
             set
@@ -231,11 +232,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Byte Byte
+        public global::System.Byte Byte
         {
             get
             {
-                return base.GetRelatedProperty<System.Byte>("Byte");
+                return base.GetRelatedProperty<global::System.Byte>("Byte");
             }
 
             set
@@ -244,11 +245,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Char Char
+        public global::System.Char Char
         {
             get
             {
-                return base.GetRelatedProperty<System.Char>("Char");
+                return base.GetRelatedProperty<global::System.Char>("Char");
             }
 
             set
@@ -257,11 +258,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.SByte SByte
+        public global::System.SByte SByte
         {
             get
             {
-                return base.GetRelatedProperty<System.SByte>("SByte");
+                return base.GetRelatedProperty<global::System.SByte>("SByte");
             }
 
             set
@@ -335,11 +336,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Byte[] ByteArray
+        public global::System.Byte[] ByteArray
         {
             get
             {
-                return base.GetRelatedProperty<System.Byte[]>("ByteArray");
+                return base.GetRelatedProperty<global::System.Byte[]>("ByteArray");
             }
 
             set
@@ -348,11 +349,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Boolean? NullableBool
+        public global::System.Boolean? NullableBool
         {
             get
             {
-                return base.GetRelatedProperty<System.Boolean?>("NullableBool");
+                return base.GetRelatedProperty<global::System.Boolean?>("NullableBool");
             }
 
             set
@@ -361,11 +362,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Int16? NullableInt16
+        public global::System.Int16? NullableInt16
         {
             get
             {
-                return base.GetRelatedProperty<System.Int16?>("NullableInt16");
+                return base.GetRelatedProperty<global::System.Int16?>("NullableInt16");
             }
 
             set
@@ -374,11 +375,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Int32? NullableInt32
+        public global::System.Int32? NullableInt32
         {
             get
             {
-                return base.GetRelatedProperty<System.Int32?>("NullableInt32");
+                return base.GetRelatedProperty<global::System.Int32?>("NullableInt32");
             }
 
             set
@@ -387,11 +388,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Int64? NullableInt64
+        public global::System.Int64? NullableInt64
         {
             get
             {
-                return base.GetRelatedProperty<System.Int64?>("NullableInt64");
+                return base.GetRelatedProperty<global::System.Int64?>("NullableInt64");
             }
 
             set
@@ -400,11 +401,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.UInt16? NullableUInt16
+        public global::System.UInt16? NullableUInt16
         {
             get
             {
-                return base.GetRelatedProperty<System.UInt16?>("NullableUInt16");
+                return base.GetRelatedProperty<global::System.UInt16?>("NullableUInt16");
             }
 
             set
@@ -413,11 +414,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.UInt32? NullableUInt32
+        public global::System.UInt32? NullableUInt32
         {
             get
             {
-                return base.GetRelatedProperty<System.UInt32?>("NullableUInt32");
+                return base.GetRelatedProperty<global::System.UInt32?>("NullableUInt32");
             }
 
             set
@@ -426,11 +427,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.UInt64? NullableUInt64
+        public global::System.UInt64? NullableUInt64
         {
             get
             {
-                return base.GetRelatedProperty<System.UInt64?>("NullableUInt64");
+                return base.GetRelatedProperty<global::System.UInt64?>("NullableUInt64");
             }
 
             set
@@ -439,11 +440,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Decimal? NullableDecimal
+        public global::System.Decimal? NullableDecimal
         {
             get
             {
-                return base.GetRelatedProperty<System.Decimal?>("NullableDecimal");
+                return base.GetRelatedProperty<global::System.Decimal?>("NullableDecimal");
             }
 
             set
@@ -452,11 +453,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Double? NullableDouble
+        public global::System.Double? NullableDouble
         {
             get
             {
-                return base.GetRelatedProperty<System.Double?>("NullableDouble");
+                return base.GetRelatedProperty<global::System.Double?>("NullableDouble");
             }
 
             set
@@ -465,11 +466,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Single? NullableSingle
+        public global::System.Single? NullableSingle
         {
             get
             {
-                return base.GetRelatedProperty<System.Single?>("NullableSingle");
+                return base.GetRelatedProperty<global::System.Single?>("NullableSingle");
             }
 
             set
@@ -478,11 +479,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Byte? NullableByte
+        public global::System.Byte? NullableByte
         {
             get
             {
-                return base.GetRelatedProperty<System.Byte?>("NullableByte");
+                return base.GetRelatedProperty<global::System.Byte?>("NullableByte");
             }
 
             set
@@ -491,11 +492,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.Char? NullableChar
+        public global::System.Char? NullableChar
         {
             get
             {
-                return base.GetRelatedProperty<System.Char?>("NullableChar");
+                return base.GetRelatedProperty<global::System.Char?>("NullableChar");
             }
 
             set
@@ -504,11 +505,11 @@ namespace BrightstarDB.CodeGeneration.Tests
             }
         }
 
-        public System.SByte? NullableSByte
+        public global::System.SByte? NullableSByte
         {
             get
             {
-                return base.GetRelatedProperty<System.SByte?>("NullableSByte");
+                return base.GetRelatedProperty<global::System.SByte?>("NullableSByte");
             }
 
             set
