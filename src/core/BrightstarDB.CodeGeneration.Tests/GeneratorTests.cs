@@ -88,7 +88,7 @@ namespace BrightstarDB.CodeGeneration.Tests
                 //var sanitisedResult = result.Replace("1.10.0.0", "$VERSION$");
                 //System.Diagnostics.Debug.WriteLine(sanitisedResult);
 
-                Assert.AreEqual(expectedCode, result);
+                Assert.AreEqual(expectedCode.Replace("\r\n", "\n"), result.Replace("\r\n", "\n"));
             }
         }
 
