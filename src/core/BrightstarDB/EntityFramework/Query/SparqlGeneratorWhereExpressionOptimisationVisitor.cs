@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using Remotion.Linq.Clauses.Expressions;
 using Remotion.Linq.Parsing;
+using VDS.RDF.Parsing.Events.RdfXml;
 
 namespace BrightstarDB.EntityFramework.Query
 {
@@ -24,6 +25,17 @@ namespace BrightstarDB.EntityFramework.Query
             return (expr is BooleanFlagExpression) && ((BooleanFlagExpression) expr).Value;
         }
 
+        public override Expression Visit(Expression node)
+        {
+            if (node is SubQueryExpression subQuery) return VisitSubQueryExpression(subQuery);
+            return base.Visit(node);
+        }
+
+        protected Expression VisitSubQueryExpression(SubQueryExpression expression)
+        {
+            return expression;
+            //return this.Visit(expression.QueryModel.MainFromClause.FromExpression);
+        }
 
         protected override Expression VisitBinary(BinaryExpression expression)
         {
