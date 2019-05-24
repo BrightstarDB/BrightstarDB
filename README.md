@@ -1,9 +1,7 @@
 BrightstarDB
 ============
 
-<div style="text-align:right">
 [![Build status](https://ci.appveyor.com/api/projects/status/s8cinpfl2dh6y31a/branch/develop?svg=true)](https://ci.appveyor.com/project/kal/brightstardb/branch/develop)
-</div>
 
 
 BrightstarDB is a native .NET RDF triple store. It uses dotNetRDF to provide support for 
