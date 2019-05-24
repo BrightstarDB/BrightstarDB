@@ -1,6 +1,11 @@
 BrightstarDB
 ============
 
+<div style="text-align:right">
+[![Build status](https://ci.appveyor.com/api/projects/status/s8cinpfl2dh6y31a/branch/develop?svg=true)](https://ci.appveyor.com/project/kal/brightstardb/branch/develop)
+</div>
+
+
 BrightstarDB is a native .NET RDF triple store. It uses dotNetRDF to provide support for 
 a wide range of RDF syntaxes as well as SPARQL query support. In addition to providing
 a raw RDF-based API, BrightstarDB also provides support for binding RDF resources to
@@ -14,24 +19,20 @@ To get started with BrightstarDB you may want to check out the following resourc
  * [API Documentation](http://brightstardb.com/api/latest/)
  
 If you want a binary installer that includes BrightstarDB, the BrightstarDB service and the Polaris management tool, 
-please get them from our [Codeplex project homepage](http://brightstardb.codeplex.com/)
+please get them from the [releases page](https://github.com/BrightstarDB/BrightstarDB/releases/latest)
 
 Licensing
 ---------
 
 BrightstarDB is provided under the MIT license. It is free to use for both commercial and non-commercial purposes.
 
-Commercial Support
-------------------
-
-For a commercial support contract please [contact NetworkedPlanet](http://www.networkedplanet.com/solutions/brightstardb/)
 
 Questions ?
 -----------
 
-If you have questions please come to the [BrightstarDB Discussion Forum on Codeplex](http://brightstardb.codeplex.com/discussions).
+If you have questions please raise them on StackOverflow and tag your question `brightstardb`
 
 Bugs ?
 ------
 
-Please report any bugs you find here on the GitHub project issue tracker.
+Please report any bugs you find here on the [GitHub issue tracker](https://github.com/BrightstarDB/BrightstarDB/issues).
