@@ -1,5 +1,4 @@
 ﻿<Project>
-  
   <!-- Default code generation target. Runs before CoreCompile to generate the BrightstarDB entity context class and entity implementation classes -->
   <Target Name="BrightstarDBCodeGen" DependsOnTargets="_RunForCore;_RunForDesktop" BeforeTargets="CoreCompile" Condition="'$(RunCodeGeneration)' == '' Or $(RunCodeGeneration)">
     
@@ -7,10 +6,12 @@
   
   <Target Name="_RunForCore" Condition="'$(TargetFrameworkIdentifier)'=='.NETCoreApp' AND '$(RuntimeIdentifier)'==''">
     <Message Text="Run for Core" />
+    <GenerateEntityContext SolutionPath="$(SolutionPath)" EntityContextNamespace="$(RootNamespace)" EntityContextFileName="EntityContext.cs" EntityContextClassName="EntityContext" />
     <!--
     GetDotNetHost attempts to locate the muxer path if the executing process is a .NET Core application i.e. dotnet msbuild.
     If we know we're being launched from desktop MSBuild, avoid running the task. We'll use the dotnet that appears in the path.
     -->
+    <!--
     <GetDotNetHost Condition="'$(MSBuildRuntimeType)'=='Core' AND '$(RunCommand)'==''">
       <Output TaskParameter="MuxerPath" PropertyName="RunCommand" />
     </GetDotNetHost>
@@ -18,11 +19,12 @@
     <PropertyGroup>
       <RunCommand Condition="'$(RunCommand)' == ''">dotnet</RunCommand>
       <_BrightstarCodeGenBinariesDir Condition="'$(_BrightstarCodeGenBinariesDir)' == ''">$(MSBuildThisFileDirectory)</_BrightstarCodeGenBinariesDir>
-      <_BrightstarCodeGenBinariesPath Condition="'$(_BrightstarCodeGenBinariesPath)' == ''">$(_BrightstarCodeGenBinariesDir)netcoreapp2.1\BrightstarDB.CodeGeneration.Console.dll</_BrightstarCodeGenBinariesPath>
-      <_BrightstarCodeGenDepsFile Condition="'$(_BrightstarCodeGenDepsFile)' == ''">$(_BrightstarCodeGenBinariesDir)netcoreapp2.1\BrightstarDB.CodeGeneration.Console.deps</_BrightstarCodeGenDepsFile>
-      <_BrightstarCodeGenConfig   Condition="'$(_BrightstarCodeGenConfig)' == ''">$(_BrightstarCodeGenConfig)netcoreapp2.1\BrightstarDB.CodeGeneration.Console.dll.config</_BrightstarCodeGenConfig>
+      <_BrightstarCodeGenBinariesPath Condition="'$(_BrightstarCodeGenBinariesPath)' == ''">$(_BrightstarCodeGenBinariesDir)netcoreapp2.1\bstar-gen.dll</_BrightstarCodeGenBinariesPath>
+      <_BrightstarCodeGenDepsFile Condition="'$(_BrightstarCodeGenDepsFile)' == ''">$(_BrightstarCodeGenBinariesDir)netcoreapp2.1\bstar-gen.deps.json</_BrightstarCodeGenDepsFile>
+      <_BrightstarCodeGenConfig   Condition="'$(_BrightstarCodeGenConfig)' == ''">$(_BrightstarCodeGenBinariesDir)netcoreapp2.1\bstar-gen.dll.config</_BrightstarCodeGenConfig>
       <EntityProjectFile Condition="'$(EntityProjectFile)' == ''">$(MSBuildProjectFullPath)</EntityProjectFile>
       <EntityContextNamespace Condition="'$(EntityContextNamespace)'==''">$(RootNamespace)</EntityContextNamespace>
+      <EntityContextFileName Condition="'$(EntityContextFileName)'==''">EntityContext.cs</EntityContextFileName>
       <EntityContextClassName Condition="'$(EntityContextClassName)'==''">EntityContext</EntityContextClassName>
       <EntityClassesInternal Condition="'$(EntityClassesInternal)'==''">false</EntityClassesInternal>
       <ExecArgs>&quot;$(RunCommand)&quot; exec</ExecArgs>
@@ -38,6 +40,7 @@
     </PropertyGroup>
     <Message Text="ExecArgs=$(ExecArgs)"/>
     <Exec Command="$(ExecArgs)"/>
+    -->
   </Target>
   
   <Target Name="_RunForDesktop" Condition="'$(TargetFrameworkIdentifier)'!='.NETCoreApp'">

@@ -1,6 +1,7 @@
 using System.IO;
 using System.Reflection;
-using Microsoft.Build.Locator;
+using Buildalyzer;
+using Buildalyzer.Workspaces;
 
 namespace BrightstarDB.CodeGeneration
 {
@@ -17,7 +18,6 @@ namespace BrightstarDB.CodeGeneration
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Formatting;
-    using Microsoft.CodeAnalysis.MSBuild;
     using VB = Microsoft.CodeAnalysis.VisualBasic;
     using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
@@ -127,7 +127,7 @@ namespace BrightstarDB.CodeGeneration
         /// <returns>
         /// A <see cref="SyntaxNode"/> for each generated class, with the entity context first in the list.
         /// </returns>
-        public async static Task<IImmutableList<SyntaxNode>> GenerateAsync(
+        public static async Task<IImmutableList<SyntaxNode>> GenerateAsync(
             Language language,
             string solutionPath,
             string contextNamespace,
@@ -138,29 +138,36 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, bool> interfacePredicate = null,
             string brightstarAssemblyPath = null)
         {
-            MSBuildLocator.RegisterDefaults();
-            using (var workspace = MSBuildWorkspace.Create())
+            var manager = new AnalyzerManager(solutionPath);
+            var workspace = new AdhocWorkspace();
+            //brightstarAssemblyPath = GetBrightstarAssemblyLocation();
+            foreach (var project in manager.Projects.Values)
             {
-                var solution = await workspace.OpenSolutionAsync(solutionPath);
-                if (workspace.Diagnostics.Any(d => d.Kind == WorkspaceDiagnosticKind.Failure))
+                var results = project.Build().First();
+                if (brightstarAssemblyPath == null)
                 {
-                    var errorMessages = workspace.Diagnostics.Select(d => $"{d.Kind}: {d.Message}");
-                    throw new CodeGeneratorException("There were one or more errors loading the workspace:\n\t" +
-                                                     string.Join("\n\t", errorMessages));
+                    brightstarAssemblyPath = results.References.FirstOrDefault(r =>
+                        r.EndsWith("BrightstarDB.dll", true, CultureInfo.InvariantCulture));
                 }
 
-                return await GenerateAsync(
-                    language,
-                    solution,
-                    contextNamespace,
-                    contextName,
-                    entityNamespaceSelector,
-                    entityNameSelector,
-                    entityAccessibilitySelector,
-                    interfacePredicate,
-                    brightstarAssemblyPath);
-
+                if (results.PackageReferences.ContainsKey("BrightstarDB"))
+                {
+                    var packageMetadata = results.PackageReferences["BrightstarDB"];
+                }
+                project.AddToWorkspace(workspace);
             }
+
+
+            return await GenerateAsync(
+                language,
+                workspace.CurrentSolution,
+                contextNamespace,
+                contextName,
+                entityNamespaceSelector,
+                entityNameSelector,
+                entityAccessibilitySelector,
+                interfacePredicate,
+                brightstarAssemblyPath);
         }
 
         /// <summary>
@@ -198,7 +205,7 @@ namespace BrightstarDB.CodeGeneration
         /// <returns>
         /// A <see cref="SyntaxNode"/> for each generated class, with the entity context first in the list.
         /// </returns>
-        public async static Task<IImmutableList<SyntaxNode>> GenerateAsync(
+        public static async Task<IImmutableList<SyntaxNode>> GenerateAsync(
             Language language,
             Solution solution,
             string contextNamespace,
@@ -211,7 +218,7 @@ namespace BrightstarDB.CodeGeneration
         {
             if (brightstarAssemblyPath == null)
             {
-                brightstarAssemblyPath = GetBrightstarAssemblyLocation(solution);
+                brightstarAssemblyPath = GetBrightstarAssemblyLocation();
             }
 
             entityNamespaceSelector = entityNamespaceSelector ?? (x => x.ContainingNamespace.ToDisplayString());
@@ -334,6 +341,13 @@ namespace BrightstarDB.CodeGeneration
         public static Accessibility InteralyEntityAccessibilitySelector(INamedTypeSymbol interfaceSymbol)
         {
             return interfaceSymbol.DeclaredAccessibility == Accessibility.Public ? Accessibility.Internal : interfaceSymbol.DeclaredAccessibility;
+        }
+
+        private static string GetBrightstarAssemblyLocation()
+        {
+            var codeGenAssemblyLocation = Assembly.GetExecutingAssembly().Location;
+            var bsLocation = Path.Combine(Path.GetDirectoryName(codeGenAssemblyLocation), "brightstar.dll");
+            return bsLocation;
         }
 
         private static string GetBrightstarAssemblyLocation(Solution solution)
