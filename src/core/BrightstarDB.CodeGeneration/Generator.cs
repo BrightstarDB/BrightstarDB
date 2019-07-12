@@ -138,25 +138,34 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, bool> interfacePredicate = null,
             string brightstarAssemblyPath = null)
         {
-            var manager = new AnalyzerManager(solutionPath);
+            var log = new StringWriter();
+            var managerOptions = new AnalyzerManagerOptions { LogWriter = log };
+            var manager = new AnalyzerManager(solutionPath, managerOptions);
             var workspace = new AdhocWorkspace();
             //brightstarAssemblyPath = GetBrightstarAssemblyLocation();
             foreach (var project in manager.Projects.Values)
             {
+                Console.WriteLine("Loading project " + project.ProjectFile.Path);
                 var results = project.Build().First();
+                Console.WriteLine("Project Build " + (results.Succeeded?"Succeeded" : "FAILED"));
+                if (!results.Succeeded)
+                {
+                    throw new Exception("Analysis build failed for project: " + results.ProjectFilePath + "\n" + log);
+                }
+                Console.WriteLine(string.Join("\n", results.References));
                 if (brightstarAssemblyPath == null)
                 {
                     brightstarAssemblyPath = results.References.FirstOrDefault(r =>
                         r.EndsWith("BrightstarDB.dll", true, CultureInfo.InvariantCulture));
                 }
-
-                if (results.PackageReferences.ContainsKey("BrightstarDB"))
-                {
-                    var packageMetadata = results.PackageReferences["BrightstarDB"];
-                }
                 project.AddToWorkspace(workspace);
             }
 
+            if (brightstarAssemblyPath == null)
+            {
+                throw new Exception(
+                    "Could not locate a BrightstarDB.dll reference amongst any of the solution projects");
+            }
 
             return await GenerateAsync(
                 language,

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>BrightstarDB.CodeGeneration</id>
+    <version>$version$</version>
+	<title>BrightstarDB Entity Context Generator Library</title>
+    <authors>Kal Ahmed</authors>
+    <owners>Kal Ahmed</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>http://brightstardb.com/</projectUrl>
+	<iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>Copyright 2019 Khalil Ahmed, Graham Moore, and other contributors</copyright>
+    <description>
+        A Roslyn-based code generator for BrightstarDB.
+    </description>
+    <tags>brightstardb .NET codegen roslyn</tags>
+  </metadata>
+  <files>
+    <file src="$publishdir$\netstandard2.0\**\*" target="tools/netstandard2.0"/>
+    <file src="BrightstarDB.CodeGeneration.targets" target="build/BrightstarDB.CodeGeneration.targets"/>
+  </files>
+</package>
