@@ -2,7 +2,8 @@
   "profiles": {
     "BrightstarDB.CodeGeneration.Console": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\Projects\\BrightstarPackageTests\\BrightstarPackageTests.sln\" NetCoreConsoleApp  EntityContext"
+      "commandLineArgs": "\"D:\\Projects\\BrightstarPackageTests\\BrightstarPackageTests.sln\" NetCoreConsoleApp  EntityContext.cs",
+      "workingDirectory": "D:\\Projects\\BrightstarPackageTests\\NetCoreConsoleApp"
     }
   }
 }

@@ -20,14 +20,14 @@
 
   <Target Name="PublishAll" BeforeTargets="GenerateNuspec">
     <ItemGroup>
-      <_TargetFramework Include="$(TargetFrameworks)"/>
+      <_TargetFramework Include="$(TargetFrameworks)" />
     </ItemGroup>
-    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" Properties="TargetFramework=%(_TargetFramework.Identity)"/>
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" Properties="TargetFramework=%(_TargetFramework.Identity)" />
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build" Version="15.9.20" />
-    <PackageReference Include="PowerArgs" Version="3.*" />
+    <PackageReference Include="Microsoft.Build" Version="16.0.461" />
+    <PackageReference Include="PowerArgs" Version="3.6.0" />
   </ItemGroup>
 
   <ItemGroup>

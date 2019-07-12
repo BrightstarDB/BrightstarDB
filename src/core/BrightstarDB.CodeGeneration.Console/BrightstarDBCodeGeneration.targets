@@ -1,7 +1,10 @@
 ﻿<Project>
-  <Target Name="BrightstarDBCodeGen" DependsOnTargets="_RunForCore;_RunForDesktop" BeforeTargets="CoreCompile">
+  
+  <!-- Default code generation target. Runs before CoreCompile to generate the BrightstarDB entity context class and entity implementation classes -->
+  <Target Name="BrightstarDBCodeGen" DependsOnTargets="_RunForCore;_RunForDesktop" BeforeTargets="CoreCompile" Condition="'$(RunCodeGeneration)' == '' Or $(RunCodeGeneration)">
     
   </Target>
+  
   <Target Name="_RunForCore" Condition="'$(TargetFrameworkIdentifier)'=='.NETCoreApp' AND '$(RuntimeIdentifier)'==''">
     <Message Text="Run for Core" />
     <!--
@@ -16,13 +19,15 @@
       <RunCommand Condition="'$(RunCommand)' == ''">dotnet</RunCommand>
       <_BrightstarCodeGenBinariesDir Condition="'$(_BrightstarCodeGenBinariesDir)' == ''">$(MSBuildThisFileDirectory)</_BrightstarCodeGenBinariesDir>
       <_BrightstarCodeGenBinariesPath Condition="'$(_BrightstarCodeGenBinariesPath)' == ''">$(_BrightstarCodeGenBinariesDir)netcoreapp2.1\BrightstarDB.CodeGeneration.Console.dll</_BrightstarCodeGenBinariesPath>
+      <_BrightstarCodeGenDepsFile Condition="'$(_BrightstarCodeGenDepsFile)' == ''">$(_BrightstarCodeGenBinariesDir)netcoreapp2.1\BrightstarDB.CodeGeneration.Console.deps</_BrightstarCodeGenDepsFile>
+      <_BrightstarCodeGenConfig   Condition="'$(_BrightstarCodeGenConfig)' == ''">$(_BrightstarCodeGenConfig)netcoreapp2.1\BrightstarDB.CodeGeneration.Console.dll.config</_BrightstarCodeGenConfig>
       <EntityProjectFile Condition="'$(EntityProjectFile)' == ''">$(MSBuildProjectFullPath)</EntityProjectFile>
       <EntityContextNamespace Condition="'$(EntityContextNamespace)'==''">$(RootNamespace)</EntityContextNamespace>
       <EntityContextClassName Condition="'$(EntityContextClassName)'==''">EntityContext</EntityContextClassName>
       <EntityClassesInternal Condition="'$(EntityClassesInternal)'==''">false</EntityClassesInternal>
       <ExecArgs>&quot;$(RunCommand)&quot; exec</ExecArgs>
-      <ExecArgs>$(ExecArgs) --runtimeconfig $(ProjectRuntimeConfigFilePath)</ExecArgs>
-      <ExecArgs>$(ExecArgs) --depsfile &quot;$(ProjectDepsFilePath)&quot;</ExecArgs>
+      <ExecArgs>$(ExecArgs) --runtimeconfig $(_BrightstarCodeGenConfig)</ExecArgs>
+      <ExecArgs>$(ExecArgs) --depsfile &quot;$(_BrightstarCodeGenDepsFile)&quot;</ExecArgs>
       <ExecArgs>$(ExecArgs) &quot;$(_BrightstarCodeGenBinariesPath)&quot;</ExecArgs>
       <ExecArgs>$(ExecArgs) &quot;$(EntityProjectFile)&quot;</ExecArgs>
       <ExecArgs>$(ExecArgs) $(EntityContextNamespace)</ExecArgs>
