@@ -2,6 +2,7 @@ using System.IO;
 using System.Reflection;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
+using Microsoft.Extensions.Logging;
 
 namespace BrightstarDB.CodeGeneration
 {
@@ -90,6 +91,62 @@ namespace BrightstarDB.CodeGeneration
                     new StringBuilder(),
                     (sb, next) => sb.AppendLine(next.ToFullString()),
                     x => x.ToString());
+        }
+
+        public static async Task<IImmutableList<SyntaxNode>> GenerateFromProjectAsync(
+            Language language,
+            string projectPath,
+            string contextNamespace,
+            string contextName,
+            Func<INamedTypeSymbol, string> entityNamespaceSelector = null,
+            Func<INamedTypeSymbol, string> entityNameSelector = null,
+            Func<INamedTypeSymbol, Accessibility> entityAccessibilitySelector = null,
+            Func<INamedTypeSymbol, bool> interfacePredicate = null,
+            ILoggerFactory loggerFactory = null)
+        {
+            var amOptions = new AnalyzerManagerOptions();
+            TextWriter logTextWriter = null;
+            if (loggerFactory != null)
+            {
+                amOptions.LoggerFactory = loggerFactory;
+            }
+            else
+            {
+                amOptions.LogWriter = logTextWriter = new StringWriter();
+            }
+            var manager = new AnalyzerManager(amOptions);
+            var workspace = new AdhocWorkspace();
+            var project = manager.GetProject(projectPath);
+            var results = project.Build().First();
+            if (!results.Succeeded)
+            {
+                var exceptionMessage = "Analysis build failed for project " + results.ProjectFilePath;
+                if (logTextWriter != null)
+                {
+                    exceptionMessage += "\n" + logTextWriter;
+                }
+                throw new Exception(exceptionMessage);
+            }
+            var brightstarAssemblyPath = results.References.FirstOrDefault(r =>
+                r.EndsWith("BrightstarDB.dll", true, CultureInfo.InvariantCulture));
+            if (brightstarAssemblyPath == null)
+            {
+                throw new Exception(
+                    "Could not locate a BrightstarDB.dll reference amongst any of the solution projects");
+            }
+
+            project.AddToWorkspace(workspace);
+
+            return await GenerateAsync(
+                language,
+                workspace.CurrentSolution,
+                contextNamespace,
+                contextName,
+                entityNamespaceSelector,
+                entityNameSelector,
+                entityAccessibilitySelector,
+                interfacePredicate,
+                brightstarAssemblyPath);
         }
 
         /// <summary>

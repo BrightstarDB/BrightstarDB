@@ -1,7 +1,15 @@
 ﻿<Project>
   <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)/../tools/netstandard2.0/BrightstarDB.CodeGeneration.dll" TaskName="GenerateEntityContext" />
-  <Target Name="BrightstarDBCodeGen" BeforeTargets="CoreCompile" Condition="('$(RunCodeGeneration)' == '' Or $(RunCodeGeneration)) And ('$(DesignTimeBuild)' == '' Or !$(DesignTimeBuild))">
-    <Message Text="$(SolutionPath)"/>
-    <GenerateEntityContext SolutionPath="$(SolutionPath)" EntityContextNamespace="$(RootNamespace)" EntityContextFileName="EntityContext.cs" EntityContextClassName="EntityContext" />
+  <PropertyGroup>
+    <EntityContextNamespace Condition="'$(EntityContextNamespace)' == ''">$(RootNamespace)</EntityContextNamespace>
+    <EntityContextFileName Condition="'$(EntityContextFileName)' == ''">EntityContext.cs</EntityContextFileName>
+    <EntityContextClassName Condition="'$(EntityContextClassName)' == ''">EntityContext</EntityContextClassName>
+  </PropertyGroup>
+  <Target Name="BrightstarDBCodeGen" BeforeTargets="CoreCompile" 
+          Condition="('$(RunCodeGeneration)' == '' Or $(RunCodeGeneration)) And ('$(DesignTimeBuild)' == '' Or !$(DesignTimeBuild))">
+    <GenerateEntityContext ProjectPath="$(MSBuildProjectFullPath)" 
+                           EntityContextNamespace="$(EntityContextNamespace)" 
+                           EntityContextFileName="$(EntityContextFileName)" 
+                           EntityContextClassName="$(EntityContextClassName)" />
   </Target>
 </Project>
