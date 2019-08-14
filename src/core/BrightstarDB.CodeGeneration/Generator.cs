@@ -52,13 +52,13 @@ namespace BrightstarDB.CodeGeneration
         // whether entity classes default to internal accessibility. The old entry point is kept for backwards compatibility with existing project's T4 templates
         public static string Generate2(
             string language,
-            string solutionPath,
+            string projectPath,
             string contextNamespace,
             string contextName = "EntityContext",
             bool internalEntityClasses = false
             )
         {
-            return _Generate(language, solutionPath, contextNamespace, contextName,
+            return _Generate(language, projectPath, contextNamespace, contextName,
                 entityAccessibiltySelector:
                     internalEntityClasses
                         ? (Func<INamedTypeSymbol, Accessibility>)Generator.InteralyEntityAccessibilitySelector
@@ -66,7 +66,7 @@ namespace BrightstarDB.CodeGeneration
         }
 
         private static string _Generate(string language,
-            string solutionPath,
+            string projectPath,
             string contextNamespace,
             string contextName = "EntityContext",
             Func<INamedTypeSymbol, string> entityNamespaceSelector = null,
@@ -76,9 +76,9 @@ namespace BrightstarDB.CodeGeneration
         {
             var castLanguage = (Language)Enum.Parse(typeof(Language), language);
 
-            var nodes = GenerateAsync(
+            var nodes = GenerateFromProjectAsync(
                 castLanguage,
-                solutionPath,
+                projectPath,
                 contextNamespace,
                 contextName,
                 entityNamespaceSelector,
