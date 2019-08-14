@@ -551,7 +551,7 @@ namespace BrightstarDB.Tests
         public void TestExportWhileWriting()
         {
             const int firstBatchSize = 50000;
-            var storeName = Guid.NewGuid().ToString();
+            var storeName = "TestExportWhileWriting_" + DateTime.UtcNow.Ticks;
             var client = GetClient();
             client.CreateStore(storeName);
             var batch1 = MakeTriples(0, firstBatchSize);

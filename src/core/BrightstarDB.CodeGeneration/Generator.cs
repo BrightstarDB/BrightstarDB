@@ -1,6 +1,8 @@
 using System.IO;
 using System.Reflection;
-using Microsoft.Build.Locator;
+using Buildalyzer;
+using Buildalyzer.Workspaces;
+using Microsoft.Extensions.Logging;
 
 namespace BrightstarDB.CodeGeneration
 {
@@ -17,7 +19,6 @@ namespace BrightstarDB.CodeGeneration
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Formatting;
-    using Microsoft.CodeAnalysis.MSBuild;
     using VB = Microsoft.CodeAnalysis.VisualBasic;
     using VBSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
@@ -51,13 +52,13 @@ namespace BrightstarDB.CodeGeneration
         // whether entity classes default to internal accessibility. The old entry point is kept for backwards compatibility with existing project's T4 templates
         public static string Generate2(
             string language,
-            string solutionPath,
+            string projectPath,
             string contextNamespace,
             string contextName = "EntityContext",
             bool internalEntityClasses = false
             )
         {
-            return _Generate(language, solutionPath, contextNamespace, contextName,
+            return _Generate(language, projectPath, contextNamespace, contextName,
                 entityAccessibiltySelector:
                     internalEntityClasses
                         ? (Func<INamedTypeSymbol, Accessibility>)Generator.InteralyEntityAccessibilitySelector
@@ -65,7 +66,7 @@ namespace BrightstarDB.CodeGeneration
         }
 
         private static string _Generate(string language,
-            string solutionPath,
+            string projectPath,
             string contextNamespace,
             string contextName = "EntityContext",
             Func<INamedTypeSymbol, string> entityNamespaceSelector = null,
@@ -75,9 +76,9 @@ namespace BrightstarDB.CodeGeneration
         {
             var castLanguage = (Language)Enum.Parse(typeof(Language), language);
 
-            var nodes = GenerateAsync(
+            var nodes = GenerateFromProjectAsync(
                 castLanguage,
-                solutionPath,
+                projectPath,
                 contextNamespace,
                 contextName,
                 entityNamespaceSelector,
@@ -90,6 +91,62 @@ namespace BrightstarDB.CodeGeneration
                     new StringBuilder(),
                     (sb, next) => sb.AppendLine(next.ToFullString()),
                     x => x.ToString());
+        }
+
+        public static async Task<IImmutableList<SyntaxNode>> GenerateFromProjectAsync(
+            Language language,
+            string projectPath,
+            string contextNamespace,
+            string contextName,
+            Func<INamedTypeSymbol, string> entityNamespaceSelector = null,
+            Func<INamedTypeSymbol, string> entityNameSelector = null,
+            Func<INamedTypeSymbol, Accessibility> entityAccessibilitySelector = null,
+            Func<INamedTypeSymbol, bool> interfacePredicate = null,
+            ILoggerFactory loggerFactory = null)
+        {
+            var amOptions = new AnalyzerManagerOptions();
+            TextWriter logTextWriter = null;
+            if (loggerFactory != null)
+            {
+                amOptions.LoggerFactory = loggerFactory;
+            }
+            else
+            {
+                amOptions.LogWriter = logTextWriter = new StringWriter();
+            }
+            var manager = new AnalyzerManager(amOptions);
+            var workspace = new AdhocWorkspace();
+            var project = manager.GetProject(projectPath);
+            var results = project.Build().First();
+            if (!results.Succeeded)
+            {
+                var exceptionMessage = "Analysis build failed for project " + results.ProjectFilePath;
+                if (logTextWriter != null)
+                {
+                    exceptionMessage += "\n" + logTextWriter;
+                }
+                throw new Exception(exceptionMessage);
+            }
+            var brightstarAssemblyPath = results.References.FirstOrDefault(r =>
+                r.EndsWith("BrightstarDB.dll", true, CultureInfo.InvariantCulture));
+            if (brightstarAssemblyPath == null)
+            {
+                throw new Exception(
+                    "Could not locate a BrightstarDB.dll reference amongst any of the solution projects");
+            }
+
+            project.AddToWorkspace(workspace);
+
+            return await GenerateAsync(
+                language,
+                workspace.CurrentSolution,
+                contextNamespace,
+                contextName,
+                entityNamespaceSelector,
+                entityNameSelector,
+                entityAccessibilitySelector,
+                interfacePredicate,
+                brightstarAssemblyPath);
         }
 
         /// <summary>
@@ -127,7 +184,7 @@ namespace BrightstarDB.CodeGeneration
         /// <returns>
         /// A <see cref="SyntaxNode"/> for each generated class, with the entity context first in the list.
         /// </returns>
-        public async static Task<IImmutableList<SyntaxNode>> GenerateAsync(
+        public static async Task<IImmutableList<SyntaxNode>> GenerateAsync(
             Language language,
             string solutionPath,
             string contextNamespace,
@@ -138,29 +195,45 @@ namespace BrightstarDB.CodeGeneration
             Func<INamedTypeSymbol, bool> interfacePredicate = null,
             string brightstarAssemblyPath = null)
         {
-            MSBuildLocator.RegisterDefaults();
-            using (var workspace = MSBuildWorkspace.Create())
+            var log = new StringWriter();
+            var managerOptions = new AnalyzerManagerOptions { LogWriter = log };
+            var manager = new AnalyzerManager(solutionPath, managerOptions);
+            var workspace = new AdhocWorkspace();
+            //brightstarAssemblyPath = GetBrightstarAssemblyLocation();
+            foreach (var project in manager.Projects.Values)
             {
-                var solution = await workspace.OpenSolutionAsync(solutionPath);
-                if (workspace.Diagnostics.Any(d => d.Kind == WorkspaceDiagnosticKind.Failure))
+                Console.WriteLine("Loading project " + project.ProjectFile.Path);
+                var results = project.Build().First();
+                Console.WriteLine("Project Build " + (results.Succeeded?"Succeeded" : "FAILED"));
+                if (!results.Succeeded)
                 {
-                    var errorMessages = workspace.Diagnostics.Select(d => $"{d.Kind}: {d.Message}");
-                    throw new CodeGeneratorException("There were one or more errors loading the workspace:\n\t" +
-                                                     string.Join("\n\t", errorMessages));
+                    throw new Exception("Analysis build failed for project: " + results.ProjectFilePath + "\n" + log);
                 }
-
-                return await GenerateAsync(
-                    language,
-                    solution,
-                    contextNamespace,
-                    contextName,
-                    entityNamespaceSelector,
-                    entityNameSelector,
-                    entityAccessibilitySelector,
-                    interfacePredicate,
-                    brightstarAssemblyPath);
-
+                Console.WriteLine(string.Join("\n", results.References));
+                if (brightstarAssemblyPath == null)
+                {
+                    brightstarAssemblyPath = results.References.FirstOrDefault(r =>
+                        r.EndsWith("BrightstarDB.dll", true, CultureInfo.InvariantCulture));
+                }
+                project.AddToWorkspace(workspace);
             }
+
+            if (brightstarAssemblyPath == null)
+            {
+                throw new Exception(
+                    "Could not locate a BrightstarDB.dll reference amongst any of the solution projects");
+            }
+
+            return await GenerateAsync(
+                language,
+                workspace.CurrentSolution,
+                contextNamespace,
+                contextName,
+                entityNamespaceSelector,
+                entityNameSelector,
+                entityAccessibilitySelector,
+                interfacePredicate,
+                brightstarAssemblyPath);
         }
 
         /// <summary>
@@ -198,7 +271,7 @@ namespace BrightstarDB.CodeGeneration
         /// <returns>
         /// A <see cref="SyntaxNode"/> for each generated class, with the entity context first in the list.
         /// </returns>
-        public async static Task<IImmutableList<SyntaxNode>> GenerateAsync(
+        public static async Task<IImmutableList<SyntaxNode>> GenerateAsync(
             Language language,
             Solution solution,
             string contextNamespace,
@@ -211,7 +284,7 @@ namespace BrightstarDB.CodeGeneration
         {
             if (brightstarAssemblyPath == null)
             {
-                brightstarAssemblyPath = GetBrightstarAssemblyLocation(solution);
+                brightstarAssemblyPath = GetBrightstarAssemblyLocation();
             }
 
             entityNamespaceSelector = entityNamespaceSelector ?? (x => x.ContainingNamespace.ToDisplayString());
@@ -334,6 +407,13 @@ namespace BrightstarDB.CodeGeneration
         public static Accessibility InteralyEntityAccessibilitySelector(INamedTypeSymbol interfaceSymbol)
         {
             return interfaceSymbol.DeclaredAccessibility == Accessibility.Public ? Accessibility.Internal : interfaceSymbol.DeclaredAccessibility;
+        }
+
+        private static string GetBrightstarAssemblyLocation()
+        {
+            var codeGenAssemblyLocation = Assembly.GetExecutingAssembly().Location;
+            var bsLocation = Path.Combine(Path.GetDirectoryName(codeGenAssemblyLocation), "brightstar.dll");
+            return bsLocation;
         }
 
         private static string GetBrightstarAssemblyLocation(Solution solution)

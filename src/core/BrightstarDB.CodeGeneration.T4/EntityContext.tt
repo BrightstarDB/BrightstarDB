@@ -20,8 +20,13 @@ var contextNamespace = this.Host.ResolveParameterValue("directiveId", "namespace
 // The name of the .tt file determines the name of the generated context class
 var contextClassName = System.IO.Path.GetFileNameWithoutExtension(this.Host.TemplateFile);
 
-// Ensure that the solution and all projects in it are saved to disk as the generator will read the files from disk
+// Get the solution and current project file path
 var solution = this.DTE.Solution;
+var projectItem = this.DTE.Solution.FindProjectItems(this.Host.TemplateFile);
+var project = projectItem.ContainingProject;
+var projectPath = project.FullName;
+
+// Ensure that the solution and all projects in it are saved to disk as the generator will read the files from disk
 foreach(Project proj in solution.Projects) {
   if (!proj.Saved){
 	proj.Save();
@@ -36,7 +41,7 @@ this.SetFileExtensionForLanguage(language);
 this.HookAssemblyResolution();
 var generator = Type.GetType("BrightstarDB.CodeGeneration.Generator, BrightstarDB.CodeGeneration");
 var generateMethod = generator.GetMethod("Generate2");
-var result = (string)generateMethod.Invoke(null, new object[] { language, solutionPath, contextNamespace, contextClassName, internalEntityClasses });
+var result = (string)generateMethod.Invoke(null, new object[] { language, projectPath, contextNamespace, contextClassName, internalEntityClasses });
 
 this.WriteLine(result);
 #>

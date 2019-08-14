@@ -5,6 +5,7 @@
     <AssemblyOriginatorKeyFile>..\..\..\key\brightstardb.snk</AssemblyOriginatorKeyFile>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageId>BrightstarDBLibs</PackageId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="dotNetRDF" Version="2.2.0" />

@@ -1,0 +1,4 @@
+﻿<Project>
+  <UsingTask AssemblyFile="$(MSBuildThisFileDirectory)/../../tools/netcoreapp2.1/BrightstarDB.CodeGeneration.dll" TaskName="GenerateEntityContext" />
+  <Import Project="$(MSBuildThisFileDirectory)/../../tools/BrightstarDBCodeGeneration.targets" />
+</Project>

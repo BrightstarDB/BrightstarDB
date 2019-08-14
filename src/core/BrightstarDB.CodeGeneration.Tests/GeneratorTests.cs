@@ -61,14 +61,15 @@ namespace BrightstarDB.CodeGeneration.Tests
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));
                 var solution = workspace.CurrentSolution;
-
+                var brightstarAssemblyPath = typeof(BrightstarException).Assembly.Location;
                 var results = await Generator
                     .GenerateAsync(
                         language,
                         solution,
                         "BrightstarDB.CodeGeneration.Tests",
                         interfacePredicate: x => true,
-                        entityAccessibilitySelector: internalEntityClasses ? (Func<INamedTypeSymbol, Accessibility>) Generator.InteralyEntityAccessibilitySelector : Generator.DefaultEntityAccessibilitySelector);
+                        entityAccessibilitySelector: internalEntityClasses ? (Func<INamedTypeSymbol, Accessibility>) Generator.InteralyEntityAccessibilitySelector : Generator.DefaultEntityAccessibilitySelector,
+                        brightstarAssemblyPath:brightstarAssemblyPath);
                 var result = results
                     .Aggregate(
                         new StringBuilder(),
@@ -128,7 +129,7 @@ namespace BrightstarDB.CodeGeneration.Tests
                 var project = workspace.AddProject(projectInfo);
                 workspace.AddDocument(projectId, "Source.cs", SourceText.From(inputStream));
                 var solution = workspace.CurrentSolution;
-
+                var brightstarAssemblyPath = typeof(BrightstarException).Assembly.Location;
                 try
                 {
                     var results = await Generator
@@ -136,7 +137,8 @@ namespace BrightstarDB.CodeGeneration.Tests
                             language,
                             solution,
                             "BrightstarDB.CodeGeneration.Tests",
-                            interfacePredicate: x => true);
+                            interfacePredicate: x => true,
+                            brightstarAssemblyPath:brightstarAssemblyPath);
 
                     Assert.Fail("No exception was thrown during code generation.");
                 }

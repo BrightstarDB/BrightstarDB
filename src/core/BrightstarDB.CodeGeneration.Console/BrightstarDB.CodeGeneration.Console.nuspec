@@ -3,7 +3,7 @@
   <metadata>
     <id>BrightstarDB.CodeGeneration.Console</id>
     <version>$version$</version>
-	<title>BrightstarDB Entity Context Generator Console</title>
+	  <title>BrightstarDB Entity Context Generator Console</title>
     <authors>Kal Ahmed</authors>
     <owners>Kal Ahmed</owners>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
@@ -19,7 +19,11 @@
   <files>
     <file src="_._" target="lib/netstandard1.0"/>
     <file src="_._" target="lib/net45"/>
-    <file src="$publishdir$\netcoreapp2.0\**\*" target="tools/netcoreapp2.0/"/>
+    <file src="$publishdir$\netcoreapp2.1\**\*" target="tools/netcoreapp2.1/"/>
     <file src="$publishdir$\net472\**\*" target="tools/net472"/>
+    <file src="BrightstarDB.CodeGeneration.Console.targets" target="build/netcoreapp2.1/BrightstarDB.CodeGeneration.Console.targets" />
+    <file src="BrightstarDB.CodeGeneration.Console.targets" target="build/netcoreapp2.2/BrightstarDB.CodeGeneration.Console.targets" />
+    <file src="BrightstarDB.CodeGeneration.Console.targets" target="build/net472/BrightstarDB.CodeGeneration.Console.targets" />
+    <file src="BrightstarDBCodeGeneration.targets" target="tools/BrightstarDBCodeGeneration.targets" />
   </files>
 </package>
