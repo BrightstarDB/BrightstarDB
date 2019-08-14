@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>BrightstarDB.CodeGeneration.T4</id>
+    <version>$version$</version>
+	<title>BrightstarDB Entity Context Generator Console</title>
+    <authors>Kal Ahmed</authors>
+    <owners>Kal Ahmed</owners>
+    <license type="expression">MIT</license>
+    <projectUrl>http://brightstardb.com/</projectUrl>
+	<iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+        A T4-based code generator for BrightstarDB.
+    </description>
+    <tags>brightstardb .NET codegen t4</tags>
+    <copyright>Copyright 2019 Khalil Ahmed, Graham Moore, and other contributors</copyright>
+  </metadata>
+  <files>
+    <file src="EntityContext.tt" target="contentFiles\any\any\EntityContext.tt"/>
+  </files>
+</package>
