@@ -16,6 +16,9 @@
     <tags>brightstardb .NET codegen console</tags>
     <copyright>Copyright 2019 Khalil Ahmed, Graham Moore, and other contributors</copyright>
   </metadata>
+  <dependencies>
+    <dependency id="BrightstarDB.CodeGeneration" version="[$version$]" />
+  </dependencies>
   <files>
     <file src="_._" target="lib/netstandard1.0"/>
     <file src="_._" target="lib/net45"/>
