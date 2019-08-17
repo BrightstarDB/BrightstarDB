@@ -13,6 +13,8 @@ build_script: |
   dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB 
   dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB.CodeGeneration
   dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB.CodeGeneration.T4
+  installer/nuget/nuget.exe update -self
+  installer/nuget/nuget.exe pack installer/nuget/BrightstarDB.nuspec -OutputDirectory %APPVEYOR_BUILD_FOLDER%\nugets -Properties version=%GitVersion_NugetVersion%
 
 before_test:
     - ps: |

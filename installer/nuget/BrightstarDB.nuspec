@@ -1,21 +1,22 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>BrightstarDB.Platform</id>
+    <id>BrightstarDB</id>
     <version>$version$</version>
-	<title>BrightstarDB Portable Platform Libraries</title>
+	<title>BrightstarDB</title>
     <authors>kal_ahmed</authors>
     <owners>kal_ahmed</owners>
-    <licenseUrl>http://www.opensource.org/licenses/MIT</licenseUrl>
+    <license type="expression">MIT</license>
     <projectUrl>http://brightstardb.com/</projectUrl>
     <iconUrl>http://brightstardb.com/images/logo-nuget.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>This package contains the platform-specific assemblies for running BrightstarDB using Portable Class Library.</description>
+    <description>BrightstarDB is a fast and scalable NoSQL database for .NET with code-first data model generation. This package installs the BrightstarDB libraries and the text template for generating a BrightstarDB Entity Framework context class.</description>
 	<releaseNotes>Please see http://brightstardb.readthedocs.org/en/latest/Whats_New/ for the updated release notes.</releaseNotes>
-    <copyright>Copyright 2016 Khalil Ahmed, Graham Moore, and other contributors</copyright>
+    <copyright>Copyright 2019 Khalil Ahmed, Graham Moore, and other contributors</copyright>
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
     <dependencies>
       <dependency id="BrightstarDBLibs" version="[$version$]" />
+      <dependency id="BrightstarDB.CodeGeneration.T4" version="[$version$]" />
     </dependencies>
   </metadata>
 </package>
