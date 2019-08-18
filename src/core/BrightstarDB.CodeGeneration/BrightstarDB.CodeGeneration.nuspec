@@ -15,6 +15,9 @@
         A Roslyn-based code generator for BrightstarDB.
     </description>
     <tags>brightstardb .NET codegen roslyn</tags>
+    <dependencies>
+      <dependency id="BrightstarDBLibs" version="[$version$]" />
+    </dependencies>
   </metadata>
   <files>
     <file src="$publishdir$\netstandard2.0\**\*" target="tools/netstandard2.0"/>

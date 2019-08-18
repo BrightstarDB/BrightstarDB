@@ -21,9 +21,5 @@
     <file src="_._" target="lib/net45"/>
     <file src="$publishdir$\netcoreapp2.1\**\*" target="tools/netcoreapp2.1/"/>
     <file src="$publishdir$\net472\**\*" target="tools/net472"/>
-    <file src="BrightstarDB.CodeGeneration.Console.targets" target="build/netcoreapp2.1/BrightstarDB.CodeGeneration.Console.targets" />
-    <file src="BrightstarDB.CodeGeneration.Console.targets" target="build/netcoreapp2.2/BrightstarDB.CodeGeneration.Console.targets" />
-    <file src="BrightstarDB.CodeGeneration.Console.targets" target="build/net472/BrightstarDB.CodeGeneration.Console.targets" />
-    <file src="BrightstarDBCodeGeneration.targets" target="tools/BrightstarDBCodeGeneration.targets" />
   </files>
 </package>

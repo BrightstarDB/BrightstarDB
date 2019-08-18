@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.572
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29209.62
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB", "BrightstarDB\BrightstarDB.csproj", "{121A81F3-EB1C-4228-81FB-0D7505A438FB}"
 EndProject
@@ -23,8 +23,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.CodeGeneration.Tests", "BrightstarDB.CodeGeneration.Tests\BrightstarDB.CodeGeneration.Tests.csproj", "{96D0FE3E-237F-40DF-BA92-36F685B51134}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.CodeGeneration.Console", "BrightstarDB.CodeGeneration.Console\BrightstarDB.CodeGeneration.Console.csproj", "{01B64C48-BCCE-41BB-AEBB-59752443CF09}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.CodeGeneration.T4", "BrightstarDB.CodeGeneration.T4\BrightstarDB.CodeGeneration.T4.csproj", "{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.Tests", "BrightstarDB.Tests\BrightstarDB.Tests.csproj", "{FA912AC7-79B6-4D29-91E3-D5D1E215E193}"
 EndProject
@@ -108,18 +106,6 @@ Global
 		{01B64C48-BCCE-41BB-AEBB-59752443CF09}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{01B64C48-BCCE-41BB-AEBB-59752443CF09}.Release|x86.ActiveCfg = Release|Any CPU
 		{01B64C48-BCCE-41BB-AEBB-59752443CF09}.Release|x86.Build.0 = Release|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Debug|x86.Build.0 = Debug|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Release|x86.ActiveCfg = Release|Any CPU
-		{1860E708-D436-4A94-8E62-4CE0AB2A9A0F}.Release|x86.Build.0 = Release|Any CPU
 		{FA912AC7-79B6-4D29-91E3-D5D1E215E193}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FA912AC7-79B6-4D29-91E3-D5D1E215E193}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA912AC7-79B6-4D29-91E3-D5D1E215E193}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

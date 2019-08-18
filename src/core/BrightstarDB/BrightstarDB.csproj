@@ -6,7 +6,16 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageId>BrightstarDBLibs</PackageId>
+    <Title>BrightstarDB Core Library</Title>
+    <Description>BrightstarDB is a fast and scalable NoSQL database for .NET with code-first data model generation. This package installs the BrightstarDB libraries alone without any code-generation support.</Description>
+    <Authors>kal_ahmed</Authors>
+    <PackageProjectUrl>http://brightstardb.com/</PackageProjectUrl>
+    <PackageIconUrl>http://brightstardb.com/images/logo-nuget.png</PackageIconUrl>
+    <Copyright>Copyright 2019 Khalil Ahmed, Graham Moore, and other contributor</Copyright>
+    <PackageTags>brightstardb;rdf;nosql;database;sparql</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="dotNetRDF" Version="2.2.0" />
     <PackageReference Include="Remotion.Linq" Version="2.2.0" />

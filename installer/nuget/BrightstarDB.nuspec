@@ -16,7 +16,7 @@
     <tags>brightstardb rdf nosql database sparql entityframework</tags>
     <dependencies>
       <dependency id="BrightstarDBLibs" version="[$version$]" />
-      <dependency id="BrightstarDB.CodeGeneration.T4" version="[$version$]" />
+      <dependency id="BrightstarDB.CodeGeneration" version="[$version$]" />
     </dependencies>
   </metadata>
 </package>
