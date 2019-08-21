@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AssemblyName>BrightstarDB.Samples.EntityFramework.GettingStartedCore</AssemblyName>
+    <RootNamespace>BrightstarDB.Samples.EntityFramework.GettingStartedCore</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\SamplesConfiguration.cs" Link="SamplesConfiguration.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BrightstarDB" Version="1.14.0-alpha0003" />
+    <PackageReference Include="BrightstarDB.CodeGeneration" Version="1.14.0-alpha0003" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+    <PackageReference Include="System.ComponentModel" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
