@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29209.62
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GettingStartedCore", "..\GettingStartedCore\GettingStartedCore.csproj", "{8ECBBC50-8820-4712-9F0A-288E77C3EA66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChangeTrackingCore", "ChangeTrackingCore\ChangeTrackingCore.csproj", "{DD800A48-6FC0-4E15-BDFE-3B2CAF6740FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChangeTrackingCore", "ChangeTrackingCore\ChangeTrackingCore.csproj", "{DD800A48-6FC0-4E15-BDFE-3B2CAF6740FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FoafCore", "FoafCore\FoafCore.csproj", "{346D104D-47BF-44EE-A441-145BE70AD493}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoafCore", "FoafCore\FoafCore.csproj", "{346D104D-47BF-44EE-A441-145BE70AD493}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TweetBoxCore", "TweetBoxCore\TweetBoxCore.csproj", "{D7FF2143-A768-40CF-A713-9EAF9D936C33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TweetBoxCore", "TweetBoxCore\TweetBoxCore.csproj", "{D7FF2143-A768-40CF-A713-9EAF9D936C33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GettingStartedCore", "GettingStartedCore\GettingStartedCore.csproj", "{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +21,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Debug|x86.Build.0 = Debug|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Release|x86.ActiveCfg = Release|Any CPU
-		{8ECBBC50-8820-4712-9F0A-288E77C3EA66}.Release|x86.Build.0 = Release|Any CPU
 		{DD800A48-6FC0-4E15-BDFE-3B2CAF6740FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DD800A48-6FC0-4E15-BDFE-3B2CAF6740FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD800A48-6FC0-4E15-BDFE-3B2CAF6740FE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -69,6 +57,18 @@ Global
 		{D7FF2143-A768-40CF-A713-9EAF9D936C33}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D7FF2143-A768-40CF-A713-9EAF9D936C33}.Release|x86.ActiveCfg = Release|Any CPU
 		{D7FF2143-A768-40CF-A713-9EAF9D936C33}.Release|x86.Build.0 = Release|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Debug|x86.Build.0 = Debug|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Release|x86.ActiveCfg = Release|Any CPU
+		{FFC6D62F-1600-4310-ACE8-1CD9BF0BE6C6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

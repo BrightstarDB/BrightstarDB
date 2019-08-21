@@ -8,17 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
-    <PackageReference Include="System.ComponentModel" Version="4.3.0" />
+    <Compile Include="..\..\SamplesConfiguration.cs" Link="SamplesConfiguration.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="BrightstarDB">
-      <HintPath>..\..\..\..\..\src\core\BrightstarDB\bin\Debug\netstandard2.0\BrightstarDB.dll</HintPath>
-    </Reference>
-    <Reference Include="BrightstarDB.CodeGeneration">
-      <HintPath>..\..\..\..\..\src\core\BrightstarDB.CodeGeneration\bin\Debug\netstandard2.0\BrightstarDB.CodeGeneration.dll</HintPath>
-    </Reference>
+    <PackageReference Include="BrightstarDB" Version="1.14.0-alpha0003" />
+    <PackageReference Include="BrightstarDB.CodeGeneration" Version="1.14.0-alpha0003" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+    <PackageReference Include="System.ComponentModel" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

@@ -12,7 +12,7 @@ namespace BrightstarDB.Samples.EntityFramework.GettingStartedCore
     class Program
     {
         private static void Main(string[] args)
-        { /*
+        { 
             // Initialise license and stores directory location
             SamplesConfiguration.Register();
 
@@ -51,7 +51,7 @@ namespace BrightstarDB.Samples.EntityFramework.GettingStartedCore
             ctx.SaveChanges();
 
             // open a new context
-            ctx = new MyEntityContext(connectionString);
+            ctx = new EntityContext(connectionString);
 
             // find an actor via LINQ
             ford = ctx.Actors.FirstOrDefault(a => a.Name.Equals("Harrison Ford"));
@@ -121,7 +121,7 @@ namespace BrightstarDB.Samples.EntityFramework.GettingStartedCore
             Console.WriteLine();
             Console.WriteLine("Finished. Press the Return key to exit.");
             Console.ReadLine();
-        */
+        
         }
 
     }
