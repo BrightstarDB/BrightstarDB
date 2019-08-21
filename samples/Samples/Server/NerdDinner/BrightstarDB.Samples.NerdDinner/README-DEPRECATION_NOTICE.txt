@@ -1,0 +1,1 @@
+﻿This project is deprecated and will be removed when a new ASP.NET Core equivalent has been tested.
