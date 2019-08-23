@@ -10,8 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BrightstarDB" Version="1.14.0-alpha0003" />
-    <PackageReference Include="BrightstarDB.CodeGeneration" Version="1.14.0-alpha0003" />
+    <PackageReference Include="BrightstarDBLibs" Version="1.14.0-alpha0003" />
   </ItemGroup>
 
 </Project>
