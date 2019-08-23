@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\SamplesConfiguration.cs" Link="SamplesConfiguration.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BrightstarDB" Version="1.14.0-alpha0003" />
+    <PackageReference Include="BrightstarDB.CodeGeneration" Version="1.14.0-alpha0003" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ISocialNetworkAccount.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>
