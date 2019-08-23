@@ -75,13 +75,13 @@ namespace BrightstarDB.Samples.StoreAdministration.CommitPointsCore
             const string addSet3 = "<http://example.org/people/carol> <http://www.w3.org/2000/01/rdf-schema#label> \"Carol\".";
 
             // Transaction 1: Add Alice
-            client.ExecuteTransaction(storeName, null, null, addSet1);
+            client.ExecuteTransaction(storeName, new UpdateTransactionData{InsertData = addSet1});
 
             // Transaction 2 : Add Bob
-            client.ExecuteTransaction(storeName, null, null, addSet2);
+            client.ExecuteTransaction(storeName, new UpdateTransactionData { InsertData = addSet2});
 
             // Transaction 3 : Add Carol
-            client.ExecuteTransaction(storeName, null, null, addSet3);
+            client.ExecuteTransaction(storeName, new UpdateTransactionData { InsertData = addSet3});
 
             return storeName;
         }
