@@ -49,7 +49,8 @@ namespace BrightstarDB.Samples.Rdf.GettingStartedCore
             Console.WriteLine("Inserting RDF triples into store.");
 
             // execute a transaction to insert the data into the store
-            client.ExecuteTransaction(storeName, null, null, data.ToString());
+            var txnData = new UpdateTransactionData {InsertData = data.ToString()};
+            client.ExecuteTransaction(storeName, txnData);
 
             // SPARQL query for all the categories connected to BrightstarDB
             var query =
@@ -82,7 +83,8 @@ namespace BrightstarDB.Samples.Rdf.GettingStartedCore
 
             Console.WriteLine("Executing SPARQL query for deletion against store.");
             Console.WriteLine(deletePatternsData);
-            client.ExecuteTransaction(storeName, null, deletePatternsData.ToString(), null);
+            txnData = new UpdateTransactionData {DeletePatterns = deletePatternsData.ToString()};
+            client.ExecuteTransaction(storeName, txnData);
 
             // SPARQL query for all the categories connected to BrightstarDB
             query =
@@ -106,7 +108,8 @@ namespace BrightstarDB.Samples.Rdf.GettingStartedCore
             Console.WriteLine("Inserting RDF triples into store.");
 
             // execute a transaction to insert the data into the store
-            client.ExecuteTransaction(storeName, null, null, literals.ToString());
+            txnData = new UpdateTransactionData {InsertData = literals.ToString()};
+            client.ExecuteTransaction(storeName, txnData);
 
             const string queryAll = "SELECT ?o ?p ?l WHERE { ?o ?p ?l }";
 
@@ -125,7 +128,7 @@ namespace BrightstarDB.Samples.Rdf.GettingStartedCore
                 Console.WriteLine("o= {0}\tp={1}\tl={2}", o, p, l);
             }
 
-            // Shutdown Brightstar processing threads
+            // Shutdown BrightstarDB processing threads
             BrightstarService.Shutdown();
 
             Console.WriteLine();
