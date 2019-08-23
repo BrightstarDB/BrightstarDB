@@ -9,19 +9,19 @@ namespace BrightstarDB.Samples.EntityFramework.FoafCore
         [Identifier("http://www.brightstardb.com/people/")]
         string Id { get; }
 
-        [PropertyType("foaf:nick")]
+        [PropertyType("http://xmlns.com/foaf/0.1/nick")]
         string Nickname { get; set; }
 
-        [PropertyType("foaf:name")]
+        [PropertyType("http://xmlns.com/foaf/0.1/name")]
         string Name { get; set; }
 
-        [PropertyType("foaf:Organization")]
+        [PropertyType("http://xmlns.com/foaf/0.1/Organization")]
         string Organisation { get; set; }
 
-        [PropertyType("foaf:knows")]
+        [PropertyType("http://xmlns.com/foaf/0.1/knows")]
         ICollection<IPerson> Knows { get; set; }
 
-        [InversePropertyType("foaf:knows")]
+        [InversePropertyType("http://xmlns.com/foaf/0.1/knows")]
         ICollection<IPerson> KnownBy { get; set; }
     }
 }
