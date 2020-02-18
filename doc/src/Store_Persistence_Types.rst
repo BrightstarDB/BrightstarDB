@@ -27,7 +27,7 @@ index file. This approach has a number of benefits:
 
 The down-side of this format is that the index file will grow not only as more data is added 
 but also with every update operation applied to the store. BrightstarDB does provide a way to 
-truncate a store to just its latest state, removing all the previous historical page states so 
+:ref:`consolidate the data in a store to just its latest state <Admin_Consolidate_Store>`, removing all the previous historical page states so 
 this operation executed periodically can help to keep the file size under control.
 
 In general the Append-Only format is recommended for most systems as long as disk space is not 

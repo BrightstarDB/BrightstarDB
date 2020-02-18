@@ -176,13 +176,19 @@ Reverting The Store
         ICommitPointInfo commitPointInfo = ... ; // Code to get the commit point we want to revert to
         client.RevertToCommitPoint(storeName, commitPointInfo); // Reverts the store
 
+.. _Admin_Consolidate_Store:
 
 Consolidating The Store
 =======================
 
     Over time the size of the BrightstarDB store will grow. Each separate commit adds new data to 
-    the store, even if the commit deletes triples from the store the commit itself will extend the 
-    store file. The ``ConsolidateStore()`` operation enables the BrightstarDB store to be compressed, 
+    the store, and even if the commit deletes triples from the store the commit itself will extend the 
+    store file leaving some unused space that gets larger over time. This is particularly true of the append-only 
+    store type as each new commit results in the modified index data pages being appended to the store,
+    but the re-writeable store will also suffer from this expansion as triples are added to and deleted from
+    the store.
+    
+    The ``ConsolidateStore()`` operation enables the BrightstarDB store to be compressed, 
     removing all commit point history. The operation rewrites the store data file to a shadow file 
     and then replaces the existing data file with the new compressed data file and updates the 
     master file. The consolidate operation blocks new writers, but allows readers to continue 
