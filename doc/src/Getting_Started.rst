@@ -57,14 +57,14 @@ Other sections of interest will probably be :ref:`SPARQL Endpoint
 
 
 BrightstarDB provides several layers of API that are aimed at specific 
-development activities or scenarios. There are three main API levels, Entity 
-Framework, Data Objects and RDF.
+development activities or scenarios. There are three main API levels: Entity 
+Framework, Data Objects, and RDF.
 
 **BrightstarDB Entity Framework & LINQ**
 
 The BrightstarDB Entity Framework is a powerful and simple to use technology 
 to quickly build a typed .NET domain model that can persist object state into 
-a BrightstarDB instance.To use this you create a set of .NET interfaces that 
+a BrightstarDB instance. To use this you create a set of .NET interfaces that 
 define the data model. The BrightstarDB tooling takes these definitions and 
 creates concrete implementing classes. These classes can then be used in an 
 application. The flexibility of the underlying storage makes evolving the 
@@ -89,7 +89,7 @@ documentation and examples of this APIs.
 
 **RDF & SPARQL**
 
-To work programmatically with RDF, SPARQL, and SPARQL see update the 
+To work programmatically with RDF, SPARQL query, and SPARQL update, see the 
 :ref:`RDF Client API <RDF_Client_API>` and :ref:`SPARQL Endpoint 
 <SPARQL_Endpoint>` sections. 
 
