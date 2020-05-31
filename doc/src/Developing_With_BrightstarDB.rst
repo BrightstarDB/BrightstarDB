@@ -27,5 +27,5 @@ and take a walk through our :ref:`Developer Quick Start <Developer_Quick_Start>`
 you are already comfortable with RDF and SPARQL you may wish to start with the lower level APIs.
 
 If you are the kind of person that just likes to dive straight into sample code, please take a 
-moment to read about Running the BrightstarDB Samples first.
+moment to read about :ref:`Running the BrightstarDB Samples <Running_The_Samples>` first.
 
