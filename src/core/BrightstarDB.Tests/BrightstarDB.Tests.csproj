@@ -3,8 +3,6 @@
     <TargetFrameworks>netcoreapp1.0;net451;netcoreapp2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\key\brightstardb.snk</AssemblyOriginatorKeyFile>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
@@ -23,7 +21,6 @@
     <None Update="appSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Compile Include="**\*.cs" Exclude="Sparql11TestSuite\**\*.cs" />
   </ItemGroup>
   
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp1.0'">
