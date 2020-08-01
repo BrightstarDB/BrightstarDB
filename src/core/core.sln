@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.CodeGeneration
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.Tests", "BrightstarDB.Tests\BrightstarDB.Tests.csproj", "{FA912AC7-79B6-4D29-91E3-D5D1E215E193}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.Core", "BrightstarDB.Core\BrightstarDB.Core.csproj", "{978A120A-5C4F-4EEE-A56D-82774B761910}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,6 +120,18 @@ Global
 		{FA912AC7-79B6-4D29-91E3-D5D1E215E193}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{FA912AC7-79B6-4D29-91E3-D5D1E215E193}.Release|x86.ActiveCfg = Release|Any CPU
 		{FA912AC7-79B6-4D29-91E3-D5D1E215E193}.Release|x86.Build.0 = Release|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Debug|x86.Build.0 = Debug|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Release|Any CPU.Build.0 = Release|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Release|x86.ActiveCfg = Release|Any CPU
+		{978A120A-5C4F-4EEE-A56D-82774B761910}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

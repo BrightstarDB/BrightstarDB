@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BrightstarDB\BrightstarDB.csproj" />
+    <ProjectReference Include="..\BrightstarDB.Core\BrightstarDB.Core.csproj" />
     <ProjectReference Include="..\BrightstarDB.CodeGeneration\BrightstarDB.CodeGeneration.csproj" />
     <EmbeddedResource Include="GeneratorTestsResources\*.txt" />
   </ItemGroup>

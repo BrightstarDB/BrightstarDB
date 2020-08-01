@@ -85,7 +85,7 @@
     </Target>
 
     <Target Name="PackBrightstarDBLibs">
-        <Exec Command="dotnet pack src\core\BrightstarDB\BrightstarDB.csproj -c:$(Configuration) -p:PackageVersion=1.14.0" />
+        <Exec Command="dotnet pack src\core\BrightstarDB.Core\BrightstarDB.Core.csproj -c:$(Configuration) -p:PackageVersion=1.14.0" />
     </Target>
     
     <Target Name="PackBrightstarDBCodegen">
@@ -95,7 +95,6 @@
     </Target>
     
     <Target Name="PackBrightstarDBBundle">
-        <Exec Command="installer\nuget\nuget update -self" />
-        <Exec Command="installer\nuget\nuget pack installer\nuget\BrightstarDB.nuspec -OutputDirectory build\nugets -Properties version=1.14.0"/>
+        <Exec Command="dotnet pack src\core\BrightstarDB\BrightstarDB.csproj -c:$(Configuration) -p:PackageVersion=1.14.0" />
     </Target>
 </Project>

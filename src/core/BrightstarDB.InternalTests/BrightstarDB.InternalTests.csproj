@@ -13,7 +13,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BrightstarDB\BrightstarDB.csproj" />
+    <ProjectReference Include="..\BrightstarDB.Core\BrightstarDB.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="App.config">
