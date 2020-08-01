@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26124.0
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.CodeGen", "BrightstarDB.CodeGen\BrightstarDB.CodeGen.csproj", "{1D24E78C-1E53-46EC-8150-37CE56735461}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.CodeGen.Attributes", "BrightstarDB.CodeGen.Attributes\BrightstarDB.CodeGen.Attributes.csproj", "{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.CodeGen.Generators", "BrightstarDB.CodeGen.Generators\BrightstarDB.CodeGen.Generators.csproj", "{FB96AF4E-4F01-4445-924F-2535774F696D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Debug|x64.Build.0 = Debug|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Debug|x86.Build.0 = Debug|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Release|x64.ActiveCfg = Release|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Release|x64.Build.0 = Release|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Release|x86.ActiveCfg = Release|Any CPU
+		{1D24E78C-1E53-46EC-8150-37CE56735461}.Release|x86.Build.0 = Release|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Debug|x64.Build.0 = Debug|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Debug|x86.Build.0 = Debug|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Release|x64.ActiveCfg = Release|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Release|x64.Build.0 = Release|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Release|x86.ActiveCfg = Release|Any CPU
+		{8B57AE72-BDA4-463C-8CBE-1EEBD6F94D82}.Release|x86.Build.0 = Release|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Debug|x64.Build.0 = Debug|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Debug|x86.Build.0 = Debug|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Release|x64.ActiveCfg = Release|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Release|x64.Build.0 = Release|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Release|x86.ActiveCfg = Release|Any CPU
+		{FB96AF4E-4F01-4445-924F-2535774F696D}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CodeGeneration.Roslyn.Tool" Version="0.7.63" PrivateAssets="all" />
+    <PackageReference Include="CodeGeneration.Roslyn.Attributes" Version="0.7.63"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BrightstarDB.CodeGen.Generators\BrightstarDB.CodeGen.Generators.csproj"  OutputItemType="CodeGenerationRoslynPlugin"/>
+    <ProjectReference Include="..\BrightstarDB\BrightstarDB.csproj" />
+  </ItemGroup>
+
+</Project>

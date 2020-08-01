@@ -1,6 +1,7 @@
 <Project ToolsVersion="15.0"  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <PackageVersion Condition=" '$(PackageVersion)' == '' ">1.14.0</PackageVersion>
     </PropertyGroup>
     
     <!-- Main Build Targets -->
@@ -11,6 +12,10 @@
     </Target>
     
     <Target Name="NuGet" DependsOnTargets="PackBrightstarDBLibs;PackBrightstarDBCodegen;PackBrightstarDBBundle">
+        <ItemGroup>
+            <TestNugets Include="src\core\**\*.nupkg;build\nugets\*.nupkg" />
+        </ItemGroup>
+        <Copy SourceFiles="@(TestNugets)" DestinationFolder="d:\projects\NugetPackages" />
     </Target>
 
     <Target Name="BuildCore" DependsOnTargets="CompileCore">
@@ -85,17 +90,19 @@
     </Target>
 
     <Target Name="PackBrightstarDBLibs">
-        <Exec Command="dotnet pack src\core\BrightstarDB\BrightstarDB.csproj -c:$(Configuration) -p:PackageVersion=1.14.0" />
+        <Exec Command="dotnet pack src\core\BrightstarDB\BrightstarDB.csproj -c:$(Configuration) -p:PackageVersion=$(PackageVersion)" />
     </Target>
     
     <Target Name="PackBrightstarDBCodegen">
-        <Exec Command="dotnet pack src\core\BrightstarDB.CodeGeneration\BrightstarDB.CodeGeneration.csproj -c:$(Configuration) -p:PackageVersion=1.14.0"/>
-        <Exec Command="dotnet pack src\core\BrightstarDB.CodeGeneration.Console\BrightstarDB.CodeGeneration.Console.csproj -c:$(Configuration) -p:PackageVersion=1.14.0"/>
-        <Exec Command="dotnet pack src\core\BrightstarDB.CodeGeneration.T4\BrightstarDB.CodeGeneration.T4.csproj -c:$(Configuration) -p:PackageVersion=1.14.0"/>
+        <Exec Command="dotnet pack src\core\BrightstarDB.CodeGeneration\BrightstarDB.CodeGeneration.csproj -c:$(Configuration) -p:PackageVersion=$(PackageVersion)"/>
+        <Exec Command="dotnet pack src\core\BrightstarDB.CodeGeneration.Console\BrightstarDB.CodeGeneration.Console.csproj -c:$(Configuration) -p:PackageVersion=$(PackageVersion)"/>
+        <Exec Command="dotnet pack src\core\BrightstarDB.CodeGeneration.T4\BrightstarDB.CodeGeneration.T4.csproj -c:$(Configuration) -p:PackageVersion=$(PackageVersion)"/>
+        <Exec Command="dotnet pack src\core\BrightstarDB.CodeGen\BrightstarDB.CodeGen.csproj -c:$(Configuration) -p:PackageVersion=$(PackageVersion)"/>
+        <Exec Command="dotnet pack src\core\BrightstarDB.CodeGen.Generators\BrightstarDB.CodeGen.Generators.csproj -c:$(Configuration) -p:PackageVersion=$(PackageVersion)"/>
     </Target>
     
     <Target Name="PackBrightstarDBBundle">
         <Exec Command="installer\nuget\nuget update -self" />
-        <Exec Command="installer\nuget\nuget pack installer\nuget\BrightstarDB.nuspec -OutputDirectory build\nugets -Properties version=1.14.0"/>
+        <Exec Command="installer\nuget\nuget pack installer\nuget\BrightstarDB.nuspec -OutputDirectory build\nugets -Properties version=$(PackageVersion)"/>
     </Target>
 </Project>

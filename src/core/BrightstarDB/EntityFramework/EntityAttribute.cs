@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using CodeGeneration.Roslyn;
 
 namespace BrightstarDB.EntityFramework
 {
@@ -9,6 +11,8 @@ namespace BrightstarDB.EntityFramework
     /// the base URI specified by the <see cref="TypeIdentifierPrefixAttribute"/> on the assembly.
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface|AttributeTargets.Class, AllowMultiple=false)]
+    [CodeGenerationAttribute("BrightstarDB.CodeGen.Generators.EntityClassGenerator, BrightstarDB.CodeGen.Generators")]
+    [Conditional("CodeGeneration")]
     public sealed class EntityAttribute : RelativeOrAbsoluteIdentifierAttribute
     {
         /// <summary>
@@ -23,5 +27,7 @@ namespace BrightstarDB.EntityFramework
         public EntityAttribute(string entityTypeIdentifier = null) : base(entityTypeIdentifier)
         {
         }
+
+        public bool LaunchDebuggerDuringBuild { get; set; }
     }
 }
