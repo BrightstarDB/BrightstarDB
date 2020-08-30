@@ -147,11 +147,17 @@ namespace BrightstarDB.Server
                                 var st = DateTime.UtcNow;
                                 job.Run();
                                 var et = DateTime.UtcNow;
-#if NETSTANDARD16
-                                Logging.LogInfo("Job completed in {0}", et.Subtract(st).TotalMilliseconds);
-#else
-                                Logging.LogInfo("Job completed in {0} : Current memory usage : {1}", et.Subtract(st).TotalMilliseconds, System.Diagnostics.Process.GetCurrentProcess().WorkingSet64);
-#endif
+
+                                long workingSet = GetProcessWorkingSet();
+                                if (workingSet <= 0)
+                                {
+                                    Logging.LogInfo("Job completed in {0}", et.Subtract(st).TotalMilliseconds);
+                                }
+                                else
+                                {
+                                    Logging.LogInfo("Job completed in {0} : Current memory usage : {1}", et.Subtract(st).TotalMilliseconds, workingSet);
+                                }
+
                                 jobExecutionStatus.Information = "Job Completed";
                                 jobExecutionStatus.Ended = DateTime.UtcNow;
                                 jobExecutionStatus.JobStatus = JobStatus.CompletedOk;
@@ -200,6 +206,25 @@ namespace BrightstarDB.Server
                 }
             }
         }
+
+#if NETSTANDARD16
+        private static long GetProcessWorkingSet() => -1;
+#else
+        private static long? WorkingSetOverride;
+        private static long GetProcessWorkingSet() => WorkingSetOverride ?? GetProcessWorkingSetCore();
+        private static long GetProcessWorkingSetCore()
+        {
+            try
+            {
+                return System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
+            }
+            catch (PlatformNotSupportedException)
+            {
+                WorkingSetOverride = -1;
+                return -1;
+            }
+        }
+#endif
 
         private static ExceptionDetailObject GetExceptionDetail(Exception ex)
         {
