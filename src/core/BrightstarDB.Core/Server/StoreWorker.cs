@@ -24,14 +24,14 @@ namespace BrightstarDB.Server
     ///<summary>
     /// Called by the store worker after the thread has been successfully terminated.
     ///</summary>
-    internal delegate void ShutdownContinuation(); 
+    internal delegate void ShutdownContinuation();
 
     /// <summary>
     /// This can be considered a logical store. A logical store is comprised of 2 physical stores. A read store and a write store.
-    /// Read requests coming in to the store worker are dispatched to the readStore. The readStore pulls data in from the disk as required, until 
+    /// Read requests coming in to the store worker are dispatched to the readStore. The readStore pulls data in from the disk as required, until
     /// it reaches some predefined levels at which point the cache is flushed.
     /// Update transactions coming to the logical store are put in a queue. The logical store has a worker thread that processes each transaction
-    /// one at time. All updates are made against the writeStore. When a transaction completes the read store instance is invalidated so that the 
+    /// one at time. All updates are made against the writeStore. When a transaction completes the read store instance is invalidated so that the
     /// next read request to arrive forces the data to be re-read from disk.
     /// </summary>
     internal class StoreWorker
@@ -78,9 +78,9 @@ namespace BrightstarDB.Server
         private ShutdownContinuation _shutdownContinuation;
 
         private List<WeakReference> _invalidatedReadStores;
- 
+
         /// <summary>
-        /// Creates a new server core 
+        /// Creates a new server core
         /// </summary>
         /// <param name="baseLocation">Path to the stores directory</param>
         /// <param name="storeName">Name of store</param>
@@ -106,7 +106,6 @@ namespace BrightstarDB.Server
         /// </summary>
         public void Start()
         {
-            
             ThreadPool.QueueUserWorkItem(ProcessJobs);
         }
 
@@ -139,7 +138,6 @@ namespace BrightstarDB.Server
                         JobExecutionStatus jobExecutionStatus;
                         if (_jobExecutionStatus.TryGetValue(job.JobId.ToString(), out jobExecutionStatus))
                         {
-
                             try
                             {
                                 jobExecutionStatus.Information = "Job Started";
@@ -149,11 +147,17 @@ namespace BrightstarDB.Server
                                 var st = DateTime.UtcNow;
                                 job.Run();
                                 var et = DateTime.UtcNow;
-#if NETSTANDARD16
-                                Logging.LogInfo("Job completed in {0}", et.Subtract(st).TotalMilliseconds);
-#else
-                                Logging.LogInfo("Job completed in {0} : Current memory usage : {1}",et.Subtract(st).TotalMilliseconds, System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 );
-#endif
+
+                                long workingSet = GetProcessWorkingSet();
+                                if (workingSet <= 0)
+                                {
+                                    Logging.LogInfo("Job completed in {0}", et.Subtract(st).TotalMilliseconds);
+                                }
+                                else
+                                {
+                                    Logging.LogInfo("Job completed in {0} : Current memory usage : {1}", et.Subtract(st).TotalMilliseconds, workingSet);
+                                }
+
                                 jobExecutionStatus.Information = "Job Completed";
                                 jobExecutionStatus.Ended = DateTime.UtcNow;
                                 jobExecutionStatus.JobStatus = JobStatus.CompletedOk;
@@ -172,7 +176,7 @@ namespace BrightstarDB.Server
                             }
                             finally
                             {
-                                if (JobCompleted!= null)
+                                if (JobCompleted != null)
                                 {
                                     JobCompleted(this, new JobCompletedEventArgs(_storeName, job));
                                 }
@@ -202,6 +206,25 @@ namespace BrightstarDB.Server
                 }
             }
         }
+
+#if NETSTANDARD16
+        private static long GetProcessWorkingSet() => -1;
+#else
+        private static long? WorkingSetOverride;
+        private static long GetProcessWorkingSet() => WorkingSetOverride ?? GetProcessWorkingSetCore();
+        private static long GetProcessWorkingSetCore()
+        {
+            try
+            {
+                return System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
+            }
+            catch (PlatformNotSupportedException)
+            {
+                WorkingSetOverride = -1;
+                return -1;
+            }
+        }
+#endif
 
         private static ExceptionDetailObject GetExceptionDetail(Exception ex)
         {
@@ -239,7 +262,7 @@ namespace BrightstarDB.Server
 
         internal void InvalidateReadStore()
         {
-            lock(_readStoreLock)
+            lock (_readStoreLock)
             {
                 // KA: Don't close the read store at this point
                 // as export jobs or queries may still be using it
@@ -289,7 +312,7 @@ namespace BrightstarDB.Server
             }
         }
 
-        public BrightstarSparqlResultsType Query(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, string[] defaultGraphUris )
+        public BrightstarSparqlResultsType Query(SparqlQuery query, ISerializationFormat targetFormat, Stream resultsStream, string[] defaultGraphUris)
         {
             Logging.LogDebug("Query {0}", query);
             try
@@ -342,7 +365,7 @@ namespace BrightstarDB.Server
         /// <param name="format"></param>
         /// <param name="jobLabel"></param>
         /// <returns></returns>
-        public Guid ProcessTransaction(string preconditions, string notExistsPreconditions, string deletePatterns, string insertData, string defaultGraphUri, string format, string jobLabel= null)
+        public Guid ProcessTransaction(string preconditions, string notExistsPreconditions, string deletePatterns, string insertData, string defaultGraphUri, string format, string jobLabel = null)
         {
             Logging.LogDebug("ProcessTransaction");
             var jobId = Guid.NewGuid();
@@ -490,7 +513,7 @@ namespace BrightstarDB.Server
             WriteStore.Consolidate(jobId);
             ReleaseResources();
             _writeStore = null;
-            _readStore = null;    
+            _readStore = null;
         }
 
         private void InitializeStatsMonitor()
@@ -518,7 +541,7 @@ namespace BrightstarDB.Server
 #if PORTABLE || WINDOWS_PHONE
             var pagesToPreload = (int)Math.Floor(PageCache.Instance.FreePages * (float)pageCacheRatio);
 #else
-            var pagesToPreload = (int)Math.Floor(PageCache.Instance.FreePages*pageCacheRatio);
+            var pagesToPreload = (int)Math.Floor(PageCache.Instance.FreePages * pageCacheRatio);
 #endif
             ReadStore.WarmupPageCache(pagesToPreload);
         }
