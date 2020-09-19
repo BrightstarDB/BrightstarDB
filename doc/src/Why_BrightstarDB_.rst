@@ -43,7 +43,7 @@ networks, or any graph like data structure.
 
 The associative model used in BrightstarDB means data can be inserted into a 
 BrightstarDB database without the need to define a traditional database 
-schema. This further enhances flexibility and supports solution evolution 
+schema. This further enhances flexibility and supports solution evolution, 
 which is a critical feature of modern software solutions. 
 
 While the schema-less data store enables data of any shape to be imported and 
@@ -114,8 +114,8 @@ the same semantic data model.
 **********************************
 
 If you are working on .NET and want the power and flexibility of a semantic 
-web data store. Then BrightstarDB is a great place to start. With support for 
-the SPARQL query language and also the NTriples data format building semantic 
+web data store then BrightstarDB is a great place to start. With support for 
+the SPARQL query language and also the NTriples data format, building semantic 
 web based applications is simple and fun with BrightstarDB.
 
 
@@ -125,12 +125,12 @@ web based applications is simple and fun with BrightstarDB.
 ****************************************************
 
 Objects are composed of properties, each property is either a literal value 
-or a reference to another object. This creates a graph or related things with 
+or a reference to another object. This creates a graph of related things with 
 properties. ORM systems require that tables are organised in specific ways 
 to facilitate storing object state. Changes to either the object model or the 
 relational schema often require a reciprocal change. RDF on the other hand 
-can ideally be used to store both literal properties and object relationships 
-and if the object model needs to change then new property value can be added 
+can ideally be used to store both literal properties and object relationships; 
+if the object model needs to change then new property values can be added, 
 as there is no fixed schema. Similarly, if additional RDF data is added to 
 the store the object model can either ignore or make use of this data. In 
 this way the object model is an operational, read/write, view of the RDF data.

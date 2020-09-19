@@ -37,7 +37,7 @@ The following diagram provides an overview of the BrightstarDB architecture.
  Data Model
 ***********
 
-BrightstarDB supports the `W3C RDF`_ and SPARQL 1.1 `Query`_ and `Update`_. 
+BrightstarDB supports the `W3C RDF`_ and SPARQL 1.1 `Query`_ and `Update`_ 
 standards, the data model stored is triples with a graph context (often this 
 is called a quad store). The triple data structure is very powerful, 
 especially for creating associative data models, merging data from many 
@@ -82,12 +82,12 @@ There are three different code layers with which to access BrightstarDB. The
 first of these is the :ref:`RDF Client API <RDF_Client_API>`. This is a low 
 level API that allows developers to insert and delete triples, and run SPARQL 
 queries. The second API layer is the :ref:`Data Object Layer 
-<Data_Object_Layer>`. This provides the ability to  treat a collection of 
+<Data_Object_Layer>`. This provides the ability to treat a collection of 
 triples with the same subject as a single unit and also provides support for 
 RDF list structures and optimistic locking. The highest API layer is the 
 :ref:`BrightstarDB Entity Framework <Entity_Framework>`. BrightstarDB enables 
 data-binding from items at the Data Object Layer to full .NET objects 
-described by a programmer-defined interface. As well as storing object state 
+described by a programmer-defined interface. As well as storing object state, 
 BrightstarDB also allows developers to use LINQ expressions to query the data 
 they have created.
 
