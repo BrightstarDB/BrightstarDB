@@ -28,9 +28,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.Tests", "Brigh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.Core", "BrightstarDB.Core\BrightstarDB.Core.csproj", "{978A120A-5C4F-4EEE-A56D-82774B761910}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.Modules", "BrightstarDB.Server.Modules\BrightstarDB.Server.Modules.csproj", "{A6A05324-BA02-4C82-9199-AD19BC442C60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.Server.Modules", "BrightstarDB.Server.Modules\BrightstarDB.Server.Modules.csproj", "{A6A05324-BA02-4C82-9199-AD19BC442C60}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrightstarDB.Server.Modules.Tests", "BrightstarDB.Server.Modules.Tests\BrightstarDB.Server.Modules.Tests.csproj", "{6FA455B2-1278-45E4-B96D-C16C88B636C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrightstarDB.Server.Runner", "BrightstarDB.Server.Runner\BrightstarDB.Server.Runner.csproj", "{3911AEEA-5B8D-4129-9916-3A827E649CB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -160,6 +162,18 @@ Global
 		{6FA455B2-1278-45E4-B96D-C16C88B636C2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6FA455B2-1278-45E4-B96D-C16C88B636C2}.Release|x86.ActiveCfg = Release|Any CPU
 		{6FA455B2-1278-45E4-B96D-C16C88B636C2}.Release|x86.Build.0 = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Debug|x86.Build.0 = Debug|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Release|x86.ActiveCfg = Release|Any CPU
+		{3911AEEA-5B8D-4129-9916-3A827E649CB0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
