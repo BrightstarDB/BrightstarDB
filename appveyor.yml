@@ -10,7 +10,7 @@ before_build:
 build_script: |
   gitversion /l console /output buildserver /updateassemblyinfo
   dotnet build -c Release src/core/core.sln
-  dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB 
+  dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB.Core 
   dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB.CodeGeneration
   dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB.CodeGeneration.Console
   dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets src\core\BrightstarDB\BrightstarDB.csproj -p:NuspecFile=..\..\..\installer\nuget\BrightstarDB.nuspec -p:NuspecBasePath=. -p:NuspecProperties="version=%GitVersion_NugetVersion%" --no-build
