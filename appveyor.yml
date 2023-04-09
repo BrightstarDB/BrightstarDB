@@ -10,11 +10,10 @@ before_build:
 build_script: |
   gitversion /l console /output buildserver /updateassemblyinfo
   dotnet build -c Release src/core/core.sln
-  dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB 
+  dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB.Core 
   dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB.CodeGeneration
   dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets -p:PackageVersion=%GitVersion_NugetVersion% src\core\BrightstarDB.CodeGeneration.Console
-  installer\nuget\nuget.exe update -self
-  installer\nuget\nuget.exe pack installer\nuget\BrightstarDB.nuspec -OutputDirectory %APPVEYOR_BUILD_FOLDER%\nugets -Properties version=%GitVersion_NugetVersion%
+  dotnet pack -c Release -o %APPVEYOR_BUILD_FOLDER%\nugets src\core\BrightstarDB\BrightstarDB.csproj -p:NuspecFile=..\..\..\installer\nuget\BrightstarDB.nuspec -p:NuspecBasePath=. -p:NuspecProperties="version=%GitVersion_NugetVersion%" --no-build
 
 before_test:
     - ps: |
@@ -30,12 +29,16 @@ before_test:
         pushd .\src\core\BrightstarDB.Tests
         nuget install Appveyor.TestLogger
         popd
+        pushd .\src\core\BrightstarDB.Server.Modules.Tests
+        nuget install Appveyor.TestLogger
+        popd
 
 test_script:
     - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.InternalTests\BrightstarDB.InternalTests.csproj
-    - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.CodeGeneration.Tests\BrightstarDB.CodeGeneration.Tests.csproj
-    - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.EntityFramework.Tests\BrightstarDB.EntityFramework.Tests.csproj
     - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.Tests\BrightstarDB.Tests.csproj
+    - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.Server.Modules.Tests\BrightstarDB.Server.Modules.Tests.csproj
+    - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.EntityFramework.Tests\BrightstarDB.EntityFramework.Tests.csproj
+    - dotnet test -c Release --test-adapter-path:. --logger:Appveyor src\core\BrightstarDB.CodeGeneration.Tests\BrightstarDB.CodeGeneration.Tests.csproj
 
 deploy:
   - provider: GitHub
