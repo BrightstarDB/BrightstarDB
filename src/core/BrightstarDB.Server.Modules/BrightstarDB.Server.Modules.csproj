@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net461</TargetFramework>
+        <TargetFramework>net462</TargetFramework>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <RootNamespace>BrightstarDB.Server.Modules</RootNamespace>
         <AssemblyName>BrightstarDB.Server.Modules</AssemblyName>
@@ -28,7 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
     <None Include="web.config" />
   </ItemGroup>
 

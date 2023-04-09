@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.6;net451;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\..\key\brightstardb.snk</AssemblyOriginatorKeyFile>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -19,7 +19,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="dotNetRDF" Version="2.2.0" />
+    <PackageReference Include="dotNetRDF" Version="2.7.5" />
     <PackageReference Include="Remotion.Linq" Version="2.2.0" />
     <PackageReference Include="Serilog" Version="2.*" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.*" />
@@ -46,10 +46,10 @@
   
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <Compile Include="**\*.cs" Exclude="obj\**\*.cs;OData\*.cs" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.*" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.*" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="2.*" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.*" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
